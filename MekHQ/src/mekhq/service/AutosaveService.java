@@ -107,7 +107,7 @@ public class AutosaveService implements IAutosaveService {
                       GZIPOutputStream gos = new GZIPOutputStream(fos);
                       OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
                       PrintWriter writer = new PrintWriter(osw)) {
-                    campaign.writeToXML(writer);
+                    campaign.writeToXML(writer, false);
                     writer.flush();
                 }
             } else {

@@ -36,6 +36,7 @@ import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
 import static megamek.common.equipment.MiscType.createCLImprovedSensors;
 import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
@@ -335,7 +336,7 @@ public class CapturePrisoners {
             if (capturingFaction != null && capturingFaction.isClan()) {
                 if (isMekHQCaptureStyle && (bondsmanRoll + d6(1) == 2)) {
                     if (isNPC) {
-                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                        campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                               "bondsref.report",
                               prisoner.getFullName(),
                               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -357,7 +358,7 @@ public class CapturePrisoners {
             } else if (capturingFaction != null && capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
                 if (bondsmanRoll == 1) {
                     if (isNPC) {
-                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                        campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                               "bondsref.report",
                               prisoner.getFullName(),
                               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -376,7 +377,7 @@ public class CapturePrisoners {
             if (Objects.equals(prisoner.getOriginFaction().getShortName(), "DC")) {
                 if (d6(2) == 2) {
                     if (isNPC) {
-                        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                        campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                               "seppuku.report",
                               prisoner.getFullName(),
                               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -539,11 +540,13 @@ public class CapturePrisoners {
         campaign.recruitPerson(prisoner, prisonerStatus, false, true, true);
 
         if (prisonerStatus.isPrisonerDefector()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report", prisoner.getHyperlinkedName()));
+            campaign.addReport(PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "defection.report", prisoner.getHyperlinkedName()));
         }
 
         if (prisonerStatus.isBecomingBondsman()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsman.report", prisoner.getHyperlinkedName()));
+            campaign.addReport(PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "bondsman.report", prisoner.getHyperlinkedName()));
         }
     }
 

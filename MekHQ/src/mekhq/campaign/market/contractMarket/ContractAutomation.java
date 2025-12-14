@@ -33,6 +33,8 @@
 package mekhq.campaign.market.contractMarket;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -56,6 +58,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
@@ -138,6 +141,10 @@ public class ContractAutomation {
               false);
 
         if (transitDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
+            if (!JumpBlockers.areAllUnitsJumpCapable(campaign)) {
+                return;
+            }
+
             campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
@@ -150,12 +157,12 @@ public class ContractAutomation {
                   campaign.getCurrentSystem());
 
             if (jumpReport.isBlank()) {
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
                       "transitDescription.report",
                       targetSystem,
                       travelDays));
             } else {
-                campaign.addReport(jumpReport);
+                campaign.addReport(GENERAL, jumpReport);
             }
         }
     }
@@ -199,7 +206,7 @@ public class ContractAutomation {
                     mothballUnitAction.execute(campaign, unit);
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 } else {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                           "mothballingFailed.text",
                           unit.getHyperlinkedName()));
                 }
@@ -224,7 +231,8 @@ public class ContractAutomation {
             Unit unit = campaign.getUnit(unitId);
 
             if (unit == null) {
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.uuid", unitId.toString()));
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.uuid",
+                      unitId.toString()));
                 continue;
             }
 
@@ -233,7 +241,7 @@ public class ContractAutomation {
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
 
                 if (unit.isMothballed()) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.text"),
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.text"),
                           unit.getHyperlinkedName());
                 }
             }

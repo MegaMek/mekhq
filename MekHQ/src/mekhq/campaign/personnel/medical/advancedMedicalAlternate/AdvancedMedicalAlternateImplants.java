@@ -39,6 +39,8 @@ import static megamek.common.options.OptionsConstants.MD_DERMAL_CAMO_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_VDNI;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.medical.BodyLocation.BRAIN;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR;
@@ -154,7 +156,7 @@ public class AdvancedMedicalAlternateImplants {
      *   report.</li>
      * </ol>
      *
-     * @param campaign the current {@link Campaign}, used for game year, logging and other campaign context
+     * @param campaign the current {@link Campaign}, used for game year, logging, and other campaign context
      * @param person   the {@link Person} to evaluate; must not be {@code null}
      */
     public static void performEnhancedImagingDegradationCheck(Campaign campaign, Person person) {
@@ -198,24 +200,24 @@ public class AdvancedMedicalAlternateImplants {
                                (isTooManyProsthetics ? "prosthetics" : "implant") +
                                ".fatigue";
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                   key,
                   spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG,
                   person.getHyperlinkedFullTitle()));
         }
 
-            int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
-            AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"),
-                  person,
-                  SkillAttribute.BODY,
-                  SkillAttribute.WILLPOWER,
-                  new ArrayList<>(),
-                  resistanceModifier,
-                  true,
-                  false);
-            campaign.addReport(attributeCheckUtility.getResultsText());
+        int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
+        AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(
+              getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"),
+              person,
+              SkillAttribute.BODY,
+              SkillAttribute.WILLPOWER,
+              new ArrayList<>(),
+              resistanceModifier,
+              true,
+              false);
+        campaign.addReport(SKILL_CHECKS, attributeCheckUtility.getResultsText());
 
         if (!attributeCheckUtility.isSuccess() && useAbilities) {
             String flaw = getAndApplyEIDegradationFlaw(person);
@@ -224,7 +226,7 @@ public class AdvancedMedicalAlternateImplants {
                                    (isTooManyProsthetics ? "prosthetics" : "implant") +
                                    ".degradation";
 
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                       key,
                       spanOpeningWithCustomColor(getNegativeColor()),
                       CLOSING_SPAN_TAG,
@@ -269,7 +271,7 @@ public class AdvancedMedicalAlternateImplants {
             }
         }
 
-        return eligibleProstheticsCount >= prostheticThreshold;
+        return eligibleProstheticsCount == prostheticThreshold;
     }
 
     /**

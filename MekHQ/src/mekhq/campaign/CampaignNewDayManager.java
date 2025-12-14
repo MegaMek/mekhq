@@ -37,6 +37,14 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
@@ -52,6 +60,7 @@ import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCo
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.SECONDARY_POWER_SUPPLY;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
@@ -94,6 +103,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
@@ -140,6 +150,7 @@ import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -150,7 +161,6 @@ import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RiotScenario;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
@@ -165,6 +175,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
+import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
@@ -212,6 +223,13 @@ public class CampaignNewDayManager {
      * @return <code>true</code> if the new day arrived
      */
     public boolean newDay() {
+        // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
+        // posted prior to this point).
+        CommandCenterTab commandCenter = campaign.getApp().getCampaigngui().getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
+
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
@@ -264,6 +282,10 @@ public class CampaignNewDayManager {
         campaign.setBattleReportHTML("");
         campaign.getNewBattleReports().clear();
 
+        campaign.getPoliticsReport().clear();
+        campaign.setPoliticsReportHTML("");
+        campaign.getNewPoliticsReports().clear();
+
         campaign.getPersonnelReport().clear();
         campaign.setPersonnelReportHTML("");
         campaign.getNewPersonnelReports().clear();
@@ -271,6 +293,10 @@ public class CampaignNewDayManager {
         campaign.getMedicalReport().clear();
         campaign.setMedicalReportHTML("");
         campaign.getNewMedicalReports().clear();
+
+        campaign.getFinancesReport().clear();
+        campaign.setFinancesReportHTML("");
+        campaign.getNewFinancesReports().clear();
 
         campaign.getAcquisitionsReport().clear();
         campaign.setAcquisitionsReportHTML("");
@@ -297,7 +323,7 @@ public class CampaignNewDayManager {
                   campaign.getFactionStandings().processRegardDegradation(faction.getShortName(),
                         today.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
-                campaign.addReport(report);
+                campaign.addReport(GENERAL, report);
             }
         }
 
@@ -342,9 +368,7 @@ public class CampaignNewDayManager {
             processNewDayATB();
         }
 
-        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            processReputationChanges();
-        }
+        processReputationChanges();
 
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
@@ -391,7 +415,7 @@ public class CampaignNewDayManager {
         // campaign duplicates any turnover information so that it is still available on the
         // new day. otherwise, it's only available if the user inspects history records
         for (String entry : campaign.getTurnoverRetirementInformation()) {
-            campaign.addReport(entry);
+            campaign.addReport(PERSONNEL, entry);
         }
 
         if (campaign.getTopUpWeekly() && isMonday) {
@@ -400,7 +424,7 @@ public class CampaignNewDayManager {
                   false,
                   campaign.getIgnoreSparesUnderQuality());
             int bought = partsInUseManager.stockUpPartsInUse(actualPartsInUse);
-            campaign.addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
+            campaign.addReport(ACQUISITIONS, String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 
         // Random Events
@@ -609,7 +633,7 @@ public class CampaignNewDayManager {
                 // campaign shouldn't be necessary, but a safety net never hurt
                 if (today.isAfter(person.getBecomingBondsmanEndDate().minusDays(1))) {
                     person.setPrisonerStatus(campaign, BONDSMAN, true);
-                    campaign.addReport(String.format(resources.getString("becomeBondsman.text"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("becomeBondsman.text"),
                           person.getHyperlinkedName(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           CLOSING_SPAN_TAG));
@@ -664,7 +688,7 @@ public class CampaignNewDayManager {
                           !person.isHasPerformedExtremeExpenditure()) {
                     String reportString = performDiscretionarySpending(person, finances, today);
                     if (reportString != null) {
-                        campaign.addReport(reportString);
+                        campaign.addReport(FINANCES, reportString);
                     } else {
                         LOGGER.error("Unable to process discretionary spending for {}", person.getFullTitle());
                     }
@@ -673,7 +697,7 @@ public class CampaignNewDayManager {
                 String extraIncomeReport = ExtraIncome.processExtraIncome(finances, person, today,
                       useBetterMonthlyIncome);
                 if (!StringUtility.isNullOrBlank(extraIncomeReport)) {
-                    campaign.addReport(extraIncomeReport);
+                    campaign.addReport(FINANCES, extraIncomeReport);
                 }
 
                 person.setHasPerformedExtremeExpenditure(false);
@@ -692,7 +716,7 @@ public class CampaignNewDayManager {
                     if (person.hasDarkSecret()) {
                         String darkSecretReport = person.isDarkSecretRevealed(true, false);
                         if (!StringUtility.isNullOrBlank(darkSecretReport)) {
-                            campaign.addReport(darkSecretReport);
+                            campaign.addReport(PERSONNEL, darkSecretReport);
                         }
                     }
                 }
@@ -704,7 +728,7 @@ public class CampaignNewDayManager {
                 if (campaignOptions.isAllowMonthlyConnections()) {
                     String connectionsReport = person.performConnectionsWealthCheck(today, finances);
                     if (!StringUtility.isNullOrBlank(connectionsReport)) {
-                        campaign.addReport(connectionsReport);
+                        campaign.addReport(PERSONNEL, connectionsReport);
                     }
                 }
 
@@ -736,7 +760,7 @@ public class CampaignNewDayManager {
         }
 
         if (!campaign.getPersonnelWhoAdvancedInXP().isEmpty()) {
-            campaign.addReport(String.format(resources.getString("gainedExperience.text"),
+            campaign.addReport(GENERAL, String.format(resources.getString("gainedExperience.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   campaign.getPersonnelWhoAdvancedInXP().size(),
                   CLOSING_SPAN_TAG));
@@ -774,7 +798,7 @@ public class CampaignNewDayManager {
             if (commander != null && commander.getBurnedConnectionsEndDate() == null) {
                 String report = commander.checkForBurnedContacts(today);
                 if (!report.isBlank()) {
-                    campaign.addReport(report);
+                    campaign.addReport(PERSONNEL, report);
                 }
             }
         }
@@ -794,7 +818,8 @@ public class CampaignNewDayManager {
         if ((campaign.getShipSearchExpiration() != null) && !campaign.getShipSearchExpiration().isAfter(today)) {
             campaign.setShipSearchExpiration(null);
             if (campaign.getShipSearchResult() != null) {
-                campaign.addReport("Opportunity for purchase of " + campaign.getShipSearchResult() + " has expired.");
+                campaign.addReport(ACQUISITIONS, "Opportunity for purchase of " + campaign.getShipSearchResult() + " " +
+                                                       "has expired.");
                 campaign.setShipSearchResult(null);
             }
         }
@@ -808,11 +833,6 @@ public class CampaignNewDayManager {
             /*
              * First of the month; roll Morale.
              */
-            if (campaignOptions.getUnitRatingMethod().isFMMR()) {
-                IUnitRating rating = campaign.getUnitRating();
-                rating.reInitialize();
-            }
-
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
@@ -830,7 +850,7 @@ public class CampaignNewDayManager {
                 }
 
                 if (!report.isBlank()) {
-                    campaign.addReport(report);
+                    campaign.addReport(GENERAL, report);
                 }
             }
         }
@@ -902,7 +922,7 @@ public class CampaignNewDayManager {
                                                            campaignOptions.getRegardMultiplier());
 
                         for (String report : reports) {
-                            campaign.addReport(report);
+                            campaign.addReport(GENERAL, report);
                         }
                     }
                 }
@@ -1032,7 +1052,8 @@ public class CampaignNewDayManager {
                       "Unable to perform maintenance on {} ({}) due to an error",
                       unit.getName(),
                       unit.getId().toString());
-                campaign.addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
+                campaign.addReport(TECHNICAL, String.format("ERROR: An error occurred performing maintenance on %s, " +
+                                                                  "check the log",
                       unit.getName()));
             }
         }
@@ -1095,12 +1116,12 @@ public class CampaignNewDayManager {
                               "Could not perform overnight maintenance on {} ({}) due to an error",
                               part.getName(),
                               part.getId());
-                        campaign.addReport(String.format(
+                        campaign.addReport(TECHNICAL, String.format(
                               "ERROR: an error occurred performing overnight maintenance on %s, check the log",
                               part.getName()));
                     }
                 } else {
-                    campaign.addReport(String.format(
+                    campaign.addReport(TECHNICAL, String.format(
                           "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
@@ -1137,7 +1158,7 @@ public class CampaignNewDayManager {
 
                 // Has unit just been delivered?
                 if (unit.isPresent()) {
-                    campaign.addReport(String.format(resources.getString("unitArrived.text"),
+                    campaign.addReport(ACQUISITIONS, String.format(resources.getString("unitArrived.text"),
                           unit.getHyperlinkedName(),
                           spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                           CLOSING_SPAN_TAG));
@@ -1158,7 +1179,8 @@ public class CampaignNewDayManager {
                 MRMSService.mrmsAllUnits(campaign);
             } catch (Exception ex) {
                 LOGGER.error("Could not perform mass repair/salvage on units due to an error", ex);
-                campaign.addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
+                campaign.addReport(TECHNICAL,
+                      "ERROR: an error occurred performing mass repair/salvage on units, check the log");
             }
         }
     }
@@ -1196,7 +1218,7 @@ public class CampaignNewDayManager {
         }
 
         if (!personnelToRemove.isEmpty()) {
-            campaign.addReport(resources.getString("personnelRemoval.text"));
+            campaign.addReport(PERSONNEL, resources.getString("personnelRemoval.text"));
         }
     }
 
@@ -1242,7 +1264,7 @@ public class CampaignNewDayManager {
                   today,
                   campaignOptions.getRegardMultiplier(),
                   campaignOptions.isTrackClimateRegardChanges());
-            campaign.addReport(report);
+            campaign.addReport(POLITICS, report);
         }
 
         List<Mission> activeMissions = campaign.getActiveMissions(false);
@@ -1272,19 +1294,10 @@ public class CampaignNewDayManager {
             }
 
             // Accolade check
-            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
-            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
-                  !isInTransit,
-                  campaign.getActiveAtBContracts(),
-                  activeMissions,
-                  relevantFactionCode,
-                  updatedLocation.getCurrentSystem(),
-                  ignoreEmployer);
-
             FactionAccoladeLevel newAccoladeLevel = campaign.getFactionStandings().checkForAccolade(
-                  relevantFaction, today, isOnMission);
+                  relevantFaction, today);
 
-            if (newAccoladeLevel != null) {
+            if (newAccoladeLevel != null && newAccoladeLevel != FactionAccoladeLevel.NO_ACCOLADE) {
                 new FactionAccoladeEvent(campaign, relevantFaction, newAccoladeLevel,
                       faction.equals(relevantFaction));
             }
@@ -1350,7 +1363,7 @@ public class CampaignNewDayManager {
                     report += " " + resources.getString("anniversaryBirthday.retirement");
                 }
 
-                campaign.addReport(report);
+                campaign.addReport(PERSONNEL, report);
             }
 
             LocalDate recruitmentDate = person.getRecruitment();
@@ -1360,7 +1373,7 @@ public class CampaignNewDayManager {
 
                 if ((recruitmentAnniversary.isEqual(today)) &&
                           (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
-                    campaign.addReport(String.format(resources.getString("anniversaryRecruitment.text"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("anniversaryRecruitment.text"),
                           person.getHyperlinkedFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                           yearsOfEmployment,
@@ -1370,7 +1383,7 @@ public class CampaignNewDayManager {
             }
         } else if ((person.getAge(today) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
             if (isBirthday) {
-                campaign.addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                campaign.addReport(PERSONNEL, String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       person.getAge(today),
@@ -1446,18 +1459,36 @@ public class CampaignNewDayManager {
           boolean isUseAdvancedMedical, boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         String gamblingReport = person.gambleWealth();
         if (!gamblingReport.isBlank()) {
-            campaign.addReport(gamblingReport);
+            campaign.addReport(PERSONNEL, gamblingReport);
         }
 
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
-            int prostheticCount = 1; // Minimum of 1
+            int prostheticMedicalReliance = 1; // Minimum of 1
+            int myomerProsthetics = 0;
+            boolean hasPowerSupply = false;
+
             for (Injury injury : person.getInjuries()) {
-                if (injury.getSubType().isProsthetic()) {
-                    prostheticCount++;
+                InjurySubType injurySubType = injury.getSubType();
+                if (injurySubType.isPermanentModification()) {
+                    prostheticMedicalReliance++;
+                }
+
+                if (injurySubType.isMyomerProsthetic()) {
+                    myomerProsthetics++;
+                }
+
+                if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
+                    hasPowerSupply = true;
                 }
             }
 
-            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * prostheticCount);
+            if (!hasPowerSupply) {
+                myomerProsthetics *= 2;
+            }
+
+            int totalProstheticCount = prostheticMedicalReliance + myomerProsthetics;
+
+            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
                   getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
                 checkForDiscontinuationSyndrome(person,
@@ -1494,7 +1525,7 @@ public class CampaignNewDayManager {
             String report = person.processSplitPersonality(true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
-                campaign.addReport(report);
+                campaign.addReport(MEDICAL, report);
             }
         }
 
@@ -1506,7 +1537,7 @@ public class CampaignNewDayManager {
             String report = person.processClinicalParanoia(true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
-                campaign.addReport(report);
+                campaign.addReport(MEDICAL, report);
             }
 
             resetClinicalParanoia = false;
@@ -1522,7 +1553,7 @@ public class CampaignNewDayManager {
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
-                campaign.addReport(report);
+                campaign.addReport(MEDICAL, report);
             }
         }
 
@@ -1536,7 +1567,7 @@ public class CampaignNewDayManager {
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
-                campaign.addReport(report);
+                campaign.addReport(MEDICAL, report);
             }
         }
 
@@ -1549,7 +1580,7 @@ public class CampaignNewDayManager {
                   true,
                   failedWillpowerCheck);
             if (!report.isBlank()) {
-                campaign.addReport(report);
+                campaign.addReport(MEDICAL, report);
             }
         }
 
@@ -1559,7 +1590,7 @@ public class CampaignNewDayManager {
                   null, modifier);
             String report = person.processHysteria(campaign, true, isUseAdvancedMedical, failedWillpowerCheck);
             if (!report.isBlank()) {
-                campaign.addReport(report);
+                campaign.addReport(MEDICAL, report);
             }
 
             resetClinicalParanoia = false;
@@ -1600,9 +1631,9 @@ public class CampaignNewDayManager {
             report.append(campaign.getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
                   .append(" deducted for ship search.");
         } else {
-            campaign.addReport("<font color=" +
-                                     ReportingUtilities.getNegativeColor() +
-                                     ">Insufficient funds for ship search.</font>");
+            campaign.addReport(FINANCES, "<font color=" +
+                                               ReportingUtilities.getNegativeColor() +
+                                               ">Insufficient funds for ship search.</font>");
             campaign.setShipSearchStart(null);
             return;
         }
@@ -1644,7 +1675,7 @@ public class CampaignNewDayManager {
                 report.append("<br/>Ship search unsuccessful.");
             }
         }
-        campaign.addReport(report.toString());
+        campaign.addReport(ACQUISITIONS, report.toString());
     }
 
     /**
@@ -1773,20 +1804,15 @@ public class CampaignNewDayManager {
         // Second, we process them and any already generated scenarios
         for (AtBContract contract : contracts) {
             /*
-             * Situations like a delayed start or running out of funds during transit can
-             * delay arrival until after the contract start. In that case, shift the
-             * starting and ending dates before making any battle rolls. We check that the
-             * unit is actually on route to the planet in case the user is using a custom
-             * system for transport or splitting the unit, etc.
+             * Situations like a delayed start or running out of funds during transit can delay arrival until after
+             * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
-            if (!updatedLocation.isOnPlanet() &&
-                      !updatedLocation.getJumpPath().isEmpty() &&
-                      updatedLocation.getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
-                // transitTime is measured in days; so we round up to the next whole day
+            if (updatedLocation.getCurrentSystem().getId().equals(contract.getSystem().getId())) {
+                // transitTime is measured in days, so we round up to the next whole day
                 contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
-                campaign.addReport("The start and end dates of " +
-                                         contract.getHyperlinkedName() +
-                                         " have been shifted to reflect the current ETA.");
+                campaign.addReport(GENERAL, "The start and end dates of " +
+                                                  contract.getHyperlinkedName() +
+                                                  " have been shifted to reflect the current ETA.");
 
                 if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
                     LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
@@ -1805,7 +1831,7 @@ public class CampaignNewDayManager {
                 StratConCampaignState campaignState = contract.getStratconCampaignState();
 
                 if (campaignState != null && deficit > 0) {
-                    campaign.addReport(String.format(resources.getString("contractBreach.text"),
+                    campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
                           contract.getHyperlinkedName(),
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
@@ -1813,11 +1839,13 @@ public class CampaignNewDayManager {
                     campaignState.updateVictoryPoints(-1);
                 } else if (deficit > 0) {
                     contract.addPlayerMinorBreaches(deficit);
-                    campaign.addReport("Failure to meet " +
-                                             contract.getHyperlinkedName() +
-                                             " requirements resulted in " +
-                                             deficit +
-                                             ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
+                    campaign.addReport(GENERAL, "Failure to meet " +
+                                                      contract.getHyperlinkedName() +
+                                                      " requirements resulted in " +
+                                                      deficit +
+                                                      ((deficit == 1) ?
+                                                             " minor contract breach" :
+                                                             " minor contract breaches"));
                 }
             }
 
@@ -1842,9 +1870,9 @@ public class CampaignNewDayManager {
                     } else {
                         contract.addPlayerMinorBreach();
 
-                        campaign.addReport("Failure to deploy for " +
-                                                 scenario.getHyperlinkedName() +
-                                                 " resulted in a minor contract breach.");
+                        campaign.addReport(BATTLE, "Failure to deploy for " +
+                                                         scenario.getHyperlinkedName() +
+                                                         " resulted in a minor contract breach.");
                     }
 
                     scenario.convertToStub(campaign,
@@ -1883,7 +1911,7 @@ public class CampaignNewDayManager {
                             campaign.getForceIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
                             atBScenario.addForces(forceId);
 
-                            campaign.addReport(MessageFormat.format(resources.getString(
+                            campaign.addReport(BATTLE, MessageFormat.format(resources.getString(
                                         "atbScenarioTodayWithForce.format"),
                                   atBScenario.getHyperlinkedName(),
                                   campaign.getForceIds().get(forceId).getName()));
@@ -1891,19 +1919,22 @@ public class CampaignNewDayManager {
                                   atBScenario));
                         } else {
                             if (atBScenario.getHasTrack()) {
-                                campaign.addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                campaign.addReport(BATTLE, MessageFormat.format(resources.getString("atbScenarioToday" +
+                                                                                                          ".stratCon"),
                                       atBScenario.getHyperlinkedName()));
                             } else {
-                                campaign.addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                                campaign.addReport(BATTLE, MessageFormat.format(resources.getString("atbScenarioToday" +
+                                                                                                          ".atb"),
                                       atBScenario.getHyperlinkedName()));
                             }
                         }
                     } else {
                         if (atBScenario.getHasTrack()) {
-                            campaign.addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
-                                  atBScenario.getHyperlinkedName()));
+                            campaign.addReport(BATTLE,
+                                  MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                        atBScenario.getHyperlinkedName()));
                         } else {
-                            campaign.addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                            campaign.addReport(BATTLE, MessageFormat.format(resources.getString("atbScenarioToday.atb"),
                                   atBScenario.getHyperlinkedName()));
                         }
                     }
@@ -1939,7 +1970,7 @@ public class CampaignNewDayManager {
         List<String> reports = FacilityRentals.payForAllContractRentals(finances, today, hospitalRentalFee,
               kitchenRentalFee, holdingCellRentalFee);
         for (String report : reports) { // No report is generated if the transaction is successful
-            campaign.addReport(report);
+            campaign.addReport(FINANCES, report);
         }
     }
 

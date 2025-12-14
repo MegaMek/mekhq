@@ -101,6 +101,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -161,7 +162,6 @@ import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
-import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
@@ -224,6 +224,7 @@ public class CampaignGUI extends JPanel {
     private final RoundedJButton btnCompanyGenerator = new RoundedJButton(resourceMap.getString(
           "btnCompanyGenerator.text"));
     private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+    private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnPersonnelMarket =
@@ -379,6 +380,10 @@ public class CampaignGUI extends JPanel {
             }
         });
 
+        CommandCenterTab commandCenter = getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
     }
 
     /**
@@ -962,13 +967,8 @@ public class CampaignGUI extends JPanel {
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
-            miDragoonsRating.addActionListener(evt -> new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(
-                  true));
-        } else {
-            miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(
-                  true));
-        }
+        miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(
+              true));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));
@@ -1451,8 +1451,21 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.insets = new Insets(3, 15, 3, 0);
         pnlButton.add(btnAdvanceDay, gridBagConstraints);
+
+        btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(3, 15, 3, 15);
+        pnlButton.add(btnBugReport, gridBagConstraints);
 
         return pnlButton;
     }
@@ -1799,7 +1812,11 @@ public class CampaignGUI extends JPanel {
             return false;
         }
 
-        return saveCampaign(getFrame(), getCampaign(), file);
+        return saveCampaign(getFrame(), getCampaign(), file, false);
+    }
+
+    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
+        return saveCampaign(frame, campaign, file, false);
     }
 
     /**
@@ -1807,7 +1824,7 @@ public class CampaignGUI extends JPanel {
      *
      * @param frame The parent frame in which to display the error message. May be null.
      */
-    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file) {
+    public static boolean saveCampaign(JFrame frame, Campaign campaign, File file, boolean isForBugReport) {
         String path = file.getPath();
         if (!path.endsWith(".cpnx") && !path.endsWith(".cpnx.gz")) {
             path += ".cpnx";
@@ -1827,7 +1844,7 @@ public class CampaignGUI extends JPanel {
               BufferedOutputStream bos = new BufferedOutputStream(os);
               OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
               PrintWriter pw = new PrintWriter(osw)) {
-            campaign.writeToXML(pw);
+            campaign.writeToXML(pw, isForBugReport);
             pw.flush();
             // delete the backup file because we didn't need it
             if (backupFile.exists() && !backupFile.delete()) {
@@ -2688,10 +2705,16 @@ public class CampaignGUI extends JPanel {
      * {@code logNagActive} flag.</p>
      *
      * <p>If no tab is currently selected, a warning is logged and no action is taken.</p>
+     *
+     * @param logType the category of daily report the UI should prompt the user to review
      */
-    public void checkDailyLogNag() {
+    public void checkDailyLogNag(DailyReportType logType) {
         // If we're already nagging, no need to nag again
-        if (logNagActive) {
+        boolean subTabNagActive = getCommandCenterTab().isLogNagActive(logType);
+        int relevantIndex = logType.getTabIndex();
+
+        // We're already nagging
+        if (logNagActive && subTabNagActive) {
             return;
         }
 
@@ -2701,18 +2724,49 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        // Already on the Command Center tab, no nag necessary
+        // If the player is already viewing the correct log tab, no nag needed
         final Component selectedTab = tabMain.getComponentAt(selectedIndex);
-        if (selectedTab instanceof CommandCenterTab) {
-            return;
+        if (selectedTab instanceof CommandCenterTab commandCenterTab) {
+            int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
+
+            if (logsSelected == relevantIndex) {
+                return;
+            }
         }
 
         // Loop through the tabs until we find the Command Center tab, then color that tab's label.
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             Component component = tabMain.getComponentAt(i);
-            if (component instanceof CommandCenterTab) {
-                tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
-                logNagActive = true;
+
+            if (component instanceof CommandCenterTab commandCenterTab) {
+                // If the player is currently on the Command Center Tab, no need to nag that tab, though we're still
+                // going to nag the sub-tab
+                if (!(selectedTab instanceof CommandCenterTab)) {
+                    tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
+                    logNagActive = true;
+                }
+
+                EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
+                int logsSelected = tabLogs.getSelectedIndex();
+                if (logsSelected != relevantIndex) {
+                    DailyReportLogPanel reportTab = switch (logType) {
+                        case GENERAL -> commandCenterTab.getGeneralLog();
+                        case BATTLE -> commandCenterTab.getBattleLog();
+                        case PERSONNEL -> commandCenterTab.getPersonnelLog();
+                        case MEDICAL -> commandCenterTab.getMedicalLog();
+                        case FINANCES -> commandCenterTab.getFinancesLog();
+                        case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
+                        case TECHNICAL -> commandCenterTab.getTechnicalLog();
+                        case POLITICS -> commandCenterTab.getPoliticsLog();
+                        case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+                    };
+
+                    if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
+                        commandCenterTab.nagLogTab(relevantIndex);
+                        commandCenterTab.setLogNagActive(logType, true);
+                    }
+                }
+
                 break;
             }
         }

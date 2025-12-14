@@ -37,6 +37,7 @@ import static java.lang.Math.min;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.finances.enums.TransactionType.RANSOM;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.HOMICIDE;
@@ -438,7 +439,7 @@ public class PrisonerMissionEndEvent {
         boolean crimeNoticed = crimeNoticeRoll < prisoners.size();
 
         int penalty = min(MAX_CRIME_PENALTY, prisoners.size() * 2);
-        if (crimeNoticed && campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+        if (crimeNoticed) {
             campaign.changeCrimeRating(-penalty);
             campaign.setDateOfLastCrime(campaign.getLocalDate());
         }
@@ -460,6 +461,6 @@ public class PrisonerMissionEndEvent {
                                           CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(crimeMessage);
+        campaign.addReport(GENERAL, crimeMessage);
     }
 }

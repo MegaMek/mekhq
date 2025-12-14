@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
@@ -1679,11 +1680,11 @@ public abstract class AbstractCompanyGenerator {
 
         // Report the financial state in the daily report
         if (loan.isZero()) {
-            campaign.addReport(String.format(
+            campaign.addReport(FINANCES, String.format(
                   resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithoutLoan.report"),
                   startingCash));
         } else {
-            campaign.addReport(String.format(
+            campaign.addReport(FINANCES, String.format(
                   resources.getString("AbstractCompanyGenerator.CompanyStartupFundedWithLoan.report"),
                   startingCash, loan));
         }

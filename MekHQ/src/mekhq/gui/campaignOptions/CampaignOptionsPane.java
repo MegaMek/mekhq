@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
@@ -66,6 +67,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
@@ -497,13 +499,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * categories).
      *
      * @param preset       an optional {@link CampaignPreset} used to override campaign options
-     * @param mode     the mode in which the application process was triggered
+     * @param mode         the mode in which the application process was triggered
      * @param isSaveAction determines if this action is saving options to a preset
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, CampaignOptionsDialogMode mode,
           boolean isSaveAction) {
         boolean isStartUp = mode == STARTUP || mode == STARTUP_ABRIDGED;
-        boolean isCampaignUpgrade = mode == CAMPAIGN_UPGRADE;
 
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
@@ -515,18 +516,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             presetSkills = preset.getSkills();
         }
 
-        // Store old values for use if we want to trigger certain dialogs
-        boolean oldAwardVeterancySPAs = options.isAwardVeterancySPAs();
-        boolean oldIsTrackFactionStanding = options.isTrackFactionStanding();
-        boolean oldIsTrackPrisoners = !options.getPrisonerCaptureStyle().isNone();
-        boolean oldIsUseMASHTheatres = options.isUseMASHTheatres();
-        boolean oldIsUseFatigue = options.isUseFatigue();
-        boolean oldIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
-        boolean oldIsUseStratCon = options.isUseStratCon();
-        boolean oldIsUseMapless = options.isUseStratConMaplessMode();
-        boolean oldIsUseAdvancedScouting = options.isUseAdvancedScouting() && oldIsUseStratCon;
-        boolean oldIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
-        boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && options.isUseRandomDiseases();
+        CampaignOptionsFreebieTracker oldCampaignOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
 
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
@@ -536,7 +526,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(campaign, options);
-        biographyTab.applyCampaignOptionsToCampaign(isCampaignUpgrade, options);
+        biographyTab.applyCampaignOptionsToCampaign(options);
         relationshipsTab.applyCampaignOptionsToCampaign(options);
         salariesTab.applyCampaignOptionsToCampaign(options);
         turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
@@ -565,7 +555,56 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
 
-        boolean newIsTrackFactionStandings = options.isTrackFactionStanding();
+        CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
+        triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
+
+        campaign.resetRandomDeath();
+        if (campaignGui != null) {
+            campaignGui.refreshMarketButtonLabels();
+        }
+    }
+
+    /**
+     * Compares a previously-recorded {@link CampaignOptionsFreebieTracker} snapshot against a new snapshot and triggers
+     * any one-time handlers required when critical campaign options are enabled.
+     *
+     * <p>This method is intended to be called immediately after applying campaign option changes (or when
+     * loading/upgrading a campaign) so the campaign can react to newly-enabled systems. Reactions may include prompting
+     * the player with confirmation dialogs, adjusting campaign state, or granting "freebies" to keep the save
+     * consistent and fair when major rulesets are turned on mid-campaign.</p>
+     *
+     * <p>Only transitions from {@code false -> true} are acted upon (that is, newly enabled features). Disabling
+     * options typically does not require compensation and is therefore ignored here.</p>
+     *
+     * <p>When {@code isStartUp} is {@code true}, interactive prompts are suppressed; the method may still perform
+     * required non-interactive adjustments depending on implementation.</p>
+     *
+     * @param campaign   the campaign whose state may be adjusted and/or to which reports may be added
+     * @param oldOptions snapshot of the option state before the change (or previously acknowledged state)
+     * @param newOptions snapshot of the option state after the change (current effective state)
+     * @param isStartUp  whether this invocation is happening during startup/load/upgrade rather than an in-session
+     *                   options change
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static void triggerUpgradeFreebies(Campaign campaign, CampaignOptionsFreebieTracker oldOptions,
+          CampaignOptionsFreebieTracker newOptions,
+          boolean isStartUp) {
+        // Store old values for use if we want to trigger certain dialogs
+        boolean oldAwardVeterancySPAs = oldOptions.awardVeterancySPAs();
+        boolean oldIsTrackFactionStanding = oldOptions.trackFactionStanding();
+        boolean oldIsTrackPrisoners = !oldOptions.trackPrisoners();
+        boolean oldIsUseMASHTheatres = oldOptions.useMASHTheatres();
+        boolean oldIsUseFatigue = oldOptions.useFatigue();
+        boolean oldIsUseAdvancedSalvage = oldOptions.useAdvancedSalvage();
+        boolean oldIsUseStratCon = oldOptions.useStratCon();
+        boolean oldIsUseMapless = oldOptions.useMapless();
+        boolean oldIsUseAdvancedScouting = oldOptions.useAdvancedScouting() && oldIsUseStratCon;
+        boolean oldIsUseAltAdvancedMedical = oldOptions.useAltAdvancedMedical();
+        boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && oldOptions.useDiseases();
+
+        boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
         if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
             FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
                   null,
@@ -575,69 +614,64 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                   campaign.getFactionStandings(),
                   campaign.getMissions(),
                   newIsTrackFactionStandings,
-                  campaignOptions.getRegardMultiplier());
+                  campaign.getCampaignOptions().getRegardMultiplier());
 
             List<String> reports = dialog.getReports();
             for (String report : reports) {
                 if (report != null && !report.isBlank()) {
-                    campaign.addReport(report);
+                    campaign.addReport(POLITICS, report);
                 }
             }
         }
 
-        boolean newIsAwardVeterancySPAs = options.isAwardVeterancySPAs();
+        boolean newIsAwardVeterancySPAs = newOptions.awardVeterancySPAs();
         if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
             new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseMASHTheatres = options.isUseMASHTheatres();
+        boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();
         if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsTrackPrisoners = !options.getPrisonerCaptureStyle().isNone();
+        boolean newIsTrackPrisoners = !newOptions.trackPrisoners();
         if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
             new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseFatigue = options.isUseFatigue();
+        boolean newIsUseFatigue = newOptions.useFatigue();
         if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
             new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseAdvancedSalvage = options.isUseCamOpsSalvage();
+        boolean newIsUseAdvancedSalvage = newOptions.useAdvancedSalvage();
         if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
             new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseStratCon = options.isUseStratCon();
+        boolean newIsUseStratCon = newOptions.useStratCon();
         if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
             new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseMapless = options.isUseStratConMaplessMode();
+        boolean newIsUseMapless = newOptions.useMapless();
         if (!isStartUp && newIsUseMapless && !oldIsUseMapless) { // Has tracking changed?
             new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseAdvancedScouting = options.isUseAdvancedScouting() && newIsUseStratCon;
+        boolean newIsUseAdvancedScouting = newOptions.useAdvancedScouting() && newIsUseStratCon;
         if (!isStartUp && newIsUseAdvancedScouting && !oldIsUseAdvancedScouting) { // Has tracking changed?
             new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseAltAdvancedMedical = options.isUseAlternativeAdvancedMedical();
+        boolean newIsUseAltAdvancedMedical = newOptions.useAltAdvancedMedical();
         if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
             new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsUseDiseases = newIsUseAltAdvancedMedical && options.isUseRandomDiseases();
+        boolean newIsUseDiseases = newIsUseAltAdvancedMedical && newOptions.useDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
-            inoculateAllCharacters();
-        }
-
-        campaign.resetRandomDeath();
-        if (campaignGui != null) {
-            campaignGui.refreshMarketButtonLabels();
+            inoculateAllCharacters(campaign);
         }
     }
 
@@ -657,7 +691,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @author Illiani
      * @since 0.50.10
      */
-    private void inoculateAllCharacters() {
+    private static void inoculateAllCharacters(Campaign campaign) {
         String currentPlanetId = null;
         CurrentLocation location = campaign.getLocation();
         if (location.isOnPlanet()) {

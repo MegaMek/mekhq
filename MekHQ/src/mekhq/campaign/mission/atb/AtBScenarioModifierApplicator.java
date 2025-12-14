@@ -51,6 +51,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.BotForce;
@@ -60,7 +61,6 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -270,8 +270,8 @@ public class AtBScenarioModifierApplicator {
         int currentQuality = scenario.getContract(c).getEnemyQuality();
 
         currentQuality += qualityAdjustment;
-        currentQuality = Math.min(IUnitRating.DRAGOON_ASTAR, currentQuality);
-        currentQuality = Math.max(IUnitRating.DRAGOON_F, currentQuality);
+        currentQuality = Math.min(DragoonRating.DRAGOON_ASTAR.getRating(), currentQuality);
+        currentQuality = Math.max(DragoonRating.DRAGOON_F.getRating(), currentQuality);
         scenario.setEffectiveOpForQuality(currentQuality);
     }
 

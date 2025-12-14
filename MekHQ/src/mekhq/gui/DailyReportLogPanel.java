@@ -36,6 +36,8 @@ package mekhq.gui;
 import java.awt.BorderLayout;
 import java.io.Reader;
 import java.io.StringReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -49,6 +51,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.Utilities;
+import mekhq.campaign.enums.DailyReportType;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into its own panel so that we can
@@ -57,6 +60,8 @@ import mekhq.Utilities;
  * @author Jay Lawson
  */
 public class DailyReportLogPanel extends JPanel {
+    private static final DateTimeFormatter DAILY_REPORT_DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
+
     //region Variable Declarations
     private final CampaignGUI gui;
     final JScrollPane logPanel = new FastJScrollPane();
@@ -120,7 +125,7 @@ public class DailyReportLogPanel extends JPanel {
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
-    public void refreshLog(final String text) {
+    public void refreshLog(final String text, DailyReportType type) {
         if (text.equals(getLogText())) {
             return;
         }
@@ -137,18 +142,22 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().setDocument(blank);
         getTxtLog().setCaretPosition(blank.getLength());
 
-        getGUI().checkDailyLogNag();
+        // If there is only one line in the log, it means it's just the date header, so we don't want to alert the
+        // player for no reason
+        if (!isDateOnly(List.of(text))) {
+            getGUI().checkDailyLogNag(type);
+        }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
     }
 
-    public void appendLog(final List<String> newReports) {
+    public void appendLog(final List<String> newReports, final DailyReportType type) {
         final String addedText = Utilities.combineString(newReports, "");
         if (StringUtility.isNullOrBlank(addedText)) {
             return;
         }
 
         if (getLogText().isBlank()) {
-            refreshLog(addedText);
+            refreshLog(addedText, type);
             return;
         }
 
@@ -161,7 +170,50 @@ public class DailyReportLogPanel extends JPanel {
 
         }
         getTxtLog().setCaretPosition(doc.getLength());
-        getGUI().checkDailyLogNag();
+
+        // We only want to nag the player if there is something of value. So no nag occurs if we're just adding the date
+        if (!isDateOnly(newReports)) {
+            getGUI().checkDailyLogNag(type);
+        }
         SwingUtilities.invokeLater(() -> logPanel.getVerticalScrollBar().setValue(0));
+    }
+
+    /**
+     * Checks whether the given list of report lines represents a single, date-only entry.
+     *
+     * <p>This method returns {@code true} only when all the following are true:</p>
+     * <ul>
+     *     <li>{@code reports} contains exactly one element,</li>
+     *     <li>that element is wrapped in {@code <b>} and {@code </b>} tags, and</li>
+     *     <li>the inner text parses successfully as a {@link LocalDate} using the {@link #DAILY_REPORT_DATE_FORMAT}
+     *     formatter.</li>
+     * </ul>
+     *
+     * <p>If the list size is not exactly one, the element is not correctly formatted, or the inner text cannot be
+     * parsed as a date, this method returns {@code false} without throwing an exception.</p>
+     *
+     * @param reports the list of report lines to inspect
+     *
+     * @return {@code true} if the list represents a single bolded, correctly formatted date-only entry; {@code false}
+     *       otherwise
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static boolean isDateOnly(List<String> reports) {
+        boolean isDateOnly = false;
+        if (reports.size() == 1) {
+            // If parsing succeeds, it's a real report date
+            try {
+                String line = reports.get(0);
+                String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
+
+                LocalDate.parse(inner, DAILY_REPORT_DATE_FORMAT);
+                isDateOnly = true;
+            } catch (Exception ignored) {
+                // Not a formatted date — do nothing
+            }
+        }
+        return isDateOnly;
     }
 }

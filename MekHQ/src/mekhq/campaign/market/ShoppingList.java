@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.market;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +136,7 @@ public class ShoppingList {
         // and return
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
-                campaign.addReport(newWork.getShoppingListReport(quantity));
+                campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(quantity));
                 while (quantity > 0) {
                     shoppingItem.incrementQuantity();
                     quantity--;
@@ -160,16 +162,16 @@ public class ShoppingList {
             if ((newWork.getQuantity() == origQuantity) &&
                       campaign.getCampaignOptions().isUsePlanetaryAcquisition() &&
                       !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                campaign.addReport("<font color='" +
-                                         ReportingUtilities.getNegativeColor() +
-                                         "'><b>You failed to find " +
-                                         newWork.getAcquisitionName() +
-                                         " within " +
-                                         campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() +
-                                         " jumps</b></font>");
+                campaign.addReport(ACQUISITIONS, "<font color='" +
+                                                       ReportingUtilities.getNegativeColor() +
+                                                       "'><b>You failed to find " +
+                                                       newWork.getAcquisitionName() +
+                                                       " within " +
+                                                       campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() +
+                                                       " jumps</b></font>");
             }
 
-            campaign.addReport(newWork.getShoppingListReport(newWork.getQuantity()));
+            campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(newWork.getQuantity()));
 
             getShoppingList().add(newWork);
             MekHQ.triggerEvent(new ProcurementEvent(newWork));

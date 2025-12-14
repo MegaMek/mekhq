@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
@@ -362,7 +363,7 @@ public abstract class AbstractProcreation {
         final String babyAmount = getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1];
 
         if (!isNoReport) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                   "babyConceived.report",
                   mother.getHyperlinkedName(),
                   babyAmount).trim());
@@ -412,7 +413,7 @@ public abstract class AbstractProcreation {
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                   "multipleBabiesBorn.report",
                   mother.getHyperlinkedName(),
                   getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1]));
@@ -440,7 +441,7 @@ public abstract class AbstractProcreation {
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
             // Create reports and log the birth
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
                   "babyBorn.report",
                   mother.getHyperlinkedName(),
                   baby.getHyperlinkedName(),

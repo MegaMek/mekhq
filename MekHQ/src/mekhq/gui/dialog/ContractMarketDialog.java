@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.universe.Faction.getActiveMercenaryOrganization;
 
 import java.awt.BorderLayout;
@@ -489,7 +491,7 @@ public class ContractMarketDialog extends JDialog {
             AtBContract contract = contractMarket.addAtBContract(campaign);
 
             if (contract == null) {
-                campaign.addReport(resourceMap.getString("report.UnableToGMContract"));
+                campaign.addReport(GENERAL, resourceMap.getString("report.UnableToGMContract"));
                 return;
             }
 
@@ -629,7 +631,7 @@ public class ContractMarketDialog extends JDialog {
                                 campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier(), 1);
 
                     if (standingsReport != null) {
-                        campaign.addReport(standingsReport);
+                        campaign.addReport(POLITICS, standingsReport);
                     }
                 }
 

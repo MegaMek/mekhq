@@ -41,6 +41,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
@@ -59,6 +60,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -69,7 +71,6 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -245,7 +246,7 @@ public abstract class AbstractContractMarket {
 
     protected void updateReport(Campaign campaign) {
         if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
-            campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
+            campaign.addReport(GENERAL, "<a href='CONTRACT_MARKET'>Contract market updated</a>");
         }
     }
 
@@ -411,15 +412,15 @@ public abstract class AbstractContractMarket {
 
     protected int getQualityRating(int roll) {
         if (roll <= 5) {
-            return IUnitRating.DRAGOON_F;
+            return DragoonRating.DRAGOON_F.getRating();
         } else if (roll <= 8) {
-            return IUnitRating.DRAGOON_D;
+            return DragoonRating.DRAGOON_D.getRating();
         } else if (roll <= 10) {
-            return IUnitRating.DRAGOON_C;
+            return DragoonRating.DRAGOON_C.getRating();
         } else if (roll == 11) {
-            return IUnitRating.DRAGOON_B;
+            return DragoonRating.DRAGOON_B.getRating();
         } else {
-            return IUnitRating.DRAGOON_A;
+            return DragoonRating.DRAGOON_A.getRating();
         }
     }
 
@@ -560,8 +561,8 @@ public abstract class AbstractContractMarket {
             contract.setEnemyCode(enemyCode);
         } else {
             String enemyFactionCode = RandomFactionGenerator.getInstance()
-                                        .getEnemy(contract.getEmployerCode(),
-                                              contract.getContractType().isGarrisonType());
+                                            .getEnemy(contract.getEmployerCode(),
+                                                  contract.getContractType().isGarrisonType());
             Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
 
             // If the OpFor isn't Clan, there is a 1-in-5 chance they've hired mercenaries to do their dirty work. So

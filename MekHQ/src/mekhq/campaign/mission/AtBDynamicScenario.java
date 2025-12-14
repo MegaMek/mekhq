@@ -52,6 +52,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -60,7 +61,6 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
@@ -131,7 +131,7 @@ public class AtBDynamicScenario extends AtBScenario {
         setFriendlyInstantReinforcements(new ArrayList<>());
         setHostileReinforcementDelayReduction(0);
         setEffectiveOpForSkill(SkillLevel.REGULAR);
-        setEffectiveOpForQuality(IUnitRating.DRAGOON_C);
+        setEffectiveOpForQuality(DragoonRating.DRAGOON_C.getRating());
         setPlayerUnitSwaps(new HashMap<>());
         setFinalized(false);
         setBotForceTemplates(new HashMap<>());
@@ -235,8 +235,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    public void setMapSize() {
-        AtBDynamicScenarioFactory.setScenarioMapSize(this);
+    public void setMapSize(Campaign campaign) {
+        AtBDynamicScenarioFactory.setScenarioMapSize(this, campaign);
     }
 
     /**

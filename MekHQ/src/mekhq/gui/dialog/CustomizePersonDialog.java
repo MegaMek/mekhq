@@ -34,6 +34,7 @@ package mekhq.gui.dialog;
 
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
@@ -1580,7 +1581,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 } else {
                     String report = person.isDarkSecretRevealed(true, true);
                     if (!report.isBlank()) {
-                        campaign.addReport(report);
+                        campaign.addReport(PERSONNEL, report);
                     }
                 }
             }

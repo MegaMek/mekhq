@@ -37,6 +37,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -222,7 +223,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
                       today,
                       skillName,
                       1);
-                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
                       person.getHyperlinkedName(),
                       SkillType.getType(skillName).getName()));
             }

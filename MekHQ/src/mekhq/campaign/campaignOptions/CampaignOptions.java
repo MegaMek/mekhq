@@ -68,7 +68,6 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -116,7 +115,6 @@ public class CampaignOptions {
 
     // region Variable Declarations
     // region General Tab
-    private UnitRatingMethod unitRatingMethod;
     private int manualUnitRatingModifier;
     private boolean clampReputationPayMultiplier;
     private boolean reduceReputationPerformanceModifier;
@@ -628,6 +626,7 @@ public class CampaignOptions {
     private boolean useAdvancedScouting;
     private boolean noSeedForces;
     private SkillLevel skillLevel;
+    private BoardScalingType boardScalingType;
 
     // Contract Operations
     private int moraleVictoryEffect;
@@ -691,7 +690,6 @@ public class CampaignOptions {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
 
         // region General Tab
-        unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         manualUnitRatingModifier = 0;
         clampReputationPayMultiplier = false;
         reduceReputationPerformanceModifier = false;
@@ -1285,6 +1283,7 @@ public class CampaignOptions {
         useAdvancedScouting = false;
         noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
+        boardScalingType = BoardScalingType.NORMAL;
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
         autoResolveNumberOfScenarios = 100;
@@ -1345,23 +1344,6 @@ public class CampaignOptions {
     // endregion Constructors
 
     // region General Tab
-
-    /**
-     * @return the method of unit rating to use
-     */
-    @Deprecated(since = "0.50.10", forRemoval = false)
-    public UnitRatingMethod getUnitRatingMethod() {
-        return UnitRatingMethod.CAMPAIGN_OPS;
-    }
-
-    /**
-     * @param unitRatingMethod the method of unit rating to use
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setUnitRatingMethod(final UnitRatingMethod unitRatingMethod) {
-        this.unitRatingMethod = unitRatingMethod;
-    }
-
     public int getManualUnitRatingModifier() {
         return manualUnitRatingModifier;
     }
@@ -4968,6 +4950,14 @@ public class CampaignOptions {
 
     public void setSkillLevel(final SkillLevel skillLevel) {
         this.skillLevel = skillLevel;
+    }
+
+    public BoardScalingType getBoardScalingType() {
+        return boardScalingType;
+    }
+
+    public void setBoardScalingType(final BoardScalingType boardScalingType) {
+        this.boardScalingType = boardScalingType;
     }
 
     public boolean isAeroRecruitsHaveUnits() {

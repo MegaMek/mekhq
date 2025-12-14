@@ -38,9 +38,9 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
@@ -74,21 +74,22 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         for (PersonnelRole role : PersonnelRole.getMarketableRoles()) {
             int roll = Compute.d6(2);
             // TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-            switch (c.getAtBUnitRatingMod()) {
-                case IUnitRating.DRAGOON_A:
-                case IUnitRating.DRAGOON_ASTAR:
+            DragoonRating dragoonRating = DragoonRating.fromRating(c.getAtBUnitRatingMod());
+            switch (dragoonRating) {
+                case DRAGOON_A:
+                case DRAGOON_ASTAR:
                     roll += 3;
                     break;
-                case IUnitRating.DRAGOON_B:
+                case DRAGOON_B:
                     roll += 2;
                     break;
-                case IUnitRating.DRAGOON_C:
+                case DRAGOON_C:
                     roll += 1;
                     break;
-                case IUnitRating.DRAGOON_D:
+                case DRAGOON_D:
                     roll -= 1;
                     break;
-                case IUnitRating.DRAGOON_F:
+                case DRAGOON_F:
                     roll -= 2;
                     break;
             }

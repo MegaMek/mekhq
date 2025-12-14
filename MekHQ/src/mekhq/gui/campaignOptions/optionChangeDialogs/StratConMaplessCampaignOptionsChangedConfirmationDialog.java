@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.optionChangeDialogs;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.MHQConstants.DISCORD_LINK;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -40,8 +41,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -59,7 +58,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 public class StratConMaplessCampaignOptionsChangedConfirmationDialog {
     private static final MMLogger LOGGER = MMLogger.create(StratConMaplessCampaignOptionsChangedConfirmationDialog.class);
 
-    private final static String DISCORD_LINK = "https://discord.gg/megamek";
     private final static String ATB_RETIREMENT_LINK = "https://megamek.org/announcements/development/mekhq/2025/11/11/Retiring-the-Colors-Against-the-Bot.html";
 
     public StratConMaplessCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
@@ -112,16 +110,13 @@ public class StratConMaplessCampaignOptionsChangedConfirmationDialog {
         btnDiscord.setToolTipText(discordLink);
         btnDiscord.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnDiscord.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnDiscord.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        URI uri = new URI(discordLink);
-                        Desktop.getDesktop().browse(uri);
-                    } catch (Exception ex) {
-                        LOGGER.error(ex, "Failed to open URL: {}", discordLink);
-                    }
+        btnDiscord.addActionListener(e -> {
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    URI uri = new URI(discordLink);
+                    Desktop.getDesktop().browse(uri);
+                } catch (Exception ex) {
+                    LOGGER.error(ex, "Failed to open URL: {}", discordLink);
                 }
             }
         });

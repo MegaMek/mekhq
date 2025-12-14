@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
@@ -58,6 +60,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.ScenarioType;
@@ -65,7 +68,6 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -222,7 +224,7 @@ public class Loot {
                         cash,
                         "Reward for " + getName() + " during " + scenario.getName());
 
-            campaign.addReport(String.format(resources.getString("looted.cash"),
+            campaign.addReport(FINANCES, String.format(resources.getString("looted.cash"),
                   cash.toAmountAndSymbolString(),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
@@ -263,7 +265,7 @@ public class Loot {
 
         if (!lootedParts.isEmpty()) {
             String lootedPartsReport = lootedParts.toString().replace("[", "").replace("]", "");
-            campaign.addReport(String.format(resources.getString("looted.successful.parts"),
+            campaign.addReport(ACQUISITIONS, String.format(resources.getString("looted.successful.parts"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG,
                   lootedPartsReport));
@@ -271,7 +273,7 @@ public class Loot {
 
         if (!abandonedParts.isEmpty()) {
             String abandonedPartsReport = abandonedParts.toString().replace("[", "").replace("]", "");
-            campaign.addReport(String.format(resources.getString("looted.failed.parts"),
+            campaign.addReport(ACQUISITIONS, String.format(resources.getString("looted.failed.parts"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG,
                   abandonedPartsReport));
@@ -311,25 +313,26 @@ public class Loot {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
 
         if (contract instanceof AtBContract) {
-            switch (((AtBContract) contract).getEnemyQuality()) {
-                case IUnitRating.DRAGOON_F:
+            DragoonRating dragoonRating = DragoonRating.fromRating(((AtBContract) contract).getEnemyQuality());
+            switch (dragoonRating) {
+                case DRAGOON_F:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_A.toNumeric());
                     qualityAndModifier.put("modifier", -2);
                     break;
-                case IUnitRating.DRAGOON_D:
+                case DRAGOON_D:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_B.toNumeric());
                     qualityAndModifier.put("modifier", -1);
                     break;
-                case IUnitRating.DRAGOON_C:
-                case IUnitRating.DRAGOON_B:
+                case DRAGOON_C:
+                case DRAGOON_B:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_C.toNumeric());
                     qualityAndModifier.put("modifier", 0);
                     break;
-                case IUnitRating.DRAGOON_A:
+                case DRAGOON_A:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
                     qualityAndModifier.put("modifier", 1);
                     break;
-                case IUnitRating.DRAGOON_ASTAR:
+                case DRAGOON_ASTAR:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_F.toNumeric());
                     qualityAndModifier.put("modifier", 2);
                     break;

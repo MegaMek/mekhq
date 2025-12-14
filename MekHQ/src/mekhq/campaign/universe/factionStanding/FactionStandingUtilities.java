@@ -522,6 +522,7 @@ public class FactionStandingUtilities {
      * @author Illiani
      * @since 0.50.07
      */
+    @Deprecated(since = "0.50.11", forRemoval = true)
     public static boolean isIsOnMission(boolean isOnPlanet, List<AtBContract> activeAtBContracts,
           List<Mission> activeMissions, String factionCode, PlanetarySystem currentSystem, boolean ignoreEmployer) {
         if (!isOnPlanet) {

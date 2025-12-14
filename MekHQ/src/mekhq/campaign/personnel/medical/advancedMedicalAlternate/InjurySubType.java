@@ -41,7 +41,7 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
  *   <li>{@link #NORMAL} — Standard or conventional injuries.</li>
  *   <li>{@link #BURN} — Thermal or chemical burn injuries.</li>
  *   <li>{@link #DISEASE} — Injuries or conditions caused by illness or infection.</li>
- *   <li>{@link #PROSTHETIC} — Artificial or mechanical replacements for body parts.</li>
+ *   <li>{@link #PROSTHETIC_GENERIC} — Artificial or mechanical replacements for body parts.</li>
  * </ul>
  *
  * @author Illiani
@@ -58,7 +58,20 @@ public enum InjurySubType {
     DISEASE,
 
     /** Mechanical or artificial body replacements. Always count as 0 TW-scale 'Hits.' */
-    PROSTHETIC,
+    PROSTHETIC_GENERIC,
+
+    /** Myomer body replacements. Always count as 0 TW-scale 'Hits.' */
+    PROSTHETIC_MYOMER,
+
+    /** Artificial brain enhancement. Implants of this type can be combined. Always count as 0 TW-scale 'Hits.' */
+    IMPLANT_GENERIC,
+
+    /**
+     * A type of Vehicle Direct Neural Interface. A type of implant. All implants of this type are mutually exclusive.
+     * Always count as 0 TW-scale 'Hits.'
+     *
+     */
+    IMPLANT_VDNI,
 
     /** Special injuries caused by Flaws. Always count as 0 TW-scale 'Hits.' */
     FLAW;
@@ -93,10 +106,32 @@ public enum InjurySubType {
     /**
      * Checks whether this subtype represents a prosthetic or artificial body part.
      *
-     * @return {@code true} if this subtype is {@link #PROSTHETIC}, otherwise {@code false}.
+     * @return {@code true} if this subtype is {@link #PROSTHETIC_GENERIC}, otherwise {@code false}.
      */
     public boolean isProsthetic() {
-        return this == PROSTHETIC;
+        return this == PROSTHETIC_GENERIC || this == PROSTHETIC_MYOMER;
+    }
+
+    public boolean isMyomerProsthetic() {
+        return this == PROSTHETIC_MYOMER;
+    }
+
+    /**
+     * Checks whether this subtype represents an implant.
+     *
+     * @return {@code true} if this subtype is {@link #IMPLANT_GENERIC}, otherwise {@code false}.
+     */
+    public boolean isImplant() {
+        return this == IMPLANT_GENERIC || this == IMPLANT_VDNI;
+    }
+
+    /**
+     * Checks whether this subtype represents a permanent modification, such as a prosthetic replacement, or implant.
+     *
+     * @return {@code true} if this subtype is a permanent modification
+     */
+    public boolean isPermanentModification() {
+        return isProsthetic() || isImplant();
     }
 
     /**

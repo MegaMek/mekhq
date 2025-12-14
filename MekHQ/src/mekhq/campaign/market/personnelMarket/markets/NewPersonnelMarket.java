@@ -35,6 +35,8 @@ package mekhq.campaign.market.personnelMarket.markets;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
@@ -242,7 +244,7 @@ public class NewPersonnelMarket {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
             if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
-                campaign.addReport(generatePersonnelReport(campaign));
+                campaign.addReport(GENERAL, generatePersonnelReport(campaign));
             }
 
             MekHQ.triggerEvent(new MarketNewPersonnelEvent(currentApplicants));
@@ -306,7 +308,7 @@ public class NewPersonnelMarket {
                 logger.info("Rolling to use connections to get extra recruits {} {} vs. {}",
                       commander.getFullTitle(), roll, CONNECTIONS_TARGET_NUMBER);
                 if (roll >= CONNECTIONS_TARGET_NUMBER) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "connections.recruits",
+                    campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "connections.recruits",
                           commander.getHyperlinkedFullTitle(), additionalRecruitRolls,
                           spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
 

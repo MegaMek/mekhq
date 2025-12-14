@@ -35,6 +35,7 @@ package mekhq.gui;
 import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.MHQConstants.CONFIRMATION_BEGIN_TRANSIT;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.outOfContractMothballAutomation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
@@ -73,6 +74,7 @@ import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.enums.MHQTabType;
@@ -273,6 +275,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             return;
         }
 
+        if (!JumpBlockers.areAllUnitsJumpCapable(getCampaign())) {
+            return;
+        }
+
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_BEGIN_TRANSIT)) {
             ImmersiveDialogConfirmation dialog = new ImmersiveDialogConfirmation(getCampaign(),
                   CONFIRMATION_BEGIN_TRANSIT);
@@ -298,7 +304,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
               getCampaign().getLocalDate(), journeyCost, getCampaign().getCurrentSystem());
 
         if (!jumpReport.isBlank()) {
-            getCampaign().addReport(jumpReport);
+            getCampaign().addReport(GENERAL, jumpReport);
         }
 
         getCampaign().getLocation().setJumpPath(panMap.getJumpPath());

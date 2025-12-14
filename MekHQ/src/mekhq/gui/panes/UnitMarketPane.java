@@ -32,6 +32,9 @@
  */
 package mekhq.gui.panes;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -478,11 +481,12 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
-                getCampaign().addReport(String.format("<font color='" +
-                                                            ReportingUtilities.getNegativeColor() +
-                                                            "'>" +
-                                                            resources.getString("UnitMarketPane.CannotAfford.report") +
-                                                            "</font>", entity.getShortName()));
+                getCampaign().addReport(FINANCES, String.format("<font color='" +
+                                                                      ReportingUtilities.getNegativeColor() +
+                                                                      "'>" +
+                                                                      resources.getString(
+                                                                            "UnitMarketPane.CannotAfford.report") +
+                                                                      "</font>", entity.getShortName()));
                 offersIterator.remove();
                 continue;
             }
@@ -495,11 +499,12 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                             price.dividedBy(roll),
                             String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                   entity.getShortName()));
-                getCampaign().addReport("<font color='" +
-                                              ReportingUtilities.getNegativeColor() +
-                                              "'>" +
-                                              resources.getString("UnitMarketPane.BlackMarketSwindled.report") +
-                                              "</font>");
+                getCampaign().addReport(ACQUISITIONS, "<font color='" +
+                                                            ReportingUtilities.getNegativeColor() +
+                                                            "'>" +
+                                                            resources.getString(
+                                                                  "UnitMarketPane.BlackMarketSwindled.report") +
+                                                            "</font>");
                 getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
@@ -539,12 +544,13 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                   UnitMarketType.getQuality(campaign, offer.getMarketType()));
 
             if (!instantDelivery) {
-                getCampaign().addReport("<font color='" +
-                                              ReportingUtilities.getPositiveColor() +
-                                              "'>" +
-                                              String.format(resources.getString(
-                                                          "UnitMarketPane.UnitDeliveryLength.report") + "</font>",
-                                                    offer.getTransitDuration()));
+                getCampaign().addReport(ACQUISITIONS, "<font color='" +
+                                                            ReportingUtilities.getPositiveColor() +
+                                                            "'>" +
+                                                            String.format(resources.getString(
+                                                                        "UnitMarketPane.UnitDeliveryLength.report") +
+                                                                                "</font>",
+                                                                  offer.getTransitDuration()));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);
         }

@@ -76,6 +76,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
@@ -87,7 +88,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
 import mekhq.campaign.stratCon.StratConCampaignState;
@@ -353,7 +353,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaignOptions.isUseWeatherConditions()) {
             setWeatherConditions(campaignOptions.isUseNoTornadoes());
         }
-        setMapSize();
+        setMapSize(campaign);
         setMapFile();
         if (isStandardScenario()) {
             forceCount = 1;
@@ -465,7 +465,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    public void setMapSize() {
+    public void setMapSize(Campaign campaign) {
         int roll = Compute.randomInt(20) + 1;
         if (roll < 6) {
             setMapSizeX(20);
@@ -1423,8 +1423,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         /* Ensure Novas use Frontline tables to get best chance at OmniMeks */
         int tmpQuality = quality;
-        if (forceType == FORCE_NOVA && quality < IUnitRating.DRAGOON_B) {
-            tmpQuality = IUnitRating.DRAGOON_B;
+        if (forceType == FORCE_NOVA && quality < DragoonRating.DRAGOON_B.getRating()) {
+            tmpQuality = DragoonRating.DRAGOON_B.getRating();
         }
         for (int point = 0; point < weights.length(); point++) {
             for (int unit = 0; unit < unitsPerPoint; unit++) {

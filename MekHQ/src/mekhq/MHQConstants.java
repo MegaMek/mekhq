@@ -48,6 +48,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
+    public static final String DISCORD_LINK = "https://discord.gg/megamek";
     // endregion General Constants
 
     // region Faction Generation Constants
@@ -97,6 +98,7 @@ public final class MHQConstants extends SuiteConstants {
     // region Personnel Tab
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
+    public static final String USE_UNIFIED_DAILY_REPORT = "useUnifiedDailyReport";
     // endregion Personnel Tab
     // endregion Display
 
@@ -226,6 +228,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
+    public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
     // endregion Nag Tab
 
     // region Miscellaneous Options
@@ -292,6 +295,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FORCE_ICON_PATH = "data/images/force";
     public static final String PERSONNEL_MARKET_DIRECTORY_PATH = "data/universe/markets/personnelMarket/";
     public static final String MAP_GEN_PATH = "data/mapgen";
+    public static final String LOGS_PATH = "logs";
 
     // region StratCon
     public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";

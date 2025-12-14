@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.finances;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
@@ -114,7 +116,7 @@ public class Asset {
         if (getFinancialTerm().endsToday(yesterday, today)) {
             finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
                   String.format(resources.getString("AssetPayment.finances"), getName()));
-            campaign.addReport(String.format(resources.getString("AssetPayment.report"),
+            campaign.addReport(FINANCES, String.format(resources.getString("AssetPayment.report"),
                   getIncome().toAmountAndSymbolString(), getName()));
         }
     }

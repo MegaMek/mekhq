@@ -39,6 +39,12 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
@@ -69,6 +75,7 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -89,6 +96,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.util.PlayerColour;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.annotations.Nullable;
@@ -123,11 +131,14 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.camOpsReputation.IUnitRating;
+import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanNewEvent;
 import mekhq.campaign.events.loans.LoanPaidEvent;
@@ -219,10 +230,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.stratCon.StratConRulesManager;
@@ -353,6 +360,10 @@ public class Campaign implements ITechManager {
     private transient String technicalReportHTML;
     private transient List<String> newTechnicalReports;
 
+    private final ArrayList<String> financesReport;
+    private transient String financesReportHTML;
+    private transient List<String> newFinancesReports;
+
     private final ArrayList<String> acquisitionsReport;
     private transient String acquisitionsReportHTML;
     private transient List<String> newAcquisitionsReports;
@@ -364,6 +375,10 @@ public class Campaign implements ITechManager {
     private final ArrayList<String> battleReport;
     private transient String battleReportHTML;
     private transient List<String> newBattleReports;
+
+    private final ArrayList<String> politicsReport;
+    private transient String politicsReportHTML;
+    private transient List<String> newPoliticsReports;
 
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
@@ -424,6 +439,7 @@ public class Campaign implements ITechManager {
     private String shipSearchResult; // AtB
     private LocalDate shipSearchExpiration; // AtB
     private IUnitGenerator unitGenerator; // deprecated
+    @Deprecated(since = "0.50.10", forRemoval = true)
     private IUnitRating unitRating; // deprecated
     private ReputationController reputation;
     private int crimeRating;
@@ -624,6 +640,10 @@ public class Campaign implements ITechManager {
         technicalReportHTML = "";
         newTechnicalReports = new ArrayList<>();
 
+        financesReport = new ArrayList<>();
+        financesReportHTML = "";
+        newFinancesReports = new ArrayList<>();
+
         acquisitionsReport = new ArrayList<>();
         acquisitionsReportHTML = "";
         newAcquisitionsReports = new ArrayList<>();
@@ -635,6 +655,10 @@ public class Campaign implements ITechManager {
         battleReport = new ArrayList<>();
         battleReportHTML = "";
         newBattleReports = new ArrayList<>();
+
+        politicsReport = new ArrayList<>();
+        politicsReportHTML = "";
+        newPoliticsReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -1125,9 +1149,9 @@ public class Campaign implements ITechManager {
         Money cost = Money.of(ms.getCost());
 
         if (getFunds().isLessThan(cost)) {
-            addReport("<font color='" +
-                            ReportingUtilities.getNegativeColor() +
-                            "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
+            addReport(FINANCES, "<font color='" +
+                                      ReportingUtilities.getNegativeColor() +
+                                      "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
             return;
         }
 
@@ -1158,11 +1182,11 @@ public class Campaign implements ITechManager {
         addNewUnit(en, true, transitDays, quality);
 
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
-            addReport("<font color='" +
-                            ReportingUtilities.getPositiveColor() +
-                            "'>Unit will be delivered in " +
-                            transitDays +
-                            " days.</font>");
+            addReport(ACQUISITIONS, "<font color='" +
+                                          ReportingUtilities.getPositiveColor() +
+                                          "'>Unit will be delivered in " +
+                                          transitDays +
+                                          " days.</font>");
         }
         setShipSearchResult(null);
         setShipSearchExpiration(null);
@@ -1227,9 +1251,9 @@ public class Campaign implements ITechManager {
                     Person spouse = person.getGenealogy().getSpouse();
 
                     if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
-                        addReport(spouse.getHyperlinkedFullTitle() +
-                                        ' ' +
-                                        resources.getString("turnoverJointDeparture.text"));
+                        addReport(PERSONNEL, spouse.getHyperlinkedFullTitle() +
+                                                   ' ' +
+                                                   resources.getString("turnoverJointDeparture.text"));
                         spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
 
                         turnoverRetirementInformation.add(spouse.getHyperlinkedFullTitle() +
@@ -1265,9 +1289,9 @@ public class Campaign implements ITechManager {
 
                             // if there is a remaining parent, there is a 50/50 chance the child departs
                             if ((hasRemainingParent) && (randomInt(2) == 0)) {
-                                addReport(child.getHyperlinkedFullTitle() +
-                                                ' ' +
-                                                resources.getString("turnoverJointDepartureChild.text"));
+                                addReport(PERSONNEL, child.getHyperlinkedFullTitle() +
+                                                           ' ' +
+                                                           resources.getString("turnoverJointDepartureChild.text"));
                                 child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
 
                                 turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() +
@@ -1279,9 +1303,9 @@ public class Campaign implements ITechManager {
                             // if there is no remaining parent, the child will always depart, unless the
                             // parents are dead
                             if ((!hasRemainingParent) && (child.getGenealogy().hasLivingParents())) {
-                                addReport(child.getHyperlinkedFullTitle() +
-                                                ' ' +
-                                                resources.getString("turnoverJointDepartureChild.text"));
+                                addReport(PERSONNEL, child.getHyperlinkedFullTitle() +
+                                                           ' ' +
+                                                           resources.getString("turnoverJointDepartureChild.text"));
                                 child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
 
                                 turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() +
@@ -1289,7 +1313,8 @@ public class Campaign implements ITechManager {
                                                                         resources.getString(
                                                                               "turnoverJointDepartureChild.text"));
                             } else if (!child.getGenealogy().hasLivingParents()) {
-                                addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
+                                addReport(PERSONNEL, child.getHyperlinkedFullTitle() + ' ' + resources.getString(
+                                      "orphaned.text"));
 
                                 turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() +
                                                                         ' ' +
@@ -1307,9 +1332,9 @@ public class Campaign implements ITechManager {
                 return true;
             }
         } else {
-            addReport("<font color='" +
-                            ReportingUtilities.getNegativeColor() +
-                            "'>You cannot afford to make the final payments.</font>");
+            addReport(FINANCES, "<font color='" +
+                                      ReportingUtilities.getNegativeColor() +
+                                      "'>You cannot afford to make the final payments.</font>");
             return false;
         }
 
@@ -1755,7 +1780,7 @@ public class Campaign implements ITechManager {
         scenarios.put(id, s);
 
         if (newScenario && !suppressReport) {
-            addReport(MessageFormat.format(resources.getString("newAtBScenario.format"),
+            addReport(BATTLE, MessageFormat.format(resources.getString("newAtBScenario.format"),
                   s.getHyperlinkedName(),
                   MekHQ.getMHQOptions().getDisplayFormattedDate(s.getDate())));
         }
@@ -1969,7 +1994,7 @@ public class Campaign implements ITechManager {
         game.addEntity(unit.getEntity());
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
-        addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
+        addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
     }
 
     /**
@@ -2052,7 +2077,7 @@ public class Campaign implements ITechManager {
         }
 
         checkDuplicateNamesDuringAdd(en);
-        addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
+        addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
         MekHQ.triggerEvent(new UnitNewEvent(unit));
 
         return unit;
@@ -2449,7 +2474,7 @@ public class Campaign implements ITechManager {
                       person.getSalary(this).multipliedBy(2),
                       String.format(resources.getString("personnelRecruitmentFinancesReason.text"),
                             person.getFullName()))) {
-                    addReport(String.format(resources.getString("personnelRecruitmentInsufficientFunds.text"),
+                    addReport(FINANCES, String.format(resources.getString("personnelRecruitmentInsufficientFunds.text"),
                           ReportingUtilities.getNegativeColor(),
                           person.getFullName()));
                     return false;
@@ -2498,7 +2523,7 @@ public class Campaign implements ITechManager {
                                                                 "personnelRecruitmentBondsman.text" :
                                                                 "personnelRecruitmentPrisoner.text")) :
                                "";
-            addReport(String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
+            addReport(PERSONNEL, String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
                   person.getHyperlinkedFullTitle(),
                   formerSurname,
                   add));
@@ -2654,7 +2679,7 @@ public class Campaign implements ITechManager {
             recruitPerson(spouse, PrisonerStatus.FREE, true, false, false);
 
             if (currentSpouse == spouse) {
-                addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                addReport(PERSONNEL, String.format(resources.getString("relativeJoinsForce.text"),
                       spouse.getHyperlinkedFullTitle(),
                       person.getHyperlinkedFullTitle(),
                       resources.getString("relativeJoinsForceSpouse.text")));
@@ -2709,7 +2734,7 @@ public class Campaign implements ITechManager {
             recruitPerson(child, PrisonerStatus.FREE, true, false, false);
 
             if (currentChildren.contains(child)) {
-                addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                addReport(PERSONNEL, String.format(resources.getString("relativeJoinsForce.text"),
                       child.getHyperlinkedFullTitle(),
                       person.getHyperlinkedFullTitle(),
                       resources.getString("relativeJoinsForceChild.text")));
@@ -2875,9 +2900,7 @@ public class Campaign implements ITechManager {
                 }
             }
             // Higher-rated units are more likely to have Blood named
-            if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
-                bloodnameTarget += IUnitRating.DRAGOON_C - getAtBUnitRatingMod();
-            }
+            bloodnameTarget += DragoonRating.DRAGOON_C.getRating() - getAtBUnitRatingMod();
 
             // Reavings diminish the number of available Blood rights in later eras
             int year = getGameYear();
@@ -3339,6 +3362,32 @@ public class Campaign implements ITechManager {
         return oldTechnicalReports;
     }
 
+    public List<String> getFinancesReport() {
+        return financesReport;
+    }
+
+    public void setFinancesReportHTML(String html) {
+        financesReportHTML = html;
+    }
+
+    public String getFinancesReportHTML() {
+        return financesReportHTML;
+    }
+
+    public List<String> getNewFinancesReports() {
+        return newFinancesReports;
+    }
+
+    public void setNewFinancesReports(List<String> reports) {
+        newFinancesReports = reports;
+    }
+
+    public List<String> fetchAndClearNewFinancesReports() {
+        List<String> oldFinancesReports = newFinancesReports;
+        setNewFinancesReports(new ArrayList<>());
+        return oldFinancesReports;
+    }
+
     public List<String> getAcquisitionsReport() {
         return acquisitionsReport;
     }
@@ -3441,6 +3490,32 @@ public class Campaign implements ITechManager {
         List<String> oldBattleReports = newBattleReports;
         setNewBattleReports(new ArrayList<>());
         return oldBattleReports;
+    }
+
+    public List<String> getPoliticsReport() {
+        return politicsReport;
+    }
+
+    public void setPoliticsReportHTML(String html) {
+        politicsReportHTML = html;
+    }
+
+    public String getPoliticsReportHTML() {
+        return politicsReportHTML;
+    }
+
+    public List<String> getNewPoliticsReports() {
+        return newPoliticsReports;
+    }
+
+    public void setNewPoliticsReports(List<String> reports) {
+        newPoliticsReports = reports;
+    }
+
+    public List<String> fetchAndClearNewPoliticsReports() {
+        List<String> oldPoliticsReports = newPoliticsReports;
+        setNewPoliticsReports(new ArrayList<>());
+        return oldPoliticsReports;
     }
 
     /**
@@ -4103,7 +4178,7 @@ public class Campaign implements ITechManager {
     private ShoppingList goShoppingStandard(ShoppingList sList) {
         List<Person> logisticsPersonnel = getLogisticsPersonnel();
         if (logisticsPersonnel.isEmpty()) {
-            addReport("Your force has no one capable of acquiring equipment.");
+            addReport(ACQUISITIONS, "Your force has no one capable of acquiring equipment.");
             return sList;
         }
 
@@ -4146,7 +4221,7 @@ public class Campaign implements ITechManager {
     private ShoppingList goShoppingByPlanet(ShoppingList sList) {
         List<Person> logisticsPersonnel = getLogisticsPersonnel();
         if (logisticsPersonnel.isEmpty()) {
-            addReport("Your force has no one capable of acquiring equipment.");
+            addReport(ACQUISITIONS, "Your force has no one capable of acquiring equipment.");
             return sList;
         }
 
@@ -4208,16 +4283,16 @@ public class Campaign implements ITechManager {
                                 totalQuantity++;
                             }
                             if (totalQuantity > 0) {
-                                addReport(personTitle +
-                                                "<font color='" +
-                                                ReportingUtilities.getPositiveColor() +
-                                                "'><b> found " +
-                                                shoppingItem.getQuantityName(totalQuantity) +
-                                                " on " +
-                                                system.getPrintableName(currentDate) +
-                                                ". Delivery in " +
-                                                transitTime +
-                                                " days.</b></font>");
+                                addReport(ACQUISITIONS, personTitle +
+                                                              "<font color='" +
+                                                              ReportingUtilities.getPositiveColor() +
+                                                              "'><b> found " +
+                                                              shoppingItem.getQuantityName(totalQuantity) +
+                                                              " on " +
+                                                              system.getPrintableName(currentDate) +
+                                                              ". Delivery in " +
+                                                              transitTime +
+                                                              " days.</b></font>");
                             }
                         } else if (result == PartAcquisitionResult.PartInherentFailure) {
                             shelvedItems.add(shoppingItem);
@@ -4230,11 +4305,11 @@ public class Campaign implements ITechManager {
                         // if we can't afford it, then don't keep searching for it on other planets
                         if (!canPayFor(shoppingItem)) {
                             if (!getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                                addReport("<font color='" +
-                                                ReportingUtilities.getNegativeColor() +
-                                                "'><b>You cannot afford to purchase another " +
-                                                shoppingItem.getAcquisitionName() +
-                                                "</b></font>");
+                                addReport(FINANCES, "<font color='" +
+                                                          ReportingUtilities.getNegativeColor() +
+                                                          "'><b>You cannot afford to purchase another " +
+                                                          shoppingItem.getAcquisitionName() +
+                                                          "</b></font>");
                             }
                             shelvedItems.add(shoppingItem);
                         } else {
@@ -4333,15 +4408,15 @@ public class Campaign implements ITechManager {
         // if it's already impossible, don't bother with the rest
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='" +
-                                ReportingUtilities.getNegativeColor() +
-                                "'><b>" +
-                                impossibleSentencePrefix +
-                                acquisition.getAcquisitionName() +
-                                " on " +
-                                system.getPrintableName(getLocalDate()) +
-                                " because:</b></font> " +
-                                target.getDesc());
+                addReport(ACQUISITIONS, "<font color='" +
+                                              ReportingUtilities.getNegativeColor() +
+                                              "'><b>" +
+                                              impossibleSentencePrefix +
+                                              acquisition.getAcquisitionName() +
+                                              " on " +
+                                              system.getPrintableName(getLocalDate()) +
+                                              " because:</b></font> " +
+                                              target.getDesc());
             }
             return PartAcquisitionResult.PartInherentFailure;
         }
@@ -4355,15 +4430,15 @@ public class Campaign implements ITechManager {
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='" +
-                                ReportingUtilities.getNegativeColor() +
-                                "'><b>" +
-                                impossibleSentencePrefix +
-                                acquisition.getAcquisitionName() +
-                                " on " +
-                                system.getPrintableName(getLocalDate()) +
-                                " because:</b></font> " +
-                                target.getDesc());
+                addReport(ACQUISITIONS, "<font color='" +
+                                              ReportingUtilities.getNegativeColor() +
+                                              "'><b>" +
+                                              impossibleSentencePrefix +
+                                              acquisition.getAcquisitionName() +
+                                              " on " +
+                                              system.getPrintableName(getLocalDate()) +
+                                              " because:</b></font> " +
+                                              target.getDesc());
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         }
@@ -4375,48 +4450,48 @@ public class Campaign implements ITechManager {
         if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='" +
-                                ReportingUtilities.getNegativeColor() +
-                                "'><b>" +
-                                failedSentencePrefix +
-                                acquisition.getAcquisitionName() +
-                                " on " +
-                                system.getPrintableName(getLocalDate()) +
-                                " at TN: " +
-                                target.getValue() +
-                                " - Modifiers (Tech: " +
-                                (techBonus > 0 ? "+" : "") +
-                                techBonus +
-                                ", Industry: " +
-                                (industryBonus > 0 ? "+" : "") +
-                                industryBonus +
-                                ", Outputs: " +
-                                (outputsBonus > 0 ? "+" : "") +
-                                outputsBonus +
-                                ") </font>");
+                addReport(ACQUISITIONS, "<font color='" +
+                                              ReportingUtilities.getNegativeColor() +
+                                              "'><b>" +
+                                              failedSentencePrefix +
+                                              acquisition.getAcquisitionName() +
+                                              " on " +
+                                              system.getPrintableName(getLocalDate()) +
+                                              " at TN: " +
+                                              target.getValue() +
+                                              " - Modifiers (Tech: " +
+                                              (techBonus > 0 ? "+" : "") +
+                                              techBonus +
+                                              ", Industry: " +
+                                              (industryBonus > 0 ? "+" : "") +
+                                              industryBonus +
+                                              ", Outputs: " +
+                                              (outputsBonus > 0 ? "+" : "") +
+                                              outputsBonus +
+                                              ") </font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         } else {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='" +
-                                ReportingUtilities.getPositiveColor() +
-                                "'>" +
-                                succeededSentencePrefix +
-                                acquisition.getAcquisitionName() +
-                                " on " +
-                                system.getPrintableName(getLocalDate()) +
-                                " at TN: " +
-                                target.getValue() +
-                                " - Modifiers (Tech: " +
-                                (techBonus > 0 ? "+" : "") +
-                                techBonus +
-                                ", Industry: " +
-                                (industryBonus > 0 ? "+" : "") +
-                                industryBonus +
-                                ", Outputs: " +
-                                (outputsBonus > 0 ? "+" : "") +
-                                outputsBonus +
-                                ") </font>");
+                addReport(ACQUISITIONS, "<font color='" +
+                                              ReportingUtilities.getPositiveColor() +
+                                              "'>" +
+                                              succeededSentencePrefix +
+                                              acquisition.getAcquisitionName() +
+                                              " on " +
+                                              system.getPrintableName(getLocalDate()) +
+                                              " at TN: " +
+                                              target.getValue() +
+                                              " - Modifiers (Tech: " +
+                                              (techBonus > 0 ? "+" : "") +
+                                              techBonus +
+                                              ", Industry: " +
+                                              (industryBonus > 0 ? "+" : "") +
+                                              industryBonus +
+                                              ", Outputs: " +
+                                              (outputsBonus > 0 ? "+" : "") +
+                                              outputsBonus +
+                                              ") </font>");
             }
             return PartAcquisitionResult.Success;
         }
@@ -4489,7 +4564,7 @@ public class Campaign implements ITechManager {
                             "</b></font>";
             if (!getCampaignOptions().isUsePlanetaryAcquisition() ||
                       getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport(report);
+                addReport(ACQUISITIONS, report);
             }
             return false;
         }
@@ -4553,7 +4628,7 @@ public class Campaign implements ITechManager {
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
         if (!getCampaignOptions().isUsePlanetaryAcquisition() || getCampaignOptions().isPlanetAcquisitionVerbose()) {
-            addReport(report);
+            addReport(ACQUISITIONS, report);
         }
         return found;
     }
@@ -4606,7 +4681,8 @@ public class Campaign implements ITechManager {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
-                addReport(String.format(resources.getString("noTech.mothballing"), unit.getHyperlinkedName()));
+                addReport(TECHNICAL, String.format(resources.getString("noTech.mothballing"),
+                      unit.getHyperlinkedName()));
                 unit.cancelMothballOrActivation();
                 return;
             }
@@ -4617,7 +4693,7 @@ public class Campaign implements ITechManager {
             // check AsTech time
             if (!unit.isSelfCrewed() && asTechPoolMinutes < minutes * 6) {
                 // uh-oh
-                addReport(String.format(resources.getString("notEnoughAstechTime.mothballing"),
+                addReport(TECHNICAL, String.format(resources.getString("notEnoughAstechTime.mothballing"),
                       unit.getHyperlinkedName()));
                 return;
             }
@@ -4648,7 +4724,7 @@ public class Campaign implements ITechManager {
             report += String.format(resources.getString("remaining.text"), unit.getMothballTime());
         }
 
-        addReport(report);
+        addReport(TECHNICAL, report);
     }
 
     /**
@@ -4691,7 +4767,8 @@ public class Campaign implements ITechManager {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
-                addReport(String.format(resources.getString("noTech.activation"), unit.getHyperlinkedName()));
+                addReport(TECHNICAL, String.format(resources.getString("noTech.activation"),
+                      unit.getHyperlinkedName()));
                 unit.cancelMothballOrActivation();
                 return;
             }
@@ -4702,7 +4779,7 @@ public class Campaign implements ITechManager {
             // check AsTech time
             if (!unit.isSelfCrewed() && asTechPoolMinutes < minutes * 6) {
                 // uh-oh
-                addReport(String.format(resources.getString("notEnoughAstechTime.activation"),
+                addReport(TECHNICAL, String.format(resources.getString("notEnoughAstechTime.activation"),
                       unit.getHyperlinkedName()));
                 return;
             }
@@ -4733,7 +4810,7 @@ public class Campaign implements ITechManager {
             report += String.format(resources.getString("remaining.text"), unit.getMothballTime());
         }
 
-        addReport(report);
+        addReport(TECHNICAL, report);
     }
 
     public void refit(Refit theRefit) {
@@ -4741,9 +4818,9 @@ public class Campaign implements ITechManager {
                             theRefit.getTech() :
                             theRefit.getUnit().getEngineer();
         if (tech == null) {
-            addReport("No tech is assigned to refit " +
-                            theRefit.getOriginalEntity().getShortName() +
-                            ". Refit cancelled.");
+            addReport(TECHNICAL, "No tech is assigned to refit " +
+                                       theRefit.getOriginalEntity().getShortName() +
+                                       ". Refit cancelled.");
             theRefit.cancel();
             return;
         }
@@ -4815,7 +4892,7 @@ public class Campaign implements ITechManager {
             }
         }
         MekHQ.triggerEvent(new PartWorkEvent(tech, theRefit));
-        addReport(report);
+        addReport(TECHNICAL, report);
     }
 
     /**
@@ -4865,21 +4942,21 @@ public class Campaign implements ITechManager {
         if ((partWork instanceof Armor) && !partWork.isSalvaging()) {
             if (!((Armor) partWork).isInSupply()) {
                 report += "<b>Not enough armor remaining.  Task suspended.</b>";
-                addReport(report);
+                addReport(TECHNICAL, report);
                 return report;
             }
         }
         if ((partWork instanceof ProtoMekArmor) && !partWork.isSalvaging()) {
             if (!((ProtoMekArmor) partWork).isInSupply()) {
                 report += "<b>Not enough Protomek armor remaining.  Task suspended.</b>";
-                addReport(report);
+                addReport(TECHNICAL, report);
                 return report;
             }
         }
         if ((partWork instanceof BAArmor) && !partWork.isSalvaging()) {
             if (!((BAArmor) partWork).isInSupply()) {
                 report += "<b>Not enough BA armor remaining.  Task suspended.</b>";
-                addReport(report);
+                addReport(TECHNICAL, report);
                 return report;
             }
         }
@@ -4949,7 +5026,7 @@ public class Campaign implements ITechManager {
                     partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
-                addReport(report);
+                addReport(TECHNICAL, report);
                 return report;
             }
         } else {
@@ -5051,7 +5128,7 @@ public class Campaign implements ITechManager {
         report += wrongType;
         partWork.cancelAssignment(true);
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
-        addReport(report);
+        addReport(TECHNICAL, report);
         return report;
     }
 
@@ -5091,11 +5168,11 @@ public class Campaign implements ITechManager {
     public void readNews() {
         // read the news
         for (NewsItem article : news.fetchNewsFor(getLocalDate())) {
-            addReport(article.getHeadlineForReport());
+            addReport(GENERAL, article.getHeadlineForReport());
         }
 
         for (NewsItem article : this.systemsInstance.getPlanetaryNews(getLocalDate())) {
-            addReport(article.getHeadlineForReport());
+            addReport(GENERAL, article.getHeadlineForReport());
         }
     }
 
@@ -5442,7 +5519,7 @@ public class Campaign implements ITechManager {
         getHangar().removeUnit(unit.getId());
 
         checkDuplicateNamesDuringDelete(unit.getEntity());
-        addReport(unit.getName() + " has been removed from the unit roster.");
+        addReport(ACQUISITIONS, unit.getName() + " has been removed from the unit roster.");
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
 
@@ -5473,7 +5550,7 @@ public class Campaign implements ITechManager {
         removeKillsFor(person.getId());
         getRetirementDefectionTracker().removePerson(person);
         if (log) {
-            addReport(person.getFullTitle() + " has been removed from the personnel roster.");
+            addReport(PERSONNEL, person.getFullTitle() + " has been removed from the personnel roster.");
         }
 
         personnel.remove(person.getId());
@@ -5926,28 +6003,6 @@ public class Campaign implements ITechManager {
     /**
      * Formats and then adds a report to the daily log
      *
-     * @param format  String with format markers.
-     * @param objects Variable list of objects to format into {@code format}
-     */
-    public void addReport(final String format, final Object... objects) {
-        addReport(DailyReportType.GENERAL, String.format(format, objects));
-    }
-
-    /**
-     * Adds a report to the daily log
-     *
-     * @param report - the report String
-     */
-    public void addReport(String report) {
-        if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
-            addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
-        }
-        addReportInternal(DailyReportType.GENERAL, report);
-    }
-
-    /**
-     * Formats and then adds a report to the daily log
-     *
      * @param type    what log to place the report in
      * @param format  String with format markers.
      * @param objects Variable list of objects to format into {@code format}
@@ -5962,10 +6017,21 @@ public class Campaign implements ITechManager {
      * @param type   what log to place the report in
      * @param report - the report String
      */
-    public void addReport(final DailyReportType type, String report) {
+    public void addReport(DailyReportType type, String report) {
+        if (StringUtility.isNullOrBlank(report)) {
+            return;
+        }
+
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             addInMemoryLogHistory(new HistoricalLogEntry(getLocalDate(), report));
         }
+
+        // We handle this here, instead of 'addReportInternal' as we don't want to post multiple new day 'dates' to
+        // the General tab
+        if (MekHQ.getMHQOptions().getUnifiedDailyReport()) {
+            type = GENERAL;
+        }
+
         addReportInternal(type, report);
     }
 
@@ -6003,6 +6069,17 @@ public class Campaign implements ITechManager {
                 }
 
                 newTechnicalReports.add(report);
+            }
+            case FINANCES -> {
+                financesReport.add(report);
+                if (!financesReportHTML.isEmpty()) {
+                    financesReportHTML = financesReportHTML + REPORT_LINEBREAK + report;
+                    newFinancesReports.add(REPORT_LINEBREAK);
+                } else {
+                    financesReportHTML = report;
+                }
+
+                newFinancesReports.add(report);
             }
             case ACQUISITIONS -> {
                 acquisitionsReport.add(report);
@@ -6048,6 +6125,17 @@ public class Campaign implements ITechManager {
 
                 newBattleReports.add(report);
             }
+            case POLITICS -> {
+                politicsReport.add(report);
+                if (!politicsReportHTML.isEmpty()) {
+                    politicsReportHTML = politicsReportHTML + REPORT_LINEBREAK + report;
+                    newPoliticsReports.add(REPORT_LINEBREAK);
+                } else {
+                    politicsReportHTML = report;
+                }
+
+                newPoliticsReports.add(report);
+            }
         }
         MekHQ.triggerEvent(new ReportEvent(this, report));
     }
@@ -6083,7 +6171,7 @@ public class Campaign implements ITechManager {
 
         finances.credit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
-        addReport("Funds added : " + quantityString + " (" + description + ')');
+        addReport(FINANCES, "Funds added : " + quantityString + " (" + description + ')');
     }
 
     public void removeFunds(final TransactionType type, final Money quantity, @Nullable String description) {
@@ -6093,7 +6181,7 @@ public class Campaign implements ITechManager {
 
         finances.debit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
-        addReport("Funds removed : " + quantityString + " (" + description + ')');
+        addReport(FINANCES, "Funds removed : " + quantityString + " (" + description + ')');
     }
 
     /**
@@ -6114,7 +6202,7 @@ public class Campaign implements ITechManager {
               individualPayouts,
               getCampaignOptions().isTrackTotalEarnings());
         String quantityString = quantity.toAmountAndSymbolString();
-        addReport("Funds removed : " + quantityString + " (" + description + ')');
+        addReport(FINANCES, "Funds removed : " + quantityString + " (" + description + ')');
 
     }
 
@@ -6214,7 +6302,7 @@ public class Campaign implements ITechManager {
         return factionStandingUltimatumsLibrary;
     }
 
-    public void writeToXML(final PrintWriter writer) {
+    public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
         int indent = 0;
 
         // File header
@@ -6310,6 +6398,13 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "technicalReport");
 
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "financesReport");
+        for (String report : financesReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "financesReport");
+
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "acquisitionsReport");
         for (String report : acquisitionsReport) {
             // This cannot use the MHQXMLUtility as it cannot be escaped
@@ -6337,6 +6432,13 @@ public class Campaign implements ITechManager {
             writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "battleReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "politicsReport");
+        for (String report : politicsReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicsReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info
@@ -6459,8 +6561,8 @@ public class Campaign implements ITechManager {
         writePartInUseToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "partsInUse");
 
-        if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
-            writeCustoms(writer);
+        if (isBugReportPrep || MekHQ.getMHQOptions().getWriteCustomsToXML()) {
+            writeCustoms(writer, isBugReportPrep);
         }
 
         // Okay, we're done.
@@ -6468,45 +6570,100 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "campaign");
     }
 
-    private void writeCustoms(PrintWriter pw1) {
-        for (String name : customs) {
-            MekSummary ms = MekSummaryCache.getInstance().getMek(name);
-            if (ms == null) {
+    /**
+     * Writes serialized custom unit definitions to the provided {@link PrintWriter}.
+     *
+     * <p>When invoked for bug report preparation, this method scans all units currently present in the campaign,
+     * extracts their raw short names, and treats them as custom entries to be exported. Each candidate name is resolved
+     * via the {@link MekSummaryCache}; if a definition is found, the source entity is parsed and serialized into
+     * XML.</p>
+     *
+     * <p>BattleMeks are exported using embedded MTF data wrapped in CDATA; all other supported entity types are
+     * exported as BLK content, line-by-line and wrapped in CDATA.</p>
+     *
+     * <p>Units that cannot be located in the cache or that fail parsing are skipped, with errors logged. The
+     * ordering of exported units depends on the underlying {@link Set} implementation.</p>
+     *
+     * <p><b>Note:</b> When {@code isBugReportPrep} is {@code false}, this method replaces the custom set.</p>
+     *
+     * @param printWriter     the output writer used to emit formatted {@code <custom>} elements
+     * @param isBugReportPrep whether campaign unit names should be collected for export; if {@code false}, no custom
+     *                        entities will be written by this method
+     */
+    private void writeCustoms(PrintWriter printWriter, boolean isBugReportPrep) {
+        Set<String> customUnits = new HashSet<>();
+        if (isBugReportPrep) {
+            for (Unit unit : units.getUnits()) {
+                Entity entity = unit.getEntity();
+                if (entity != null) {
+                    String shortName = entity.getShortNameRaw();
+                    if (!StringUtility.isNullOrBlank(shortName)) {
+                        customUnits.add(shortName);
+                    } else {
+                        LOGGER.warn("shortName was null or blank for {}. Skipping", unit.getName());
+                    }
+                }
+            }
+        } else {
+            customUnits = new HashSet<>(customs);
+        }
+
+        for (String name : customUnits) {
+            MekSummary mekSummary = MekSummaryCache.getInstance().getMek(name);
+            if (mekSummary == null) {
+                LOGGER.warn("mekSummary was null for {}", name);
                 continue;
             }
 
             MekFileParser mekFileParser = null;
             try {
-                mekFileParser = new MekFileParser(ms.getSourceFile());
+                File sourceFile = mekSummary.getSourceFile();
+                if (sourceFile == null) {
+                    LOGGER.warn("sourceFile was null for {}", name);
+                    continue;
+                }
+
+                mekFileParser = new MekFileParser(sourceFile, mekSummary.getEntryName());
             } catch (EntityLoadingException ex) {
-                LOGGER.error("", ex);
-            }
-            if (mekFileParser == null) {
+                LOGGER.error("Failed to fetch MekFileParser for {} // {}",
+                      mekSummary.getSourceFile(), mekSummary.getEntryName(), ex);
                 continue;
             }
-            Entity en = mekFileParser.getEntity();
-            pw1.println("\t<custom>");
-            pw1.println("\t\t<name>" + name + "</name>");
-            if (en instanceof Mek) {
-                pw1.print("\t\t<mtf><![CDATA[");
-                pw1.print(((Mek) en).getMtf());
-                pw1.println("]]></mtf>");
+
+            if (mekFileParser == null) {
+                LOGGER.warn("mekFileParser was null for {}", name);
+                continue;
+            }
+
+            Entity entity = mekFileParser.getEntity();
+            if (entity == null) {
+                LOGGER.warn("mekFileParser returned a null entity {}", name);
+                continue;
+            }
+
+            printWriter.println("\t<custom>");
+            String escapedName = MHQXMLUtility.escape(name);
+            printWriter.println("\t\t<name>" + escapedName + "</name>");
+            if (entity instanceof Mek) {
+                printWriter.print("\t\t<mtf><![CDATA[");
+                printWriter.print(((Mek) entity).getMtf());
+                printWriter.println("]]></mtf>");
             } else {
                 try {
-                    BuildingBlock blk = BLKFile.getBlock(en);
-                    pw1.print("\t\t<blk><![CDATA[");
-                    for (String s : blk.getAllDataAsString()) {
-                        if (s.isEmpty()) {
+                    BuildingBlock block = BLKFile.getBlock(entity);
+                    printWriter.print("\t\t<blk><![CDATA[");
+                    for (String data : block.getAllDataAsString()) {
+                        if (data.isEmpty()) {
                             continue;
                         }
-                        pw1.println(s);
+                        printWriter.println(data);
                     }
-                    pw1.println("]]></blk>");
+                    printWriter.println("]]></blk>");
                 } catch (EntitySavingException e) {
-                    LOGGER.error("Failed to save custom entity {}", en.getDisplayName(), e);
+                    LOGGER.error("Failed to save custom entity {}", entity.getDisplayName(), e);
                 }
             }
-            pw1.println("\t</custom>");
+            printWriter.println("\t</custom>");
         }
     }
 
@@ -7957,40 +8114,21 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the text representation of the unit rating based on the selected unit rating method. If the unit rating
-     * method is FMMR, the unit rating value is returned. If the unit rating method is Campaign Operations, the
-     * reputation rating and unit rating modification are combined and returned. If the unit rating method is neither
-     * FMMR nor Campaign Operations, "N/A" is returned.
+     * Returns the text representation of the unit rating based on the selected unit rating method.
      *
      * @return The text representation of the unit rating
      */
     public String getUnitRatingText() {
-        UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
-
-        if (unitRatingMethod.isFMMR()) {
-            return getUnitRating().getUnitRating();
-        } else if (unitRatingMethod.isCampaignOperations()) {
-            return String.valueOf(reputation.getReputationRating());
-        } else {
-            return "N/A";
-        }
+        return String.valueOf(reputation.getReputationRating());
     }
 
     /**
-     * Retrieves the unit rating modifier based on campaign options. If the unit rating method is not enabled, it
-     * returns the default value of IUnitRating.DRAGOON_C. If the unit rating method uses FMMR, it returns the unit
-     * rating as an integer. Otherwise, it calculates the modifier using the getAtBModifier method.
+     * Retrieves the unit rating modifier based on campaign options.
      *
      * @return The unit rating modifier based on the campaign options.
      */
     public int getAtBUnitRatingMod() {
-        if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
-            return IUnitRating.DRAGOON_C;
-        }
-
-        return getCampaignOptions().getUnitRatingMethod().isFMMR() ?
-                     getUnitRating().getUnitRatingAsInteger() :
-                     reputation.getAtbModifier();
+        return reputation.getAtbModifier();
     }
 
     /**
@@ -8537,7 +8675,7 @@ public class Campaign implements ITechManager {
                           getLocalDate(),
                           shares,
                           String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
-                        addReport(financeResources.getString("DistributedShares.text"),
+                        addReport(FINANCES, financeResources.getString("DistributedShares.text"),
                               shares.toAmountAndSymbolString());
 
                         getFinances().payOutSharesToPersonnel(this, shares);
@@ -8550,19 +8688,19 @@ public class Campaign implements ITechManager {
                       getLocalDate(),
                       remainingMoney,
                       "Remaining payment for " + contract.getName());
-                addReport("Your account has been credited for " +
-                                remainingMoney.toAmountAndSymbolString() +
-                                " for the remaining payout from contract " +
-                                contract.getHyperlinkedName());
+                addReport(FINANCES, "Your account has been credited for " +
+                                          remainingMoney.toAmountAndSymbolString() +
+                                          " for the remaining payout from contract " +
+                                          contract.getHyperlinkedName());
             } else if (remainingMoney.isNegative()) {
                 getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                       getLocalDate(),
                       remainingMoney,
                       "Repaying payment overages for " + contract.getName());
-                addReport("Your account has been debited for " +
-                                remainingMoney.absolute().toAmountAndSymbolString() +
-                                " to repay payment overages occurred during the contract " +
-                                contract.getHyperlinkedName());
+                addReport(FINANCES, "Your account has been debited for " +
+                                          remainingMoney.absolute().toAmountAndSymbolString() +
+                                          " to repay payment overages occurred during the contract " +
+                                          contract.getHyperlinkedName());
             }
 
             // This relies on the mission being a Contract, and AtB to be on
@@ -8735,11 +8873,11 @@ public class Campaign implements ITechManager {
     }
 
     public void addLoan(Loan loan) {
-        addReport("You have taken out loan " +
-                        loan +
-                        ". Your account has been credited " +
-                        loan.getPrincipal().toAmountAndSymbolString() +
-                        " for the principal amount.");
+        addReport(FINANCES, "You have taken out loan " +
+                                  loan +
+                                  ". Your account has been credited " +
+                                  loan.getPrincipal().toAmountAndSymbolString() +
+                                  " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
         finances.credit(TransactionType.LOAN_PRINCIPAL,
@@ -8753,18 +8891,18 @@ public class Campaign implements ITechManager {
               getLocalDate(),
               loan.determineRemainingValue(),
               "Loan payoff for " + loan)) {
-            addReport("You have paid off the remaining loan balance of " +
-                            loan.determineRemainingValue().toAmountAndSymbolString() +
-                            " on " +
-                            loan);
+            addReport(FINANCES, "You have paid off the remaining loan balance of " +
+                                      loan.determineRemainingValue().toAmountAndSymbolString() +
+                                      " on " +
+                                      loan);
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
-            addReport("<font color='" +
-                            ReportingUtilities.getNegativeColor() +
-                            "'>You do not have enough funds to pay off " +
-                            loan +
-                            "</font>");
+            addReport(FINANCES, "<font color='" +
+                                      ReportingUtilities.getNegativeColor() +
+                                      "'>You do not have enough funds to pay off " +
+                                      loan +
+                                      "</font>");
         }
     }
 
@@ -9090,20 +9228,8 @@ public class Campaign implements ITechManager {
      * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
      * Default is CampaignOpsReputation
      */
+    @Deprecated(since = "0.50.10", forRemoval = true)
     public IUnitRating getUnitRating() {
-        // if we switched unit rating methods,
-        if (unitRating != null && (unitRating.getUnitRatingMethod() != getCampaignOptions().getUnitRatingMethod())) {
-            unitRating = null;
-        }
-
-        if (unitRating == null) {
-            UnitRatingMethod method = getCampaignOptions().getUnitRatingMethod();
-
-            if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(method)) {
-                unitRating = new FieldManualMercRevDragoonsRating(this);
-            }
-        }
-
         return unitRating;
     }
 

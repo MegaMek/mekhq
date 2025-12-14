@@ -36,6 +36,8 @@ import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
@@ -177,7 +179,7 @@ public class TrainingCombatTeams {
         Person commander = campaign.getPerson(commanderID);
 
         if (commander == null) {
-            campaign.addReport(String.format(resources.getString("noCommander.text"), force.getName(),
+            campaign.addReport(GENERAL, String.format(resources.getString("noCommander.text"), force.getName(),
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
             LOGGER.info("Failed to fetch commander for Force: {}", force.getName());
             return;
@@ -264,7 +266,7 @@ public class TrainingCombatTeams {
                 }
 
                 if (educatorSkills.isEmpty() || skillsBeingTrained.isEmpty()) {
-                    campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("notLearningAnything.text"),
                           trainee.getHyperlinkedFullTitle(),
                           commander.getFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -279,7 +281,7 @@ public class TrainingCombatTeams {
                       campaign.getLocalDate());
 
                 if (!StringUtility.isNullOrBlank(report)) {
-                    campaign.addReport(report);
+                    campaign.addReport(PERSONNEL, report);
                 }
             }
         }
@@ -409,7 +411,7 @@ public class TrainingCombatTeams {
         String report = String.format(resources.getString("learnedProgress.text"),
               educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
               marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
-        campaign.addReport(report);
+        campaign.addReport(PERSONNEL, report);
 
         return raw;
     }

@@ -32,9 +32,16 @@
  */
 package mekhq.campaign.universe.factionHints;
 
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.universe.factionHints.DiplomacyLabel.getDiplomacyEventsStartingOn;
+import static mekhq.campaign.universe.factionHints.DiplomacyType.ALLIANCE;
+import static mekhq.campaign.universe.factionHints.DiplomacyType.NEUTRALITY;
+import static mekhq.campaign.universe.factionHints.DiplomacyType.RIVALRY;
+import static mekhq.campaign.universe.factionHints.DiplomacyType.WAR;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -105,7 +112,8 @@ public class WarAndPeaceProcessor {
         this.today = campaign.getLocalDate();
         final Faction campaignFaction = campaign.getFaction();
 
-        processFactionHints(campaignFaction, activeOnly);
+        FactionHints factionHints = FactionHints.getInstance();
+        processFactionHints(campaignFaction, activeOnly, factionHints);
         triggerAllMessages(campaignFaction);
     }
 
@@ -180,29 +188,42 @@ public class WarAndPeaceProcessor {
      *
      * @param campaignFaction The player's campaign faction.
      * @param activeOnly      If {@code true}, only check whether the hint is active today not if it started today
+     * @param factionHints    A factionHints instance
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void processFactionHints(final Faction campaignFaction, boolean activeOnly) {
-        FactionHints factionHints = FactionHints.getInstance();
+    private void processFactionHints(final Faction campaignFaction, boolean activeOnly, FactionHints factionHints) {
         Collection<Faction> activeFactions = Factions.getInstance().getActiveFactions(today);
 
-        final Map<Faction, List<FactionHint>> wars = factionHints.getWars()
-                                                           .getOrDefault(campaignFaction, Map.of());
-        collectionFactions(activeFactions, wars, warStartFactions, warEndFactions, activeOnly);
+        // Dialog alerts
+        final Map<Faction, Map<Faction, List<FactionHint>>> allWars = factionHints.getWars();
+        final Map<Faction, List<FactionHint>> wars = allWars.getOrDefault(campaignFaction, Map.of());
+        processFactions(activeFactions, wars, warStartFactions, warEndFactions, activeOnly);
 
-        final Map<Faction, List<FactionHint>> rivalries = factionHints.getRivals()
-                                                                .getOrDefault(campaignFaction, Map.of());
-        collectionFactions(activeFactions, rivalries, rivalStartFactions, rivalEndFactions, activeOnly);
+        final Map<Faction, Map<Faction, List<FactionHint>>> allRivals = factionHints.getRivals();
+        final Map<Faction, List<FactionHint>> rivalries = allRivals.getOrDefault(campaignFaction, Map.of());
+        processFactions(activeFactions, rivalries, rivalStartFactions, rivalEndFactions, activeOnly);
 
-        final Map<Faction, List<FactionHint>> neutrals = factionHints.getNeutralExceptions()
-                                                               .getOrDefault(campaignFaction, Map.of());
-        collectionFactions(activeFactions, neutrals, neutralStartFactions, neutralEndFactions, activeOnly);
+        final Map<Faction, Map<Faction, List<FactionHint>>> allNeutrals = factionHints.getNeutralExceptions();
+        final Map<Faction, List<FactionHint>> neutrals = allNeutrals.getOrDefault(campaignFaction, Map.of());
+        processFactions(activeFactions, neutrals, neutralStartFactions, neutralEndFactions, activeOnly);
 
-        final Map<Faction, List<FactionHint>> alliances = factionHints.getAlliances()
-                                                                .getOrDefault(campaignFaction, Map.of());
-        collectionFactions(activeFactions, alliances, allianceStartFactions, allianceEndFactions, activeOnly);
+        final Map<Faction, Map<Faction, List<FactionHint>>> allAlliances = factionHints.getAlliances();
+        final Map<Faction, List<FactionHint>> alliances = allAlliances.getOrDefault(campaignFaction, Map.of());
+        processFactions(activeFactions, alliances, allianceStartFactions, allianceEndFactions, activeOnly);
+
+        // Daily Report alerts
+        boolean isClanCampaign = campaignFaction.isClan();
+        List<String> reports = new ArrayList<>();
+        reports.addAll(getDiplomacyEventsStartingOn(today, allWars, WAR, isClanCampaign));
+        reports.addAll(getDiplomacyEventsStartingOn(today, allRivals, RIVALRY, isClanCampaign));
+        reports.addAll(getDiplomacyEventsStartingOn(today, allNeutrals, NEUTRALITY, isClanCampaign));
+        reports.addAll(getDiplomacyEventsStartingOn(today, allAlliances, ALLIANCE, isClanCampaign));
+
+        for (String report : reports) {
+            campaign.addReport(POLITICS, report);
+        }
     }
 
     /**
@@ -217,7 +238,7 @@ public class WarAndPeaceProcessor {
      * @author Illiani
      * @since 0.50.10
      */
-    private void collectionFactions(final Collection<Faction> activeFactions,
+    private void processFactions(final Collection<Faction> activeFactions,
           final Map<Faction, List<FactionHint>> factionHints, final Set<Faction> startFactions,
           final Set<Faction> endFactions, boolean activeOnly) {
         for (Faction faction : activeFactions) {

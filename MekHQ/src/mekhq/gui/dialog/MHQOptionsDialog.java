@@ -111,6 +111,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     // region Personnel Tab
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
+    private JCheckBox chkUnifiedDailyReport;
     // endregion Personnel Tab
     // endregion Display
 
@@ -222,6 +223,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionBeginTransitConfirmation;
     private JCheckBox optionStratConBatchallBreachConfirmation;
     private JCheckBox optionStratConDeployConfirmation;
+    private JCheckBox optionAbandonUnitsConfirmation;
 
     // endregion Nag Tab
 
@@ -442,6 +444,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         });
 
         optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
+
+        chkUnifiedDailyReport = new JCheckBox(resources.getString("chkUnifiedDailyReport.text"));
+        chkUnifiedDailyReport.setToolTipText(resources.getString("chkUnifiedDailyReport.toolTipText"));
+        chkUnifiedDailyReport.setName("chkUnifiedDailyReport");
         // endregion Personnel Tab
 
         // Programmatically Assign Accessibility Labels
@@ -507,7 +513,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             GroupLayout.DEFAULT_SIZE,
                                                             GroupLayout.DEFAULT_SIZE,
                                                             40))
-                                      .addComponent(optionPersonnelFilterOnPrimaryRole));
+                                      .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                      .addComponent(chkUnifiedDailyReport));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
@@ -545,7 +552,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(labelPersonnelFilterStyle)
                                                         .addComponent(optionPersonnelFilterStyle))
-                                        .addComponent(optionPersonnelFilterOnPrimaryRole));
+                                        .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                        .addComponent(chkUnifiedDailyReport));
 
         return body;
     }
@@ -1190,6 +1198,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionStratConDeployConfirmation.toolTipText"));
         optionStratConDeployConfirmation.setName("optionStratConDeployConfirmation");
 
+        optionAbandonUnitsConfirmation = new JCheckBox(resources.getString(
+              "optionAbandonUnitsConfirmation.text"));
+        optionAbandonUnitsConfirmation.setToolTipText(resources.getString(
+              "optionAbandonUnitsConfirmation.toolTipText"));
+        optionAbandonUnitsConfirmation.setName("optionAbandonUnitsConfirmation");
+
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -1224,7 +1238,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionFactionStandingsUltimatumConfirmation)
                                       .addComponent(optionBeginTransitConfirmation)
                                       .addComponent(optionStratConBatchallBreachConfirmation)
-                                      .addComponent(optionStratConDeployConfirmation));
+                                      .addComponent(optionStratConDeployConfirmation)
+                                      .addComponent(optionAbandonUnitsConfirmation));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionUnmaintainedUnitsNag)
@@ -1251,7 +1266,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionFactionStandingsUltimatumConfirmation)
                                         .addComponent(optionBeginTransitConfirmation)
                                         .addComponent(optionStratConBatchallBreachConfirmation)
-                                        .addComponent(optionStratConDeployConfirmation));
+                                        .addComponent(optionStratConDeployConfirmation)
+                                        .addComponent(optionAbandonUnitsConfirmation));
 
         return panel;
     }
@@ -1464,6 +1480,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         MekHQ.getMHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
+        MekHQ.getMHQOptions().setUnifiedDailyReport(chkUnifiedDailyReport.isSelected());
 
         // Colours
         MekHQ.getMHQOptions().setDeployedForeground(optionDeployedForeground.getColour());
@@ -1597,6 +1614,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY,
                     optionStratConDeployConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS,
+                    optionAbandonUnitsConfirmation.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1649,6 +1669,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         // Personnel Tab
         optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMHQOptions().getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole());
+        chkUnifiedDailyReport.setSelected(MekHQ.getMHQOptions().getUnifiedDailyReport());
 
         // Colours
         optionDeployedForeground.setColour(MekHQ.getMHQOptions().getDeployedForeground());
@@ -1777,6 +1798,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         optionStratConDeployConfirmation.setSelected(MekHQ.getMHQOptions()
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY));
+        optionAbandonUnitsConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                         .getNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS));
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
         spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());

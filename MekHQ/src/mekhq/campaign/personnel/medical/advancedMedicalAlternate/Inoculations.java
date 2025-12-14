@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_POOR_IMMUNE_SYSTEM;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SUPER_SPREADER;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_VACCINE_DODGER;
@@ -127,7 +128,7 @@ public class Inoculations {
         gatherPersonnelInNeedOfInoculations(allPersonnel, currentPlanet.getId(), civilianPersonnel, militaryPersonnel);
 
         if (militaryPersonnel.isEmpty() && civilianPersonnel.isEmpty()) { // Nobody needs treatment
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.fullVaccinated", planetName));
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.fullVaccinated", planetName));
             return;
         }
 
@@ -486,11 +487,12 @@ public class Inoculations {
      * collected set of active diseases and whether at least one Super Spreader is present.
      *
      * @param allPersonnel the collection of personnel to evaluate
+     *
      * @return a {@link DiseaseScanResult} containing:
-     *         <ul>
-     *           <li>{@code hasSuperSpreader} — {@code true} if any person has the Super Spreader flaw</li>
-     *           <li>{@code activeDiseases} — the set of all disease-type injuries present across the personnel</li>
-     *         </ul>
+     *       <ul>
+     *         <li>{@code hasSuperSpreader} — {@code true} if any person has the Super Spreader flaw</li>
+     *         <li>{@code activeDiseases} — the set of all disease-type injuries present across the personnel</li>
+     *       </ul>
      *
      * @author Illiani
      * @since 0.50.10
@@ -575,7 +577,8 @@ public class Inoculations {
                 reportKey = "Inoculations.spread.normal";
             }
 
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG, spread));
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
+                  spread));
         }
     }
 }

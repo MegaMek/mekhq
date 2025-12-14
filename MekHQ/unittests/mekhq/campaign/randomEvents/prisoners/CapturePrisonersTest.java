@@ -38,7 +38,6 @@ import static megamek.common.equipment.MiscType.createISImprovedSensors;
 import static mekhq.campaign.randomEvents.prisoners.CapturePrisoners.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
-import static mekhq.campaign.rating.IUnitRating.DRAGOON_C;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -55,6 +54,7 @@ import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.MapSettings;
 import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
@@ -184,7 +184,10 @@ class CapturePrisonersTest {
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating());
 
         // Assert
         int expectedTargetNumber = BASE_TARGET_NUMBER
@@ -208,7 +211,10 @@ class CapturePrisonersTest {
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating());
 
         // Assert
         assertTrue(capturePrisoners.attemptCaptureOfNPC(true));
@@ -225,7 +231,10 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return this.getSarTargetNumber().getValue(); // Whatever value goes here will be the value rolled
@@ -250,7 +259,10 @@ class CapturePrisonersTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return this.getSarTargetNumber().getValue() - 1; // Whatever value goes here will be the value rolled
@@ -279,7 +291,10 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return 5; // Whatever value goes here will be the value rolled
@@ -314,7 +329,7 @@ class CapturePrisonersTest {
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
               campaignFaction,
               scenario,
-              DRAGOON_C) {
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return Integer.MIN_VALUE;
@@ -351,7 +366,7 @@ class CapturePrisonersTest {
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
               campaignFaction,
               scenario,
-              DRAGOON_C) {
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return Integer.MAX_VALUE;
@@ -383,7 +398,10 @@ class CapturePrisonersTest {
 
         Person prisoner = new Person(mockCampaign);
 
-        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign, mockFaction, scenario, DRAGOON_C) {
+        CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
+              mockFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return 5; // Whatever value goes here will be the value rolled
@@ -418,7 +436,7 @@ class CapturePrisonersTest {
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
               campaignFaction,
               scenario,
-              DRAGOON_C) {
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return Integer.MIN_VALUE;
@@ -455,7 +473,7 @@ class CapturePrisonersTest {
         CapturePrisoners realCapturePrisoners = new CapturePrisoners(mockCampaign,
               campaignFaction,
               scenario,
-              DRAGOON_C) {
+              DragoonRating.DRAGOON_C.getRating()) {
             @Override
             protected int d6(int dice) {
                 return Integer.MAX_VALUE;
@@ -488,7 +506,10 @@ class CapturePrisonersTest {
         Person prisoner = new Person(mockCampaign);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating());
         capturePrisoners.determineDefectionChance(prisoner, true);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
@@ -516,7 +537,10 @@ class CapturePrisonersTest {
         prisoner.setOriginFaction(prisonerFaction);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating());
         capturePrisoners.determineDefectionChance(prisoner, true);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
@@ -544,7 +568,10 @@ class CapturePrisonersTest {
         prisoner.setClanPersonnel(true);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating());
         capturePrisoners.determineDefectionChance(prisoner, true);
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
@@ -571,7 +598,10 @@ class CapturePrisonersTest {
         prisoner.setClanPersonnel(true);
 
         // Act
-        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              campaignFaction,
+              scenario,
+              DragoonRating.DRAGOON_C.getRating());
         int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert

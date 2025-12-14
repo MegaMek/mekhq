@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
@@ -156,7 +157,7 @@ public class AttributeCheckDialog {
         String results = performAttributeCheck(dialog.getComboBoxChoiceIndex(), dialog.getSpinnerValue(), choiceIndex);
 
         // Results Dialog
-        campaign.addReport(results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
+        campaign.addReport(SKILL_CHECKS, results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
         showResultsDialog(results);
     }
 

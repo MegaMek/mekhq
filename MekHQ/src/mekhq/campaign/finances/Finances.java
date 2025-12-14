@@ -33,6 +33,11 @@
  */
 package mekhq.campaign.finances;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.PrintWriter;
@@ -313,8 +318,8 @@ public class Finances {
 
     public void addReportInsufficientFunds(Campaign campaign, String report) {
         String stringToColor = String.format(resourceMap.getString("InsufficientFunds.text"), report);
-        String colorToUse = ReportingUtilities.getNegativeColor();
-        campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(colorToUse, stringToColor));
+        String colorToUse = getNegativeColor();
+        campaign.addReport(FINANCES, messageSurroundedBySpanWithColor(colorToUse, stringToColor));
     }
 
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
@@ -327,7 +332,7 @@ public class Finances {
         if (isNewYear) {
             // calculate profits
             Money profits = getProfits();
-            campaign.addReport(String.format(resourceMap.getString("Profits.finances"),
+            campaign.addReport(FINANCES, String.format(resourceMap.getString("Profits.finances"),
                   profits.toAmountAndSymbolString()));
 
             // clear the ledger
@@ -346,7 +351,7 @@ public class Finances {
                       today,
                       contract.getMonthlyPayOut(),
                       String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()));
-                campaign.addReport(String.format(resourceMap.getString("ContractPaymentCredit.text"),
+                campaign.addReport(FINANCES, String.format(resourceMap.getString("ContractPaymentCredit.text"),
                       contract.getMonthlyPayOut().toAmountAndSymbolString(),
                       contract.getHyperlinkedName()));
 
@@ -368,7 +373,7 @@ public class Finances {
                           today,
                           peacetimeCost,
                           resourceMap.getString("PeacetimeCosts.title"))) {
-                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCosts.text"),
+                        campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCosts.text"),
                               peacetimeCost.toAmountAndSymbolString()));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("OperatingCosts.text"));
@@ -382,7 +387,7 @@ public class Finances {
                           today,
                           sparePartsCost,
                           resourceMap.getString("PeacetimeCostsParts.title"))) {
-                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsParts.text"),
+                        campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCostsParts.text"),
                               sparePartsCost.toAmountAndSymbolString()));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("SpareParts.text"));
@@ -392,8 +397,9 @@ public class Finances {
                           today,
                           ammoCost,
                           resourceMap.getString("PeacetimeCostsAmmunition.title"))) {
-                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
-                              ammoCost.toAmountAndSymbolString()));
+                        campaign.addReport(FINANCES,
+                              String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
+                                    ammoCost.toAmountAndSymbolString()));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("TrainingMunitions.text"));
                     }
@@ -402,7 +408,7 @@ public class Finances {
                           today,
                           fuelCost,
                           resourceMap.getString("PeacetimeCostsFuel.title"))) {
-                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
+                        campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
                               fuelCost.toAmountAndSymbolString()));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("Fuel.text"));
@@ -420,7 +426,7 @@ public class Finances {
                       resourceMap.getString("Salaries.title"),
                       accountant.getPayRollSummary(),
                       campaignOptions.isTrackTotalEarnings())) {
-                    campaign.addReport(String.format(resourceMap.getString("Salaries.text"),
+                    campaign.addReport(FINANCES, String.format(resourceMap.getString("Salaries.text"),
                           payRollCost.toAmountAndSymbolString()));
 
                 } else {
@@ -443,9 +449,10 @@ public class Finances {
                     ResourceBundle loyaltyChangeResources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                           MekHQ.getMHQOptions().getLocale());
 
-                    campaign.addReport(String.format(loyaltyChangeResources.getString("loyaltyChangeGroup.text"),
-                          ReportingUtilities.spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          ReportingUtilities.CLOSING_SPAN_TAG));
+                    campaign.addReport(PERSONNEL,
+                          String.format(loyaltyChangeResources.getString("loyaltyChangeGroup.text"),
+                                ReportingUtilities.spanOpeningWithCustomColor(getNegativeColor()),
+                                ReportingUtilities.CLOSING_SPAN_TAG));
                 }
             }
 
@@ -454,7 +461,7 @@ public class Finances {
                 Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
-                    campaign.addReport(String.format(resourceMap.getString("Overhead.text"),
+                    campaign.addReport(FINANCES, String.format(resourceMap.getString("Overhead.text"),
                           overheadCost.toAmountAndSymbolString()));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
@@ -467,7 +474,7 @@ public class Finances {
                       today,
                       foodAndHousingExpenses,
                       resourceMap.getString("FoodAndHousing.title"))) {
-                    campaign.addReport(String.format(resourceMap.getString("FoodAndHousing.text"),
+                    campaign.addReport(FINANCES, String.format(resourceMap.getString("FoodAndHousing.text"),
                           foodAndHousingExpenses.toAmountAndSymbolString()));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("HousingAndFoodCosts.text"));
@@ -482,15 +489,15 @@ public class Finances {
                       today,
                       loan.getPaymentAmount(),
                       String.format(resourceMap.getString("Loan.title"), loan))) {
-                    campaign.addReport(resourceMap.getString("Loan.text"),
+                    campaign.addReport(FINANCES, resourceMap.getString("Loan.text"),
                           loan.getPaymentAmount().toAmountAndSymbolString(),
                           loan);
                     loan.paidLoan();
                 } else {
-                    campaign.addReport("<font color='" +
-                                             MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                             "'>" +
-                                             resourceMap.getString("Loan.insufficient.report"),
+                    campaign.addReport(FINANCES, "<font color='" +
+                                                       MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                                       "'>" +
+                                                       resourceMap.getString("Loan.insufficient.report"),
                           loan,
                           "</font>",
                           loan.getPaymentAmount().toAmountAndSymbolString());
@@ -501,7 +508,7 @@ public class Finances {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(resourceMap.getString("Loan.paid.report"), loan);
+                campaign.addReport(FINANCES, resourceMap.getString("Loan.paid.report"), loan);
             }
         }
 
@@ -557,7 +564,7 @@ public class Finances {
                       date,
                       shares,
                       String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
-                    campaign.addReport(resourceMap.getString("DistributedShares.text"),
+                    campaign.addReport(FINANCES, resourceMap.getString("DistributedShares.text"),
                           shares.toAmountAndSymbolString());
 
                     payOutSharesToPersonnel(campaign, shares);
@@ -566,7 +573,7 @@ public class Finances {
                      * This should not happen, as the shares payment should be less than the
                      * contract payment that has just been made.
                      */
-                    campaign.addReport(ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                    campaign.addReport(FINANCES, messageSurroundedBySpanWithColor(getNegativeColor(),
                           String.format(resourceMap.getString("InsufficientFunds.text"), resourceMap.getString(
                                 "Shares.text"))));
                     LOGGER.error("Attempted to payout share amount larger than the payment of the contract");
@@ -608,7 +615,7 @@ public class Finances {
                       campaign.getLocalDate(),
                       loan.getPaymentAmount(),
                       String.format(resourceMap.getString("Loan.title"), loan))) {
-                    campaign.addReport(resourceMap.getString("Loan.text"),
+                    campaign.addReport(FINANCES, resourceMap.getString("Loan.text"),
                           loan.getPaymentAmount().toAmountAndSymbolString(),
                           loan);
                     loan.paidLoan();
@@ -619,7 +626,7 @@ public class Finances {
             if (loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport(resourceMap.getString("Loan.paid.report"), loan);
+                campaign.addReport(FINANCES, resourceMap.getString("Loan.paid.report"), loan);
             }
         }
         loans = newLoans;

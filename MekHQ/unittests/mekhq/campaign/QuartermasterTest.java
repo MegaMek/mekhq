@@ -32,6 +32,7 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -254,7 +255,7 @@ public class QuartermasterTest {
             quartermaster.arrivePart(mockPart);
 
             // ...and see that we put in a report the part arrived...
-            verify(mockCampaign, times(1)).addReport(eq(arrivalReport));
+            verify(mockCampaign, times(1)).addReport(eq(ACQUISITIONS), eq(arrivalReport));
 
             // ...and make sure we got a notification!
             assertNotNull(eventSpy.findEvent(PartArrivedEvent.class, e -> e.getPart() == mockPart));
