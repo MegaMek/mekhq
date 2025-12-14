@@ -714,24 +714,6 @@ public class MRMSServiceTest {
             unit.initializeParts(true);
 
             realTechs = new ArrayList<>();
-            /**
-            // Since we aren't actually doing fixPart, let's mock the time usage
-            doAnswer(invocationOnMock -> {
-                IPartWork fixPartWork = invocationOnMock.getArgument(0);
-                Person fixPerson = invocationOnMock.getArgument(1);
-                fixPerson.setMinutesLeft(fixPerson.getMinutesLeft() - fixPartWork.getActualTime());
-                return "Part Test";
-            }).when(mockCampaign).fixPart(any(IPartWork.class), any(Person.class));
-
-            when(mockCampaign.fixPart(any(IPartWork.class), any(Person.class))).then(
-                  invocationOnMock -> {
-                      IPartWork fixPartWork = invocationOnMock.getArgument(0);
-                      Person fixPerson = invocationOnMock.getArgument(1);
-                      fixPerson.setMinutesLeft(fixPerson.getMinutesLeft() - fixPartWork.getActualTime());
-                      return "Part Test";
-                  }
-            );
- **/
         }
 
         /**
@@ -857,14 +839,11 @@ public class MRMSServiceTest {
         }
 
         /**
-         * POTENTIAL BUG TEST: When carryover is disabled, a tech has low skill requiring extra time,
-         * and the extra time needed exceeds their available minutes, the repair should NOT be attempted.
-         *
          * Scenario:
-         * - Tech has 100 minutes available
-         * - At NORMAL time, repair would take 45 minutes (fits within 80)
+         * - Tech has 40 minutes available
+         * - At NORMAL time, repair would take 15 minutes (fits within 40)
          * - Tech has low skill (GREEN level), requiring target number adjustment
-         * - With extra time needed, repair would take 135+ minutes (exceeds 80)
+         * - With extra time needed, repair would take 45+ minutes (exceeds 40)
          * - With carryover disabled, this should not be attempted because the time check
          *   happens BEFORE the work time calculation adjusts for extra time
          *
@@ -896,8 +875,6 @@ public class MRMSServiceTest {
             // Assert
             // EXPECTED: No repairs should be performed because the tech doesn't have enough time
             //           even with carryover, once extra time is factored in
-            // IF BUG EXISTS: Repairs will be performed because the time check uses NORMAL time
-            //                before calculating that extra time is needed
             verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
         }
 
