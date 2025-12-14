@@ -8769,8 +8769,6 @@ public class Person {
      * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
      * all modifiers. If the skill is absent, returns {@code 0}.</p>
      *
-     * @param person the {@link Person} whose contribution is to be calculated
-     *
      * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
      *
      * @since 0.50.11
