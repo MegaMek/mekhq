@@ -984,7 +984,7 @@ public class MRMSService {
         if (partWork instanceof Part part) {
             part.setMode(workTime);
         } else {
-            LOGGER.warn("Tried to set part work time for non-part " + partWork.getPartName());
+            LOGGER.debug("Tried to set part work time for non-part " + partWork.getPartName());
         }
     }
 
