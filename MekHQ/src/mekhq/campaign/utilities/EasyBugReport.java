@@ -36,6 +36,7 @@ import static mekhq.MHQConstants.LOGS_PATH;
 import static mekhq.gui.CampaignGUI.saveCampaign;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -43,11 +44,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import megamek.client.generator.RandomCallsignGenerator;
@@ -55,6 +61,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import org.apache.commons.io.output.CountingOutputStream;
 
 /**
  * Utility methods for preparing and packaging campaign data for bug reports.
@@ -75,6 +82,27 @@ import mekhq.campaign.Campaign;
 public class EasyBugReport {
     private static final MMLogger LOGGER = MMLogger.create(EasyBugReport.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.EasyBugReport";
+
+    /**
+     * Maximum target size (in bytes) for each generated bug-report ZIP part.
+     *
+     * <p>If the combined inputs exceed this limit, the bug report is written as multiple independent ZIP files (e.g.,
+     * {@code name-part1.zip}, {@code name-part2.zip}, ...).</p>
+     *
+     * <p><b>Note:</b> This is a best-effort cap because ZIP container metadata and compression behavior can affect
+     * the final on-disk size.</p>
+     */
+    private static final long MAX_ARCHIVE_BYTES = 24L * 1024L * 1024L; // 24 MiB
+
+    /**
+     * Conservative per-entry overhead estimate (in bytes) used when deciding whether adding another file would exceed
+     * {@link #MAX_ARCHIVE_BYTES}.
+     *
+     * <p>ZIP files add metadata per entry (headers, file name bytes, optional data descriptors, etc.), and the exact
+     * overhead depends on the entry name length and ZIP features used. This constant intentionally overestimates
+     * typical overhead to keep the resulting part sizes under the limit in practice.</p>
+     */
+    private static final long ZIP_ENTRY_OVERHEAD_BYTES = 2_048L;
 
     /**
      * Saves the given campaign and packages it, along with log files, into a ZIP archive chosen by the user.
@@ -157,8 +185,7 @@ public class EasyBugReport {
 
         // Now package campaign + logs into the user-chosen archive
         try {
-            File archiveFile = createBugReportArchive(campaignFile, chosenArchiveFile);
-            LOGGER.info("Bug report archive created: {}", archiveFile.getName());
+            createBugReportArchive(campaignFile, chosenArchiveFile);
 
             // We only want the archive, so delete the loose campaign file
             if (!campaignFile.delete()) {
@@ -184,42 +211,117 @@ public class EasyBugReport {
      * @param campaignFile the already-saved campaign file to be included at the root of the archive
      * @param archiveFile  the target ZIP file to write to
      *
-     * @return the archive file passed in as {@code archiveFile}, once it has been successfully written
-     *
      * @throws IOException if an I/O error occurs while writing the archive
      * @author Illiani
      * @since 0.50.11
      */
-    private static File createBugReportArchive(File campaignFile, File archiveFile) throws IOException {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(archiveFile);
-              ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
+    private static void createBugReportArchive(File campaignFile, File archiveFile) throws IOException {
+        List<File> inputFiles = new ArrayList<>();
+        inputFiles.add(campaignFile);
 
-            // Add the campaign file at the root of the archive
-            addFileToZip(campaignFile, campaignFile.getName(), zipOutputStream);
-
-            // Add logs under 'logs/<filename>'
-            File logsDirectory = new File(LOGS_PATH);
-            if (!logsDirectory.isDirectory()) {
-                LOGGER.warn("Logs directory does not exist or is not a directory: {}", LOGS_PATH);
-                return archiveFile;
-            }
-
-            File[] logFiles = logsDirectory.listFiles(f -> f.isFile() &&
-                                                                 (f.getName().endsWith(".log") ||
-                                                                        f.getName().endsWith(".log.gz")));
-
-            if (logFiles == null || logFiles.length == 0) {
+        File logsDirectory = new File(LOGS_PATH);
+        if (!logsDirectory.isDirectory()) {
+            LOGGER.warn("Logs directory does not exist or is not a directory: {}", LOGS_PATH);
+        } else {
+            File[] logFiles = logsDirectory.listFiles(file -> file.isFile()
+                                                                    && (file.getName().endsWith(".log") ||
+                                                                              file.getName().endsWith(".log.gz")));
+            if (logFiles != null && logFiles.length > 0) {
+                // Stable order helps reproducibility and makes parts predictable
+                inputFiles.addAll(List.of(logFiles));
+                inputFiles.sort(Comparator.comparing(File::getName));
+            } else {
                 LOGGER.info("No .log or .log.gz files found in {}", LOGS_PATH);
-                return archiveFile;
-            }
-
-            for (File logFile : logFiles) {
-                String entryName = "logs/" + logFile.getName();
-                addFileToZip(logFile, entryName, zipOutputStream);
             }
         }
 
-        return archiveFile;
+        String baseName = archiveFile.getName();
+        if (baseName.toLowerCase().endsWith(".zip")) {
+            baseName = baseName.substring(0, baseName.length() - 4);
+        }
+        File parentDirectory = archiveFile.getParentFile();
+        if (parentDirectory == null) {
+            parentDirectory = new File(".");
+        }
+
+        List<File> parts = new ArrayList<>();
+        int partIndex = 1;
+
+        File currentArchive = new File(parentDirectory, baseName + "-part" + partIndex + ".zip");
+        CountingOutputStream countingOut = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(
+              currentArchive)));
+        ZipOutputStream zipOut = new ZipOutputStream(countingOut);
+        parts.add(currentArchive);
+
+        try {
+            for (File inputFile : inputFiles) {
+                String entryName = inputFile.equals(campaignFile) ?
+                                         campaignFile.getName() :
+                                         ("logs/" + inputFile.getName());
+
+                long estimatedAddedBytes = inputFile.length() + ZIP_ENTRY_OVERHEAD_BYTES;
+
+                // If adding this file would exceed the cap, roll to next part (if current part already has something).
+                // Note: This is conservative and should keep the actual ZIP size under the limit in practice.
+                if (countingOut.getCount() > 0 && (countingOut.getCount() + estimatedAddedBytes) > MAX_ARCHIVE_BYTES) {
+                    try {
+                        zipOut.close();
+                    } finally {
+                        // zipOut.close() closes countingOut too, but be explicit in case of partial failures
+                        try {countingOut.close();} catch (IOException ignored) {}
+                    }
+
+                    partIndex++;
+                    currentArchive = new File(parentDirectory, baseName + "-part" + partIndex + ".zip");
+                    countingOut = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(currentArchive)));
+                    zipOut = new ZipOutputStream(countingOut);
+                    parts.add(currentArchive);
+                }
+
+                // If a single file is huge, it may exceed MAX_ARCHIVE_BYTES even alone.
+                if (inputFile.length() > (MAX_ARCHIVE_BYTES - ZIP_ENTRY_OVERHEAD_BYTES)) {
+                    LOGGER.warn(
+                          "File '{}' is larger than the per-archive limit ({} bytes); it will be placed in its own " +
+                                "part and may exceed the limit.",
+                          inputFile.getName(),
+                          MAX_ARCHIVE_BYTES);
+                }
+
+                addFileToZip(inputFile, entryName, zipOut);
+            }
+        } finally {
+            try {
+                zipOut.close();
+            } catch (IOException ex) {
+                LOGGER.error(ex, "Unable to close zip output stream");
+            }
+        }
+
+        LOGGER.info("Created bug report archive in {} part(s): {}", parts.size(), parts);
+        showTooMuchDataDialog();
+    }
+
+    /**
+     * Shows a modal warning dialog informing the user that the bug report data was split into multiple archive parts
+     * and that all parts must be uploaded.
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static void showTooMuchDataDialog() {
+        String message = getTextAt(RESOURCE_BUNDLE, "EasyBugReport.warning.tooMuchData");
+
+        JOptionPane pane = new JOptionPane(
+              message,
+              JOptionPane.WARNING_MESSAGE,
+              JOptionPane.DEFAULT_OPTION
+        );
+
+        JDialog dialog = pane.createDialog("");
+        dialog.setModal(true);
+
+        dialog.setVisible(true);
+        dialog.dispose();
     }
 
     /**
