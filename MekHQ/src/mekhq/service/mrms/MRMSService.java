@@ -861,12 +861,12 @@ public class MRMSService {
             // Fallback TN check to account for discrepancies between Techs
             TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
             if (canChangeWorkTime) {
-                WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
-                if (null == wt) {
+                WorkTime workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+                if (null == workTime) {
                     debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
-                    wt = WorkTime.NORMAL;
+                    workTime = WorkTime.NORMAL;
                 }
-                ((Part) partWork).setMode(wt);
+                ((Part) partWork).setMode(workTime);
                 // Get updated TN with worktime in mind
                 targetRoll = campaign.getTargetFor(partWork, tech);
                 ((Part) partWork).resetModeToNormal();
@@ -894,7 +894,10 @@ public class MRMSService {
 
             boolean isSameDayTech;
 
-            if ((tech.getMinutesLeft() < partWork.getActualTime())) {
+            WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
+            int expectedTime = getExpectedWorkTime((partWork), workTime);
+
+            if ((tech.getMinutesLeft() < expectedTime)) {
                 if (!configuredOptions.isAllowCarryover()) {
                     debugLog("... would carry over day and configuration doesn't allow", "repairPart");
 
@@ -953,17 +956,10 @@ public class MRMSService {
 
         Person tech = validTechs.get(0);
 
-        if (canChangeWorkTime) {
-            Skill skill = tech.getSkillForWorkingOn(partWork);
-            WorkTime wt = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+        Skill skill = tech.getSkillForWorkingOn(partWork);
+        WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
 
-            if (null == wt) {
-                debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
-                wt = WorkTime.NORMAL;
-            }
-
-            ((Part) partWork).setMode(wt);
-        }
+        setPartWorkTime(partWork, workTime);
 
         if (warehouseMode && (partWork instanceof Part)) {
             campaign.fixWarehousePart((Part) partWork, tech);
@@ -982,6 +978,37 @@ public class MRMSService {
         debugLog("Ending after %s ns", "repairPart", System.nanoTime() - repairPartTime);
 
         return MRMSPartAction.createRepaired(partWork);
+    }
+
+    private static void setPartWorkTime(IPartWork partWork, WorkTime workTime) {
+        if (partWork instanceof Part part) {
+            part.setMode(workTime);
+        } else {
+            LOGGER.debug("Tried to set part work time for non-part " + partWork.getPartName());
+        }
+    }
+
+    private static WorkTime getWorkTime(boolean canChangeWorkTime,
+          Map<String, WorkTime> techSkillToWorktimeMap, Skill skill, Person tech) {
+        WorkTime workTime = WorkTime.NORMAL;
+        if (canChangeWorkTime) {
+
+            workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+
+            if (null == workTime) {
+                debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
+                workTime = WorkTime.NORMAL;
+            }
+        }
+        return workTime;
+    }
+
+    private static int getExpectedWorkTime(IPartWork part, WorkTime workTime) {
+        WorkTime priorWorkTime = part.getMode();
+        setPartWorkTime(part, workTime);
+        int expectedTime = part.getActualTime();
+        setPartWorkTime(part, priorWorkTime);
+        return expectedTime;
     }
 
     private static List<IPartWork> filterParts(List<IPartWork> parts, Map<PartRepairType, MRMSOption> mrmsOptionsByType,

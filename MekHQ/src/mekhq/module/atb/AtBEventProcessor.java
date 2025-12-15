@@ -59,6 +59,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.events.NewDayEvent;
+import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
@@ -333,5 +334,23 @@ public record AtBEventProcessor(Campaign campaign) {
             }
         }
         return c.getFaction().getShortName();
+    }
+
+
+    /**
+     * Handles updates to personnel records.
+     *
+     * <p>Clears cached values</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param personEvent the event containing updates related to a person in the campaign
+     */
+    @Subscribe
+    public void handlePersonUpdate(PersonEvent personEvent) {
+        campaign().invalidateActivePersonnelCache();
+        Person person = personEvent.getPerson();
+        person.invalidateAdvancedAsTechContribution();
     }
 }
