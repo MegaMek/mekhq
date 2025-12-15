@@ -150,8 +150,8 @@ public class AverageExperienceRating {
                     continue;
                 }
 
-                int pilotingTargetNumber = 0;
-                int gunneryTargetNumber = 0;
+                int pilotingTargetNumber;
+                int gunneryTargetNumber;
                 if (entity instanceof SmallCraft) { // includes DropShips
                     // For Small Craft & DropShips we average the piloting and gunnery of the personnel in those roles
                     double totalPilotingTargetNumbers = 0;
@@ -160,7 +160,12 @@ public class AverageExperienceRating {
                         SkillModifierData skillModifierData = driver.getSkillModifierData(true);
                         totalPilotingTargetNumbers += getSkillTargetNumber(driver, entity, skillModifierData, true);
                     }
-                    pilotingTargetNumber = (int) round(totalPilotingTargetNumbers / drivers.size());
+                    int driverCount = drivers.size();
+                    pilotingTargetNumber = driverCount == 0 ? 0 : (int) round(totalPilotingTargetNumbers / driverCount);
+
+                    if (driverCount > 1) {
+                        hasAtLeastOneCrew = true;
+                    }
 
                     double totalGunneryTargetNumbers = 0;
                     Set<Person> gunners = unit.getGunners();
@@ -168,7 +173,12 @@ public class AverageExperienceRating {
                         SkillModifierData skillModifierData = gunner.getSkillModifierData(true);
                         totalGunneryTargetNumbers += getSkillTargetNumber(gunner, entity, skillModifierData, false);
                     }
-                    gunneryTargetNumber = (int) round(totalGunneryTargetNumbers / gunners.size());
+                    int gunnerCount = gunners.size();
+                    gunneryTargetNumber = gunnerCount == 0 ? 0 : (int) round(totalGunneryTargetNumbers / gunnerCount);
+
+                    if (gunnerCount > 1) {
+                        hasAtLeastOneCrew = true;
+                    }
                 } else {
                     // CamOps treats all units as single entities. Tracking down to the individual crew level is a MekHQ
                     // invention. To keep as close to CamOps as possible, we only consider the unit commander when
