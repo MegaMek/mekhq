@@ -38,9 +38,11 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
 
 import java.awt.event.ActionEvent;
@@ -119,6 +121,7 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
@@ -284,16 +287,34 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
+            Campaign campaign = gui.getCampaign();
+            String resourceBundle = "mekhq.resources.GUI";
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     Money sellValue = unit.getSellValue();
-                    String text = sellValue.toAmountAndSymbolString();
-                    if (0 ==
-                              JOptionPane.showConfirmDialog(null,
-                                    "Do you really want to sell " + unit.getName() + " for " + text,
-                                    "Sell Unit?",
-                                    JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().getQuartermaster().sellUnit(unit);
+                    String commanderAddress = campaign.getCommanderAddress();
+
+                    // Build the confirmation message - GM mode shows detailed breakdown
+                    String message;
+                    if (campaign.isGM()) {
+                        message = getFormattedTextAt(resourceBundle, "sellUnit.messageGM",
+                              commanderAddress, unit.getName(), unit.getSellValueBreakdown());
+                    } else {
+                        message = getFormattedTextAt(resourceBundle, "sellUnit.message",
+                              commanderAddress, unit.getName(), sellValue.toAmountAndSymbolString());
+                    }
+
+                    // Cancel is first (index 0) so closing dialog via X defaults to cancel
+                    List<String> buttons = List.of(
+                          getFormattedTextAt(resourceBundle, "sellUnit.buttonCancel"),
+                          getFormattedTextAt(resourceBundle, "sellUnit.buttonConfirm"));
+
+                    Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
+                    ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+                          logisticsAdmin, null, message, buttons, null, null, false);
+
+                    if (dialog.getDialogChoice() == 1) {
+                        campaign.getQuartermaster().sellUnit(unit);
                     }
                 }
             }

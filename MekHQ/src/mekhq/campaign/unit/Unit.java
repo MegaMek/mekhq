@@ -1459,7 +1459,7 @@ public class Unit implements ITechnology {
             Money unitCost = Money.of(entity.getAlternateCost());
             double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
 
-            return switch (this.getQuality()) {
+            Money infantryValue = switch (this.getQuality()) {
                 case QUALITY_A -> unitCost.multipliedBy(usedPartPriceMultipliers[0]);
                 case QUALITY_B -> unitCost.multipliedBy(usedPartPriceMultipliers[1]);
                 case QUALITY_C -> unitCost.multipliedBy(usedPartPriceMultipliers[2]);
@@ -1467,6 +1467,14 @@ public class Unit implements ITechnology {
                 case QUALITY_E -> unitCost.multipliedBy(usedPartPriceMultipliers[4]);
                 case QUALITY_F -> unitCost.multipliedBy(usedPartPriceMultipliers[5]);
             };
+
+            // Apply obsolete quirk resale modifier
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                infantryValue = infantryValue.multipliedBy(obsoleteMultiplier);
+            }
+
+            return infantryValue;
         }
 
         // We need to adjust this for equipment that doesn't show up as parts
@@ -1543,15 +1551,172 @@ public class Unit implements ITechnology {
             int sinks = 0;
             for (Mounted<?> mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
-                    WeaponType wType = (WeaponType) mount.getType();
-                    sinks += wType.getHeat();
+                    WeaponType weaponType = (WeaponType) mount.getType();
+                    sinks += weaponType.getHeat();
                 }
             }
             partsValue = partsValue.plus(2000.0 * sinks);
         }
 
         // Scale the final value by the entity's price multiplier
-        partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+        if (entity != null) {
+            partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+
+            // Apply obsolete quirk resale modifier
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                partsValue = partsValue.multipliedBy(obsoleteMultiplier);
+            }
+        }
+
+        return partsValue;
+    }
+
+    /**
+     * Returns a detailed breakdown of how the sell value is calculated. Shows buy new price, current worth based on
+     * quality, and final sell price. Useful for GM mode to understand what factors affect the unit's sale price.
+     *
+     * @return A formatted string showing the sell value breakdown
+     */
+    public String getSellValueBreakdown() {
+        StringBuilder breakdown = new StringBuilder();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        // Get the "buy new" price
+        Money buyNewPrice = getBuyCost();
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
+              buyNewPrice.toAmountAndSymbolString())).append("<br>");
+
+        // Get quality info
+        String qualityName = getQuality().toName(campaignOptions.isReverseQualityNames());
+        double[] usedPartPriceMultipliers = campaignOptions.getUsedPartPriceMultipliers();
+        double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
+
+        // Calculate current worth (before obsolete modifier)
+        Money currentWorth = getSellValueBeforeObsolete();
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
+              qualityName, String.format("%.2f", qualityMultiplier))).append("<br>");
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.currentWorth",
+              currentWorth.toAmountAndSymbolString())).append("<br>");
+
+        // Check for obsolete quirk
+        Money sellFor = currentWorth;
+        if (entity != null) {
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                int yearsObsolete = campaign.getGameYear() - entity.getObsoleteYearForModifiers(campaign.getGameYear());
+                breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.obsolete",
+                      yearsObsolete, String.format("%.2f", obsoleteMultiplier))).append("<br>");
+                sellFor = currentWorth.multipliedBy(obsoleteMultiplier);
+            }
+        }
+
+        breakdown.append("<hr>");
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.sellFor",
+              sellFor.toAmountAndSymbolString()));
+        return breakdown.toString();
+    }
+
+    /**
+     * Calculates the sell value before applying the obsolete quirk modifier. This represents the "current worth" of the
+     * unit based on its parts and quality.
+     *
+     * @return The unit's value before obsolete modifier
+     */
+    private Money getSellValueBeforeObsolete() {
+        // Infantry uses alternate calculation
+        if (entity instanceof Infantry) {
+            Money unitCost = Money.of(entity.getAlternateCost());
+            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+            double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
+            return unitCost.multipliedBy(qualityMultiplier);
+        }
+
+        // Standard calculation - sum of parts (includes quality via getActualValue)
+        Money partsValue = Money.zero();
+        for (Part part : parts) {
+            partsValue = partsValue.plus(part.getActualValue().multipliedBy(part.getQuantity()));
+        }
+
+        // Spacecraft additions - cost formulas from TechManual (TM pg 274-284)
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            if (entity instanceof SmallCraft) {
+                // Bridge: 200,000 + (10 * tonnage) C-Bills
+                partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight());
+                // Computer: 200,000 C-Bills
+                partsValue = partsValue.plus(200000.0);
+            }
+            if ((entity instanceof Jumpship jumpShip) && !(entity instanceof SpaceStation)) {
+                Money driveCost = Money.zero();
+                // Jump Sail: 50,000 * (30 + (tonnage / 7,500)) C-Bills
+                driveCost = driveCost.plus(50000.0 * (30.0 + (jumpShip.getWeight() / 7500.0)));
+                // Drive core multipliers: Compact x5, LF x3, Compact+LF x15
+                if (jumpShip.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT && jumpShip.hasLF()) {
+                    driveCost = driveCost.multipliedBy(15);
+                } else if (jumpShip.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+                    driveCost = driveCost.multipliedBy(5);
+                } else if (jumpShip.hasLF()) {
+                    driveCost = driveCost.multipliedBy(3);
+                }
+                // Drive Support Systems
+                // Warship: 20,000,000 * (50 + (tonnage / 10,000))
+                // JumpShip: 10,000,000 * (tonnage / 10,000)
+                if (jumpShip instanceof Warship) {
+                    driveCost = driveCost.plus(20000000.0 * (50.0 + jumpShip.getWeight() / 10000.0));
+                } else {
+                    driveCost = driveCost.plus(10000000.0 * (jumpShip.getWeight() / 10000.0));
+                }
+                partsValue = partsValue.plus(driveCost);
+
+                // HPG: 1,000,000,000 C-Bills
+                if (jumpShip.hasHPG()) {
+                    partsValue = partsValue.plus(1000000000.0);
+                }
+                // Fuel: 200 C-Bills per ton
+                partsValue = partsValue.plus(200.0 * jumpShip.getFuel() / jumpShip.getFuelPerTon());
+                partsValue = partsValue.plus(jumpShip.getArmorWeight(jumpShip.locations()) *
+                                                   ArmorType.forEntity(jumpShip).getCost());
+
+                // Heat sinks: 2,000 (single) or 6,000 (double) C-Bills each
+                Money sinkCost = Money.of(2000.0 + 4000.0 * jumpShip.getHeatType());
+                partsValue = partsValue.plus(sinkCost.multipliedBy(jumpShip.getOHeatSinks()));
+
+                int bayDoors = 0;
+                Money bayCost = Money.zero();
+                for (Bay next : jumpShip.getTransportBays()) {
+                    bayDoors += next.getDoors();
+                    // Mek/ASF/SmallCraft Bays: 20,000 C-Bills per cubicle
+                    if ((next instanceof MekBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
+                        bayCost = bayCost.plus(20000.0 * next.getCapacity());
+                    }
+                    // Vehicle Bays: 20,000 C-Bills per cubicle
+                    if ((next instanceof LightVehicleBay) || (next instanceof HeavyVehicleBay)) {
+                        bayCost = bayCost.plus(20000.0 * next.getCapacity());
+                    }
+                }
+                // Bay doors: 1,000 C-Bills each
+                partsValue = partsValue.plus(bayCost.plus(bayDoors * 1000.0));
+                // Life boats/escape pods: 5,000 C-Bills each
+                partsValue = partsValue.plus((jumpShip.getLifeBoats() + jumpShip.getEscapePods()) * 5000.0);
+            }
+        }
+
+        // ProtoMek heat sinks - 2,000 C-Bills each (TM pg 274-284)
+        if (entity instanceof ProtoMek) {
+            int sinks = 0;
+            for (Mounted<?> mount : entity.getWeaponList()) {
+                if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
+                    WeaponType weaponType = (WeaponType) mount.getType();
+                    sinks += weaponType.getHeat();
+                }
+            }
+            partsValue = partsValue.plus(2000.0 * sinks);
+        }
+
+        // Apply entity price multiplier
+        if (entity != null) {
+            partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+        }
 
         return partsValue;
     }
