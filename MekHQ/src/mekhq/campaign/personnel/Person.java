@@ -7160,7 +7160,7 @@ public class Person {
     public void clearInjuriesExcludingProsthetics() {
         for (Injury injury : new ArrayList<>(injuries)) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification()) {
+            if (!injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
