@@ -33,7 +33,6 @@
 package mekhq.campaign.utilities;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MEK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -53,6 +52,7 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
@@ -222,12 +222,12 @@ class AutomatedTechAssignmentsTest {
         when(cPerson.getTechUnits()).thenReturn(new ArrayList<>()); // size=0
 
         // Tie-breaker on skill level: aPerson higher than bPerson
-        stubTechLevel(techAssignments, aPerson, S_TECH_MEK, 5);
-        stubTechLevel(techAssignments, bPerson, S_TECH_MEK, 2);
-        stubTechLevel(techAssignments, cPerson, S_TECH_MEK, 99); // irrelevant because size=0 should come first
+        stubTechLevel(aPerson, 5);
+        stubTechLevel(bPerson, 2);
+        stubTechLevel(cPerson, 99); // irrelevant because size=0 should come first
 
         List<Person> list = new ArrayList<>(List.of(aPerson, bPerson, cPerson));
-        invokeSortTechList(techAssignments, list, S_TECH_MEK);
+        invokeSortTechList(techAssignments, list);
 
         assertEquals(List.of(cPerson, aPerson, bPerson), list,
               "Expected: smallest assigned count first; for ties, highest tech level first");
@@ -242,13 +242,13 @@ class AutomatedTechAssignmentsTest {
         Person tech1 = mock(Person.class);
         List<Unit> tech1Units = new ArrayList<>();
         when(tech1.getTechUnits()).thenReturn(tech1Units);
-        stubTechLevel(techAssignments, tech1, S_TECH_MEK, 3);
+        stubTechLevel(tech1, 3);
 
         // Tech 2: 0 units, tech level 9 (should win tie on first assignment)
         Person tech2 = mock(Person.class);
         List<Unit> tech2Units = new ArrayList<>();
         when(tech2.getTechUnits()).thenReturn(tech2Units);
-        stubTechLevel(techAssignments, tech2, S_TECH_MEK, 9);
+        stubTechLevel(tech2, 9);
 
         // Units to assign
         Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
@@ -263,7 +263,7 @@ class AutomatedTechAssignmentsTest {
         List<Person> techs = new ArrayList<>(List.of(tech1, tech2));
         List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2, unit3));
 
-        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained);
 
         // Assignment expectation:
         // unit1 -> tech2 (tie on size 0, higher skill wins)
@@ -289,18 +289,18 @@ class AutomatedTechAssignmentsTest {
         List<Person> techs = new ArrayList<>();
         List<Unit> units = new ArrayList<>(List.of(unitWithUnitTypeAndBV(UnitType.MEK, 1)));
 
-        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, units, S_TECH_MEK);
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, units);
         assertEquals(0, units.stream().filter(u -> u.getTech() != null).count());
 
         // Empty units
         Person tech = mock(Person.class);
         when(tech.getTechUnits()).thenReturn(new ArrayList<>());
-        stubTechLevel(techAssignments, tech, S_TECH_MEK, 1);
+        stubTechLevel(tech, 1);
 
         List<Person> techs2 = new ArrayList<>(List.of(tech));
         List<Unit> units2 = new ArrayList<>();
 
-        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs2, units2, S_TECH_MEK);
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs2, units2);
         assertEquals(List.of(tech), techs2, "Tech list should remain unchanged when there are no units");
     }
 
@@ -329,32 +329,30 @@ class AutomatedTechAssignmentsTest {
         }).when(unit).setTech(any(Person.class));
     }
 
-    private static void stubTechLevel(AutomatedTechAssignments techAssignments, Person person, String skillType,
-          int level) {
+    private static void stubTechLevel(Person person, int level) {
         Skill skill = mock(Skill.class);
         SkillModifierData modData = mock(SkillModifierData.class);
 
-        when(person.getSkill(eq(skillType))).thenReturn(skill);
+        when(person.getSkill(eq(SkillType.S_TECH_MEK))).thenReturn(skill);
         when(person.getSkillModifierData()).thenReturn(modData);
         when(skill.getTotalSkillLevel(modData)).thenReturn(level);
     }
 
     private static void invokeAssignUnmaintainedUnitsTechs(AutomatedTechAssignments techAssignments,
-          List<Person> techs, List<Unit> units, String skillType) throws Exception {
+          List<Person> techs, List<Unit> units) throws Exception {
         Method assignUnmaintainedUnitsTechs = AutomatedTechAssignments.class.getDeclaredMethod(
               "assignUnmaintainedUnitsTechs", List.class, List.class, String.class);
         assignUnmaintainedUnitsTechs.setAccessible(true);
-        assignUnmaintainedUnitsTechs.invoke(techAssignments, techs, units, skillType);
+        assignUnmaintainedUnitsTechs.invoke(techAssignments, techs, units, SkillType.S_TECH_MEK);
     }
 
-    private static void invokeSortTechList(AutomatedTechAssignments techAssignments, List<Person> techs,
-          String skillType)
+    private static void invokeSortTechList(AutomatedTechAssignments techAssignments, List<Person> techs)
           throws Exception {
         Method sortTechList = AutomatedTechAssignments.class.getDeclaredMethod("sortTechList",
               List.class,
               String.class);
         sortTechList.setAccessible(true);
-        sortTechList.invoke(techAssignments, techs, skillType);
+        sortTechList.invoke(techAssignments, techs, SkillType.S_TECH_MEK);
     }
 
     private static void invokeStaticSortByBattleValue(List<Unit> units) throws Exception {
@@ -380,13 +378,13 @@ class AutomatedTechAssignmentsTest {
         Person tech1 = mock(Person.class);
         List<Unit> tech1Units = new ArrayList<>(List.of(mock(Unit.class))); // size=1
         when(tech1.getTechUnits()).thenReturn(tech1Units);
-        stubTechLevel(techAssignments, tech1, S_TECH_MEK, 10);
+        stubTechLevel(tech1, 10);
 
         // Tech 2 starts with 0 units, lower skill.
         Person tech2 = mock(Person.class);
         List<Unit> tech2Units = new ArrayList<>(); // size=0
         when(tech2.getTechUnits()).thenReturn(tech2Units);
-        stubTechLevel(techAssignments, tech2, S_TECH_MEK, 1);
+        stubTechLevel(tech2, 1);
 
         Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
         Unit unit2 = unitWithUnitTypeAndBV(UnitType.MEK, 20);
@@ -399,7 +397,7 @@ class AutomatedTechAssignmentsTest {
         List<Person> techs = new ArrayList<>(List.of(tech1, tech2));
         List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2, unit3));
 
-        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained);
 
         assertSame(tech2, unit1.getTech());
         assertSame(tech1, unit2.getTech());
@@ -423,13 +421,13 @@ class AutomatedTechAssignmentsTest {
         Person cappedTech = mock(Person.class);
         List<Unit> cappedUnits = new ArrayList<>(List.of(mock(Unit.class), mock(Unit.class))); // size=2
         when(cappedTech.getTechUnits()).thenReturn(cappedUnits);
-        stubTechLevel(techAssignments, cappedTech, S_TECH_MEK, 999);
+        stubTechLevel(cappedTech, 999);
 
         // Eligible tech: 0 units.
         Person eligibleTech = mock(Person.class);
         List<Unit> eligibleUnits = new ArrayList<>();
         when(eligibleTech.getTechUnits()).thenReturn(eligibleUnits);
-        stubTechLevel(techAssignments, eligibleTech, S_TECH_MEK, 1);
+        stubTechLevel(eligibleTech, 1);
 
         Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
         Unit unit2 = unitWithUnitTypeAndBV(UnitType.MEK, 20);
@@ -440,7 +438,7 @@ class AutomatedTechAssignmentsTest {
         List<Person> techs = new ArrayList<>(List.of(cappedTech, eligibleTech));
         List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2));
 
-        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained);
 
         assertSame(eligibleTech, unit1.getTech());
         assertSame(eligibleTech, unit2.getTech());
@@ -462,7 +460,7 @@ class AutomatedTechAssignmentsTest {
         Person tech = mock(Person.class);
         List<Unit> techUnits = new ArrayList<>();
         when(tech.getTechUnits()).thenReturn(techUnits);
-        stubTechLevel(techAssignments, tech, S_TECH_MEK, 5);
+        stubTechLevel(tech, 5);
 
         Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
         Unit unit2 = unitWithUnitTypeAndBV(UnitType.MEK, 20);
@@ -475,7 +473,7 @@ class AutomatedTechAssignmentsTest {
         List<Person> techs = new ArrayList<>(List.of(tech));
         List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2, unit3));
 
-        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained);
 
         assertSame(tech, unit1.getTech());
         assertSame(tech, unit2.getTech());
