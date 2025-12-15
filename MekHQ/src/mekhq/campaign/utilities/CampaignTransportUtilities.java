@@ -110,7 +110,7 @@ public class CampaignTransportUtilities {
             } else if (transporterType == INFANTRY_COMPARTMENT) {
                 return calcInfantryCompartmentWeight(transportedInfantry);
             }
-        } else if (transporterType == TANK_TRAILER_HITCH) {
+        } else if (transporterType == TANK_TRAILER_HITCH || transporterType == NAVAL_REPAIR_FACILITY) {
             return transportedUnit.getTonnage();
         } else if (transportedUnit instanceof Cargo) {
             return transportedUnit.getTonnage();
