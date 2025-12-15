@@ -66,6 +66,8 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.wr
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -308,6 +310,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
 
+    @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
@@ -3820,12 +3823,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
+                    person.setSecondInCommand(true);
                     getCampaign().addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
                           person.getHyperlinkedFullTitle()));
                     getCampaign().personUpdated(person);
                 }
             });
             menu.add(miCommander);
+
+            final JCheckBoxMenuItem miSecondInCommand = new JCheckBoxMenuItem(getText("miSecondInCommand.text"));
+            miSecondInCommand.setToolTipText(getText("miSecondInCommand.toolTipText"));
+            miSecondInCommand.setName("miSecondInCommand");
+            miSecondInCommand.setSelected(person.isCommander());
+            miSecondInCommand.addActionListener(evt -> {
+                getCampaign().getPersonnel().stream().filter(Person::isSecondInCommand).forEach(secondInCommand -> {
+                    secondInCommand.setSecondInCommand(false);
+                    getCampaign().addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                          secondInCommand.getHyperlinkedFullTitle()));
+                    getCampaign().personUpdated(secondInCommand);
+                });
+                if (miSecondInCommand.isSelected()) {
+                    person.setSecondInCommand(true);
+                    person.setCommander(false);
+                    getCampaign().addReport(PERSONNEL, getFormattedText("setAsSecondInCommand.format",
+                          person.getHyperlinkedFullTitle()));
+                    getCampaign().personUpdated(person);
+                }
+            });
+            menu.add(miSecondInCommand);
         }
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));

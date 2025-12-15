@@ -59,7 +59,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
@@ -107,7 +106,6 @@ import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
-import megamek.common.event.Subscribe;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
@@ -148,7 +146,6 @@ import mekhq.campaign.events.missions.MissionRemovedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
-import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioNewEvent;
@@ -3992,30 +3989,66 @@ public class Campaign implements ITechManager {
     private Person[] findTopCommanders() {
         Person flaggedCommander = getFlaggedCommander();
         Person commander = flaggedCommander;
-        Person secondInCommand = null;
+
+        Person flaggedSecondInCommand = getFlaggedSecondInCommand();
+        Person secondInCommand = flaggedSecondInCommand;
+
+        if (flaggedCommander != null && flaggedSecondInCommand != null) {
+            return new Person[] { commander, secondInCommand };
+        }
 
         for (Person person : getActivePersonnel(false, false)) {
-            // If we have a flagged commander, skip them
-            if (flaggedCommander != null) {
-                if (person.equals(flaggedCommander)) {
-                    continue;
-                }
-                // Second in command is best among non-flagged
-                if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                    secondInCommand = person;
-                }
-            } else {
+            if (person == null) {
+                continue;
+            }
+
+            if (person.equals(flaggedCommander) || person.equals(flaggedSecondInCommand)) {
+                continue;
+            }
+
+            // Commander selection (if not locked)
+            if (flaggedCommander == null) {
                 if (commander == null) {
                     commander = person;
-                } else if (person.outRanksUsingSkillTiebreaker(this, commander)) {
-                    secondInCommand = commander;
+                    continue;
+                }
+
+                if (!person.equals(commander) && person.outRanksUsingSkillTiebreaker(this, commander)) {
+                    Person previousCommander = commander;
                     commander = person;
-                } else if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                    if (!person.equals(commander)) {
-                        secondInCommand = person;
+
+                    // Previous commander becomes a candidate for second-in-command (if not locked)
+                    if (flaggedSecondInCommand == null && !previousCommander.equals(commander)) {
+                        if (secondInCommand == null) {
+                            secondInCommand = previousCommander;
+                        } else if (!previousCommander.equals(secondInCommand)
+                                         && previousCommander.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                            secondInCommand = previousCommander;
+                        }
                     }
+                    continue;
                 }
             }
+
+            // Second-in-command selection (if not locked), excluding commander
+            if (flaggedSecondInCommand == null) {
+                if (person.equals(commander)) {
+                    continue;
+                }
+
+                if (secondInCommand == null) {
+                    secondInCommand = person;
+                    continue;
+                }
+
+                if (!person.equals(secondInCommand) && person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    secondInCommand = person;
+                }
+            }
+        }
+
+        if (commander != null && commander.equals(secondInCommand)) {
+            secondInCommand = null;
         }
 
         return new Person[] { commander, secondInCommand };
@@ -5475,6 +5508,10 @@ public class Campaign implements ITechManager {
      */
     public @Nullable Person getFlaggedCommander() {
         return getPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
+    }
+
+    public @Nullable Person getFlaggedSecondInCommand() {
+        return getPersonnel().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
 
     /**

@@ -65,6 +65,7 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -396,6 +397,7 @@ public class Person {
     // region Flags
     private boolean clanPersonnel;
     private boolean commander;
+    private boolean secondInCommand;
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
@@ -634,6 +636,7 @@ public class Person {
         // region Flags
         setClanPersonnel(originFaction.isClan());
         setCommander(false);
+        setSecondInCommand(false);
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
@@ -1456,11 +1459,7 @@ public class Person {
     }
 
     /**
-     * This is used to change the person's PersonnelStatus
      *
-     * @param campaign the campaign the person is part of
-     * @param today    the current date
-     * @param status   the person's new PersonnelStatus
      */
     public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status) {
         if (status == getStatus()) { // no change means we don't need to process anything
@@ -1618,6 +1617,24 @@ public class Person {
             }
 
             setCommander(false);
+
+            // promote second in command
+            Person secondInCommand = campaign.getSecondInCommand();
+            secondInCommand.setSecondInCommand(false);
+            secondInCommand.setCommander(true);
+
+            String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
+            campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                  secondInCommandHyperlink));
+            campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                  secondInCommandHyperlink));
+
+            campaign.personUpdated(secondInCommand);
+        }
+
+        // release the second-in-command flag.
+        if (isSecondInCommand() && status.isDepartedUnit()) {
+            setSecondInCommand(false);
         }
 
         // clean up the save entry
@@ -3001,6 +3018,14 @@ public class Person {
         this.commander = commander;
     }
 
+    public boolean isSecondInCommand() {
+        return secondInCommand;
+    }
+
+    public void setSecondInCommand(final boolean secondInCommand) {
+        this.secondInCommand = secondInCommand;
+    }
+
     public boolean isDivorceable() {
         return divorceable;
     }
@@ -3644,6 +3669,7 @@ public class Person {
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondInCommand", secondInCommand);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
@@ -4250,6 +4276,8 @@ public class Person {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
                     person.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("secondInCommand")) {
+                    person.setSecondInCommand(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("divorceable")) {
                     person.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("founder")) {
