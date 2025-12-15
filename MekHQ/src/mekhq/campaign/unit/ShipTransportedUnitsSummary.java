@@ -39,6 +39,8 @@ import java.util.Set;
 import java.util.Vector;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.Bay;
+import megamek.common.equipment.DockingCollar;
 import megamek.common.equipment.Transporter;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -111,18 +113,14 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
             }
         }
 
-        //Let's get matching transporters and then recalculate our transport capacity for this transporter type
-        Vector<Transporter> transporters = new Vector<>(transport.getEntity().getTransports().stream()
-                                                              .filter(transporter -> TransporterType.getTransporterType(
-                                                                    transporter) == transporterType).toList());
-        recalculateTransportCapacity(transporters);
+        transport.initializeShipTransportSpace();
 
         return oldTransports;
     }
 
     private @Nullable Unit loadTransport(TransporterType transporterType, Unit transportedUnit) {
         Unit oldTransport = null;
-        int bayNumber = Utilities.selectBestBayFor(transportedUnit.getEntity(), transport.getEntity());
+
 
         TransporterType oldTransporterType = null;
         if (transportedUnit.hasTransportShipAssignment()) {
@@ -133,19 +131,38 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
             }
         }
 
-        transportedUnit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumber));
+        /*
+         * Based on the BLK file, they do share a source for
+         * IDs, so a bay and a docking collar should not have an ID conflict.
+         */
+        int bayNumberOrDockingCollar = Utilities.selectBestBayFor(transportedUnit.getEntity(), transport.getEntity());
+        // Let's see if we can get a bay that matches this transporter type and can load the unit:
+        for (Transporter transporter : transport.getEntity().getTransports()) {
+            if (transporterType.getTransporterClass() == transporter.getClass() &&
+                      transporter.canLoad(transportedUnit.getEntity())) {
+                if (transporter instanceof Bay bay) {
+                    bayNumberOrDockingCollar = bay.getBayNumber();
+                    break;
+                } else if (transporter instanceof DockingCollar dockingCollar) {
+                    bayNumberOrDockingCollar = dockingCollar.getCollarNumber();
+                    break;
+                }
+            }
+        }
+
+        transportedUnit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumberOrDockingCollar));
 
         if ((transportedUnit.getEntity() != null)) {
             // This shouldn't happen, but it'd be really annoying to debug if it did
-            if ((transportedUnit.getEntity().getBayById(bayNumber) != null &&
-                       TransporterType.getTransporterType(transportedUnit.getEntity().getBayById(bayNumber)) !=
+            if ((transportedUnit.getEntity().getBayById(bayNumberOrDockingCollar) != null &&
+                       TransporterType.getTransporterType(transportedUnit.getEntity().getBayById(bayNumberOrDockingCollar)) !=
                              transporterType)) {
                 LOGGER.warn(
                       "Unit was assigned a bay number for a different transport type than the unit is assigned! Transport: {} Unit: {} Assigned Transporter: {} Assigned Bay ID: {}",
                       transport.getName(),
                       transportedUnit.getName(),
                       transporterType,
-                      bayNumber);
+                      bayNumberOrDockingCollar);
             }
         }
 
