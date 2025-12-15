@@ -98,14 +98,6 @@ public class NagController {
             }
         }
 
-        // No Commander
-        if (NoCommanderNagDialog.checkNag(campaign.getCommander())) {
-            NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(campaign);
-            if (noCommanderNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
         final List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final int doctorCapacity = campaignOptions.getMaximumPatients();
