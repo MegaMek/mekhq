@@ -586,6 +586,8 @@ public record Accountant(Campaign campaign) {
             if (useEquipmentSellValue) {
                 return forceValue.multipliedBy(0.5);
             }
+
+            return forceValue;
         }
 
         if (getCampaignOptions().isUsePeacetimeCost()) {

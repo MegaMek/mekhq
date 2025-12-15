@@ -56,6 +56,9 @@ import java.util.Collections;
 import java.util.List;
 
 import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.Infantry;
+import megamek.common.units.LandAirMek;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
@@ -65,6 +68,8 @@ import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class AlternatePaymentModelValuesTest {
     @Test
@@ -253,6 +258,34 @@ class AlternatePaymentModelValuesTest {
         }
 
         @Test
+        void smallCraft_usesSmallCraftValue_notCombatMultiplierScaled() throws Exception {
+            Entity entity = mock(Entity.class);
+            when(entity.isLargeCraft()).thenReturn(false);
+            when(entity.isSmallCraft()).thenReturn(true);
+
+            Money result = invokeGetUnitContractValue(entity, false, 0.25, 0, 0, 0);
+            assertEquals(AlternatePaymentModelValues.SMALL_CRAFT.getValue(), result);
+        }
+
+        @Test
+        void conventionalFighter_usesConventionalFighterValue() throws Exception {
+            Entity entity = mock(Entity.class);
+            when(entity.isConventionalFighter()).thenReturn(true);
+
+            Money result = invokeGetUnitContractValue(entity, false, 1.0, 0, 0, 0);
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_FIGHTER.getValue(), result);
+        }
+
+        @Test
+        void lam_landAirMek_returnsLamValue_evenWhenCombatMultiplierWouldApply() throws Exception {
+            LandAirMek lam = mock(LandAirMek.class);
+            when(lam.isBattleMek()).thenReturn(true);
+
+            Money result = invokeGetUnitContractValue(lam, false, 0.25, 0, 0, 0);
+            assertEquals(AlternatePaymentModelValues.LAM.getValue(), result);
+        }
+
+        @Test
         void protoMek_usesCombatMultiplier() throws Exception {
             Entity entity = mock(Entity.class);
             when(entity.isProtoMek()).thenReturn(true);
@@ -366,8 +399,64 @@ class AlternatePaymentModelValuesTest {
 
             when(entity.getWeightClass()).thenReturn(WEIGHT_SUPER_HEAVY);
             // Implementation maps SUPER_HEAVY to ASSAULT value
-            assertEquals(AlternatePaymentModelValues.COMBAT_VEHICLE_ASSAULT.getValue(),
+            assertEquals(AlternatePaymentModelValues.COMBAT_VEHICLE_SUPER_HEAVY.getValue(),
                   invokeGetUnitContractValue(entity, false, 1.0, 0, 0, 0));
+        }
+
+        @Test
+        void infantry_footModes_mapToFootValue_scaledByCombatMultiplier() throws Exception {
+            Infantry infantry = mock(Infantry.class);
+
+            when(infantry.getMovementMode()).thenReturn(EntityMovementMode.INF_UMU);
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_INFANTRY_FOOT.getValue().multipliedBy(0.50),
+                  invokeGetUnitContractValue(infantry, false, 0.50, 0, 0, 0));
+
+            when(infantry.getMovementMode()).thenReturn(EntityMovementMode.INF_LEG);
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_INFANTRY_FOOT.getValue().multipliedBy(0.50),
+                  invokeGetUnitContractValue(infantry, false, 0.50, 0, 0, 0));
+        }
+
+        @Test
+        void infantry_motorized_mapsToMotorizedValue_scaledByCombatMultiplier() throws Exception {
+            Infantry infantry = mock(Infantry.class);
+            when(infantry.getMovementMode()).thenReturn(EntityMovementMode.INF_MOTORIZED);
+
+            Money result = invokeGetUnitContractValue(infantry, false, 0.25, 0, 0, 0);
+
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_INFANTRY_MOTORIZED.getValue().multipliedBy(0.25),
+                  result);
+        }
+
+        @Test
+        void infantry_jumpMapsToJumpValue_scaledByCombatMultiplier() throws Exception {
+            Infantry infantry = mock(Infantry.class);
+            when(infantry.getMovementMode()).thenReturn(EntityMovementMode.INF_JUMP);
+
+            Money result = invokeGetUnitContractValue(infantry, false, 0.75, 0, 0, 0);
+
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_INFANTRY_JUMP.getValue().multipliedBy(0.75), result);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = EntityMovementMode.class, names = { "TRACKED", "WHEELED", "HOVER" })
+        void infantry_mechanizedModes_mapToMechanizedValue_scaledByCombatMultiplier(EntityMovementMode movementMode)
+              throws Exception {
+            Infantry infantry = mock(Infantry.class);
+            when(infantry.getMovementMode()).thenReturn(movementMode);
+
+            Money result = invokeGetUnitContractValue(infantry, false, 1.0, 0, 0, 0);
+
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_INFANTRY_MECHANIZED.getValue(), result);
+        }
+
+        @Test
+        void infantry_isZeroWhenExcluded() throws Exception {
+            Infantry infantry = mock(Infantry.class);
+            when(infantry.getMovementMode()).thenReturn(EntityMovementMode.INF_LEG);
+
+            Money result = invokeGetUnitContractValue(infantry, true, 1.0, 0, 0, 0);
+
+            assertEquals(Money.zero(), result);
         }
 
         @Test
