@@ -779,7 +779,7 @@ public class TransportCostCalculations {
             return 0;
         }
 
-        double tonnage = spaceStation.getTonnage();
+        double tonnage = spaceStation.getWeight();
         if (spaceStation.hasKFAdapter()) {
             return (int) ceil(tonnage / SPACE_STATION_ADAPTOR_COLLAR_NEED_DIVIDER);
         }
