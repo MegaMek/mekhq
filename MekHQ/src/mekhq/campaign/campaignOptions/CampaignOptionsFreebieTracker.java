@@ -99,7 +99,7 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.isUseAdvancedScouting() && options.isUseStratCon(),
               options.isUseAlternativeAdvancedMedical(),
               options.isUseAlternativeAdvancedMedical() && options.isUseRandomDiseases(),
-              options.isUseAlternatePaymentMode() && isDiminishingContractPayRelevant(options),
+              options.isUseAlternatePaymentMode(),
               options.isUseDiminishingContractPay() && isDiminishingContractPayRelevant(options)
         );
     }
