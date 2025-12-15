@@ -207,6 +207,7 @@ public final class MHQConstants extends SuiteConstants {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String NAG_ADMIN_STRAIN = "nagAdminStrain";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
+    @Deprecated(since = "0.50.11", forRemoval = true)
     public static final String NAG_NO_COMMANDER = "nagNoCommander";
     public static final String NAG_CONTRACT_ENDED = "nagContractEnded";
     public static final String NAG_INSUFFICIENT_AS_TECHS = "nagInsufficientAstechs";
