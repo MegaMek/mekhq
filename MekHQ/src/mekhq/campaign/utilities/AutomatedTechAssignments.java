@@ -201,22 +201,27 @@ public class AutomatedTechAssignments {
     }
 
     /**
-     * Assigns each unit in {@code unmaintainedUnits} to a tech from {@code techs} using a load-balancing priority
-     * rule.
+     * Assigns each unit in {@code unmaintainedUnits} to a tech from {@code techs} using a load-balancing priority rule
+     * and a per-tech capacity limit.
      *
      * <p>The “best” tech is selected by:</p>
      * <ol>
-     *     <li>fewest assigned tech units: {@code person.getTechUnits().size()} ascending</li>
-     *     <li>tie-breaker: {@link #getTechLevel(Person, String)} descending</li>
+     *     <li>{@link #getTechLevel(Person, String)} highest -> lowest</li>
+     *     <li>tie-breaker: fewest assigned tech units lowest -> highest</li>
      * </ol>
      *
-     * <p>Tech selection is implemented with a priority queue. After a unit is assigned to a tech, that tech is
-     * reinserted into the queue so its new load is considered for the next unit.</p>
+     * <p><b>Capacity limit:</b> a tech may be assigned at most two units total. Techs that already have
+     * {@code person.getTechUnits().size() >= 2} are skipped. After assigning a unit, a tech is only reinserted into
+     * the priority queue if they are still under the limit.</p>
      *
-     * <p>If {@code techs} or {@code unmaintainedUnits} are {@code null} or empty, this method does nothing.</p>
+     * <p>If {@code unmaintainedUnits} is {@code null} or empty, this method does nothing. If {@code techs} is
+     * {@code null} or empty, each unit in {@code unmaintainedUnits} is reported as unassignable.</p>
      *
-     * @param techs             the tech candidates eligible for these units (modified in-place to reflect final
-     *                          best-first order)
+     * <p>If the method runs out of eligible techs while units remain, each remaining unit is reported as
+     * unassignable.</p>
+     *
+     * @param techs             the tech candidates eligible for these units (modified in-place to reflect the final
+     *                          priority-queue poll order of any remaining eligible techs)
      * @param unmaintainedUnits the units that need a tech assigned
      * @param techSkill         the skill type used to evaluate tech proficiency for tiebreaking
      *
@@ -246,9 +251,23 @@ public class AutomatedTechAssignments {
 
         for (Unit unit : unmaintainedUnits) {
             Person tech = queue.poll();
-            if (tech == null) {
-                return;
+
+            // Skip techs who are already at/over capacity (>= 2 units).
+            while (tech != null && tech.getTechUnits().size() >= 2) {
+                tech = queue.poll();
             }
+
+            if (tech == null) {
+                // No more eligible techs: report this unit as unassignable.
+                reports.add(getFormattedTextAt(
+                      RESOURCE_BUNDLE,
+                      "AutomatedTechAssignments.unableToAssign",
+                      unit.getHyperlinkedName(),
+                      techSkill
+                ));
+                continue;
+            }
+
             unit.setTech(tech);
 
             reports.add(getFormattedTextAt(
@@ -258,7 +277,10 @@ public class AutomatedTechAssignments {
                   unit.getHyperlinkedName()
             ));
 
-            queue.offer(tech);
+            // Only re-queue if still eligible after assignment.
+            if (tech.getTechUnits().size() < 2) {
+                queue.offer(tech);
+            }
         }
 
         techs.clear();
@@ -348,9 +370,9 @@ public class AutomatedTechAssignments {
 
         techs.sort(
               Comparator
-                    .comparingInt((Person p) -> getTechLevel(p, skillType))
+                    .comparingInt((Person tech) -> getTechLevel(tech, skillType))
                     .reversed() // highest tech level first
-                    .thenComparingInt(p -> p.getTechUnits().size()) // smallest -> largest
+                    .thenComparingInt(tech -> tech.getTechUnits().size()) // smallest -> largest
         );
     }
 
