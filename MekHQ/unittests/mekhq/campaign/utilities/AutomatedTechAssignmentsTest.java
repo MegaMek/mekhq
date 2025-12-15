@@ -35,6 +35,7 @@ package mekhq.campaign.utilities;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MEK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -367,5 +368,119 @@ class AutomatedTechAssignmentsTest {
         Field declaredField = target.getClass().getDeclaredField(fieldName);
         declaredField.setAccessible(true);
         return (T) declaredField.get(target);
+    }
+
+    @Test
+    void assignUnmaintainedUnitsTechs_doesNotAssignMoreThanTwoUnitsToAnyTech_evenAcrossMultipleAssignments()
+          throws Exception {
+        AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
+
+        // Tech 1 starts with 1 assigned unit already, high skill, so they would win ties if eligible.
+        Person tech1 = mock(Person.class);
+        List<Unit> t1Units = new ArrayList<>(List.of(mock(Unit.class))); // size=1
+        when(tech1.getTechUnits()).thenReturn(t1Units);
+        stubTechLevel(techAssignments, tech1, S_TECH_MEK, 10);
+
+        // Tech 2 starts with 0 units, lower skill.
+        Person tech2 = mock(Person.class);
+        List<Unit> t2Units = new ArrayList<>(); // size=0
+        when(tech2.getTechUnits()).thenReturn(t2Units);
+        stubTechLevel(techAssignments, tech2, S_TECH_MEK, 1);
+
+        Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit unit2 = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit unit3 = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+
+        wireSetTechToUpdateTechUnits(unit1);
+        wireSetTechToUpdateTechUnits(unit2);
+        wireSetTechToUpdateTechUnits(unit3);
+
+        List<Person> techs = new ArrayList<>(List.of(tech1, tech2));
+        List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2, unit3));
+
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+
+        // Expected:
+        // unit1 -> tech2 (least loaded: 0 vs. 1)
+        // unit2 -> tech1 (tie on load 1, tech1 higher skill; then tech1 reaches cap=2)
+        // unit3 -> tech2 (tech1 is capped and must be skipped)
+        assertSame(tech2, unit1.getTech());
+        assertSame(tech1, unit2.getTech());
+        assertSame(tech2, unit3.getTech());
+
+        // Tech1 must have exactly one new assignment (from 1 -> 2) and must not receive more.
+        assertEquals(2, t1Units.size());
+        // Both techs hit cap=2, so neither should remain in the returned eligible-tech list.
+        assertEquals(List.of(), techs);
+        // No unit should be unassigned in this scenario.
+        assertEquals(0, techAssignments.getReports().size());
+    }
+
+    @Test
+    void assignUnmaintainedUnitsTechs_skipsTechsAlreadyAtCapacity() throws Exception {
+        AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
+
+        // Capped tech: already has 2 units, should never receive any new unit.
+        Person cappedTech = mock(Person.class);
+        List<Unit> cappedUnits = new ArrayList<>(List.of(mock(Unit.class), mock(Unit.class))); // size=2
+        when(cappedTech.getTechUnits()).thenReturn(cappedUnits);
+        stubTechLevel(techAssignments, cappedTech, S_TECH_MEK, 999);
+
+        // Eligible tech: 0 units.
+        Person eligibleTech = mock(Person.class);
+        List<Unit> eligibleUnits = new ArrayList<>();
+        when(eligibleTech.getTechUnits()).thenReturn(eligibleUnits);
+        stubTechLevel(techAssignments, eligibleTech, S_TECH_MEK, 1);
+
+        Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit unit2 = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+
+        wireSetTechToUpdateTechUnits(unit1);
+        wireSetTechToUpdateTechUnits(unit2);
+
+        List<Person> techs = new ArrayList<>(List.of(cappedTech, eligibleTech));
+        List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2));
+
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+
+        assertSame(eligibleTech, unit1.getTech());
+        assertSame(eligibleTech, unit2.getTech());
+        assertEquals(2, eligibleUnits.size());
+
+        // The capped tech must not change.
+        assertEquals(2, cappedUnits.size());
+        assertEquals(0, techAssignments.getReports().size());
+    }
+
+    @Test
+    void assignUnmaintainedUnitsTechs_reportsUnitsThatCannotBeAssignedWhenAllTechsReachCapacity() throws Exception {
+        AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
+
+        // One tech can take at most 2 units; provide 3 units => last one must be reported unassignable.
+        Person tech = mock(Person.class);
+        List<Unit> techUnits = new ArrayList<>();
+        when(tech.getTechUnits()).thenReturn(techUnits);
+        stubTechLevel(techAssignments, tech, S_TECH_MEK, 5);
+
+        Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit unit2 = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit unit3 = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+
+        wireSetTechToUpdateTechUnits(unit1);
+        wireSetTechToUpdateTechUnits(unit2);
+        wireSetTechToUpdateTechUnits(unit3);
+
+        List<Person> techs = new ArrayList<>(List.of(tech));
+        List<Unit> unmaintained = new ArrayList<>(List.of(unit1, unit2, unit3));
+
+        invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
+
+        assertSame(tech, unit1.getTech());
+        assertSame(tech, unit2.getTech());
+        assertNull(unit3.getTech(), "Expected the 3rd unit to remain unassigned due to the 2-unit tech capacity cap");
+
+        assertEquals(2, techUnits.size());
+        assertEquals(1, techAssignments.getReports().size(),
+              "Expected one 'unable to assign' report when eligible techs run out");
     }
 }
