@@ -240,14 +240,14 @@ class AutomatedTechAssignmentsTest {
 
         // Tech 1: 0 units, tech level 3
         Person tech1 = mock(Person.class);
-        List<Unit> t1Units = new ArrayList<>();
-        when(tech1.getTechUnits()).thenReturn(t1Units);
+        List<Unit> tech1Units = new ArrayList<>();
+        when(tech1.getTechUnits()).thenReturn(tech1Units);
         stubTechLevel(techAssignments, tech1, S_TECH_MEK, 3);
 
         // Tech 2: 0 units, tech level 9 (should win tie on first assignment)
         Person tech2 = mock(Person.class);
-        List<Unit> t2Units = new ArrayList<>();
-        when(tech2.getTechUnits()).thenReturn(t2Units);
+        List<Unit> tech2Units = new ArrayList<>();
+        when(tech2.getTechUnits()).thenReturn(tech2Units);
         stubTechLevel(techAssignments, tech2, S_TECH_MEK, 9);
 
         // Units to assign
@@ -374,17 +374,18 @@ class AutomatedTechAssignmentsTest {
     void assignUnmaintainedUnitsTechs_doesNotAssignMoreThanTwoUnitsToAnyTech_evenAcrossMultipleAssignments()
           throws Exception {
         AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
+        int initialReportCount = techAssignments.getReports().size();
 
         // Tech 1 starts with 1 assigned unit already, high skill, so they would win ties if eligible.
         Person tech1 = mock(Person.class);
-        List<Unit> t1Units = new ArrayList<>(List.of(mock(Unit.class))); // size=1
-        when(tech1.getTechUnits()).thenReturn(t1Units);
+        List<Unit> tech1Units = new ArrayList<>(List.of(mock(Unit.class))); // size=1
+        when(tech1.getTechUnits()).thenReturn(tech1Units);
         stubTechLevel(techAssignments, tech1, S_TECH_MEK, 10);
 
         // Tech 2 starts with 0 units, lower skill.
         Person tech2 = mock(Person.class);
-        List<Unit> t2Units = new ArrayList<>(); // size=0
-        when(tech2.getTechUnits()).thenReturn(t2Units);
+        List<Unit> tech2Units = new ArrayList<>(); // size=0
+        when(tech2.getTechUnits()).thenReturn(tech2Units);
         stubTechLevel(techAssignments, tech2, S_TECH_MEK, 1);
 
         Unit unit1 = unitWithUnitTypeAndBV(UnitType.MEK, 10);
@@ -400,25 +401,23 @@ class AutomatedTechAssignmentsTest {
 
         invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained, S_TECH_MEK);
 
-        // Expected:
-        // unit1 -> tech2 (least loaded: 0 vs. 1)
-        // unit2 -> tech1 (tie on load 1, tech1 higher skill; then tech1 reaches cap=2)
-        // unit3 -> tech2 (tech1 is capped and must be skipped)
         assertSame(tech2, unit1.getTech());
         assertSame(tech1, unit2.getTech());
         assertSame(tech2, unit3.getTech());
 
-        // Tech1 must have exactly one new assignment (from 1 -> 2) and must not receive more.
-        assertEquals(2, t1Units.size());
+        assertEquals(2, tech1Units.size());
+
         // Both techs hit cap=2, so neither should remain in the returned eligible-tech list.
         assertEquals(List.of(), techs);
-        // No unit should be unassigned in this scenario.
-        assertEquals(0, techAssignments.getReports().size());
+
+        // 3 successful assignments => 3 "automaticallyAssigned" reports
+        assertEquals(initialReportCount + 3, techAssignments.getReports().size());
     }
 
     @Test
     void assignUnmaintainedUnitsTechs_skipsTechsAlreadyAtCapacity() throws Exception {
         AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
+        int initialReportCount = techAssignments.getReports().size();
 
         // Capped tech: already has 2 units, should never receive any new unit.
         Person cappedTech = mock(Person.class);
@@ -449,14 +448,17 @@ class AutomatedTechAssignmentsTest {
 
         // The capped tech must not change.
         assertEquals(2, cappedUnits.size());
-        assertEquals(0, techAssignments.getReports().size());
+
+        // 2 successful assignments => 2 "automaticallyAssigned" reports
+        assertEquals(initialReportCount + 2, techAssignments.getReports().size());
     }
 
     @Test
     void assignUnmaintainedUnitsTechs_reportsUnitsThatCannotBeAssignedWhenAllTechsReachCapacity() throws Exception {
         AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
+        int initialReportCount = techAssignments.getReports().size();
 
-        // One tech can take at most 2 units; provide 3 units => last one must be reported unassignable.
+        // One tech can take at most 2 units; provide 3 units => last one must be unassigned and reported.
         Person tech = mock(Person.class);
         List<Unit> techUnits = new ArrayList<>();
         when(tech.getTechUnits()).thenReturn(techUnits);
@@ -480,7 +482,8 @@ class AutomatedTechAssignmentsTest {
         assertNull(unit3.getTech(), "Expected the 3rd unit to remain unassigned due to the 2-unit tech capacity cap");
 
         assertEquals(2, techUnits.size());
-        assertEquals(1, techAssignments.getReports().size(),
-              "Expected one 'unable to assign' report when eligible techs run out");
+
+        // 2 successful assignments + 1 unable-to-assign report => 3 reports total for this run
+        assertEquals(initialReportCount + 3, techAssignments.getReports().size());
     }
 }
