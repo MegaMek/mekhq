@@ -270,13 +270,14 @@ class AutomatedTechAssignmentsTest {
         // unit2 -> tech1 (least loaded)
         // now both have 1
         // unit3 -> tech2 again (tie on size 1, higher skill wins)
+        // now tech2 has 2 (at capacity)
         assertSame(tech2, unit1.getTech());
         assertSame(tech1, unit2.getTech());
         assertSame(tech2, unit3.getTech());
 
-        // Tech list should be in "best first" order after assignment (the least loaded first; tie by skill desc)
-        // After assignments: tech1 has 1, tech2 has 2 -> tech1 should come first
-        assertEquals(List.of(tech1, tech2), techs);
+        // Tech list should reflect the remaining eligible techs in "best first" order.
+        // After assignments: tech1 has 1, tech2 has 2 and is at capacity, so tech2 is not re-queued and is absent.
+        assertEquals(List.of(tech1), techs);
     }
 
     @Test
