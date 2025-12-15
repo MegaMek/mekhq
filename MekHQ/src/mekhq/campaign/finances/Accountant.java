@@ -51,6 +51,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -544,17 +545,34 @@ public record Accountant(Campaign campaign) {
         final CampaignOptions options = getCampaignOptions();
 
         final boolean excludeInfantry = options.isInfantryDontCount();
+        final double combatUnitContractPercent = options.getEquipmentContractPercent();
         final double dropShipContractPercent = options.getDropShipContractPercent();
         final double warShipContractPercent = options.getWarShipContractPercent();
         final double jumpShipContractPercent = options.getJumpShipContractPercent();
-        final boolean useEquipmentSalveValue = options.isEquipmentContractSaleValue();
+        final boolean useEquipmentSellValue = options.isEquipmentContractSaleValue();
+
+        if (getCampaignOptions().isUseAlternatePaymentMode()) {
+            final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getAllForces(),
+                  campaign.getHangar(),
+                  excludeInfantry,
+                  combatUnitContractPercent,
+                  dropShipContractPercent,
+                  warShipContractPercent,
+                  jumpShipContractPercent);
+
+            if (useEquipmentSellValue) {
+                return forceValue.multipliedBy(0.5);
+            }
+
+            return forceValue;
+        }
 
         if (getCampaignOptions().isUsePeacetimeCost()) {
             final Money forceValue = getForceValue(excludeInfantry,
                   dropShipContractPercent,
                   warShipContractPercent,
                   jumpShipContractPercent,
-                  useEquipmentSalveValue);
+                  useEquipmentSellValue);
 
             return getPeacetimeCost().multipliedBy(0.75).plus(forceValue);
         }
@@ -564,7 +582,7 @@ public record Accountant(Campaign campaign) {
                   dropShipContractPercent,
                   warShipContractPercent,
                   jumpShipContractPercent,
-                  useEquipmentSalveValue);
+                  useEquipmentSellValue);
         }
 
         return getTheoreticalPayroll(getCampaignOptions().isInfantryDontCount());
