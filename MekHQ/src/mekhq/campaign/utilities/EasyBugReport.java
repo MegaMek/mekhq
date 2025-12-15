@@ -297,8 +297,12 @@ public class EasyBugReport {
             }
         }
 
-        LOGGER.info("Created bug report archive in {} part(s): {}", parts.size(), parts);
-        showTooMuchDataDialog();
+        int partCount = parts.size();
+        LOGGER.info("Created bug report archive in {} part(s): {}", partCount, parts);
+
+        if (partCount > 1) {
+            showTooMuchDataDialog();
+        }
     }
 
     /**
