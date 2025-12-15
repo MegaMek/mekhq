@@ -1807,7 +1807,7 @@ public class CampaignNewDayManager {
              * Situations like a delayed start or running out of funds during transit can delay arrival until after
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
-            if (updatedLocation.getCurrentSystem().getId().equals(contract.getSystem().getId())) {
+            if (!updatedLocation.getCurrentSystem().getId().equals(contract.getSystem().getId())) {
                 // transitTime is measured in days, so we round up to the next whole day
                 contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
                 campaign.addReport(GENERAL, "The start and end dates of " +
