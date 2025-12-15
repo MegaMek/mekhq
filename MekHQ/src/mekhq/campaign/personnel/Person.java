@@ -402,6 +402,7 @@ public class Person {
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
     private boolean underProtection;
+    private boolean neverAssignMaintenanceAutomatically;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -630,6 +631,7 @@ public class Person {
             }
         }
         underProtection = false;
+        neverAssignMaintenanceAutomatically = false;
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -3049,6 +3051,14 @@ public class Person {
         this.underProtection = underProtection;
     }
 
+    public boolean isNeverAssignMaintenanceAutomatically() {
+        return neverAssignMaintenanceAutomatically;
+    }
+
+    public void setNeverAssignMaintenanceAutomatically(final boolean neverAssignMaintenanceAutomatically) {
+        this.neverAssignMaintenanceAutomatically = neverAssignMaintenanceAutomatically;
+    }
+
     public boolean isEmployed() {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
@@ -3650,6 +3660,10 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "neverAssignMaintenanceAutomatically",
+                  neverAssignMaintenanceAutomatically);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
@@ -4262,6 +4276,8 @@ public class Person {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
+                    person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();

@@ -3873,6 +3873,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                   .forEach(p -> p.setUnderProtection(!p.isUnderProtection())));
         menu.add(cbMenuItem);
 
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("neverAssignMaintenanceAutomatically.text"));
+        cbMenuItem.setToolTipText(wordWrap(resources.getString("neverAssignMaintenanceAutomatically.toolTipText")));
+        cbMenuItem.setName("neverAssignMaintenanceAutomatically");
+        cbMenuItem.setSelected(selected.length == 1 && person.isNeverAssignMaintenanceAutomatically());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected)
+                                                  .forEach(p -> p.setNeverAssignMaintenanceAutomatically(!p.isNeverAssignMaintenanceAutomatically())));
+        menu.add(cbMenuItem);
+
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
         cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
         cbMenuItem.setName("miPrefersMen");
