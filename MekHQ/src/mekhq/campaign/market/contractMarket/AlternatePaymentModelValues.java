@@ -386,7 +386,7 @@ public enum AlternatePaymentModelValues {
      *     <li>A cutoff index is computed as {@code 2 * battalionSize}, where {@code battalionSize} is derived from
      *     {@link CombatTeam#getStandardForceSize(Faction, int)} using {@link FormationLevel#BATTALION} depth.</li>
      *     <li>For units beyond the cutoff, a diminishing multiplier is applied:
-     *     {@code multiplier = 1 / (1 + slope * distanceFromCutOff)}.</li>
+     *     {@code multiplier = 1 / (1 + slope * distanceFromCutOff)^power}.</li>
      *     <li>The multiplier is floored at {@code minMultiplier} so unit contributions never drop below a fixed
      *     percentage of their original value.</li>
      * </ol>
