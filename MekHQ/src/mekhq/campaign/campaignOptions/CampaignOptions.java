@@ -527,6 +527,7 @@ public class CampaignOptions {
 
     // region Mercenary Tab
     private boolean useAlternatePaymentMode;
+    private boolean useDiminishingContractPay;
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
@@ -1178,6 +1179,7 @@ public class CampaignOptions {
 
         // region Mercenary Tab
         useAlternatePaymentMode = false;
+        useDiminishingContractPay = false;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
@@ -4597,6 +4599,14 @@ public class CampaignOptions {
 
     public void setUseAlternatePaymentMode(final boolean useAlternatePaymentMode) {
         this.useAlternatePaymentMode = useAlternatePaymentMode;
+    }
+
+    public boolean isUseDiminishingContractPay() {
+        return useDiminishingContractPay;
+    }
+
+    public void setUseDiminishingContractPay(final boolean useDiminishingContractPay) {
+        this.useDiminishingContractPay = useDiminishingContractPay;
     }
 
     public boolean isEquipmentContractBase() {
