@@ -120,6 +120,7 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
@@ -285,27 +286,33 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
-            boolean isGMMode = gui.getCampaign().isGM();
+            Campaign campaign = gui.getCampaign();
+            boolean isGMMode = campaign.isGM();
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     Money sellValue = unit.getSellValue();
-                    String text = sellValue.toAmountAndSymbolString();
+                    String sellValueText = sellValue.toAmountAndSymbolString();
 
                     // Build the confirmation message
                     String message;
                     if (isGMMode) {
-                        // GM mode: show detailed breakdown
-                        message = "Do you really want to sell " + unit.getName() + " for " + text + "?\n\n" +
-                                        "Value Breakdown:\n" + unit.getSellValueBreakdown();
+                        // GM mode: show detailed breakdown with HTML support
+                        message = String.format(resources.getString("sellUnit.confirmMessageGM"),
+                              unit.getName(), sellValueText, unit.getSellValueBreakdown());
                     } else {
-                        message = "Do you really want to sell " + unit.getName() + " for " + text + "?";
+                        message = String.format(resources.getString("sellUnit.confirmMessage"),
+                              unit.getName(), sellValueText);
                     }
 
-                    if (0 == JOptionPane.showConfirmDialog(null,
-                          message,
-                                    "Sell Unit?",
-                                    JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().getQuartermaster().sellUnit(unit);
+                    List<String> buttons = new ArrayList<>();
+                    buttons.add(resources.getString("sellUnit.buttonYes"));
+                    buttons.add(resources.getString("sellUnit.buttonNo"));
+
+                    ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+                          null, null, message, buttons, null, null, false);
+
+                    if (dialog.getDialogChoice() == 0) {
+                        campaign.getQuartermaster().sellUnit(unit);
                     }
                 }
             }

@@ -1551,8 +1551,8 @@ public class Unit implements ITechnology {
             int sinks = 0;
             for (Mounted<?> mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
-                    WeaponType wType = (WeaponType) mount.getType();
-                    sinks += wType.getHeat();
+                    WeaponType weaponType = (WeaponType) mount.getType();
+                    sinks += weaponType.getHeat();
                 }
             }
             partsValue = partsValue.plus(2000.0 * sinks);
@@ -1580,21 +1580,24 @@ public class Unit implements ITechnology {
      */
     public String getSellValueBreakdown() {
         StringBuilder breakdown = new StringBuilder();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Get the "buy new" price
         Money buyNewPrice = getBuyCost();
-        breakdown.append("Buy New: ").append(buyNewPrice.toAmountAndSymbolString()).append("\n");
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
+              buyNewPrice.toAmountAndSymbolString())).append("<br>");
 
         // Get quality info
-        String qualityName = getQuality().toName(campaign.getCampaignOptions().isReverseQualityNames());
-        double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+        String qualityName = getQuality().toName(campaignOptions.isReverseQualityNames());
+        double[] usedPartPriceMultipliers = campaignOptions.getUsedPartPriceMultipliers();
         double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
 
         // Calculate current worth (before obsolete modifier)
         Money currentWorth = getSellValueBeforeObsolete();
-        breakdown.append("Quality (").append(qualityName).append("): x")
-              .append(String.format("%.2f", qualityMultiplier)).append("\n");
-        breakdown.append("Current Worth: ").append(currentWorth.toAmountAndSymbolString()).append("\n");
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
+              qualityName, String.format("%.2f", qualityMultiplier))).append("<br>");
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.currentWorth",
+              currentWorth.toAmountAndSymbolString())).append("<br>");
 
         // Check for obsolete quirk
         Money sellFor = currentWorth;
@@ -1602,14 +1605,15 @@ public class Unit implements ITechnology {
             double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
             if (obsoleteMultiplier < 1.0) {
                 int yearsObsolete = campaign.getGameYear() - entity.getObsoleteYearForModifiers(campaign.getGameYear());
-                breakdown.append("Obsolete (").append(yearsObsolete).append(" years): x")
-                      .append(String.format("%.2f", obsoleteMultiplier)).append("\n");
+                breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.obsolete",
+                      yearsObsolete, String.format("%.2f", obsoleteMultiplier))).append("<br>");
                 sellFor = currentWorth.multipliedBy(obsoleteMultiplier);
             }
         }
 
-        breakdown.append("-----------------\n");
-        breakdown.append("Sell For: ").append(sellFor.toAmountAndSymbolString());
+        breakdown.append("<hr>");
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.sellFor",
+              sellFor.toAmountAndSymbolString()));
         return breakdown.toString();
     }
 
@@ -1634,62 +1638,76 @@ public class Unit implements ITechnology {
             partsValue = partsValue.plus(part.getActualValue().multipliedBy(part.getQuantity()));
         }
 
-        // Spacecraft additions
+        // Spacecraft additions - cost formulas from TechManual (TM pg 274-284)
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             if (entity instanceof SmallCraft) {
-                partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight()); // bridge
-                partsValue = partsValue.plus(200000.0); // computer
+                // Bridge: 200,000 + (10 * tonnage) C-Bills
+                partsValue = partsValue.plus(200000.0 + 10.0 * entity.getWeight());
+                // Computer: 200,000 C-Bills
+                partsValue = partsValue.plus(200000.0);
             }
-            if ((entity instanceof Jumpship js) && !(entity instanceof SpaceStation)) {
+            if ((entity instanceof Jumpship jumpShip) && !(entity instanceof SpaceStation)) {
                 Money driveCost = Money.zero();
-                driveCost = driveCost.plus(50000.0 * (30.0 + (js.getWeight() / 7500.0))); // sail
-                if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT && js.hasLF()) {
+                // Jump Sail: 50,000 * (30 + (tonnage / 7,500)) C-Bills
+                driveCost = driveCost.plus(50000.0 * (30.0 + (jumpShip.getWeight() / 7500.0)));
+                // Drive core multipliers: Compact x5, LF x3, Compact+LF x15
+                if (jumpShip.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT && jumpShip.hasLF()) {
                     driveCost = driveCost.multipliedBy(15);
-                } else if (js.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
+                } else if (jumpShip.getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
                     driveCost = driveCost.multipliedBy(5);
-                } else if (js.hasLF()) {
+                } else if (jumpShip.hasLF()) {
                     driveCost = driveCost.multipliedBy(3);
                 }
                 // Drive Support Systems
-                if (js instanceof Warship) {
-                    driveCost = driveCost.plus(20000000.0 * (50.0 + js.getWeight() / 10000.0));
+                // Warship: 20,000,000 * (50 + (tonnage / 10,000))
+                // JumpShip: 10,000,000 * (tonnage / 10,000)
+                if (jumpShip instanceof Warship) {
+                    driveCost = driveCost.plus(20000000.0 * (50.0 + jumpShip.getWeight() / 10000.0));
                 } else {
-                    driveCost = driveCost.plus(10000000.0 * (js.getWeight() / 10000.0));
+                    driveCost = driveCost.plus(10000000.0 * (jumpShip.getWeight() / 10000.0));
                 }
                 partsValue = partsValue.plus(driveCost);
 
-                if (js.hasHPG()) {
+                // HPG: 1,000,000,000 C-Bills
+                if (jumpShip.hasHPG()) {
                     partsValue = partsValue.plus(1000000000.0);
                 }
-                partsValue = partsValue.plus(200.0 * js.getFuel() / js.getFuelPerTon());
-                partsValue = partsValue.plus(js.getArmorWeight(js.locations()) * ArmorType.forEntity(js).getCost());
+                // Fuel: 200 C-Bills per ton
+                partsValue = partsValue.plus(200.0 * jumpShip.getFuel() / jumpShip.getFuelPerTon());
+                partsValue = partsValue.plus(jumpShip.getArmorWeight(jumpShip.locations()) *
+                                                   ArmorType.forEntity(jumpShip).getCost());
 
-                Money sinkCost = Money.of(2000.0 + 4000.0 * js.getHeatType());
-                partsValue = partsValue.plus(sinkCost.multipliedBy(js.getOHeatSinks()));
+                // Heat sinks: 2,000 (single) or 6,000 (double) C-Bills each
+                Money sinkCost = Money.of(2000.0 + 4000.0 * jumpShip.getHeatType());
+                partsValue = partsValue.plus(sinkCost.multipliedBy(jumpShip.getOHeatSinks()));
 
                 int bayDoors = 0;
                 Money bayCost = Money.zero();
-                for (Bay next : js.getTransportBays()) {
+                for (Bay next : jumpShip.getTransportBays()) {
                     bayDoors += next.getDoors();
+                    // Mek/ASF/SmallCraft Bays: 20,000 C-Bills per cubicle
                     if ((next instanceof MekBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
                         bayCost = bayCost.plus(20000.0 * next.getCapacity());
                     }
+                    // Vehicle Bays: 20,000 C-Bills per cubicle
                     if ((next instanceof LightVehicleBay) || (next instanceof HeavyVehicleBay)) {
                         bayCost = bayCost.plus(20000.0 * next.getCapacity());
                     }
                 }
+                // Bay doors: 1,000 C-Bills each
                 partsValue = partsValue.plus(bayCost.plus(bayDoors * 1000.0));
-                partsValue = partsValue.plus((js.getLifeBoats() + js.getEscapePods()) * 5000.0);
+                // Life boats/escape pods: 5,000 C-Bills each
+                partsValue = partsValue.plus((jumpShip.getLifeBoats() + jumpShip.getEscapePods()) * 5000.0);
             }
         }
 
-        // ProtoMek heat sinks
+        // ProtoMek heat sinks - 2,000 C-Bills each (TM pg 274-284)
         if (entity instanceof ProtoMek) {
             int sinks = 0;
             for (Mounted<?> mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
-                    WeaponType wType = (WeaponType) mount.getType();
-                    sinks += wType.getHeat();
+                    WeaponType weaponType = (WeaponType) mount.getType();
+                    sinks += weaponType.getHeat();
                 }
             }
             partsValue = partsValue.plus(2000.0 * sinks);
