@@ -36,6 +36,8 @@ import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.LETTE
 
 import java.time.LocalDate;
 
+import megamek.logging.MMLogger;
+
 /**
  * Represents the record of a specific accolade event, capturing both the recognition level of the accolade and the date
  * it was issued.
@@ -50,6 +52,8 @@ import java.time.LocalDate;
  * @since 0.50.07
  */
 public record AccoladeEntry(FactionAccoladeLevel level, LocalDate issueDate) {
+    private static final MMLogger LOGGER = MMLogger.create(AccoladeEntry.class);
+
     /** The minimum number of months that must pass before an accolade is eligible for improvement. */
     static final int COOLDOWN_PERIOD = 6;
 
@@ -69,15 +73,26 @@ public record AccoladeEntry(FactionAccoladeLevel level, LocalDate issueDate) {
      */
     public boolean canImprove(LocalDate today, FactionStandingLevel currentFactionStanding) {
         if (level.getRecognition() >= LETTER_FROM_HEAD_OF_STATE.getRecognition()) {
+            LOGGER.debug("Accolade questline concluded");
             return false;
         }
+
         LocalDate cooldownDate = issueDate.plusMonths(COOLDOWN_PERIOD);
-        boolean isOffCooldown = today.isAfter(cooldownDate);
+        boolean isOffCooldown = !today.isBefore(cooldownDate);
+        if (!isOffCooldown) {
+            LOGGER.debug("Accolade on cooldown. Last accolade date: {}. Level: {}. Cooldown expires: {}",
+                  issueDate, level.getRecognition(), cooldownDate);
+            return false;
+        }
 
         int currentStandingLevel = currentFactionStanding.getStandingLevel();
         int requiredStandingLevel = level.getRequiredStandingLevel();
         boolean standingRequirementsMet = currentStandingLevel >= requiredStandingLevel;
+        if (!standingRequirementsMet) {
+            LOGGER.debug("Current standing level below required standing level");
+            return false;
+        }
 
-        return isOffCooldown && standingRequirementsMet;
+        return true;
     }
 }

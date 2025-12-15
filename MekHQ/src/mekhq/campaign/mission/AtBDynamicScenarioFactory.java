@@ -1926,11 +1926,15 @@ public class AtBDynamicScenarioFactory {
 
             // We want to keep scenario heights low to avoid players needing to spend several turns just traveling.
             // We received feedback that while this allowed for more tactical maneuvers, it wasn't fun.
-            int mapSheetsTall = totalMapSheets >= 4 ? (int) floor(totalMapSheets / 2.0) : 1;
-            mapSheetsTall = max(1, mapSheetsTall + heightModifier + mapParameters.getAdditionalMapSheetTall());
+            int mapSheetCountHalved = (int) floor(totalMapSheets / 2.0);
+            int baseHeight = clamp(mapSheetCountHalved, 1, 2);
+
+            // Don't merge these two calculations
+            int mapSheetsTall = max(1, baseHeight + heightModifier);
+            mapSheetsTall = max(1, mapSheetsTall + mapParameters.getAdditionalMapSheetTall());
 
             // This creates a wide area of engagement which should help reduce the tendency for forces to 'death ball'
-            int mapSheetsWide = (int) floor(totalMapSheets / mapSheetsTall);
+            int mapSheetsWide = (int) floor(totalMapSheets / baseHeight);
             mapSheetsWide = max(minimumWidth, mapSheetsWide + mapParameters.getAdditionalMapSheetWide());
 
             mapSizeX = mapSheetWidth * mapSheetsWide;

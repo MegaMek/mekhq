@@ -75,6 +75,7 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -106,6 +107,7 @@ import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
+import megamek.common.event.Subscribe;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
@@ -146,6 +148,7 @@ import mekhq.campaign.events.missions.MissionRemovedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioNewEvent;
@@ -281,7 +284,7 @@ public class Campaign implements ITechManager {
      * When using the 'useful assistants' campaign options, the relevant skill levels possessed by each assistant is
      * divided by this value and then floored.\
      */
-    private static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
+    public static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
@@ -299,6 +302,12 @@ public class Campaign implements ITechManager {
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
+
+    /**
+     * This can easily be expanded for other personnel lists by providing a unique String as the map's key.
+     */
+    private transient Map<String, List<Person>> activePersonnelCache = new HashMap<>();
+
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private final TreeMap<Integer, Mission> missions = new TreeMap<>();
@@ -3022,6 +3031,17 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects matching the criteria
      */
     public List<Person> getActivePersonnel(boolean includePrisoners, boolean includeCampFollowers) {
+        String cacheKey = "includePrisoners:" + includePrisoners + "_" + "includeCampFollowers:" + includeCampFollowers;
+
+        // If the cache value is known and not empty, let's just use that
+        // An empty list will be cached after loading so we will always
+        // recalculate if it's empty. And if it's empty, it should be quick, right?
+        if (activePersonnelCache != null &&
+                  activePersonnelCache.containsKey(cacheKey) &&
+                  !activePersonnelCache.get(cacheKey).isEmpty()) {
+            return new ArrayList<>(activePersonnelCache.get(cacheKey));
+        }
+
         List<Person> activePersonnel = new ArrayList<>();
 
         for (Person person : getPersonnel()) {
@@ -3046,7 +3066,18 @@ public class Campaign implements ITechManager {
             activePersonnel.add(person);
         }
 
+        if (activePersonnelCache == null) {
+            activePersonnelCache = new HashMap<>();
+        }
+        activePersonnelCache.put(cacheKey, new ArrayList<>(activePersonnel));
         return activePersonnel;
+    }
+
+    /**
+     * Clears the {@code activePersonnelCache} so it's recalculated next time we getActivePersonnel
+     */
+    public void invalidateActivePersonnelCache() {
+        activePersonnelCache.clear();
     }
 
     /**
@@ -6595,7 +6626,12 @@ public class Campaign implements ITechManager {
             for (Unit unit : units.getUnits()) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
-                    customUnits.add(entity.getShortNameRaw());
+                    String shortName = entity.getShortNameRaw();
+                    if (!StringUtility.isNullOrBlank(shortName)) {
+                        customUnits.add(shortName);
+                    } else {
+                        LOGGER.warn("shortName was null or blank for {}. Skipping", unit.getName());
+                    }
                 }
             }
         } else {
@@ -6603,40 +6639,58 @@ public class Campaign implements ITechManager {
         }
 
         for (String name : customUnits) {
-            MekSummary ms = MekSummaryCache.getInstance().getMek(name);
-            if (ms == null) {
+            MekSummary mekSummary = MekSummaryCache.getInstance().getMek(name);
+            if (mekSummary == null) {
+                LOGGER.warn("mekSummary was null for {}", name);
                 continue;
             }
 
             MekFileParser mekFileParser = null;
             try {
-                mekFileParser = new MekFileParser(ms.getSourceFile());
+                File sourceFile = mekSummary.getSourceFile();
+                if (sourceFile == null) {
+                    LOGGER.warn("sourceFile was null for {}", name);
+                    continue;
+                }
+
+                mekFileParser = new MekFileParser(sourceFile, mekSummary.getEntryName());
             } catch (EntityLoadingException ex) {
-                LOGGER.error("", ex);
-            }
-            if (mekFileParser == null) {
+                LOGGER.error("Failed to fetch MekFileParser for {} // {}",
+                      mekSummary.getSourceFile(), mekSummary.getEntryName(), ex);
                 continue;
             }
-            Entity en = mekFileParser.getEntity();
+
+            if (mekFileParser == null) {
+                LOGGER.warn("mekFileParser was null for {}", name);
+                continue;
+            }
+
+            Entity entity = mekFileParser.getEntity();
+            if (entity == null) {
+                LOGGER.warn("mekFileParser returned a null entity {}", name);
+                continue;
+            }
+
             printWriter.println("\t<custom>");
-            printWriter.println("\t\t<name>" + name + "</name>");
-            if (en instanceof Mek) {
+            String escapedName = MHQXMLUtility.escape(name);
+            printWriter.println("\t\t<name>" + escapedName + "</name>");
+            if (entity instanceof Mek) {
                 printWriter.print("\t\t<mtf><![CDATA[");
-                printWriter.print(((Mek) en).getMtf());
+                printWriter.print(((Mek) entity).getMtf());
                 printWriter.println("]]></mtf>");
             } else {
                 try {
-                    BuildingBlock blk = BLKFile.getBlock(en);
+                    BuildingBlock block = BLKFile.getBlock(entity);
                     printWriter.print("\t\t<blk><![CDATA[");
-                    for (String s : blk.getAllDataAsString()) {
-                        if (s.isEmpty()) {
+                    for (String data : block.getAllDataAsString()) {
+                        if (data.isEmpty()) {
                             continue;
                         }
-                        printWriter.println(s);
+                        printWriter.println(data);
                     }
                     printWriter.println("]]></blk>");
                 } catch (EntitySavingException e) {
-                    LOGGER.error("Failed to save custom entity {}", en.getDisplayName(), e);
+                    LOGGER.error("Failed to save custom entity {}", entity.getDisplayName(), e);
                 }
             }
             printWriter.println("\t</custom>");
@@ -7764,23 +7818,10 @@ public class Campaign implements ITechManager {
      *
      * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
      *
-     * @author Illiani
      * @since 0.50.07
      */
     private static int getAdvancedAsTechContribution(Person person) {
-        Skill asTechSkill = person.getSkill(S_ASTECH);
-        if (asTechSkill != null) {
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
-
-            // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
-            // by design.
-            SkillModifierData skillModifierData = person.getSkillModifierData();
-            int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
-            return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
-        }
-
-        return 0;
+        return person.getAdvancedAsTechContribution();
     }
 
     /**

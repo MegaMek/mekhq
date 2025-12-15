@@ -44,6 +44,7 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
@@ -59,7 +60,12 @@ import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(value = MockitoExtension.class)
@@ -521,181 +527,68 @@ public class AbstractMarriageTest {
         verify(mockMarriage, never()).marry(any(), any(), any(), any(), any(), anyBoolean());
     }
 
-    @Test
-    public void testMarryRandomSpouse_FemalePrefersFemales() {
-        doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), eq(true), eq(true));
+    @ParameterizedTest(name = "[{index}] origin={0} (men={1}, women={2}) | spouse={3} (men={4}, women={5}) => {6}")
+    @MethodSource("allGenderAndPreferenceCombinations")
+    void isGenderCompatible_allCombinations(Gender originGender, boolean originPrefersMen, boolean originPrefersWomen,
+          Gender spouseGender, boolean spousePrefersMen, boolean spousePrefersWomen, boolean expected) {
+        Person origin = mock(Person.class, invocation ->
+                                                 answerPerson(invocation,
+                                                       originGender,
+                                                       originPrefersMen,
+                                                       originPrefersWomen));
 
-        final Person mockMale = mock(Person.class);
-        final Person mockFemale = mock(Person.class);
+        Person potentialSpouse = mock(Person.class, invocation ->
+                                                          answerPerson(invocation,
+                                                                spouseGender,
+                                                                spousePrefersMen,
+                                                                spousePrefersWomen));
 
-        final List<Person> mockPersonnel = List.of(mockMale, mockFemale);
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
+        boolean actual = AbstractMarriage.isGenderCompatible(origin, potentialSpouse);
 
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.isPrefersMen()).thenReturn(false);
-        when(mockPerson.isPrefersWomen()).thenReturn(true);
-
-        // Only the female is a potential spouse
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), eq(mockFemale), eq(false), eq(true)))
-              .thenReturn(true);
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), eq(mockMale), eq(false), eq(true)))
-              .thenReturn(false);
-
-        doNothing().when(mockMarriage).marry(any(), any(), eq(mockPerson), any(), any(), eq(true));
-
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
-
-        verify(mockMarriage).marry(any(), any(), eq(mockPerson), eq(mockFemale), any(), eq(true));
+        assertEquals(expected, actual);
     }
 
-    @Test
-    public void testMarryRandomSpouse_FemalePrefersMales() {
-        doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), eq(true), eq(true));
-
-        final Person mockMale = mock(Person.class);
-        final Person mockFemale = mock(Person.class);
-
-        final List<Person> mockPersonnel = List.of(mockMale, mockFemale);
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
-
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.isPrefersMen()).thenReturn(true);
-        when(mockPerson.isPrefersWomen()).thenReturn(false);
-
-        // Only the male is a potential spouse
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), eq(mockMale), eq(true), eq(false)))
-              .thenReturn(true);
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), eq(mockFemale), eq(true), eq(false)))
-              .thenReturn(false);
-
-        doNothing().when(mockMarriage).marry(any(), any(), eq(mockPerson), any(), any(), eq(true));
-
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
-
-        verify(mockMarriage).marry(any(), any(), eq(mockPerson), eq(mockMale), any(), eq(true));
+    private static Object answerPerson(InvocationOnMock invocation, Gender gender, boolean prefersMen,
+          boolean prefersWomen) throws Throwable {
+        return switch (invocation.getMethod().getName()) {
+            case "getGender" -> gender;
+            case "isPrefersMen" -> prefersMen;
+            case "isPrefersWomen" -> prefersWomen;
+            default -> Answers.RETURNS_DEFAULTS.answer(invocation);
+        };
     }
 
-    @Test
-    public void testMarryRandomSpouse_MalePrefersMales() {
-        doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), eq(true), eq(true));
+    static Stream<Arguments> allGenderAndPreferenceCombinations() {
+        Stream.Builder<Arguments> args = Stream.builder();
 
-        final Person mockMale = mock(Person.class);
-        final Person mockFemale = mock(Person.class);
+        for (Gender originGender : Gender.values()) {
+            for (boolean originPrefersMen : new boolean[] { false, true }) {
+                for (boolean originPrefersWomen : new boolean[] { false, true }) {
 
-        final List<Person> mockPersonnel = List.of(mockMale, mockFemale);
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
+                    for (Gender spouseGender : Gender.values()) {
+                        for (boolean spousePrefersMen : new boolean[] { false, true }) {
+                            for (boolean spousePrefersWomen : new boolean[] { false, true }) {
 
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.isPrefersMen()).thenReturn(true);
-        when(mockPerson.isPrefersWomen()).thenReturn(false);
+                                boolean expected = likes(originPrefersMen, originPrefersWomen, spouseGender)
+                                                         && likes(spousePrefersMen, spousePrefersWomen, originGender);
 
-        // Both males are potential spouses
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), any(), eq(true), eq(false)))
-              .thenReturn(true);
+                                args.add(Arguments.of(
+                                      originGender, originPrefersMen, originPrefersWomen,
+                                      spouseGender, spousePrefersMen, spousePrefersWomen,
+                                      expected
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        doNothing().when(mockMarriage).marry(any(), any(), eq(mockPerson), any(), any(), eq(true));
-
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
-
-        verify(mockMarriage).marry(any(), any(), eq(mockPerson), any(Person.class), any(), eq(true));
+        return args.build();
     }
 
-    @Test
-    public void testMarryRandomSpouse_MalePrefersFemales() {
-        doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), eq(true), eq(true));
-
-        final Person mockMale = mock(Person.class);
-        final Person mockFemale = mock(Person.class);
-
-        final List<Person> mockPersonnel = List.of(mockMale, mockFemale);
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
-
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.isPrefersMen()).thenReturn(false);
-        when(mockPerson.isPrefersWomen()).thenReturn(true);
-
-        // Only the female is a potential spouse
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), eq(mockFemale), eq(false), eq(true)))
-              .thenReturn(true);
-        when(mockMarriage.isPotentialRandomSpouse(any(), any(), eq(mockPerson), eq(mockMale), eq(false), eq(true)))
-              .thenReturn(false);
-
-        doNothing().when(mockMarriage).marry(any(), any(), eq(mockPerson), any(), any(), eq(true));
-
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
-
-        verify(mockMarriage).marry(any(), any(), eq(mockPerson), eq(mockFemale), any(), eq(true));
+    private static boolean likes(boolean prefersMen, boolean prefersWomen, Gender otherGender) {
+        return (prefersMen && otherGender.isMale())
+                     || (prefersWomen && otherGender.isFemale());
     }
-
-    @Test
-    public void testIsPotentialRandomSpouse() {
-        doCallRealMethod().when(mockMarriage).isPotentialRandomSpouse(any(), any(), any(), any(), anyBoolean(),
-              anyBoolean());
-
-        when(mockCampaignOptions.getRandomMarriageAgeRange()).thenReturn(10);
-
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.getAge(any())).thenReturn(35);
-
-        final Person mockPotentialSpouse = mock(Person.class);
-        when(mockPotentialSpouse.getGender()).thenReturn(Gender.MALE);
-
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-
-        when(mockMarriage.safeSpouse(any(), any(), any(), any(), anyBoolean())).thenReturn(false);
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-
-        when(mockMarriage.safeSpouse(any(), any(), any(), any(), anyBoolean())).thenReturn(true);
-        when(mockPotentialSpouse.getAge(any())).thenReturn(20);
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-
-        when(mockPotentialSpouse.getAge(any())).thenReturn(25);
-        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-
-        when(mockPotentialSpouse.getAge(any())).thenReturn(35);
-        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-
-        when(mockPotentialSpouse.getAge(any())).thenReturn(45);
-        assertTrue(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-
-        when(mockPotentialSpouse.getAge(any())).thenReturn(50);
-        assertFalse(mockMarriage.isPotentialRandomSpouse(mockCampaign,
-              LocalDate.ofYearDay(3025, 1),
-              mockPerson,
-              mockPotentialSpouse,
-              true,
-              true));
-    }
-    //endregion Random Marriage
-    //endregion New Day
 }

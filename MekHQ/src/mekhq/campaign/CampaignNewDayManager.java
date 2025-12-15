@@ -103,6 +103,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
@@ -174,6 +175,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
+import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
@@ -221,6 +223,13 @@ public class CampaignNewDayManager {
      * @return <code>true</code> if the new day arrived
      */
     public boolean newDay() {
+        // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
+        // posted prior to this point).
+        CommandCenterTab commandCenter = campaign.getApp().getCampaigngui().getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
+
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
@@ -1285,19 +1294,10 @@ public class CampaignNewDayManager {
             }
 
             // Accolade check
-            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
-            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
-                  !isInTransit,
-                  campaign.getActiveAtBContracts(),
-                  activeMissions,
-                  relevantFactionCode,
-                  updatedLocation.getCurrentSystem(),
-                  ignoreEmployer);
-
             FactionAccoladeLevel newAccoladeLevel = campaign.getFactionStandings().checkForAccolade(
-                  relevantFaction, today, isOnMission);
+                  relevantFaction, today);
 
-            if (newAccoladeLevel != null) {
+            if (newAccoladeLevel != null && newAccoladeLevel != FactionAccoladeLevel.NO_ACCOLADE) {
                 new FactionAccoladeEvent(campaign, relevantFaction, newAccoladeLevel,
                       faction.equals(relevantFaction));
             }
@@ -1804,16 +1804,11 @@ public class CampaignNewDayManager {
         // Second, we process them and any already generated scenarios
         for (AtBContract contract : contracts) {
             /*
-             * Situations like a delayed start or running out of funds during transit can
-             * delay arrival until after the contract start. In that case, shift the
-             * starting and ending dates before making any battle rolls. We check that the
-             * unit is actually on route to the planet in case the user is using a custom
-             * system for transport or splitting the unit, etc.
+             * Situations like a delayed start or running out of funds during transit can delay arrival until after
+             * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
-            if (!updatedLocation.isOnPlanet() &&
-                      !updatedLocation.getJumpPath().isEmpty() &&
-                      updatedLocation.getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
-                // transitTime is measured in days; so we round up to the next whole day
+            if (!updatedLocation.getCurrentSystem().getId().equals(contract.getSystem().getId())) {
+                // transitTime is measured in days, so we round up to the next whole day
                 contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
                 campaign.addReport(GENERAL, "The start and end dates of " +
                                                   contract.getHyperlinkedName() +
