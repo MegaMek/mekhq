@@ -45,6 +45,7 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
+import megamek.common.units.LandAirMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Money;
@@ -244,55 +245,6 @@ public enum AlternatePaymentModelValues {
      */
     private static Money getUnitContractValue(Entity entity, boolean excludeInfantry, double combatMultiplier,
           double dropShipMultiplier, double warShipMultiplier, double jumpShipMultiplier) {
-        if (entity instanceof BattleArmor battleArmor) {
-            if (excludeInfantry) {
-                return Money.zero();
-            }
-            int suits = battleArmor.getNumberActiveTroopers();
-            return BATTLE_ARMOR_PER_SUIT.getValue().multipliedBy(suits).multipliedBy(combatMultiplier);
-        }
-
-        if (entity instanceof Infantry infantry) {
-            if (excludeInfantry) {
-                return Money.zero();
-            }
-            EntityMovementMode movementMode = infantry.getMovementMode();
-            Money base = switch (movementMode) {
-                case INF_UMU, INF_LEG -> CONVENTIONAL_INFANTRY_FOOT.getValue();
-                case INF_MOTORIZED -> CONVENTIONAL_INFANTRY_MOTORIZED.getValue();
-                case INF_JUMP -> CONVENTIONAL_INFANTRY_JUMP.getValue();
-                case TRACKED -> CONVENTIONAL_INFANTRY_MECHANIZED.getValue();
-                default -> {
-                    LOGGER.error(new IllegalStateException("Unexpected value (infantry): " + movementMode));
-                    yield Money.zero();
-                }
-            };
-            return base.multipliedBy(combatMultiplier);
-        }
-
-        if (entity.isLargeCraft()) {
-            double multiplier = entity.isDropShip() ?
-                                      dropShipMultiplier :
-                                      (entity.isJumpShip() ? jumpShipMultiplier : warShipMultiplier);
-            return LARGE_CRAFT.getValue().multipliedBy(multiplier);
-        }
-
-        if (entity.isProtoMek()) {
-            return PROTOMEK.getValue().multipliedBy(combatMultiplier);
-        }
-
-        if (entity.isSupportVehicle()) {
-            double weight = entity.getWeight();
-            Money base = (weight < 5.0) ?
-                               SUPPORT_VEHICLE_LIGHT.getValue() :
-                               (weight <= 100) ?
-                                     SUPPORT_VEHICLE_MEDIUM.getValue() :
-                                     (weight <= 1000) ?
-                                           SUPPORT_VEHICLE_HEAVY.getValue() :
-                                           SUPPORT_VEHICLE_SUPER_HEAVY.getValue();
-            return base.multipliedBy(combatMultiplier);
-        }
-
         int weightClass = entity.getWeightClass();
         if (entity.isAerospaceFighter()) {
             Money base = switch (weightClass) {
@@ -308,6 +260,10 @@ public enum AlternatePaymentModelValues {
         }
 
         if (entity.isBattleMek()) {
+            if (entity instanceof LandAirMek) {
+                return LAM.getValue();
+            }
+
             Money base = switch (weightClass) {
                 case WEIGHT_ULTRA_LIGHT, WEIGHT_LIGHT -> BATTLEMEK_LIGHT.getValue();
                 case WEIGHT_MEDIUM -> BATTLEMEK_MEDIUM.getValue();
@@ -335,6 +291,65 @@ public enum AlternatePaymentModelValues {
                 }
             };
             return base.multipliedBy(combatMultiplier);
+        }
+
+        if (entity instanceof BattleArmor battleArmor) {
+            if (excludeInfantry) {
+                return Money.zero();
+            }
+            int suits = battleArmor.getNumberActiveTroopers();
+            return BATTLE_ARMOR_PER_SUIT.getValue().multipliedBy(suits).multipliedBy(combatMultiplier);
+        }
+
+        if (entity instanceof Infantry infantry) {
+            if (excludeInfantry) {
+                return Money.zero();
+            }
+            EntityMovementMode movementMode = infantry.getMovementMode();
+            Money base = switch (movementMode) {
+                case INF_UMU, INF_LEG -> CONVENTIONAL_INFANTRY_FOOT.getValue();
+                case INF_MOTORIZED -> CONVENTIONAL_INFANTRY_MOTORIZED.getValue();
+                case INF_JUMP -> CONVENTIONAL_INFANTRY_JUMP.getValue();
+                case TRACKED, WHEELED, HOVER -> CONVENTIONAL_INFANTRY_MECHANIZED.getValue();
+                default -> {
+                    LOGGER.error(new IllegalStateException("Unexpected value (infantry): " + movementMode));
+                    yield Money.zero();
+                }
+            };
+            return base.multipliedBy(combatMultiplier);
+        }
+
+        if (entity.isLargeCraft()) {
+            double multiplier = entity.isDropShip() ?
+                                      dropShipMultiplier :
+                                      (entity.isJumpShip() ? jumpShipMultiplier : warShipMultiplier);
+            return LARGE_CRAFT.getValue().multipliedBy(multiplier);
+        }
+
+        // Must be after large craft
+        if (entity.isSmallCraft()) {
+            return SMALL_CRAFT.getValue();
+        }
+
+        if (entity.isProtoMek()) {
+            return PROTOMEK.getValue().multipliedBy(combatMultiplier);
+        }
+
+        if (entity.isSupportVehicle()) {
+            double weight = entity.getWeight();
+            Money base = (weight < 5.0) ?
+                               SUPPORT_VEHICLE_LIGHT.getValue() :
+                               (weight <= 100) ?
+                                     SUPPORT_VEHICLE_MEDIUM.getValue() :
+                                     (weight <= 1000) ?
+                                           SUPPORT_VEHICLE_HEAVY.getValue() :
+                                           SUPPORT_VEHICLE_SUPER_HEAVY.getValue();
+            return base.multipliedBy(combatMultiplier);
+        }
+
+        // Must be before Aerospace Fighter
+        if (entity.isConventionalFighter()) {
+            return CONVENTIONAL_FIGHTER.getValue();
         }
 
         return Money.zero();
