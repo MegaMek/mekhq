@@ -416,6 +416,9 @@ public class Person {
     private boolean hidePersonality;
     // endregion Flags
 
+    // Cache
+    private transient Integer advancedAsTechContribution = null;
+
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
@@ -7161,9 +7164,33 @@ public class Person {
     }
 
     public int getTotalInjurySeverity() {
-        int totalSeverity = 0;
+        int totalSeverity = hits; // Normal hits should be included here
         for (Injury injury : injuries) {
             totalSeverity += injury.getHits();
+        }
+
+        return totalSeverity;
+    }
+
+    /**
+     * Calculates a severity score for this person based on current hits and non-permanent injuries.
+     *
+     * <p>The returned value starts with the person's current {@code hits} value, then adds the hit contribution from
+     * each injury that is <em>not</em> permanent. Permanent injuries are intentionally excluded from this
+     * calculation.</p>
+     *
+     * @return the total severity score, consisting of {@code hits} plus the sum of {@link Injury#getHits()} for all
+     *       non-permanent injuries
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public int getNonPermanentInjurySeverity() {
+        int totalSeverity = hits;
+        for (Injury injury : injuries) {
+            if (!injury.isPermanent()) {
+                totalSeverity += injury.getHits();
+            }
         }
 
         return totalSeverity;
@@ -7201,7 +7228,7 @@ public class Person {
     public void clearInjuriesExcludingProsthetics(LocalDate today) {
         for (Injury injury : new ArrayList<>(injuries)) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification()) {
+            if (!injurySubType.isPermanentModification()) {
                 removeInjury(injury, today);
             }
         }
@@ -7308,8 +7335,7 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        return !injuries.isEmpty() &&
-                     injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
+        return !injuries.isEmpty();
     }
 
     /**
@@ -8839,5 +8865,43 @@ public class Person {
               adjustedReputation,
               injuryEffects,
               ageForAttributeModifiers);
+    }
+
+    /**
+     * Calculates the individual AsTech contribution for a person based on their {@link SkillType#S_ASTECH} skill.
+     *
+     * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
+     * all modifiers. If the skill is absent, returns {@code 0}.</p>
+     *
+     * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
+     *
+     * @since 0.50.11
+     */
+    public int getAdvancedAsTechContribution() {
+        int contribution;
+        if (advancedAsTechContribution == null) {
+            Skill asTechSkill = getSkill(S_ASTECH);
+            if (asTechSkill != null) {
+                // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
+                // by design.
+                SkillModifierData skillModifierData = getSkillModifierData();
+                int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
+                contribution = (int) floor(totalSkillLevel / Campaign.ASSISTANT_SKILL_LEVEL_DIVIDER);
+            } else {
+                contribution = 0;
+            }
+            setAdvancedAsTechContribution(contribution);
+        } else {
+            contribution = advancedAsTechContribution;
+        }
+        return contribution;
+    }
+
+    public void invalidateAdvancedAsTechContribution() {
+        advancedAsTechContribution = null;
+    }
+
+    public void setAdvancedAsTechContribution(int contribution) {
+        advancedAsTechContribution = contribution;
     }
 }

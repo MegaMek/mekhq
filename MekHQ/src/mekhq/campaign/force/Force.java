@@ -489,6 +489,36 @@ public class Force {
     }
 
     /**
+     * Resolves and returns the {@link Unit} objects that belong to this force by looking them up in the provided
+     * {@link Hangar}.
+     *
+     * <p>This method iterates over the unit IDs returned by {@link #getUnits()} and attempts to retrieve each unit
+     * from the hangar via {@link Hangar#getUnit(UUID)}. Any IDs that do not resolve to a unit (i.e.,
+     * {@code getUnit(...)} returns {@code null}) are ignored.</p>
+     *
+     * <p>The returned list contains only non-null units and preserves the iteration order of {@link #getUnits()}.</p>
+     *
+     * @param hangar the {@link Hangar} used to resolve unit IDs into {@link Unit} instances; must not be {@code null}
+     *
+     * @return a list of resolved {@link Unit} instances for this force; never {@code null}
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public List<Unit> getUnitsAsUnits(Hangar hangar) {
+        List<Unit> allUnits = new ArrayList<>();
+
+        for (UUID unitId : getUnits()) {
+            Unit unit = hangar.getUnit(unitId);
+            if (unit != null) {
+                allUnits.add(unit);
+            }
+        }
+
+        return allUnits;
+    }
+
+    /**
      * Add a unit id to the units vector. In general, this should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)} instead
      */

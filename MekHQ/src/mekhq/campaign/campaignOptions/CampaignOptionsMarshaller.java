@@ -191,6 +191,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "warShipContractPercent",
               campaignOptions.getWarShipContractPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternatePaymentMode",
+              campaignOptions.isUseAlternatePaymentMode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDiminishingContractPay",
+              campaignOptions.isUseDiminishingContractPay());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractBase",
               campaignOptions.isEquipmentContractBase());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractSaleValue",

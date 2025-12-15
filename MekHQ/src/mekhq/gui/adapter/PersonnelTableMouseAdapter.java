@@ -2647,7 +2647,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             Campaign campaign = getCampaign();
 
             if (StaticChecks.areAllActiveFlexible(selected)) {
-                if (Arrays.stream(selected).noneMatch(prospectiveStudent -> person.needsFixing())) {
+                if (Arrays.stream(selected)
+                          .noneMatch(prospectiveStudent -> prospectiveStudent.getNonPermanentInjurySeverity() > 0)) {
                     // this next block preps variables for use by the menu & tooltip
                     List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
                     Collections.sort(academySetNames);

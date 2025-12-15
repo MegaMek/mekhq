@@ -60,8 +60,10 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
@@ -93,6 +95,7 @@ public class MRMSServiceTest {
     CampaignOptions mockCampaignOptions;
     Warehouse warehouse;
     Quartermaster mockQuartermaster;
+    PartInventory mockPartInventory;
     MRMSConfiguredOptions configuredOptions;
 
     int targetRoll = DEFAULT_TARGET_NUMBER;
@@ -126,10 +129,14 @@ public class MRMSServiceTest {
 
         mockQuartermaster = mock(Quartermaster.class);
 
+        mockPartInventory = mock(PartInventory.class);
+        when(mockPartInventory.getTransitOrderedDetails()).thenReturn("");
+
         mockCampaign = mock(Campaign.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+        when(mockCampaign.getPartInventory(any(Part.class))).thenReturn(mockPartInventory);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockCampaign.fixPart(any(IPartWork.class), any(Person.class))).thenReturn("Part Fixed");
 
@@ -637,11 +644,13 @@ public class MRMSServiceTest {
     private void breakArmor(Armor armor) {
         int armorAmount = armor.getAmount();
         doAnswer(inv -> {
+            IPartWork fixPartWork = inv.getArgument(0);
+            Person fixPerson = inv.getArgument(1);
+            fixPerson.setMinutesLeft(fixPerson.getMinutesLeft() - fixPartWork.getActualTime());
             armor.setAmountNeeded(0);
             armor.setAmount(armorAmount);
-            //when(((Person) inv.getArgument(1)).getMinutesLeft()).thenReturn()
             timeSpent.add(((Armor) inv.getArgument(0)).getMode());
-            return null;
+            return "Mock Part Fix";
         }).when(mockCampaign).fixPart(argThat(new IPartWorkMatch(armor)), any(Person.class));
         warehouse.addPart(armor.clone(), true);
         armor.setAmountNeeded(armorAmount);
@@ -681,6 +690,212 @@ public class MRMSServiceTest {
               targetNumberMax, dailyTimeMin);
         mrmsOptions.add(mrm);
         when(mockCampaignOptions.getMRMSOptions()).thenReturn(mrmsOptions);
+    }
+
+    @Nested
+    public class TestMRMSUnitsCarryover {
+        Unit unit;
+        List<Person> realTechs;
+
+        // Values not tested in this test:
+        static final int skillMin = SkillLevel.ULTRA_GREEN.getExperienceLevel();
+        static final int skillMax = SkillLevel.LEGENDARY.getExperienceLevel();
+        static final int targetNumberPreferred = 6;
+        static final int targetNumberMax = 6;
+        static final int dailyTimeMin = 0;
+
+        @BeforeEach
+        public void beforeEach() {
+            when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+            Entity entity = getUrbanMek();
+            unit = new Unit(entity, mockCampaign);
+            unit.initializeParts(true);
+
+            realTechs = new ArrayList<>();
+        }
+
+        /**
+         * Helper method to create a real Person object for testing
+         */
+        private Person createRealTech(String name, SkillLevel skillLevel, int minutesLeft) {
+            Person tech = new Person(name, "Tech", mockCampaign);
+            tech.addSkill(SkillType.S_TECH_MEK, skillLevel.getExperienceLevel(), 0);
+            tech.setPrimaryRoleDirect(PersonnelRole.MEK_TECH);
+            tech.setMinutesLeft(minutesLeft);
+            return tech;
+        }
+
+        /**
+         * When allowCarryover is false, MRMS should not assign repairs to techs who don't have enough time
+         * remaining to complete the repair in the same day.
+         */
+        @Test
+        public void testMRMSUnitsCarryoverDisabled() {
+            // Arrange
+            when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(false);
+            when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(false);
+
+            arrangeTestMRMSUnitsCarryover(1); // Tech has only 1 minute left (not enough for armor repairs)
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert - no repairs should be performed since tech doesn't have enough time
+            verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+        }
+
+        /**
+         * When allowCarryover is true, MRMS should assign repairs to techs even if they don't have enough time
+         * remaining to complete the repair in the same day.
+         */
+        @Test
+        public void testMRMSUnitsCarryoverEnabled() {
+            // Arrange
+            when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(true);
+            when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(false);
+
+            arrangeTestMRMSUnitsCarryover(30); // Tech has only 30 minutes left
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert - repairs should be performed even though tech doesn't have enough time
+            verify(mockCampaign, times(1)).fixPart(any(Part.class), any(Person.class));
+        }
+
+        /**
+         * When allowCarryover is true and a tech has enough time to complete the repair, they should be used.
+         */
+        @Test
+        public void testMRMSUnitsCarryoverEnabledWithSufficientTime() {
+            // Arrange
+            when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(true);
+            when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(false);
+
+            arrangeTestMRMSUnitsCarryover(480); // Tech has full day of time
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert - all repairs should be performed
+            verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+        }
+
+        /**
+         * When allowCarryover is true and optimizeToCompleteToday is true, MRMS should prioritize techs who can
+         * complete the repair in the same day over techs who would need to carry over.
+         */
+        @Test
+        public void testMRMSUnitsCarryoverWithOptimizeToCompleteToday() {
+            // Arrange
+            when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(true);
+            when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(true);
+
+            // Create two techs: one with limited time, one with full time
+            Person realTech1 = createRealTech("Tech 1 (Limited)", SkillLevel.VETERAN, 30); // Insufficient time
+            Person realTech2 = createRealTech("Tech 2 (Full Day)", SkillLevel.VETERAN, 480); // Full day
+
+            realTechs.add(realTech1);
+            realTechs.add(realTech2);
+
+            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
+                targetNumberMax, dailyTimeMin);
+            configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+            when(mockCampaign.getTechs(anyBoolean())).thenReturn(realTechs);
+
+            unit.getParts()
+                .stream()
+                .filter(p -> p instanceof Armor)
+                .map(p -> (Armor) p)
+                .forEach(MRMSServiceTest.this::breakArmor);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert - repairs should be performed
+            verify(mockCampaign, times(11)).fixPart(any(Part.class), any(Person.class));
+        }
+
+        /**
+         * When allowCarryover is false and tech has exactly enough time, repair should proceed.
+         */
+        @Test
+        public void testMRMSUnitsCarryoverDisabledWithExactTime() {
+            // Arrange
+            when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(false);
+            when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(false);
+
+            arrangeTestMRMSUnitsCarryover(15);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert - some repairs should be performed (at least until tech runs out of time)
+            // We expect fewer than 11 repairs since tech will run out of time
+            verify(mockCampaign, times(1)).fixPart(any(Part.class), any(Person.class));
+        }
+
+        /**
+         * Scenario:
+         * - Tech has 40 minutes available
+         * - At NORMAL time, repair would take 15 minutes (fits within 40)
+         * - Tech has low skill (GREEN level), requiring target number adjustment
+         * - With extra time needed, repair would take 45+ minutes (exceeds 40)
+         * - With carryover disabled, this should not be attempted because the time check
+         *   now accounts for work time modifiers, so extra time is factored into the carryover decision
+         *
+         * Expected: No repairs should be performed
+         */
+        @Test
+        public void testMRMSUnitsCarryoverDisabledWithLowSkillNeedingExtraTime() {
+            // Arrange
+            when(mockCampaignOptions.isMRMSAllowCarryover()).thenReturn(false);
+            when(mockCampaignOptions.isMRMSOptimizeToCompleteToday()).thenReturn(false);
+            when(mockCampaignOptions.isMRMSUseExtraTime()).thenReturn(true); // Allow using extra time
+
+            // Set low target number preferred so that GREEN tech will need extra time to meet it
+            int targetNumberPreferred = 4; // Very low TN - will require extra time for low skill tech
+            int targetNumberMax = 8; // Allow some wiggle room
+
+            // Tech has 40 minutes - enough for NORMAL time (15 min for back armor) but NOT for EXTRA_2 time (45 min)
+            arrangeTestMRMSUnitsCarryover(SkillLevel.GREEN, 40);
+
+            // Override the MRMS option to use the stricter target numbers
+            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
+                targetNumberMax, dailyTimeMin);
+            configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+            when(mockCampaign.getTechs(anyBoolean())).thenReturn(realTechs);
+
+            // Act
+            MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+            // Assert
+            // EXPECTED: No repairs should be performed because the tech doesn't have enough time
+            //           even with carryover, once extra time is factored in
+            verify(mockCampaign, times(0)).fixPart(any(Part.class), any(Person.class));
+        }
+
+        private void arrangeTestMRMSUnitsCarryover(int techMinutesLeft) {
+            arrangeTestMRMSUnitsCarryover(SkillLevel.VETERAN, techMinutesLeft);
+        }
+
+        private void arrangeTestMRMSUnitsCarryover(SkillLevel skillLevel, int techMinutesLeft) {
+            addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
+                targetNumberMax, dailyTimeMin);
+            configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+            Person realTech = createRealTech("Test Tech", skillLevel, techMinutesLeft);
+            realTechs.add(realTech);
+            when(mockCampaign.getTechs(anyBoolean())).thenReturn(realTechs);
+
+            unit.getParts()
+                .stream()
+                .filter(p -> p instanceof Armor)
+                .map(p -> (Armor) p)
+                .forEach(MRMSServiceTest.this::breakArmor);
+        }
     }
 
 }

@@ -526,6 +526,8 @@ public class CampaignOptions {
     // endregion Finance Tab
 
     // region Mercenary Tab
+    private boolean useAlternatePaymentMode;
+    private boolean useDiminishingContractPay;
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
@@ -1176,6 +1178,8 @@ public class CampaignOptions {
         // endregion Finances Tab
 
         // region Mercenary Tab
+        useAlternatePaymentMode = false;
+        useDiminishingContractPay = false;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
@@ -4587,6 +4591,22 @@ public class CampaignOptions {
 
     public void setEquipmentContractPercent(final double equipmentContractPercent) {
         this.equipmentContractPercent = Math.min(equipmentContractPercent, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
+    }
+
+    public boolean isUseAlternatePaymentMode() {
+        return useAlternatePaymentMode;
+    }
+
+    public void setUseAlternatePaymentMode(final boolean useAlternatePaymentMode) {
+        this.useAlternatePaymentMode = useAlternatePaymentMode;
+    }
+
+    public boolean isUseDiminishingContractPay() {
+        return useDiminishingContractPay;
+    }
+
+    public void setUseDiminishingContractPay(final boolean useDiminishingContractPay) {
+        this.useDiminishingContractPay = useDiminishingContractPay;
     }
 
     public boolean isEquipmentContractBase() {
