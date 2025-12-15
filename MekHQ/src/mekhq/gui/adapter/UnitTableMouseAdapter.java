@@ -305,15 +305,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               commanderAddress, unit.getName(), sellValue.toAmountAndSymbolString());
                     }
 
+                    // Cancel is first (index 0) so closing dialog via X defaults to cancel
                     List<String> buttons = List.of(
-                          getFormattedTextAt(resourceBundle, "sellUnit.buttonConfirm"),
-                          getFormattedTextAt(resourceBundle, "sellUnit.buttonCancel"));
+                          getFormattedTextAt(resourceBundle, "sellUnit.buttonCancel"),
+                          getFormattedTextAt(resourceBundle, "sellUnit.buttonConfirm"));
 
                     Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
                           logisticsAdmin, null, message, buttons, null, null, false);
 
-                    if (dialog.getDialogChoice() == 0) {
+                    if (dialog.getDialogChoice() == 1) {
                         campaign.getQuartermaster().sellUnit(unit);
                     }
                 }
