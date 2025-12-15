@@ -7096,7 +7096,7 @@ public class Person {
     }
 
     public int getTotalInjurySeverity() {
-        int totalSeverity = 0;
+        int totalSeverity = hits; // Normal hits should be included here
         for (Injury injury : injuries) {
             totalSeverity += injury.getHits();
         }
