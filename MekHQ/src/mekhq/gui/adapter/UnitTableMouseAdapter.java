@@ -38,9 +38,11 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -287,29 +289,29 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_SELL)) {
             Campaign campaign = gui.getCampaign();
-            boolean isGMMode = campaign.isGM();
+            String resourceBundle = "mekhq.resources.GUI";
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     Money sellValue = unit.getSellValue();
-                    String sellValueText = sellValue.toAmountAndSymbolString();
+                    String commanderAddress = campaign.getCommanderAddress();
 
-                    // Build the confirmation message
+                    // Build the confirmation message - GM mode shows detailed breakdown
                     String message;
-                    if (isGMMode) {
-                        // GM mode: show detailed breakdown with HTML support
-                        message = String.format(resources.getString("sellUnit.confirmMessageGM"),
-                              unit.getName(), sellValueText, unit.getSellValueBreakdown());
+                    if (campaign.isGM()) {
+                        message = getFormattedTextAt(resourceBundle, "sellUnit.messageGM",
+                              commanderAddress, unit.getName(), unit.getSellValueBreakdown());
                     } else {
-                        message = String.format(resources.getString("sellUnit.confirmMessage"),
-                              unit.getName(), sellValueText);
+                        message = getFormattedTextAt(resourceBundle, "sellUnit.message",
+                              commanderAddress, unit.getName(), sellValue.toAmountAndSymbolString());
                     }
 
-                    List<String> buttons = new ArrayList<>();
-                    buttons.add(resources.getString("sellUnit.buttonYes"));
-                    buttons.add(resources.getString("sellUnit.buttonNo"));
+                    List<String> buttons = List.of(
+                          getFormattedTextAt(resourceBundle, "sellUnit.buttonConfirm"),
+                          getFormattedTextAt(resourceBundle, "sellUnit.buttonCancel"));
 
+                    Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
                     ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                          null, null, message, buttons, null, null, false);
+                          logisticsAdmin, null, message, buttons, null, null, false);
 
                     if (dialog.getDialogChoice() == 0) {
                         campaign.getQuartermaster().sellUnit(unit);
