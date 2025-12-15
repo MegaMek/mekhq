@@ -1902,8 +1902,6 @@ public class AtBDynamicScenarioFactory {
         if (mapParameters.isUseStandardAtBSizing()) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
             BoardScalingType boardScaling = campaignOptions.getBoardScalingType();
-            int heightModifier = boardScaling.getHeightModifier();
-            int minimumWidth = boardScaling.getMinimumWidth();
 
             // We're using this as a shortcut, rather than fetching the player force directly
             int unitCount = getUnitCountWithoutUsingASeedForce(campaign);
@@ -1920,25 +1918,23 @@ public class AtBDynamicScenarioFactory {
             int mapSheetWidth = 16;
             int mapSheetHeight = 17;
 
-            // TW suggests one map sheet per 4 units. We floor as we want to veer towards smaller maps, rather than
-            // larger.
-            double totalMapSheets = floor(unitCount / 4.0);
+            // Height
+            final int defaultSheetsTall = 2;
+            int minimumHeight = max(1, defaultSheetsTall + boardScaling.getHeightModifier());
+            int totalSheetsTall = max(1, minimumHeight + mapParameters.getAdditionalMapSheetTall());
 
-            // We want to keep scenario heights low to avoid players needing to spend several turns just traveling.
-            // We received feedback that while this allowed for more tactical maneuvers, it wasn't fun.
-            int mapSheetCountHalved = (int) floor(totalMapSheets / 2.0);
-            int baseHeight = clamp(mapSheetCountHalved, 1, 2);
+            mapSizeY = mapSheetHeight * totalSheetsTall;
 
-            // Don't merge these two calculations
-            int mapSheetsTall = max(1, baseHeight + heightModifier);
-            mapSheetsTall = max(1, mapSheetsTall + mapParameters.getAdditionalMapSheetTall());
+            // Width
+            // TW suggests one map sheet per 4 units. As we have a minimum height, we use that to determine how much
+            // we should divide unit count by. We floor the result as players generally prefer smaller maps.
+            int minimumWidth = max(1, boardScaling.getMinimumWidth());
+            double unitDivider = 4 * minimumHeight;
 
-            // This creates a wide area of engagement which should help reduce the tendency for forces to 'death ball'
-            int mapSheetsWide = (int) floor(totalMapSheets / baseHeight);
-            mapSheetsWide = max(minimumWidth, mapSheetsWide + mapParameters.getAdditionalMapSheetWide());
+            int totalSheetsWide = (int) max(minimumWidth, floor(unitCount / unitDivider));
+            totalSheetsWide = max(1, totalSheetsWide + mapParameters.getAdditionalMapSheetWide());
 
-            mapSizeX = mapSheetWidth * mapSheetsWide;
-            mapSizeY = mapSheetHeight * mapSheetsTall;
+            mapSizeX = mapSheetWidth * totalSheetsWide;
         } else {
             mapSizeX = mapParameters.getBaseWidth();
             mapSizeY = mapParameters.getBaseHeight();

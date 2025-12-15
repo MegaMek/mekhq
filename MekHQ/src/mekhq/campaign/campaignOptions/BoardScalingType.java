@@ -36,9 +36,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 public enum BoardScalingType {
     SMALL("SMALL", -1, 1),
-    NORMAL("NORMAL", 0, 1),
-    LARGE("LARGE", 1, 2),
-    HUGE("HUGE", 2, 3);
+    NORMAL("NORMAL", 0, 2),
+    LARGE("LARGE", 1, 3),
+    HUGE("HUGE", 2, 4);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.BoardScalingType";
 
