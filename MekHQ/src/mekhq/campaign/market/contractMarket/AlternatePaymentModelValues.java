@@ -327,7 +327,8 @@ public enum AlternatePaymentModelValues {
                 case WEIGHT_ULTRA_LIGHT, WEIGHT_LIGHT -> COMBAT_VEHICLE_LIGHT.getValue();
                 case WEIGHT_MEDIUM -> COMBAT_VEHICLE_MEDIUM.getValue();
                 case WEIGHT_HEAVY -> COMBAT_VEHICLE_HEAVY.getValue();
-                case WEIGHT_ASSAULT, WEIGHT_SUPER_HEAVY -> COMBAT_VEHICLE_ASSAULT.getValue();
+                case WEIGHT_ASSAULT -> COMBAT_VEHICLE_ASSAULT.getValue();
+                case WEIGHT_SUPER_HEAVY -> COMBAT_VEHICLE_SUPER_HEAVY.getValue();
                 default -> {
                     LOGGER.error(new IllegalStateException("Unexpected value (CV): " + weightClass));
                     yield Money.zero();
