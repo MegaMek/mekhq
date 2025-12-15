@@ -185,6 +185,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
+    public static final String WRITE_All_UNITS_TO_XML = "writeAllUnitsToXML";
     public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
     // endregion Campaign XML Save Options
 
