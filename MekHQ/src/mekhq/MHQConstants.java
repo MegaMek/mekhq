@@ -98,6 +98,7 @@ public final class MHQConstants extends SuiteConstants {
     // region Personnel Tab
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
+    public static final String USE_UNIFIED_DAILY_REPORT = "useUnifiedDailyReport";
     // endregion Personnel Tab
     // endregion Display
 
@@ -227,6 +228,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
+    public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
     public static final String CONFIRMATION_NEW_LIFE_PATH = "confirmationNewLifePath";
     public static final String CONFIRMATION_REGEN_PATH_ID = "confirmationRegenPathId";
     public static final String CONFIRMATION_UPGRADE_LIFE_PATHS = "confirmationUpgradeLifePaths";

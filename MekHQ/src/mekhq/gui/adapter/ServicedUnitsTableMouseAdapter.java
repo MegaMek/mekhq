@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+
 import java.awt.event.ActionEvent;
 import java.util.Optional;
 import javax.swing.JCheckBoxMenuItem;
@@ -41,11 +43,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.IUnitAction;
@@ -93,11 +98,22 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains("CHANGE_SITE")) {
-            for (Unit unit : units) {
-                if (!unit.isDeployed()) {
-                    String sel = command.split(":")[1];
-                    int selected = Integer.parseInt(sel);
-                    if ((selected > -1) && (selected < Unit.SITE_UNKNOWN)) {
+            int selected = MathUtility.parseInt(command.split(":")[1], SITE_FIELD_WORKSHOP);
+            boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
+            if (!selectedIsValid) {
+                return;
+            }
+
+            boolean wasSiteChangeSuccessful = true;
+            Campaign campaign = gui.getCampaign();
+            if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
+                      campaign.getCampaignOptions().getRentedFacilitiesCostRepairBays() > 0) {
+                wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
+            }
+
+            if (wasSiteChangeSuccessful) {
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
                         unit.setSite(selected);
                         MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                     }
@@ -157,7 +173,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
         JCheckBoxMenuItem cbMenuItem;
         // **let's fill the pop-up menu**//
         // change the location
-        JMenu menu = new JMenu("Change site");
+        JMenu menu = new JMenu("Change Site");
         int i;
         for (i = 0; i < Unit.SITE_UNKNOWN; i++) {
             cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));

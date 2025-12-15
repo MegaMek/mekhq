@@ -191,6 +191,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "warShipContractPercent",
               campaignOptions.getWarShipContractPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternatePaymentMode",
+              campaignOptions.isUseAlternatePaymentMode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDiminishingContractPay",
+              campaignOptions.isUseDiminishingContractPay());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractBase",
               campaignOptions.isEquipmentContractBase());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractSaleValue",
@@ -1056,6 +1060,10 @@ public class CampaignOptionsMarshaller {
 
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", campaignOptions.getSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "boardScalingType",
+              campaignOptions.getBoardScalingType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", campaignOptions.getAutoResolveMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

@@ -58,6 +58,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
@@ -140,6 +141,10 @@ public class ContractAutomation {
               false);
 
         if (transitDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
+            if (!JumpBlockers.areAllUnitsJumpCapable(campaign)) {
+                return;
+            }
+
             campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();

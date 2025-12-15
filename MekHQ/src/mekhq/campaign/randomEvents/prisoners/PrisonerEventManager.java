@@ -39,6 +39,7 @@ import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -637,7 +638,7 @@ public class PrisonerEventManager {
                   prisoners, campaign.getGameYear(), campaignOptions.getRegardMultiplier());
 
             for (String report : reports) {
-                campaign.addReport(GENERAL, report);
+                campaign.addReport(POLITICS, report);
             }
         }
 

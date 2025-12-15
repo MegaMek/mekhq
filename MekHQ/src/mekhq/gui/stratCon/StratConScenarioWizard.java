@@ -33,7 +33,7 @@
 package mekhq.gui.stratCon;
 
 import static mekhq.MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -1092,7 +1092,7 @@ public class StratConScenarioWizard extends JDialog {
                   enemyCode, campaign.getGameYear(), regardMultiplier);
 
             for (String report : reports) {
-                campaign.addReport(GENERAL, report);
+                campaign.addReport(POLITICS, report);
             }
         }
     }

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -111,9 +112,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.IUnitRating;
+import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.enums.DragoonRating;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -280,7 +282,7 @@ public class AtBDynamicScenarioFactory {
 
         // approximate estimate, anyway.
         scenario.setForceCount(generatedLanceCount + (playerForceUnitCount / 4));
-        setScenarioMapSize(scenario);
+        setScenarioMapSize(scenario, campaign);
         scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
         setDeploymentZones(scenario);
         setDestinationZones(scenario);
@@ -1872,57 +1874,87 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Sets dynamic AtB-sized base map size for the given scenario.
+     * Calculates and sets the dimensions of the scenario map based on the forces involved and the scenario template
+     * parameters.
      *
-     * @param scenario The scenario to process.
+     * <p>This method determines the map size using one of two strategies defined in the {@code ScenarioTemplate}:
+     * <ul>
+     *     <li><b>Standard AtB Sizing:</b> If enabled, the size is calculated based on the total unit count (player +
+     *     bot forces). It follows the "Total Warfare" suggestion of roughly one map sheet per 4 units. Infantry
+     *     units in bot forces are excluded from this count to prevent excessive map sizes.
+     *     </li>
+     *     <li><b>Template Base Sizing:</b> Uses fixed base dimensions defined in the template, optionally scaled by
+     *     increments based on the number of forces involved.
+     *     </li>
+     * </ul>
+     *
+     * <p>Additionally, if the template allows rotation, there is a 50% chance the calculated X and Y dimensions
+     * will be swapped.</p>
+     *
+     * @param scenario The dynamic scenario object to update with the new map dimensions.
+     * @param campaign The current campaign context, used to retrieve unit counts and entity lists.
      */
-    public static void setScenarioMapSize(AtBDynamicScenario scenario) {
+    public static void setScenarioMapSize(AtBDynamicScenario scenario, Campaign campaign) {
         int mapSizeX;
         int mapSizeY;
         ScenarioTemplate template = scenario.getTemplate();
+        ScenarioMapParameters mapParameters = template.mapParameters;
+        if (mapParameters.isUseStandardAtBSizing()) {
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            BoardScalingType boardScaling = campaignOptions.getBoardScalingType();
+            int heightModifier = boardScaling.getHeightModifier();
+            int minimumWidth = boardScaling.getMinimumWidth();
 
-        // if the template says to use standard AtB sizing, determine it randomly here
-        if (template.mapParameters.isUseStandardAtBSizing()) {
-            int roll = randomInt(20) + 1;
-            if (roll < 6) {
-                mapSizeX = 20;
-                mapSizeY = 10;
-            } else if (roll < 11) {
-                mapSizeX = 10;
-                mapSizeY = 20;
-            } else if (roll < 13) {
-                mapSizeX = 30;
-                mapSizeY = 10;
-            } else if (roll < 15) {
-                mapSizeX = 10;
-                mapSizeY = 30;
-            } else if (roll < 19) {
-                mapSizeX = 20;
-                mapSizeY = 20;
-            } else if (roll == 19) {
-                mapSizeX = 40;
-                mapSizeY = 10;
-            } else {
-                mapSizeX = 10;
-                mapSizeY = 40;
+            // We're using this as a shortcut, rather than fetching the player force directly
+            int unitCount = getUnitCountWithoutUsingASeedForce(campaign);
+            for (BotForce botForce : scenario.getBotForces()) {
+                for (Entity entity : botForce.getFullEntityList(campaign)) {
+                    // We don't count infantry (on the OpFor side) to avoid large infantry fights generating massive
+                    // scenario maps
+                    if (!entity.isInfantry()) {
+                        unitCount++;
+                    }
+                }
             }
-            // otherwise, the map width/height have been specified explicitly
+
+            int mapSheetWidth = 16;
+            int mapSheetHeight = 17;
+
+            // TW suggests one map sheet per 4 units. We floor as we want to veer towards smaller maps, rather than
+            // larger.
+            double totalMapSheets = floor(unitCount / 4.0);
+
+            // We want to keep scenario heights low to avoid players needing to spend several turns just traveling.
+            // We received feedback that while this allowed for more tactical maneuvers, it wasn't fun.
+            int mapSheetCountHalved = (int) floor(totalMapSheets / 2.0);
+            int baseHeight = clamp(mapSheetCountHalved, 1, 2);
+
+            // Don't merge these two calculations
+            int mapSheetsTall = max(1, baseHeight + heightModifier);
+            mapSheetsTall = max(1, mapSheetsTall + mapParameters.getAdditionalMapSheetTall());
+
+            // This creates a wide area of engagement which should help reduce the tendency for forces to 'death ball'
+            int mapSheetsWide = (int) floor(totalMapSheets / baseHeight);
+            mapSheetsWide = max(minimumWidth, mapSheetsWide + mapParameters.getAdditionalMapSheetWide());
+
+            mapSizeX = mapSheetWidth * mapSheetsWide;
+            mapSizeY = mapSheetHeight * mapSheetsTall;
         } else {
-            mapSizeX = template.mapParameters.getBaseWidth();
-            mapSizeY = template.mapParameters.getBaseHeight();
+            mapSizeX = mapParameters.getBaseWidth();
+            mapSizeY = mapParameters.getBaseHeight();
+
+            // increment map size by template-specified increments
+            mapSizeX += mapParameters.getWidthScalingIncrement() * scenario.getForceCount();
+            mapSizeY += mapParameters.getHeightScalingIncrement() * scenario.getForceCount();
         }
 
-        // increment map size by template-specified increments
-        mapSizeX += template.mapParameters.getWidthScalingIncrement() * scenario.getForceCount();
-        mapSizeY += template.mapParameters.getHeightScalingIncrement() * scenario.getForceCount();
-
         // 50/50 odds to rotate the map 90 degrees if specified.
-        if (template.mapParameters.isAllowRotation()) {
+        if (mapParameters.isAllowRotation()) {
             int roll = randomInt(20) + 1;
             if (roll <= 10) {
-                int swap = mapSizeX;
-                mapSizeX = mapSizeY;
-                mapSizeY = swap;
+                // Ignore the IDE telling you this is wrong
+                scenario.setMapSizeX(mapSizeY);
+                scenario.setMapSizeY(mapSizeX);
             }
         }
 
@@ -2364,7 +2396,7 @@ public class AtBDynamicScenarioFactory {
 
                 double bayCapacity = bay.getUnused();
                 int remainingCount = (int) max(1,
-                      Math.floor(bayCapacity / IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT));
+                      floor(bayCapacity / IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT));
                 while (remainingCount > 0) {
 
                     // Set base random generation parameters

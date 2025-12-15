@@ -132,6 +132,7 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -425,6 +426,9 @@ public class Person {
     private boolean tryingToConceive;
     private boolean hidePersonality;
     // endregion Flags
+
+    // Cache
+    private transient Integer advancedAsTechContribution = null;
 
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
@@ -2208,7 +2212,8 @@ public class Person {
         if (isAlternativeAdvancedMedicalEnabled && hasBodyModAddiction) {
             boolean hasProsthetic = false;
             for (Injury injury : getPermanentInjuries()) {
-                if (injury.getSubType().isProsthetic()) {
+                InjurySubType injurySubType = injury.getSubType();
+                if (injurySubType.isPermanentModification()) {
                     hasProsthetic = true;
                     break;
                 }
@@ -7104,9 +7109,33 @@ public class Person {
     }
 
     public int getTotalInjurySeverity() {
-        int totalSeverity = 0;
+        int totalSeverity = hits; // Normal hits should be included here
         for (Injury injury : injuries) {
             totalSeverity += injury.getHits();
+        }
+
+        return totalSeverity;
+    }
+
+    /**
+     * Calculates a severity score for this person based on current hits and non-permanent injuries.
+     *
+     * <p>The returned value starts with the person's current {@code hits} value, then adds the hit contribution from
+     * each injury that is <em>not</em> permanent. Permanent injuries are intentionally excluded from this
+     * calculation.</p>
+     *
+     * @return the total severity score, consisting of {@code hits} plus the sum of {@link Injury#getHits()} for all
+     *       non-permanent injuries
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public int getNonPermanentInjurySeverity() {
+        int totalSeverity = hits;
+        for (Injury injury : injuries) {
+            if (!injury.isPermanent()) {
+                totalSeverity += injury.getHits();
+            }
         }
 
         return totalSeverity;
@@ -7117,11 +7146,15 @@ public class Person {
     }
 
     public List<Injury> getProstheticInjuries() {
-        return injuries.stream().filter(i -> i.getSubType().isProsthetic()).collect(Collectors.toList());
+        return injuries.stream()
+                     .filter(i -> i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
     }
 
     public List<Injury> getNonProstheticInjuries() {
-        return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
+        return injuries.stream()
+                     .filter(i -> !i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
     }
 
     /**
@@ -7139,7 +7172,8 @@ public class Person {
      */
     public void clearInjuriesExcludingProsthetics() {
         for (Injury injury : new ArrayList<>(injuries)) {
-            if (!injury.getSubType().isProsthetic()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (!injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
@@ -7166,7 +7200,8 @@ public class Person {
      */
     public void clearProstheticInjuries() {
         for (Injury injury : new ArrayList<>(injuries)) {
-            if (injury.getSubType().isProsthetic()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
@@ -7180,6 +7215,10 @@ public class Person {
 
     public void removeInjury(final Injury injury) {
         injuries.remove(injury);
+
+        // We need to make sure we also remove any associated abilities and implants
+        AdvancedMedicalAlternate.removeAssociatedInjuryOptions(injury, injuries, options);
+
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -7228,8 +7267,7 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        return !injuries.isEmpty() &&
-                     injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
+        return !injuries.isEmpty();
     }
 
     /**
@@ -8759,5 +8797,43 @@ public class Person {
               adjustedReputation,
               injuryEffects,
               ageForAttributeModifiers);
+    }
+
+    /**
+     * Calculates the individual AsTech contribution for a person based on their {@link SkillType#S_ASTECH} skill.
+     *
+     * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
+     * all modifiers. If the skill is absent, returns {@code 0}.</p>
+     *
+     * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
+     *
+     * @since 0.50.11
+     */
+    public int getAdvancedAsTechContribution() {
+        int contribution;
+        if (advancedAsTechContribution == null) {
+            Skill asTechSkill = getSkill(S_ASTECH);
+            if (asTechSkill != null) {
+                // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
+                // by design.
+                SkillModifierData skillModifierData = getSkillModifierData();
+                int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
+                contribution = (int) floor(totalSkillLevel / Campaign.ASSISTANT_SKILL_LEVEL_DIVIDER);
+            } else {
+                contribution = 0;
+            }
+            setAdvancedAsTechContribution(contribution);
+        } else {
+            contribution = advancedAsTechContribution;
+        }
+        return contribution;
+    }
+
+    public void invalidateAdvancedAsTechContribution() {
+        advancedAsTechContribution = null;
+    }
+
+    public void setAdvancedAsTechContribution(int contribution) {
+        advancedAsTechContribution = contribution;
     }
 }

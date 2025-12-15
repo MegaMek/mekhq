@@ -250,6 +250,9 @@ public class CampaignOptionsUnmarshaller {
             case "dropShipContractPercent" -> campaignOptions.setDropShipContractPercent(parseDouble(nodeContents));
             case "jumpShipContractPercent" -> campaignOptions.setJumpShipContractPercent(parseDouble(nodeContents));
             case "warShipContractPercent" -> campaignOptions.setWarShipContractPercent(parseDouble(nodeContents));
+            case "useAlternatePaymentMode" -> campaignOptions.setUseAlternatePaymentMode(parseBoolean(nodeContents));
+            case "useDiminishingContractPay" ->
+                  campaignOptions.setUseDiminishingContractPay(parseBoolean(nodeContents));
             case "equipmentContractBase" -> campaignOptions.setEquipmentContractBase(parseBoolean(nodeContents));
             case "equipmentContractSaleValue" -> campaignOptions.setEquipmentContractSaleValue(parseBoolean(
                   nodeContents));
@@ -828,6 +831,8 @@ public class CampaignOptionsUnmarshaller {
             case "isEnableSalvageFlagByDefault" ->
                   campaignOptions.setEnableSalvageFlagByDefault(parseBoolean(nodeContents));
             case "skillLevel" -> campaignOptions.setSkillLevel(SkillLevel.parseFromString(nodeContents));
+            case "boardScalingType" ->
+                  campaignOptions.setBoardScalingType(BoardScalingType.parseFromLookupName(nodeContents));
             case "autoResolveMethod" -> campaignOptions.setAutoResolveMethod(AutoResolveMethod.valueOf(nodeContents));
             case "autoResolveVictoryChanceEnabled" -> campaignOptions.setAutoResolveVictoryChanceEnabled(parseBoolean(
                   nodeContents));

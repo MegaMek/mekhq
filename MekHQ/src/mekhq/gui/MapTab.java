@@ -74,6 +74,7 @@ import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.enums.MHQTabType;
@@ -271,6 +272,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     private void beginTransit() {
         if (panMap.getJumpPath().isEmpty()) {
+            return;
+        }
+
+        if (!JumpBlockers.areAllUnitsJumpCapable(getCampaign())) {
             return;
         }
 

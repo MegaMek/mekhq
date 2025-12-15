@@ -34,9 +34,12 @@
 package mekhq.campaign.unit;
 
 import java.util.Objects;
+import java.util.Vector;
 
+import megamek.common.equipment.DockingCollar;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.enums.TransporterType;
 
 /**
  * Represents an assignment to a specific bay on a transport ship. Currently only used by SHIP_TRANSPORT but this could
@@ -60,6 +63,23 @@ public class TransportShipAssignment extends TransportAssignment {
 
         if (getTransportShip().getEntity() != null) {
             setTransportedLocation(transportShip.getEntity().getBayById(bayNumber));
+
+            if (getTransportedLocation() == null) {
+                // If we didn't find a matching bay, maybe it's a docking collar?
+                Vector<DockingCollar> dockingCollars = transportShip.getEntity().getDockingCollars();
+                for (DockingCollar dockingCollar : dockingCollars) {
+                    if (dockingCollar.getCollarNumber() == bayNumber) {
+                        setTransportedLocation(dockingCollar);
+                        break;
+                    }
+                }
+            }
+
+            // Okay, now did we find a transport location? Let's set our transporter type if we did.
+            if (getTransportedLocation() != null) {
+                TransporterType transporterType = TransporterType.getTransporterType(getTransportedLocation());
+                setTransporterType(transporterType);
+            }
         }
     }
 

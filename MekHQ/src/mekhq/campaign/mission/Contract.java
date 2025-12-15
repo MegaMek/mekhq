@@ -616,7 +616,7 @@ public class Contract extends Mission {
     public Money getEstimatedTotalProfit(Campaign campaign) {
         return getTotalAdvanceAmount()
                      .plus(getTotalMonthlyPayOut(campaign))
-                     .minus(getTransportCost(campaign, false));
+                     .minus(getTransportCost(campaign, true));
     }
 
     /**
