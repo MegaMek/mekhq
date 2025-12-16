@@ -92,7 +92,7 @@ public class EasyBugReport {
      * <p><b>Note:</b> This is a best-effort cap because ZIP container metadata and compression behavior can affect
      * the final on-disk size.</p>
      */
-    private static final long MAX_ARCHIVE_BYTES = 24L * 1024L * 1024L; // 24 MiB
+    private static final long MAX_ARCHIVE_BYTES = 1024L * 1024L; // 24 MiB
 
     /**
      * Conservative per-entry overhead estimate (in bytes) used when deciding whether adding another file would exceed
@@ -254,43 +254,43 @@ public class EasyBugReport {
         ZipOutputStream zipOut = new ZipOutputStream(countingOut);
         parts.add(currentArchive);
 
-        int fileIndex = 0;
-        while (fileIndex < inputFiles.size()) {
-            currentArchive = new File(parentDirectory, baseName + "-part" + partIndex + ".zip");
-            parts.add(currentArchive);
-            try (
-                CountingOutputStream countingOut = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(currentArchive)));
-                ZipOutputStream zipOut = new ZipOutputStream(countingOut)
-            ) {
-                boolean addedAny = false;
-                for (; fileIndex < inputFiles.size(); fileIndex++) {
-                    File inputFile = inputFiles.get(fileIndex);
-                    String entryName = inputFile.equals(campaignFile) ?
-                                             campaignFile.getName() :
-                                             ("logs/" + inputFile.getName());
+        try {
+            for (File inputFile : inputFiles) {
+                String entryName = inputFile.equals(campaignFile) ?
+                                         campaignFile.getName() :
+                                         ("logs/" + inputFile.getName());
 
-                    long estimatedAddedBytes = inputFile.length() + ZIP_ENTRY_OVERHEAD_BYTES;
+                long estimatedAddedBytes = inputFile.length() + ZIP_ENTRY_OVERHEAD_BYTES;
 
-                    // If adding this file would exceed the cap, roll to next part (if current part already has something).
-                    // Note: This is conservative and should keep the actual ZIP size under the limit in practice.
-                    if (addedAny && (countingOut.getCount() + estimatedAddedBytes) > MAX_ARCHIVE_BYTES) {
-                        partIndex++;
-                        break; // exit for-loop to start a new archive part
+                // If adding this file would exceed the cap, roll to next part (if current part already has something).
+                // Note: This is conservative and should keep the actual ZIP size under the limit in practice.
+                if (countingOut.getCount() > 0 && (countingOut.getCount() + estimatedAddedBytes) > MAX_ARCHIVE_BYTES) {
+                    try {
+                        zipOut.close();
+                    } finally {
+                        // zipOut.close() closes countingOut too, but be explicit in case of partial failures
+                        try {countingOut.close();} catch (IOException ignored) {}
                     }
 
-                    // If a single file is huge, it may exceed MAX_ARCHIVE_BYTES even alone.
-                    if (inputFile.length() > (MAX_ARCHIVE_BYTES - ZIP_ENTRY_OVERHEAD_BYTES)) {
-                        LOGGER.warn(
-                              "File '{}' is larger than the per-archive limit ({} bytes); it will be placed in its own " +
-                                    "part and may exceed the limit.",
-                              inputFile.getName(),
-                              MAX_ARCHIVE_BYTES);
-                    }
-
-                    addFileToZip(inputFile, entryName, zipOut);
-                    addedAny = true;
+                    partIndex++;
+                    currentArchive = new File(parentDirectory, baseName + "-part" + partIndex + ".zip");
+                    countingOut = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(currentArchive)));
+                    zipOut = new ZipOutputStream(countingOut);
+                    parts.add(currentArchive);
                 }
+
+                // If a single file is huge, it may exceed MAX_ARCHIVE_BYTES even alone.
+                if (inputFile.length() > (MAX_ARCHIVE_BYTES - ZIP_ENTRY_OVERHEAD_BYTES)) {
+                    LOGGER.warn(
+                          "File '{}' is larger than the per-archive limit ({} bytes); it will be placed in its own " +
+                                "part and may exceed the limit.",
+                          inputFile.getName(),
+                          MAX_ARCHIVE_BYTES);
+                }
+
+                addFileToZip(inputFile, entryName, zipOut);
             }
+        } finally {
             try {
                 zipOut.close();
             } catch (IOException ex) {
