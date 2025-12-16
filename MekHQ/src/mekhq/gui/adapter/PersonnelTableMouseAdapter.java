@@ -3823,7 +3823,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
-                    person.setSecondInCommand(true);
+                    person.setSecondInCommand(false);
                     getCampaign().addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
                           person.getHyperlinkedFullTitle()));
                     getCampaign().personUpdated(person);

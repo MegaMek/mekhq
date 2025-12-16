@@ -1459,7 +1459,11 @@ public class Person {
     }
 
     /**
+     * This is used to change the person's PersonnelStatus
      *
+     * @param campaign the campaign the person is part of
+     * @param today    the current date
+     * @param status   the person's new PersonnelStatus
      */
     public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status) {
         if (status == getStatus()) { // no change means we don't need to process anything
@@ -1620,21 +1624,25 @@ public class Person {
 
             // promote second in command
             Person secondInCommand = campaign.getSecondInCommand();
-            secondInCommand.setSecondInCommand(false);
-            secondInCommand.setCommander(true);
+            if (secondInCommand != null) {
+                secondInCommand.setSecondInCommand(false);
+                secondInCommand.setCommander(true);
 
-            String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
-            campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
-                  secondInCommandHyperlink));
-            campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
-                  secondInCommandHyperlink));
+                String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
+                campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                      secondInCommandHyperlink));
+                campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                      secondInCommandHyperlink));
 
-            campaign.personUpdated(secondInCommand);
+                campaign.personUpdated(secondInCommand);
+            }
         }
 
         // release the second-in-command flag.
         if (isSecondInCommand() && status.isDepartedUnit()) {
             setSecondInCommand(false);
+            campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                  getHyperlinkedFullTitle()));
         }
 
         // clean up the save entry
