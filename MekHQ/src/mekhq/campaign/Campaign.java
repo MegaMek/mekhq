@@ -5510,6 +5510,13 @@ public class Campaign implements ITechManager {
         return getPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
     }
 
+    /**
+     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns {@code null}.
+     *
+     * <p><b>Usage:</b> consider using {@link #getSecondInCommand()} instead.</p>
+     *
+     * @return the flagged second-in-command if present, otherwise {@code null}
+     */
     public @Nullable Person getFlaggedSecondInCommand() {
         return getPersonnel().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
