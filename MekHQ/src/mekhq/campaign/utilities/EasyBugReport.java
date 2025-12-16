@@ -228,8 +228,9 @@ public class EasyBugReport {
                                                                               file.getName().endsWith(".log.gz")));
             if (logFiles != null && logFiles.length > 0) {
                 // Stable order helps reproducibility and makes parts predictable
-                inputFiles.addAll(List.of(logFiles));
-                inputFiles.sort(Comparator.comparing(File::getName));
+                List<File> sortedLogFiles = new ArrayList<>(List.of(logFiles));
+                sortedLogFiles.sort(Comparator.comparing(File::getName));
+                inputFiles.addAll(sortedLogFiles);
             } else {
                 LOGGER.info("No .log or .log.gz files found in {}", LOGS_PATH);
             }
