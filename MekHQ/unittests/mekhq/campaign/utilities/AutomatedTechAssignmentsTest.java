@@ -234,7 +234,7 @@ class AutomatedTechAssignmentsTest {
     }
 
     @Test
-    void assignUnmaintainedUnitsTechs_assignsUnitsToLeastLoadedTech_andKeepsTechListInBestFirstOrder()
+    void assignUnmaintainedUnitsTechs_assignsUnitsToBestTechFirst_andKeepsTechListInBestFirstOrder()
           throws Exception {
         AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
 
@@ -244,7 +244,7 @@ class AutomatedTechAssignmentsTest {
         when(tech1.getTechUnits()).thenReturn(tech1Units);
         stubTechLevel(tech1, 3);
 
-        // Tech 2: 0 units, tech level 9 (should win tie on first assignment)
+        // Tech 2: 0 units, tech level 9 (should win due to best-tech-first ordering)
         Person tech2 = mock(Person.class);
         List<Unit> tech2Units = new ArrayList<>();
         when(tech2.getTechUnits()).thenReturn(tech2Units);
@@ -265,19 +265,16 @@ class AutomatedTechAssignmentsTest {
 
         invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained);
 
-        // Assignment expectation:
-        // unit1 -> tech2 (tie on size 0, higher skill wins)
-        // now tech2 has 1, tech1 has 0
-        // unit2 -> tech1 (least loaded)
-        // now both have 1
-        // unit3 -> tech2 again (tie on size 1, higher skill wins)
-        // now tech2 has 2 (at capacity)
+        // Assignment expectation (best-tech-first, tie-break by least loaded):
+        // unit1 -> tech2 (higher skill wins)
+        // unit2 -> tech2 again (skill is primary, so tech2 wins even though it's now more loaded)
+        // unit3 -> tech1 (tech2 reached capacity=2 and is not re-queued)
         assertSame(tech2, unit1.getTech());
-        assertSame(tech1, unit2.getTech());
-        assertSame(tech2, unit3.getTech());
+        assertSame(tech2, unit2.getTech());
+        assertSame(tech1, unit3.getTech());
 
         // Tech list should reflect the remaining eligible techs in "best first" order.
-        // After assignments: tech1 has 1, tech2 has 2 and is at capacity, so tech2 is not re-queued and is absent.
+        // After assignments: tech2 is at capacity and is absent; tech1 remains eligible.
         assertEquals(List.of(tech1), techs);
     }
 
@@ -374,7 +371,7 @@ class AutomatedTechAssignmentsTest {
         AutomatedTechAssignments techAssignments = new AutomatedTechAssignments(List.of(), List.of());
         int initialReportCount = techAssignments.getReports().size();
 
-        // Tech 1 starts with 1 assigned unit already, high skill, so they would win ties if eligible.
+        // Tech 1 starts with 1 assigned unit already, high skill, so they will be picked first until cap=2.
         Person tech1 = mock(Person.class);
         List<Unit> tech1Units = new ArrayList<>(List.of(mock(Unit.class))); // size=1
         when(tech1.getTechUnits()).thenReturn(tech1Units);
@@ -399,11 +396,17 @@ class AutomatedTechAssignmentsTest {
 
         invokeAssignUnmaintainedUnitsTechs(techAssignments, techs, unmaintained);
 
-        assertSame(tech2, unit1.getTech());
-        assertSame(tech1, unit2.getTech());
+        // With best-tech-first ordering:
+        // unit1 -> tech1 (best skill, tech1 goes from 1 -> 2 and hits cap)
+        // unit2 -> tech2
+        // unit3 -> tech2 (tech2 goes from 1 -> 2 and hits cap)
+        assertSame(tech1, unit1.getTech());
+        assertSame(tech2, unit2.getTech());
         assertSame(tech2, unit3.getTech());
 
+        // Tech 1 started with 1, can only receive one more.
         assertEquals(2, tech1Units.size());
+        assertEquals(2, tech2Units.size());
 
         // Both techs hit cap=2, so neither should remain in the returned eligible-tech list.
         assertEquals(List.of(), techs);

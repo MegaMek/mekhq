@@ -294,10 +294,10 @@ public class AutomatedTechAssignments {
      *
      * <p>The queue is ordered so that the "best" tech is at the head:</p>
      * <ol>
-     *     <li><b>Lowest current workload first</b>: {@code person.getTechUnits().size()} ascending (fewest assigned
-     *     units).</li>
      *     <li><b>Tie-breaker</b>: higher tech skill first, using {@link #getTechLevel(Person, String)} with the
      *     provided {@code techSkill}.</li>
+     *     <li><b>Lowest current workload first</b>: {@code person.getTechUnits().size()} ascending (fewest assigned
+     *     units).</li>
      * </ol>
      *
      * <p>This ordering is used to implement simple load-balancing when assigning units to techs: repeatedly polling
@@ -311,10 +311,10 @@ public class AutomatedTechAssignments {
      * @since 0.50.11
      */
     private @NonNull PriorityQueue<Person> getPersonPriorityQueue(String techSkill) {
-        Comparator<Person> bestTechFirst = Comparator.comparingInt((Person p) -> p.getTechUnits()
-                                                                                       .size()) // smallest to largest
-                                                 .thenComparing(Comparator.comparingInt((Person p) -> getTechLevel(p,
-                                                       techSkill)).reversed()); // tie: highest tech level
+        Comparator<Person> bestTechFirst = Comparator
+                                                 .comparingInt((Person p) -> getTechLevel(p, techSkill))
+                                                 .reversed() // highest tech level first
+                                                 .thenComparingInt(p -> p.getTechUnits().size()); // smallest to largest
 
         return new PriorityQueue<>(bestTechFirst);
     }
