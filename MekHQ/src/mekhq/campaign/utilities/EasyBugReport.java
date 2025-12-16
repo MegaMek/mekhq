@@ -242,7 +242,7 @@ public class EasyBugReport {
         }
         File parentDirectory = archiveFile.getParentFile();
         if (parentDirectory == null) {
-            parentDirectory = new File(".");
+            parentDirectory = archiveFile.getAbsoluteFile().getParentFile();
         }
 
         List<File> parts = new ArrayList<>();
