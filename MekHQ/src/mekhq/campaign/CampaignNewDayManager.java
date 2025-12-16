@@ -669,8 +669,14 @@ public class CampaignNewDayManager {
                     processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
-                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseAltAdvancedMedical,
-                      isUseFatigue, fatigueRate);
+                if (person.getStatus().isActiveFlexible() && person.getPrisonerStatus().isFreeOrBondsman()) {
+                    processCompulsionsAndMadness(person,
+                          personnelOptions,
+                          isUseAdvancedMedical,
+                          isUseAltAdvancedMedical,
+                          isUseFatigue,
+                          fatigueRate);
+                }
             }
 
             // Monthly events
