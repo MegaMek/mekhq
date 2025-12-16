@@ -4739,7 +4739,7 @@ public class Unit implements ITechnology {
         // handling built into their methods.
         Person commander = getCommander();
 
-        if (campaignOptions.isUseTactics() && campaignOptions.isUseInitiativeBonus()) {
+        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
             setTacticsInitiativeBonus(commander);
         }
 
@@ -4833,11 +4833,14 @@ public class Unit implements ITechnology {
         if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
             SkillModifierData skillModifierData = commander.getSkillModifierData();
 
-            entity.getCrew()
-                  .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
-                                         .getTotalSkillLevel(skillModifierData));
-            entity.getCrew().setInitBonus(commander.getSkill(SkillType.S_TACTICS)
-                                                .getTotalSkillLevel(skillModifierData));
+            int commanderTacticsBonus = commander.getSkill(SkillType.S_TACTICS)
+                                              .getTotalSkillLevel(skillModifierData);
+
+            if (getCampaign().getCampaignOptions().isUseTactics()) {
+                entity.getCrew().setCommandBonus(commanderTacticsBonus);
+            } else if (getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
+                entity.getCrew().setInitBonus(commanderTacticsBonus);
+            }
         }
     }
 

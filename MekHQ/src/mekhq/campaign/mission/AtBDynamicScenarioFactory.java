@@ -2955,9 +2955,10 @@ public class AtBDynamicScenarioFactory {
         // Assign the crew to the unit
         entity.setCrew(entityCrew);
 
-        if (campaignOptions.isUseTactics() && campaignOptions.isUseInitiativeBonus()) {
-            int tacticsInitiativeBonus = getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction);
+        int tacticsInitiativeBonus = getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction);
+        if (campaignOptions.isUseTactics()) {
             entity.getCrew().setCommandBonus(tacticsInitiativeBonus);
+        } else if (campaignOptions.isUseInitiativeBonus()) {
             entity.getCrew().setInitBonus(tacticsInitiativeBonus);
         }
 
