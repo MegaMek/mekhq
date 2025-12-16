@@ -38,14 +38,21 @@ import static megamek.common.units.EntityWeightClass.WEIGHT_LIGHT;
 import static megamek.common.units.EntityWeightClass.WEIGHT_MEDIUM;
 import static megamek.common.units.EntityWeightClass.WEIGHT_SUPER_HEAVY;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_FLOOR;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_POWER;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.DIMINISHING_RETURNS_SLOPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import megamek.common.units.Entity;
@@ -54,10 +61,13 @@ import megamek.common.units.Infantry;
 import megamek.common.units.LandAirMek;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -72,16 +82,28 @@ class AlternatePaymentModelValuesTest {
     @Test
     void getForceValue_skipsNonStandardForces() {
         Force nonStandard = mockForce(false, true, List.of(mockUnitWithEntity(mock(Entity.class))));
-        Money total = AlternatePaymentModelValues.getForceValue(List.of(nonStandard), mock(Hangar.class), false,
-              100, 100, 100, 100);
+        Money total = AlternatePaymentModelValues.getForceValue(
+              dummyFaction(),
+              List.of(nonStandard),
+              mock(Hangar.class),
+              false,
+              false,
+              100, 100, 100, 100
+        );
         assertEquals(Money.zero(), total);
     }
 
     @Test
     void getForceValue_skipsNonCombatRoleForces() {
         Force nonCombat = mockForce(true, false, List.of(mockUnitWithEntity(mock(Entity.class))));
-        Money total = AlternatePaymentModelValues.getForceValue(List.of(nonCombat), mock(Hangar.class), false,
-              100, 100, 100, 100);
+        Money total = AlternatePaymentModelValues.getForceValue(
+              dummyFaction(),
+              List.of(nonCombat),
+              mock(Hangar.class),
+              false,
+              false,
+              100, 100, 100, 100
+        );
         assertEquals(Money.zero(), total);
     }
 
@@ -96,10 +118,87 @@ class AlternatePaymentModelValuesTest {
 
         Force force = mockForce(true, true, units);
 
-        Money total = AlternatePaymentModelValues.getForceValue(List.of(force), mock(Hangar.class), false,
-              100, 100, 100, 100);
+        Money total = AlternatePaymentModelValues.getForceValue(
+              dummyFaction(),
+              List.of(force),
+              mock(Hangar.class),
+              false,
+              false,
+              100, 100, 100, 100
+        );
 
         assertEquals(Money.zero(), total);
+    }
+
+    @Test
+    void getForceValue_doesNotUseDiminishingReturnsWhenDisabled_evenIfUnitCountExceedsStart() {
+        Faction faction = dummyFaction();
+        Hangar hangar = mock(Hangar.class);
+
+        // 3 ProtoMeks @ 100% combat multiplier => raw total = 3,000,000
+        Force force = mockForce(true, true, List.of(
+              mockUnitWithEntity(mockProtoMekEntity()),
+              mockUnitWithEntity(mockProtoMekEntity()),
+              mockUnitWithEntity(mockProtoMekEntity())
+        ));
+
+        // Make diminishingReturnsStart = 0 so the force is definitely "affected" (size > start).
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(0);
+
+            Money actual = AlternatePaymentModelValues.getForceValue(
+                  faction,
+                  List.of(force),
+                  hangar,
+                  false, // useDiminishingContractPay DISABLED
+                  false,
+                  100, 0, 0, 0
+            );
+
+            Money rawExpected = AlternatePaymentModelValues.PROTOMEK.getValue().multipliedBy(3);
+            assertEquals(rawExpected, actual, "When diminishing pay is disabled, total must be the raw sum");
+        }
+    }
+
+    @Test
+    void getForceValue_usesDiminishingReturnsOnlyWhenEnabled_andUnitCountExceedsStart() {
+        Faction faction = dummyFaction();
+        Hangar hangar = mock(Hangar.class);
+
+        // 3 ProtoMeks @ 100% combat multiplier => raw total = 3,000,000
+        Force force = mockForce(true, true, List.of(
+              mockUnitWithEntity(mockProtoMekEntity()),
+              mockUnitWithEntity(mockProtoMekEntity()),
+              mockUnitWithEntity(mockProtoMekEntity())
+        ));
+
+        // Make diminishingReturnsStart = 2 (standard force size=1 => cutoff=2),
+        // so with 3 units we exceed the start and should see discounting.
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(1);
+
+            Money actual = AlternatePaymentModelValues.getForceValue(
+                  faction,
+                  List.of(force),
+                  hangar,
+                  true, // useDiminishingContractPay ENABLED
+                  false,
+                  100, 0, 0, 0
+            );
+
+            List<Money> unitValues = new ArrayList<>(List.of(
+                  AlternatePaymentModelValues.PROTOMEK.getValue(),
+                  AlternatePaymentModelValues.PROTOMEK.getValue(),
+                  AlternatePaymentModelValues.PROTOMEK.getValue()
+            ));
+            Money diminishedExpected = AlternatePaymentModelValues.adjustValuesForDiminishingReturns(faction,
+                  unitValues);
+
+            assertEquals(diminishedExpected, actual,
+                  "When enabled and unit count exceeds start, total must be the diminished-returns sum");
+        }
     }
 
     @Test
@@ -111,8 +210,14 @@ class AlternatePaymentModelValuesTest {
         Force force = mockForce(true, true, List.of(unit));
 
         // 50% combat multiplier => PROTOMEK(1_000_000) * 0.5 = 500_000
-        Money total = AlternatePaymentModelValues.getForceValue(List.of(force), mock(Hangar.class), false,
-              50, 0, 0, 0);
+        Money total = AlternatePaymentModelValues.getForceValue(
+              dummyFaction(),
+              List.of(force),
+              mock(Hangar.class),
+              false,
+              false,
+              50, 0, 0, 0
+        );
 
         assertEquals(Money.of(500_000), total);
     }
@@ -379,6 +484,12 @@ class AlternatePaymentModelValuesTest {
         return unit;
     }
 
+    private static Entity mockProtoMekEntity() {
+        Entity entity = mock(Entity.class);
+        when(entity.isProtoMek()).thenReturn(true);
+        return entity;
+    }
+
     private static Money invokeGetUnitContractValue(Entity entity, boolean excludeInfantry,
           double combatMultiplier, double dropShipMultiplier, double warShipMultiplier, double jumpShipMultiplier)
           throws Exception {
@@ -395,5 +506,214 @@ class AlternatePaymentModelValuesTest {
         getUnitContractValue.setAccessible(true);
         return (Money) getUnitContractValue.invoke(null, entity, excludeInfantry, combatMultiplier,
               dropShipMultiplier, warShipMultiplier, jumpShipMultiplier);
+    }
+
+    @Test
+    void returnsZeroForEmptyList() throws Exception {
+        Faction faction = dummyFaction();
+
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            // Even if this is called, it shouldn't matter for an empty list
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(36);
+
+            Money result = invokeAdjustValuesForDiminishingReturns(faction, new ArrayList<>());
+
+            assertEquals(Money.zero(), result);
+        }
+    }
+
+    @Test
+    void sortsListDescendingInPlace() throws Exception {
+        Faction faction = dummyFaction();
+        List<Money> values = new ArrayList<>(List.of(
+              Money.of(5),
+              Money.of(1),
+              Money.of(10),
+              Money.of(3)
+        ));
+
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            // Start way after list size so no discount; we just verify sorting side-effect
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(999);
+
+            Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
+
+            assertEquals(Money.of(19), result);
+            assertEquals(List.of(Money.of(10), Money.of(5), Money.of(3), Money.of(1)), values,
+                  "Method should sort unitValues descending in-place");
+        }
+    }
+
+    @Test
+    void appliesNoDiscountBeforeCutoff() throws Exception {
+        Faction faction = dummyFaction();
+
+        // If standard force size = 2, cutoff = 2 * 2 = 4
+        // List size 4 => indices 0..3 => no i >= 4 => no discount
+        List<Money> values = new ArrayList<>(List.of(
+              Money.of(10),
+              Money.of(10),
+              Money.of(10),
+              Money.of(10)
+        ));
+
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(2);
+
+            Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
+
+            assertEquals(Money.of(40), result);
+        }
+    }
+
+    @Test
+    void discountsUnitsAfterCutoff_usingFormula() throws Exception {
+        Faction faction = dummyFaction();
+
+        // Mock cutoff small so we can test easily:
+        // standard force size = 1 => cutoff = 2
+        // indices:
+        // 0,1 => full value
+        // 2 => distance=1 => 1/(1+slope*1)^power
+        // 3 => distance=2 => 1/(1+slope*2)^power
+        List<Money> values = new ArrayList<>(List.of(
+              Money.of(1),   // will be sorted
+              Money.of(100),
+              Money.of(10),
+              Money.of(1)
+        ));
+
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(1);
+
+            // Build expected using the exact same math & Money operations as the method (avoids rounding mismatches)
+            List<Money> sorted = new ArrayList<>(values);
+            sorted.sort(Money::compareTo);
+            Collections.reverse(sorted);
+
+            final int diminishingReturnsStart = 2;
+
+            Money expected = Money.zero();
+            for (int i = 0; i < sorted.size(); i++) {
+                Money unitValue = sorted.get(i);
+                double multiplier = 1.0;
+                if (i >= diminishingReturnsStart) {
+                    int distance = (i - diminishingReturnsStart) + 1;
+                    multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distance, DIMINISHING_RETURNS_POWER);
+                    multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
+                }
+                expected = expected.plus(unitValue.multipliedBy(multiplier));
+            }
+
+            Money actual = invokeAdjustValuesForDiminishingReturns(faction, values);
+
+            assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    void hitsFloorAtExpectedDistance_whenCutoffIsSmallEnough() throws Exception {
+        Faction faction = dummyFaction();
+
+        // With power applied, floor begins when:
+        // 1/(1 + slope*distance)^power <= floor
+        // => distance >= (floor^(-1/power) - 1) / slope
+        //
+        // For slope=0.1233, power=2.0, floor=0.10:
+        // floor^(-1/2) = sqrt(10) ≈ 3.1623
+        // distance >= (3.1623 - 1) / 0.1233 ≈ 17.54 => 18
+        //
+        // Use standard force size = 1 => cutoff = 2, so index for first floored unit is:
+        // i = cutoff + distance - 1 = 2 + 18 - 1 = 19 (0-based)
+        // => list size must be >= 20.
+        List<Money> values = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            values.add(Money.of(1));
+        }
+
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(1);
+
+            Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
+
+            final int diminishingReturnsStart = 2;
+
+            Money expected = Money.zero();
+            for (int i = 0; i < 20; i++) {
+                double multiplier = 1.0;
+                if (i >= diminishingReturnsStart) {
+                    int distance = (i - diminishingReturnsStart) + 1;
+                    multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distance, DIMINISHING_RETURNS_POWER);
+                    multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
+                }
+                expected = expected.plus(Money.of(1).multipliedBy(multiplier));
+            }
+
+            assertEquals(expected, result);
+        }
+    }
+
+    @Test
+    void discountsLeastValuableUnitsFirst_dueToDescendingSort() throws Exception {
+        Faction faction = dummyFaction();
+
+        // cutoff=2 (standard force size=1)
+        // After sorting desc => [1000, 100, 10, 1]
+        // The discounted units are indices 2 and 3 => values 10 and 1 get discounted (least valuable first).
+        List<Money> values = new ArrayList<>(Arrays.asList(
+              Money.of(1),
+              Money.of(10),
+              Money.of(100),
+              Money.of(1000)
+        ));
+
+        try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
+            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+                  .thenReturn(1);
+
+            Money actual = invokeAdjustValuesForDiminishingReturns(faction, values);
+
+            List<Money> sorted = new ArrayList<>(values);
+            sorted.sort(Money::compareTo);
+            Collections.reverse(sorted);
+
+            final int diminishingReturnsStart = 2;
+
+            Money expected = Money.zero();
+            for (int i = 0; i < sorted.size(); i++) {
+                Money unitValue = sorted.get(i);
+                double multiplier = 1.0;
+                if (i >= diminishingReturnsStart) {
+                    int distance = (i - diminishingReturnsStart) + 1;
+                    multiplier = 1.0 / Math.pow(1.0 + DIMINISHING_RETURNS_SLOPE * distance, DIMINISHING_RETURNS_POWER);
+                    multiplier = Math.max(DIMINISHING_RETURNS_FLOOR, multiplier);
+                }
+                expected = expected.plus(unitValue.multipliedBy(multiplier));
+            }
+
+            assertEquals(expected, actual);
+        }
+    }
+
+    private static Money invokeAdjustValuesForDiminishingReturns(Faction campaignFaction, List<Money> unitValues)
+          throws Exception {
+        Method adjustValuesForDiminishingReturns = AlternatePaymentModelValues.class.getDeclaredMethod(
+              "adjustValuesForDiminishingReturns",
+              Faction.class,
+              List.class
+        );
+        adjustValuesForDiminishingReturns.setAccessible(true);
+        return (Money) adjustValuesForDiminishingReturns.invoke(null, campaignFaction, unitValues);
+    }
+
+    private static Faction dummyFaction() {
+        // The method under test only passes this through to CombatTeam.getStandardForceSize,
+        // which we mock, so this can be any non-null instance.
+        return mock(Faction.class);
     }
 }

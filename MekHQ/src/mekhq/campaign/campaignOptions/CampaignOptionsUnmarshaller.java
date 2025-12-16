@@ -251,6 +251,8 @@ public class CampaignOptionsUnmarshaller {
             case "jumpShipContractPercent" -> campaignOptions.setJumpShipContractPercent(parseDouble(nodeContents));
             case "warShipContractPercent" -> campaignOptions.setWarShipContractPercent(parseDouble(nodeContents));
             case "useAlternatePaymentMode" -> campaignOptions.setUseAlternatePaymentMode(parseBoolean(nodeContents));
+            case "useDiminishingContractPay" ->
+                  campaignOptions.setUseDiminishingContractPay(parseBoolean(nodeContents));
             case "equipmentContractBase" -> campaignOptions.setEquipmentContractBase(parseBoolean(nodeContents));
             case "equipmentContractSaleValue" -> campaignOptions.setEquipmentContractSaleValue(parseBoolean(
                   nodeContents));

@@ -33,6 +33,8 @@
 package mekhq.campaign.finances;
 
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.adjustValuesForDiminishingReturns;
+import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.getDiminishingReturnsStart;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 
 import java.time.LocalDate;
@@ -393,64 +395,69 @@ public record Accountant(Campaign campaign) {
     }
 
     /**
-     * Calculates the total monetary value of all units assigned to combat roles in the campaign's forces, applying
-     * specific percentage adjustments and exclusion rules based on unit types.
+     * Calculates the total contract value of all qualifying units assigned to combat-role standard forces, applying
+     * category-specific percentage multipliers and (optionally) diminishing returns.
      *
-     * <p>This method iterates over all forces in the campaign that are standard force types with combat roles. For
-     * each unit within these forces, it computes their total value by checking each unit's type and applying the
-     * appropriate adjustments or exclusions.</p>
-     *
-     * <p>The following unit types are handled with specific rules:</p>
+     * <p>This method iterates over {@code campaign().getAllForces()} and includes only forces that are both:</p>
      * <ul>
-     *   <li><b>Conventional Infantry:</b> Excluded if {@code excludeInfantry} is {@code true}</li>
-     *   <li><b>DropShips and SmallCraft:</b> Excluded if {@code dropShipContractPercent} is {@code 0}</li>
-     *   <li><b>WarShips:</b> Excluded if {@code warShipContractPercent} is {@code 0}</li>
-     *   <li><b>JumpShips and Space Stations:</b> Excluded if {@code jumpShipContractPercent} is {@code 0}</li>
-     *   <li><b>All Other Units:</b> Always included in the calculation</li>
+     *     <li>a standard force type ({@code force.getForceType().isStandard()}); and</li>
+     *     <li>marked as a combat role ({@code force.getCombatRoleInMemory().isCombatRole()}).</li>
      * </ul>
      *
-     * <p>The value of each unit is calculated using {@link #getEquipmentContractValue(Unit, boolean)}, which
-     * respects the {@code useEquipmentSaleValue} flag to determine whether to use equipment sale values or standard
-     * values.</p>
+     * <p>Units are resolved via the campaign hangar; {@code null} units and units with {@code null} entities are
+     * skipped. Conventional infantry is skipped when {@code excludeInfantry} is {@code true}.</p>
      *
-     * <p><b>Note:</b> Forces that are not standard force types or do not have combat-preferred roles are excluded
-     * from the calculation.</p>
+     * <p>Large-craft categories are included only when their associated percentage is non-zero:</p>
+     * <ul>
+     *     <li><b>DropShips / Small Craft</b> use {@code dropShipContractPercent}</li>
+     *     <li><b>WarShips</b> use {@code warShipContractPercent}</li>
+     *     <li><b>JumpShips / Space Stations</b> use {@code jumpShipContractPercent}</li>
+     * </ul>
      *
-     * @param excludeInfantry         if {@code true}, conventional infantry units (non-Battle Armor) are excluded from
-     *                                the calculation
-     * @param dropShipContractPercent the percentage adjustment for DropShips and SmallCraft; if {@code 0}, these units
-     *                                are excluded
-     * @param warShipContractPercent  the percentage adjustment for WarShips; if {@code 0}, WarShips are excluded
-     * @param jumpShipContractPercent the percentage adjustment for JumpShips and Space Stations; if {@code 0}, these
-     *                                units are excluded
-     * @param useEquipmentSaleValue   if {@code true}, uses equipment sale values; if {@code false}, uses standard
-     *                                values
+     * <p>Per-unit values are provided by {@link #getEquipmentContractValue(Unit, boolean)}. This method does not
+     * apply the percentage itself; instead, it uses the percentage parameters as inclusion/exclusion flags (non-zero
+     * = included, zero = excluded) for the corresponding large-craft categories.</p>
      *
-     * @return a {@link Money} object representing the total force value of combat-assigned units after applying the
-     *       specified rules and exclusions
+     * <p>If {@code useDiminishingContractPay} is {@code true} and the number of included units exceeds the diminishing
+     * returns start ({@link AlternatePaymentModelValues#getDiminishingReturnsStart(Faction)}), the total is computed
+     * using {@link AlternatePaymentModelValues#adjustValuesForDiminishingReturns(Faction, List)}. Otherwise, the
+     * method returns the straight sum.</p>
+     *
+     * @param useDiminishingContractPay whether diminishing returns should be applied (only when the unit count exceeds
+     *                                  the diminishing-returns start)
+     * @param excludeInfantry           if {@code true}, conventional infantry units are excluded from the calculation
+     * @param dropShipContractPercent   inclusion flag for DropShips and Small Craft; if {@code 0}, these units are
+     *                                  excluded
+     * @param warShipContractPercent    inclusion flag for WarShips; if {@code 0}, these units are excluded
+     * @param jumpShipContractPercent   inclusion flag for JumpShips and Space Stations; if {@code 0}, these units are
+     *                                  excluded
+     * @param useEquipmentSaleValue     if {@code true}, {@link #getEquipmentContractValue(Unit, boolean)} uses
+     *                                  equipment sale values; if {@code false}, it uses standard values
+     *
+     * @return the total {@link Money} value of all included units, with diminishing returns applied when enabled and
+     *       relevant
      */
-    public Money getForceValue(boolean excludeInfantry, double dropShipContractPercent, double warShipContractPercent,
-          double jumpShipContractPercent, boolean useEquipmentSaleValue) {
-        Money value = Money.zero();
+    public Money getForceValue(boolean useDiminishingContractPay, boolean excludeInfantry,
+          double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent,
+          boolean useEquipmentSaleValue) {
+        List<Money> unitValues = new ArrayList<>();
 
+        Money total = Money.zero();
         for (Force force : campaign().getAllForces()) {
             if (!force.getForceType().isStandard()) {
                 continue;
             }
-
             if (!force.getCombatRoleInMemory().isCombatRole()) {
                 continue;
             }
 
             for (UUID uuid : force.getUnits()) {
                 Unit unit = getHangar().getUnit(uuid);
-
                 if (unit == null) {
                     continue;
                 }
 
                 Entity entity = unit.getEntity();
-
                 if (entity == null) {
                     continue;
                 }
@@ -460,41 +467,54 @@ public record Accountant(Campaign campaign) {
                     continue;
                 }
 
-                // DropShips
+                Money unitValue = getEquipmentContractValue(unit, useEquipmentSaleValue);
+
+                // DropShips / Small Craft
                 if (entity.isDropShip() || entity.isSmallCraft()) {
                     if (dropShipContractPercent != 0) {
-                        value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                        unitValues.add(unitValue);
+                        total = total.plus(unitValue);
                     }
-
                     continue;
                 }
 
                 // WarShips
                 if (entity.isWarShip()) {
                     if (warShipContractPercent != 0) {
-                        value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                        unitValues.add(unitValue);
+                        total = total.plus(unitValue);
                     }
-
                     continue;
                 }
 
-                // JumpShips
+                // JumpShips / Space Stations
                 if (entity.isJumpShip() || entity.isSpaceStation()) {
                     if (jumpShipContractPercent != 0) {
-                        value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                        unitValues.add(unitValue);
+                        total = total.plus(unitValue);
                     }
-
                     continue;
                 }
 
                 // Other
-                value = value.plus(getEquipmentContractValue(unit, useEquipmentSaleValue));
+                unitValues.add(unitValue);
+                total = total.plus(unitValue);
             }
         }
 
-        return value;
-    }
+        if (unitValues.isEmpty()) {
+            return Money.zero();
+        }
 
+        // Only process diminishing returns if it is both enabled and relevant.
+        Faction campaignFaction = campaign.getFaction();
+        boolean isAffectedByDiminishingReturns = unitValues.size() > getDiminishingReturnsStart(campaignFaction);
+        if (useDiminishingContractPay && isAffectedByDiminishingReturns) {
+            return adjustValuesForDiminishingReturns(campaignFaction, unitValues);
+        }
+
+        return total;
+    }
 
     public Money getTotalEquipmentValue() {
         Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
@@ -550,10 +570,13 @@ public record Accountant(Campaign campaign) {
         final double warShipContractPercent = options.getWarShipContractPercent();
         final double jumpShipContractPercent = options.getJumpShipContractPercent();
         final boolean useEquipmentSellValue = options.isEquipmentContractSaleValue();
+        final boolean useDiminishingContractPay = options.isUseDiminishingContractPay();
 
         if (getCampaignOptions().isUseAlternatePaymentMode()) {
-            final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getAllForces(),
+            final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getFaction(),
+                  campaign.getAllForces(),
                   campaign.getHangar(),
+                  useDiminishingContractPay,
                   excludeInfantry,
                   combatUnitContractPercent,
                   dropShipContractPercent,
@@ -568,7 +591,8 @@ public record Accountant(Campaign campaign) {
         }
 
         if (getCampaignOptions().isUsePeacetimeCost()) {
-            final Money forceValue = getForceValue(excludeInfantry,
+            final Money forceValue = this.getForceValue(useDiminishingContractPay,
+                  excludeInfantry,
                   dropShipContractPercent,
                   warShipContractPercent,
                   jumpShipContractPercent,
@@ -578,7 +602,8 @@ public record Accountant(Campaign campaign) {
         }
 
         if (getCampaignOptions().isEquipmentContractBase()) {
-            return getForceValue(excludeInfantry,
+            return this.getForceValue(useDiminishingContractPay,
+                  excludeInfantry,
                   dropShipContractPercent,
                   warShipContractPercent,
                   jumpShipContractPercent,

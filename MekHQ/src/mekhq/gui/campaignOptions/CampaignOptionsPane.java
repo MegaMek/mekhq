@@ -555,13 +555,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
 
-        CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
-        triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
-
         campaign.resetRandomDeath();
         if (campaignGui != null) {
             campaignGui.refreshMarketButtonLabels();
         }
+
+        CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
+        triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
     }
 
     /**
@@ -603,6 +603,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean oldIsUseAdvancedScouting = oldOptions.useAdvancedScouting() && oldIsUseStratCon;
         boolean oldIsUseAltAdvancedMedical = oldOptions.useAltAdvancedMedical();
         boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && oldOptions.useDiseases();
+        boolean oldUseNormalizedContractPayModel = oldOptions.useNormalizedContractPayModel();
+        boolean oldIsDiminishReturnsContractPay = oldOptions.useDiminishingContractPay();
 
         boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
         if (!isStartUp && newIsTrackFactionStandings && !oldIsTrackFactionStanding) { // Has tracking changed?
@@ -672,6 +674,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         boolean newIsUseDiseases = newIsUseAltAdvancedMedical && newOptions.useDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
             inoculateAllCharacters(campaign);
+        }
+
+        boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel();
+        if (!isStartUp && newUseNormalizedContractPayModel && !oldUseNormalizedContractPayModel) {
+            new NormalizedContractPayCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay();
+        if (!isStartUp && newIsDiminishReturnsContractPay && !oldIsDiminishReturnsContractPay) {
+            new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
         }
     }
 

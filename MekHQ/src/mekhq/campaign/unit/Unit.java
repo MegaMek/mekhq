@@ -1597,7 +1597,7 @@ public class Unit implements ITechnology {
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
               qualityName, String.format("%.2f", qualityMultiplier))).append("<br>");
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.currentWorth",
-              currentWorth.toAmountAndSymbolString())).append("<br>");
+              currentWorth.toAmountString())).append("<br>");
 
         // Check for obsolete quirk
         Money sellFor = currentWorth;
@@ -1613,7 +1613,7 @@ public class Unit implements ITechnology {
 
         breakdown.append("<hr>");
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.sellFor",
-              sellFor.toAmountAndSymbolString()));
+              sellFor.toAmountString()));
         return breakdown.toString();
     }
 

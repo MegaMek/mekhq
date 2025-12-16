@@ -42,8 +42,8 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -143,6 +143,8 @@ import mekhq.gui.utilities.StaticChecks;
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger LOGGER = MMLogger.create(UnitTableMouseAdapter.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
     // region Variable Declarations
     private final CampaignGUI gui;
     private final JTable unitTable;
@@ -210,6 +212,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     // endregion GM Commands
     // endregion Commands
 
+    @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
@@ -287,35 +290,65 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
-            Campaign campaign = gui.getCampaign();
-            String resourceBundle = "mekhq.resources.GUI";
+            Money totalValue = Money.zero();
+            List<Unit> sellableUnits = new ArrayList<>();
             for (Unit unit : units) {
+                if (unit == null) {
+                    continue;
+                }
                 if (!unit.isDeployed()) {
-                    Money sellValue = unit.getSellValue();
-                    String commanderAddress = campaign.getCommanderAddress();
+                    sellableUnits.add(unit);
+                    totalValue = totalValue.plus(unit.getSellValue());
+                }
+            }
 
-                    // Build the confirmation message - GM mode shows detailed breakdown
-                    String message;
-                    if (campaign.isGM()) {
-                        message = getFormattedTextAt(resourceBundle, "sellUnit.messageGM",
-                              commanderAddress, unit.getName(), unit.getSellValueBreakdown());
-                    } else {
-                        message = getFormattedTextAt(resourceBundle, "sellUnit.message",
-                              commanderAddress, unit.getName(), sellValue.toAmountAndSymbolString());
-                    }
+            if (sellableUnits.isEmpty()) {
+                return;
+            }
 
-                    // Cancel is first (index 0) so closing dialog via X defaults to cancel
-                    List<String> buttons = List.of(
-                          getFormattedTextAt(resourceBundle, "sellUnit.buttonCancel"),
-                          getFormattedTextAt(resourceBundle, "sellUnit.buttonConfirm"));
+            Campaign campaign = gui.getCampaign();
+            String commanderAddress = campaign.getCommanderAddress();
+            Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
 
-                    Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
-                    ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                          logisticsAdmin, null, message, buttons, null, null, false);
+            // Cancel is first (index 0), so closing dialog via X defaults to cancel
+            List<String> buttons = List.of(
+                  getFormattedTextAt(RESOURCE_BUNDLE, "sellUnit.buttonCancel"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "sellUnit.buttonConfirm"));
 
-                    if (dialog.getDialogChoice() == 1) {
-                        campaign.getQuartermaster().sellUnit(unit);
-                    }
+            final int confirmDialogIndex = 1;
+
+            String message;
+            if (sellableUnits.size() == 1) {
+                Unit unit = sellableUnits.get(0);
+                message = getFormattedTextAt(
+                      RESOURCE_BUNDLE,
+                      "sellUnit.message.single",
+                      commanderAddress,
+                      unit.getName(),
+                      unit.getSellValueBreakdown());
+            } else {
+                message = getFormattedTextAt(
+                      RESOURCE_BUNDLE,
+                      "sellUnit.message.multiple",
+                      commanderAddress,
+                      totalValue.toAmountString());
+            }
+
+            ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
+                  campaign,
+                  logisticsAdmin,
+                  null,
+                  message,
+                  buttons,
+                  null,
+                  null,
+                  true);
+
+            boolean wasConfirmed = dialog.getDialogChoice() == confirmDialogIndex;
+
+            if (wasConfirmed) {
+                for (Unit unit : sellableUnits) {
+                    campaign.getQuartermaster().sellUnit(unit);
                 }
             }
         } else if (command.equals(COMMAND_LOSS)) {
