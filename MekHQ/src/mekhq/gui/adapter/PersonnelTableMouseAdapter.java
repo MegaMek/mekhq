@@ -3834,7 +3834,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             final JCheckBoxMenuItem miSecondInCommand = new JCheckBoxMenuItem(getText("miSecondInCommand.text"));
             miSecondInCommand.setToolTipText(getText("miSecondInCommand.toolTipText"));
             miSecondInCommand.setName("miSecondInCommand");
-            miSecondInCommand.setSelected(person.isCommander());
+            miSecondInCommand.setSelected(person.isSecondInCommand());
             miSecondInCommand.addActionListener(evt -> {
                 getCampaign().getPersonnel().stream().filter(Person::isSecondInCommand).forEach(secondInCommand -> {
                     secondInCommand.setSecondInCommand(false);
