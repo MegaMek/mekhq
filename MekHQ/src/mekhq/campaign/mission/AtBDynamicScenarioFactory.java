@@ -1929,7 +1929,7 @@ public class AtBDynamicScenarioFactory {
             // TW suggests one map sheet per 4 units. As we have a minimum height, we use that to determine how much
             // we should divide unit count by. We floor the result as players generally prefer smaller maps.
             int minimumWidth = max(1, boardScaling.getMinimumWidth());
-            double unitDivider = 4 * minimumHeight;
+            double unitDivider = 4 * totalSheetsTall;
 
             int totalSheetsWide = (int) max(minimumWidth, floor(unitCount / unitDivider));
             totalSheetsWide = max(1, totalSheetsWide + mapParameters.getAdditionalMapSheetWide());
