@@ -1058,7 +1058,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
 
         optionWriteAllUnitsToXML = new JCheckBox(resources.getString("optionWriteAllUnitsToXML.text"));
-        optionWriteAllUnitsToXML.setMnemonic(KeyEvent.VK_C);
+        optionWriteAllUnitsToXML.setMnemonic(KeyEvent.VK_A);
 
         optionSaveMothballState = new JCheckBox(resources.getString("optionSaveMothballState.text"));
         optionSaveMothballState.setToolTipText(resources.getString("optionSaveMothballState.toolTipText"));
