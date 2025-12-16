@@ -249,32 +249,45 @@ public class EasyBugReport {
         int partIndex = 1;
 
         File currentArchive = new File(parentDirectory, baseName + "-part" + partIndex + ".zip");
-        CountingOutputStream countingOut = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(
-              currentArchive)));
-        ZipOutputStream zipOut = new ZipOutputStream(countingOut);
-        parts.add(currentArchive);
+        CountingOutputStream countingOut = null;
+        ZipOutputStream zipOut = null;
 
         try {
+            countingOut = new CountingOutputStream(
+                  new BufferedOutputStream(new FileOutputStream(currentArchive))
+            );
+            zipOut = new ZipOutputStream(countingOut);
+            parts.add(currentArchive);
+
             for (File inputFile : inputFiles) {
-                String entryName = inputFile.equals(campaignFile) ?
-                                         campaignFile.getName() :
-                                         ("logs/" + inputFile.getName());
+                String entryName = inputFile.equals(campaignFile)
+                                         ? campaignFile.getName()
+                                         : ("logs/" + inputFile.getName());
 
                 long estimatedAddedBytes = inputFile.length() + ZIP_ENTRY_OVERHEAD_BYTES;
 
-                // If adding this file would exceed the cap, roll to next part (if current part already has something).
+                // If adding this file exceeds the cap, roll to next part (if current part already has something).
                 // Note: This is conservative and should keep the actual ZIP size under the limit in practice.
-                if (countingOut.getCount() > 0 && (countingOut.getCount() + estimatedAddedBytes) > MAX_ARCHIVE_BYTES) {
+                if (countingOut.getCount() > 0
+                          && (countingOut.getCount() + estimatedAddedBytes) > MAX_ARCHIVE_BYTES) {
+
                     try {
-                        zipOut.close();
+                        zipOut.close(); // closes countingOut as well
                     } finally {
-                        // zipOut.close() closes countingOut too, but be explicit in case of partial failures
-                        try {countingOut.close();} catch (IOException ignored) {}
+                        try {
+                            countingOut.close();
+                        } catch (IOException ignored) {
+                        }
                     }
+
+                    zipOut = null;
+                    countingOut = null;
 
                     partIndex++;
                     currentArchive = new File(parentDirectory, baseName + "-part" + partIndex + ".zip");
-                    countingOut = new CountingOutputStream(new BufferedOutputStream(new FileOutputStream(currentArchive)));
+                    countingOut = new CountingOutputStream(
+                          new BufferedOutputStream(new FileOutputStream(currentArchive))
+                    );
                     zipOut = new ZipOutputStream(countingOut);
                     parts.add(currentArchive);
                 }
@@ -282,19 +295,28 @@ public class EasyBugReport {
                 // If a single file is huge, it may exceed MAX_ARCHIVE_BYTES even alone.
                 if (inputFile.length() > (MAX_ARCHIVE_BYTES - ZIP_ENTRY_OVERHEAD_BYTES)) {
                     LOGGER.warn(
-                          "File '{}' is larger than the per-archive limit ({} bytes); it will be placed in its own " +
-                                "part and may exceed the limit.",
+                          "File '{}' is larger than the per-archive limit ({} bytes); it will be placed in its own "
+                                + "part and may exceed the limit.",
                           inputFile.getName(),
-                          MAX_ARCHIVE_BYTES);
+                          MAX_ARCHIVE_BYTES
+                    );
                 }
 
                 addFileToZip(inputFile, entryName, zipOut);
             }
         } finally {
-            try {
-                zipOut.close();
-            } catch (IOException ex) {
-                LOGGER.error(ex, "Unable to close zip output stream");
+            if (zipOut != null) {
+                try {
+                    zipOut.close();
+                } catch (IOException ex) {
+                    LOGGER.error(ex, "Unable to close zip output stream");
+                }
+            } else if (countingOut != null) {
+                try {
+                    countingOut.close();
+                } catch (IOException ex) {
+                    LOGGER.error(ex, "Unable to close counting output stream");
+                }
             }
         }
 
