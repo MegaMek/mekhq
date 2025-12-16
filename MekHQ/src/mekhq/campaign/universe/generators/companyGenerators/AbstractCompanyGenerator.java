@@ -398,7 +398,9 @@ public abstract class AbstractCompanyGenerator {
 
         // Dynamically fetch the second-in-command
         Person secondInCommand = campaign.getFlaggedSecondInCommand();
-        secondInCommand.setSecondInCommand(true);
+        if (secondInCommand != null) {
+            secondInCommand.setSecondInCommand(true);
+        }
 
         return sortedTrackers;
     }
