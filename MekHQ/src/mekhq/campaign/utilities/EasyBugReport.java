@@ -92,7 +92,7 @@ public class EasyBugReport {
      * <p><b>Note:</b> This is a best-effort cap because ZIP container metadata and compression behavior can affect
      * the final on-disk size.</p>
      */
-    private static final long MAX_ARCHIVE_BYTES = 1024L * 1024L; // 24 MiB
+    private static final long MAX_ARCHIVE_BYTES = 24L * 1_000_000L; // 24 MB
 
     /**
      * Conservative per-entry overhead estimate (in bytes) used when deciding whether adding another file would exceed
