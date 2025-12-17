@@ -461,6 +461,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 }
 
                 // Campaign upgrading
+                // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
+                // dialogs will get 'stuck' behind other dialogs
                 if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
                     handleCampaignUpgrading(campaign);
                 }

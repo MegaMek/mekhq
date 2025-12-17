@@ -53,9 +53,11 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -216,6 +218,9 @@ public class CampaignUpgradeDialog {
                 }
             }
         }
+
+        campaign.addReport(DailyReportType.GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
+              "CampaignUpgradeDialog.upgrading", MHQConstants.VERSION.toString()));
     }
 
     /**
