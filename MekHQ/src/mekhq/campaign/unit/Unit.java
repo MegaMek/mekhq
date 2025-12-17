@@ -3654,6 +3654,12 @@ public class Unit implements ITechnology {
                     BattleArmorSuit baSuit = new BattleArmorSuit((BattleArmor) entity, i, getCampaign());
                     addPart(baSuit);
                     partsToAdd.add(baSuit);
+                } else if ((entity instanceof AbstractBuildingEntity abstractBuildingEntity)) {
+                    BuildingLocation buildingLocation = new BuildingLocation(i,
+                          abstractBuildingEntity.getBuildingType(), abstractBuildingEntity.getBldgClass(),
+                          getCampaign());
+                    addPart(buildingLocation);
+                    partsToAdd.add(buildingLocation);
                 }
             }
             if (null == armor[i]) {
