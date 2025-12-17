@@ -743,6 +743,7 @@ public class CampaignOptions {
         // region Supplies and Acquisitions Tab
         // Acquisition
         waitingPeriod = 7;
+        acquisitionsType = AcquisitionsType.ANY_TECH;
         useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
