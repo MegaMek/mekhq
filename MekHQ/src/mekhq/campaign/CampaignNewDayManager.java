@@ -247,9 +247,9 @@ public class CampaignNewDayManager {
             campaign.distributeSoldierPoolToUnits();
         }
 
-        if (MekHQ.getMHQOptions().getNewDayBattleArmourPoolFill()) {
-            campaign.resetBattleArmourPool();
-            campaign.distributeBattleArmourPoolToUnits();
+        if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
+            campaign.resetBattleArmorPool();
+            campaign.distributeBattleArmorPoolToUnits();
         }
 
         // Ensure we don't have anything that would prevent the new day

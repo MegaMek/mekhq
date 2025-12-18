@@ -859,12 +859,12 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_SOLDIER_POOL_FILL, value);
     }
 
-    public boolean getNewDayBattleArmourPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOUR_POOL_FILL, false);
+    public boolean getNewDayBattleArmorPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_FILL, false);
     }
 
-    public void setNewDayBattleArmourPoolFill(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOUR_POOL_FILL, value);
+    public void setNewDayBattleArmorPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_FILL, value);
     }
 
     public boolean getNewDayMRMS() {

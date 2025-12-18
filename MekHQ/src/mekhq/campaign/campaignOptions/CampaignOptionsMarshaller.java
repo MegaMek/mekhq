@@ -379,7 +379,7 @@ public class CampaignOptionsMarshaller {
 
         // region Blob Crew
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobInfantry", campaignOptions.isUseBlobInfantry());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobBattleArmour", campaignOptions.isUseBlobBattleArmour());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobBattleArmor", campaignOptions.isUseBlobBattleArmor());
         // endregion Blob Crew
 
         // region Prisoners

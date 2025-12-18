@@ -628,14 +628,14 @@ public record Accountant(Campaign campaign) {
         // And pay our pool
         payRollSummary.put(null,
               Money.of(getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool()) +
-                             getTempCrewPay(PersonnelRole.MEDIC, campaign().getTemporaryMedicPool()) + getTempCrewPay(PersonnelRole.SOLDIER, campaign.getTemporarySoldierPool()) + getTempCrewPay(PersonnelRole.BATTLE_ARMOUR, campaign.getTemporaryBattleArmourPool())));
+                             getTempCrewPay(PersonnelRole.MEDIC, campaign().getTemporaryMedicPool()) + getTempCrewPay(PersonnelRole.SOLDIER, campaign.getTemporarySoldierPool()) + getTempCrewPay(PersonnelRole.BATTLE_ARMOUR, campaign.getTemporaryBattleArmorPool())));
 
         return payRollSummary;
     }
 
-    private double getTempCrewPay(PersonnelRole astech, int TemporaryAsTechPool) {
+     private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
         return campaign().getCampaignOptions()
-                     .getRoleBaseSalaries()[astech.ordinal()].getAmount().doubleValue() *
-                     TemporaryAsTechPool;
+                     .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() *
+                     tempPersonnelPool;
     }
 }

@@ -122,7 +122,7 @@ public class PersonnelTab {
 
     private JPanel pnlBlobCrew;
     private JCheckBox chkUseBlobInfantry;
-    private JCheckBox chkUseBlobBattleArmour;
+    private JCheckBox chkUseBlobBattleArmor;
     //end General Tab
 
     //start Personnel Logs Tab
@@ -398,7 +398,7 @@ public class PersonnelTab {
 
         pnlBlobCrew = new JPanel();
         chkUseBlobInfantry = new JCheckBox();
-        chkUseBlobBattleArmour = new JCheckBox();
+        chkUseBlobBattleArmor = new JCheckBox();
     }
 
     /**
@@ -618,8 +618,8 @@ public class PersonnelTab {
         // Contents
         chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry");
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobInfantry"));
-        chkUseBlobBattleArmour = new CampaignOptionsCheckBox("UseBlobBattleArmour");
-        chkUseBlobBattleArmour.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmour"));
+        chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor");
+        chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmor"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("BlobCrewPanel", true, "BlobCrewPanel");
@@ -630,7 +630,7 @@ public class PersonnelTab {
         panel.add(chkUseBlobInfantry, layout);
 
         layout.gridy++;
-        panel.add(chkUseBlobBattleArmour, layout);
+        panel.add(chkUseBlobBattleArmor, layout);
 
         return panel;
     }
@@ -1397,7 +1397,7 @@ public class PersonnelTab {
         chkAdminsHaveNegotiation.setSelected(options.isAdminsHaveNegotiation());
         chkAdminExperienceLevelIncludeNegotiation.setSelected(options.isAdminExperienceLevelIncludeNegotiation());
         chkUseBlobInfantry.setSelected(options.isUseBlobInfantry());
-        chkUseBlobBattleArmour.setSelected(options.isUseBlobBattleArmour());
+        chkUseBlobBattleArmor.setSelected(options.isUseBlobBattleArmor());
 
         // Personnel Log
         chkUseTransfers.setSelected(options.isUseTransfers());
@@ -1501,7 +1501,7 @@ public class PersonnelTab {
         options.setAdminsHaveNegotiation(chkAdminsHaveNegotiation.isSelected());
         options.setAdminExperienceLevelIncludeNegotiation(chkAdminExperienceLevelIncludeNegotiation.isSelected());
         options.setUseBlobInfantry(chkUseBlobInfantry.isSelected());
-        options.setUseBlobBattleArmour(chkUseBlobBattleArmour.isSelected());
+        options.setUseBlobBattleArmor(chkUseBlobBattleArmor.isSelected());
 
         // Personnel Log
         options.setUseTransfers(chkUseTransfers.isSelected());

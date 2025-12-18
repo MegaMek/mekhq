@@ -103,7 +103,7 @@ import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
-import mekhq.campaign.events.BattleArmourPoolChangedEvent;
+import mekhq.campaign.events.BattleArmorPoolChangedEvent;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.LocationChangedEvent;
@@ -214,8 +214,12 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblTempSoldiers;
-    private JLabel lblTempBattleArmour;
+    private JLabel lblTempBattleArmor;
     private JLabel lblPartsAvailabilityRating;
+
+    // Blob crew menu references for visibility control
+    private JMenu menuSoldierPool;
+    private JMenu menuBattleArmorPool;
 
     /* for the top button panel */
     private JPanel pnlTop;
@@ -357,7 +361,7 @@ public class CampaignGUI extends JPanel {
         refreshTempAsTechs();
         refreshTempMedics();
         refreshTempSoldiers();
-        refreshTempBattleArmour();
+        refreshTempBattleArmor();
         refreshPartsAvailability();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -962,8 +966,9 @@ public class CampaignGUI extends JPanel {
         // endregion Medic Pool
 
         // region Soldier Pool
-        JMenu menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
+        menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
         menuSoldierPool.setMnemonic(KeyEvent.VK_S);
+        menuSoldierPool.setVisible(getCampaign().isBlobInfantryEnabled());
 
         JMenuItem miHireSoldiers = new JMenuItem(resourceMap.getString("miHireSoldiers.text"));
         miHireSoldiers.setMnemonic(KeyEvent.VK_H);
@@ -999,7 +1004,10 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthSoldiers = new JMenuItem(resourceMap.getString("miFullStrengthSoldiers.text"));
         miFullStrengthSoldiers.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthSoldiers.addActionListener(evt -> getCampaign().resetSoldierPool());
+        miFullStrengthSoldiers.addActionListener(evt -> {
+            getCampaign().resetSoldierPool();
+            getCampaign().distributeSoldierPoolToUnits();
+        });
         menuSoldierPool.add(miFullStrengthSoldiers);
 
         JMenuItem miFireAllSoldiers = new JMenuItem(resourceMap.getString("miFireAllSoldiers.text"));
@@ -1009,53 +1017,55 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(menuSoldierPool);
         // endregion Soldier Pool
 
-        // region Battle Armour Pool
-        JMenu menuBattleArmourPool = new JMenu(resourceMap.getString("menuBattleArmourPool.text"));
-        menuBattleArmourPool.setMnemonic(KeyEvent.VK_B);
+        // region Battle Armor Pool
+        menuBattleArmorPool = new JMenu(resourceMap.getString("menuBattleArmorPool.text"));
+        menuBattleArmorPool.setVisible(getCampaign().isBlobBattleArmorEnabled());
 
-        JMenuItem miHireBattleArmour = new JMenuItem(resourceMap.getString("miHireBattleArmour.text"));
-        miHireBattleArmour.setMnemonic(KeyEvent.VK_H);
-        miHireBattleArmour.addActionListener(evt -> {
+        JMenuItem miHireBattleArmor = new JMenuItem(resourceMap.getString("miHireBattleArmor.text"));
+        miHireBattleArmor.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
-                  resourceMap.getString("popupHireBattleArmourNum.text"),
+                  resourceMap.getString("popupHireBattleArmorNum.text"),
                   1,
                   0,
                   CampaignGUI.MAX_QUANTITY_SPINNER);
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseBattleArmourPool(popupValueChoiceDialog.getValue());
+                getCampaign().increaseBattleArmorPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuBattleArmourPool.add(miHireBattleArmour);
+        menuBattleArmorPool.add(miHireBattleArmor);
 
-        JMenuItem miFireBattleArmour = new JMenuItem(resourceMap.getString("miFireBattleArmour.text"));
-        miFireBattleArmour.setMnemonic(KeyEvent.VK_E);
-        miFireBattleArmour.addActionListener(evt -> {
+        JMenuItem miFireBattleArmor = new JMenuItem(resourceMap.getString("miFireBattleArmor.text"));
+        miFireBattleArmor.setMnemonic(KeyEvent.VK_E);
+        miFireBattleArmor.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
-                  resourceMap.getString("popupFireBattleArmourNum.text"),
+                  resourceMap.getString("popupFireBattleArmorNum.text"),
                   1,
                   0,
-                  getCampaign().getTemporaryBattleArmourPool());
+                  getCampaign().getTemporaryBattleArmorPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseBattleArmourPool(popupValueChoiceDialog.getValue());
+                getCampaign().decreaseBattleArmorPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuBattleArmourPool.add(miFireBattleArmour);
+        menuBattleArmorPool.add(miFireBattleArmor);
 
-        JMenuItem miFullStrengthBattleArmour = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmour.text"));
-        miFullStrengthBattleArmour.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthBattleArmour.addActionListener(evt -> getCampaign().resetBattleArmourPool());
-        menuBattleArmourPool.add(miFullStrengthBattleArmour);
+        JMenuItem miFullStrengthBattleArmor = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmor.text"));
+        miFullStrengthBattleArmor.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthBattleArmor.addActionListener(evt -> {
+            getCampaign().resetBattleArmorPool();
+            getCampaign().distributeBattleArmorPoolToUnits();
+        });
+        menuBattleArmorPool.add(miFullStrengthBattleArmor);
 
-        JMenuItem miFireAllBattleArmour = new JMenuItem(resourceMap.getString("miFireAllBattleArmour.text"));
-        miFireAllBattleArmour.setMnemonic(KeyEvent.VK_R);
-        miFireAllBattleArmour.addActionListener(evt -> getCampaign().emptyBattleArmourPool());
-        menuBattleArmourPool.add(miFireAllBattleArmour);
-        menuMarket.add(menuBattleArmourPool);
-        // endregion Battle Armour Pool
+        JMenuItem miFireAllBattleArmor = new JMenuItem(resourceMap.getString("miFireAllBattleArmor.text"));
+        miFireAllBattleArmor.setMnemonic(KeyEvent.VK_R);
+        miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyBattleArmorPool());
+        menuBattleArmorPool.add(miFireAllBattleArmor);
+        menuMarket.add(menuBattleArmorPool);
+        // endregion Battle Armor Pool
 
         menuBar.add(menuMarket);
         // endregion Marketplace Menu
@@ -1279,14 +1289,14 @@ public class CampaignGUI extends JPanel {
         lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
         lblTempSoldiers = new JLabel();
-        lblTempBattleArmour = new JLabel();
+        lblTempBattleArmor = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
         statusPanel.add(lblTempSoldiers);
-        statusPanel.add(lblTempBattleArmour);
+        statusPanel.add(lblTempBattleArmor);
         statusPanel.add(lblPartsAvailabilityRating);
     }
 
@@ -2939,15 +2949,25 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempSoldiers() {
+        if (!getCampaign().isBlobInfantryEnabled()) {
+            lblTempSoldiers.setVisible(false);
+            return;
+        }
+        lblTempSoldiers.setVisible(true);
         // FIXME : Localize
         String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTemporarySoldierPool() + "</html>";
         lblTempSoldiers.setText(text);
     }
 
-    private void refreshTempBattleArmour() {
+    private void refreshTempBattleArmor() {
+        if (!getCampaign().isBlobBattleArmorEnabled()) {
+            lblTempBattleArmor.setVisible(false);
+            return;
+        }
+        lblTempBattleArmor.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Battle Armour</b>: " + getCampaign().getTemporaryBattleArmourPool() + "</html>";
-        lblTempBattleArmour.setText(text);
+        String text = "<html><b>Temp Battle Armor</b>: " + getCampaign().getTemporaryBattleArmorPool() + "</html>";
+        lblTempBattleArmor.setText(text);
     }
 
     private void refreshPartsAvailability() {
@@ -3312,6 +3332,14 @@ public class CampaignGUI extends JPanel {
             addStandardTab(MHQTabType.STRAT_CON);
         }
 
+        // Update blob crew menu visibility based on campaign options
+        menuSoldierPool.setVisible(getCampaign().isBlobInfantryEnabled());
+        menuBattleArmorPool.setVisible(getCampaign().isBlobBattleArmorEnabled());
+
+        // Update blob crew label visibility
+        refreshTempSoldiers();
+        refreshTempBattleArmor();
+
         refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
@@ -3421,18 +3449,18 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Handles updates when the pool of available battle armour personnel changes.
+     * Handles updates when the pool of available battle armor personnel changes.
      *
-     * <p>Refreshes the temporary battle armour pool, updating the related UI and game state.</p>
+     * <p>Refreshes the temporary battle armor pool, updating the related UI and game state.</p>
      *
      * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
      * wrong.</p>
      *
-     * @param battleArmourPoolChangedEvent the event indicating a change in the battle armour pool
+     * @param battleArmorPoolChangedEvent the event indicating a change in the battle armor pool
      */
     @Subscribe
-    public void handle(BattleArmourPoolChangedEvent battleArmourPoolChangedEvent) {
-        refreshTempBattleArmour();
+    public void handle(BattleArmorPoolChangedEvent battleArmorPoolChangedEvent) {
+        refreshTempBattleArmor();
     }
 
     /**

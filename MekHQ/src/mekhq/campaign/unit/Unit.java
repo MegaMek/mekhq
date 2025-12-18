@@ -110,6 +110,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
@@ -5229,10 +5230,10 @@ public class Unit implements ITechnology {
             // Do this after reordering BA so real people have better armor, when applicable
             // Add temp crew to fill shortfall for infantry and BA
             if (entity instanceof Infantry && !isBattleArmor()
-                      && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+                      && getCampaign().isBlobInfantryEnabled()) {
                 nGunners += getTempSoldiers();
             } else if (isBattleArmor()
-                             && getCampaign().getCampaignOptions().isUseBlobBattleArmour()) {
+                             && getCampaign().isBlobBattleArmorEnabled()) {
                 nGunners += getTempBattleArmor();
             }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
@@ -6302,6 +6303,7 @@ public class Unit implements ITechnology {
     public void setTempSoldiers(int tempSoldiers) {
         this.tempSoldiers = Math.max(0, tempSoldiers);
         resetPilotAndEntity();
+        MekHQ.triggerEvent(new UnitChangedEvent(this));
     }
 
     /**
@@ -6326,7 +6328,7 @@ public class Unit implements ITechnology {
     public void setTempBattleArmor(int tempBattleArmor) {
         this.tempBattleArmor = Math.max(0, tempBattleArmor);
         resetPilotAndEntity();
-
+        MekHQ.triggerEvent(new UnitChangedEvent(this));
     }
 
     /**

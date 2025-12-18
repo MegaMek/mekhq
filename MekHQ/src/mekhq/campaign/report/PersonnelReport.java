@@ -103,6 +103,14 @@ public class PersonnelReport extends AbstractReport {
             }
         }
 
+        // Add Salaries of Temp Combat Crew
+        if (getCampaign().isBlobInfantryEnabled()) {
+            salary = salary.plus(getTempCrewPay(PersonnelRole.SOLDIER, getCampaign().getTemporarySoldierPool()));
+        }
+        if (getCampaign().isBlobBattleArmorEnabled()) {
+            salary = salary.plus(getTempCrewPay(PersonnelRole.BATTLE_ARMOUR, getCampaign().getTemporaryBattleArmorPool()));
+        }
+
         StringBuilder sb = new StringBuilder(resources.getString("combat.personnel.header.text") + "\n\n");
 
         sb.append(String.format("%-30s        %4s\n", resources.getString("combat.personnel.text"), countTotal));
@@ -113,6 +121,18 @@ public class PersonnelReport extends AbstractReport {
                       role.getLabel(getCampaign().getFaction().isClan()),
                       countPersonByType[role.ordinal()]));
             }
+        }
+
+        // Add Temp Soldiers and Battle Armor to Combat List
+        if (getCampaign().isBlobInfantryEnabled()) {
+            sb.append(String.format("    %-30s    %4s\n",
+                  resources.getString("combat.temp.soldiers.text"),
+                  getCampaign().getTemporarySoldierPool()));
+        }
+        if (getCampaign().isBlobBattleArmorEnabled()) {
+            sb.append(String.format("    %-30s    %4s\n",
+                  resources.getString("combat.temp.battleArmor.text"),
+                  getCampaign().getTemporaryBattleArmorPool()));
         }
 
         sb.append(getSecondaryCombatPersonnelDetails());
@@ -208,12 +228,8 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Salaries of Temp Workers
-        salary = salary.plus(getCampaign().getCampaignOptions()
-                                   .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getTemporaryAsTechPool());
-        salary = salary.plus(getCampaign().getCampaignOptions()
-                                   .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                   getCampaign().getTemporaryMedicPool());
+        salary = salary.plus(getTempCrewPay(PersonnelRole.ASTECH, getCampaign().getTemporaryAsTechPool()));
+        salary = salary.plus(getTempCrewPay(PersonnelRole.MEDIC, getCampaign().getTemporaryMedicPool()));
 
         StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text") + "\n\n");
 
@@ -277,6 +293,11 @@ public class PersonnelReport extends AbstractReport {
                                                          + ".PersonnelReport", "bondsmen.text", bondsmen)).append(": ");
 
         return getFormattedTextAt("mekhq.resources.PersonnelReport", "secondary.support", sb.toString());
+    }
+
+    private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
+        return getCampaign().getCampaignOptions()
+                     .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() * tempPersonnelPool;
     }
 
     public String getSecondarySupportPersonnelDetails() {

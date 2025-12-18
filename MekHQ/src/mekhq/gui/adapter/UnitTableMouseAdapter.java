@@ -545,7 +545,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     if (needed > 0) {
                         // Check available pool
-                        int availableInPool = gui.getCampaign().getTemporaryBattleArmourPool();
+                        int availableInPool = gui.getCampaign().getTemporaryBattleArmorPool();
                         int toAssign = Math.min(needed, availableInPool);
 
                         if (toAssign > 0) {
@@ -1177,7 +1177,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     canFillWithTempCrew = gui.getCampaign().getCampaignOptions().isUseBlobInfantry();
                 } else if (unit.isBattleArmor()) {
                     // Battle armor unit - check if blob battle armor is enabled
-                    canFillWithTempCrew = gui.getCampaign().getCampaignOptions().isUseBlobBattleArmour();
+                    canFillWithTempCrew = gui.getCampaign().getCampaignOptions().isUseBlobBattleArmor();
                 }
 
                 if (canFillWithTempCrew && unit.getActiveCrew().size() > 0) {

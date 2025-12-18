@@ -275,7 +275,7 @@ public class CampaignOptions {
 
     // Blob Crew
     private boolean useBlobInfantry;
-    private boolean useBlobBattleArmour;
+    private boolean useBlobBattleArmor;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -871,7 +871,7 @@ public class CampaignOptions {
 
         // Blob Crew
         useBlobInfantry = false;
-        useBlobBattleArmour = false;
+        useBlobBattleArmor = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -2118,12 +2118,12 @@ public class CampaignOptions {
         this.useBlobInfantry = useBlobInfantry;
     }
 
-    public boolean isUseBlobBattleArmour() {
-        return useBlobBattleArmour;
+    public boolean isUseBlobBattleArmor() {
+        return useBlobBattleArmor;
     }
 
-    public void setUseBlobBattleArmour(final boolean useBlobBattleArmour) {
-        this.useBlobBattleArmour = useBlobBattleArmour;
+    public void setUseBlobBattleArmor(final boolean useBlobBattleArmor) {
+        this.useBlobBattleArmor = useBlobBattleArmor;
     }
 
     public boolean isUseMASHTheatres() {

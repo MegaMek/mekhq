@@ -1635,7 +1635,8 @@ public class ResolveScenarioTracker {
 
         // Calculate payout for killed temp battle armor
         if (killedTempBattleArmor > 0) {
-            Money baSalary = options.getRoleBaseSalaries()[mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR.ordinal()];
+            Money baSalary =
+                  options.getRoleBaseSalaries()[mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR.ordinal()];
             Money baPayout = calculateTempCrewPayout(baSalary, false);
             totalPayout = totalPayout.plus(baPayout.multipliedBy(killedTempBattleArmor));
         }
