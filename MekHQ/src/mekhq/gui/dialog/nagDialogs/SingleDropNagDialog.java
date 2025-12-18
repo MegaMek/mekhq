@@ -59,6 +59,19 @@ import mekhq.gui.dialog.nagDialogs.nagLogic.SingleDropSetUpNagLogic;
  * </p>
  */
 public class SingleDropNagDialog extends ImmersiveDialogNag {
+    /**
+     * Creates a new nag dialog reminding the user to configure single-drop mode
+     * for eligible StratCon contracts in the current campaign.
+     * <p>
+     * This initializes the underlying {@link ImmersiveDialogNag} with the
+     * {@code NAG_SINGLE_DROP_SET_UP} option key and the dialog identifier
+     * {@code "SingleDropNagDialog"} so that user preferences and localization
+     * can be applied consistently with other nag dialogs.
+     *
+     * @param campaign
+     *            the {@link Campaign} whose active contracts and options are used
+     *            to configure and display this nag dialog
+     */
     public SingleDropNagDialog(final Campaign campaign) {
         super(campaign, null, NAG_SINGLE_DROP_SET_UP, "SingleDropNagDialog");
     }
