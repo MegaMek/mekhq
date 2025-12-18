@@ -320,6 +320,7 @@ public final class InjuryTypes {
             InjuryType.register(191, "alt:CYBERNETIC_EAR_ENHANCED", AlternateInjuries.CYBERNETIC_EAR_ENHANCED);
             InjuryType.register(192, "alt:IMPLANT_REMOVAL_RECOVERY", AlternateInjuries.IMPLANT_REMOVAL_RECOVERY);
             InjuryType.register(193, "alt:SECONDARY_POWER_SUPPLY", AlternateInjuries.SECONDARY_POWER_SUPPLY);
+            InjuryType.register(194, "alt:PROTOTYPE_VDNI", AlternateInjuries.PROTOTYPE_VDNI);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
