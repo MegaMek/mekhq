@@ -1084,6 +1084,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setAsTechPoolOvertime(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("medicPool")) {
                     campaign.setMedicPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("soldierPool")) {
+                    campaign.setSoldierPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("battleArmourPool")) {
+                    campaign.setBattleArmourPool(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("fieldKitchenWithinCapacity")) {
                     campaign.setFieldKitchenWithinCapacity(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("mashTheatreCapacity")) {

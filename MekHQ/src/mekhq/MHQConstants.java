@@ -173,6 +173,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
     public static final String NEW_DAY_AS_TECH_POOL_FILL = "newDayAstechPoolFill";
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
+    public static final String NEW_DAY_SOLDIER_POOL_FILL = "newDaySoldierPoolFill";
+    public static final String NEW_DAY_BATTLE_ARMOUR_POOL_FILL = "newDayBattleArmourPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";

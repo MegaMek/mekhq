@@ -377,6 +377,11 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mashTheatreCapacity", campaignOptions.getMASHTheatreCapacity());
         // endregion Medical
 
+        // region Blob Crew
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobInfantry", campaignOptions.isUseBlobInfantry());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobBattleArmour", campaignOptions.isUseBlobBattleArmour());
+        // endregion Blob Crew
+
         // region Prisoners
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

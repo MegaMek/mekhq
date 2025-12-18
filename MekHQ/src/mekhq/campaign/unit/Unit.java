@@ -212,6 +212,9 @@ public class Unit implements ITechnology {
     private Person navigator;
     // this is the id of the tech assigned for maintenance if any
     private Person tech;
+    // blob crew - temporary personnel not represented by Person objects
+    private int tempSoldiers;
+    private int tempBattleArmor;
 
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
@@ -263,6 +266,8 @@ public class Unit implements ITechnology {
         this.lastMaintenanceReport = "";
         this.fluffName = "";
         this.maintenanceMultiplier = 4;
+        this.tempSoldiers = 0;
+        this.tempBattleArmor = 0;
         initializeAllTransportSpace();
         reCalc();
     }
@@ -355,11 +360,11 @@ public class Unit implements ITechnology {
         if (getTech() != null) {
             if (uncrewed) {
                 return CrewAssignmentState.UNCREWED;
-            } else if (canTakeMoreDrivers() ||
+            } else if ((needsMoreDrivers() ||
                              canTakeMoreVesselCrew() ||
                              canTakeTechOfficer() ||
-                             canTakeMoreGunners() ||
-                             canTakeNavigator()) {
+                             needsMoreGunners() ||
+                             canTakeNavigator())) {
                 return CrewAssignmentState.PARTIALLY_CREWED;
             } else {
                 return CrewAssignmentState.FULLY_CREWED;
@@ -2732,6 +2737,14 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
+        // Blob crew
+        if (tempSoldiers > 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tempSoldiers", tempSoldiers);
+        }
+        if (tempBattleArmor > 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tempBattleArmor", tempBattleArmor);
+        }
+
         // If this entity is assigned to a transport ship, write that
         if (hasTransportShipAssignment()) {
             pw.println(MHQXMLUtility.indentStr(indent) +
@@ -2932,6 +2945,10 @@ public class Unit implements ITechnology {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.tech = new UnitPersonRef(UUID.fromString(wn2.getTextContent()));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("tempSoldiers")) {
+                    retVal.tempSoldiers = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tempBattleArmor")) {
+                    retVal.tempBattleArmor = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
@@ -4763,6 +4780,7 @@ public class Unit implements ITechnology {
                         slot++;
                     }
                 }
+                // Fill remaining slots or mark as missing
                 while (slot < entity.getCrew().getSlotCount()) {
                     entity.getCrew().setMissing(true, slot++);
                 }
@@ -5207,6 +5225,16 @@ public class Unit implements ITechnology {
                     }
                 }
             }
+
+            // Do this after reordering BA so real people have better armor, when applicable
+            // Add temp crew to fill shortfall for infantry and BA
+            if (entity instanceof Infantry && !isBattleArmor()
+                      && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+                nGunners += getTempSoldiers();
+            } else if (isBattleArmor()
+                             && getCampaign().getCampaignOptions().isUseBlobBattleArmour()) {
+                nGunners += getTempBattleArmor();
+            }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
         }
 
@@ -5498,6 +5526,23 @@ public class Unit implements ITechnology {
         return nDrivers < getTotalDriverNeeds();
     }
 
+    public boolean needsMoreDrivers() {
+        int nDrivers = drivers.size() + getTempDrivers();
+        return nDrivers < getTotalDriverNeeds();
+    }
+
+    /**
+     * Not to be confused with vehicle drivers
+     */
+    private int getTempDrivers() {
+        if (isConventionalInfantry()) {
+            return getTempSoldiers();
+        } else if (isBattleArmor()) {
+            return getTempBattleArmor();
+        }
+        return 0;
+    }
+
     public boolean canTakeMoreVesselCrew() {
         int nCrew = vesselCrew.size();
         return nCrew < getTotalCrewNeeds();
@@ -5539,6 +5584,20 @@ public class Unit implements ITechnology {
     public boolean canTakeMoreGunners() {
         int nGunners = gunners.size();
         return nGunners < getTotalGunnerNeeds();
+    }
+
+    public boolean needsMoreGunners() {
+        int nGunners = gunners.size() + getTempGunners();
+        return nGunners < getTotalGunnerNeeds();
+    }
+
+    private int getTempGunners() {
+        if (isConventionalInfantry()) {
+            return getTempSoldiers();
+        } else if (isBattleArmor()) {
+            return getTempBattleArmor();
+        }
+        return 0;
     }
 
     public int getTotalGunnerNeeds() {
@@ -5721,6 +5780,14 @@ public class Unit implements ITechnology {
             gunners.add(person);
         }
         person.setUnit(this);
+
+        // Remove one temp crew member when adding a real Person
+        if (entity != null && entity.isInfantry() && !isBattleArmor() && tempSoldiers > 0) {
+            tempSoldiers--;
+        } else if (isBattleArmor() && tempBattleArmor > 0) {
+            tempBattleArmor--;
+        }
+
         resetPilotAndEntity();
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
@@ -6212,6 +6279,70 @@ public class Unit implements ITechnology {
             crew.add(techOfficer);
         }
         return crew;
+    }
+
+    /**
+     * @return the number of temporary crew (blob crew) assigned to this unit
+     */
+    public int getTotalTempCrew() {
+        return getTempSoldiers() + getTempBattleArmor();
+    }
+
+    /**
+     * @return the number of temporary soldiers (blob crew) assigned to this unit
+     */
+    public int getTempSoldiers() {
+        return tempSoldiers;
+    }
+
+    /**
+     * Sets the number of temporary soldiers (blob crew) assigned to this unit
+     * @param tempSoldiers the number of temporary soldiers
+     */
+    public void setTempSoldiers(int tempSoldiers) {
+        this.tempSoldiers = Math.max(0, tempSoldiers);
+        resetPilotAndEntity();
+    }
+
+    /**
+     * @return the number of temporary battle armor personnel (blob crew) assigned to this unit
+     */
+    public int getTempBattleArmor() {
+        return tempBattleArmor;
+    }
+
+    /**
+     * Returns true if this unit is using any type of blob crew (temp soldiers or temp BA)
+     * @return true if unit has temp soldiers or temp battle armor assigned
+     */
+    public boolean isUsingBlobCrew() {
+        return tempSoldiers > 0 || tempBattleArmor > 0;
+    }
+
+    /**
+     * Sets the number of temporary battle armor personnel (blob crew) assigned to this unit
+     * @param tempBattleArmor the number of temporary battle armor personnel
+     */
+    public void setTempBattleArmor(int tempBattleArmor) {
+        this.tempBattleArmor = Math.max(0, tempBattleArmor);
+        resetPilotAndEntity();
+
+    }
+
+    /**
+     * @return the total crew size including both Person objects and blob crew
+     */
+    public int getTotalCrewSize() {
+        int personCrew = getActiveCrew().size();
+        int blobCrew = 0;
+
+        if (getEntity() != null && getEntity().isInfantry() && !isBattleArmor()) {
+            blobCrew = tempSoldiers;
+        } else if (isBattleArmor()) {
+            blobCrew = tempBattleArmor;
+        }
+
+        return personCrew + blobCrew;
     }
 
     /**

@@ -172,6 +172,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
+    public static final String COMMAND_FILL_TEMP_CREW = "FILL_TEMP_CREW";
+    public static final String COMMAND_REMOVE_TEMP_CREW = "REMOVE_TEMP_CREW";
     public static final String COMMAND_DISBAND = "DISBAND";
     public static final String COMMAND_SELL = "SELL";
     public static final String COMMAND_LOSS = "LOSS";
@@ -504,6 +506,62 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               person.getPrimaryRole(),
                               skillLevel);
                     }
+                }
+            }
+        } else if (command.equals(COMMAND_FILL_TEMP_CREW)) {
+            // Only works on single selected unit
+            if (units.length == 1) {
+                Unit unit = units[0];
+                int currentCrew = unit.getActiveCrew().size();
+                int fullCrew = unit.getFullCrewSize();
+
+                // Can't add temp crew if no real Person exists
+                if (currentCrew == 0) {
+                    return;
+                }
+
+                // Maximum temp crew for this unit is (fullCrewSize - currentCrew)
+                // This ensures the unit is at full strength
+                int maxTempCrewForUnit = fullCrew - currentCrew;
+
+                if (unit.getEntity() != null && unit.getEntity().isInfantry() && !unit.isBattleArmor()) {
+                    // Infantry unit
+                    int currentTempSoldiers = unit.getTempSoldiers();
+                    int needed = maxTempCrewForUnit - currentTempSoldiers;
+
+                    if (needed > 0) {
+                        // Check available pool
+                        int availableInPool = gui.getCampaign().getTemporarySoldierPool();
+                        int toAssign = Math.min(needed, availableInPool);
+
+                        if (toAssign > 0) {
+                            unit.setTempSoldiers(currentTempSoldiers + toAssign);
+                        }
+                    }
+                } else if (unit.isBattleArmor()) {
+                    // Battle armor unit
+                    int currentTempBA = unit.getTempBattleArmor();
+                    int needed = maxTempCrewForUnit - currentTempBA;
+
+                    if (needed > 0) {
+                        // Check available pool
+                        int availableInPool = gui.getCampaign().getTemporaryBattleArmourPool();
+                        int toAssign = Math.min(needed, availableInPool);
+
+                        if (toAssign > 0) {
+                            unit.setTempBattleArmor(currentTempBA + toAssign);
+                        }
+                    }
+                }
+            }
+        } else if (command.equals(COMMAND_REMOVE_TEMP_CREW)) {
+            // Remove all temp crew from selected unit(s)
+            for (Unit unit : units) {
+                if (unit.getTempSoldiers() > 0) {
+                    unit.setTempSoldiers(0);
+                }
+                if (unit.getTempBattleArmor() > 0) {
+                    unit.setTempBattleArmor(0);
                 }
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
@@ -1108,6 +1166,42 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.setActionCommand(COMMAND_HIRE_FULL);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
+                }
+            }
+
+            // fill with temp crew (blob crew)
+            if (oneSelected) {
+                boolean canFillWithTempCrew = false;
+                if (unit.getEntity() != null && unit.getEntity().isInfantry() && !unit.isBattleArmor()) {
+                    // Infantry unit - check if blob infantry is enabled
+                    canFillWithTempCrew = gui.getCampaign().getCampaignOptions().isUseBlobInfantry();
+                } else if (unit.isBattleArmor()) {
+                    // Battle armor unit - check if blob battle armor is enabled
+                    canFillWithTempCrew = gui.getCampaign().getCampaignOptions().isUseBlobBattleArmour();
+                }
+
+                if (canFillWithTempCrew && unit.getActiveCrew().size() > 0) {
+                    int currentCrew = unit.getActiveCrew().size();
+                    int currentTempCrew = unit.getEntity().isInfantry() && !unit.isBattleArmor()
+                        ? unit.getTempSoldiers() : unit.getTempBattleArmor();
+                    int fullCrew = unit.getFullCrewSize();
+                    int maxTempCrew = fullCrew - 1; // At least one must be a real Person
+
+                    // Only show if unit can accept more temp crew
+                    if (currentCrew + currentTempCrew < maxTempCrew) {
+                        menuItem = new JMenuItem("Fill with temp crew");
+                        menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+
+                    // Show "Remove temp crew" if unit has any temp crew
+                    if (currentTempCrew > 0) {
+                        menuItem = new JMenuItem("Remove temp crew");
+                        menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
                 }
             }
 

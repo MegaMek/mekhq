@@ -103,6 +103,7 @@ import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.BattleArmourPoolChangedEvent;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.LocationChangedEvent;
@@ -110,6 +111,7 @@ import mekhq.campaign.events.MedicPoolChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.SoldierPoolChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
@@ -211,6 +213,8 @@ public class CampaignGUI extends JPanel {
     private JLabel lblFunds;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
+    private JLabel lblTempSoldiers;
+    private JLabel lblTempBattleArmour;
     private JLabel lblPartsAvailabilityRating;
 
     /* for the top button panel */
@@ -352,6 +356,8 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshTempAsTechs();
         refreshTempMedics();
+        refreshTempSoldiers();
+        refreshTempBattleArmour();
         refreshPartsAvailability();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -955,6 +961,102 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(menuMedicPool);
         // endregion Medic Pool
 
+        // region Soldier Pool
+        JMenu menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
+        menuSoldierPool.setMnemonic(KeyEvent.VK_S);
+
+        JMenuItem miHireSoldiers = new JMenuItem(resourceMap.getString("miHireSoldiers.text"));
+        miHireSoldiers.setMnemonic(KeyEvent.VK_H);
+        miHireSoldiers.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireSoldiersNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseSoldierPool(popupValueChoiceDialog.getValue());
+            }
+        });
+        menuSoldierPool.add(miHireSoldiers);
+
+        JMenuItem miFireSoldiers = new JMenuItem(resourceMap.getString("miFireSoldiers.text"));
+        miFireSoldiers.setMnemonic(KeyEvent.VK_E);
+        miFireSoldiers.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireSoldiersNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTemporarySoldierPool());
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseSoldierPool(popupValueChoiceDialog.getValue());
+            }
+        });
+        menuSoldierPool.add(miFireSoldiers);
+
+        JMenuItem miFullStrengthSoldiers = new JMenuItem(resourceMap.getString("miFullStrengthSoldiers.text"));
+        miFullStrengthSoldiers.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthSoldiers.addActionListener(evt -> getCampaign().resetSoldierPool());
+        menuSoldierPool.add(miFullStrengthSoldiers);
+
+        JMenuItem miFireAllSoldiers = new JMenuItem(resourceMap.getString("miFireAllSoldiers.text"));
+        miFireAllSoldiers.setMnemonic(KeyEvent.VK_R);
+        miFireAllSoldiers.addActionListener(evt -> getCampaign().emptySoldierPool());
+        menuSoldierPool.add(miFireAllSoldiers);
+        menuMarket.add(menuSoldierPool);
+        // endregion Soldier Pool
+
+        // region Battle Armour Pool
+        JMenu menuBattleArmourPool = new JMenu(resourceMap.getString("menuBattleArmourPool.text"));
+        menuBattleArmourPool.setMnemonic(KeyEvent.VK_B);
+
+        JMenuItem miHireBattleArmour = new JMenuItem(resourceMap.getString("miHireBattleArmour.text"));
+        miHireBattleArmour.setMnemonic(KeyEvent.VK_H);
+        miHireBattleArmour.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireBattleArmourNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseBattleArmourPool(popupValueChoiceDialog.getValue());
+            }
+        });
+        menuBattleArmourPool.add(miHireBattleArmour);
+
+        JMenuItem miFireBattleArmour = new JMenuItem(resourceMap.getString("miFireBattleArmour.text"));
+        miFireBattleArmour.setMnemonic(KeyEvent.VK_E);
+        miFireBattleArmour.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireBattleArmourNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTemporaryBattleArmourPool());
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseBattleArmourPool(popupValueChoiceDialog.getValue());
+            }
+        });
+        menuBattleArmourPool.add(miFireBattleArmour);
+
+        JMenuItem miFullStrengthBattleArmour = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmour.text"));
+        miFullStrengthBattleArmour.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthBattleArmour.addActionListener(evt -> getCampaign().resetBattleArmourPool());
+        menuBattleArmourPool.add(miFullStrengthBattleArmour);
+
+        JMenuItem miFireAllBattleArmour = new JMenuItem(resourceMap.getString("miFireAllBattleArmour.text"));
+        miFireAllBattleArmour.setMnemonic(KeyEvent.VK_R);
+        miFireAllBattleArmour.addActionListener(evt -> getCampaign().emptyBattleArmourPool());
+        menuBattleArmourPool.add(miFireAllBattleArmour);
+        menuMarket.add(menuBattleArmourPool);
+        // endregion Battle Armour Pool
+
         menuBar.add(menuMarket);
         // endregion Marketplace Menu
 
@@ -1176,11 +1278,15 @@ public class CampaignGUI extends JPanel {
         lblFunds = new JLabel();
         lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
+        lblTempSoldiers = new JLabel();
+        lblTempBattleArmour = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
+        statusPanel.add(lblTempSoldiers);
+        statusPanel.add(lblTempBattleArmour);
         statusPanel.add(lblPartsAvailabilityRating);
     }
 
@@ -2832,6 +2938,18 @@ public class CampaignGUI extends JPanel {
         lblTempMedics.setText(text);
     }
 
+    private void refreshTempSoldiers() {
+        // FIXME : Localize
+        String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTemporarySoldierPool() + "</html>";
+        lblTempSoldiers.setText(text);
+    }
+
+    private void refreshTempBattleArmour() {
+        // FIXME : Localize
+        String text = "<html><b>Temp Battle Armour</b>: " + getCampaign().getTemporaryBattleArmourPool() + "</html>";
+        lblTempBattleArmour.setText(text);
+    }
+
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().isUseAtB() ||
                   getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
@@ -3285,6 +3403,36 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(MedicPoolChangedEvent medicPoolChangedEvent) {
         refreshTempMedics();
+    }
+
+    /**
+     * Handles updates when the pool of available soldiers changes.
+     *
+     * <p>Refreshes the temporary soldier pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param soldierPoolChangedEvent the event indicating a change in the soldier pool
+     */
+    @Subscribe
+    public void handle(SoldierPoolChangedEvent soldierPoolChangedEvent) {
+        refreshTempSoldiers();
+    }
+
+    /**
+     * Handles updates when the pool of available battle armour personnel changes.
+     *
+     * <p>Refreshes the temporary battle armour pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param battleArmourPoolChangedEvent the event indicating a change in the battle armour pool
+     */
+    @Subscribe
+    public void handle(BattleArmourPoolChangedEvent battleArmourPoolChangedEvent) {
+        refreshTempBattleArmour();
     }
 
     /**

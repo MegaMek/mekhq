@@ -242,6 +242,16 @@ public class CampaignNewDayManager {
             campaign.resetMedicPool();
         }
 
+        if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
+            campaign.resetSoldierPool();
+            campaign.distributeSoldierPoolToUnits();
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayBattleArmourPoolFill()) {
+            campaign.resetBattleArmourPool();
+            campaign.distributeBattleArmourPoolToUnits();
+        }
+
         // Ensure we don't have anything that would prevent the new day
         if (MekHQ.triggerEvent(new DayEndingEvent(campaign))) {
             return false;

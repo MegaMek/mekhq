@@ -301,7 +301,15 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 Force force = unit.getCampaign().getForce(unit.getForceId());
                 yield (force != null) ? force.getFullName() : "-";
             }
-            case COL_CREW -> unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+            case COL_CREW -> unit.getTotalTempCrew() == 0 ?
+                                   unit.getActiveCrew().size() + "/" + unit.getFullCrewSize() :
+                                   (unit.getTotalTempCrew() +
+                                         unit.getActiveCrew().size()) +
+                                         "(" +
+                                         unit.getActiveCrew().size() +
+                                         ")" +
+                                         "/" +
+                                         unit.getFullCrewSize();
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
             case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
             case COL_MAINTAIN_CYCLE -> {

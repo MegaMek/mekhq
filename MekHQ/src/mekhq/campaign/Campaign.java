@@ -322,6 +322,10 @@ public class Campaign implements ITechManager {
     private int asTechPoolMinutes;
     private int asTechPoolOvertime;
     private int medicPool;
+    /** Total temp soldier pool (not just available - use getAvailableSoldierPool() for available count) */
+    private int soldierPool;
+    /** Total temp battle armor pool (not just available - use getAvailableBattleArmourPool() for available count) */
+    private int battleArmourPool;
 
     private int lastForceId;
     private int lastMissionId;
@@ -613,6 +617,8 @@ public class Campaign implements ITechManager {
         combatTeams = new Hashtable<>();
         asTechPool = 0;
         medicPool = 0;
+        soldierPool = 0;
+        battleArmourPool = 0;
         customs = new ArrayList<>();
         personnelWhoAdvancedInXP = new ArrayList<>();
         turnoverRetirementInformation = new ArrayList<>();
@@ -6238,7 +6244,19 @@ public class Campaign implements ITechManager {
     }
 
     public void setCampaignOptions(CampaignOptions options) {
+        // Check if blob crew was disabled
+        boolean infantryWasEnabled = campaignOptions.isUseBlobInfantry();
+        boolean baWasEnabled = campaignOptions.isUseBlobBattleArmour();
+
         campaignOptions = options;
+
+        // If blob crew was disabled, clear all blob crew from units and pools
+        boolean infantryNowDisabled = infantryWasEnabled && !options.isUseBlobInfantry();
+        boolean baNowDisabled = baWasEnabled && !options.isUseBlobBattleArmour();
+
+        if (infantryNowDisabled || baNowDisabled) {
+            clearBlobCrew();
+        }
     }
 
     public StoryArc getStoryArc() {
@@ -6385,6 +6403,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolMinutes", asTechPoolMinutes);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolOvertime", asTechPoolOvertime);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "soldierPool", soldierPool);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "battleArmourPool", battleArmourPool);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "fieldKitchenWithinCapacity", fieldKitchenWithinCapacity);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mashTheatreCapacity", mashTheatreCapacity);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "repairBaysRented", repairBaysRented);
@@ -7741,6 +7761,76 @@ public class Campaign implements ITechManager {
         return medicPool;
     }
 
+    /**
+     * Sets the total soldier pool size (not just available)
+     * @param size the total number of temp soldiers in the pool
+     */
+    public void setSoldierPool(int size) {
+        soldierPool = size;
+    }
+
+    /**
+     * Gets the total soldier pool size (not just available)
+     * To get available soldiers, use {@link #getAvailableSoldierPool()}
+     * @return the total number of temp soldiers in the pool
+     */
+    public int getTemporarySoldierPool() {
+        return soldierPool;
+    }
+
+    /**
+     * Sets the total battle armor pool size (not just available)
+     * @param size the total number of temp battle armor in the pool
+     */
+    public void setBattleArmourPool(int size) {
+        battleArmourPool = size;
+    }
+
+    /**
+     * Gets the total battle armor pool size (not just available)
+     * To get available battle armor, use {@link #getAvailableBattleArmourPool()}
+     * @return the total number of temp battle armor in the pool
+     */
+    public int getTemporaryBattleArmourPool() {
+        return battleArmourPool;
+    }
+
+    /**
+     * Calculates the total number of temp soldiers currently assigned to units
+     * @return the number of temp soldiers in use across all units
+     */
+    public int getSoldiersInUse() {
+        return getUnits().stream()
+            .mapToInt(Unit::getTempSoldiers)
+            .sum();
+    }
+
+    /**
+     * Calculates the total number of temp battle armor currently assigned to units
+     * @return the number of temp battle armor in use across all units
+     */
+    public int getBattleArmourInUse() {
+        return getUnits().stream()
+            .mapToInt(Unit::getTempBattleArmor)
+            .sum();
+    }
+
+    /**
+     * Calculates the number of temp soldiers available for assignment
+     * @return total soldier pool minus soldiers currently in use
+     */
+    public int getAvailableSoldierPool() {
+        return Math.max(0, soldierPool - getSoldiersInUse());
+    }
+
+    /**
+     * Calculates the number of temp battle armor available for assignment
+     * @return total battle armor pool minus battle armor currently in use
+     */
+    public int getAvailableBattleArmourPool() {
+        return Math.max(0, battleArmourPool - getBattleArmourInUse());
+    }
+
     public boolean requiresAdditionalAsTechs() {
         return getAsTechNeed() > 0;
     }
@@ -8023,6 +8113,196 @@ public class Campaign implements ITechManager {
     public void decreaseMedicPool(int i) {
         medicPool = max(0, medicPool - i);
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
+    }
+
+    public void increaseSoldierPool(int i) {
+        soldierPool += i;
+        MekHQ.triggerEvent(new SoldierPoolChangedEvent(this, i));
+    }
+
+    public void resetSoldierPool() {
+        emptySoldierPool();
+        fillSoldierPool();
+    }
+
+    public void emptySoldierPool() {
+        final int currentSoldierPool = getTemporarySoldierPool();
+        decreaseSoldierPool(currentSoldierPool);
+    }
+
+    public void fillSoldierPool() {
+        if (!getCampaignOptions().isUseBlobInfantry()) {
+            return;
+        }
+
+        int need = 0;
+        for (Unit unit : getUnits()) {
+            if (unit.getEntity() != null && unit.getEntity().isInfantry() && !unit.isBattleArmor()) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempSoldiers = unit.getTempSoldiers();
+                int fullCrew = unit.getFullCrewSize();
+                int totalCurrentCrew = currentCrew + currentTempSoldiers;
+                if (fullCrew > totalCurrentCrew) {
+                    need += (fullCrew - totalCurrentCrew);
+                }
+            }
+        }
+
+        if (need > 0) {
+            increaseSoldierPool(need);
+        }
+    }
+
+    public void decreaseSoldierPool(int i) {
+        soldierPool = max(0, soldierPool - i);
+        MekHQ.triggerEvent(new SoldierPoolChangedEvent(this, -i));
+    }
+
+    public void increaseBattleArmourPool(int i) {
+        battleArmourPool += i;
+        MekHQ.triggerEvent(new BattleArmourPoolChangedEvent(this, i));
+    }
+
+    public void resetBattleArmourPool() {
+        emptyBattleArmourPool();
+        fillBattleArmourPool();
+    }
+
+    public void emptyBattleArmourPool() {
+        final int currentBattleArmourPool = getTemporaryBattleArmourPool();
+        decreaseBattleArmourPool(currentBattleArmourPool);
+    }
+
+    public void fillBattleArmourPool() {
+        if (!getCampaignOptions().isUseBlobBattleArmour()) {
+            return;
+        }
+
+        int need = 0;
+        for (Unit unit : getUnits()) {
+            if (unit.isBattleArmor()) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempBA = unit.getTempBattleArmor();
+                int fullCrew = unit.getFullCrewSize();
+                int totalCurrentCrew = currentCrew + currentTempBA;
+                if (fullCrew > totalCurrentCrew) {
+                    need += (fullCrew - totalCurrentCrew);
+                }
+            }
+        }
+
+        if (need > 0) {
+            increaseBattleArmourPool(need);
+        }
+    }
+
+    public void decreaseBattleArmourPool(int i) {
+        battleArmourPool = max(0, battleArmourPool - i);
+        MekHQ.triggerEvent(new BattleArmourPoolChangedEvent(this, -i));
+    }
+
+    /**
+     * Clears all blob crew (temp soldiers and battle armor) from units and empties the campaign pools.
+     * Should be called when blob crew options are disabled.
+     */
+    public void clearBlobCrew() {
+        // Clear temp crew from all units
+        for (Unit unit : getUnits()) {
+            if (unit.getTempSoldiers() > 0) {
+                unit.setTempSoldiers(0);
+            }
+            if (unit.getTempBattleArmor() > 0) {
+                unit.setTempBattleArmor(0);
+            }
+        }
+
+        // Empty the campaign pools
+        emptySoldierPool();
+        emptyBattleArmourPool();
+    }
+
+    /**
+     * Distributes soldiers from the pool to individual infantry units that need crew.
+     * Each unit can be filled up to (fullCrewSize - 1) with temp soldiers, ensuring at least one real Person.
+     * Only runs if blob infantry is enabled.
+     */
+    public void distributeSoldierPoolToUnits() {
+        if (!getCampaignOptions().isUseBlobInfantry()) {
+            return;
+        }
+
+        int availablePool = getAvailableSoldierPool();
+        for (Unit unit : getUnits()) {
+            if (availablePool <= 0) {
+                break;
+            }
+
+            if (unit.getEntity() != null && unit.getEntity().isInfantry() && !unit.isBattleArmor()) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempSoldiers = unit.getTempSoldiers();
+                int fullCrew = unit.getFullCrewSize();
+
+                // Can't add temp crew if no real Person exists
+                if (currentCrew == 0) {
+                    continue;
+                }
+
+                // Maximum temp crew is (fullCrewSize - 1) to ensure at least one real Person
+                int maxTempCrew = fullCrew - 1;
+                int totalCurrentCrew = currentCrew + currentTempSoldiers;
+                int needed = maxTempCrew - (totalCurrentCrew - currentCrew);
+
+                if (needed > 0) {
+                    int toAssign = Math.min(needed, availablePool);
+                    unit.setTempSoldiers(currentTempSoldiers + toAssign);
+                    availablePool -= toAssign;
+                }
+            }
+        }
+        // Note: No need to decrease the total pool - it's tracked by units automatically
+        // The soldierPool represents the TOTAL, and "in use" is calculated from units
+    }
+
+    /**
+     * Distributes battle armor from the pool to individual BA units that need crew.
+     * Each unit can be filled up to (fullCrewSize - 1) with temp BA, ensuring at least one real Person.
+     * Only runs if blob battle armor is enabled.
+     */
+    public void distributeBattleArmourPoolToUnits() {
+        if (!getCampaignOptions().isUseBlobBattleArmour()) {
+            return;
+        }
+
+        int availablePool = getAvailableBattleArmourPool();
+        for (Unit unit : getUnits()) {
+            if (availablePool <= 0) {
+                break;
+            }
+
+            if (unit.isBattleArmor()) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempBA = unit.getTempBattleArmor();
+                int fullCrew = unit.getFullCrewSize();
+
+                // Can't add temp crew if no real Person exists
+                if (currentCrew == 0) {
+                    continue;
+                }
+
+                // Maximum temp crew is (fullCrewSize - 1) to ensure at least one real Person
+                int maxTempCrew = fullCrew - 1;
+                int totalCurrentCrew = currentCrew + currentTempBA;
+                int needed = maxTempCrew - (totalCurrentCrew - currentCrew);
+
+                if (needed > 0) {
+                    int toAssign = Math.min(needed, availablePool);
+                    unit.setTempBattleArmor(currentTempBA + toAssign);
+                    availablePool -= toAssign;
+                }
+            }
+        }
+        // Note: No need to decrease the total pool - it's tracked by units automatically
+        // The battleArmourPool represents the TOTAL, and "in use" is calculated from units
     }
 
     public GameOptions getGameOptions() {
