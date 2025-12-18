@@ -83,6 +83,7 @@ import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -808,7 +809,7 @@ public class ResolveScenarioTracker {
                         if (casualtiesAssigned < casualties) {
                             // Determine if this casualty should hit a blob crew member or a Person
                             int totalCrew = u.getTotalCrewSize();
-                            int blobCrew = u.getTempSoldiers() + u.getTempBattleArmor();
+                            int blobCrew = u.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) + u.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
                             int personCrew = crew.size();
 
                             // If we have blob crew, randomly assign casualties proportionally
@@ -820,11 +821,12 @@ public class ResolveScenarioTracker {
 
                             if (hitBlobCrew) {
                                 // Assign casualty to blob crew instead of Person
-                                if (u.getEntity().isInfantry() && !u.isBattleArmor() && u.getTempSoldiers() > 0) {
-                                    u.setTempSoldiers(u.getTempSoldiers() - 1);
+                                if (u.getEntity().isInfantry() && !u.isBattleArmor() && u.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) > 0) {
+                                    u.setTempCrew(PersonnelRole.SOLDIER, u.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) - 1);
                                     killedTempSoldiers++;
-                                } else if (u.isBattleArmor() && u.getTempBattleArmor() > 0) {
-                                    u.setTempBattleArmor(u.getTempBattleArmor() - 1);
+                                } else if (u.isBattleArmor() && u.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) > 0) {
+                                    u.setTempCrew(PersonnelRole.BATTLE_ARMOUR, u.getTempCrewByPersonnelRole(
+                                          PersonnelRole.BATTLE_ARMOUR) - 1);
                                     killedTempBattleArmor++;
                                 }
                                 casualtiesAssigned++;
@@ -1247,7 +1249,7 @@ public class ResolveScenarioTracker {
                         if (casualtiesAssigned < casualties) {
                             // Determine if this casualty should hit a blob crew member or a Person
                             int totalCrew = unit.getTotalCrewSize();
-                            int blobCrew = unit.getTempSoldiers() + unit.getTempBattleArmor();
+                            int blobCrew = unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) + unit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
 
                             // If we have blob crew, randomly assign casualties proportionally
                             boolean hitBlobCrew = false;
@@ -1258,10 +1260,10 @@ public class ResolveScenarioTracker {
 
                             if (hitBlobCrew) {
                                 // Assign casualty to blob crew instead of Person
-                                if (unit.getEntity().isInfantry() && !unit.isBattleArmor() && unit.getTempSoldiers() > 0) {
-                                    unit.setTempSoldiers(unit.getTempSoldiers() - 1);
-                                } else if (unit.isBattleArmor() && unit.getTempBattleArmor() > 0) {
-                                    unit.setTempBattleArmor(unit.getTempBattleArmor() - 1);
+                                if (unit.getEntity().isInfantry() && !unit.isBattleArmor() && unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) > 0) {
+                                    unit.setTempCrew(PersonnelRole.SOLDIER, unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) - 1);
+                                } else if (unit.isBattleArmor() && unit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) > 0) {
+                                    unit.setTempCrew(PersonnelRole.BATTLE_ARMOUR, unit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) - 1);
                                 }
                                 casualtiesAssigned++;
                             } else {

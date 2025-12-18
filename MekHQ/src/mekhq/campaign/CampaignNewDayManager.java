@@ -139,6 +139,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.ExtraIncome;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -243,13 +244,43 @@ public class CampaignNewDayManager {
         }
 
         if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
-            campaign.resetSoldierPool();
+            campaign.setTempCrewPool(PersonnelRole.SOLDIER, 0);
             campaign.distributeSoldierPoolToUnits();
         }
 
         if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
-            campaign.resetBattleArmorPool();
+            campaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 0);
             campaign.distributeBattleArmorPoolToUnits();
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVehicleCrewVTOLPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVehicleCrewNavalPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVesselPilotPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVesselGunnerPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VESSEL_CREW, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
         }
 
         // Ensure we don't have anything that would prevent the new day

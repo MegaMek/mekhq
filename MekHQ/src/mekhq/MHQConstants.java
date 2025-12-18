@@ -175,6 +175,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_SOLDIER_POOL_FILL = "newDaySoldierPoolFill";
     public static final String NEW_DAY_BATTLE_ARMOR_POOL_FILL = "newDayBattleArmorPoolFill";
+    public static final String NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL = "newDayVehicleCrewGroundPoolFill";
+    public static final String NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL = "newDayVehicleCrewVTOLPoolFill";
+    public static final String NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL = "newDayVehicleCrewNavalPoolFill";
+    public static final String NEW_DAY_VESSEL_PILOT_POOL_FILL = "newDayVesselPilotPoolFill";
+    public static final String NEW_DAY_VESSEL_GUNNER_POOL_FILL = "newDayVesselGunnerPoolFill";
+    public static final String NEW_DAY_VESSEL_CREW_POOL_FILL = "newDayVesselCrewPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";

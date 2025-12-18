@@ -867,6 +867,54 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_FILL, value);
     }
 
+    public boolean getNewDayVehicleCrewGroundPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL, false);
+    }
+
+    public void setNewDayVehicleCrewGroundPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL, value);
+    }
+
+    public boolean getNewDayVehicleCrewVTOLPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL, false);
+    }
+
+    public void setNewDayVehicleCrewVTOLPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL, value);
+    }
+
+    public boolean getNewDayVehicleCrewNavalPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL, false);
+    }
+
+    public void setNewDayVehicleCrewNavalPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL, value);
+    }
+
+    public boolean getNewDayVesselPilotPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VESSEL_PILOT_POOL_FILL, false);
+    }
+
+    public void setNewDayVesselPilotPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VESSEL_PILOT_POOL_FILL, value);
+    }
+
+    public boolean getNewDayVesselGunnerPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VESSEL_GUNNER_POOL_FILL, false);
+    }
+
+    public void setNewDayVesselGunnerPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VESSEL_GUNNER_POOL_FILL, value);
+    }
+
+    public boolean getNewDayVesselCrewPoolFill() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_FILL, false);
+    }
+
+    public void setNewDayVesselCrewPoolFill(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_FILL, value);
+    }
+
     public boolean getNewDayMRMS() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_MRMS, false);
     }

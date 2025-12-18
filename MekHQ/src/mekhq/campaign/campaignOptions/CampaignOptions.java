@@ -276,6 +276,12 @@ public class CampaignOptions {
     // Blob Crew
     private boolean useBlobInfantry;
     private boolean useBlobBattleArmor;
+    private boolean useBlobVehicleCrewGround;
+    private boolean useBlobVehicleCrewVTOL;
+    private boolean useBlobVehicleCrewNaval;
+    private boolean useBlobVesselPilot;
+    private boolean useBlobVesselGunner;
+    private boolean useBlobVesselCrew;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -872,6 +878,12 @@ public class CampaignOptions {
         // Blob Crew
         useBlobInfantry = false;
         useBlobBattleArmor = false;
+        useBlobVehicleCrewGround = false;
+        useBlobVehicleCrewVTOL = false;
+        useBlobVehicleCrewNaval = false;
+        useBlobVesselPilot = false;
+        useBlobVesselGunner = false;
+        useBlobVesselCrew = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -2124,6 +2136,54 @@ public class CampaignOptions {
 
     public void setUseBlobBattleArmor(final boolean useBlobBattleArmor) {
         this.useBlobBattleArmor = useBlobBattleArmor;
+    }
+
+    public boolean isUseBlobVehicleCrewGround() {
+        return useBlobVehicleCrewGround;
+    }
+
+    public void setUseBlobVehicleCrewGround(final boolean useBlobVehicleCrewGround) {
+        this.useBlobVehicleCrewGround = useBlobVehicleCrewGround;
+    }
+
+    public boolean isUseBlobVehicleCrewVTOL() {
+        return useBlobVehicleCrewVTOL;
+    }
+
+    public void setUseBlobVehicleCrewVTOL(final boolean useBlobVehicleCrewVTOL) {
+        this.useBlobVehicleCrewVTOL = useBlobVehicleCrewVTOL;
+    }
+
+    public boolean isUseBlobVehicleCrewNaval() {
+        return useBlobVehicleCrewNaval;
+    }
+
+    public void setUseBlobVehicleCrewNaval(final boolean useBlobVehicleCrewNaval) {
+        this.useBlobVehicleCrewNaval = useBlobVehicleCrewNaval;
+    }
+
+    public boolean isUseBlobVesselPilot() {
+        return useBlobVesselPilot;
+    }
+
+    public void setUseBlobVesselPilot(final boolean useBlobVesselPilot) {
+        this.useBlobVesselPilot = useBlobVesselPilot;
+    }
+
+    public boolean isUseBlobVesselGunner() {
+        return useBlobVesselGunner;
+    }
+
+    public void setUseBlobVesselGunner(final boolean useBlobVesselGunner) {
+        this.useBlobVesselGunner = useBlobVesselGunner;
+    }
+
+    public boolean isUseBlobVesselCrew() {
+        return useBlobVesselCrew;
+    }
+
+    public void setUseBlobVesselCrew(final boolean useBlobVesselCrew) {
+        this.useBlobVesselCrew = useBlobVesselCrew;
     }
 
     public boolean isUseMASHTheatres() {

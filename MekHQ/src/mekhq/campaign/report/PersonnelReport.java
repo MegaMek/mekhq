@@ -104,11 +104,10 @@ public class PersonnelReport extends AbstractReport {
         }
 
         // Add Salaries of Temp Combat Crew
-        if (getCampaign().isBlobInfantryEnabled()) {
-            salary = salary.plus(getTempCrewPay(PersonnelRole.SOLDIER, getCampaign().getTemporarySoldierPool()));
-        }
-        if (getCampaign().isBlobBattleArmorEnabled()) {
-            salary = salary.plus(getTempCrewPay(PersonnelRole.BATTLE_ARMOUR, getCampaign().getTemporaryBattleArmorPool()));
+        for (PersonnelRole role : PersonnelRole.values()) {
+            if (role.isCombat() && getCampaign().isBlobCrewEnabled(role)) {
+                salary = salary.plus(getTempCrewPay(role, getCampaign().getTempCrewPool(role)));
+            }
         }
 
         StringBuilder sb = new StringBuilder(resources.getString("combat.personnel.header.text") + "\n\n");
@@ -123,16 +122,18 @@ public class PersonnelReport extends AbstractReport {
             }
         }
 
-        // Add Temp Soldiers and Battle Armor to Combat List
-        if (getCampaign().isBlobInfantryEnabled()) {
-            sb.append(String.format("    %-30s    %4s\n",
-                  resources.getString("combat.temp.soldiers.text"),
-                  getCampaign().getTemporarySoldierPool()));
-        }
-        if (getCampaign().isBlobBattleArmorEnabled()) {
-            sb.append(String.format("    %-30s    %4s\n",
-                  resources.getString("combat.temp.battleArmor.text"),
-                  getCampaign().getTemporaryBattleArmorPool()));
+        // Add Temp Crew to Combat List
+        for (PersonnelRole role : PersonnelRole.values()) {
+            if (role.isCombat() && getCampaign().isBlobCrewEnabled(role)) {
+                int poolSize = getCampaign().getTempCrewPool(role);
+                if (poolSize > 0) {
+                    String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
+                    String label = resources.containsKey(labelKey) ?
+                        resources.getString(labelKey) :
+                        "Temp " + role.getLabel(getCampaign().getFaction().isClan());
+                    sb.append(String.format("    %-30s    %4s\n", label, poolSize));
+                }
+            }
         }
 
         sb.append(getSecondaryCombatPersonnelDetails());

@@ -302,15 +302,12 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 yield (force != null) ? force.getFullName() : "-";
             }
             case COL_CREW -> {
-                // Only show temp crew if blob crew is enabled for this unit type
-                boolean showTempCrew = (unit.getEntity() != null && unit.getEntity().isInfantry() && !unit.isBattleArmor()
-                    && campaign.isBlobInfantryEnabled())
-                    || (unit.isBattleArmor() && campaign.isBlobBattleArmorEnabled());
+                int totalTempCrew = unit.getTotalTempCrew();
 
-                if (!showTempCrew || unit.getTotalTempCrew() == 0) {
+                if (totalTempCrew == 0) {
                     yield unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
                 } else {
-                    yield (unit.getTotalTempCrew() + unit.getActiveCrew().size()) +
+                    yield (totalTempCrew + unit.getActiveCrew().size()) +
                         "(" + unit.getActiveCrew().size() + ")" +
                         "/" + unit.getFullCrewSize();
                 }

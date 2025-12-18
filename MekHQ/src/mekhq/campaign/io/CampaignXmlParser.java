@@ -1088,6 +1088,36 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setSoldierPool(MathUtility.parseInt(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("battlearmorPool")) {
                     campaign.setBattleArmorPool(MathUtility.parseInt(childNode.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("tempCrewPools")) {
+                    NodeList tempCrewNodes = childNode.getChildNodes();
+                    for (int i = 0; i < tempCrewNodes.getLength(); i++) {
+                        Node tempCrewNode = tempCrewNodes.item(i);
+                        if (tempCrewNode.getNodeName().equalsIgnoreCase("tempCrewPool")) {
+                            String roleStr = null;
+                            int size = 0;
+
+                            NodeList poolDataNodes = tempCrewNode.getChildNodes();
+                            for (int j = 0; j < poolDataNodes.getLength(); j++) {
+                                Node dataNode = poolDataNodes.item(j);
+                                String dataNodeName = dataNode.getNodeName();
+
+                                if (dataNodeName.equalsIgnoreCase("role")) {
+                                    roleStr = dataNode.getTextContent().trim();
+                                } else if (dataNodeName.equalsIgnoreCase("size")) {
+                                    size = MathUtility.parseInt(dataNode.getTextContent().trim());
+                                }
+                            }
+
+                            if (roleStr != null) {
+                                try {
+                                    PersonnelRole role = PersonnelRole.valueOf(roleStr);
+                                    campaign.setTempCrewPool(role, size);
+                                } catch (IllegalArgumentException e) {
+                                    LOGGER.warn("Unknown PersonnelRole: " + roleStr);
+                                }
+                            }
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("fieldKitchenWithinCapacity")) {
                     campaign.setFieldKitchenWithinCapacity(Boolean.parseBoolean(childNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("mashTheatreCapacity")) {
