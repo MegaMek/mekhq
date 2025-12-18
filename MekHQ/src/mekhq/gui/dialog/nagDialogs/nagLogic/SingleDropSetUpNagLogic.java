@@ -36,7 +36,22 @@ import java.util.List;
 
 import mekhq.campaign.mission.AtBContract;
 
+/**
+ * Provides nag logic related to the single-drop setup flow.
+ *
+ * <p>This helper exposes static predicates that inspect active contracts
+ * to decide whether a nag dialog should be shown.</p>
+ */
 public class SingleDropSetUpNagLogic {
+    /**
+     * Determines whether any of the given active contracts has an associated
+     * StratCon campaign state.
+     *
+     * @param activeContracts the list of currently active AtB contracts to inspect;
+     *                        may be empty but not {@code null}
+     * @return {@code true} if at least one contract has a non-{@code null}
+     *         StratCon campaign state; otherwise {@code false}
+     */
     public static boolean hasActiveStratConContract(List<AtBContract> activeContracts) {
         for (AtBContract atBContract : activeContracts) {
             if (atBContract.getStratconCampaignState() != null) {
