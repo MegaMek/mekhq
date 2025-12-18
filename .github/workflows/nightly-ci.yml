@@ -90,7 +90,7 @@ jobs:
         run: ./gradlew testAll
 
       - name: Upload Test Logs on Failure
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: cd-failure-logs
@@ -108,7 +108,7 @@ jobs:
           verbose: true
 
       - name: Upload Tar GZ Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
           path: mekhq/MekHQ/build/distributions/*.tar.gz
