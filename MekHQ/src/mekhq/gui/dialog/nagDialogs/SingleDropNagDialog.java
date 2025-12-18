@@ -42,6 +42,22 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 import mekhq.gui.dialog.nagDialogs.nagLogic.SingleDropSetUpNagLogic;
 
+/**
+ * Nag dialog reminding the player to configure a single-drop setup when using
+ * StratCon singles mode with at least one active StratCon contract.
+ * <p>
+ * This dialog is typically shown at campaign time progression (e.g. weekly on
+ * Sundays) when {@link #checkNag(List, boolean, boolean)} evaluates to
+ * {@code true} and the corresponding
+ * {@link mekhq.MHQConstants#NAG_SINGLE_DROP_SET_UP} nag option has not been
+ * disabled in {@link MekHQ#getMHQOptions()}.
+ * </p>
+ * <p>
+ * It extends {@link ImmersiveDialogNag} to provide a themed, immersive warning
+ * that the current campaign configuration may not match the expected single-drop
+ * StratCon setup.
+ * </p>
+ */
 public class SingleDropNagDialog extends ImmersiveDialogNag {
     public SingleDropNagDialog(final Campaign campaign) {
         super(campaign, null, NAG_SINGLE_DROP_SET_UP, "SingleDropNagDialog");
