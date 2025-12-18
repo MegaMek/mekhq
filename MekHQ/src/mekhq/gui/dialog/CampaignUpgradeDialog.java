@@ -219,8 +219,9 @@ public class CampaignUpgradeDialog {
             }
         }
 
-        campaign.addReport(DailyReportType.GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
-              "CampaignUpgradeDialog.upgrading", MHQConstants.VERSION.toString()));
+        SwingUtilities.invokeLater(() -> campaign.addReport(DailyReportType.GENERAL,
+              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
+                    MHQConstants.VERSION.toString())));
     }
 
     /**
