@@ -1779,7 +1779,12 @@ public class StratConRulesManager {
                 }
 
                 if (useCommanderOnly) {
-                    unitCrew = List.of(unit.getCommander());
+                    Person commander = unit.getCommander();
+                    if (commander == null) {
+                        LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());
+                        continue;
+                    }
+                    unitCrew = Collections.singletonList(commander);
                 }
             }
 
