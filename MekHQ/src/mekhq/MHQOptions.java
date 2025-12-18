@@ -949,6 +949,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.XML_SAVES_NODE).putBoolean(MHQConstants.WRITE_CUSTOMS_TO_XML, value);
     }
 
+    public boolean getWriteAllUnitsToXML() {
+        return userPreferences.node(MHQConstants.XML_SAVES_NODE).getBoolean(MHQConstants.WRITE_ALL_UNITS_TO_XML, true);
+    }
+
+    public void setWriteAllUnitsToXML(boolean value) {
+        userPreferences.node(MHQConstants.XML_SAVES_NODE).putBoolean(MHQConstants.WRITE_ALL_UNITS_TO_XML, value);
+    }
+
     public boolean getSaveMothballState() {
         return userPreferences.node(MHQConstants.XML_SAVES_NODE).getBoolean(MHQConstants.SAVE_MOTHBALL_STATE, true);
     }

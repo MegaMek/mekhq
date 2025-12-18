@@ -197,6 +197,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     // region Campaign XML Save
     private JCheckBox optionPreferGzippedOutput;
     private JCheckBox optionWriteCustomsToXML;
+    private JCheckBox optionWriteAllUnitsToXML;
     private JCheckBox optionSaveMothballState;
     // endregion Campaign XML Save
 
@@ -1068,6 +1069,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionWriteCustomsToXML = new JCheckBox(resources.getString("optionWriteCustomsToXML.text"));
         optionWriteCustomsToXML.setMnemonic(KeyEvent.VK_C);
 
+        optionWriteAllUnitsToXML = new JCheckBox(resources.getString("optionWriteAllUnitsToXML.text"));
+        optionWriteAllUnitsToXML.setMnemonic(KeyEvent.VK_A);
+
         optionSaveMothballState = new JCheckBox(resources.getString("optionSaveMothballState.text"));
         optionSaveMothballState.setToolTipText(resources.getString("optionSaveMothballState.toolTipText"));
         optionSaveMothballState.setMnemonic(KeyEvent.VK_U);
@@ -1083,11 +1087,13 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(layout.createSequentialGroup()
                                       .addComponent(optionPreferGzippedOutput)
                                       .addComponent(optionWriteCustomsToXML)
+                                      .addComponent(optionWriteAllUnitsToXML)
                                       .addComponent(optionSaveMothballState));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionPreferGzippedOutput)
                                         .addComponent(optionWriteCustomsToXML)
+                                        .addComponent(optionWriteAllUnitsToXML)
                                         .addComponent(optionSaveMothballState));
 
         return body;
@@ -1571,6 +1577,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         options.setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         options.setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
+        options.setWriteAllUnitsToXML(optionWriteAllUnitsToXML.isSelected());
         options.setSaveMothballState(optionSaveMothballState.isSelected());
 
         options
@@ -1766,6 +1773,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         optionPreferGzippedOutput.setSelected(options.getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(options.getWriteCustomsToXML());
+        optionWriteAllUnitsToXML.setSelected(options.getWriteAllUnitsToXML());
         optionSaveMothballState.setSelected(options.getSaveMothballState());
 
         optionUnmaintainedUnitsNag.setSelected(options
