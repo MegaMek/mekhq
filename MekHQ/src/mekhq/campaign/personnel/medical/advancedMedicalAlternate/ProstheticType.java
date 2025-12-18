@@ -1013,7 +1013,7 @@ public enum ProstheticType {
           ENHANCED,
           5,
           AlternateInjuries.PROTOTYPE_VDNI,
-          Money.of(1400000),
+          Money.of(2500000),
           PlanetarySystem.PlanetarySophistication.A,
           ATOWLegalityRating.F,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
