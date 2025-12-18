@@ -206,7 +206,7 @@ public class CampaignUpgradeDialog {
                 SwingUtilities.invokeLater(() -> {
                     triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
 
-                    LOGGER.info("Applied '{}' during upgrade process", chosenPreset.getTitle());
+                    LOGGER.info("Applying '{}' during upgrade process", chosenPreset.getTitle());
                     MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
                 });
             }
