@@ -274,6 +274,13 @@ public class NagController {
             return endContractNagDialog.shouldCancelAdvanceDay();
         }
 
+        // Single Drop Nag
+        boolean isUseStratConSingleDrop = campaignOptions.isUseStratConSinglesMode();
+        if (SingleDropNagDialog.checkNag(activeContracts, isSunday, isUseStratConSingleDrop)) {
+            SingleDropNagDialog singleDropNagDialog = new SingleDropNagDialog(campaign);
+            return singleDropNagDialog.shouldCancelAdvanceDay();
+        }
+
         // Player did not cancel Advance Day at any point
         return false;
     }
