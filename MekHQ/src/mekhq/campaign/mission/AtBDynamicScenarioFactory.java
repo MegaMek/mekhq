@@ -884,7 +884,7 @@ public class AtBDynamicScenarioFactory {
                     rp.groundMap = onGround;
                     rp.spaceEnvironment = (mapLocation == MapLocation.Space);
                     MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
-                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
+                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp, null);
                 } else {
                     // Load the fighters with bombs
                     tlg.populateAeroBombs(generatedLance,
