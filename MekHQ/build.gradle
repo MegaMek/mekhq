@@ -295,6 +295,10 @@ distributions {
                 exclude 'log4j2.xml'
             }
 
+            from("${mmDir}/megamek/mmconf/munitionLoadoutSettings.yaml") {
+                into 'mmconf'
+            }
+
             from("${mmDir}/megamek/build/launch4j/lib") {
                 into "lib"
             }
