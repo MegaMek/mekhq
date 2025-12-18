@@ -61,7 +61,6 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Canonica
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
@@ -109,7 +108,6 @@ import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
-import megamek.common.event.Subscribe;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
@@ -150,7 +148,6 @@ import mekhq.campaign.events.missions.MissionRemovedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
-import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioNewEvent;
@@ -6656,8 +6653,10 @@ public class Campaign implements ITechManager {
         writePartInUseToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "partsInUse");
 
-        if (isBugReportPrep || MekHQ.getMHQOptions().getWriteCustomsToXML()) {
-            writeCustoms(writer, isBugReportPrep);
+        boolean shouldSaveAllUnits = isBugReportPrep || MekHQ.getMHQOptions().getWriteAllUnitsToXML();
+        boolean shouldSaveCustomsOnly = !shouldSaveAllUnits && MekHQ.getMHQOptions().getWriteCustomsToXML();
+        if (shouldSaveAllUnits || shouldSaveCustomsOnly) {
+            writeUnitDefinitionsIntoSave(writer, shouldSaveAllUnits, shouldSaveCustomsOnly);
         }
 
         // Okay, we're done.
@@ -6666,28 +6665,41 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Writes serialized custom unit definitions to the provided {@link PrintWriter}.
+     * Writes custom unit definitions to the campaign XML output.
      *
-     * <p>When invoked for bug report preparation, this method scans all units currently present in the campaign,
-     * extracts their raw short names, and treats them as custom entries to be exported. Each candidate name is resolved
-     * via the {@link MekSummaryCache}; if a definition is found, the source entity is parsed and serialized into
-     * XML.</p>
+     * <p>This method can operate in two modes:</p>
+     * <ul>
+     *     <li>If {@code shouldSaveAllUnits} is {@code true}, it scans all units currently present in the campaign
+     *     and collects each unit's raw short name (via {@code entity.getShortNameRaw()}) as a candidate custom
+     *     definition.</li>
+     *     <li>Else, if {@code shouldSaveAllCustoms} is {@code true}, it writes all names already present in the
+     *     campaign's {@code customs} collection.</li>
+     * </ul>
      *
-     * <p>BattleMeks are exported using embedded MTF data wrapped in CDATA; all other supported entity types are
-     * exported as BLK content, line-by-line and wrapped in CDATA.</p>
+     * <p>For each collected name, the corresponding {@link MekSummary} is looked up via {@link MekSummaryCache}. If
+     * a summary and source file can be resolved, the source entity is parsed and serialized:</p>
+     * <ul>
+     *     <li>{@link Mek} entities are exported as embedded MTF text inside a CDATA section.</li>
+     *     <li>All other supported entities are exported as BLK content (non-empty lines only) inside a CDATA
+     *     section.</li>
+     * </ul>
      *
-     * <p>Units that cannot be located in the cache or that fail parsing are skipped, with errors logged. The
-     * ordering of exported units depends on the underlying {@link Set} implementation.</p>
+     * <p>Entries that cannot be resolved (missing/blank short name, missing {@link MekSummary}, missing source file,
+     * parse failures, null parsed entity, or save failures) are skipped and logged.</p>
      *
-     * <p><b>Note:</b> When {@code isBugReportPrep} is {@code false}, this method replaces the custom set.</p>
+     * <p><b>Note:</b> This method is for enshrining unit definition data into the save (the BLK for the unit) and
+     * not general unit data (who is crewing the unit, etc).</p>
      *
-     * @param printWriter     the output writer used to emit formatted {@code <custom>} elements
-     * @param isBugReportPrep whether campaign unit names should be collected for export; if {@code false}, no custom
-     *                        entities will be written by this method
+     * @param printWriter          the output writer that receives {@code <custom>} XML elements; must not be
+     *                             {@code null}
+     * @param shouldSaveAllUnits   when {@code true}, derive the custom list by scanning all current units
+     * @param shouldSaveAllCustoms when {@code true} (and {@code shouldSaveAllUnits} is {@code false}), write all names
+     *                             from the campaign's stored customs list
      */
-    private void writeCustoms(PrintWriter printWriter, boolean isBugReportPrep) {
+    private void writeUnitDefinitionsIntoSave(PrintWriter printWriter, boolean shouldSaveAllUnits,
+          boolean shouldSaveAllCustoms) {
         Set<String> customUnits = new HashSet<>();
-        if (isBugReportPrep) {
+        if (shouldSaveAllUnits) {
             for (Unit unit : units.getUnits()) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
@@ -6699,7 +6711,7 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
-        } else {
+        } else if (shouldSaveAllCustoms) {
             customUnits = new HashSet<>(customs);
         }
 
@@ -6722,11 +6734,6 @@ public class Campaign implements ITechManager {
             } catch (EntityLoadingException ex) {
                 LOGGER.error("Failed to fetch MekFileParser for {} // {}",
                       mekSummary.getSourceFile(), mekSummary.getEntryName(), ex);
-                continue;
-            }
-
-            if (mekFileParser == null) {
-                LOGGER.warn("mekFileParser was null for {}", name);
                 continue;
             }
 

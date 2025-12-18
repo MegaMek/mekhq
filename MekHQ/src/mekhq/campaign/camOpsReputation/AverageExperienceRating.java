@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.camOpsReputation;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 
 import java.util.ArrayList;
@@ -192,6 +193,14 @@ public class AverageExperienceRating {
 
                     SkillModifierData skillModifierData = commander.getSkillModifierData(true);
                     pilotingTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, true);
+                    if (entity.isInfantry()) {
+                        // Total War has infantry without Anti-Mek calculated as if they had Anti-Mek 8+. While
+                        // CamOps doesn't explicitly state that applies here, it does stand to reason that it would.
+                        // Otherwise, infantry units in the players' campaign (without Anti-Mek) would utterly tank
+                        // the players' average experience level.
+                        pilotingTargetNumber = max(8, pilotingTargetNumber);
+                    }
+
                     gunneryTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, false);
                 }
 
@@ -265,7 +274,7 @@ public class AverageExperienceRating {
                   skillType, entity);
             return SkillType.getType(skillType).getTarget() + 1; // Returning the base target number +1
         } else {
-            return Math.max(0, skill.getFinalSkillValue(skillModifierData));
+            return max(0, skill.getFinalSkillValue(skillModifierData));
         }
     }
 }

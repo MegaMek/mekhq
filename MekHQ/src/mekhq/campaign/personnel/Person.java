@@ -1322,7 +1322,7 @@ public class Person {
             // 1) Can always be Dependent
             // 2) Cannot be None
             // 3) Cannot be equal to the secondary role
-            // 4) Cannot be a tech role if the secondary role is a tech role (inc. Astech)
+            // 4) Cannot be astech role if the secondary role is a tech role
             // 5) Cannot be a medical if the secondary role is one of the medical staff roles
             // 6) Cannot be an admin role if the secondary role is one of the administrator roles
             if (role.isDependent()) {
@@ -1337,7 +1337,7 @@ public class Person {
                 return false;
             }
 
-            if ((role.isTech() || role.isAstech()) && (secondaryRole.isTechSecondary() || secondaryRole.isAstech())) {
+            if (role.isAstech() && secondaryRole.isTechSecondary()) {
                 return false;
             }
 
@@ -1353,7 +1353,7 @@ public class Person {
             // 1) Can always be None
             // 2) Cannot be Dependent
             // 3) Cannot be equal to the primary role
-            // 4) Cannot be a tech role if the primary role is a tech role (inc. Astech)
+            // 4) Cannot be a tech role if the primary role is Astech
             // 5) Cannot be a medical role if the primary role is one of the medical staff roles
             // 6) Cannot be an admin role if the primary role is one of the administrator roles
             if (role.isNone()) {
@@ -1368,7 +1368,7 @@ public class Person {
                 return false;
             }
 
-            if ((role.isTechSecondary() || role.isAstech()) && (primaryRole.isTech() || primaryRole.isAstech())) {
+            if (role.isTechSecondary() && primaryRole.isAstech()) {
                 return false;
             }
 
