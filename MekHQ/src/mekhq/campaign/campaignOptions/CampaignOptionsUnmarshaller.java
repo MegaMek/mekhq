@@ -387,6 +387,8 @@ public class CampaignOptionsUnmarshaller {
             case "useUsefulMedics" -> campaignOptions.setIsUseUsefulMedics(parseBoolean(nodeContents));
             case "useMASHTheatres" -> campaignOptions.setIsUseMASHTheatres(parseBoolean(nodeContents));
             case "mashTheatreCapacity" -> campaignOptions.setMASHTheatreCapacity(parseInt(nodeContents));
+            case "useBlobInfantry" -> campaignOptions.setUseBlobInfantry(parseBoolean(nodeContents));
+            case "useBlobBattleArmor" -> campaignOptions.setUseBlobBattleArmor(parseBoolean(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
                   nodeContents));
             case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
