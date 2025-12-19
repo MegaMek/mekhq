@@ -53,7 +53,7 @@ import mekhq.MHQConstants;
  */
 public enum GlossaryEntry {
     ADMIN_STRAIN("HR_STRAIN", new Version("0.50.06")),
-    ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.10")),
+    ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.11")),
     AGING("AGING", new Version("0.50.06")),
     ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),
