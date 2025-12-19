@@ -47,6 +47,7 @@ import megamek.common.game.Game;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,10 +77,15 @@ class AtBDynamicScenarioFactoryTest {
         when(options.isUseTactics()).thenReturn(false);
         when(options.isUseInitiativeBonus()).thenReturn(false);
 
+        RandomSkillPreferences randomSkillPreferences = mock(RandomSkillPreferences.class);
+        when(randomSkillPreferences.randomizeSkill()).thenReturn(false);
+        when(randomSkillPreferences.getCommandSkillsModifier(org.mockito.ArgumentMatchers.anyInt())).thenReturn(0);
+
         when(campaign.getPlayer()).thenReturn(player);
         when(campaign.getGame()).thenReturn(game);
 
         when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getRandomSkillPreferences()).thenReturn(randomSkillPreferences);
 
         when(campaign.getGameYear()).thenReturn(3025);
     }
