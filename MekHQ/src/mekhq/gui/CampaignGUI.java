@@ -1003,7 +1003,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireSoldiersNum.text"),
                   1,
                   0,
-                  getCampaign().getTemporarySoldierPool());
+                  getCampaign().getTempCrewPool(PersonnelRole.SOLDIER));
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
@@ -1053,7 +1053,7 @@ public class CampaignGUI extends JPanel {
                   resourceMap.getString("popupFireBattleArmorNum.text"),
                   1,
                   0,
-                  getCampaign().getTemporaryBattleArmorPool());
+                  getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
                 getCampaign().decreaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
@@ -3258,7 +3258,7 @@ public class CampaignGUI extends JPanel {
         }
         lblTempSoldiers.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTemporarySoldierPool() + "</html>";
+        String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTempCrewPool(PersonnelRole.SOLDIER) + "</html>";
         lblTempSoldiers.setText(text);
     }
 
@@ -3269,7 +3269,8 @@ public class CampaignGUI extends JPanel {
         }
         lblTempBattleArmor.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Battle Armor</b>: " + getCampaign().getTemporaryBattleArmorPool() + "</html>";
+        String text = "<html><b>Temp Battle Armor</b>: " + getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR) +
+                            "</html>";
         lblTempBattleArmor.setText(text);
     }
 

@@ -7863,40 +7863,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Sets the total soldier pool size (not just available)
-     * @param size the total number of temp soldiers in the pool
-     */
-    public void setSoldierPool(int size) {
-        setTempCrewPool(PersonnelRole.SOLDIER, size);
-    }
-
-    /**
-     * Gets the total soldier pool size (not just available)
-     * To get available soldiers, use {@link #getAvailableSoldierPool()}
-     * @return the total number of temp soldiers in the pool
-     */
-    public int getTemporarySoldierPool() {
-        return getTempCrewPool(PersonnelRole.SOLDIER);
-    }
-
-    /**
-     * Sets the total battle armor pool size (not just available)
-     * @param size the total number of temp battle armor in the pool
-     */
-    public void setBattleArmorPool(int size) {
-        setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, size);
-    }
-
-    /**
-     * Gets the total battle armor pool size (not just available)
-     * To get available battle armor, use {@link #getAvailableBattleArmorPool()}
-     * @return the total number of temp battle armor in the pool
-     */
-    public int getTemporaryBattleArmorPool() {
-        return getTempCrewPool(PersonnelRole.BATTLE_ARMOUR);
-    }
-
-    /**
      * Checks if blob infantry (temp soldiers) is enabled in campaign options
      * @return true if blob infantry is enabled
      */
