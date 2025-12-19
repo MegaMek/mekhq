@@ -1069,7 +1069,6 @@ public class UnitPersonTest {
          * Tests that only certain entity types can use specific temp crew roles.
          */
         @Nested
-        @Disabled // TODO: Fix these
         class EntityRoleCompatibilityTests {
 
             /**
@@ -1103,10 +1102,35 @@ public class UnitPersonTest {
                 @SuppressWarnings("unchecked")
                 Entity mockSpecificEntity = mock((Class<Entity>) entityClass);
                 when(mockSpecificEntity.getId()).thenReturn(1);
-                when(mockSpecificEntity.getCrew()).thenReturn(mockEntity.getCrew());
+
+                // Get the Crew reference first to avoid unfinished stubbing
+                Crew mockCrew = mockEntity.getCrew();
+                when(mockSpecificEntity.getCrew()).thenReturn(mockCrew);
                 when(mockSpecificEntity.getTransports()).thenReturn(new Vector<>());
                 when(mockSpecificEntity.getSensors()).thenReturn(new Vector<>());
                 when(mockSpecificEntity.hasBAP()).thenReturn(false);
+
+                // Mock entity type checks based on the entity class
+                when(mockSpecificEntity.isMek()).thenReturn(false);
+                when(mockSpecificEntity.isBattleArmor()).thenReturn(
+                    entityClass.equals(megamek.common.battleArmor.BattleArmor.class));
+                when(mockSpecificEntity.isConventionalInfantry()).thenReturn(
+                    entityClass.equals(megamek.common.units.Infantry.class));
+                when(mockSpecificEntity.isAerospace()).thenReturn(false);
+                when(mockSpecificEntity.isSmallCraft()).thenReturn(false);
+                when(mockSpecificEntity.isLargeCraft()).thenReturn(false);
+                when(mockSpecificEntity.isProtoMek()).thenReturn(false);
+
+                // Mock movement mode for Tank/VTOL types
+                if (entityClass.equals(megamek.common.units.Tank.class) ||
+                    entityClass.equals(megamek.common.units.VTOL.class)) {
+                    megamek.common.units.EntityMovementMode mockMovementMode =
+                        mock(megamek.common.units.EntityMovementMode.class);
+                    when(mockMovementMode.isMarine()).thenReturn(false);
+                    when(mockMovementMode.isVTOL()).thenReturn(
+                        entityClass.equals(megamek.common.units.VTOL.class));
+                    when(mockSpecificEntity.getMovementMode()).thenReturn(mockMovementMode);
+                }
 
                 Unit testSpecificUnit = new Unit(mockSpecificEntity, mockCampaign);
 
