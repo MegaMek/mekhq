@@ -4816,9 +4816,20 @@ public class Unit implements ITechnology {
                         slot++;
                     }
                 }
-                // Fill remaining slots or mark as missing
+                // Fill remaining slots with temp crew or mark as missing
+                // At this point we should have accurate list of temp
+                // crew, if we don't we should fix that upstream
+                int availableTempCrew = getTotalTempCrew();
+
                 while (slot < entity.getCrew().getSlotCount()) {
-                    entity.getCrew().setMissing(true, slot++);
+                    if (availableTempCrew > 0) {
+                        // Fill slot with temp crew (don't mark as missing)
+                        entity.getCrew().setMissing(false, slot);
+                        availableTempCrew--;
+                    } else {
+                        entity.getCrew().setMissing(true, slot);
+                    }
+                    slot++;
                 }
             } else {
                 // tripod, quadvee, or dual cockpit; driver and gunner are assigned separately

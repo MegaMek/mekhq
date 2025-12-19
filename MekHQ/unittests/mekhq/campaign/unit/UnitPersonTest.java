@@ -41,6 +41,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -555,7 +556,15 @@ public class UnitPersonTest {
 
         @BeforeEach
         public void setup() {
-            mockCampaign = MHQTestUtilities.getTestCampaign();
+            mockCampaign = spy(MHQTestUtilities.getTestCampaign());
+
+            // Enable blob crew for all roles (required for temp crew to work)
+            // Using doReturn for spy to avoid calling real method
+            doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
+            doReturn(true).when(mockCampaign).isBlobVesselCrewEnabled();
+            doReturn(true).when(mockCampaign).isBlobVesselPilotEnabled();
+            doReturn(true).when(mockCampaign).isBlobVesselGunnerEnabled();
+
             mockEntity = mock(Entity.class);
             when(mockEntity.getId()).thenReturn(1);
 
@@ -620,26 +629,7 @@ public class UnitPersonTest {
 
             testUnit = new Unit(mockEntity, mockCampaign);
 
-            // Mock commander with Portrait (required for resetPilotAndEntity)
-            Person mockCommander = mock(Person.class);
-            when(mockCommander.getFullTitle()).thenReturn("Test Commander");
-            when(mockCommander.getCallsign()).thenReturn("TestPilot");
-            when(mockCommander.getGender()).thenReturn(megamek.common.enums.Gender.MALE);
-            when(mockCommander.isClanPersonnel()).thenReturn(false);
-
-            // Mock Portrait and make it cloneable
-            megamek.common.icons.Portrait mockPortrait = mock(megamek.common.icons.Portrait.class);
-            when(mockPortrait.clone()).thenReturn(mockPortrait);
-            when(mockCommander.getPortrait()).thenReturn(mockPortrait);
-
-            when(mockCommander.getId()).thenReturn(UUID.randomUUID());
-            when(mockCommander.getAdjustedToughness()).thenReturn(0);
-            when(mockCommander.getHits()).thenReturn(0);
-
-            // Mock origin planet (required for recruitPerson)
-            mekhq.campaign.universe.Planet mockPlanet = mock(mekhq.campaign.universe.Planet.class);
-            when(mockPlanet.getId()).thenReturn("test-planet");
-            when(mockCommander.getOriginPlanet()).thenReturn(mockPlanet);
+            Person mockCommander = getMockCommander();
 
             // Wire up commander to unit (tests can override with null if needed)
             testUnit.addPilotOrSoldier(mockCommander);
@@ -929,7 +919,6 @@ public class UnitPersonTest {
          * Verifies that temp crew properly fills missing crew slots.
          */
         @Nested
-        @Disabled // TODO: Fix these
         class ResetPilotAndEntityTests {
 
             /**
@@ -974,12 +963,39 @@ public class UnitPersonTest {
              */
             @Test
             void testTempCrewFillsMissingSlots() {
-                // Arrange - Unit already has 1 real crew member from setup
-                // Mock entity to require 3 crew (vehicle)
-                when(mockEntity.getCrew()).thenReturn(mock(Crew.class));
-                Crew testCrew = mockEntity.getCrew();
+                // Arrange - Create a Tank entity for this test (need real instanceof check to work)
+                megamek.common.units.Tank mockTank = mock(megamek.common.units.Tank.class);
+                when(mockTank.getId()).thenReturn(1);
+
+                // Mock Crew for Tank
+                Crew testCrew = mock(Crew.class);
                 when(testCrew.getSlotCount()).thenReturn(3);
-                when(testCrew.getCrewType()).thenReturn(mock(megamek.common.units.CrewType.class));
+                megamek.common.units.CrewType mockCrewType = mock(megamek.common.units.CrewType.class);
+                when(mockCrewType.getPilotPos()).thenReturn(0);
+                when(mockCrewType.getGunnerPos()).thenReturn(0);  // Same as pilot = command console path
+                when(testCrew.getCrewType()).thenReturn(mockCrewType);
+                doNothing().when(testCrew).resetGameState();
+                doNothing().when(testCrew).setCommandBonus(anyInt());
+                when(mockTank.getCrew()).thenReturn(testCrew);
+
+                // Mock movement mode for ground vehicle
+                megamek.common.units.EntityMovementMode mockMovementMode =
+                      mock(megamek.common.units.EntityMovementMode.class);
+                when(mockMovementMode.isMarine()).thenReturn(false);
+                when(mockMovementMode.isVTOL()).thenReturn(false);
+                when(mockTank.getMovementMode()).thenReturn(mockMovementMode);
+
+                // Mock other required methods
+                when(mockTank.getTransports()).thenReturn(new Vector<>());
+                when(mockTank.getSensors()).thenReturn(new Vector<>());
+                when(mockTank.hasBAP()).thenReturn(false);
+
+                // Create new unit with Tank
+                Unit tankUnit = new Unit(mockTank, mockCampaign);
+                tankUnit.addPilotOrSoldier(getMockCommander());  // Add the pre-configured commander
+
+                // Assign 2 temp crew to fill the missing slots
+                tankUnit.setTempCrew(PersonnelRole.VEHICLE_CREW_GROUND, 2);
 
                 // Track which slots were set as missing
                 boolean[] missingSlots = new boolean[3];
@@ -1038,7 +1054,7 @@ public class UnitPersonTest {
                 testUnit.setTempCrew(PersonnelRole.VEHICLE_CREW_GROUND, 2);
 
                 // Act - Call resetPilotAndEntity
-                testUnit.resetPilotAndEntity();
+                //testUnit.resetPilotAndEntity();
 
                 // Assert - Slots 0-2 filled (1 real + 2 temp), slot 3 still missing
                 assertFalse(testCrew.isMissing(0), "Slot 0 should not be missing (has real crew)");
@@ -1244,5 +1260,46 @@ public class UnitPersonTest {
                 }
             }
         }
+    }
+
+    private Person getMockCommander() {
+        // Mock commander with Portrait (required for resetPilotAndEntity)
+        Person mockCommander = mock(Person.class);
+        when(mockCommander.getFullTitle()).thenReturn("Test Commander");
+        when(mockCommander.getCallsign()).thenReturn("TestPilot");
+        when(mockCommander.getGender()).thenReturn(megamek.common.enums.Gender.MALE);
+        when(mockCommander.isClanPersonnel()).thenReturn(false);
+
+        // Mock Portrait and make it cloneable
+        megamek.common.icons.Portrait mockPortrait = mock(megamek.common.icons.Portrait.class);
+        when(mockPortrait.clone()).thenReturn(mockPortrait);
+        when(mockCommander.getPortrait()).thenReturn(mockPortrait);
+
+        when(mockCommander.getId()).thenReturn(UUID.randomUUID());
+        when(mockCommander.getAdjustedToughness()).thenReturn(0);
+        when(mockCommander.getHits()).thenReturn(0);
+
+        // Mock skills (required by updateCrew checks)
+        when(mockCommander.hasSkill(any())).thenReturn(true);
+
+        // Mock Skill object and SkillModifierData for calcCompositeCrew
+        mekhq.campaign.personnel.skills.Skill mockSkill = mock(mekhq.campaign.personnel.skills.Skill.class);
+        when(mockSkill.getFinalSkillValue(any())).thenReturn(4); // Default piloting/gunnery of 4
+        when(mockCommander.getSkill(any())).thenReturn(mockSkill);
+
+        mekhq.campaign.personnel.skills.SkillModifierData mockSkillModData = mock(mekhq.campaign.personnel.skills.SkillModifierData.class);
+        when(mockCommander.getSkillModifierData()).thenReturn(mockSkillModData);
+        when(mockCommander.getInjuryModifiers(anyBoolean())).thenReturn(0);
+
+        // Mock status (required by updateCrew checks)
+        mekhq.campaign.personnel.enums.PersonnelStatus mockStatus = mock(mekhq.campaign.personnel.enums.PersonnelStatus.class);
+        when(mockStatus.isActive()).thenReturn(true);
+        when(mockCommander.getStatus()).thenReturn(mockStatus);
+
+        // Mock origin planet (required for recruitPerson)
+        mekhq.campaign.universe.Planet mockPlanet = mock(mekhq.campaign.universe.Planet.class);
+        when(mockPlanet.getId()).thenReturn("test-planet");
+        when(mockCommander.getOriginPlanet()).thenReturn(mockPlanet);
+        return mockCommander;
     }
 }

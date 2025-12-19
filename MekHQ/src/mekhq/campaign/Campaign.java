@@ -7806,6 +7806,10 @@ public class Campaign implements ITechManager {
         return tempPersonnelRoleMap.getOrDefault(role, 0);
     }
 
+    public Set<PersonnelRole> getTempCrewRoleKeys() {
+        return tempPersonnelRoleMap.keySet();
+    }
+
     /**
      * Sets the total temp crew pool size for a specific personnel role
      * @param role the personnel role
@@ -7890,38 +7894,6 @@ public class Campaign implements ITechManager {
      */
     public int getTemporaryBattleArmorPool() {
         return getTempCrewPool(PersonnelRole.BATTLE_ARMOUR);
-    }
-
-    /**
-     * Calculates the total number of temp soldiers currently assigned to units
-     * @return the number of temp soldiers in use across all units
-     */
-    public int getTempSoldiersInUse() {
-        return getTempCrewInUse(PersonnelRole.SOLDIER);
-    }
-
-    /**
-     * Calculates the total number of temp battle armor currently assigned to units
-     * @return the number of temp battle armor in use across all units
-     */
-    public int getTempBattleArmorInUse() {
-        return getTempCrewInUse(PersonnelRole.BATTLE_ARMOUR);
-    }
-
-    /**
-     * Calculates the number of temp soldiers available for assignment
-     * @return total soldier pool minus soldiers currently in use
-     */
-    public int getAvailableSoldierPool() {
-        return getAvailableTempCrewPool(PersonnelRole.SOLDIER);
-    }
-
-    /**
-     * Calculates the number of temp battle armor available for assignment
-     * @return total battle armor pool minus battle armor currently in use
-     */
-    public int getAvailableBattleArmorPool() {
-        return getAvailableTempCrewPool(PersonnelRole.BATTLE_ARMOUR);
     }
 
     /**
