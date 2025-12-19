@@ -6245,18 +6245,42 @@ public class Campaign implements ITechManager {
     }
 
     public void setCampaignOptions(CampaignOptions options) {
-        // Check if blob crew was disabled
+        // Check if blob crew was disabled for each role
         boolean infantryWasEnabled = campaignOptions.isUseBlobInfantry();
         boolean baWasEnabled = campaignOptions.isUseBlobBattleArmor();
+        boolean vehicleGroundWasEnabled = campaignOptions.isUseBlobVehicleCrewGround();
+        boolean vehicleVTOLWasEnabled = campaignOptions.isUseBlobVehicleCrewVTOL();
+        boolean vehicleNavalWasEnabled = campaignOptions.isUseBlobVehicleCrewNaval();
+        boolean vesselPilotWasEnabled = campaignOptions.isUseBlobVesselPilot();
+        boolean vesselGunnerWasEnabled = campaignOptions.isUseBlobVesselGunner();
+        boolean vesselCrewWasEnabled = campaignOptions.isUseBlobVesselCrew();
 
         campaignOptions = options;
 
-        // If blob crew was disabled, clear all blob crew from units and pools
-        boolean infantryNowDisabled = infantryWasEnabled && !options.isUseBlobInfantry();
-        boolean baNowDisabled = baWasEnabled && !options.isUseBlobBattleArmor();
-
-        if (infantryNowDisabled || baNowDisabled) {
-            clearBlobCrew();
+        // If blob crew was disabled for a specific role, clear only that role's blob crew
+        if (infantryWasEnabled && !options.isUseBlobInfantry()) {
+            clearBlobCrewForRole(PersonnelRole.SOLDIER);
+        }
+        if (baWasEnabled && !options.isUseBlobBattleArmor()) {
+            clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (vehicleGroundWasEnabled && !options.isUseBlobVehicleCrewGround()) {
+            clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (vehicleVTOLWasEnabled && !options.isUseBlobVehicleCrewVTOL()) {
+            clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (vehicleNavalWasEnabled && !options.isUseBlobVehicleCrewNaval()) {
+            clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (vesselPilotWasEnabled && !options.isUseBlobVesselPilot()) {
+            clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
+        }
+        if (vesselGunnerWasEnabled && !options.isUseBlobVesselGunner()) {
+            clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (vesselCrewWasEnabled && !options.isUseBlobVesselCrew()) {
+            clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
         }
     }
 
@@ -8286,92 +8310,77 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public void increaseSoldierPool(int i) {
-        increaseTempCrewPool(PersonnelRole.SOLDIER, i);
-    }
-
-    public void resetSoldierPool() {
-        emptySoldierPool();
-        fillSoldierPool();
-    }
-
-    public void emptySoldierPool() {
-        final int currentSoldierPool = getTemporarySoldierPool();
-        decreaseSoldierPool(currentSoldierPool);
-    }
-
-    public void fillSoldierPool() {
-        if (!getCampaignOptions().isUseBlobInfantry()) {
-            return;
-        }
-
-        int need = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.getEntity() != null && unit.getEntity().isInfantry() && !unit.isBattleArmor()) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempSoldiers = unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
-                int fullCrew = unit.getFullCrewSize();
-                int totalCurrentCrew = currentCrew + currentTempSoldiers;
-                if (fullCrew > totalCurrentCrew) {
-                    need += (fullCrew - totalCurrentCrew);
-                }
-            }
-        }
-
-        if (need > 0) {
-            increaseSoldierPool(need);
-        }
-    }
-
-    public void decreaseSoldierPool(int i) {
-        decreaseTempCrewPool(PersonnelRole.SOLDIER, i);
-    }
-
-    public void increaseBattleArmorPool(int i) {
-        increaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, i);
-    }
-
-    public void resetBattleArmorPool() {
-        emptyBattleArmorPool();
-        fillBattleArmorPool();
-    }
-
-    public void emptyBattleArmorPool() {
-        final int currentBattleArmorPool = getTemporaryBattleArmorPool();
-        decreaseBattleArmorPool(currentBattleArmorPool);
-    }
-
-    public void fillBattleArmorPool() {
-        if (!getCampaignOptions().isUseBlobBattleArmor()) {
-            return;
-        }
-
-        int need = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.isBattleArmor()) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempBA = unit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
-                int fullCrew = unit.getFullCrewSize();
-                int totalCurrentCrew = currentCrew + currentTempBA;
-                if (fullCrew > totalCurrentCrew) {
-                    need += (fullCrew - totalCurrentCrew);
-                }
-            }
-        }
-
-        if (need > 0) {
-            increaseBattleArmorPool(need);
-        }
-    }
-
-    public void decreaseBattleArmorPool(int i) {
-        decreaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, i);
+    /**
+     * Empties the temp crew pool for a specific role by setting it to 0.
+     * @param role the personnel role to empty
+     */
+    public void emptyTempCrewPoolForRole(PersonnelRole role) {
+        setTempCrewPool(role, 0);
     }
 
     /**
-     * Clears all blob crew from units and empties the campaign pools.
-     * Should be called when blob crew options are disabled.
+     * Fills the temp crew pool for a specific role by calculating crew needs across all units.
+     * Only runs if the corresponding blob crew option is enabled.
+     * @param role the personnel role to fill
      */
+    public void fillTempCrewPoolForRole(PersonnelRole role) {
+        if (!isBlobCrewEnabled(role)) {
+            return;
+        }
+
+        int need = 0;
+        for (Unit unit : getUnits()) {
+            if (unitCanUseTempCrewRole(unit, role)) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
+                int fullCrew = unit.getFullCrewSize();
+                int totalCurrentCrew = currentCrew + currentTempCrew;
+                if (fullCrew > totalCurrentCrew) {
+                    need += (fullCrew - totalCurrentCrew);
+                }
+            }
+        }
+
+        if (need > 0) {
+            increaseTempCrewPool(role, need);
+        }
+    }
+
+    /**
+     * Resets the temp crew pool for a specific role by emptying and then filling it.
+     * @param role the personnel role to reset
+     */
+    public void resetTempCrewPoolForRole(PersonnelRole role) {
+        emptyTempCrewPoolForRole(role);
+        fillTempCrewPoolForRole(role);
+    }
+
+
+    /**
+     * Clears blob crew for a specific personnel role from units and empties the campaign pool.
+     * Should be called when a specific blob crew option is disabled.
+     * @param role the personnel role to clear
+     */
+    public void clearBlobCrewForRole(PersonnelRole role) {
+        // Clear temp crew from all units for this specific role
+        for (Unit unit : getUnits()) {
+            if (unit.getTempCrewByPersonnelRole(role) > 0) {
+                unit.setTempCrew(role, 0);
+            }
+        }
+
+        // Empty the campaign pool for this specific role
+        if (getTempCrewPool(role) > 0) {
+            setTempCrewPool(role, 0);
+        }
+    }
+
+    /**
+     * Clears all blob crew from units and empties all campaign pools.
+     * Should be called when all blob crew options are disabled.
+     * @deprecated Use {@link #clearBlobCrewForRole(PersonnelRole)} to clear specific roles instead
+     */
+    @Deprecated
     public void clearBlobCrew() {
         // Clear temp crew from all units
         for (Unit unit : getUnits()) {
@@ -8391,13 +8400,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a unit can use temp crew of a specific personnel role
+     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use
+     * temp crew - checks if the commander is null
      * @param unit the unit to check
      * @param role the personnel role
      * @return true if the unit can use this type of temp crew
      */
     private boolean unitCanUseTempCrewRole(Unit unit, PersonnelRole role) {
-        if (unit.getEntity() == null) {
+        if (unit.getCommander() == null || unit.getEntity() == null) {
             return false;
         }
 
@@ -8435,10 +8445,6 @@ public class Campaign implements ITechManager {
                 int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
                 int fullCrew = unit.getFullCrewSize();
 
-                // Can't add temp crew if no real Person exists
-                if (currentCrew == 0) {
-                    continue;
-                }
 
                 // Maximum temp crew is (fullCrewSize - 1) to ensure at least one real Person
                 int maxTempCrew = fullCrew - 1;
@@ -8456,23 +8462,6 @@ public class Campaign implements ITechManager {
         // The pool represents the TOTAL, and "in use" is calculated from units
     }
 
-    /**
-     * Distributes soldiers from the pool to individual infantry units that need crew.
-     * Each unit can be filled up to (fullCrewSize - 1) with temp soldiers, ensuring at least one real Person.
-     * Only runs if blob infantry is enabled.
-     */
-    public void distributeSoldierPoolToUnits() {
-        distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-    }
-
-    /**
-     * Distributes battle armor from the pool to individual BA units that need crew.
-     * Each unit can be filled up to (fullCrewSize - 1) with temp BA, ensuring at least one real Person.
-     * Only runs if blob battle armor is enabled.
-     */
-    public void distributeBattleArmorPoolToUnits() {
-        distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-    }
 
     public GameOptions getGameOptions() {
         return gameOptions;

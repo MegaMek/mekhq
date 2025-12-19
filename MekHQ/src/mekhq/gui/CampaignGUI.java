@@ -990,7 +990,7 @@ public class CampaignGUI extends JPanel {
                   CampaignGUI.MAX_QUANTITY_SPINNER);
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseSoldierPool(popupValueChoiceDialog.getValue());
+                getCampaign().increaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
             }
         });
         menuSoldierPool.add(miHireSoldiers);
@@ -1006,7 +1006,7 @@ public class CampaignGUI extends JPanel {
                   getCampaign().getTemporarySoldierPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseSoldierPool(popupValueChoiceDialog.getValue());
+                getCampaign().decreaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
             }
         });
         menuSoldierPool.add(miFireSoldiers);
@@ -1014,14 +1014,14 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthSoldiers = new JMenuItem(resourceMap.getString("miFullStrengthSoldiers.text"));
         miFullStrengthSoldiers.setMnemonic(KeyEvent.VK_B);
         miFullStrengthSoldiers.addActionListener(evt -> {
-            getCampaign().resetSoldierPool();
-            getCampaign().distributeSoldierPoolToUnits();
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
         });
         menuSoldierPool.add(miFullStrengthSoldiers);
 
         JMenuItem miFireAllSoldiers = new JMenuItem(resourceMap.getString("miFireAllSoldiers.text"));
         miFireAllSoldiers.setMnemonic(KeyEvent.VK_R);
-        miFireAllSoldiers.addActionListener(evt -> getCampaign().emptySoldierPool());
+        miFireAllSoldiers.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.SOLDIER));
         menuSoldierPool.add(miFireAllSoldiers);
         menuMarket.add(menuSoldierPool);
         // endregion Soldier Pool
@@ -1040,7 +1040,7 @@ public class CampaignGUI extends JPanel {
                   CampaignGUI.MAX_QUANTITY_SPINNER);
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseBattleArmorPool(popupValueChoiceDialog.getValue());
+                getCampaign().increaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
             }
         });
         menuBattleArmorPool.add(miHireBattleArmor);
@@ -1056,7 +1056,7 @@ public class CampaignGUI extends JPanel {
                   getCampaign().getTemporaryBattleArmorPool());
             popupValueChoiceDialog.setVisible(true);
             if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseBattleArmorPool(popupValueChoiceDialog.getValue());
+                getCampaign().decreaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
             }
         });
         menuBattleArmorPool.add(miFireBattleArmor);
@@ -1064,14 +1064,14 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthBattleArmor = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmor.text"));
         miFullStrengthBattleArmor.setMnemonic(KeyEvent.VK_B);
         miFullStrengthBattleArmor.addActionListener(evt -> {
-            getCampaign().resetBattleArmorPool();
-            getCampaign().distributeBattleArmorPoolToUnits();
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
         });
         menuBattleArmorPool.add(miFullStrengthBattleArmor);
 
         JMenuItem miFireAllBattleArmor = new JMenuItem(resourceMap.getString("miFireAllBattleArmor.text"));
         miFireAllBattleArmor.setMnemonic(KeyEvent.VK_R);
-        miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyBattleArmorPool());
+        miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR));
         menuBattleArmorPool.add(miFireAllBattleArmor);
         menuMarket.add(menuBattleArmorPool);
         // endregion Battle Armor Pool

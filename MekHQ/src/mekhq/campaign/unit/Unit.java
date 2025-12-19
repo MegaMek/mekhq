@@ -6438,7 +6438,7 @@ public class Unit implements ITechnology {
      * @return true if the unit is fully crewed, false otherwise.
      */
     public boolean isFullyCrewed() {
-        return getActiveCrew().size() == getFullCrewSize();
+        return getTotalCrewSize() == getFullCrewSize();
     }
 
     /**
@@ -7720,36 +7720,36 @@ public class Unit implements ITechnology {
      * @since 0.50.10
      */
     public @Nullable PersonnelRole getDriverRole() {
-        if (entity == null) {
+        if (getEntity() == null) {
             return null;
         }
 
-        if (entity instanceof LandAirMek) {
+        if (getEntity() instanceof LandAirMek) {
             return PersonnelRole.LAM_PILOT;
-        } else if (entity.isMek()) {
+        } else if (getEntity().isMek()) {
             return PersonnelRole.MEKWARRIOR;
-        } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
-            if (entity.getMovementMode().isMarine()) {
+        } else if (getEntity() instanceof Tank) { // instanceof to include Gun Emplacements
+            if (getEntity().getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
-            } else if (entity.getMovementMode().isVTOL()) {
+            } else if (getEntity().getMovementMode().isVTOL()) {
                 return PersonnelRole.VEHICLE_CREW_VTOL;
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
+        } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (entity.isLargeCraft()) {
+        } else if (getEntity().isLargeCraft()) {
             return PersonnelRole.VESSEL_PILOT;
-        } else if (entity.isAerospace()) {
+        } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity.isBattleArmor()) {
+        } else if (getEntity().isBattleArmor()) {
             return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity.isConventionalInfantry()) {
+        } else if (getEntity().isConventionalInfantry()) {
             return PersonnelRole.SOLDIER;
-        } else if (entity.isProtoMek()) {
+        } else if (getEntity().isProtoMek()) {
             return PersonnelRole.PROTOMEK_PILOT;
         } else {
-            LOGGER.info("Unknown unit type parsed into getDriverRole(): {}", entity.getUnitType());
+            LOGGER.info("Unknown unit type parsed into getDriverRole(): {}", getEntity().getUnitType());
             return null;
         }
     }
@@ -7768,36 +7768,36 @@ public class Unit implements ITechnology {
      * @since 0.50.10
      */
     public @Nullable PersonnelRole getGunnerRole() {
-        if (entity == null) {
+        if (getEntity() == null) {
             return null;
         }
 
-        if (entity instanceof LandAirMek) {
+        if (getEntity() instanceof LandAirMek) {
             return PersonnelRole.LAM_PILOT;
-        } else if (entity.isMek()) {
+        } else if (getEntity().isMek()) {
             return PersonnelRole.MEKWARRIOR;
-        } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
-            if (entity.getMovementMode().isMarine()) {
+        } else if (getEntity() instanceof Tank) { // instanceof to include Gun Emplacements
+            if (getEntity().getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
-            } else if (entity.getMovementMode().isVTOL()) {
+            } else if (getEntity().getMovementMode().isVTOL()) {
                 return PersonnelRole.VEHICLE_CREW_VTOL;
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
+        } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (entity.isSmallCraft() || entity.isLargeCraft()) {
+        } else if (getEntity().isSmallCraft() || entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_GUNNER;
-        } else if (entity.isAerospace()) {
+        } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity.isBattleArmor()) {
+        } else if (getEntity().isBattleArmor()) {
             return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity.isConventionalInfantry()) {
+        } else if (getEntity().isConventionalInfantry()) {
             return PersonnelRole.SOLDIER;
-        } else if (entity.isProtoMek()) {
+        } else if (getEntity().isProtoMek()) {
             return PersonnelRole.PROTOMEK_PILOT;
         } else {
-            LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", entity.getUnitType());
+            LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", getEntity().getUnitType());
             return null;
         }
     }

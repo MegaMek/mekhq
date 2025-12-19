@@ -245,12 +245,12 @@ public class CampaignNewDayManager {
 
         if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
             campaign.setTempCrewPool(PersonnelRole.SOLDIER, 0);
-            campaign.distributeSoldierPoolToUnits();
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
         }
 
         if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
             campaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 0);
-            campaign.distributeBattleArmorPoolToUnits();
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill()) {
