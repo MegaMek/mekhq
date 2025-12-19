@@ -4734,6 +4734,7 @@ public class Unit implements ITechnology {
         entity.setCommander(false);
         entity.getCrew().resetGameState();
         entity.getCrew().setCommandBonus(0);
+        entity.getCrew().setInitBonus(0);
         entity.resetPickedUpMekWarriors();
         entity.setStartingPos(START_NONE);
 
@@ -4744,8 +4745,8 @@ public class Unit implements ITechnology {
         // handling built into their methods.
         Person commander = getCommander();
 
-        if (campaignOptions.isUseInitiativeBonus()) {
-            setCommandBonus(commander);
+        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
+            setTacticsInitiativeBonus(commander);
         }
 
         if (campaignOptions.isUseAbilities() || campaignOptions.isUseEdge() || campaignOptions.isUseImplants()) {
@@ -4832,14 +4833,20 @@ public class Unit implements ITechnology {
         }
     }
 
-    private void setCommandBonus(@Nullable Person commander) {
+    private void setTacticsInitiativeBonus(@Nullable Person commander) {
         // Tactics command bonus. This should actually reflect the unit's commander
+        // Let's set it for both
         if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
             SkillModifierData skillModifierData = commander.getSkillModifierData();
 
-            entity.getCrew()
-                  .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
-                                         .getTotalSkillLevel(skillModifierData));
+            int commanderTacticsBonus = commander.getSkill(SkillType.S_TACTICS)
+                                              .getTotalSkillLevel(skillModifierData);
+
+            if (getCampaign().getCampaignOptions().isUseTactics()) {
+                entity.getCrew().setCommandBonus(commanderTacticsBonus);
+            } else if (getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
+                entity.getCrew().setInitBonus(commanderTacticsBonus);
+            }
         }
     }
 

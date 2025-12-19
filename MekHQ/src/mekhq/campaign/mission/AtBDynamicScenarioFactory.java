@@ -884,7 +884,7 @@ public class AtBDynamicScenarioFactory {
                     rp.groundMap = onGround;
                     rp.spaceEnvironment = (mapLocation == MapLocation.Space);
                     MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
-                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
+                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp, null);
                 } else {
                     // Load the fighters with bombs
                     tlg.populateAeroBombs(generatedLance,
@@ -2951,8 +2951,11 @@ public class AtBDynamicScenarioFactory {
         // Assign the crew to the unit
         entity.setCrew(entityCrew);
 
-        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
-            entity.getCrew().setCommandBonus(getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction));
+        int tacticsInitiativeBonus = getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction);
+        if (campaignOptions.isUseTactics()) {
+            entity.getCrew().setCommandBonus(tacticsInitiativeBonus);
+        } else if (campaignOptions.isUseInitiativeBonus()) {
+            entity.getCrew().setInitBonus(tacticsInitiativeBonus);
         }
 
         entity.setExternalIdAsString(UUID.randomUUID().toString());
