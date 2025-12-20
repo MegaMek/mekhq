@@ -111,6 +111,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String FLAW_SUPER_SPREADER = "flaw_super_spreader";
     public static final String FLAW_POOR_IMMUNE_SYSTEM = "flaw_poor_immune_system";
     public static final String UNOFFICIAL_ADAPTIVE_IMMUNITY = "unofficial_adaptive_immunity";
+    public static final String UNOFFICIAL_AGERANIUMS_DISEASE = "unofficial_ageraniums_disease";
+    public static final String UNOFFICIAL_DOBROWSKI_SYNDROME = "unofficial_dobrowski_depression_a_syndrome";
 
     public static final String DARK_SECRET_TRIVIAL = "dark_secret_trivial";
     public static final String DARK_SECRET_SIGNIFICANT = "dark_secret_significant";
@@ -278,6 +280,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, FLAW_SUPER_SPREADER, false);
         addOption(l3a, FLAW_POOR_IMMUNE_SYSTEM, false);
         addOption(l3a, UNOFFICIAL_ADAPTIVE_IMMUNITY, false);
+        addOption(l3a, UNOFFICIAL_AGERANIUMS_DISEASE, false);
+        addOption(l3a, UNOFFICIAL_DOBROWSKI_SYNDROME, false);
 
         addOption(l3a, DARK_SECRET_TRIVIAL, false);
         addOption(l3a, DARK_SECRET_SIGNIFICANT, false);

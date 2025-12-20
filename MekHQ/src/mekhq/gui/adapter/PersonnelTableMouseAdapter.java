@@ -1565,7 +1565,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_CLEAR_INJURIES: {
                 for (Person person : people) {
-                    person.clearInjuriesExcludingProsthetics();
+                    person.clearInjuriesExcludingProsthetics(getCampaign().getLocalDate());
                     Unit unit = person.getUnit();
                     if (null != unit) {
                         unit.resetPilotAndEntity();
@@ -1575,7 +1575,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_CLEAR_PROSTHETICS: {
                 for (Person person : people) {
-                    person.clearProstheticInjuries();
+                    person.clearProstheticInjuries(getCampaign().getLocalDate());
                     Unit unit = person.getUnit();
                     if (null != unit) {
                         unit.resetPilotAndEntity();
@@ -1593,7 +1593,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
                 if (toRemove != null) {
-                    selectedPerson.removeInjury(toRemove);
+                    selectedPerson.removeInjury(toRemove, getCampaign().getLocalDate());
                 }
                 Unit u = selectedPerson.getUnit();
                 if (null != u) {
@@ -1624,7 +1624,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
                 Inoculations.triggerDiseaseSpreadMessages(getCampaign(), !getCampaign().getLocation().isOnPlanet(),
-                      Collections.singleton(disease.getSimpleName()));
+                      Set.of(disease.getSimpleName()));
                 for (Person person : people) {
                     Inoculations.applyDisease(getCampaign(), person, disease);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -1919,7 +1919,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Injury newInjury = REPLACEMENT_LIMB_RECOVERY.newInjury(campaign, selectedPerson, location, hitCount);
                 newInjury.setWorkedOn(true);
 
-                selectedPerson.removeInjury(injury);
+                selectedPerson.removeInjury(injury, campaign.getLocalDate());
                 selectedPerson.addInjury(newInjury);
                 break;
             }

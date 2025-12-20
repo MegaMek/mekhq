@@ -2416,8 +2416,8 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         JLabel lblFatigue = null;
-        int baseFatigue = person.getFatigue();
-        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.getPermanentFatigue(),
+        int baseFatigue = person.getAdjustedFatigue();
+        int effectiveFatigue = getEffectiveFatigue(baseFatigue, person.getPermanentFatigue(),
               person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");

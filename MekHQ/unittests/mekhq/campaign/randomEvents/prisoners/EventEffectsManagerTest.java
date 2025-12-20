@@ -553,14 +553,14 @@ class EventEffectsManagerTest {
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
-        int oldFatigue = prisoner.getFatigue();
+        int oldFatigue = prisoner.getFatigueDirect();
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int expectedFatigue = oldFatigue + MAGNITUDE;
-        int actualFatigue = prisoner.getFatigue();
+        int actualFatigue = prisoner.getFatigueDirect();
 
         assertEquals(expectedFatigue, actualFatigue);
     }
@@ -592,10 +592,10 @@ class EventEffectsManagerTest {
         Person prisoner2 = new Person(mockCampaign);
         Person prisoner3 = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
-        List<Integer> oldFatigues = List.of(prisoner0.getFatigue(),
-              prisoner1.getFatigue(),
-              prisoner2.getFatigue(),
-              prisoner3.getFatigue());
+        List<Integer> oldFatigues = List.of(prisoner0.getFatigueDirect(),
+              prisoner1.getFatigueDirect(),
+              prisoner2.getFatigueDirect(),
+              prisoner3.getFatigueDirect());
 
         // Act
         new EventEffectsManager(mockCampaign, eventData, 0, true);
@@ -604,7 +604,7 @@ class EventEffectsManagerTest {
         List<Person> currentPrisoners = mockCampaign.getCurrentPrisoners();
         for (int i = 0; i < currentPrisoners.size(); i++) {
             int expectedFatigue = oldFatigues.get(i) + MAGNITUDE;
-            int actualFatigue = currentPrisoners.get(i).getFatigue();
+            int actualFatigue = currentPrisoners.get(i).getFatigueDirect();
 
             assertEquals(expectedFatigue, actualFatigue);
         }
@@ -801,7 +801,7 @@ class EventEffectsManagerTest {
         // Assert
         int fatiguedCharacters = 0;
         for (Person character : potentialTargets) {
-            if (character.getFatigue() > 0) {
+            if (character.getFatigueDirect() > 0) {
                 fatiguedCharacters++;
             }
         }

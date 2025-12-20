@@ -854,7 +854,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
             lblFatigue.setName("lblFatigue");
 
-            textFatigue.setText(Integer.toString(person.getFatigue()));
+            textFatigue.setText(Integer.toString(person.getFatigueDirect()));
             textFatigue.setName("textFatigue");
 
             gridBagConstraints = new GridBagConstraints();
@@ -1538,7 +1538,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), currentValue));
         }
 
-        currentValue = person.getFatigue();
+        currentValue = person.getFatigueDirect();
         person.setFatigue(MathUtility.parseInt(textFatigue.getText(), currentValue));
 
         if (null == choiceOriginalUnit.getSelectedItem()) {

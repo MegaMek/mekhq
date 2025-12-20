@@ -259,10 +259,18 @@ public class Attributes {
         boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
         boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
         boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
+        boolean hasAgeraniumsDisease = options.booleanOption(UNOFFICIAL_AGERANIUMS_DISEASE);
 
         int attributeScore = 0;
         return switch (attribute) {
-            case NONE, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, EDGE -> 0;
+            case NONE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
+            case INTELLIGENCE -> {
+                if (hasAgeraniumsDisease) {
+                    attributeScore -= 2;
+                }
+
+                yield attributeScore;
+            }
             case STRENGTH -> {
                 if (hasFreakishStrength) {
                     attributeScore += 2;

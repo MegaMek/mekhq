@@ -893,6 +893,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         InjurySubType subType = surgeryInjuryType.getSubType();
         boolean surgeryIsImplant = subType.isImplant(); // Includes VDNI implants
         boolean surgeryIsVDNI = subType == IMPLANT_VDNI;
+        LocalDate today = campaign.getLocalDate();
 
         // Implants remove any other instances of the same implant, otherwise no removal occurs. Non-implants remove
         // all relevant injuries.
@@ -903,7 +904,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     // We only remove implants if we're adding an identical implant, or another VDNI implant
                     if ((surgeryIsVDNI && injurySubType == IMPLANT_VDNI) ||
                               (injury.getType() == surgeryInjuryType)) {
-                        patient.removeInjury(injury);
+                        patient.removeInjury(injury, today);
                     }
                 }
             }
@@ -911,7 +912,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
                 if (injury != null) {
                     if (injury.getSubType().isBurn() || !isBurnRemovalOnly) {
-                        patient.removeInjury(injury);
+                        patient.removeInjury(injury, today);
                     }
                 }
             }

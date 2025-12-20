@@ -32,6 +32,9 @@
  */
 package mekhq.gui.view;
 
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -44,6 +47,8 @@ import java.awt.geom.Arc2D;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringJoiner;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,6 +57,7 @@ import javax.swing.text.DefaultCaret;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
@@ -336,6 +342,88 @@ public class PlanetViewPanel extends JScrollablePanel {
             }
         }
 
+        //HPG status
+        if (null != planet.getSourcedHPG(currentDate)) {
+            JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblHPG, gbcLabel);
+            SourceableValueLabel txtHPG = new SourceableValueLabel(planet.getSourcedHPG(currentDate));
+            gbcText.gridy = infoRow;
+            panel.add(txtHPG, gbcText);
+            ++infoRow;
+        }
+
+        //Hiring Hall Level
+        JLabel lblHiringHall = new JLabel(resourceMap.getString("lblHiringHall.text"));
+        gbcLabel.gridy = infoRow;
+        panel.add(lblHiringHall, gbcLabel);
+        JLabel textHiringHall = new JLabel(StringUtils.capitalize(
+              planet.getHiringHallLevel(currentDate)
+                    .name()
+                    .toLowerCase()));
+        gbcText.gridy = infoRow;
+        panel.add(textHiringHall, gbcText);
+        ++infoRow;
+
+        // Academies
+        List<Academy> filteredAcademies = system.getFilteredAcademies(campaign);
+        if (!filteredAcademies.isEmpty()) {
+            JLabel lblAcademies = new JLabel(resourceMap.getString("lblAcademies.text"));
+            gbcLabel.gridx = 0;
+            gbcLabel.gridy = infoRow;
+            panel.add(lblAcademies, gbcLabel);
+
+            JTextPane txtAcademies = new JTextPane();
+            txtAcademies.setEditable(false);
+            txtAcademies.setContentType("text/html");
+            txtAcademies.setText(MarkdownRenderer.getRenderedHtml(system.getAcademiesForSystem(filteredAcademies)));
+            ((DefaultCaret) txtAcademies.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panel.add(txtAcademies, gridBagConstraints);
+            ++infoRow;
+        }
+
+        // Noteworthy Diseases
+        Set<InjuryType> activeDiseases = getAllActiveBioweapons(system.getId(), currentDate, true);
+        activeDiseases.addAll(getAllActiveDiseases(system.getId(), currentDate, true));
+        if (!activeDiseases.isEmpty()) {
+            JLabel lblDiseases = new JLabel(resourceMap.getString("lblDiseases.text"));
+            gbcLabel.gridx = 0;
+            gbcLabel.gridy = infoRow;
+            panel.add(lblDiseases, gbcLabel);
+
+            StringJoiner diseaseJoiner = new StringJoiner(", ");
+            for (InjuryType disease : activeDiseases) {
+                diseaseJoiner.add(disease.getSimpleName());
+            }
+            String diseaseString = diseaseJoiner.toString();
+
+            JTextPane txtDiseases = new JTextPane();
+            txtDiseases.setEditable(false);
+            txtDiseases.setContentType("text/html");
+            txtDiseases.setText(diseaseString);
+            ((DefaultCaret) txtDiseases.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panel.add(txtDiseases, gridBagConstraints);
+            ++infoRow;
+        }
+
         //landmasses
         if (null != planet.getLandMasses()) {
             JLabel lblLandMass = new JLabel(resourceMap.getString("lblLandMass1.text"));
@@ -387,57 +475,6 @@ public class PlanetViewPanel extends JScrollablePanel {
             txtSocioIndustrial.setText(sidText);
             gbcText.gridy = infoRow;
             panel.add(txtSocioIndustrial, gbcText);
-            ++infoRow;
-        }
-
-        //HPG status
-        if (null != planet.getSourcedHPG(currentDate)) {
-            JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
-            gbcLabel.gridy = infoRow;
-            panel.add(lblHPG, gbcLabel);
-            SourceableValueLabel txtHPG = new SourceableValueLabel(planet.getSourcedHPG(currentDate));
-            gbcText.gridy = infoRow;
-            panel.add(txtHPG, gbcText);
-            ++infoRow;
-        }
-
-        //Hiring Hall Level
-        JLabel lblHiringHall = new JLabel(resourceMap.getString("lblHiringHall.text"));
-        gbcLabel.gridy = infoRow;
-        panel.add(lblHiringHall, gbcLabel);
-        JLabel textHiringHall = new JLabel(StringUtils.capitalize(
-              planet.getHiringHallLevel(currentDate)
-                    .name()
-                    .toLowerCase()));
-        gbcText.gridy = infoRow;
-        panel.add(textHiringHall, gbcText);
-        ++infoRow;
-
-        // Academies
-        List<Academy> filteredAcademies = system.getFilteredAcademies(campaign);
-
-        if (!filteredAcademies.isEmpty()) {
-            ++infoRow;
-            JLabel lblAcademies = new JLabel(resourceMap.getString("lblAcademies.text"));
-            gbcLabel.gridx = 0;
-            gbcLabel.gridy = infoRow;
-            panel.add(lblAcademies, gbcLabel);
-
-            JTextPane txtAcademies = new JTextPane();
-            txtAcademies.setEditable(false);
-            txtAcademies.setContentType("text/html");
-            txtAcademies.setText(MarkdownRenderer.getRenderedHtml(system.getAcademiesForSystem(filteredAcademies)));
-            ((DefaultCaret) txtAcademies.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = infoRow;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            panel.add(txtAcademies, gridBagConstraints);
             ++infoRow;
         }
 

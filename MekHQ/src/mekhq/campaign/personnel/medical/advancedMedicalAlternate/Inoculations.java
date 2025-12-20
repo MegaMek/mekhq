@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.FLAW_POOR_IMMUNE_SYSTEM;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SUPER_SPREADER;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_VACCINE_DODGER;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ADAPTIVE_IMMUNITY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -47,12 +48,14 @@ import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -91,7 +94,10 @@ public class Inoculations {
     // They also don't require MedTech checks, and they don't run the risk of an allergic reaction or failing. That
     // suggests these are higher quality. Also, this whole mechanic is meant to be a money sink, so it needs to have
     // some teeth.
-    private static final int INOCULATION_COST_PER_PERSON = 200;
+    private static final Money INOCULATION_COST_PER_PERSON = Money.of(200);
+    // Specific inoculations are more expensive as, in addition to the above benefits, they generally apply to
+    // multiple systems.
+    private static final Money SPECIFIC_INOCULATION_COST_PER_PERSON = INOCULATION_COST_PER_PERSON.multipliedBy(10);
 
     private static final int DIALOG_CHOICE_EVERYBODY = 0;
     private static final int DIALOG_CHOICE_MILITARY = 1;
@@ -118,28 +124,69 @@ public class Inoculations {
             return;
         }
         Planet currentPlanet = location.getPlanet();
+        String planetId = currentPlanet.getId();
+        String systemId = currentPlanet.getParentSystem().getId();
         LocalDate today = campaign.getLocalDate();
         String planetName = currentPlanet.getName(today);
 
         // Determine who, if anyone, needs inoculations
         Collection<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
-        List<Person> militaryPersonnel = new ArrayList<>();
-        List<Person> civilianPersonnel = new ArrayList<>();
-        gatherPersonnelInNeedOfInoculations(allPersonnel, currentPlanet.getId(), civilianPersonnel, militaryPersonnel);
 
-        if (militaryPersonnel.isEmpty() && civilianPersonnel.isEmpty()) { // Nobody needs treatment
+        // Generic inoculations
+        Set<Person> militaryPersonnelInNeedOfGenericInoculation = new HashSet<>();
+        Set<Person> civilianPersonnelInNeedOfGenericInoculation = new HashSet<>();
+        gatherPersonnelInNeedOfInoculations(allPersonnel,
+              planetId,
+              militaryPersonnelInNeedOfGenericInoculation,
+              civilianPersonnelInNeedOfGenericInoculation);
+
+        // Canon inoculations
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemId, today,
+              false);
+        Map<String, Set<Person>> militaryPersonnelInNeedOfCanonInoculation = new HashMap<>();
+        Map<String, Set<Person>> civilianPersonnelInNeedOfCanonInoculation = new HashMap<>();
+        gatherPersonnelInNeedOfCanonInoculations(availableCures,
+              allPersonnel,
+              civilianPersonnelInNeedOfCanonInoculation,
+              militaryPersonnelInNeedOfCanonInoculation);
+
+        // If nobody needs any inoculation, early exit
+        if (militaryPersonnelInNeedOfGenericInoculation.isEmpty() &&
+                  civilianPersonnelInNeedOfGenericInoculation.isEmpty() &&
+                  militaryPersonnelInNeedOfCanonInoculation.isEmpty() &&
+                  civilianPersonnelInNeedOfCanonInoculation.isEmpty()) {
             campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.fullVaccinated", planetName));
             return;
         }
 
-        Money militaryInoculationCost = Money.of(INOCULATION_COST_PER_PERSON).multipliedBy(militaryPersonnel.size());
-        Money civilianInoculationCost = Money.of(INOCULATION_COST_PER_PERSON).multipliedBy(civilianPersonnel.size());
-        Money totalInoculationCost = militaryInoculationCost.plus(civilianInoculationCost);
+        // Determine inoculation cost
+        Money militaryInoculationCost = INOCULATION_COST_PER_PERSON.multipliedBy(
+              militaryPersonnelInNeedOfGenericInoculation.size());
+        int militaryCanonInoculationMultiplier = 0;
+        for (Set<Person> personSet : militaryPersonnelInNeedOfCanonInoculation.values()) {
+            militaryCanonInoculationMultiplier += personSet.size();
+        }
+        Money militaryCanonInoculationCost = SPECIFIC_INOCULATION_COST_PER_PERSON.multipliedBy(
+              militaryCanonInoculationMultiplier);
 
+        Money civilianInoculationCost = INOCULATION_COST_PER_PERSON.multipliedBy(
+              civilianPersonnelInNeedOfGenericInoculation.size());
+        int civilianCanonInoculationMultiplier = 0;
+        for (Set<Person> personSet : civilianPersonnelInNeedOfCanonInoculation.values()) {
+            civilianCanonInoculationMultiplier += personSet.size();
+        }
+        Money civilianCanonInoculationCost = SPECIFIC_INOCULATION_COST_PER_PERSON.multipliedBy(
+              civilianCanonInoculationMultiplier);
+
+        Money totalMilitaryCost = militaryInoculationCost.plus(militaryCanonInoculationCost);
+        Money totalCivilianCost = civilianInoculationCost.plus(civilianCanonInoculationCost);
+        Money totalInoculationCost = totalMilitaryCost.plus(totalCivilianCost);
+
+        // Display dialog
         ImmersiveDialogSimple dialog = triggerDialog(campaign,
               planetName,
-              militaryInoculationCost.toAmountString(),
-              civilianInoculationCost.toAmountString(),
+              totalMilitaryCost.toAmountString(),
+              totalCivilianCost.toAmountString(),
               totalInoculationCost.toAmountString(),
               isAdHoc);
 
@@ -148,15 +195,50 @@ public class Inoculations {
             return;
         }
 
+        // Pool all relevant personnel (we'll filter them later)
+        Set<Person> allMilitaryPersonnel = new HashSet<>(militaryPersonnelInNeedOfGenericInoculation);
+        for (Set<Person> personnel : militaryPersonnelInNeedOfCanonInoculation.values()) {
+            allMilitaryPersonnel.addAll(personnel);
+        }
+
+        Set<Person> allCivilianPersonnel = new HashSet<>(civilianPersonnelInNeedOfGenericInoculation);
+        for (Set<Person> personnel : civilianPersonnelInNeedOfCanonInoculation.values()) {
+            allCivilianPersonnel.addAll(personnel);
+        }
+
+        // Process the inculations and fee payment
         handleDialogChoice(campaign,
               dialog.getDialogChoice(),
               today,
               totalInoculationCost,
-              militaryPersonnel,
+              allMilitaryPersonnel,
               currentPlanet,
-              civilianPersonnel,
+              allCivilianPersonnel,
               militaryInoculationCost,
               civilianInoculationCost);
+    }
+
+    private static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
+          Collection<Person> allPersonnel,
+          Map<String, Set<Person>> civilianPersonnelInNeedOfCanonInoculation,
+          Map<String, Set<Person>> militaryPersonnelInNeedOfCanonInoculation) {
+        for (InjuryType inoculationType : availableCures) {
+            Set<Person> combatantInNeedOfInoculation = new HashSet<>();
+            Set<Person> civilianInNeedOfInoculation = new HashSet<>();
+
+            for (Person person : allPersonnel) {
+                if (!person.hasCanonDiseaseInoculation(inoculationType.getKey())) {
+                    if (person.isCivilian()) {
+                        civilianInNeedOfInoculation.add(person);
+                    } else {
+                        combatantInNeedOfInoculation.add(person);
+                    }
+                }
+            }
+
+            civilianPersonnelInNeedOfCanonInoculation.put(inoculationType.getKey(), civilianInNeedOfInoculation);
+            militaryPersonnelInNeedOfCanonInoculation.put(inoculationType.getKey(), combatantInNeedOfInoculation);
+        }
     }
 
     /**
@@ -174,7 +256,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     private static void gatherPersonnelInNeedOfInoculations(Collection<Person> allPersonnel, String planetId,
-          List<Person> civilianPersonnel, List<Person> militaryPersonnel) {
+          Set<Person> civilianPersonnel, Set<Person> militaryPersonnel) {
         for (Person person : allPersonnel) {
             if (person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
                 continue;
@@ -246,7 +328,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     private static void handleDialogChoice(Campaign campaign, int choiceIndex, LocalDate today,
-          Money totalInoculationCost, List<Person> militaryPersonnel, Planet location, List<Person> civilianPersonnel,
+          Money totalInoculationCost, Set<Person> militaryPersonnel, Planet location, Set<Person> civilianPersonnel,
           Money militaryInoculationCost, Money civilianInoculationCost) {
         Finances finances = campaign.getFinances();
         switch (choiceIndex) {
@@ -288,12 +370,26 @@ public class Inoculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void inoculatePersonnel(LocalDate today, List<Person> personnel, Planet planet) {
+    private static void inoculatePersonnel(LocalDate today, Set<Person> personnel, Planet planet) {
         String planetName = planet.getName(today);
+        String planetId = planet.getId();
+        String systemId = planet.getParentSystem().getId();
+
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemId, today,
+              false);
 
         for (Person person : personnel) {
-            person.addPlanetaryInoculation(planet.getId());
-            MedicalLogger.inoculation(person, today, planetName);
+            if (!person.hasPlanetaryInoculation(planetId)) {
+                person.addPlanetaryInoculation(planetId);
+                MedicalLogger.inoculation(person, today, planetName);
+            }
+
+            for (InjuryType injuryType : availableCures) {
+                if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
+                    person.addCanonDiseaseInoculation(injuryType.getKey());
+                    MedicalLogger.specificInoculation(person, today, injuryType.getSimpleName());
+                }
+            }
         }
     }
 
@@ -396,37 +492,52 @@ public class Inoculations {
      */
     public static void performDiseaseChecks(Campaign campaign) {
         CurrentLocation location = campaign.getLocation();
+        LocalDate today = campaign.getLocalDate();
+
         String planetCode = location.isOnPlanet() ? location.getPlanet().getId() : null;
+        String systemCode = location.getCurrentSystem().getId();
 
         List<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
 
         // Gather the active diseases in the players' campaign
         DiseaseScanResult diseaseScanResult = getActiveDiseases(allPersonnel);
         Set<InjuryType> activeDiseases = diseaseScanResult.activeDiseases;
+        Set<InjuryType> canonDiseases = diseaseScanResult.activeCanonDiseases;
+
         boolean hasSuperSpreader = diseaseScanResult.hasSuperSpreader;
         int diseaseChance = activeDiseases.isEmpty() ?
                                   MONTHLY_NEW_DISEASE_CHANCE : // Super Spreader doesn't affect new disease chance
                                   hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE / 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
 
-        if (activeDiseases.isEmpty()) {
+        // If there are no active diseases, add one
+        if (activeDiseases.isEmpty() && canonDiseases.isEmpty()) {
             if (planetCode != null) {
-                // If there are no active diseases, add one
-                activeDiseases.add(DiseaseService.catchRandomDisease());
-            } else {
-                // No new diseases are introduced while in transit
-                return;
+                // We keep canonical diseases rare for three reasons:
+                // 1) to keep them feeling unique.
+                // 2) because many of them are deadly (the writers don't write about the 36 flavors of common cold).
+                // 3) we don't want them to crowd out the generic diseases as this would make the galaxy feel less
+                // dynamic (i.e., we don't want every disease to be the same six canon diseases).
+                boolean isCanonicalDisease = randomInt(100) == 0;
+                if (isCanonicalDisease) {
+                    Set<InjuryType> canonicalDiseasesInLocation = CanonicalDiseaseType.getAllActiveDiseases(systemCode,
+                          today, false);
+                    canonDiseases.add(ObjectUtility.getRandomItem(canonicalDiseasesInLocation));
+                } else {
+                    activeDiseases.add(DiseaseService.catchRandomDisease());
+                }
             }
+
+            // No new diseases are introduced while in transit
         }
 
         // Now roll for the spread of disease among unvaccinated characters
-        Set<String> spreadingDiseases = getSpreadingDiseases(campaign,
-              allPersonnel,
-              planetCode,
-              activeDiseases,
+        getSpreadingDiseases(campaign, allPersonnel, planetCode, systemCode, activeDiseases, canonDiseases,
               diseaseChance);
 
-        // Inform the player
-        triggerDiseaseSpreadMessages(campaign, planetCode == null, spreadingDiseases);
+        // Now roll for the spread of bioweapons among unvaccinated characters
+        Set<InjuryType> activeBioweapons = CanonicalDiseaseType.getAllActiveBioweapons(systemCode, today, false);
+        diseaseChance = hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE / 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
+        getSpreadingBioweapons(campaign, allPersonnel, planetCode != null, systemCode, activeBioweapons, diseaseChance);
     }
 
     /**
@@ -440,26 +551,27 @@ public class Inoculations {
      * @param allPersonnel   all active personnel
      * @param planetCode     the planet code, or null if in transit
      * @param activeDiseases the set of currently active diseases
+     * @param canonDiseases  the set of currently active canonical diseases
      * @param diseaseChance  the chance for disease spread (1 in diseaseChance)
-     *
-     * @return a set of disease names that spread during this check
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static Set<String> getSpreadingDiseases(Campaign campaign, Collection<Person> allPersonnel,
-          String planetCode, Set<InjuryType> activeDiseases, int diseaseChance) {
-        Set<String> spreadingDiseases = new HashSet<>();
+    private static void getSpreadingDiseases(Campaign campaign, Collection<Person> allPersonnel,
+          String planetCode, String systemCode, Set<InjuryType> activeDiseases, Set<InjuryType> canonDiseases,
+          int diseaseChance) {
+        Set<String> spreadingGenericDiseases = new HashSet<>();
+        Set<String> spreadingCanonDiseasesWithCure = new HashSet<>();
+        Set<String> spreadingCanonDiseasesNoCure = new HashSet<>();
+
         LocalDate today = campaign.getLocalDate();
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemCode, today, false);
+
         for (Person person : allPersonnel) {
+            Set<InjuryType> activeInjuryTypes = person.getActiveInjuryTypes();
+
             // Some of these diseases are of a venereal nature, we don't want children getting infected.
             if (person.isChild(today, true)) {
-                continue;
-            }
-
-            // If planetCode is null, the campaign is in transit. If they have an active disease while in transit, the
-            // close confines remove any benefit from vaccinations
-            if (planetCode != null && person.hasPlanetaryInoculation(planetCode)) {
                 continue;
             }
 
@@ -470,17 +582,103 @@ public class Inoculations {
             double spreadMultiplier = person.getOptions().booleanOption(FLAW_POOR_IMMUNE_SYSTEM) ? 3.0 : 1.0;
             int personalInfectionChance = (int) round(diseaseChance / spreadMultiplier);
 
-            for (InjuryType disease : activeDiseases) {
+            // If planetCode is null, the campaign is in transit. If they have an active disease while in transit, the
+            // close confines remove any benefit from vaccinations
+            boolean hasPlanetaryInoculation = planetCode != null && person.hasPlanetaryInoculation(planetCode);
+            if (!hasPlanetaryInoculation) {
+                for (InjuryType disease : activeDiseases) {
+                    // Prevent reinfection of the same disease
+                    if (activeInjuryTypes.contains(disease)) {
+                        continue;
+                    }
+
+                    if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
+                        applyDisease(campaign, person, disease);
+                        spreadingGenericDiseases.add(disease.getSimpleName());
+                    }
+                }
+            }
+
+            for (InjuryType disease : canonDiseases) {
+                // Prevent reinfection of the same disease
+                if (activeInjuryTypes.contains(disease)) {
+                    continue;
+                }
+
+                // Inoculation against canonical diseases is handled on a case-by-case basis, rather than being
+                // handled by a single blanket inoculation. As above, inoculations offer no protection while in transit
+                boolean isInoculated = planetCode != null && person.hasCanonDiseaseInoculation(disease.getKey());
+                if (isInoculated) {
+                    continue;
+                }
+
                 if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
                     applyDisease(campaign, person, disease);
-                    spreadingDiseases.add(disease.getSimpleName());
+                    if (availableCures.contains(disease)) {
+                        spreadingCanonDiseasesWithCure.add(disease.getSimpleName());
+                    } else {
+                        spreadingCanonDiseasesNoCure.add(disease.getSimpleName());
+                    }
                 }
             }
         }
-        return spreadingDiseases;
+
+        boolean isInTransit = planetCode == null;
+        triggerDiseaseSpreadMessages(campaign, isInTransit, spreadingGenericDiseases);
+        triggerCanonDiseaseSpreadMessages(campaign, isInTransit, true, spreadingCanonDiseasesWithCure);
+        triggerCanonDiseaseSpreadMessages(campaign, isInTransit, false, spreadingCanonDiseasesNoCure);
     }
 
-    public record DiseaseScanResult(boolean hasSuperSpreader, Set<InjuryType> activeDiseases) {}
+    private static void getSpreadingBioweapons(Campaign campaign, Collection<Person> allPersonnel,
+          boolean isOnPlanet, String systemCode, Set<InjuryType> activeBioweapons, int diseaseChance) {
+        Set<String> spreadingBioweaponsWithCure = new HashSet<>();
+        Set<String> spreadingBioweaponsDiseasesNoCure = new HashSet<>();
+
+        LocalDate today = campaign.getLocalDate();
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemCode, today, false);
+
+        for (Person person : allPersonnel) {
+            Set<InjuryType> activeInjuryTypes = person.getActiveInjuryTypes();
+
+            // Most of these diseases are deadly, we don't want children getting infected.
+            if (person.isChild(today, true)) {
+                continue;
+            }
+
+            // Adaptive immunity won't protect you against bioweapons, so we don't check for that SPA here
+
+            double spreadMultiplier = person.getOptions().booleanOption(FLAW_POOR_IMMUNE_SYSTEM) ? 3.0 : 1.0;
+            int personalInfectionChance = (int) round(diseaseChance / spreadMultiplier);
+
+            for (InjuryType disease : activeBioweapons) {
+                // Prevent reinfection of the same disease
+                if (activeInjuryTypes.contains(disease)) {
+                    continue;
+                }
+
+                // Inoculations offer no protection while in transit
+                boolean isInoculated = isOnPlanet && person.hasCanonDiseaseInoculation(disease.getKey());
+                if (isInoculated) {
+                    continue;
+                }
+
+                if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
+                    applyDisease(campaign, person, disease);
+                    if (availableCures.contains(disease)) {
+                        spreadingBioweaponsWithCure.add(disease.getSimpleName());
+                    } else {
+                        spreadingBioweaponsDiseasesNoCure.add(disease.getSimpleName());
+                    }
+                }
+            }
+        }
+
+        triggerBioweaponSpreadMessages(campaign, !isOnPlanet, true, spreadingBioweaponsWithCure);
+        triggerBioweaponSpreadMessages(campaign, !isOnPlanet, false, spreadingBioweaponsDiseasesNoCure);
+    }
+
+    public record DiseaseScanResult(boolean hasSuperSpreader, Set<InjuryType> activeDiseases,
+          Set<InjuryType> activeCanonDiseases) {}
 
     /**
      * Scans all personnel for disease-related injuries and the presence of any Super Spreader flaw. Returns both the
@@ -500,6 +698,7 @@ public class Inoculations {
     private static DiseaseScanResult getActiveDiseases(List<Person> allPersonnel) {
         boolean hasSuperSpreader = false;
         Set<InjuryType> activeDiseases = new HashSet<>();
+        Set<InjuryType> activeCanonDiseases = new HashSet<>();
 
         for (Person person : allPersonnel) {
             // Super Spreader is a one-time flag; no stacking
@@ -508,13 +707,20 @@ public class Inoculations {
             }
 
             for (Injury injury : person.getInjuries()) {
-                if (injury.getSubType().isDisease()) {
-                    activeDiseases.add(injury.getType());
+                InjurySubType subType = injury.getSubType();
+                InjuryType type = injury.getType();
+
+                if (subType.isDisease()) {
+                    if (subType.isCanonDisease()) {
+                        activeCanonDiseases.add(type);
+                        continue;
+                    }
+                    activeDiseases.add(type);
                 }
             }
         }
 
-        return new DiseaseScanResult(hasSuperSpreader, activeDiseases);
+        return new DiseaseScanResult(hasSuperSpreader, activeDiseases, activeCanonDiseases);
     }
 
     /**
@@ -542,9 +748,11 @@ public class Inoculations {
             LOGGER.error("Failed to generate disease of type {} at body location {} with duration multiplier {}",
                   disease, BodyLocation.INTERNAL, 1);
         } else {
-            int duration = DiseaseService.getDiseaseDuration();
-            newDisease.setOriginalTime(duration);
-            newDisease.setTime(duration);
+            if (newDisease.getOriginalTime() == 0) {
+                int duration = DiseaseService.getDiseaseDuration();
+                newDisease.setOriginalTime(duration);
+                newDisease.setTime(duration);
+            }
             person.addInjury(newDisease);
 
             if (disease.impliesDead(BodyLocation.INTERNAL)) {
@@ -579,6 +787,44 @@ public class Inoculations {
 
             campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
                   spread));
+        }
+    }
+
+    public static void triggerCanonDiseaseSpreadMessages(Campaign campaign, boolean isInTransit, boolean hasCure,
+          Set<String> diseases) {
+        String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
+        alertColor = hasCure ? alertColor : getNegativeColor();
+
+        String reportKey = "Inoculations.spread.normal";
+        if (!hasCure) {
+            reportKey = "Inoculations.spread.canon.noCure";
+        } else if (isInTransit) {
+            reportKey = "Inoculations.spread.transit";
+        }
+
+        for (String disease : diseases) {
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
+                  disease));
+        }
+    }
+
+    public static void triggerBioweaponSpreadMessages(Campaign campaign, boolean isInTransit, boolean hasCure,
+          Set<String> diseases) {
+        String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
+        alertColor = hasCure ? alertColor : getNegativeColor();
+
+        String reportKey;
+        if (!hasCure) {
+            reportKey = "Inoculations.spread.bioweapon.noCure";
+        } else if (isInTransit) {
+            reportKey = "Inoculations.spread.bioweapon.normal";
+        } else {
+            reportKey = "Inoculations.spread.bioweapon";
+        }
+
+        for (String disease : diseases) {
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
+                  disease));
         }
     }
 }
