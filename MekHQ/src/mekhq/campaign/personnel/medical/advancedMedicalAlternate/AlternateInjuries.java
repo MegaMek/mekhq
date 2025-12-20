@@ -327,6 +327,7 @@ public class AlternateInjuries {
     public static final InjuryType DERMAL_MYOMER_LEG_ARMOR = new DermalMyomerArmorLeg();
     public static final InjuryType DERMAL_MYOMER_LEG_CAMO = new DermalMyomerCamoLeg();
     public static final InjuryType DERMAL_MYOMER_LEG_TRIPLE = new DermalMyomerTripleLeg();
+    public static final InjuryType PROTOTYPE_VDNI = new PrototypeVDNI();
     public static final InjuryType VEHICULAR_DNI = new VehicularDNI();
     public static final InjuryType BUFFERED_VDNI = new BufferedVDNI();
     public static final InjuryType BUFFERED_VDNI_TRIPLE_CORE = new BufferedVDNITripleCore();
@@ -2686,6 +2687,17 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.COSMETIC_ANIMAL_EAR_PROSTHETIC.simpleName");
             this.allowedLocations = Set.of(EARS);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class PrototypeVDNI extends Prosthetic {
+        PrototypeVDNI() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.PROTOTYPE_VDNI.simpleName");
+            this.injurySubType = IMPLANT_VDNI;
+            this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = NONE;
         }
     }

@@ -65,6 +65,7 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -398,12 +399,14 @@ public class Person {
     // region Flags
     private boolean clanPersonnel;
     private boolean commander;
+    private boolean secondInCommand;
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
     private boolean underProtection;
+    private boolean neverAssignMaintenanceAutomatically;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -633,10 +636,12 @@ public class Person {
             }
         }
         underProtection = false;
+        neverAssignMaintenanceAutomatically = false;
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
         setCommander(false);
+        setSecondInCommand(false);
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
@@ -1621,6 +1626,28 @@ public class Person {
             }
 
             setCommander(false);
+
+            // promote second in command
+            Person secondInCommand = campaign.getSecondInCommand();
+            if (secondInCommand != null) {
+                secondInCommand.setSecondInCommand(false);
+                secondInCommand.setCommander(true);
+
+                String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
+                campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                      secondInCommandHyperlink));
+                campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                      secondInCommandHyperlink));
+
+                campaign.personUpdated(secondInCommand);
+            }
+        }
+
+        // release the second-in-command flag.
+        if (isSecondInCommand() && status.isDepartedUnit()) {
+            setSecondInCommand(false);
+            campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                  getHyperlinkedFullTitle()));
         }
 
         // clean up the save entry
@@ -3031,6 +3058,14 @@ public class Person {
         this.commander = commander;
     }
 
+    public boolean isSecondInCommand() {
+        return secondInCommand;
+    }
+
+    public void setSecondInCommand(final boolean secondInCommand) {
+        this.secondInCommand = secondInCommand;
+    }
+
     public boolean isDivorceable() {
         return divorceable;
     }
@@ -3077,6 +3112,14 @@ public class Person {
 
     public void setUnderProtection(final boolean underProtection) {
         this.underProtection = underProtection;
+    }
+
+    public boolean isNeverAssignMaintenanceAutomatically() {
+        return neverAssignMaintenanceAutomatically;
+    }
+
+    public void setNeverAssignMaintenanceAutomatically(final boolean neverAssignMaintenanceAutomatically) {
+        this.neverAssignMaintenanceAutomatically = neverAssignMaintenanceAutomatically;
     }
 
     public boolean isEmployed() {
@@ -3682,12 +3725,17 @@ public class Person {
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondInCommand", secondInCommand);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "neverAssignMaintenanceAutomatically",
+                  neverAssignMaintenanceAutomatically);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
@@ -4304,6 +4352,8 @@ public class Person {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
                     person.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("secondInCommand")) {
+                    person.setSecondInCommand(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("divorceable")) {
                     person.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("founder")) {
@@ -4316,6 +4366,8 @@ public class Person {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
+                    person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();

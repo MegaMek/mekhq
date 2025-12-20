@@ -454,15 +454,17 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
 
-                // Campaign upgrading
-                final Version campaignVersion = campaign.getVersion();
-                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
-                    handleCampaignUpgrading(campaign);
-                }
-
                 // <50.10 compatibility handler
+                final Version campaignVersion = campaign.getVersion();
                 if (campaignVersion.isLowerThan(new Version("0.50.10"))) {
                     new WarAndPeaceProcessor(campaign, true);
+                }
+
+                // Campaign upgrading
+                // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
+                // dialogs will get 'stuck' behind other dialogs
+                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
+                    handleCampaignUpgrading(campaign);
                 }
                 // endregion Progress 7
             }
@@ -495,8 +497,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @since 0.50.07
          */
         private static void handleCampaignUpgrading(Campaign campaign) {
-            CampaignUpgradeDialog.campaignUpgradeDialog(campaign,
-                  () -> MekHQ.triggerEvent(new OptionsChangedEvent(campaign)));
+            CampaignUpgradeDialog.campaignUpgradeDialog(campaign);
         }
 
         /**
