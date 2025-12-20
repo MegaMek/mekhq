@@ -60,7 +60,7 @@ public enum DocumentationEntry {
     COMBAT_TEAMS("COMBAT_TEAMS", "StratCon/Combat Teams, Roles & Reinforcements", new Version("0.50.10")),
     COOP_CAMPAIGNS("COOP_CAMPAIGNS", "MekHQ Co-Op Campaign Guide v1", new Version("0.50.06")),
     EDUCATION_MODULE("EDUCATION_MODULE", "Personnel Modules/Education Module", new Version("0.50.06")),
-    FACTION_STANDINGS("FACTION_STANDINGS", "MekHQ Systems/Faction Standings", new Version("0.50.07")),
+    FACTION_STANDINGS("FACTION_STANDINGS", "MekHQ Systems/Faction Standings", new Version("0.50.11")),
     NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "0_MHQ New Player Guide", new Version("0.50.06")),
     PRISONERS_OF_WAR("PRISONERS_OF_WAR",
           "MekHQ Systems/Prisoners of War & Abstracted Search and Rescue",
