@@ -504,8 +504,6 @@ public class AtBContract extends Contract {
      * @param today    The current LocalDate object.
      */
     private void updateEnemy(Campaign campaign, LocalDate today) {
-        Faction oldEnemyFaction = getEnemy();
-
         String enemyCode = RandomFactionGenerator.getInstance()
                                  .getEnemy(Factions.getInstance().getFaction(employerCode), false, true);
         setEnemyCode(enemyCode);
