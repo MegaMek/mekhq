@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * Utility class that provides methods for managing and modifying the skills, loyalty, and advantages of personnel in
@@ -202,16 +203,19 @@ public class PersonUtility {
      * Otherwise, the skill is added with the specified experience level.</p>
      *
      * @param person     the {@link Person} to whom the skill is being added.
-     * @param skill      the name of the skill to add.
+     * @param skillName  the name of the skill to add.
      * @param skillLevel the {@link SkillLevel} used to set the skill's experience level.
      */
-    private static void addSkillFixedExperienceLevel(Person person, String skill, SkillLevel skillLevel) {
-        int bonus = 0;
+    private static void addSkillFixedExperienceLevel(Person person, String skillName, SkillLevel skillLevel) {
+        SkillType skillType = SkillType.getType(skillName);
+        int targetLevel = skillType.getLevelFromExperience(skillLevel.getAdjustedValue());
 
-        if (person.hasSkill(skill)) {
-            bonus = person.getSkill(skill).getBonus();
+        int bonus = 0;
+        Skill skill = person.getSkill(skillName);
+        if (skill != null) {
+            bonus = skill.getBonus();
         }
 
-        addSkill(person, skill, skillLevel.getAdjustedValue(), bonus);
+        addSkill(person, skillName, targetLevel, bonus);
     }
 }
