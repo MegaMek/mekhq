@@ -623,6 +623,16 @@ public class CampaignNewDayManager {
             PersonnelOptions personnelOptions = person.getOptions();
 
             // Daily events
+            medicalController.processMedicalEvents(person,
+                  campaignOptions.isUseAgeEffects(),
+                  campaign.isClanCampaign(),
+                  today);
+
+            // The character can die during the prior step, if so we stop processing them.
+            if (person.getStatus().isDead()) {
+                continue;
+            }
+
             if (person.getStatus().isMIA()) {
                 recovery.attemptRescueOfPlayerCharacter(person);
             }
@@ -642,11 +652,6 @@ public class CampaignNewDayManager {
 
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
-
-            medicalController.processMedicalEvents(person,
-                  campaignOptions.isUseAgeEffects(),
-                  campaign.isClanCampaign(),
-                  today);
 
             processAnniversaries(person);
 
