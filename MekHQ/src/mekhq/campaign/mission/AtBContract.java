@@ -1197,11 +1197,6 @@ public class AtBContract extends Contract {
                     stratconCampaignState = StratConCampaignState.Deserialize(item);
                     stratconCampaignState.setContract(this);
                     this.setStratConCampaignState(stratconCampaignState);
-
-                    // <50.10 compatibility handler
-                    if (!(getContractType().isGarrisonType() || getContractType().isReliefDuty())) {
-                        stratconCampaignState.setAllowEarlyVictory(true);
-                    }
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {
