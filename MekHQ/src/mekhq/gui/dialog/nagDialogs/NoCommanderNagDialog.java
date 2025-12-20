@@ -50,6 +50,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
  * including the {@code HR} speaker and the {@code NAG_NO_COMMANDER} constant, to configure dialog settings and
  * content.</p>
  */
+@Deprecated(since = "0.50.11", forRemoval = true)
 public class NoCommanderNagDialog extends ImmersiveDialogNag {
     /**
      * Constructs a new {@code NoCommanderNagDialog} instance to display the no commander nag dialog.

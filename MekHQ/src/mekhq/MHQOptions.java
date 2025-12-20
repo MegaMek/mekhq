@@ -869,6 +869,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, value);
     }
 
+    public boolean getNewDayAutomaticallyAssignUnmaintainedUnits() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS, false);
+    }
+
+    public void setNewDayAutomaticallyAssignUnmaintainedUnits(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS, value);
+    }
+
     public boolean getNewMonthQuickTrain() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, false);
