@@ -2736,18 +2736,20 @@ public class PersonViewPanel extends JScrollablePanel {
             vWeight = 0.0;
         }
 
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
-            getAlternativeAdvancedMedicalDisplay(lblAdvancedMedical2,
-                  lblAdvancedMedical1,
-                  gridBagConstraints,
-                  vWeight,
-                  pnlInjuryDetails);
-        } else {
-            getAdvancedMedicalDisplay(lblAdvancedMedical1,
-                  pnlInjuryDetails,
-                  gridBagConstraints,
-                  lblAdvancedMedical2,
-                  vWeight);
+        if (!isProstheticReport) {
+            if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                getAlternativeAdvancedMedicalDisplay(lblAdvancedMedical2,
+                      lblAdvancedMedical1,
+                      gridBagConstraints,
+                      vWeight,
+                      pnlInjuryDetails);
+            } else {
+                getAdvancedMedicalDisplay(lblAdvancedMedical1,
+                      pnlInjuryDetails,
+                      gridBagConstraints,
+                      lblAdvancedMedical2,
+                      vWeight);
+            }
         }
 
         // This adds a dummy/invisible label to column 2, row 0 to prevent column 3 from being pushed away
