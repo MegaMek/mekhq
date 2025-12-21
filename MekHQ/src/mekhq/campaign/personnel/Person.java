@@ -8298,13 +8298,18 @@ public class Person {
             // The berserker hurts themselves
             victims.add(this);
 
+            boolean isUseAltAdvancedMedical = campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
             for (Person victim : victims) {
-                int wounds = randomInt(2) + 1; // (1-2)
                 if (useAdvancedMedical) {
-                    InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
+                    if (isUseAltAdvancedMedical) {
+                        Injury injury = AlternateInjuries.TERRIBLE_BRUISES.newInjury(campaign, this, GENERIC, 1);
+                        addInjury(injury);
+                    } else {
+                        InjuryUtil.resolveCombatDamage(campaign, victim, 1);
+                    }
                 } else {
                     int currentHits = victim.getHits();
-                    victim.setHits(currentHits + wounds);
+                    victim.setHits(currentHits + 1);
                 }
 
                 if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
