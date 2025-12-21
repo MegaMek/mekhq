@@ -1599,7 +1599,11 @@ public class CampaignNewDayManager {
             int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
             boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
                   null, modifier);
-            String report = person.processHysteria(campaign, true, isUseAdvancedMedical, failedWillpowerCheck);
+            String report = person.processHysteria(campaign,
+                  true,
+                  isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
+                  failedWillpowerCheck);
             if (!report.isBlank()) {
                 campaign.addReport(MEDICAL, report);
             }

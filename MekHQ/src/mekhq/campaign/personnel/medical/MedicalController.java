@@ -128,7 +128,7 @@ public class MedicalController {
     public void processMedicalEvents(Person patient, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
         // Should the character be dead already?
-        if (patient.getTotalInjurySeverity() >= 5) {
+        if (patient.getTotalInjurySeverity() > Person.DEATH_THRESHOLD) {
             patient.changeStatus(campaign, today, PersonnelStatus.WOUNDS);
             return; // Early exit as there is no point continuing to process the character
         }
