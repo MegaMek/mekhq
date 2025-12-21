@@ -457,6 +457,9 @@ public class Person {
         OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
         OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
     }
+
+    /** Greater than this value means death */
+    public static int DEATH_THRESHOLD = 5;
     // endregion Variable Declarations
 
     // region Constructors
@@ -7790,7 +7793,6 @@ public class Person {
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
         final int FATIGUE_INCREASE = 2;
-        final int DEATH_THRESHOLD = 5;
 
         if (hasCompulsionAddiction && failedWillpowerCheck) {
             if (useAdvancedMedical) {
@@ -7816,7 +7818,7 @@ public class Person {
             }
 
             int severity = getTotalInjurySeverity();
-            if ((severity > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (severity > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -7847,7 +7849,6 @@ public class Person {
           boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasFlashbacks, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
 
         if (hasFlashbacks && failedWillpowerCheck) {
             if (useAdvancedMedical) {
@@ -7864,7 +7865,7 @@ public class Person {
                 hits += 1;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8126,7 +8127,6 @@ public class Person {
           boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasRegression, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
 
         if (hasRegression && failedWillpowerCheck) {
             if (useAdvancedMedical) {
@@ -8143,7 +8143,7 @@ public class Person {
                 hits += 1;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8177,8 +8177,6 @@ public class Person {
     public String processCatatonia(Campaign campaign, boolean useAdvancedMedical, boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCatatonia, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
         if (hasCatatonia && failedWillpowerCheck) {
             if (useAdvancedMedical) {
                 Injury injury;
@@ -8194,7 +8192,7 @@ public class Person {
                 hits += 1;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8215,29 +8213,31 @@ public class Person {
      * <p>Returns a formatted warning message describing the confusion compulsion, or an empty string if no action
      * was taken.</p>
      *
-     * @param campaign             The current campaign instance, used for logging and state updates.
-     * @param useAdvancedMedical   Whether the advanced medical system should be used.
-     * @param hasMadnessConfusion  Indicates if the personnel is afflicted with madness-induced confusion.
-     * @param failedWillpowerCheck Indicates if the required willpower check was failed.
+     * @param campaign                The current campaign instance, used for logging and state updates.
+     * @param useAdvancedMedical      Whether the advanced medical system should be used.
+     * @param isUseAltAdvancedMedical {@code true} to use alt advanced medical rules, {@code false} otherwise
+     * @param hasMadnessConfusion     Indicates if the personnel is afflicted with madness-induced confusion.
+     * @param failedWillpowerCheck    Indicates if the required willpower check was failed.
      *
      * @return A formatted string with the confusion compulsion warning, or an empty string if not applicable.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String processConfusion(Campaign campaign, boolean useAdvancedMedical,
+    public String processConfusion(Campaign campaign, boolean useAdvancedMedical, boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasMadnessConfusion, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
         if (hasMadnessConfusion && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
+            if (isUseAltAdvancedMedical) {
+                Injury injury = AlternateInjuries.TERRIBLE_BRUISES.newInjury(campaign, this, GENERIC, 1);
+                addInjury(injury);
+            } else if (useAdvancedMedical) {
                 InjuryUtil.resolveCombatDamage(campaign, this, 1);
             } else {
                 hits++;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8277,7 +8277,6 @@ public class Person {
     public String processBerserkerFrenzy(Campaign campaign, boolean useAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasBerserker, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
 
         if (hasBerserker && failedWillpowerCheck) {
             if (randomInt(4) != 0) { // the character was restrained before they could do harm
@@ -8312,7 +8311,7 @@ public class Person {
                     victim.setHits(currentHits + 1);
                 }
 
-                if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
+                if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                     victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
                                                                                  PersonnelStatus.MEDICAL_COMPLICATIONS :
                                                                                  PersonnelStatus.HOMICIDE);
@@ -8363,17 +8362,18 @@ public class Person {
      * appropriate episode handler is called, and its result returned as a description string. When the episode is not
      * paranoia, any paranoia flag is cleared. Otherwise, if the conditions are not met, returns an empty string.</p>
      *
-     * @param campaign             the current campaign context
-     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
-     * @param hasHysteria          {@code true} if the person is suffering from hysteria
-     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     * @param campaign              the current campaign context
+     * @param useAdvancedMedical    {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param useAltAdvancedMedical {@code true} to use alternate advanced medical rules, {@code false} otherwise
+     * @param hasHysteria           {@code true} if the person is suffering from hysteria
+     * @param failedWillpowerCheck  {@code true} if the person failed their willpower check
      *
      * @return description of the resulting episode, or an empty string if no episode occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String processHysteria(Campaign campaign, boolean useAdvancedMedical,
+    public String processHysteria(Campaign campaign, boolean useAdvancedMedical, boolean useAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasHysteria, boolean failedWillpowerCheck) {
 
@@ -8381,7 +8381,7 @@ public class Person {
             int roll = d6(1);
             String report = switch (roll) {
                 case 1, 2 -> processBerserkerFrenzy(campaign, useAdvancedMedical, true, true);
-                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, true, true);
+                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, useAltAdvancedMedical, true, true);
                 case 5, 6 -> processClinicalParanoia(true, true);
                 default -> throw new IllegalStateException("Unexpected value: " + roll);
             };
