@@ -2832,8 +2832,7 @@ public class PersonViewPanel extends JScrollablePanel {
               InjuryEffect.getEffectsLabel(injuryEffects));
 
         int hits = person.getTotalInjurySeverity();
-        String hitsLabel = getFormattedTextAt(RESOURCE_BUNDLE, "lblAltAdvancedMedical.hits",
-              person.getTotalInjurySeverity());
+        String hitsLabel = getFormattedTextAt(RESOURCE_BUNDLE, "lblAltAdvancedMedical.hits", hits);
 
         String label = "<html>" + effectsLabel + "</html>";
         if (hits > 0) {
