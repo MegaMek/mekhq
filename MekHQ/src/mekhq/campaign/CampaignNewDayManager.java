@@ -623,6 +623,16 @@ public class CampaignNewDayManager {
             PersonnelOptions personnelOptions = person.getOptions();
 
             // Daily events
+            medicalController.processMedicalEvents(person,
+                  campaignOptions.isUseAgeEffects(),
+                  campaign.isClanCampaign(),
+                  today);
+
+            // The character can die during the prior step, if so we stop processing them.
+            if (person.getStatus().isDead()) {
+                continue;
+            }
+
             if (person.getStatus().isMIA()) {
                 recovery.attemptRescueOfPlayerCharacter(person);
             }
@@ -642,11 +652,6 @@ public class CampaignNewDayManager {
 
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
-
-            medicalController.processMedicalEvents(person,
-                  campaignOptions.isUseAgeEffects(),
-                  campaign.isClanCampaign(),
-                  today);
 
             processAnniversaries(person);
 
@@ -1594,7 +1599,11 @@ public class CampaignNewDayManager {
             int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
             boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
                   null, modifier);
-            String report = person.processHysteria(campaign, true, isUseAdvancedMedical, failedWillpowerCheck);
+            String report = person.processHysteria(campaign,
+                  true,
+                  isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
+                  failedWillpowerCheck);
             if (!report.isBlank()) {
                 campaign.addReport(MEDICAL, report);
             }

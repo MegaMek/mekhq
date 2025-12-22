@@ -149,6 +149,7 @@ public class AlternateInjuries {
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
     public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
     public static final InjuryType CATATONIA = new ChronicDisassociation();
+    public static final InjuryType TERRIBLE_BRUISES = new TerribleBruises();
     // Diseases
     public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
     public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
@@ -2307,6 +2308,19 @@ public class AlternateInjuries {
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CATATONIA.simpleName");
+            this.injurySubType = FLAW;
+        }
+    }
+
+    public static final class TerribleBruises extends BaseInjury {
+        TerribleBruises() {
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.TERRIBLE_BRUISES.simpleName");
             this.injurySubType = FLAW;
         }
     }
