@@ -418,6 +418,12 @@ public class Campaign implements ITechManager {
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private MekHQ app;
 
+    /**
+     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
+     * applied to Campaign.
+     */
+    private CampaignEventProcessor campaignEventProcessor = new CampaignEventProcessor(this);
+
     private ShoppingList shoppingList;
 
     private NewPersonnelMarket newPersonnelMarket;
