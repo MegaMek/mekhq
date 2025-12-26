@@ -950,7 +950,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getWriteAllUnitsToXML() {
-        return userPreferences.node(MHQConstants.XML_SAVES_NODE).getBoolean(MHQConstants.WRITE_ALL_UNITS_TO_XML, true);
+        return userPreferences.node(MHQConstants.XML_SAVES_NODE).getBoolean(MHQConstants.WRITE_ALL_UNITS_TO_XML, false);
     }
 
     public void setWriteAllUnitsToXML(boolean value) {
