@@ -45,6 +45,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Entity;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
@@ -560,11 +561,11 @@ public class EquipmentPart extends Part {
             } else if (type.hasFlag(MiscType.F_TARGETING_COMPUTER)) {
                 varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) &&
-                             (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
+                             (type.hasAnyFlag(MiscTypeFlag.S_HATCHET, MiscTypeFlag.S_MACE_THB))) {
                 varCost = Money.of(getTonnage() * 5000);
-            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
+            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_SWORD)) {
                 varCost = Money.of(getTonnage() * 10000);
-            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
+            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE)) {
                 varCost = Money.of((1 + getTonnage()) * 10000);
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
                 // TODO: Handle this through subtyping
@@ -576,9 +577,9 @@ public class EquipmentPart extends Part {
                 varCost = Money.of(getTonnage() * 50000);
             } else if (type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
                 // TODO: subtype this one
-            } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
+            } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasFlag(MiscTypeFlag.S_CLAW))) {
                 varCost = Money.of(getUnitTonnage() * 200);
-            } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
+            } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasFlag(MiscTypeFlag.S_LANCE))) {
                 varCost = Money.of(getUnitTonnage() * 150);
             } else if (type.hasFlag(MiscType.F_NAVAL_C3)) {
                 varCost = Money.of(getUnitTonnage() * 100000);
@@ -613,14 +614,14 @@ public class EquipmentPart extends Part {
     public static double getMaxTonnage(EquipmentType type) {
         if (type.hasFlag(MiscType.F_TALON) ||
                   (type.hasFlag(MiscType.F_CLUB) &&
-                         (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB)))) {
+                         (type.hasAnyFlag(MiscTypeFlag.S_HATCHET, MiscTypeFlag.S_MACE_THB)))) {
             return 7;
         } else if (type.hasFlag(MiscType.F_CLUB) &&
-                         (type.hasSubType(MiscType.S_LANCE) || type.hasSubType(MiscType.S_SWORD))) {
+                         (type.hasAnyFlag(MiscTypeFlag.S_LANCE, MiscTypeFlag.S_SWORD))) {
             return 5;
-        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_MACE)) {
+        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_MACE)) {
             return 10;
-        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
+        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE)) {
             return 5.5;
         } else if (type.hasFlag(MiscType.F_TARGETING_COMPUTER)) {
             // direct fire weapon weight divided by 4 - what is reasonably the highest - 15
@@ -631,7 +632,7 @@ public class EquipmentPart extends Part {
     }
 
     public static double getTonnageIncrement(EquipmentType type) {
-        if ((type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))) {
+        if ((type.hasFlag(MiscType.F_CLUB) && type.hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE))) {
             return 0.5;
         }
         return 1;

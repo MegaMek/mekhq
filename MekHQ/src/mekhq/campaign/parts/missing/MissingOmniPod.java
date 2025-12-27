@@ -40,6 +40,7 @@ import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -174,7 +175,7 @@ public class MissingOmniPod extends MissingPart {
                             partType = new JumpJet(tonnage, et, -1, false, campaign);
                         } else if (et instanceof MiscType
                                          && et.hasFlag(MiscType.F_MASC)
-                                         && (et.getSubType() & MiscType.S_SUPERCHARGER) == 0) {
+                                         && !et.hasFlag(MiscTypeFlag.S_SUPERCHARGER)) {
                             if (null != wn2.getAttributes().getNamedItem("rating")) {
                                 int rating = Integer
                                                    .parseInt(wn2.getAttributes()
