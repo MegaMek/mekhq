@@ -422,7 +422,7 @@ public class Campaign implements ITechManager {
      * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
      * applied to Campaign.
      */
-    private CampaignEventProcessor campaignEventProcessor = new CampaignEventProcessor(this);
+    private transient CampaignEventProcessor campaignEventProcessor;
 
     private ShoppingList shoppingList;
 
@@ -1066,6 +1066,10 @@ public class Campaign implements ITechManager {
             initUnitGenerator();
         }
         return unitGenerator;
+    }
+
+    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
+        campaignEventProcessor = processor;
     }
 
     public void setAtBEventProcessor(AtBEventProcessor processor) {
