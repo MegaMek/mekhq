@@ -203,6 +203,8 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -476,8 +478,9 @@ public class Campaign implements ITechManager {
     // We deliberately don't write this data to the save file as we want it rebuilt
     // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
-    RandomEventLibraries randomEventLibraries;
-    FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private RandomEventLibraries randomEventLibraries;
+    private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private Map<UUID, LifePath> lifePathLibrary;
 
     /**
      * A constant that provides the ISO-8601 definition of week-based fields.
@@ -534,6 +537,7 @@ public class Campaign implements ITechManager {
               campConf.getfinances(),
               campConf.getRandomEvents(),
               campConf.getUltimatums(),
+              campConf.getLifePaths(),
               campConf.getRetDefTracker(),
               campConf.getAutosave(),
               campConf.getBehaviorSettings(),
@@ -546,20 +550,16 @@ public class Campaign implements ITechManager {
         );
     }
 
-    public Campaign(Game game,
-          Player player, String name, LocalDate date, CampaignOptions campaignOpts, GameOptions gameOptions,
-          PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
-          RandomDeath randomDeath, CampaignSummary campaignSummary,
-          Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
-          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
-          FactionStandings factionStandings, RankSystem rankSystem, Force force, Finances finances,
-          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
-          RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
-          BehaviorSettings behaviorSettings,
-          PersonnelMarket persMarket, AbstractContractMarket atbMonthlyContractMarket,
-          AbstractUnitMarket unitMarket,
-          AbstractDivorce divorce, AbstractMarriage marriage,
-          AbstractProcreation procreation) {
+    public Campaign(Game game, Player player, String name, LocalDate date, CampaignOptions campaignOpts,
+          GameOptions gameOptions, PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
+          RandomDeath randomDeath, CampaignSummary campaignSummary, Faction faction,
+          megamek.common.enums.Faction techFaction, CurrencyManager currencyManager, Systems systemsInstance,
+          CurrentLocation startLocation, ReputationController reputationController, FactionStandings factionStandings,
+          RankSystem rankSystem, Force force, Finances finances, RandomEventLibraries randomEvents,
+          FactionStandingUltimatumsLibrary ultimatums, Map<UUID, LifePath> lifePaths,
+          RetirementDefectionTracker retDefTracker, IAutosaveService autosave, BehaviorSettings behaviorSettings,
+          PersonnelMarket persMarket, AbstractContractMarket atbMonthlyContractMarket, AbstractUnitMarket unitMarket,
+          AbstractDivorce divorce, AbstractMarriage marriage, AbstractProcreation procreation) {
 
         // Essential state
         id = UUID.randomUUID();
@@ -581,6 +581,7 @@ public class Campaign implements ITechManager {
         this.finances = finances;
         randomEventLibraries = randomEvents;
         factionStandingUltimatumsLibrary = ultimatums;
+        lifePathLibrary = lifePaths;
         retirementDefectionTracker = retDefTracker;
         autosaveService = autosave;
         autoResolveBehaviorSettings = behaviorSettings;
@@ -681,6 +682,15 @@ public class Campaign implements ITechManager {
         this.newPersonnelMarket.setCampaign(this);
         this.randomDeath.setCampaign(this);
         this.campaignSummary.setCampaign(this);
+
+        // TODO remove Immersive Dialog's reliance on Campaign so this can be enabled and the duplicate code in
+        //  CampaignFactory can be removed.
+        //        try {
+        //            lifePathLibrary = LifePathIO.loadAllLifePaths(this);
+        //        } catch (Exception ex) {
+        //            LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this must " +
+        //                               "be investigated.", ex);
+        //        }
     }
 
     public IAutosaveService getAutosaveService() {
@@ -6384,6 +6394,18 @@ public class Campaign implements ITechManager {
 
     public FactionStandingUltimatumsLibrary getFactionStandingUltimatumsLibrary() {
         return factionStandingUltimatumsLibrary;
+    }
+
+    public Map<UUID, LifePath> getLifePathLibrary() {
+        return lifePathLibrary;
+    }
+
+    public @Nullable LifePath getSingleLifePath(UUID lifePathID) {
+        return lifePathLibrary.get(lifePathID);
+    }
+
+    public void setLifePathLibrary(Map<UUID, LifePath> lifePathLibrary) {
+        this.lifePathLibrary = lifePathLibrary;
     }
 
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
