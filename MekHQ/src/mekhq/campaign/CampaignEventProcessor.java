@@ -39,13 +39,24 @@ import mekhq.campaign.personnel.Person;
 
 /**
  * For processing events that should trigger for any kind of campaign, AtB or otherwise.
- * @param campaign
+ *
+ * @param campaign the campaign whose events this processor will handle
  */
 public record CampaignEventProcessor(Campaign campaign) {
 
     public CampaignEventProcessor(Campaign campaign) {
         this.campaign = campaign;
         MekHQ.registerHandler(this);
+    }
+
+    /**
+     * Unregisters this processor from MekHQ's event handling system.
+     *
+     * <p>This should be called when the associated campaign is being shut down
+     * or replaced, to avoid memory leaks from lingering event handlers.</p>
+     */
+    public void shutdown() {
+        MekHQ.unregisterHandler(this);
     }
 
     /**
