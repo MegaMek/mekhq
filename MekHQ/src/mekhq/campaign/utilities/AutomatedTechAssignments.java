@@ -399,12 +399,19 @@ public class AutomatedTechAssignments {
      */
     private void arrangeUnitsIntoBuckets(Collection<Unit> units) {
         for (Unit unit : units) {
-            if (unit.getTech() == null) {
-                Entity entity = unit.getEntity();
-                if (entity == null) {
-                    continue;
-                }
+            // If the unit isn't available, it can't be maintained. This protects us from assigning personnel to
+            // mothballed, refitting, or deployed units.
+            if (!unit.isAvailable()) {
+                continue;
+            }
 
+            // If the unit doesn't have an Entity, we can't parse what kind of unit it is, so we skip it.
+            Entity entity = unit.getEntity();
+            if (entity == null) {
+                continue;
+            }
+
+            if (unit.getTech() == null) {
                 int unitType = entity.getUnitType();
                 switch (unitType) {
                     // Self-crewed or not yet supported
