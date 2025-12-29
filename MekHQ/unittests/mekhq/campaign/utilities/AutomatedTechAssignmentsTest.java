@@ -309,6 +309,7 @@ class AutomatedTechAssignmentsTest {
         Unit unit = mock(Unit.class);
         when(unit.getTech()).thenReturn(null);
         when(unit.getEntity()).thenReturn(entity);
+        when(unit.isAvailable()).thenReturn(true);
 
         return unit;
     }
