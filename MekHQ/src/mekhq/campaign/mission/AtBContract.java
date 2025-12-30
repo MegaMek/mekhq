@@ -68,6 +68,7 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -561,6 +562,47 @@ public class AtBContract extends Contract {
                 if (report != null) {
                     campaign.addReport(GENERAL, report);
                 }
+            }
+        }
+
+        // Check for emergency clause (this can trigger multiple times if the enemy faction keeps changing to a Clan
+        // faction. This can be seen as the employer getting increasingly desperate and wanting to keep the player on
+        // side.
+        checkForSpecialClanSalvageClause(campaign, today, enemyFaction);
+    }
+
+    /**
+     * Checks for and applies a special emergency salvage clause when fighting Clan forces prior to or during the Battle
+     * of Tukayyid.
+     *
+     * <p>If the employer is non-Clan and the enemy is Clan, and the current date is on or before the Battle of
+     * Tukayyid, the salvage percentage is increased by 25% (up to a minimum of 100%) and salvage exchange is enabled.
+     * An immersive dialog is displayed to inform the player of the contract adjustment.</p>
+     *
+     * @param campaign     The current campaign instance.
+     * @param today        The current game date to check against the Tukayyid threshold.
+     * @param enemyFaction The faction being fought in the current contract or mission.
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    private void checkForSpecialClanSalvageClause(Campaign campaign, LocalDate today, Faction enemyFaction) {
+        if (!getEmployerFaction().isClan() && enemyFaction.isClan()) {
+            if (!today.isAfter(BATTLE_OF_TUKAYYID)) {
+                int oldSalvagePercent = getSalvagePct();
+                int newSalvagePercent = (int) max(100, round(oldSalvagePercent * 1.25));
+
+                boolean isAlreadyMax = oldSalvagePercent >= 100;
+
+                setSalvageExchange(true);
+                setSalvagePct(newSalvagePercent);
+
+                String message = getTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.message");
+                if (!isAlreadyMax) {
+                    message += getFormattedTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.addendum",
+                          oldSalvagePercent, newSalvagePercent);
+                }
+                new ImmersiveDialogSimple(campaign, getEmployerLiaison(), null, message, null, null, null, false);
             }
         }
     }
@@ -1197,11 +1239,6 @@ public class AtBContract extends Contract {
                     stratconCampaignState = StratConCampaignState.Deserialize(item);
                     stratconCampaignState.setContract(this);
                     this.setStratConCampaignState(stratconCampaignState);
-
-                    // <50.10 compatibility handler
-                    if (!(getContractType().isGarrisonType() || getContractType().isReliefDuty())) {
-                        stratconCampaignState.setAllowEarlyVictory(true);
-                    }
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {

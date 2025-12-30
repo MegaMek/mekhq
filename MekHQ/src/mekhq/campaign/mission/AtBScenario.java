@@ -73,6 +73,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -99,6 +100,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -353,7 +355,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaignOptions.isUseWeatherConditions()) {
             setWeatherConditions(campaignOptions.isUseNoTornadoes());
         }
-        setMapSize();
+        setMapSize(campaign);
         setMapFile();
         if (isStandardScenario()) {
             forceCount = 1;
@@ -465,7 +467,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    public void setMapSize() {
+    public void setMapSize(Campaign campaign) {
         int roll = Compute.randomInt(20) + 1;
         if (roll < 6) {
             setMapSizeX(20);
@@ -870,11 +872,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().isUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
-                for (UUID id : campaign.getAllUnitsInTheTOE(true)) {
-                    if ((campaign.getUnit(id).getEntity().getEntityType() & Entity.ETYPE_DROPSHIP) != 0 &&
-                              campaign.getUnit(id).isAvailable()) {
-                        addUnit(id);
-                        campaign.getUnit(id).setScenarioId(getId());
+                Hangar hangar = campaign.getHangar();
+                List<UUID> allCombatUnits = campaign.getAllUnitsInTheTOE(true);
+                Collections.shuffle(allCombatUnits); // Remove bias
+                for (UUID unitId : allCombatUnits) {
+                    Entity entity = EntityUtilities.getEntityFromUnitId(hangar, unitId);
+
+                    if (entity != null && entity.isDropShip()) {
+                        addUnit(unitId);
+                        campaign.getUnit(unitId).setScenarioId(getId());
                         dropshipFound = true;
                         break;
                     }

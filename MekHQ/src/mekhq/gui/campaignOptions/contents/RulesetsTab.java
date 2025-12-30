@@ -52,6 +52,7 @@ import megamek.client.ui.models.FileNameComboBoxModel;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
+import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.stratCon.StratConPlayType;
@@ -86,6 +87,8 @@ public class RulesetsTab {
     //start Universal Options
     private JLabel lblSkillLevel;
     private MMComboBox<SkillLevel> comboSkillLevel;
+    private JLabel lblBoardScalingType;
+    private MMComboBox<BoardScalingType> comboBoardScalingType;
     private JPanel pnlScenarioGenerationPanel;
     private JPanel pnlCampaignOptions;
 
@@ -201,6 +204,8 @@ public class RulesetsTab {
         // General
         lblSkillLevel = new JLabel();
         comboSkillLevel = new MMComboBox<>("comboSkillLevel", getSkillLevelOptions());
+        lblBoardScalingType = new JLabel();
+        comboBoardScalingType = new MMComboBox<>("comboBoardScalingType", BoardScalingType.values());
         pnlScenarioGenerationPanel = new JPanel();
 
         // CallSigns
@@ -287,6 +292,7 @@ public class RulesetsTab {
     private void substantializeUniversalOptions() {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
+        lblBoardScalingType = new CampaignOptionsLabel("BoardScalingType");
 
         // CallSigns
         pnlCallSigns = createCallSignsPanel();
@@ -787,6 +793,8 @@ public class RulesetsTab {
         spnScenarioModBV.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModBV"));
         lblSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
         comboSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
+        lblBoardScalingType.addMouseListener(createTipPanelUpdater(stratConHeader, "BoardScalingType"));
+        comboBoardScalingType.addMouseListener(createTipPanelUpdater(stratConHeader, "BoardScalingType"));
         chkAutoGenerateOpForCallSigns.addMouseListener(createTipPanelUpdater(stratConHeader,
               "AutoGenerateOpForCallSigns"));
         lblMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
@@ -840,6 +848,12 @@ public class RulesetsTab {
         layout.gridx++;
         panel.add(comboSkillLevel, layout);
         layout.gridx++;
+        panel.add(lblBoardScalingType, layout);
+        layout.gridx++;
+        panel.add(comboBoardScalingType, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(chkUseGenericBattleValue, layout);
         layout.gridx++;
         panel.add(chkUseVerboseBidding, layout);
@@ -920,6 +934,7 @@ public class RulesetsTab {
 
         // Universal
         options.setSkillLevel(comboSkillLevel.getSelectedItem());
+        options.setBoardScalingType(comboBoardScalingType.getSelectedItem());
         options.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
         options.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
         options.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
@@ -983,6 +998,7 @@ public class RulesetsTab {
 
         // Universal
         comboSkillLevel.setSelectedItem(options.getSkillLevel());
+        comboBoardScalingType.setSelectedItem(options.getBoardScalingType());
         spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
         spnOpForLanceTypeVehicles.setValue(options.getOpForLanceTypeVehicles());

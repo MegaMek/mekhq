@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.gui.campaignOptions.CampaignOptionsPane.triggerUpgradeFreebies;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -55,10 +56,12 @@ import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 
@@ -112,12 +115,11 @@ public class CampaignUpgradeDialog {
      * dialog.</p>
      *
      * @param campaign The campaign being upgraded; must not be {@code null}.
-     * @param runnable An optional {@link Runnable} to trigger after a successful upgrade.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static void campaignUpgradeDialog(Campaign campaign, Runnable runnable) {
+    public static void campaignUpgradeDialog(Campaign campaign) {
         JPanel supplementalPanel = createSupplementalPanel();
 
         // This will occur if there are no presets available. This should never occur under normal circumstances as
@@ -156,8 +158,14 @@ public class CampaignUpgradeDialog {
                 }
 
                 CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
+
+                // This needs to be before we start changing options
+                CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
+
+                campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
                 campaign.setGameOptions(chosenPreset.getGameOptions());
                 campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
+
                 Map<String, SkillType> presetSkills = chosenPreset.getSkills();
                 for (final String skillName : SkillType.getSkillList()) {
                     SkillType storedType = SkillType.getType(skillName);
@@ -194,7 +202,13 @@ public class CampaignUpgradeDialog {
 
                 SpecialAbility.replaceSpecialAbilities(chosenPreset.getSpecialAbilities());
 
-                LOGGER.info("Applying {} during upgrade process", chosenPreset.getTitle());
+                CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(chosenPreset.getCampaignOptions());
+                SwingUtilities.invokeLater(() -> {
+                    triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
+
+                    LOGGER.info("Applying '{}' during upgrade process", chosenPreset.getTitle());
+                    MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                });
             }
             case PRESET_SELECTION_CUSTOMIZE -> {
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(null, campaign);
@@ -202,13 +216,12 @@ public class CampaignUpgradeDialog {
                 if (optionsDialog.wasCanceled()) {
                     exitApp(campaign.getApp());
                 }
-                SwingUtilities.invokeLater(runnable);
             }
         }
 
-        new ImmersiveDialogNotification(campaign,
-              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading", MHQConstants.VERSION.toString()),
-              true);
+        SwingUtilities.invokeLater(() -> campaign.addReport(DailyReportType.GENERAL,
+              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
+                    MHQConstants.VERSION.toString())));
     }
 
     /**

@@ -71,7 +71,7 @@ public class OrderFactory {
     }
 
     private void addOrder(Order order) {
-        LOGGER.info("Adding order {}", order);
+        LOGGER.debug("Adding order {}", order);
         this.orders.add(order);
     }
 

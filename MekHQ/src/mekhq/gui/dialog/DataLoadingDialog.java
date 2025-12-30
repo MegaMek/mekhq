@@ -33,7 +33,7 @@
 package mekhq.gui.dialog;
 
 import static java.util.Arrays.sort;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
@@ -71,6 +71,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignEventProcessor;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -386,7 +387,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
                           campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
                           true);
-                    campaign.addReport(GENERAL, report);
+                    campaign.addReport(POLITICS, report);
                 }
                 // endregion Progress 6
 
@@ -454,15 +455,17 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 unassignCrewFromUnsupportedUnits(campaign.getUnits());
 
-                // Campaign upgrading
-                final Version campaignVersion = campaign.getVersion();
-                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
-                    handleCampaignUpgrading(campaign);
-                }
-
                 // <50.10 compatibility handler
+                final Version campaignVersion = campaign.getVersion();
                 if (campaignVersion.isLowerThan(new Version("0.50.10"))) {
                     new WarAndPeaceProcessor(campaign, true);
+                }
+
+                // Campaign upgrading
+                // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
+                // dialogs will get 'stuck' behind other dialogs
+                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
+                    handleCampaignUpgrading(campaign);
                 }
                 // endregion Progress 7
             }
@@ -470,6 +473,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             if (isNewCampaign) {
                 new WarAndPeaceProcessor(campaign, true);
             }
+
+            // Generic event processor
+            campaign.setCampaignEventProcessor(new CampaignEventProcessor(campaign));
 
             campaign.setApp(getApplication());
             return campaign;
@@ -495,8 +501,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @since 0.50.07
          */
         private static void handleCampaignUpgrading(Campaign campaign) {
-            CampaignUpgradeDialog.campaignUpgradeDialog(campaign,
-                  () -> MekHQ.triggerEvent(new OptionsChangedEvent(campaign)));
+            CampaignUpgradeDialog.campaignUpgradeDialog(campaign);
         }
 
         /**

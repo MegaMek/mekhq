@@ -62,6 +62,8 @@ public class ScenarioMapParameters implements Cloneable {
         clone.mapLocation = mapLocation;
         clone.useStandardAtBSizing = useStandardAtBSizing;
         clone.widthScalingIncrement = widthScalingIncrement;
+        clone.additionalMapSheetTall = additionalMapSheetTall;
+        clone.additionalMapSheetWide = additionalMapSheetWide;
 
         return clone;
     }
@@ -87,6 +89,10 @@ public class ScenarioMapParameters implements Cloneable {
      * lance
      */
     private int heightScalingIncrement = 5;
+
+    private int additionalMapSheetTall = 0;
+
+    private int additionalMapSheetWide = 0;
 
     /**
      * Allow the map to potentially (with 50/50 odds) to be rotated 90 degrees.
@@ -143,6 +149,13 @@ public class ScenarioMapParameters implements Cloneable {
         this.heightScalingIncrement = heightScalingIncrement;
     }
 
+    public int getAdditionalMapSheetTall() {
+        return additionalMapSheetTall;
+    }
+
+    public int getAdditionalMapSheetWide() {
+        return additionalMapSheetWide;
+    }
     public boolean isAllowRotation() {
         return allowRotation;
     }

@@ -235,8 +235,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    public void setMapSize() {
-        AtBDynamicScenarioFactory.setScenarioMapSize(this);
+    public void setMapSize(Campaign campaign) {
+        AtBDynamicScenarioFactory.setScenarioMapSize(this, campaign);
     }
 
     /**

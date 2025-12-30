@@ -149,6 +149,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
+import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -2746,10 +2747,25 @@ public class CampaignGUI extends JPanel {
                     logNagActive = true;
                 }
 
-                int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
+                EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
+                int logsSelected = tabLogs.getSelectedIndex();
                 if (logsSelected != relevantIndex) {
-                    commandCenterTab.nagLogTab(relevantIndex);
-                    commandCenterTab.setLogNagActive(logType, true);
+                    DailyReportLogPanel reportTab = switch (logType) {
+                        case GENERAL -> commandCenterTab.getGeneralLog();
+                        case BATTLE -> commandCenterTab.getBattleLog();
+                        case PERSONNEL -> commandCenterTab.getPersonnelLog();
+                        case MEDICAL -> commandCenterTab.getMedicalLog();
+                        case FINANCES -> commandCenterTab.getFinancesLog();
+                        case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
+                        case TECHNICAL -> commandCenterTab.getTechnicalLog();
+                        case POLITICS -> commandCenterTab.getPoliticsLog();
+                        case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+                    };
+
+                    if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
+                        commandCenterTab.nagLogTab(relevantIndex);
+                        commandCenterTab.setLogNagActive(logType, true);
+                    }
                 }
 
                 break;
@@ -2933,6 +2949,10 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handleDayEnding(DayEndingEvent dayEndingEvent) {
+        if (MekHQ.getMHQOptions().getNewDayAutomaticallyAssignUnmaintainedUnits()) {
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+        }
+
         if (triggerDailyNags(getCampaign())) {
             dayEndingEvent.cancel();
             return;

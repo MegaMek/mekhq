@@ -39,7 +39,6 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -178,6 +177,25 @@ public enum InjuryEffect {
           -2,
           -2,
           false,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0),
+    BRAIN_TRAUMA("BRAIN_TRAUMA",
+          getNegativeColor(),
+          0,
+          0,
+          0,
+          0,
+          0,
+          -2,
+          -2,
+          -2,
+          true,
           0,
           0,
           0,
@@ -1269,9 +1287,9 @@ public enum InjuryEffect {
           0,
           0,
           0),
-    CYBERNETIC_EYE_TELESCOPE("CYBERNETIC_EYE_TELESCOPE",
+    EYESIGHT_ENHANCED("CYBERNETIC_EYE_TELESCOPE",
           "",
-          2,
+          1,
           0,
           0,
           0,
@@ -1288,7 +1306,7 @@ public enum InjuryEffect {
           0,
           0,
           0),
-    CYBERNETIC_EYE_LASER("CYBERNETIC_EYE_LASER",
+    EYESIGHT_LASER("EYESIGHT_LASER",
           "",
           0,
           0,
@@ -1307,9 +1325,9 @@ public enum InjuryEffect {
           0,
           0,
           0),
-    CYBERNETIC_EYE_MULTI("CYBERNETIC_EYE_MULTI",
+    EYESIGHT_MULTI("EYESIGHT_MULTI",
           "",
-          2,
+          1,
           0,
           0,
           0,
@@ -1326,28 +1344,9 @@ public enum InjuryEffect {
           0,
           0,
           0),
-    CYBERNETIC_EAR_SIGNAL("CYBERNETIC_EAR_SIGNAL",
+    HEARING_ENHANCED("HEARING_ENHANCED",
           "",
-          2,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          false,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0),
-    CYBERNETIC_EAR_MULTI("CYBERNETIC_EAR_MULTI",
-          "",
-          3,
+          1,
           0,
           0,
           0,
@@ -1687,7 +1686,7 @@ public enum InjuryEffect {
      * Builds a localized tooltip summarizing key information about all active injury effects.
      *
      * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
-     * {@link ProstheticType#getTooltip(Faction, LocalDate, boolean)}.</p>
+     * {@link ProstheticType#getTooltip(Faction, int, boolean)}.</p>
      *
      * @param injuryEffects A list of currently active injury effects
      *
@@ -1824,7 +1823,7 @@ public enum InjuryEffect {
             effects.append(formatEffect(entry.getKey(), entry.getValue()));
         }
 
-        return "<html>" + effects + "</html>";
+        return effects.toString();
     }
 
     private static String formatEffect(InjuryEffect effect, long count) {

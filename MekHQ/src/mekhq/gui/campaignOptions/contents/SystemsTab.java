@@ -102,6 +102,7 @@ public class SystemsTab {
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
     private JCheckBox chkDisplayAllAttributes;
+    private JCheckBox chkUseAgeEffects;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkAllowMonthlyReinvestment;
     private JCheckBox chkAllowMonthlyConnections;
@@ -436,6 +437,8 @@ public class SystemsTab {
         chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
         chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes");
         chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
+        chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects");
+        chkUseAgeEffects.addMouseListener(createTipPanelUpdater(atowHeader, "UseAgeEffects"));
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
@@ -464,16 +467,20 @@ public class SystemsTab {
         layout.gridx++;
         panel.add(chkDisplayAllAttributes, layout);
         layout.gridx++;
-        panel.add(chkRandomizeTraits, layout);
+        panel.add(chkUseAgeEffects, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(chkRandomizeTraits, layout);
+        layout.gridx++;
         panel.add(chkAllowMonthlyReinvestment, layout);
         layout.gridx++;
         panel.add(chkAllowMonthlyConnections, layout);
         layout.gridx++;
         panel.add(chkUseBetterExtraIncome, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(chkUseSmallArmsOnly, layout);
 
         return panel;
@@ -540,6 +547,7 @@ public class SystemsTab {
         chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
         chkDisplayAllAttributes.setSelected(options.isDisplayAllAttributes());
+        chkUseAgeEffects.setSelected(options.isUseAgeEffects());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
         chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
@@ -603,6 +611,7 @@ public class SystemsTab {
         skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
         skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
         options.setDisplayAllAttributes(chkDisplayAllAttributes.isSelected());
+        options.setUseAgeEffects(chkUseAgeEffects.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
         options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());

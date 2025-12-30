@@ -39,6 +39,7 @@ import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
@@ -146,6 +147,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private DailyReportLogPanel pnlGeneralLog;
     private DailyReportLogPanel pnlSkillLog;
     private DailyReportLogPanel pnlBattleLog;
+    private DailyReportLogPanel pnlPoliticsLog;
     private DailyReportLogPanel pnlPersonnelLog;
     private DailyReportLogPanel pnlMedicalLog;
     private DailyReportLogPanel pnlFinancesLog;
@@ -154,6 +156,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private boolean logNagActiveGeneral = false;
     private boolean logNagActiveBattle = false;
+    private boolean logNagActivePolitics = false;
     private boolean logNagActivePersonnel = false;
     private boolean logNagActiveMedical = false;
     private boolean logNagActiveFinances = false;
@@ -202,6 +205,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     public DailyReportLogPanel getBattleLog() {
         return pnlBattleLog;
+    }
+
+    public DailyReportLogPanel getPoliticsLog() {
+        return pnlPoliticsLog;
     }
 
     public DailyReportLogPanel getPersonnelLog() {
@@ -519,6 +526,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlBattleLog.setMinimumSize(size);
         pnlBattleLog.setPreferredSize(size);
 
+        pnlPoliticsLog = new DailyReportLogPanel(getCampaignGui());
+        pnlPoliticsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
+        pnlPoliticsLog.setMinimumSize(size);
+        pnlPoliticsLog.setPreferredSize(size);
+
         pnlPersonnelLog = new DailyReportLogPanel(getCampaignGui());
         pnlPersonnelLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
         pnlPersonnelLog.setMinimumSize(size);
@@ -560,6 +572,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         tabLogs.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
         tabLogs.addTab(TECHNICAL.getIconString(), pnlTechnicalLog);
         tabLogs.setToolTipTextAt(TECHNICAL.getTabIndex(), TECHNICAL.getTooltip());
+        tabLogs.addTab(POLITICS.getIconString(), pnlPoliticsLog);
+        tabLogs.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
         tabLogs.addTab(SKILL_CHECKS.getIconString(), pnlSkillLog);
         tabLogs.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
 
@@ -569,7 +583,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
     }
 
-    void clearDailyReportNag(int selectedIndex) {
+    public void clearDailyReportNag(int selectedIndex) {
         DailyReportType type = DailyReportType.getTypeFromIndex(selectedIndex);
         if (type != null) {
             tabLogs.setBackgroundAt(selectedIndex, null);
@@ -585,6 +599,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         return switch (logType) {
             case GENERAL -> logNagActiveGeneral;
             case BATTLE -> logNagActiveBattle;
+            case POLITICS -> logNagActivePolitics;
             case PERSONNEL -> logNagActivePersonnel;
             case MEDICAL -> logNagActiveMedical;
             case FINANCES -> logNagActiveFinances;
@@ -598,6 +613,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         switch (logType) {
             case GENERAL -> logNagActiveGeneral = isActive;
             case BATTLE -> logNagActiveBattle = isActive;
+            case POLITICS -> logNagActivePolitics = isActive;
             case PERSONNEL -> logNagActivePersonnel = isActive;
             case MEDICAL -> logNagActiveMedical = isActive;
             case FINANCES -> logNagActiveFinances = isActive;
@@ -770,7 +786,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             for (String report : factionStandingReport.getReports()) {
                 if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(GENERAL, report);
+                    getCampaign().addReport(POLITICS, report);
                 }
             }
         });
@@ -812,6 +828,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         refreshGeneralLog();
         refreshSkillLog();
         refreshBattleLog();
+        refreshPoliticsLog();
         refreshPersonnelLog();
         refreshMedicalLog();
         refreshFinancesLog();
@@ -979,6 +996,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlBattleLog.refreshLog(battleReport, BATTLE);
         getCampaign().fetchAndClearNewBattleReports();
 
+        String politicsReport = getCampaign().getPoliticsReportHTML();
+        pnlPoliticsLog.refreshLog(politicsReport, POLITICS);
+        getCampaign().fetchAndClearNewPoliticsReports();
+
         String personnelReport = getCampaign().getPersonnelReportHTML();
         pnlPersonnelLog.refreshLog(personnelReport, PERSONNEL);
         getCampaign().fetchAndClearNewPersonnelReports();
@@ -1013,6 +1034,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     synchronized private void refreshBattleLog() {
         pnlBattleLog.appendLog(getCampaign().fetchAndClearNewBattleReports(), BATTLE);
+    }
+
+    synchronized private void refreshPoliticsLog() {
+        pnlPoliticsLog.appendLog(getCampaign().fetchAndClearNewPoliticsReports(), POLITICS);
     }
 
     synchronized private void refreshPersonnelLog() {
@@ -1060,6 +1085,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         refreshGeneralLog();
         refreshSkillLog();
         refreshBattleLog();
+        refreshPoliticsLog();
         refreshPersonnelLog();
         refreshMedicalLog();
         refreshFinancesLog();

@@ -770,9 +770,8 @@ public class FactionStandings {
      * accolade level will be increased for the provided date. The updated accolade level is then returned; if no change
      * is needed, {@code null} is returned.</p>
      *
-     * @param faction           the {@link Faction} object to check against
-     * @param today             the date to use when recording a possible accolade improvement
-     * @param hasActiveContract {@code true} if the campaign has an active contract, otherwise {@code false}
+     * @param faction the {@link Faction} object to check against
+     * @param today   the date to use when recording a possible accolade improvement
      *
      * @return the new {@link FactionAccoladeLevel} if an accolade change occurred, or {@code null} if there was no
      *       change
@@ -780,8 +779,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nullable FactionAccoladeLevel checkForAccolade(Faction faction, LocalDate today,
-          boolean hasActiveContract) {
+    public @Nullable FactionAccoladeLevel checkForAccolade(Faction faction, LocalDate today) {
         if (faction.isAggregate()) {
             return null;
         }
@@ -798,7 +796,7 @@ public class FactionStandings {
         if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
             LOGGER.debug("Faction {} has sufficient standing for accolade improvement.", factionCode);
             // This will return null if no change has taken place
-            return factionJudgment.increaseAccoladeForFaction(faction, today, factionStanding, hasActiveContract);
+            return factionJudgment.increaseAccoladeForFaction(faction, today, factionStanding);
         }
 
         return null;

@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Test;
  * This class is a test class for the {@link NoCommanderNagDialog} class. It contains test methods for various scenarios
  * related to commander assignment.
  */
+@Deprecated(since = "0.50.11", forRemoval = true)
 class NoCommanderNagLogicTest {
     private Person commander;
     private Person commanderNull;

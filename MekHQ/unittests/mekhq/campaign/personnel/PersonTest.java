@@ -44,7 +44,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import megamek.common.TechConstants;
@@ -928,7 +931,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, false, false, false);
+        person.processConfusion(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -943,7 +946,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, false, true, false);
+        person.processConfusion(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -962,7 +965,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, false, true, true);
+        person.processConfusion(mockCampaign, false, false, true, true);
         assertTrue(person.getInjuries().isEmpty());
         assertTrue(person.getHits() > 0);
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -981,7 +984,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, true, true, true);
+        person.processConfusion(mockCampaign, true, false, true, true);
         assertFalse(person.getInjuries().isEmpty());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1006,7 +1009,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processConfusion(mockCampaign, false, true, true);
+        person.processConfusion(mockCampaign, false, false, true, true);
         assertTrue(person.getInjuries().isEmpty());
         assertTrue(person.getHits() > 5);
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1033,7 +1036,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processConfusion(mockCampaign, true, true, true);
+        person.processConfusion(mockCampaign, true, false, true, true);
         assertTrue(person.getInjuries().size() > 5);
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1257,5 +1260,96 @@ public class PersonTest {
         assertEquals(6, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
+    }
+
+    @Test
+    void returnsHitsWhenNoInjuries() throws Exception {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        setField(person, "hits", 3);
+        setField(person, "injuries", new ArrayList<Injury>());
+
+        assertEquals(3, person.getNonPermanentInjurySeverity());
+    }
+
+    @Test
+    void ignoresPermanentInjuries() throws Exception {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        setField(person, "hits", 2);
+
+        Injury permanent1 = mock(Injury.class);
+        when(permanent1.isPermanent()).thenReturn(true);
+        when(permanent1.getHits()).thenReturn(10);
+
+        Injury permanent2 = mock(Injury.class);
+        when(permanent2.isPermanent()).thenReturn(true);
+        when(permanent2.getHits()).thenReturn(1);
+
+        setField(person, "injuries", new ArrayList<>(List.of(permanent1, permanent2)));
+
+        // Only base hits should count
+        assertEquals(2, person.getNonPermanentInjurySeverity());
+    }
+
+    @Test
+    void sumsOnlyNonPermanentInjuryHitsPlusBaseHits() throws Exception {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        setField(person, "hits", 5);
+
+        Injury nonPermanent1 = mock(Injury.class);
+        when(nonPermanent1.isPermanent()).thenReturn(false);
+        when(nonPermanent1.getHits()).thenReturn(2);
+
+        Injury permanent = mock(Injury.class);
+        when(permanent.isPermanent()).thenReturn(true);
+        when(permanent.getHits()).thenReturn(100); // should be ignored
+
+        Injury nonPermanent2 = mock(Injury.class);
+        when(nonPermanent2.isPermanent()).thenReturn(false);
+        when(nonPermanent2.getHits()).thenReturn(4);
+
+        setField(person, "injuries", new ArrayList<>(List.of(nonPermanent1, permanent, nonPermanent2)));
+
+        // 5 + 2 + 4 = 11
+        assertEquals(11, person.getNonPermanentInjurySeverity());
+    }
+
+    @Test
+    void countsNonPermanentInjuriesEvenWhenHitsIsZero() throws Exception {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        setField(person, "hits", 0);
+
+        Injury injury = mock(Injury.class);
+        when(injury.isPermanent()).thenReturn(false);
+        when(injury.getHits()).thenReturn(3);
+
+        setField(person, "injuries", new ArrayList<>(List.of(injury)));
+
+        assertEquals(3, person.getNonPermanentInjurySeverity());
+    }
+
+    private static void setField(Object target, String fieldName, Object value) throws Exception {
+        Field declaredField = target.getClass().getDeclaredField(fieldName);
+        declaredField.setAccessible(true);
+        declaredField.set(target, value);
     }
 }

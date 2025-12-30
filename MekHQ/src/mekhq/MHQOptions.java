@@ -242,6 +242,16 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
               .putBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
+
+    public boolean getUnifiedDailyReport() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_UNIFIED_DAILY_REPORT, false);
+    }
+
+    public void setUnifiedDailyReport(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_UNIFIED_DAILY_REPORT, value);
+    }
     // endregion Personnel Tab
     // endregion Display Tab
 
@@ -859,6 +869,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, value);
     }
 
+    public boolean getNewDayAutomaticallyAssignUnmaintainedUnits() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS, false);
+    }
+
+    public void setNewDayAutomaticallyAssignUnmaintainedUnits(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS, value);
+    }
+
     public boolean getNewMonthQuickTrain() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, false);
@@ -927,6 +947,14 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setWriteCustomsToXML(boolean value) {
         userPreferences.node(MHQConstants.XML_SAVES_NODE).putBoolean(MHQConstants.WRITE_CUSTOMS_TO_XML, value);
+    }
+
+    public boolean getWriteAllUnitsToXML() {
+        return userPreferences.node(MHQConstants.XML_SAVES_NODE).getBoolean(MHQConstants.WRITE_ALL_UNITS_TO_XML, false);
+    }
+
+    public void setWriteAllUnitsToXML(boolean value) {
+        userPreferences.node(MHQConstants.XML_SAVES_NODE).putBoolean(MHQConstants.WRITE_ALL_UNITS_TO_XML, value);
     }
 
     public boolean getSaveMothballState() {

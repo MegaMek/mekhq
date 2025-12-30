@@ -1715,7 +1715,9 @@ public final class BriefingTab extends CampaignGuiTab {
             rp.groundMap = groundMap;
             rp.spaceEnvironment = spaceMap;
             MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, entityList, "");
-            tlg.reconfigureEntities(entityList, opForFactionCode, mt, rp);
+            // We now have the ability to pre-create a munition availability map for use with special scenarios,
+            // representing limited-availability ammo in the hands of a specific force.
+            tlg.reconfigureEntities(entityList, opForFactionCode, mt, rp, null);
         }
 
         // Finally, reconfigure all allies (but not player entities) as one organization
@@ -1733,7 +1735,7 @@ public final class BriefingTab extends CampaignGuiTab {
         rp.groundMap = groundMap;
         rp.spaceEnvironment = spaceMap;
         MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, alliedEntities, "");
-        tlg.reconfigureEntities(alliedEntities, allyFactionCodes.get(0), mt, rp);
+        tlg.reconfigureEntities(alliedEntities, allyFactionCodes.get(0), mt, rp, null);
 
     }
 

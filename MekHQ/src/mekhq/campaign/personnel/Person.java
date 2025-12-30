@@ -65,6 +65,7 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateReasoning;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getTraitIndex;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -132,6 +133,7 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -395,12 +397,14 @@ public class Person {
     // region Flags
     private boolean clanPersonnel;
     private boolean commander;
+    private boolean secondInCommand;
     private boolean divorceable;
     private boolean founder; // +1 share if using shares system
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
     private boolean underProtection;
+    private boolean neverAssignMaintenanceAutomatically;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -412,6 +416,9 @@ public class Person {
     private boolean tryingToConceive;
     private boolean hidePersonality;
     // endregion Flags
+
+    // Cache
+    private transient Integer advancedAsTechContribution = null;
 
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
@@ -450,6 +457,9 @@ public class Person {
         OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
         OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
     }
+
+    /** Greater than this value means death */
+    public static int DEATH_THRESHOLD = 5;
     // endregion Variable Declarations
 
     // region Constructors
@@ -626,10 +636,12 @@ public class Person {
             }
         }
         underProtection = false;
+        neverAssignMaintenanceAutomatically = false;
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
         setCommander(false);
+        setSecondInCommand(false);
         setDivorceable(true);
         setFounder(false);
         setImmortal(false);
@@ -1315,7 +1327,7 @@ public class Person {
             // 1) Can always be Dependent
             // 2) Cannot be None
             // 3) Cannot be equal to the secondary role
-            // 4) Cannot be a tech role if the secondary role is a tech role (inc. Astech)
+            // 4) Cannot be astech role if the secondary role is a tech role
             // 5) Cannot be a medical if the secondary role is one of the medical staff roles
             // 6) Cannot be an admin role if the secondary role is one of the administrator roles
             if (role.isDependent()) {
@@ -1330,7 +1342,7 @@ public class Person {
                 return false;
             }
 
-            if ((role.isTech() || role.isAstech()) && (secondaryRole.isTechSecondary() || secondaryRole.isAstech())) {
+            if (role.isAstech() && secondaryRole.isTechSecondary()) {
                 return false;
             }
 
@@ -1346,7 +1358,7 @@ public class Person {
             // 1) Can always be None
             // 2) Cannot be Dependent
             // 3) Cannot be equal to the primary role
-            // 4) Cannot be a tech role if the primary role is a tech role (inc. Astech)
+            // 4) Cannot be a tech role if the primary role is Astech
             // 5) Cannot be a medical role if the primary role is one of the medical staff roles
             // 6) Cannot be an admin role if the primary role is one of the administrator roles
             if (role.isNone()) {
@@ -1361,7 +1373,7 @@ public class Person {
                 return false;
             }
 
-            if ((role.isTechSecondary() || role.isAstech()) && (primaryRole.isTech() || primaryRole.isAstech())) {
+            if (role.isTechSecondary() && primaryRole.isAstech()) {
                 return false;
             }
 
@@ -1614,6 +1626,28 @@ public class Person {
             }
 
             setCommander(false);
+
+            // promote second in command
+            Person secondInCommand = campaign.getSecondInCommand();
+            if (secondInCommand != null) {
+                secondInCommand.setSecondInCommand(false);
+                secondInCommand.setCommander(true);
+
+                String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
+                campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                      secondInCommandHyperlink));
+                campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                      secondInCommandHyperlink));
+
+                campaign.personUpdated(secondInCommand);
+            }
+        }
+
+        // release the second-in-command flag.
+        if (isSecondInCommand() && status.isDepartedUnit()) {
+            setSecondInCommand(false);
+            campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                  getHyperlinkedFullTitle()));
         }
 
         // clean up the save entry
@@ -2195,7 +2229,8 @@ public class Person {
         if (isAlternativeAdvancedMedicalEnabled && hasBodyModAddiction) {
             boolean hasProsthetic = false;
             for (Injury injury : getPermanentInjuries()) {
-                if (injury.getSubType().isProsthetic()) {
+                InjurySubType injurySubType = injury.getSubType();
+                if (injurySubType.isPermanentModification()) {
                     hasProsthetic = true;
                     break;
                 }
@@ -2996,6 +3031,14 @@ public class Person {
         this.commander = commander;
     }
 
+    public boolean isSecondInCommand() {
+        return secondInCommand;
+    }
+
+    public void setSecondInCommand(final boolean secondInCommand) {
+        this.secondInCommand = secondInCommand;
+    }
+
     public boolean isDivorceable() {
         return divorceable;
     }
@@ -3042,6 +3085,14 @@ public class Person {
 
     public void setUnderProtection(final boolean underProtection) {
         this.underProtection = underProtection;
+    }
+
+    public boolean isNeverAssignMaintenanceAutomatically() {
+        return neverAssignMaintenanceAutomatically;
+    }
+
+    public void setNeverAssignMaintenanceAutomatically(final boolean neverAssignMaintenanceAutomatically) {
+        this.neverAssignMaintenanceAutomatically = neverAssignMaintenanceAutomatically;
     }
 
     public boolean isEmployed() {
@@ -3639,12 +3690,17 @@ public class Person {
             // region Flags
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commander", commander);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondInCommand", secondInCommand);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "divorceable", divorceable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "founder", founder);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "neverAssignMaintenanceAutomatically",
+                  neverAssignMaintenanceAutomatically);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
@@ -4245,6 +4301,8 @@ public class Person {
                     person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("commander")) {
                     person.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("secondInCommand")) {
+                    person.setSecondInCommand(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("divorceable")) {
                     person.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("founder")) {
@@ -4257,6 +4315,8 @@ public class Person {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
+                    person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -7091,9 +7151,33 @@ public class Person {
     }
 
     public int getTotalInjurySeverity() {
-        int totalSeverity = 0;
+        int totalSeverity = hits; // Normal hits should be included here
         for (Injury injury : injuries) {
             totalSeverity += injury.getHits();
+        }
+
+        return totalSeverity;
+    }
+
+    /**
+     * Calculates a severity score for this person based on current hits and non-permanent injuries.
+     *
+     * <p>The returned value starts with the person's current {@code hits} value, then adds the hit contribution from
+     * each injury that is <em>not</em> permanent. Permanent injuries are intentionally excluded from this
+     * calculation.</p>
+     *
+     * @return the total severity score, consisting of {@code hits} plus the sum of {@link Injury#getHits()} for all
+     *       non-permanent injuries
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public int getNonPermanentInjurySeverity() {
+        int totalSeverity = hits;
+        for (Injury injury : injuries) {
+            if (!injury.isPermanent()) {
+                totalSeverity += injury.getHits();
+            }
         }
 
         return totalSeverity;
@@ -7104,11 +7188,15 @@ public class Person {
     }
 
     public List<Injury> getProstheticInjuries() {
-        return injuries.stream().filter(i -> i.getSubType().isProsthetic()).collect(Collectors.toList());
+        return injuries.stream()
+                     .filter(i -> i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
     }
 
     public List<Injury> getNonProstheticInjuries() {
-        return injuries.stream().filter(i -> !i.getSubType().isProsthetic()).collect(Collectors.toList());
+        return injuries.stream()
+                     .filter(i -> !i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
     }
 
     /**
@@ -7126,7 +7214,8 @@ public class Person {
      */
     public void clearInjuriesExcludingProsthetics() {
         for (Injury injury : new ArrayList<>(injuries)) {
-            if (!injury.getSubType().isProsthetic()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (!injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
@@ -7153,7 +7242,8 @@ public class Person {
      */
     public void clearProstheticInjuries() {
         for (Injury injury : new ArrayList<>(injuries)) {
-            if (injury.getSubType().isProsthetic()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (injurySubType.isPermanentModification()) {
                 removeInjury(injury);
             }
         }
@@ -7167,6 +7257,10 @@ public class Person {
 
     public void removeInjury(final Injury injury) {
         injuries.remove(injury);
+
+        // We need to make sure we also remove any associated abilities and implants
+        AdvancedMedicalAlternate.removeAssociatedInjuryOptions(injury, injuries, options);
+
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -7215,8 +7309,7 @@ public class Person {
     }
 
     public boolean needsAMFixing() {
-        return !injuries.isEmpty() &&
-                     injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
+        return !injuries.isEmpty();
     }
 
     /**
@@ -7700,7 +7793,6 @@ public class Person {
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCompulsionAddiction, boolean failedWillpowerCheck) {
         final int FATIGUE_INCREASE = 2;
-        final int DEATH_THRESHOLD = 5;
 
         if (hasCompulsionAddiction && failedWillpowerCheck) {
             if (useAdvancedMedical) {
@@ -7726,7 +7818,7 @@ public class Person {
             }
 
             int severity = getTotalInjurySeverity();
-            if ((severity > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (severity > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -7757,7 +7849,6 @@ public class Person {
           boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasFlashbacks, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
 
         if (hasFlashbacks && failedWillpowerCheck) {
             if (useAdvancedMedical) {
@@ -7774,7 +7865,7 @@ public class Person {
                 hits += 1;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8036,7 +8127,6 @@ public class Person {
           boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasRegression, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
 
         if (hasRegression && failedWillpowerCheck) {
             if (useAdvancedMedical) {
@@ -8053,7 +8143,7 @@ public class Person {
                 hits += 1;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8087,8 +8177,6 @@ public class Person {
     public String processCatatonia(Campaign campaign, boolean useAdvancedMedical, boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasCatatonia, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
         if (hasCatatonia && failedWillpowerCheck) {
             if (useAdvancedMedical) {
                 Injury injury;
@@ -8104,7 +8192,7 @@ public class Person {
                 hits += 1;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8125,29 +8213,31 @@ public class Person {
      * <p>Returns a formatted warning message describing the confusion compulsion, or an empty string if no action
      * was taken.</p>
      *
-     * @param campaign             The current campaign instance, used for logging and state updates.
-     * @param useAdvancedMedical   Whether the advanced medical system should be used.
-     * @param hasMadnessConfusion  Indicates if the personnel is afflicted with madness-induced confusion.
-     * @param failedWillpowerCheck Indicates if the required willpower check was failed.
+     * @param campaign                The current campaign instance, used for logging and state updates.
+     * @param useAdvancedMedical      Whether the advanced medical system should be used.
+     * @param isUseAltAdvancedMedical {@code true} to use alt advanced medical rules, {@code false} otherwise
+     * @param hasMadnessConfusion     Indicates if the personnel is afflicted with madness-induced confusion.
+     * @param failedWillpowerCheck    Indicates if the required willpower check was failed.
      *
      * @return A formatted string with the confusion compulsion warning, or an empty string if not applicable.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String processConfusion(Campaign campaign, boolean useAdvancedMedical,
+    public String processConfusion(Campaign campaign, boolean useAdvancedMedical, boolean isUseAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasMadnessConfusion, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
-
         if (hasMadnessConfusion && failedWillpowerCheck) {
-            if (useAdvancedMedical) {
+            if (isUseAltAdvancedMedical) {
+                Injury injury = AlternateInjuries.TERRIBLE_BRUISES.newInjury(campaign, this, GENERIC, 1);
+                addInjury(injury);
+            } else if (useAdvancedMedical) {
                 InjuryUtil.resolveCombatDamage(campaign, this, 1);
             } else {
                 hits++;
             }
 
-            if ((getInjuries().size() > DEATH_THRESHOLD) || (hits > DEATH_THRESHOLD)) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8187,7 +8277,6 @@ public class Person {
     public String processBerserkerFrenzy(Campaign campaign, boolean useAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasBerserker, boolean failedWillpowerCheck) {
-        final int DEATH_THRESHOLD = 5;
 
         if (hasBerserker && failedWillpowerCheck) {
             if (randomInt(4) != 0) { // the character was restrained before they could do harm
@@ -8208,16 +8297,21 @@ public class Person {
             // The berserker hurts themselves
             victims.add(this);
 
+            boolean isUseAltAdvancedMedical = campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
             for (Person victim : victims) {
-                int wounds = randomInt(2) + 1; // (1-2)
                 if (useAdvancedMedical) {
-                    InjuryUtil.resolveCombatDamage(campaign, victim, wounds);
+                    if (isUseAltAdvancedMedical) {
+                        Injury injury = AlternateInjuries.TERRIBLE_BRUISES.newInjury(campaign, this, GENERIC, 1);
+                        addInjury(injury);
+                    } else {
+                        InjuryUtil.resolveCombatDamage(campaign, victim, 1);
+                    }
                 } else {
                     int currentHits = victim.getHits();
-                    victim.setHits(currentHits + wounds);
+                    victim.setHits(currentHits + 1);
                 }
 
-                if ((victim.getInjuries().size() > DEATH_THRESHOLD) || (victim.getHits() > DEATH_THRESHOLD)) {
+                if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
                     victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
                                                                                  PersonnelStatus.MEDICAL_COMPLICATIONS :
                                                                                  PersonnelStatus.HOMICIDE);
@@ -8268,17 +8362,18 @@ public class Person {
      * appropriate episode handler is called, and its result returned as a description string. When the episode is not
      * paranoia, any paranoia flag is cleared. Otherwise, if the conditions are not met, returns an empty string.</p>
      *
-     * @param campaign             the current campaign context
-     * @param useAdvancedMedical   {@code true} to use advanced medical rules, {@code false} otherwise
-     * @param hasHysteria          {@code true} if the person is suffering from hysteria
-     * @param failedWillpowerCheck {@code true} if the person failed their willpower check
+     * @param campaign              the current campaign context
+     * @param useAdvancedMedical    {@code true} to use advanced medical rules, {@code false} otherwise
+     * @param useAltAdvancedMedical {@code true} to use alternate advanced medical rules, {@code false} otherwise
+     * @param hasHysteria           {@code true} if the person is suffering from hysteria
+     * @param failedWillpowerCheck  {@code true} if the person failed their willpower check
      *
      * @return description of the resulting episode, or an empty string if no episode occurred
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public String processHysteria(Campaign campaign, boolean useAdvancedMedical,
+    public String processHysteria(Campaign campaign, boolean useAdvancedMedical, boolean useAltAdvancedMedical,
           // These boolean are here to ensure that we only ever pass in valid personnel
           boolean hasHysteria, boolean failedWillpowerCheck) {
 
@@ -8286,7 +8381,7 @@ public class Person {
             int roll = d6(1);
             String report = switch (roll) {
                 case 1, 2 -> processBerserkerFrenzy(campaign, useAdvancedMedical, true, true);
-                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, true, true);
+                case 3, 4 -> processConfusion(campaign, useAdvancedMedical, useAltAdvancedMedical, true, true);
                 case 5, 6 -> processClinicalParanoia(true, true);
                 default -> throw new IllegalStateException("Unexpected value: " + roll);
             };
@@ -8746,5 +8841,43 @@ public class Person {
               adjustedReputation,
               injuryEffects,
               ageForAttributeModifiers);
+    }
+
+    /**
+     * Calculates the individual AsTech contribution for a person based on their {@link SkillType#S_ASTECH} skill.
+     *
+     * <p>If the person has the {@link SkillType#S_ASTECH} skill, this returns their total skill level considering
+     * all modifiers. If the skill is absent, returns {@code 0}.</p>
+     *
+     * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
+     *
+     * @since 0.50.11
+     */
+    public int getAdvancedAsTechContribution() {
+        int contribution;
+        if (advancedAsTechContribution == null) {
+            Skill asTechSkill = getSkill(S_ASTECH);
+            if (asTechSkill != null) {
+                // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
+                // by design.
+                SkillModifierData skillModifierData = getSkillModifierData();
+                int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
+                contribution = (int) floor(totalSkillLevel / Campaign.ASSISTANT_SKILL_LEVEL_DIVIDER);
+            } else {
+                contribution = 0;
+            }
+            setAdvancedAsTechContribution(contribution);
+        } else {
+            contribution = advancedAsTechContribution;
+        }
+        return contribution;
+    }
+
+    public void invalidateAdvancedAsTechContribution() {
+        advancedAsTechContribution = null;
+    }
+
+    public void setAdvancedAsTechContribution(int contribution) {
+        advancedAsTechContribution = contribution;
     }
 }

@@ -98,14 +98,6 @@ public class NagController {
             }
         }
 
-        // No Commander
-        if (NoCommanderNagDialog.checkNag(campaign.getCommander())) {
-            NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(campaign);
-            if (noCommanderNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
         final List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final int doctorCapacity = campaignOptions.getMaximumPatients();
@@ -272,6 +264,13 @@ public class NagController {
         if (EndContractNagDialog.checkNag(today, activeContracts)) {
             EndContractNagDialog endContractNagDialog = new EndContractNagDialog(campaign);
             return endContractNagDialog.shouldCancelAdvanceDay();
+        }
+
+        // Single Drop Nag
+        boolean isUseStratConSingleDrop = campaignOptions.isUseStratConSinglesMode();
+        if (SingleDropNagDialog.checkNag(activeContracts, isSunday, isUseStratConSingleDrop)) {
+            SingleDropNagDialog singleDropNagDialog = new SingleDropNagDialog(campaign);
+            return singleDropNagDialog.shouldCancelAdvanceDay();
         }
 
         // Player did not cancel Advance Day at any point

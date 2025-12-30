@@ -53,7 +53,7 @@ import mekhq.MHQConstants;
  */
 public enum GlossaryEntry {
     ADMIN_STRAIN("HR_STRAIN", new Version("0.50.06")),
-    ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.10")),
+    ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.11")),
     AGING("AGING", new Version("0.50.06")),
     ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),
@@ -63,6 +63,7 @@ public enum GlossaryEntry {
     AUTOINFIRMARY("AUTOINFIRMARY", new Version("0.50.06")),
     BLOODMARK("BLOODMARK", new Version("0.50.07")),
     CAPITAL_SYSTEMS("CAPITAL_SYSTEMS", new Version("0.50.06")),
+    CHALLENGE_SKULLS("CHALLENGE_SKULLS", new Version("0.50.11")),
     CHANGING_FILTERS_HANGAR("CHANGING_FILTERS_HANGAR", new Version("0.50.06")),
     CHANGING_FILTERS_PERSONNEL("CHANGING_FILTERS_PERSONNEL", new Version("0.50.06")),
     CHANGING_FILTERS_WAREHOUSE("CHANGING_FILTERS_WAREHOUSE", new Version("0.50.06")),
@@ -87,12 +88,14 @@ public enum GlossaryEntry {
     FATIGUE("FATIGUE", new Version("0.50.06")),
     FIELD_CONTROL("FIELD_CONTROL", new Version("0.50.06")),
     FIELD_KITCHENS("FIELD_KITCHENS", new Version("0.50.06")),
+    FORCE_GENERATION("FORCE_GENERATION", new Version("0.50.11")),
     FORCE_REPUTATION("FORCE_REPUTATION", new Version("0.50.06")),
     FORCE_TYPE_COMBAT("FORCE_TYPE_COMBAT", new Version("0.50.06")),
     FORCE_TYPE_CONVOY("FORCE_TYPE_CONVOY", new Version("0.50.06")),
     FORCE_TYPE_SALVAGE("FORCE_TYPE_SALVAGE", new Version("0.50.10")),
     FORCE_TYPE_SECURITY("FORCE_TYPE_SECURITY", new Version("0.50.06")),
     FORCE_TYPE_SUPPORT("FORCE_TYPE_SUPPORT", new Version("0.50.10")),
+    GENERIC_BATTLE_VALUE("GENERIC_BATTLE_VALUE", new Version("0.50.11")),
     GROUP_BY_UNIT("GROUP_BY_UNIT", new Version("0.50.06")),
     HOSPITAL_BEDS("HOSPITAL_BEDS", new Version("0.50.10")),
     HOW_TO_DEPLOY("HOW_TO_DEPLOY", new Version("0.50.06")),
@@ -118,6 +121,7 @@ public enum GlossaryEntry {
     PRISONER_CAPACITY("PRISONER_CAPACITY", new Version("0.50.06")),
     PROFESSIONS("PROFESSIONS", new Version("0.50.06")),
     PROSTHETICS("PROSTHETICS", new Version("0.50.10")),
+    QUICK_TRAIN("QUICK_TRAIN", new Version("0.50.11")),
     RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", new Version("0.50.06")),
     RELEASE_TYPES("RELEASE_TYPES", new Version("0.50.06")),
     RELEASE_TYPE_DEVELOPMENT("RELEASE_TYPE_DEVELOPMENT", new Version("0.50.06")),
@@ -147,7 +151,6 @@ public enum GlossaryEntry {
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO", new Version("0.50.06")),
     VEHICLE_CREWS("VEHICLE_CREWS", new Version("0.50.06")),
     VOCATIONAL_XP("VOCATIONAL_XP", new Version("0.50.06")),
-    QUICK_TRAIN("QUICK_TRAIN", new Version("0.50.11")),
     WINTER_HOLIDAY("WINTER_HOLIDAY", new Version("0.50.06"));
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";

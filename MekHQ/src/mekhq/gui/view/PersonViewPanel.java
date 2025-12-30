@@ -47,6 +47,7 @@ import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -121,6 +122,7 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -152,6 +154,9 @@ public class PersonViewPanel extends JScrollablePanel {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonViewPanel";
+
+    @Deprecated(since = "0.50.11")
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
@@ -2731,18 +2736,20 @@ public class PersonViewPanel extends JScrollablePanel {
             vWeight = 0.0;
         }
 
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
-            getAlternativeAdvancedMedicalDisplay(lblAdvancedMedical2,
-                  lblAdvancedMedical1,
-                  gridBagConstraints,
-                  vWeight,
-                  pnlInjuryDetails);
-        } else {
-            getAdvancedMedicalDisplay(lblAdvancedMedical1,
-                  pnlInjuryDetails,
-                  gridBagConstraints,
-                  lblAdvancedMedical2,
-                  vWeight);
+        if (!isProstheticReport) {
+            if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                getAlternativeAdvancedMedicalDisplay(lblAdvancedMedical2,
+                      lblAdvancedMedical1,
+                      gridBagConstraints,
+                      vWeight,
+                      pnlInjuryDetails);
+            } else {
+                getAdvancedMedicalDisplay(lblAdvancedMedical1,
+                      pnlInjuryDetails,
+                      gridBagConstraints,
+                      lblAdvancedMedical2,
+                      vWeight);
+            }
         }
 
         // This adds a dummy/invisible label to column 2, row 0 to prevent column 3 from being pushed away
@@ -2804,7 +2811,8 @@ public class PersonViewPanel extends JScrollablePanel {
         String durationText = messageSurroundedBySpanWithColor(durationColor, durationValue);
 
         String label;
-        if (injury.getSubType().isProsthetic()) {
+        InjurySubType injurySubType = injury.getSubType();
+        if (injurySubType.isPermanentModification()) {
             label = String.format(resourceMap.getString("format.injuryLabel.prosthetic"), injury.getName());
         } else if (injury.isPermanent()) {
             label = String.format(resourceMap.getString("format.injuryLabel.permanent"), injury.getName(),
@@ -2819,9 +2827,20 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private void getAlternativeAdvancedMedicalDisplay(JLabel lblAdvancedMedical2, JLabel lblAdvancedMedical1,
           GridBagConstraints gridBagConstraints, double vWeight, JPanel pnlInjuryDetails) {
-        lblAdvancedMedical2.setName("lblAdvancedMedical2");
         List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
-        lblAdvancedMedical2.setText(InjuryEffect.getEffectsLabel(injuryEffects));
+        String effectsLabel = getFormattedTextAt(RESOURCE_BUNDLE, "lblAltAdvancedMedical.injuryEffects",
+              InjuryEffect.getEffectsLabel(injuryEffects));
+
+        int hits = person.getTotalInjurySeverity();
+        String hitsLabel = getFormattedTextAt(RESOURCE_BUNDLE, "lblAltAdvancedMedical.hits", hits);
+
+        String label = "<html>" + effectsLabel + "</html>";
+        if (hits > 0) {
+            label = "<html>" + hitsLabel + "<br>" + effectsLabel + "</html>";
+        }
+
+        lblAdvancedMedical2.setName("lblAdvancedMedical2");
+        lblAdvancedMedical2.setText(label);
         String injuryEffectTooltip = wordWrap(InjuryEffect.getTooltip(injuryEffects));
         lblAdvancedMedical2.setToolTipText(injuryEffectTooltip);
         lblAdvancedMedical1.setLabelFor(lblAdvancedMedical2);

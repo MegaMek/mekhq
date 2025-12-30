@@ -34,6 +34,7 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.universe.Faction.getActiveMercenaryOrganization;
 
 import java.awt.BorderLayout;
@@ -392,11 +393,17 @@ public class ContractMarketDialog extends JDialog {
         tableContracts.setIntercellSpacing(new Dimension(0, 0));
         tableContracts.setShowGrid(false);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tblContractsModel);
-        sorter.setComparator(0, new NaturalOrderComparator());
-        sorter.setComparator(1, new NaturalOrderComparator());
-        sorter.setComparator(2, new NaturalOrderComparator());
-        sorter.setComparator(3, new IntegerStringSorter());
-        sorter.setComparator(4, new FormattedNumberSorter());
+        sorter.setComparator(0, new NaturalOrderComparator()); // Employer
+        sorter.setComparator(1, new NaturalOrderComparator()); // Enemy
+        sorter.setComparator(2, new NaturalOrderComparator()); // Mission Type
+        sorter.setComparator(3, new IntegerStringSorter());    // Transit Time (stored as String)
+        sorter.setComparator(4, new FormattedNumberSorter());  // Contract Length (months)
+        sorter.setComparator(5, new NaturalOrderComparator()); // Transport Terms
+        sorter.setComparator(6, new NaturalOrderComparator()); // Salvage Rights
+        sorter.setComparator(7, new NaturalOrderComparator()); // Straight Support
+        sorter.setComparator(8, new NaturalOrderComparator()); // Battle Loss Compensation
+        sorter.setComparator(9, new FormattedNumberSorter());  // Estimated Profit (formatted currency string)
+
         tableContracts.setRowSorter(sorter);
         scrollTableContracts.setViewportView(tableContracts);
 
@@ -630,7 +637,7 @@ public class ContractMarketDialog extends JDialog {
                                 campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier(), 1);
 
                     if (standingsReport != null) {
-                        campaign.addReport(GENERAL, standingsReport);
+                        campaign.addReport(POLITICS, standingsReport);
                     }
                 }
 

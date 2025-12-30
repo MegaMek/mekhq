@@ -526,6 +526,8 @@ public class CampaignOptions {
     // endregion Finance Tab
 
     // region Mercenary Tab
+    private boolean useAlternatePaymentMode;
+    private boolean useDiminishingContractPay;
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
@@ -626,6 +628,7 @@ public class CampaignOptions {
     private boolean useAdvancedScouting;
     private boolean noSeedForces;
     private SkillLevel skillLevel;
+    private BoardScalingType boardScalingType;
 
     // Contract Operations
     private int moraleVictoryEffect;
@@ -740,6 +743,7 @@ public class CampaignOptions {
         // region Supplies and Acquisitions Tab
         // Acquisition
         waitingPeriod = 7;
+        acquisitionsType = AcquisitionsType.ANY_TECH;
         useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
@@ -1175,6 +1179,8 @@ public class CampaignOptions {
         // endregion Finances Tab
 
         // region Mercenary Tab
+        useAlternatePaymentMode = false;
+        useDiminishingContractPay = false;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
@@ -1282,6 +1288,7 @@ public class CampaignOptions {
         useAdvancedScouting = false;
         noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
+        boardScalingType = BoardScalingType.NORMAL;
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
         autoResolveNumberOfScenarios = 100;
@@ -4587,6 +4594,22 @@ public class CampaignOptions {
         this.equipmentContractPercent = Math.min(equipmentContractPercent, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
+    public boolean isUseAlternatePaymentMode() {
+        return useAlternatePaymentMode;
+    }
+
+    public void setUseAlternatePaymentMode(final boolean useAlternatePaymentMode) {
+        this.useAlternatePaymentMode = useAlternatePaymentMode;
+    }
+
+    public boolean isUseDiminishingContractPay() {
+        return useDiminishingContractPay;
+    }
+
+    public void setUseDiminishingContractPay(final boolean useDiminishingContractPay) {
+        this.useDiminishingContractPay = useDiminishingContractPay;
+    }
+
     public boolean isEquipmentContractBase() {
         return equipmentContractBase;
     }
@@ -4948,6 +4971,14 @@ public class CampaignOptions {
 
     public void setSkillLevel(final SkillLevel skillLevel) {
         this.skillLevel = skillLevel;
+    }
+
+    public BoardScalingType getBoardScalingType() {
+        return boardScalingType;
+    }
+
+    public void setBoardScalingType(final BoardScalingType boardScalingType) {
+        this.boardScalingType = boardScalingType;
     }
 
     public boolean isAeroRecruitsHaveUnits() {
