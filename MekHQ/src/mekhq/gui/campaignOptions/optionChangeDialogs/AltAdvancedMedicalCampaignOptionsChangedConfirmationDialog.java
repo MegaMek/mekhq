@@ -33,9 +33,11 @@
 package mekhq.gui.campaignOptions.optionChangeDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Math.round;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -50,32 +52,51 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import megamek.logging.MMLogger;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog";
 
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
 
+    private static final Map<BodyLocation, InjuryType> SEVERED_LIMB_TRANSLATION_MAP = Map.of(
+          BodyLocation.LEFT_ARM, AlternateInjuries.SEVERED_ARM,
+          BodyLocation.RIGHT_ARM, AlternateInjuries.SEVERED_ARM,
+          BodyLocation.LEFT_HAND, AlternateInjuries.SEVERED_HAND,
+          BodyLocation.RIGHT_HAND, AlternateInjuries.SEVERED_HAND,
+          BodyLocation.LEFT_LEG, AlternateInjuries.SEVERED_LEG,
+          BodyLocation.RIGHT_LEG, AlternateInjuries.SEVERED_LEG,
+          BodyLocation.LEFT_FOOT, AlternateInjuries.SEVERED_FOOT,
+          BodyLocation.RIGHT_FOOT, AlternateInjuries.SEVERED_FOOT
+    );
+
     private ImageIcon campaignIcon;
     private final Campaign campaign;
+
+    private JCheckBox chkInjuryTransferral;
+    private JCheckBox chkProtoMekPilots;
 
     public AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
         this.campaignIcon = campaign.getCampaignFactionIcon();
@@ -88,7 +109,6 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
     void initializeDialog() {
         setTitle(getText("accessingTerminal.title"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setResizable(false);
         pack();
         setLocationRelativeTo(null);
         setModal(true);
@@ -146,7 +166,6 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
         pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
 
         JEditorPane editorPane = new JEditorPane();
-        editorPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
@@ -158,7 +177,27 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
         String fontStyle = "font-family: Noto Sans;";
         editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>", CENTER_WIDTH, fontStyle, description));
         setFontScaling(editorPane, false, 1.1);
-        pnlCenter.add(editorPane);
+
+        FastJScrollPane scrollPane = new FastJScrollPane(editorPane);
+        scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        scrollPane.setPreferredSize(new Dimension((int) round(CENTER_WIDTH * 1.2), scaleForGUI(600)));
+        editorPane.setCaretPosition(0); // Start scrolled at the top, not bottom
+        pnlCenter.add(scrollPane);
+
+        pnlCenter.add(Box.createVerticalStrut(PADDING));
+
+        chkInjuryTransferral = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+              "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.checkbox.injuries"));
+        chkInjuryTransferral.setAlignmentX(Component.LEFT_ALIGNMENT);
+        chkInjuryTransferral.setSelected(true);
+
+        chkProtoMekPilots = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+              "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.checkbox.enhancedImaging"));
+        chkProtoMekPilots.setAlignmentX(Component.LEFT_ALIGNMENT);
+        chkProtoMekPilots.setSelected(true);
+
+        pnlCenter.add(chkInjuryTransferral);
+        pnlCenter.add(chkProtoMekPilots);
 
         pnlCenter.add(Box.createVerticalStrut(PADDING));
         pnlCenter.add(createButtonPanel());
@@ -171,25 +210,24 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
         pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.X_AXIS));
         pnlButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.cancel"));
-        btnCancel.addActionListener(evt -> dispose());
-
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeImplants(campaign);
+            if (chkInjuryTransferral.isSelected()) {
+                processInjuryTransferral(campaign);
+            }
+            if (chkProtoMekPilots.isSelected()) {
+                processFreeEnhancedImaging(campaign);
+            }
             dispose();
         });
 
-        pnlButtons.add(btnCancel);
-        pnlButtons.add(Box.createRigidArea(new Dimension(PADDING, 0)));
         pnlButtons.add(btnConfirm);
 
         return pnlButtons;
     }
 
-    public static void processFreeImplants(Campaign campaign) {
+    public static void processFreeEnhancedImaging(Campaign campaign) {
         if (!campaign.getCampaignOptions().isUseImplants()) {
             return;
         }
@@ -203,6 +241,61 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
             AdvancedMedicalAlternateImplants.giveEIImplant(campaign, person);
 
             campaign.personUpdated(person);
+        }
+    }
+
+    public static void processInjuryTransferral(Campaign campaign) {
+        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        for (Person person : personnel) {
+            // First, Total Warfare-scale 'Hits'
+            int hits = person.getHits();
+            if (hits > 0) {
+                for (int i = 0; i < hits; i++) {
+                    Injury newInjury = AlternateInjuries.OLD_WOUND.newInjury(campaign, person, GENERIC, 1);
+                    person.addInjury(newInjury);
+                }
+                person.setHits(0);
+            }
+
+            // Second, vanilla Advanced Medical 'Injuries'
+            List<Injury> injuries = person.getInjuries();
+            for (Injury oldInjury : injuries) {
+                InjuryType injuryType = oldInjury.getType();
+
+                // If the injury is an Alternate Advanced Medical injury, no transfer is required
+                if (injuryType.getKey().contains("alt:")) {
+                    continue;
+                }
+
+                boolean isMissingLocation = injuryType.impliesMissingLocation();
+
+                // Missing locations have a special handler. In the event translation fails - most likely due to an
+                // unexpected location - we're going to process the injury as if it were a normal permanent injury.
+                if (isMissingLocation) {
+                    BodyLocation oldInjuryLocation = oldInjury.getLocation();
+                    InjuryType newInjuryType = SEVERED_LIMB_TRANSLATION_MAP.get(oldInjuryLocation);
+                    if (newInjuryType != null) {
+                        person.removeInjury(oldInjury);
+
+                        Injury newInjury = newInjuryType.newInjury(campaign, person, oldInjuryLocation, 1);
+                        if (newInjury != null) { // This will happen if there is an unexpected location match-up
+                            person.addInjury(newInjury);
+                            continue;
+                        }
+                    }
+
+                    // Deliberate fall-through
+                }
+
+                // Handler for non-missing locations
+                person.removeInjury(oldInjury);
+
+                Injury newInjury = AlternateInjuries.OLD_WOUND.newInjury(campaign, person, GENERIC, 1);
+                newInjury.setOriginalTime(oldInjury.getOriginalTime());
+                newInjury.setTime(oldInjury.getTime());
+                newInjury.setPermanent(oldInjury.isPermanent());
+                person.addInjury(newInjury);
+            }
         }
     }
 }

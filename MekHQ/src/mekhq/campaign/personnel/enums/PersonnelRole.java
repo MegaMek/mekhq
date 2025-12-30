@@ -345,17 +345,17 @@ public enum PersonnelRole {
     NOBLE(KeyEvent.VK_UNDEFINED),
     COMMON_CRIMINAL(KeyEvent.VK_UNDEFINED),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    GROUND_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    GROUND_VEHICLE_DRIVER(true),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    NAVAL_VEHICLE_DRIVER(KeyEvent.VK_UNDEFINED),
+    NAVAL_VEHICLE_DRIVER(true),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    VTOL_PILOT(KeyEvent.VK_UNDEFINED),
+    VTOL_PILOT(true),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_GUNNER(KeyEvent.VK_UNDEFINED),
+    VEHICLE_GUNNER(true),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    VEHICLE_CREW(KeyEvent.VK_UNDEFINED),
+    VEHICLE_CREW(true),
     @Deprecated(since = "0.50.10", forRemoval = true)
-    COMBAT_TECHNICIAN(KeyEvent.VK_UNDEFINED);
+    COMBAT_TECHNICIAN(true);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -377,21 +377,42 @@ public enum PersonnelRole {
     private final int intelligence;
     private final int willpower;
     private final int charisma;
+    private final boolean isDeprecated;
     // endregion Variable Declarations
 
     // region Constructors
+    PersonnelRole(final boolean isDeprecated) {
+        this(PersonnelRoleSubType.CIVILIAN, false, KeyEvent.VK_UNDEFINED, 5, 5, 5, 5, 5, 5, 5, isDeprecated);
+    }
+
     PersonnelRole(final int mnemonic) {
-        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
+        this(PersonnelRoleSubType.CIVILIAN, false, mnemonic, 5, 5, 5, 5, 5, 5, 5, false);
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final int mnemonic, final int strength, final int body,
           final int dexterity, final int reflexes, final int intelligence, final int willpower, final int charisma) {
-        this(subType, false, mnemonic, strength, body, dexterity, reflexes, intelligence, willpower, charisma);
+        this(subType, false, mnemonic, strength, body, dexterity, reflexes, intelligence, willpower, charisma, false);
     }
 
     PersonnelRole(final PersonnelRoleSubType subType, final boolean hasClanName, final int mnemonic, final int strength,
           final int body, final int dexterity, final int reflexes, final int intelligence, final int willpower,
           final int charisma) {
+        this(subType,
+              hasClanName,
+              mnemonic,
+              strength,
+              body,
+              dexterity,
+              reflexes,
+              intelligence,
+              willpower,
+              charisma,
+              false);
+    }
+
+    PersonnelRole(final PersonnelRoleSubType subType, final boolean hasClanName, final int mnemonic, final int strength,
+          final int body, final int dexterity, final int reflexes, final int intelligence, final int willpower,
+          final int charisma, boolean isDeprecated) {
         this.subType = subType;
         this.hasClanName = hasClanName;
         this.mnemonic = mnemonic;
@@ -402,6 +423,7 @@ public enum PersonnelRole {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
+        this.isDeprecated = isDeprecated;
     }
     // endregion Constructors
 
@@ -1258,6 +1280,10 @@ public enum PersonnelRole {
         return isSupport(true);
     }
 
+    public boolean isDeprecated() {
+        return isDeprecated;
+    }
+
     /**
      * @param excludeCivilian whether to exclude civilian roles
      *
@@ -1342,6 +1368,10 @@ public enum PersonnelRole {
     public static List<PersonnelRole> getCombatRoles() {
         List<PersonnelRole> combatRoles = new ArrayList<>();
         for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isDeprecated()) {
+                continue;
+            }
+
             if (personnelRole.isCombat()) {
                 combatRoles.add(personnelRole);
             }
@@ -1355,6 +1385,10 @@ public enum PersonnelRole {
     public static List<PersonnelRole> getSupportRoles() {
         List<PersonnelRole> supportRoles = new ArrayList<>();
         for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isDeprecated()) {
+                continue;
+            }
+
             if (personnelRole.isSubType(PersonnelRoleSubType.SUPPORT)) {
                 supportRoles.add(personnelRole);
             }
@@ -1368,11 +1402,15 @@ public enum PersonnelRole {
      * @return a {@code List<PersonnelRole>} containing all civilian personnel roles.
      *
      * @author Illiani
-     * @since 0.50.06
+     * @since 0.50.06e
      */
     public static List<PersonnelRole> getCivilianRoles() {
         List<PersonnelRole> civilianRoles = new ArrayList<>();
         for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isDeprecated()) {
+                continue;
+            }
+
             if (personnelRole.isSubType(PersonnelRoleSubType.CIVILIAN)) {
                 civilianRoles.add(personnelRole);
             }

@@ -90,6 +90,7 @@ public class AlternateInjuries {
     private static final int POSTPARTUM_RECOVERY_HEALING_DAYS = 21; // Internet says 6 weeks
     private static final int TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS = 1;
     private static final int CHILDUS_FEVER_RECOVERY_TIME = 365;
+    private static final int OLD_WOUND_HEALING_DAYS = 7;
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -150,6 +151,8 @@ public class AlternateInjuries {
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
     public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
     public static final InjuryType CATATONIA = new ChronicDisassociation();
+    public static final InjuryType TERRIBLE_BRUISES = new TerribleBruises();
+    public static final InjuryType OLD_WOUND = new OldWound();
     // Diseases
     public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
     public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
@@ -2887,6 +2890,30 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CATATONIA.simpleName");
             this.injurySubType = FLAW;
+        }
+    }
+
+    public static final class TerribleBruises extends BaseInjury {
+        TerribleBruises() {
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.TERRIBLE_BRUISES.simpleName");
+            this.injurySubType = FLAW;
+        }
+    }
+
+    public static final class OldWound extends BaseInjury {
+        OldWound() {
+            super(OLD_WOUND_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.OLD_WOUND.simpleName");
         }
     }
 }
