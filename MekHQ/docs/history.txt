@@ -1,5 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
+0.50.12
+
 0.50.11 (2025-12-30 1900 UTC)
 * Fix #8387: Fixed Incorrect Reference Key for Rout Messaging by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8388
 * Adding Java 25 LTS to Testing by @rjhancock in https://github.com/MegaMek/mekhq/pull/8396
