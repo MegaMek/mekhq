@@ -204,7 +204,7 @@ public class QuickTrain {
 
                 int improvementCost = person.getCostToImprove(skillName, isUseReasoningMultiplier);
                 improvementCost = (int) Math.round(improvementCost * xpCostMultiplier);
-                int adjustedCost = max(0, skill.getXpProgress());
+                int adjustedCost = max(0, improvementCost - skill.getXpProgress());
 
                 if ((improvementCost < 0) || (person.getXP() < adjustedCost)) {
                     targetSkillIterator.remove();
