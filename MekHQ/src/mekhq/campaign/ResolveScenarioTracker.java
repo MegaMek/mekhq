@@ -810,7 +810,6 @@ public class ResolveScenarioTracker {
                             // Determine if this casualty should hit a blob crew member or a Person
                             int totalCrew = u.getTotalCrewSize();
                             int blobCrew = u.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) + u.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
-                            int personCrew = crew.size();
 
                             // If we have blob crew, randomly assign casualties proportionally
                             boolean hitBlobCrew = false;
@@ -1262,8 +1261,10 @@ public class ResolveScenarioTracker {
                                 // Assign casualty to blob crew instead of Person
                                 if (unit.getEntity().isInfantry() && !unit.isBattleArmor() && unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) > 0) {
                                     unit.setTempCrew(PersonnelRole.SOLDIER, unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER) - 1);
+                                    killedTempSoldiers++;
                                 } else if (unit.isBattleArmor() && unit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) > 0) {
                                     unit.setTempCrew(PersonnelRole.BATTLE_ARMOUR, unit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) - 1);
+                                    killedTempBattleArmor++;
                                 }
                                 casualtiesAssigned++;
                             } else {

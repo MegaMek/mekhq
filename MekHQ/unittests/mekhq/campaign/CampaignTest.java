@@ -608,6 +608,7 @@ public class CampaignTest {
                     // Can take more crew if not fully crewed (activeCrew.size() < fullCrewSize)
                     when(unit.canTakeMoreVesselCrew()).thenReturn(activeCrew.size() < crewSize);
                 }
+                default -> throw new IllegalStateException("Unexpected value: " + role);
             }
 
             return unit;
@@ -656,6 +657,7 @@ public class CampaignTest {
                 case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(true);
                 case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(true);
                 case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(true);
+                default -> throw new IllegalStateException("Unexpected value: " + role);
             }
         }
 
@@ -672,6 +674,7 @@ public class CampaignTest {
                 case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(false);
                 case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(false);
                 case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(false);
+                default -> throw new IllegalStateException("Unexpected value: " + role);
             }
         }
 

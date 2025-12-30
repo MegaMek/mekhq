@@ -8302,6 +8302,7 @@ public class Campaign implements ITechManager {
             case VESSEL_PILOT -> MekHQ.triggerEvent(new VesselPilotPoolChangedEvent(this, change));
             case VESSEL_GUNNER -> MekHQ.triggerEvent(new VesselGunnerPoolChangedEvent(this, change));
             case VESSEL_CREW -> MekHQ.triggerEvent(new VesselCrewPoolChangedEvent(this, change));
+            default -> throw new IllegalStateException("Unexpected value: " + role);
         }
     }
 

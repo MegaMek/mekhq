@@ -534,7 +534,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     if (needed > 0) {
                         // Check available pool for this crew type
-                        int availableInPool = gui.getCampaign().getTempCrewPool(crewRole);
+                        int availableInPool = gui.getCampaign().getAvailableTempCrewPool(crewRole);
                         int toAssign = Math.min(needed, availableInPool);
 
                         if (toAssign > 0) {
@@ -1170,7 +1170,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     // Only show if unit can accept more temp crew
                     if (currentCrew + currentTempCrew < maxTempCrew) {
-                        menuItem = new JMenuItem("Fill with temp crew");
+                        menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
                         menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
                         menuItem.addActionListener(this);
                         popup.add(menuItem);
@@ -1178,7 +1178,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     // Show "Remove temp crew" if unit has any temp crew
                     if (currentTempCrew > 0) {
-                        menuItem = new JMenuItem("Remove temp crew");
+                        menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
                         menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
                         menuItem.addActionListener(this);
                         popup.add(menuItem);
