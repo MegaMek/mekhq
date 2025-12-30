@@ -742,7 +742,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
     }
 
-    private void inoculate(Person person, Planet planet, String planetId, String systemId, LocalDate today,
+    private static void inoculate(Person person, Planet planet, String planetId, String systemId, LocalDate today,
           Map<String, Set<InjuryType>> curesBySystem) {
         if (!person.hasPlanetaryInoculation(planetId)) {
             person.addPlanetaryInoculation(planetId);
