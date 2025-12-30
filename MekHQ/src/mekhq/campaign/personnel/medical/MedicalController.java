@@ -51,6 +51,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
@@ -126,12 +127,17 @@ public class MedicalController {
      */
     public void processMedicalEvents(Person patient, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
+        // Should the character be dead already?
+        if (patient.getTotalInjurySeverity() > Person.DEATH_THRESHOLD) {
+            patient.changeStatus(campaign, today, PersonnelStatus.WOUNDS);
+            return; // Early exit as there is no point continuing to process the character
+        }
+
         Person doctor = campaign.getPerson(patient.getDoctorId());
 
         if (doctor != null) {
             doctor = isValidDoctor(patient, doctor) ? doctor : null;
         }
-
 
         if (patient.needsFixing()) {
             // This will trigger for both AM-enabled and AM-disabled campaigns

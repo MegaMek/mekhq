@@ -142,6 +142,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
+import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -3456,6 +3457,10 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handleDayEnding(DayEndingEvent dayEndingEvent) {
+        if (MekHQ.getMHQOptions().getNewDayAutomaticallyAssignUnmaintainedUnits()) {
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+        }
+
         if (triggerDailyNags(getCampaign())) {
             dayEndingEvent.cancel();
             return;

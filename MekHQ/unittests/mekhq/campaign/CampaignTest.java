@@ -34,19 +34,26 @@ package mekhq.campaign;
 
 
 import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.TEST_CANON_SYSTEMS_DIR;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -294,6 +301,115 @@ public class CampaignTest {
         campaign.applyInitiativeBonus(2);
         assertEquals(3, campaign.getInitiativeBonus());
 
+    }
+
+    private static Person[] invokeFindTopCommanders(Campaign campaign) throws Exception {
+        Method findTopCommanders = Campaign.class.getDeclaredMethod("findTopCommanders");
+        findTopCommanders.setAccessible(true);
+        return (Person[]) findTopCommanders.invoke(campaign);
+    }
+
+    @Test
+    void findTopCommanders_whenBothFlagged_returnsThoseAndDoesNotScanPersonnel() throws Exception {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+
+        Person flaggedCommander = mock(Person.class);
+        Person flaggedSecond = mock(Person.class);
+
+        doReturn(flaggedCommander).when(campaign).getFlaggedCommander();
+        doReturn(flaggedSecond).when(campaign).getFlaggedSecondInCommand();
+
+        Person[] result = invokeFindTopCommanders(campaign);
+
+        assertSame(flaggedCommander, result[0]);
+        assertSame(flaggedSecond, result[1]);
+
+        verify(campaign, never()).getActivePersonnel(false, false);
+    }
+
+    @Test
+    void findTopCommanders_whenOnlyCommanderFlagged_commanderLocked_secondChosenFromOthers() throws Exception {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+
+        Person flaggedCommander = mock(Person.class);
+        doReturn(flaggedCommander).when(campaign).getFlaggedCommander();
+        doReturn(null).when(campaign).getFlaggedSecondInCommand();
+
+        Person aPerson = mock(Person.class);
+        Person bPerson = mock(Person.class);
+
+        when(aPerson.outRanksUsingSkillTiebreaker(eq(campaign), eq(bPerson))).thenReturn(true);
+        when(bPerson.outRanksUsingSkillTiebreaker(eq(campaign), eq(aPerson))).thenReturn(false);
+
+        doReturn(List.of(flaggedCommander, bPerson, aPerson)).when(campaign).getActivePersonnel(false, false);
+
+        Person[] result = invokeFindTopCommanders(campaign);
+
+        assertSame(flaggedCommander, result[0], "Flagged commander must remain commander");
+        assertSame(aPerson, result[1], "Second-in-command should be best among remaining personnel");
+    }
+
+    @Test
+    void findTopCommanders_whenOnlySecondFlagged_secondLocked_commanderChosenFromOthersExcludingSecond()
+          throws Exception {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+
+        Person flaggedSecond = mock(Person.class);
+        doReturn(null).when(campaign).getFlaggedCommander();
+        doReturn(flaggedSecond).when(campaign).getFlaggedSecondInCommand();
+
+        Person aPerson = mock(Person.class);
+        Person bPerson = mock(Person.class);
+
+        when(bPerson.outRanksUsingSkillTiebreaker(eq(campaign), eq(aPerson))).thenReturn(true);
+
+        doReturn(List.of(aPerson, flaggedSecond, bPerson)).when(campaign).getActivePersonnel(false, false);
+
+        Person[] result = invokeFindTopCommanders(campaign);
+
+        assertSame(bPerson, result[0], "Commander should be the top-ranked among non-flagged-second personnel");
+        assertSame(flaggedSecond, result[1], "Flagged second-in-command must remain second");
+    }
+
+    @Test
+    void findTopCommanders_whenUnflagged_selectsTopTwo_andPromotesPreviousCommanderToSecondIfAppropriate()
+          throws Exception {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+
+        doReturn(null).when(campaign).getFlaggedCommander();
+        doReturn(null).when(campaign).getFlaggedSecondInCommand();
+
+        Person person1 = mock(Person.class);
+        Person person2 = mock(Person.class);
+        Person person3 = mock(Person.class);
+
+        when(person2.outRanksUsingSkillTiebreaker(eq(campaign), eq(person1))).thenReturn(true);
+        when(person3.outRanksUsingSkillTiebreaker(eq(campaign), eq(person2))).thenReturn(false);
+        when(person3.outRanksUsingSkillTiebreaker(eq(campaign), eq(person1))).thenReturn(true);
+
+        doReturn(List.of(person1, person2, person3)).when(campaign).getActivePersonnel(false, false);
+
+        Person[] result = invokeFindTopCommanders(campaign);
+
+        assertSame(person2, result[0], "Commander should be the best overall");
+        assertSame(person3, result[1], "Second should be the best excluding commander");
+    }
+
+    @Test
+    void findTopCommanders_neverReturnsSamePersonForBothSlots() throws Exception {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+
+        doReturn(null).when(campaign).getFlaggedCommander();
+        doReturn(null).when(campaign).getFlaggedSecondInCommand();
+
+        Person only = mock(Person.class);
+        doReturn(List.of(only)).when(campaign).getActivePersonnel(false, false);
+
+        Person[] result = invokeFindTopCommanders(campaign);
+
+        assertSame(only, result[0]);
+        assertNull(result[1], "Second-in-command must be null when only one eligible person exists");
+        assertArrayEquals(new Person[] { only, null }, result);
     }
 
     // region Nested Test Classes for Temp Crew

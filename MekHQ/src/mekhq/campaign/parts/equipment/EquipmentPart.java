@@ -175,7 +175,8 @@ public class EquipmentPart extends Part {
                      getTonnage() == part.getTonnage() &&
                      getStickerPrice().equals(part.getStickerPrice()) &&
                      getSize() == ((EquipmentPart) part).getSize() &&
-                     isOmniPodded() == part.isOmniPodded();
+                     isOmniPodded() == part.isOmniPodded()
+                     && (!isUnitTonnageMatters() || getUnitTonnage() == part.getUnitTonnage());
     }
 
     @Override
