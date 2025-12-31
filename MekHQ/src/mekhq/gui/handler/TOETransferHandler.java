@@ -150,7 +150,8 @@ public class TOETransferHandler extends TransferHandler {
             LOGGER.error("I/O error: {}", ioe.getMessage());
         }
 
-        if ((force != null) && (superForce != null) && force.isAncestorOf(superForce)) {
+        if ((force != null) && (superForce != null) &&
+                  (force.isAncestorOf(superForce) || force.equals(superForce))) {
             return false;
         }
 
