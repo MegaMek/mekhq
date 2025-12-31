@@ -209,6 +209,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUntreatedPersonnelNag;
     private JCheckBox optionNoCommanderNag;
     private JCheckBox optionContractEndedNag;
+    private JCheckBox optionSingleDropNag;
     private JCheckBox optionInsufficientAsTechsNag;
     private JCheckBox optionInsufficientAsTechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
@@ -1129,6 +1130,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionContractEndedNag.setToolTipText(resources.getString("optionContractEndedNag.toolTipText"));
         optionContractEndedNag.setName("optionContractEndedNag");
 
+        optionSingleDropNag = new JCheckBox(resources.getString("optionSingleDropNag.text"));
+        optionSingleDropNag.setToolTipText(resources.getString("optionSingleDropNag.toolTipText"));
+        optionSingleDropNag.setName("optionSingleDropNag");
+
         optionInsufficientAsTechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
         optionInsufficientAsTechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
         optionInsufficientAsTechsNag.setName("optionInsufficientAsTechsNag");
@@ -1239,6 +1244,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionUntreatedPersonnelNag)
                                       .addComponent(optionNoCommanderNag)
                                       .addComponent(optionContractEndedNag)
+                                      .addComponent(optionSingleDropNag)
                                       .addComponent(optionInsufficientAsTechsNag)
                                       .addComponent(optionInsufficientAsTechTimeNag)
                                       .addComponent(optionInsufficientMedicsNag)
@@ -1267,6 +1273,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionUntreatedPersonnelNag)
                                         .addComponent(optionNoCommanderNag)
                                         .addComponent(optionContractEndedNag)
+                                        .addComponent(optionSingleDropNag)
                                         .addComponent(optionInsufficientAsTechsNag)
                                         .addComponent(optionInsufficientAsTechTimeNag)
                                         .addComponent(optionInsufficientMedicsNag)
@@ -1590,6 +1597,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL, optionUntreatedPersonnelNag.isSelected());
         options.setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER, optionNoCommanderNag.isSelected());
         options.setNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED, optionContractEndedNag.isSelected());
+        options.setNagDialogIgnore(MHQConstants.NAG_SINGLE_DROP_SET_UP, optionSingleDropNag.isSelected());
         options
               .setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS, optionInsufficientAsTechsNag.isSelected());
         options
@@ -1786,8 +1794,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL));
         optionNoCommanderNag.setSelected(options.getNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER));
         optionContractEndedNag.setSelected(options.getNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED));
-        optionInsufficientAsTechsNag.setSelected(options
-                                                       .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS));
+        optionSingleDropNag.setSelected(options.getNagDialogIgnore(MHQConstants.NAG_SINGLE_DROP_SET_UP));
+        optionInsufficientAsTechsNag.setSelected(options.getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECHS));
         optionInsufficientAsTechTimeNag.setSelected(options
                                                           .getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME));
         optionInsufficientMedicsNag.setSelected(options
