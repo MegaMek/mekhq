@@ -49,7 +49,9 @@ import mekhq.campaign.personnel.medical.BodyLocation.XMLAdapter;
 @XmlJavaTypeAdapter(value = XMLAdapter.class)
 public enum BodyLocation {
     //region Enum Declarations
-    HEAD(0, "BodyLocation.HEAD.text", true),
+    // Head shouldn't be a limb, otherwise it is at risk of decapitation. User feedback was that having a risk of
+    // instant death for every Hit wasn't fun.
+    HEAD(0, "BodyLocation.HEAD.text", false),
     SKULL(12, "BodyLocation.SKULL.text", false, HEAD),
     BRAIN(47, "BodyLocation.BRAIN.text", false, HEAD),
     FACE(45, "BodyLocation.FACE.text", false, HEAD),

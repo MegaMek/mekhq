@@ -420,6 +420,12 @@ public class Campaign implements ITechManager {
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private MekHQ app;
 
+    /**
+     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
+     * applied to Campaign.
+     */
+    private transient CampaignEventProcessor campaignEventProcessor;
+
     private ShoppingList shoppingList;
 
     private NewPersonnelMarket newPersonnelMarket;
@@ -1070,6 +1076,10 @@ public class Campaign implements ITechManager {
             initUnitGenerator();
         }
         return unitGenerator;
+    }
+
+    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
+        campaignEventProcessor = processor;
     }
 
     public void setAtBEventProcessor(AtBEventProcessor processor) {
