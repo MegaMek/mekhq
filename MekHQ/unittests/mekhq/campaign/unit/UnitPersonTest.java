@@ -561,9 +561,6 @@ public class UnitPersonTest {
             // Enable blob crew for all roles (required for temp crew to work)
             // Using doReturn for spy to avoid calling real method
             doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
-            doReturn(true).when(mockCampaign).isBlobVesselCrewEnabled();
-            doReturn(true).when(mockCampaign).isBlobVesselPilotEnabled();
-            doReturn(true).when(mockCampaign).isBlobVesselGunnerEnabled();
 
             mockEntity = mock(Entity.class);
             when(mockEntity.getId()).thenReturn(1);

@@ -5283,10 +5283,10 @@ public class Unit implements ITechnology {
             // Do this after reordering BA so real people have better armor, when applicable
             // Add temp crew to fill shortfall for infantry and BA
             if (entity instanceof Infantry && !isBattleArmor()
-                      && getCampaign().isBlobInfantryEnabled()) {
+                      && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
                 nGunners += getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
             } else if (isBattleArmor()
-                             && getCampaign().isBlobBattleArmorEnabled()) {
+                             && getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
                 nGunners += getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
             }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
@@ -5356,13 +5356,13 @@ public class Unit implements ITechnology {
 
         // Add temp crew for large aero vessels
         if ((entity instanceof SmallCraft || entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-            if (getCampaign().isBlobVesselCrewEnabled()) {
+            if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
                 nCrew += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
             }
-            if (getCampaign().isBlobVesselGunnerEnabled()) {
+            if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
                 nGunners += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
             }
-            if (getCampaign().isBlobVesselPilotEnabled()) {
+            if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
                 nDrivers += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
             }
         }

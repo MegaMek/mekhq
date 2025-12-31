@@ -107,9 +107,6 @@ public class UnitIOTest {
 
             // Enable blob crew for all roles
             doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
-            doReturn(true).when(mockCampaign).isBlobVesselCrewEnabled();
-            doReturn(true).when(mockCampaign).isBlobVesselPilotEnabled();
-            doReturn(true).when(mockCampaign).isBlobVesselGunnerEnabled();
 
             // Mock getEntities() for XML writing
             doReturn(new Vector<>()).when(mockCampaign).getEntities();
@@ -522,9 +519,6 @@ public class UnitIOTest {
 
             // Enable blob crew for all roles
             doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
-            doReturn(true).when(mockCampaign).isBlobVesselCrewEnabled();
-            doReturn(true).when(mockCampaign).isBlobVesselPilotEnabled();
-            doReturn(true).when(mockCampaign).isBlobVesselGunnerEnabled();
 
             // Mock getEntities() for XML operations
             doReturn(new Vector<>()).when(mockCampaign).getEntities();

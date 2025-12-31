@@ -978,7 +978,7 @@ public class CampaignGUI extends JPanel {
         // region Soldier Pool
         menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
         menuSoldierPool.setMnemonic(KeyEvent.VK_S);
-        menuSoldierPool.setVisible(getCampaign().isBlobInfantryEnabled());
+        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
 
         JMenuItem miHireSoldiers = new JMenuItem(resourceMap.getString("miHireSoldiers.text"));
         miHireSoldiers.setMnemonic(KeyEvent.VK_H);
@@ -1029,7 +1029,7 @@ public class CampaignGUI extends JPanel {
 
         // region Battle Armor Pool
         menuBattleArmorPool = new JMenu(resourceMap.getString("menuBattleArmorPool.text"));
-        menuBattleArmorPool.setVisible(getCampaign().isBlobBattleArmorEnabled());
+        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
 
         JMenuItem miHireBattleArmor = new JMenuItem(resourceMap.getString("miHireBattleArmor.text"));
         miHireBattleArmor.addActionListener(evt -> {
@@ -1079,7 +1079,7 @@ public class CampaignGUI extends JPanel {
 
         // region Vehicle Crew Ground Pool
         menuVehicleCrewGroundPool = new JMenu(resourceMap.getString("menuVehicleCrewGroundPool.text"));
-        menuVehicleCrewGroundPool.setVisible(getCampaign().isBlobVehicleCrewGroundEnabled());
+        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
 
         JMenuItem miHireVehicleCrewGround = new JMenuItem(resourceMap.getString("miHireVehicleCrewGround.text"));
         miHireVehicleCrewGround.addActionListener(evt -> {
@@ -1126,7 +1126,7 @@ public class CampaignGUI extends JPanel {
 
         // region Vehicle Crew VTOL Pool
         menuVehicleCrewVTOLPool = new JMenu(resourceMap.getString("menuVehicleCrewVTOLPool.text"));
-        menuVehicleCrewVTOLPool.setVisible(getCampaign().isBlobVehicleCrewVTOLEnabled());
+        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
 
         JMenuItem miHireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miHireVehicleCrewVTOL.text"));
         miHireVehicleCrewVTOL.addActionListener(evt -> {
@@ -1173,7 +1173,7 @@ public class CampaignGUI extends JPanel {
 
         // region Vehicle Crew Naval Pool
         menuVehicleCrewNavalPool = new JMenu(resourceMap.getString("menuVehicleCrewNavalPool.text"));
-        menuVehicleCrewNavalPool.setVisible(getCampaign().isBlobVehicleCrewNavalEnabled());
+        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
 
         JMenuItem miHireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miHireVehicleCrewNaval.text"));
         miHireVehicleCrewNaval.addActionListener(evt -> {
@@ -1220,7 +1220,7 @@ public class CampaignGUI extends JPanel {
 
         // region Vessel Pilot Pool
         menuVesselPilotPool = new JMenu(resourceMap.getString("menuVesselPilotPool.text"));
-        menuVesselPilotPool.setVisible(getCampaign().isBlobVesselPilotEnabled());
+        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
 
         JMenuItem miHireVesselPilot = new JMenuItem(resourceMap.getString("miHireVesselPilot.text"));
         miHireVesselPilot.addActionListener(evt -> {
@@ -1267,7 +1267,7 @@ public class CampaignGUI extends JPanel {
 
         // region Vessel Gunner Pool
         menuVesselGunnerPool = new JMenu(resourceMap.getString("menuVesselGunnerPool.text"));
-        menuVesselGunnerPool.setVisible(getCampaign().isBlobVesselGunnerEnabled());
+        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
 
         JMenuItem miHireVesselGunner = new JMenuItem(resourceMap.getString("miHireVesselGunner.text"));
         miHireVesselGunner.addActionListener(evt -> {
@@ -1314,7 +1314,7 @@ public class CampaignGUI extends JPanel {
 
         // region Vessel Crew Pool
         menuVesselCrewPool = new JMenu(resourceMap.getString("menuVesselCrewPool.text"));
-        menuVesselCrewPool.setVisible(getCampaign().isBlobVesselCrewEnabled());
+        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
 
         JMenuItem miHireVesselCrew = new JMenuItem(resourceMap.getString("miHireVesselCrew.text"));
         miHireVesselCrew.addActionListener(evt -> {
@@ -3253,7 +3253,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempSoldiers() {
-        if (!getCampaign().isBlobInfantryEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobInfantry()) {
             lblTempSoldiers.setVisible(false);
             return;
         }
@@ -3264,7 +3264,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempBattleArmor() {
-        if (!getCampaign().isBlobBattleArmorEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
             lblTempBattleArmor.setVisible(false);
             return;
         }
@@ -3276,7 +3276,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewGround() {
-        if (!getCampaign().isBlobVehicleCrewGroundEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
             lblTempVehicleCrewGround.setVisible(false);
             return;
         }
@@ -3287,7 +3287,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewVTOL() {
-        if (!getCampaign().isBlobVehicleCrewVTOLEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
             lblTempVehicleCrewVTOL.setVisible(false);
             return;
         }
@@ -3298,7 +3298,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVehicleCrewNaval() {
-        if (!getCampaign().isBlobVehicleCrewNavalEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
             lblTempVehicleCrewNaval.setVisible(false);
             return;
         }
@@ -3309,7 +3309,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselPilot() {
-        if (!getCampaign().isBlobVesselPilotEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
             lblTempVesselPilot.setVisible(false);
             return;
         }
@@ -3320,7 +3320,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselGunner() {
-        if (!getCampaign().isBlobVesselGunnerEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
             lblTempVesselGunner.setVisible(false);
             return;
         }
@@ -3331,7 +3331,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshTempVesselCrew() {
-        if (!getCampaign().isBlobVesselCrewEnabled()) {
+        if (!getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
             lblTempVesselCrew.setVisible(false);
             return;
         }
@@ -3708,14 +3708,14 @@ public class CampaignGUI extends JPanel {
         }
 
         // Update blob crew menu visibility based on campaign options
-        menuSoldierPool.setVisible(getCampaign().isBlobInfantryEnabled());
-        menuBattleArmorPool.setVisible(getCampaign().isBlobBattleArmorEnabled());
-        menuVehicleCrewGroundPool.setVisible(getCampaign().isBlobVehicleCrewGroundEnabled());
-        menuVehicleCrewVTOLPool.setVisible(getCampaign().isBlobVehicleCrewVTOLEnabled());
-        menuVehicleCrewNavalPool.setVisible(getCampaign().isBlobVehicleCrewNavalEnabled());
-        menuVesselPilotPool.setVisible(getCampaign().isBlobVesselPilotEnabled());
-        menuVesselGunnerPool.setVisible(getCampaign().isBlobVesselGunnerEnabled());
-        menuVesselCrewPool.setVisible(getCampaign().isBlobVesselCrewEnabled());
+        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
+        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
+        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
+        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
+        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
+        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
+        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
+        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
 
         // Update blob crew label visibility
         refreshTempSoldiers();

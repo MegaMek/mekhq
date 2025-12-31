@@ -7887,14 +7887,14 @@ public class Campaign implements ITechManager {
      */
     public boolean isBlobCrewEnabled(PersonnelRole role) {
         return switch (role) {
-            case SOLDIER -> isBlobInfantryEnabled();
-            case BATTLE_ARMOUR -> isBlobBattleArmorEnabled();
-            case VEHICLE_CREW_GROUND -> isBlobVehicleCrewGroundEnabled();
-            case VEHICLE_CREW_VTOL -> isBlobVehicleCrewVTOLEnabled();
-            case VEHICLE_CREW_NAVAL -> isBlobVehicleCrewNavalEnabled();
-            case VESSEL_PILOT -> isBlobVesselPilotEnabled();
-            case VESSEL_GUNNER -> isBlobVesselGunnerEnabled();
-            case VESSEL_CREW -> isBlobVesselCrewEnabled();
+            case SOLDIER -> getCampaignOptions().isUseBlobInfantry();
+            case BATTLE_ARMOUR -> getCampaignOptions().isUseBlobBattleArmor();
+            case VEHICLE_CREW_GROUND -> getCampaignOptions().isUseBlobVehicleCrewGround();
+            case VEHICLE_CREW_VTOL -> getCampaignOptions().isUseBlobVehicleCrewVTOL();
+            case VEHICLE_CREW_NAVAL -> getCampaignOptions().isUseBlobVehicleCrewNaval();
+            case VESSEL_PILOT -> getCampaignOptions().isUseBlobVesselPilot();
+            case VESSEL_GUNNER -> getCampaignOptions().isUseBlobVesselGunner();
+            case VESSEL_CREW -> getCampaignOptions().isUseBlobVesselCrew();
             default -> false;
         };
     }
@@ -7917,70 +7917,6 @@ public class Campaign implements ITechManager {
      */
     public int getAvailableTempCrewPool(PersonnelRole role) {
         return Math.max(0, getTempCrewPool(role) - getTempCrewInUse(role));
-    }
-
-    /**
-     * Checks if blob infantry (temp soldiers) is enabled in campaign options
-     * @return true if blob infantry is enabled
-     */
-    public boolean isBlobInfantryEnabled() {
-        return getCampaignOptions().isUseBlobInfantry();
-    }
-
-    /**
-     * Checks if blob battle armor (temp BA) is enabled in campaign options
-     * @return true if blob battle armor is enabled
-     */
-    public boolean isBlobBattleArmorEnabled() {
-        return getCampaignOptions().isUseBlobBattleArmor();
-    }
-
-    /**
-     * Checks if blob vehicle crew (ground) is enabled in campaign options
-     * @return true if blob vehicle crew (ground) is enabled
-     */
-    public boolean isBlobVehicleCrewGroundEnabled() {
-        return getCampaignOptions().isUseBlobVehicleCrewGround();
-    }
-
-    /**
-     * Checks if blob vehicle crew (VTOL) is enabled in campaign options
-     * @return true if blob vehicle crew (VTOL) is enabled
-     */
-    public boolean isBlobVehicleCrewVTOLEnabled() {
-        return getCampaignOptions().isUseBlobVehicleCrewVTOL();
-    }
-
-    /**
-     * Checks if blob vehicle crew (naval) is enabled in campaign options
-     * @return true if blob vehicle crew (naval) is enabled
-     */
-    public boolean isBlobVehicleCrewNavalEnabled() {
-        return getCampaignOptions().isUseBlobVehicleCrewNaval();
-    }
-
-    /**
-     * Checks if blob vessel pilots are enabled in campaign options
-     * @return true if blob vessel pilots are enabled
-     */
-    public boolean isBlobVesselPilotEnabled() {
-        return getCampaignOptions().isUseBlobVesselPilot();
-    }
-
-    /**
-     * Checks if blob vessel gunners are enabled in campaign options
-     * @return true if blob vessel gunners are enabled
-     */
-    public boolean isBlobVesselGunnerEnabled() {
-        return getCampaignOptions().isUseBlobVesselGunner();
-    }
-
-    /**
-     * Checks if blob vessel crew are enabled in campaign options
-     * @return true if blob vessel crew are enabled
-     */
-    public boolean isBlobVesselCrewEnabled() {
-        return getCampaignOptions().isUseBlobVesselCrew();
     }
 
     public boolean requiresAdditionalAsTechs() {
