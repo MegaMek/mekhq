@@ -433,6 +433,11 @@ public class Force {
             return;
         }
 
+        if (equals(sub)) {
+            LOGGER.error("Cannot add a force as its own subforce!");
+            return;
+        }
+
         if (assignParent) {
             sub.setParentForce(this);
         }
