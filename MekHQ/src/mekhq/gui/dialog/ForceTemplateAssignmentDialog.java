@@ -52,7 +52,7 @@ import javax.swing.ListSelectionModel;
 
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -68,14 +68,14 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  */
 public class ForceTemplateAssignmentDialog extends JDialog {
     private final JLabel lblInstructions = new JLabel();
-    private final JList<Force> forceList = new JList<>();
+    private final JList<Formation> forceList = new JList<>();
     private final JList<Unit> unitList = new JList<>();
     private final JList<ScenarioForceTemplate> templateList = new JList<>();
     private final JButton btnAssign = new JButton();
     private final JButton btnClose = new JButton();
 
     private final AtBDynamicScenario currentScenario;
-    private final Vector<Force> currentForceVector;
+    private final Vector<Formation> currentFormationVector;
     private final Vector<Unit> currentUnitVector;
     private final CampaignGUI campaignGUI;
 
@@ -88,9 +88,9 @@ public class ForceTemplateAssignmentDialog extends JDialog {
           "mekhq.resources.ForceTemplateAssignmentDialog",
           MekHQ.getMHQOptions().getLocale());
 
-    public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, Vector<Unit> assignedUnits,
-          AtBDynamicScenario scenario) {
-        currentForceVector = assignedForces;
+    public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Formation> assignedFormations, Vector<Unit> assignedUnits,
+                                         AtBDynamicScenario scenario) {
+        currentFormationVector = assignedFormations;
         currentUnitVector = assignedUnits;
 
         currentScenario = scenario;
@@ -101,7 +101,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         lblInstructions.setText(String.format("<html>%s</html>", resourceMap.getString("lblInstructions.text")));
 
         setupTemplateList();
-        display(currentForceVector == null);
+        display(currentFormationVector == null);
     }
 
     private void display(boolean individualUnits) {
@@ -173,9 +173,9 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     }
 
     private void refreshForceList() {
-        DefaultListModel<Force> forceListModel = new DefaultListModel<>();
-        for (Force force : currentForceVector) {
-            forceListModel.addElement(force);
+        DefaultListModel<Formation> forceListModel = new DefaultListModel<>();
+        for (Formation formation : currentFormationVector) {
+            forceListModel.addElement(formation);
         }
         forceList.setModel(forceListModel);
         forceList.setCellRenderer(new ForceListCellRenderer());
@@ -229,15 +229,15 @@ public class ForceTemplateAssignmentDialog extends JDialog {
      * Event handler for assigning a force to a scenario and specific template
      */
     private void assignForceToTemplate() {
-        Force force = forceList.getSelectedValue();
+        Formation formation = forceList.getSelectedValue();
         int forceID = forceList.getSelectedValue().getId();
 
         // all this stuff apparently needs to happen when assigning a force to a scenario
-        campaignGUI.undeployForce(force);
-        force.clearScenarioIds(campaignGUI.getCampaign(), true);
-        force.setScenarioId(currentScenario.getId(), campaignGUI.getCampaign());
+        campaignGUI.undeployForce(formation);
+        formation.clearScenarioIds(campaignGUI.getCampaign(), true);
+        formation.setScenarioId(currentScenario.getId(), campaignGUI.getCampaign());
         currentScenario.addForce(forceID, templateList.getSelectedValue().getForceName());
-        for (UUID uid : force.getAllUnits(true)) {
+        for (UUID uid : formation.getAllUnits(true)) {
             Unit u = campaignGUI.getCampaign().getUnit(uid);
             if (null != u) {
                 u.setScenarioId(currentScenario.getId());
@@ -248,7 +248,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 }
             }
         }
-        MekHQ.triggerEvent(new DeploymentChangedEvent(force, currentScenario));
+        MekHQ.triggerEvent(new DeploymentChangedEvent(formation, currentScenario));
 
         refreshForceList();
     }
@@ -302,14 +302,14 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
               boolean cellHasFocus) {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            Force force = (Force) value;
-            String cellValue = currentScenario.getPlayerForceTemplates().containsKey(force.getId()) ?
+            Formation formation = (Formation) value;
+            String cellValue = currentScenario.getPlayerForceTemplates().containsKey(formation.getId()) ?
                                      String.format("%s (%s)",
-                                           force.getName(),
+                                           formation.getName(),
                                            currentScenario.getPlayerForceTemplates()
-                                                 .get(force.getId())
+                                                 .get(formation.getId())
                                                  .getForceName()) :
-                                     force.getName();
+                                     formation.getName();
             ((JLabel) cmp).setText(cellValue);
             return cmp;
         }

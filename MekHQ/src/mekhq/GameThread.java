@@ -58,7 +58,7 @@ import megamek.common.units.Entity;
 import megamek.common.weapons.handlers.WeaponOrderHandler;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
@@ -235,8 +235,8 @@ class GameThread extends Thread implements CloseClientListener {
                     // Set the TempID for auto reporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     entity.setOwner(client.getLocalPlayer());
-                    Force force = campaign.getForceFor(unit);
-                    entity.setForceString(force.getFullMMName());
+                    Formation formation = campaign.getForceFor(unit);
+                    entity.setForceString(formation.getFullMMName());
                     entities.add(entity);
                 }
                 client.sendAddEntity(entities);

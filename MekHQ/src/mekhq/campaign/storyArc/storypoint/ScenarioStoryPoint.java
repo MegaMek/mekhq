@@ -39,7 +39,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -98,10 +98,10 @@ public class ScenarioStoryPoint extends StoryPoint {
                 // set date for the scenario
                 scenario.setDate(getStoryArc().getCampaign().getLocalDate().plusDays(days));
                 getStoryArc().getCampaign().addScenario(scenario, m);
-                Force force = getCampaign().getForce(deployedForceId);
-                if (null != force) {
-                    scenario.addForces(force.getId());
-                    force.setScenarioId(scenario.getId(), getCampaign());
+                Formation formation = getCampaign().getForce(deployedForceId);
+                if (null != formation) {
+                    scenario.addForces(formation.getId());
+                    formation.setScenarioId(scenario.getId(), getCampaign());
                 }
             }
         }

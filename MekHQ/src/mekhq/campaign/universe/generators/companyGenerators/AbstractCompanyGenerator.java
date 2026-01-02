@@ -69,7 +69,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
@@ -1140,7 +1140,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateUnit(final Campaign campaign,
           final List<CompanyGenerationPersonTracker> trackers) {
-        final Force originForce = campaign.getForce(0);
+        final Formation originFormation = campaign.getForce(0);
         final Alphabet[] alphabet = Alphabet.values();
         final Faction forceIconFaction = getOptions().isUseSpecifiedFactionToGenerateForceIcons()
                                                ? getOptions().getSpecifiedFaction()
@@ -1188,13 +1188,13 @@ public abstract class AbstractCompanyGenerator {
                     layeredForceIcon.getPieces().get(LayeredForceIconLayer.BACKGROUND).add(background.clone());
                 }
 
-                originForce.setForceIcon(layeredForceIcon);
+                originFormation.setForceIcon(layeredForceIcon);
             }
         }
 
         // Generate the Mercenary Company Command Lance
         if (getOptions().isGenerateMercenaryCompanyCommandLance()) {
-            final Force commandLance = createLance(campaign, forceIconFaction, originForce, trackers,
+            final Formation commandLance = createLance(campaign, forceIconFaction, originFormation, trackers,
                   campaign.getName() + resources.getString("AbstractCompanyGenerator.CommandLance.text"),
                   background);
             if (getOptions().isGenerateForceIcons()
@@ -1209,9 +1209,9 @@ public abstract class AbstractCompanyGenerator {
 
         // Create Companies
         for (int i = 0; i < getOptions().getCompanyCount(); i++) {
-            final Force company = new Force(getOptions().getForceNamingMethod().getValue(alphabet[i])
+            final Formation company = new Formation(getOptions().getForceNamingMethod().getValue(alphabet[i])
                                                   + resources.getString("AbstractCompanyGenerator.Company.text"));
-            campaign.addForce(company, originForce);
+            campaign.addForce(company, originFormation);
             for (int y = 0; y < getOptions().getLancesPerCompany(); y++) {
                 createLance(campaign, forceIconFaction, company, trackers, alphabet[y], background);
             }
@@ -1223,7 +1223,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Create Individual Lances
         for (int i = 0; i < getOptions().getIndividualLanceCount(); i++) {
-            createLance(campaign, forceIconFaction, originForce, trackers, alphabet[i + getOptions().getCompanyCount()],
+            createLance(campaign, forceIconFaction, originFormation, trackers, alphabet[i + getOptions().getCompanyCount()],
                   background);
         }
     }
@@ -1239,8 +1239,8 @@ public abstract class AbstractCompanyGenerator {
      * @param background       the background force piece icon, which is null when there's no valid background
      */
     private void createLance(final Campaign campaign, final Faction forceIconFaction,
-          final Force head, final List<CompanyGenerationPersonTracker> trackers,
-          final Alphabet alphabet, final @Nullable ForcePieceIcon background) {
+                             final Formation head, final List<CompanyGenerationPersonTracker> trackers,
+                             final Alphabet alphabet, final @Nullable ForcePieceIcon background) {
         createLance(campaign, forceIconFaction, head, trackers,
               getOptions().getForceNamingMethod().getValue(alphabet)
                     + resources.getString("AbstractCompanyGenerator.Lance.text"),
@@ -1257,10 +1257,10 @@ public abstract class AbstractCompanyGenerator {
      *
      * @return the newly created lance
      */
-    private Force createLance(final Campaign campaign, final Faction forceIconFaction,
-          final Force head, final List<CompanyGenerationPersonTracker> trackers,
-          final String name, final @Nullable ForcePieceIcon background) {
-        final Force lance = new Force(name);
+    private Formation createLance(final Campaign campaign, final Faction forceIconFaction,
+                                  final Formation head, final List<CompanyGenerationPersonTracker> trackers,
+                                  final String name, final @Nullable ForcePieceIcon background) {
+        final Formation lance = new Formation(name);
         campaign.addForce(lance, head);
         for (int i = 0; (i < getOptions().getLanceSize()) && !trackers.isEmpty(); i++) {
             campaign.addUnitToForce(trackers.remove(0).getPerson().getUnit(), lance);
@@ -1278,13 +1278,13 @@ public abstract class AbstractCompanyGenerator {
      *
      * @param campaign         the campaign the force is a part of
      * @param forceIconFaction the faction to create a layered force icon for
-     * @param force            the force to create a layered force icon for
+     * @param formation            the force to create a layered force icon for
      * @param isLance          whether the force is a lance or a company
      * @param background       the background force piece icon, which is null when there's no valid background
      */
     private void createLayeredForceIcon(final Campaign campaign, final Faction forceIconFaction,
-          final Force force, final boolean isLance,
-          final @Nullable ForcePieceIcon background) {
+                                        final Formation formation, final boolean isLance,
+                                        final @Nullable ForcePieceIcon background) {
         if (MHQStaticDirectoryManager.getForceIcons() == null) {
             return;
         }
@@ -1293,7 +1293,7 @@ public abstract class AbstractCompanyGenerator {
 
         // Type
         final String filename = String.format("%s.png",
-              EntityWeightClass.getClassName(determineForceWeightClass(campaign, force, isLance)));
+              EntityWeightClass.getClassName(determineForceWeightClass(campaign, formation, isLance)));
         try {
             layeredForceIcon.getPieces().putIfAbsent(LayeredForceIconLayer.TYPE, new ArrayList<>());
             if (MHQStaticDirectoryManager.getForceIcons().getItem(
@@ -1313,8 +1313,8 @@ public abstract class AbstractCompanyGenerator {
                             MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
             }
         } catch (Exception ex) {
-            LOGGER.error("Cannot create a layered force icon, setting {} to the default", force, ex);
-            force.setForceIcon(new LayeredForceIcon());
+            LOGGER.error("Cannot create a layered force icon, setting {} to the default", formation, ex);
+            formation.setForceIcon(new LayeredForceIcon());
             return;
         }
 
@@ -1346,21 +1346,21 @@ public abstract class AbstractCompanyGenerator {
             layeredForceIcon.getPieces().get(LayeredForceIconLayer.BACKGROUND).add(background.clone());
         }
 
-        force.setForceIcon(layeredForceIcon);
+        formation.setForceIcon(layeredForceIcon);
     }
 
     /**
      * This determines the weight class of a force (lance or company) based on the units within
      *
      * @param campaign the campaign to determine based on
-     * @param force    the force to determine the weight class for
+     * @param formation    the force to determine the weight class for
      * @param isLance  whether the force is a lance or a company
      *
      * @return the weight class of the force
      */
-    private int determineForceWeightClass(final Campaign campaign, final Force force,
+    private int determineForceWeightClass(final Campaign campaign, final Formation formation,
           final boolean isLance) {
-        double weight = force.getAllUnits(false).stream().map(campaign::getUnit)
+        double weight = formation.getAllUnits(false).stream().map(campaign::getUnit)
                               .filter(unit -> (unit != null) && (unit.getEntity() != null))
                               .mapToDouble(unit -> unit.getEntity().getWeight()).sum();
         weight = weight * 4.0 / (getOptions().getLanceSize() * (isLance ? 1 : getOptions().getLancesPerCompany()));
@@ -1874,7 +1874,7 @@ public abstract class AbstractCompanyGenerator {
         generateUnit(campaign, sortPersonnelIntoLances(trackers));
 
         // assign appropriate Formation Levels to the forces
-        Force.populateFormationLevelsFromOrigin(campaign);
+        Formation.populateFormationLevelsFromOrigin(campaign);
 
         return units;
     }

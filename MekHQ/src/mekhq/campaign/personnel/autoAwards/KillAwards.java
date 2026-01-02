@@ -54,7 +54,7 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
@@ -218,7 +218,7 @@ public class KillAwards {
                                         depth = campaign.getForce(originForce).getFormationLevel().getDepth();
                                     }
 
-                                    Force originNode = campaign.getForce(originForce);
+                                    Formation originNode = campaign.getForce(originForce);
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
                                     LOGGER.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
@@ -346,25 +346,25 @@ public class KillAwards {
      *
      * @return a list of Kill objects that are associated with the traversed Force nodes
      */
-    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode) {
+    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Formation originNode) {
         List<Kill> kills = new ArrayList<>();
 
-        Stack<Force> stack = new Stack<>();
+        Stack<Formation> stack = new Stack<>();
         // we add visited nodes to a set, so we don't run the risk of re-evaluating
         // previously visited nodes
         Set<Integer> visitedForces = new HashSet<>();
         stack.push(originNode);
 
         while (!stack.isEmpty()) {
-            Force currentNode = stack.pop();
+            Formation currentNode = stack.pop();
 
             if (!visitedForces.contains(currentNode.getId())) {
                 if (killData.containsKey(currentNode.getId())) {
                     kills.addAll(killData.get(currentNode.getId()));
                 }
 
-                for (Force subForce : currentNode.getSubForces()) {
-                    stack.push(subForce);
+                for (Formation subFormation : currentNode.getSubForces()) {
+                    stack.push(subFormation);
                 }
 
                 visitedForces.add(currentNode.getId());

@@ -43,7 +43,7 @@ import javax.swing.JDialog;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -107,18 +107,18 @@ public class DialogContractStart extends JDialog {
         int playerConvoys = 0;
         double totalPlayerCargoCapacity = 0;
 
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isForceType(CONVOY)) {
+        for (Formation formation : campaign.getAllForces()) {
+            if (!formation.isForceType(CONVOY)) {
                 continue;
             }
 
-            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
+            if (formation.getParentForce() != null && formation.getParentForce().isForceType(CONVOY)) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
             boolean hasCargo = false;
-            for (UUID unitId : force.getAllUnits(false)) {
+            for (UUID unitId : formation.getAllUnits(false)) {
                 try {
                     Unit unit = campaign.getUnit(unitId);
                     Entity entity = unit.getEntity();

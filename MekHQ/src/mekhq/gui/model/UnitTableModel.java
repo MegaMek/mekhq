@@ -53,7 +53,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -298,8 +298,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_QUALITY -> unit.getQualityName();
             case COL_PILOT -> (unit.getCommander() != null) ? unit.getCommander().getHTMLTitle() : "-";
             case COL_FORCE -> {
-                Force force = unit.getCampaign().getForce(unit.getForceId());
-                yield (force != null) ? force.getFullName() : "-";
+                Formation formation = unit.getCampaign().getForce(unit.getForceId());
+                yield (formation != null) ? formation.getFullName() : "-";
             }
             case COL_CREW -> unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
@@ -403,10 +403,10 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     break;
                 }
                 case COL_FORCE: {
-                    Force force = getCampaign().getForceFor(u);
-                    if (force != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName()).append("</b>");
-                        Force parent = force.getParentForce();
+                    Formation formation = getCampaign().getForceFor(u);
+                    if (formation != null) {
+                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
+                        Formation parent = formation.getParentForce();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
                         while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
@@ -416,7 +416,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        final Image forceImage = force.getForceIcon().getImage(54);
+                        final Image forceImage = formation.getForceIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

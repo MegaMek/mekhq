@@ -74,7 +74,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
@@ -300,14 +300,14 @@ public class PerformResupply {
         // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
         // weight by five when picking these items.
         final Campaign campaign = resupply.getCampaign();
-        final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
+        final Map<Formation, Double> playerConvoys = resupply.getPlayerConvoys();
 
         // Sort the player's available convoys according to cargo space, largest -> smallest
-        List<Entry<Force, Double>> entryList = new ArrayList<>(playerConvoys.entrySet());
+        List<Entry<Formation, Double>> entryList = new ArrayList<>(playerConvoys.entrySet());
         entryList.sort((entry1, entry2) -> Double.compare(entry2.getValue(), entry1.getValue()));
 
-        List<Force> sortedConvoys = new ArrayList<>();
-        for (Entry<Force, Double> entry : entryList) {
+        List<Formation> sortedConvoys = new ArrayList<>();
+        for (Entry<Formation, Double> entry : entryList) {
             sortedConvoys.add(entry.getKey());
         }
 
@@ -315,7 +315,7 @@ public class PerformResupply {
         Collections.shuffle(convoyContents);
 
         // Distribute parts across the convoys
-        for (Force convoy : sortedConvoys) {
+        for (Formation convoy : sortedConvoys) {
             if (convoyContents.isEmpty()) {
                 break;
             }
@@ -360,10 +360,10 @@ public class PerformResupply {
      *
      * @param resupply       the {@link Resupply} instance defining the resupply operation.
      * @param convoyContents a list of {@link Part} objects representing the contents of the convoy.
-     * @param playerConvoy   the {@link Force} object representing the player's convoy. If {@code null}, the convoy is
+     * @param playerConvoy   the {@link Formation} object representing the player's convoy. If {@code null}, the convoy is
      *                       an NPC-controlled unit.
      */
-    public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Force playerConvoy) {
+    public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Formation playerConvoy) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
@@ -425,12 +425,12 @@ public class PerformResupply {
      * </ul>
      *
      * @param resupply           the {@link Resupply} instance containing resupply details.
-     * @param convoy             the {@link Force} representing the player's convoy. Can be {@code null} for NPC
+     * @param convoy             the {@link Formation} representing the player's convoy. Can be {@code null} for NPC
      *                           convoys.
      * @param convoyContents     a list of {@link Part} objects representing convoy cargo.
      * @param interceptionChance the calculated chance of interception for the convoy.
      */
-    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Force convoy,
+    private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Formation convoy,
           @Nullable List<Part> convoyContents, int interceptionChance) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
@@ -513,10 +513,10 @@ public class PerformResupply {
      * </ul>
      *
      * @param resupply       the {@link Resupply} instance representing the resupply mission.
-     * @param targetConvoy   the {@link Force} representing the player's convoy. Can be {@code null} for NPC convoys.
+     * @param targetConvoy   the {@link Formation} representing the player's convoy. Can be {@code null} for NPC convoys.
      * @param convoyContents a list of {@link Part} objects representing the resupply cargo.
      */
-    private static void processConvoyInterception(Resupply resupply, @Nullable Force targetConvoy,
+    private static void processConvoyInterception(Resupply resupply, @Nullable Formation targetConvoy,
           @Nullable List<Part> convoyContents) {
         final String DIRECTORY = "data/scenariotemplates/";
         final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
@@ -640,7 +640,7 @@ public class PerformResupply {
         }
     }
 
-    private static void displayDialog(Force targetConvoy, Campaign campaign, AtBContract contract) {
+    private static void displayDialog(Formation targetConvoy, Campaign campaign, AtBContract contract) {
         Person speaker;
         String inCharacterMessage = "";
         String commanderAddress = campaign.getCommanderAddress();

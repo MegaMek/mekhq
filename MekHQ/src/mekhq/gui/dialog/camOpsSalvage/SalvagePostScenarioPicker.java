@@ -72,7 +72,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -352,13 +352,13 @@ public class SalvagePostScenarioPicker {
         for (Integer forceId : scenario.getSalvageForces()) {
             salvageForces.add(forceId);
 
-            Force force = campaign.getForce(forceId);
-            if (force == null) {
+            Formation formation = campaign.getForce(forceId);
+            if (formation == null) {
                 LOGGER.error("Force {} not found in campaign", forceId);
                 continue;
             }
 
-            for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
                 Entity entity = unit.getEntity();
                 if (entity == null) {
                     continue;

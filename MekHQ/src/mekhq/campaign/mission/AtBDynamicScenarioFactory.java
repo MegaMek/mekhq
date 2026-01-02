@@ -116,7 +116,7 @@ import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -3453,10 +3453,10 @@ public class AtBDynamicScenarioFactory {
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
                 if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                    Force force = campaign.getForce(forceID);
-                    if (force != null) {
-                        bvBudget += force.getTotalBV(campaign, forceStandardBattleValue);
-                        LOGGER.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+                    Formation formation = campaign.getForce(forceID);
+                    if (formation != null) {
+                        bvBudget += formation.getTotalBV(campaign, forceStandardBattleValue);
+                        LOGGER.info("Forced BV contribution for {}: {}", formation.getName(), bvBudget);
                     }
                 }
             }
@@ -3522,7 +3522,7 @@ public class AtBDynamicScenarioFactory {
      * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
      * {@link CombatRole#PATROL}.</p>
      *
-     * <p>Only Combat Teams with a non-null {@link Force} and a positive BV are counted. If at least one valid force
+     * <p>Only Combat Teams with a non-null {@link Formation} and a positive BV are counted. If at least one valid force
      * is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
      *
      * <p>If the player has no qualifying forces, a default budget of {@code 10,000} BV is returned. This helps
@@ -3549,9 +3549,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+            Formation formation = combatTeam.getForce(campaign);
+            if (formation != null) {
+                int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
                     totalForces++;
                     totalBattleValue += battleValue;
@@ -3576,7 +3576,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method scans all player-controlled {@link CombatTeam}s that belong to a set of valid combat roles
      * (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the team's associated
-     * {@link Force} and collects its total BV. These values are then combined to compute a Gaussian-weighted average,
+     * {@link Formation} and collects its total BV. These values are then combined to compute a Gaussian-weighted average,
      * which serves as a representative BV budget for force generation.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
@@ -3616,9 +3616,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+            Formation formation = combatTeam.getForce(campaign);
+            if (formation != null) {
+                int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
                     battleValues.add(battleValue);
                 }
@@ -3654,10 +3654,10 @@ public class AtBDynamicScenarioFactory {
             // deployed player forces:
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-                Force force = campaign.getForce(forceID);
+                Formation formation = campaign.getForce(forceID);
 
-                if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && force != null) {
-                    unitCount += force.getTotalUnitCount(campaign, isClanBidding);
+                if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && formation != null) {
+                    unitCount += formation.getTotalUnitCount(campaign, isClanBidding);
                 }
             }
 
@@ -3717,9 +3717,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int unitsInForce = force.getAllUnits(false).size();
+            Formation formation = combatTeam.getForce(campaign);
+            if (formation != null) {
+                int unitsInForce = formation.getAllUnits(false).size();
                 if (unitsInForce != 0) {
                     forceCount++;
                     unitCount += unitsInForce;
@@ -3742,7 +3742,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method reviews all player-controlled {@link CombatTeam}s whose roles fall within a predefined set of
      * valid combat roles (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the
-     * associated {@link Force} and records the number of units currently assigned to that force.</p>
+     * associated {@link Formation} and records the number of units currently assigned to that force.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
      * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
@@ -3781,9 +3781,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int unitCount = force.getAllUnits(false).size();
+            Formation formation = combatTeam.getForce(campaign);
+            if (formation != null) {
+                int unitCount = formation.getAllUnits(false).size();
                 if (unitCount > 0) {
                     unitCounts.add(unitCount);
                 }
@@ -4369,9 +4369,9 @@ public class AtBDynamicScenarioFactory {
         }
 
         for (int forceID : scenario.getForceIDs()) {
-            Force playerForce = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits(true)) {
+            for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null &&
                           (currentUnit.getEntity().getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED)) {
@@ -4479,9 +4479,9 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             List<Entity> forceEntities = new ArrayList<>();
-            Force playerForce = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits(true)) {
+            for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());
@@ -4521,12 +4521,12 @@ public class AtBDynamicScenarioFactory {
                 // After we're overwritten, the template, as necessary, continue
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     LOGGER.info("We're using staggered deployment turn calculation for {}",
-                          playerForce.getName());
+                          playerFormation.getName());
 
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
                     LOGGER.info("We're using reinforcement deployment turn calculation for {}",
-                          playerForce.getName());
+                          playerFormation.getName());
 
                     setDeploymentTurnsForReinforcements(hangar,
                           scenario,
@@ -4534,7 +4534,7 @@ public class AtBDynamicScenarioFactory {
                           strategy + scenario.getFriendlyReinforcementDelayReduction());
                 } else {
                     LOGGER.info("We're using normal deployment turn calculation for {}",
-                          playerForce.getName());
+                          playerFormation.getName());
 
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
@@ -4542,7 +4542,7 @@ public class AtBDynamicScenarioFactory {
                 }
             } else {
                 LOGGER.info("We're using a fallback deployment turn calculation for {}",
-                      playerForce.getName());
+                      playerFormation.getName());
                 setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities, strategy);
             }
         }
@@ -4659,9 +4659,9 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             List<Entity> forceEntities = new ArrayList<>();
-            Force playerForce = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getForce(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits(true)) {
+            for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());

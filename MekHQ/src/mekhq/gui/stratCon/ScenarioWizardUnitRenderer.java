@@ -43,7 +43,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -64,7 +64,7 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         Campaign campaign = unit.getCampaign();
 
         int valueForceId = unit.getForceId();
-        Force force = campaign.getForce(valueForceId);
+        Formation formation = campaign.getForce(valueForceId);
 
         // Determine name color
         OperationalStatus operationalStatus = determineLayeredForceIconOperationalStatus(unit);
@@ -83,8 +83,8 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
 
         // Adjust force name to remove unnecessary information
         String forceName = "";
-        if (force != null) {
-            forceName = force.getFullName();
+        if (formation != null) {
+            forceName = formation.getFullName();
             String originNodeName = ", " + campaign.getForce(0).getName();
             forceName = forceName.replaceAll(originNodeName, "");
         }

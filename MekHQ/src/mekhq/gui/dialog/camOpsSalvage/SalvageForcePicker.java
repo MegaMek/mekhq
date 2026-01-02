@@ -64,7 +64,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
 import mekhq.campaign.personnel.Person;
@@ -112,7 +112,7 @@ public class SalvageForcePicker extends JDialog {
     }
 
     /**
-     * Returns all selected {@link Force}s from the table. If the table was never constructed (e.g., no forces were
+     * Returns all selected {@link Formation}s from the table. If the table was never constructed (e.g., no forces were
      * provided), returns an empty list.
      *
      * @return a list of selected forces (never {@code null})
@@ -120,7 +120,7 @@ public class SalvageForcePicker extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    public List<Force> getSelectedForces() {
+    public List<Formation> getSelectedForces() {
         if (tableModel == null) {
             return new ArrayList<>();
         }
@@ -493,7 +493,7 @@ public class SalvageForcePicker extends JDialog {
             // Pre-select rows where the force ID is in priorSelectedForces
             if (priorSelectedForces != null && !priorSelectedForces.isEmpty()) {
                 for (int i = 0; i < forces.size(); i++) {
-                    Force f = forces.get(i).force();
+                    Formation f = forces.get(i).formation();
                     if (priorSelectedForces.contains(f.getId())) {
                         selected[i] = true;
                     }
@@ -538,10 +538,10 @@ public class SalvageForcePicker extends JDialog {
 
             return switch (columnIndex) {
                 case COL_SELECT -> selected[rowIndex];
-                case COL_FORCE_NAME -> data.force().getName();
+                case COL_FORCE_NAME -> data.formation().getName();
                 case COL_FORCE_TYPE -> data.forceType().getDisplayName();
                 case COL_TOE_TECH -> getTechLabel(data.tech());
-                case COL_CREW_TECHS -> getCrewTechCount(campaign.getHangar(), data.force());
+                case COL_CREW_TECHS -> getCrewTechCount(campaign.getHangar(), data.formation());
                 case COL_CARGO_CAPACITY -> data.maximumCargoCapacity();
                 case COL_TOW_CAPACITY -> data.maximumTowCapacity();
                 case COL_SALVAGE_UNITS -> data.salvageCapableUnits();
@@ -578,9 +578,9 @@ public class SalvageForcePicker extends JDialog {
             }
         }
 
-        private int getCrewTechCount(Hangar hangar, Force force) {
+        private int getCrewTechCount(Hangar hangar, Formation formation) {
             int counter = 0;
-            for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
                 for (Person crew : unit.getCrew()) {
                     if (crew.isTechExpanded() && !crew.isEngineer()) {
                         counter++;
@@ -600,21 +600,21 @@ public class SalvageForcePicker extends JDialog {
         }
 
         /**
-         * Returns the {@link Force} instances corresponding to rows whose Select checkbox is enabled.
+         * Returns the {@link Formation} instances corresponding to rows whose Select checkbox is enabled.
          *
          * @return list of selected forces (never {@code null})
          *
          * @author Illiani
          * @since 0.50.10
          */
-        public List<Force> getSelectedForces() {
-            List<Force> selectedForces = new ArrayList<>();
+        public List<Formation> getSelectedForces() {
+            List<Formation> selectedFormations = new ArrayList<>();
             for (int i = 0; i < forces.size(); i++) {
                 if (selected[i]) {
-                    selectedForces.add(forces.get(i).force());
+                    selectedFormations.add(forces.get(i).formation());
                 }
             }
-            return selectedForces;
+            return selectedFormations;
         }
     }
 
@@ -679,10 +679,10 @@ public class SalvageForcePicker extends JDialog {
 
             if (component instanceof JComponent jComponent) {
                 String tooltip = switch (modelColumn) {
-                    case SalvageForceTableModel.COL_FORCE_NAME -> wordWrap(data.force().getFullName());
+                    case SalvageForceTableModel.COL_FORCE_NAME -> wordWrap(data.formation().getFullName());
                     case SalvageForceTableModel.COL_TOE_TECH -> wordWrap(data.getTechTooltip(campaign, data.tech()));
                     case SalvageForceTableModel.COL_CREW_TECHS ->
-                          wordWrap(data.getAllCrewTechTooltip(campaign, data.force()));
+                          wordWrap(data.getAllCrewTechTooltip(campaign, data.formation()));
                     case SalvageForceTableModel.COL_CARGO_CAPACITY ->
                           wordWrap(data.getCargoCapacityTooltip(campaign.getHangar()));
                     case SalvageForceTableModel.COL_TOW_CAPACITY ->

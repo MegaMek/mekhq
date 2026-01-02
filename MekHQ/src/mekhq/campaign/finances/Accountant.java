@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.finances;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORCE_NONE;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.adjustValuesForDiminishingReturns;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.getDiminishingReturnsStart;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
@@ -52,7 +52,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -443,15 +443,15 @@ public record Accountant(Campaign campaign) {
         List<Money> unitValues = new ArrayList<>();
 
         Money total = Money.zero();
-        for (Force force : campaign().getAllForces()) {
-            if (!force.getForceType().isStandard()) {
+        for (Formation formation : campaign().getAllForces()) {
+            if (!formation.getForceType().isStandard()) {
                 continue;
             }
-            if (!force.getCombatRoleInMemory().isCombatRole()) {
+            if (!formation.getCombatRoleInMemory().isCombatRole()) {
                 continue;
             }
 
-            for (UUID uuid : force.getUnits()) {
+            for (UUID uuid : formation.getUnits()) {
                 Unit unit = getHangar().getUnit(uuid);
                 if (unit == null) {
                     continue;

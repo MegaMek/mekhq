@@ -34,7 +34,7 @@
 package mekhq.campaign.events;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 
 /**
  * MekHQ event relating to the deployment of a force to a StratCon track.
@@ -42,15 +42,15 @@ import mekhq.campaign.force.Force;
  * @author NickAragua
  */
 public class StratConDeploymentEvent extends MMEvent {
-    private final Force force;
+    private final Formation formation;
 
-    public StratConDeploymentEvent(Force force) {
+    public StratConDeploymentEvent(Formation formation) {
         super();
 
-        this.force = force;
+        this.formation = formation;
     }
 
-    public Force getForce() {
-        return force;
+    public Formation getForce() {
+        return formation;
     }
 }

@@ -49,7 +49,7 @@ import java.util.UUID;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
@@ -98,15 +98,15 @@ public class ResupplyUtilities {
           AtBDynamicScenario scenario) {
         final int scenarioId = scenario.getId();
 
-        for (Force force : campaign.getAllForces()) {
-            Force parentForce = force.getParentForce();
+        for (Formation formation : campaign.getAllForces()) {
+            Formation parentFormation = formation.getParentForce();
 
-            if (parentForce != null && (force.getParentForce().isForceType(CONVOY))) {
+            if (parentFormation != null && (formation.getParentForce().isForceType(CONVOY))) {
                 continue;
             }
 
-            if (force.isForceType(CONVOY) && force.getScenarioId() == scenarioId) {
-                Person speaker = campaign.getPerson(force.getForceCommanderID());
+            if (formation.isForceType(CONVOY) && formation.getScenarioId() == scenarioId) {
+                Person speaker = campaign.getPerson(formation.getForceCommanderID());
 
                 String commanderAddress = campaign.getCommanderAddress();
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -123,7 +123,7 @@ public class ResupplyUtilities {
                       null,
                       false);
 
-                for (UUID unitID : force.getAllUnits(false)) {
+                for (UUID unitID : formation.getAllUnits(false)) {
                     Unit unit = campaign.getUnit(unitID);
 
                     for (Person crewMember : unit.getCrew()) {
@@ -191,18 +191,18 @@ public class ResupplyUtilities {
     public static int estimateAvailablePlayerCargo(Campaign campaign) {
         double totalPlayerCargoCapacity = 0;
 
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isForceType(CONVOY)) {
+        for (Formation formation : campaign.getAllForces()) {
+            if (!formation.isForceType(CONVOY)) {
                 continue;
             }
 
-            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
+            if (formation.getParentForce() != null && formation.getParentForce().isForceType(CONVOY)) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
             boolean hasCargo = false;
-            for (UUID unitId : force.getAllUnits(false)) {
+            for (UUID unitId : formation.getAllUnits(false)) {
                 try {
                     Unit unit = campaign.getUnit(unitId);
                     Entity entity = unit.getEntity();

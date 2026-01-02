@@ -57,7 +57,7 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
@@ -227,9 +227,9 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return "-";
             case COL_FORCE:
-                Force force = campaign.getForceFor(person);
-                if (null != force) {
-                    return force.getName();
+                Formation formation = campaign.getForceFor(person);
+                if (null != formation) {
+                    return formation.getName();
                 } else {
                     return "None";
                 }
@@ -435,10 +435,10 @@ public class RetirementTableModel extends AbstractTableModel {
                     clearImage();
                 }
             } else if (actualCol == COL_FORCE) {
-                Force force = campaign.getForceFor(p);
-                if (null != force) {
-                    StringBuilder desc = new StringBuilder("<html><b>" + force.getName() + "</b>");
-                    Force parent = force.getParentForce();
+                Formation formation = campaign.getForceFor(p);
+                if (null != formation) {
+                    StringBuilder desc = new StringBuilder("<html><b>" + formation.getName() + "</b>");
+                    Formation parent = formation.getParentForce();
                     // cut off after three lines and don't include the top level
                     int lines = 1;
                     while ((parent != null) && (null != parent.getParentForce()) && (lines < 4)) {
@@ -448,7 +448,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc.append("</html>");
                     setHtmlText(desc.toString());
-                    final Image forceImage = force.getForceIcon().getImage(40);
+                    final Image forceImage = formation.getForceIcon().getImage(40);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {

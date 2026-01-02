@@ -32,7 +32,7 @@
  */
 package mekhq.gui;
 
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
 
 import java.awt.Component;
 import javax.swing.Icon;
@@ -46,7 +46,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -160,8 +160,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
             String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
-            Force force = unit.getCampaign().getForce(unit.getForceId());
-            if ((null != person) && (null != force) && (person.getId().equals(force.getForceCommanderID()))) {
+            Formation formation = unit.getCampaign().getForce(unit.getForceId());
+            if ((null != person) && (null != formation) && (person.getId().equals(formation.getForceCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");
@@ -171,16 +171,16 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
-        } else if (value instanceof Force force) {
+        } else if (value instanceof Formation formation) {
             getAccessibleContext().setAccessibleName((
-                  force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
-            if (!sel && force.isDeployed()) {
+                  formation.isDeployed() ? "Deployed Force: " : "Force: ") + formation.getFullName());
+            if (!sel && formation.isDeployed()) {
                 setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
 
-            String formattedForceName = getFormattedForceName(force);
+            String formattedForceName = getFormattedForceName(formation);
 
             setText(formattedForceName);
         } else {
@@ -193,17 +193,17 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         return this;
     }
 
-    private static String getFormattedForceName(Force force) {
-        ForceType forceType = force.getForceType();
+    private static String getFormattedForceName(Formation formation) {
+        ForceType forceType = formation.getForceType();
         String typeKey = forceType.getSymbol();
 
         return String.format("<html>%s%s%s%s%s%s%s</html>",
-              force.isCombatTeam() ? "<b>" : "",
-              force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
-              force.getName(),
-              force.isCombatTeam() ? "</b>" : "",
-              force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
-              force.isCombatTeam() ? " <s>c</s>" : "",
+              formation.isCombatTeam() ? "<b>" : "",
+              formation.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+              formation.getName(),
+              formation.isCombatTeam() ? "</b>" : "",
+              formation.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+              formation.isCombatTeam() ? " <s>c</s>" : "",
               typeKey);
     }
 
@@ -215,8 +215,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 final Person person = ((Unit) node).getCommander();
                 return (person == null) ? null : person.getPortrait().getImageIcon(58);
             }
-        } else if (node instanceof Force) {
-            return ((Force) node).getForceIcon().getImageIcon(58);
+        } else if (node instanceof Formation) {
+            return ((Formation) node).getForceIcon().getImageIcon(58);
         } else {
             return null;
         }

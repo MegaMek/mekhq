@@ -46,8 +46,8 @@ import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Force.FORCE_ORIGIN;
-import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
@@ -111,7 +111,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -458,9 +458,9 @@ public class CampaignNewDayManager {
     private Set<Integer> getAllScenariosWithAssignedStandardForces() {
         Set<Integer> scenarios = new HashSet<>();
 
-        for (Force force : campaign.getAllForces()) {
-            if (force.getForceType().isStandard()) {
-                int scenarioId = force.getScenarioId();
+        for (Formation formation : campaign.getAllForces()) {
+            if (formation.getForceType().isStandard()) {
+                int scenarioId = formation.getScenarioId();
                 if (scenarioId != NO_ASSIGNED_SCENARIO) {
                     scenarios.add(scenarioId);
                 }
@@ -1198,7 +1198,7 @@ public class CampaignNewDayManager {
 
     private void processNewDayForces() {
         // update formation levels
-        Force.populateFormationLevelsFromOrigin(campaign);
+        Formation.populateFormationLevelsFromOrigin(campaign);
         recalculateCombatTeams(campaign);
 
         // Update the force icons based on the end-of-day unit status if desired

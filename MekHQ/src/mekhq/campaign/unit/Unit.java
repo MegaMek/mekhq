@@ -111,7 +111,7 @@ import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
@@ -257,7 +257,7 @@ public class Unit implements ITechnology {
         this.drivers = new ArrayList<>();
         this.gunners = new HashSet<>();
         this.vesselCrew = new ArrayList<>();
-        forceId = Force.FORCE_NONE;
+        forceId = Formation.FORCE_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
         this.history = "";
         this.lastMaintenanceReport = "";
@@ -2816,7 +2816,7 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
 
-        if (forceId != Force.FORCE_NONE) {
+        if (forceId != Formation.FORCE_NONE) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
         }
 
@@ -4590,8 +4590,8 @@ public class Unit implements ITechnology {
 
     public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
-            final Force force = campaign.getForce(getForceId());
-            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
+            final Formation formation = campaign.getForce(getForceId());
+            return (formation != null) ? formation.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
         } else {
             return getCamouflage();
         }

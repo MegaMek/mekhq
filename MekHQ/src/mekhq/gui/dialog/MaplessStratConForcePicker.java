@@ -46,7 +46,7 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -89,21 +89,21 @@ public class MaplessStratConForcePicker extends ImmersiveDialogCore {
      * </ul>
      *
      * @param campaign the current campaign
-     * @param forces   the list of available forces the player can choose from
+     * @param formations   the list of available forces the player can choose from
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public MaplessStratConForcePicker(Campaign campaign, List<Force> forces) {
+    public MaplessStratConForcePicker(Campaign campaign, List<Formation> formations) {
         super(campaign,
               campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
               null,
-              getInCharacterMessage(campaign.getCommanderAddress(), !forces.isEmpty()),
-              getButtons(!forces.isEmpty()),
+              getInCharacterMessage(campaign.getCommanderAddress(), !formations.isEmpty()),
+              getButtons(!formations.isEmpty()),
               null,
               ImmersiveDialogWidth.SMALL.getWidth(),
               false,
-              getSupplementalPanel(forces),
+              getSupplementalPanel(formations),
               null,
               true);
     }
@@ -155,14 +155,14 @@ public class MaplessStratConForcePicker extends ImmersiveDialogCore {
      * <p>This panel is displayed below the main dialog message and contains a labeled combo box populated with the
      * names of all available forces.</p>
      *
-     * @param forces the list of forces to display in the dropdown
+     * @param formations the list of forces to display in the dropdown
      *
      * @return a {@link JPanel} containing the force selection UI
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static JPanel getSupplementalPanel(List<Force> forces) {
+    private static JPanel getSupplementalPanel(List<Formation> formations) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.WEST;
@@ -170,7 +170,7 @@ public class MaplessStratConForcePicker extends ImmersiveDialogCore {
         JLabel lblScenarios = new JLabel(getTextAt(RESOURCE_BUNDLE, "MaplessStratConForcePicker.combo.label"));
         addComponent(panel, lblScenarios, constraints, 0, 1, GridBagConstraints.NONE);
 
-        MMComboBox<String> cboSkills = new MMComboBox<>("cboScenarios", getComboListItems(forces));
+        MMComboBox<String> cboSkills = new MMComboBox<>("cboScenarios", getComboListItems(formations));
         addComponent(panel, cboSkills, constraints, 1, 2, GridBagConstraints.HORIZONTAL);
 
         return panel;
@@ -203,18 +203,18 @@ public class MaplessStratConForcePicker extends ImmersiveDialogCore {
      *
      * <p>Each force is represented by its full hierarchical name in the force structure.</p>
      *
-     * @param forces the list of forces to convert
+     * @param formations the list of forces to convert
      *
      * @return an array of force names as strings
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String[] getComboListItems(List<Force> forces) {
+    private static String[] getComboListItems(List<Formation> formations) {
         List<String> forceOptions = new ArrayList<>();
 
-        for (Force force : forces) {
-            String scenarioName = force.getFullName();
+        for (Formation formation : formations) {
+            String scenarioName = formation.getFullName();
             forceOptions.add(scenarioName);
         }
 

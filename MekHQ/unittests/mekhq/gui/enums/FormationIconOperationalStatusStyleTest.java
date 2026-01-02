@@ -42,7 +42,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
-public class ForceIconOperationalStatusStyleTest {
+public class FormationIconOperationalStatusStyleTest {
     //region Variable Declarations
     private static final ForceIconOperationalStatusStyle[] styles = ForceIconOperationalStatusStyle.values();
 

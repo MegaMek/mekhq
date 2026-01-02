@@ -34,7 +34,7 @@ package mekhq.campaign.io;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORCE_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
@@ -103,7 +103,7 @@ import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -422,7 +422,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         long timestamp = System.currentTimeMillis();
 
         // loop through forces to set force id
-        for (Force f : campaign.getAllForces()) {
+        for (Formation f : campaign.getAllForces()) {
             Scenario s = campaign.getScenario(f.getScenarioId());
             if (null != s && (null == f.getParentForce() || !f.getParentForce().isDeployed())) {
                 s.addForces(f.getId());
@@ -443,7 +443,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
             Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
-            for (Force f : campaign.getAllForces()) {
+            for (Formation f : campaign.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new CombatTeam(f.getId(), campaign));
                     LOGGER.warn("Added missing Lance {} to AtB list", f.getName());
@@ -593,8 +593,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         timestamp = System.currentTimeMillis();
 
         // This removes the risk of having forces with invalid leadership getting locked in
-        for (Force force : campaign.getAllForces()) {
-            force.updateCommander(campaign);
+        for (Formation formation : campaign.getAllForces()) {
+            formation.updateCommander(campaign);
         }
 
         // ok, once we are sure that campaign has been set for all units, we can
@@ -1346,7 +1346,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
 
             if (!foundForceAlready) {
-                Force f = Force.generateInstanceFromXML(wn2, retVal, version);
+                Formation f = Formation.generateInstanceFromXML(wn2, retVal, version);
                 if (null != f) {
                     retVal.setForces(f);
                     foundForceAlready = true;

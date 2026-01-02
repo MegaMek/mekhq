@@ -69,21 +69,21 @@ public class ForceStub {
         this(null, null);
     }
 
-    public ForceStub(final @Nullable Force force, final @Nullable Campaign campaign) {
-        name = (force == null) ? "" : force.getFullName();
-        setForceIcon((force == null) ? new LayeredForceIcon() : force.getForceIcon().clone());
+    public ForceStub(final @Nullable Formation formation, final @Nullable Campaign campaign) {
+        name = (formation == null) ? "" : formation.getFullName();
+        setForceIcon((formation == null) ? new LayeredForceIcon() : formation.getForceIcon().clone());
 
         subForces = new Vector<>();
-        if (force != null) {
-            for (Force sub : force.getSubForces()) {
+        if (formation != null) {
+            for (Formation sub : formation.getSubForces()) {
                 ForceStub stub = new ForceStub(sub, campaign);
                 subForces.add(stub);
             }
         }
 
         units = new Vector<>();
-        if ((force != null) && (campaign != null)) {
-            for (UUID uid : force.getUnits()) {
+        if ((formation != null) && (campaign != null)) {
+            for (UUID uid : formation.getUnits()) {
                 Unit u = campaign.getUnit(uid);
                 if (null != u) {
                     units.add(new UnitStub(u));

@@ -48,7 +48,7 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
@@ -496,7 +496,7 @@ public class StratConContractInitializer {
             StratConScenario scenario = StratConRulesManager.generateScenario(campaign,
                   contract,
                   trackState,
-                  Force.FORCE_NONE,
+                  Formation.FORCE_NONE,
                   coords,
                   template,
                   null);

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.events.persons;
 
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -40,15 +40,15 @@ import mekhq.campaign.personnel.Person;
  */
 public class PersonForceAssignmentEvent extends PersonChangedEvent {
 
-    private final Force force;
+    private final Formation formation;
 
-    public PersonForceAssignmentEvent(Person person, Force force) {
+    public PersonForceAssignmentEvent(Person person, Formation formation) {
         super(person);
-        this.force = force;
+        this.formation = formation;
     }
 
-    public Force getForce() {
-        return force;
+    public Formation getForce() {
+        return formation;
     }
 
 }

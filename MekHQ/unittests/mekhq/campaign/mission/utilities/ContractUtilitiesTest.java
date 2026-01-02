@@ -44,7 +44,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.mission.enums.CombatRole;
 import org.junit.jupiter.api.BeforeAll;
@@ -191,14 +191,14 @@ public class ContractUtilitiesTest {
     }
 
     CombatTeam newMockCombatTeam(int size, CombatRole combatRole, ForceType forceType) {
-        Force mockForce = mock(Force.class);
-        when(mockForce.isForceType(forceType)).thenReturn(true);
-        when(mockForce.getCombatRoleInMemory()).thenReturn(combatRole);
+        Formation mockFormation = mock(Formation.class);
+        when(mockFormation.isForceType(forceType)).thenReturn(true);
+        when(mockFormation.getCombatRoleInMemory()).thenReturn(combatRole);
 
         CombatTeam mockCombatTeam = mock(CombatTeam.class);
 
         when(mockCombatTeam.getSize(any())).thenReturn(size);
-        when(mockCombatTeam.getForce(any())).thenReturn(mockForce);
+        when(mockCombatTeam.getForce(any())).thenReturn(mockFormation);
 
         return mockCombatTeam;
     }

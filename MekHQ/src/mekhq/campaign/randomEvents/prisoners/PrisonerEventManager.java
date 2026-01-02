@@ -61,7 +61,7 @@ import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -757,12 +757,12 @@ public class PrisonerEventManager {
 
         int prisonerCapacity = 0;
         double otherUnitMultiplier = 1.0;
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isForceType(SECURITY)) {
+        for (Formation formation : campaign.getAllForces()) {
+            if (!formation.isForceType(SECURITY)) {
                 continue;
             }
 
-            for (UUID unitId : force.getUnits()) {
+            for (UUID unitId : formation.getUnits()) {
                 Unit unit = campaign.getUnit(unitId);
                 if (unit == null) {
                     continue;
@@ -849,20 +849,20 @@ public class PrisonerEventManager {
      * @return The selected {@link Person} who acts as the speaker, or {@code null} if none is found.
      */
     private @Nullable Person getSpeaker() {
-        List<Force> securityForces = new ArrayList<>();
+        List<Formation> securityFormations = new ArrayList<>();
 
-        for (Force force : campaign.getAllForces()) {
-            if (force.isForceType(SECURITY)) {
-                securityForces.add(force);
+        for (Formation formation : campaign.getAllForces()) {
+            if (formation.isForceType(SECURITY)) {
+                securityFormations.add(formation);
             }
         }
 
         Person speaker = null;
 
-        if (!securityForces.isEmpty()) {
-            Collections.shuffle(securityForces);
-            Force designatedForce = securityForces.get(0);
-            UUID speakerId = designatedForce.getForceCommanderID();
+        if (!securityFormations.isEmpty()) {
+            Collections.shuffle(securityFormations);
+            Formation designatedFormation = securityFormations.get(0);
+            UUID speakerId = designatedFormation.getForceCommanderID();
             if (speakerId != null) {
                 speaker = campaign.getPerson(speakerId);
             }

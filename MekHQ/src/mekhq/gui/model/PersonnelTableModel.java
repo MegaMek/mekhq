@@ -51,7 +51,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -276,11 +276,11 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                     }
                     break;
                 case FORCE:
-                    Force force = getCampaign().getForceFor(person);
-                    if (force != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
+                    Formation formation = getCampaign().getForceFor(person);
+                    if (formation != null) {
+                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName())
                                                    .append("</b>");
-                        Force parent = force.getParentForce();
+                        Formation parent = formation.getParentForce();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
                         while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
@@ -290,7 +290,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        final Image forceImage = force.getForceIcon().getImage(54);
+                        final Image forceImage = formation.getForceIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

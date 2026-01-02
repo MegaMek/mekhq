@@ -66,7 +66,7 @@ import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.campaign.stratCon.StratConBiomeManifest.ImageType;
@@ -702,8 +702,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
                         String forceName;
                         try {
-                            Force force = campaign.getForce(forceID);
-                            forceName = force.getName();
+                            Formation formation = campaign.getForce(forceID);
+                            forceName = formation.getName();
                         } catch (Exception e) {
                             // If we can't successfully fetch the Force, there is no point trying
                             // to draw it on the map.
@@ -931,8 +931,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
-                Force force = this.campaign.getForce(forceID);
-                infoBuilder.append(force.getName()).append(" assigned");
+                Formation formation = this.campaign.getForce(forceID);
+                infoBuilder.append(formation.getName()).append(" assigned");
 
                 if (currentTrack.getStickyForces().contains(forceID)) {
                     infoBuilder.append("<i> - remain deployed</i>");

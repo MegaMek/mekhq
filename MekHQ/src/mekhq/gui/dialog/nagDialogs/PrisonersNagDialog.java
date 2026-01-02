@@ -45,7 +45,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -71,13 +71,13 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      */
     @Override
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Force> forces = campaign.getAllForces();
+        List<Formation> formations = campaign.getAllForces();
 
 
         Person speaker = null;
-        for (Force force : forces) {
-            if (force.isForceType(SECURITY)) {
-                UUID commanderId = force.getForceCommanderID();
+        for (Formation formation : formations) {
+            if (formation.isForceType(SECURITY)) {
+                UUID commanderId = formation.getForceCommanderID();
                 Person commander = campaign.getPerson(commanderId);
                 if (commander == null) {
                     continue;

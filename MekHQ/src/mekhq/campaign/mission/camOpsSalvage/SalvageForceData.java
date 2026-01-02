@@ -49,20 +49,20 @@ import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 
-public record SalvageForceData(Force force, ForceType forceType, @Nullable Person tech, double maximumCargoCapacity,
-      double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
+public record SalvageForceData(Formation formation, ForceType forceType, @Nullable Person tech, double maximumCargoCapacity,
+                               double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForceData";
 
-    public static SalvageForceData buildData(Campaign campaign, Force force, boolean isSpaceScenario) {
-        ForceType forceType = force.getForceType();
-        UUID techId = force.getTechID();
+    public static SalvageForceData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
+        ForceType forceType = formation.getForceType();
+        UUID techId = formation.getTechID();
         Person tech = techId == null || !forceType.isSalvage() ? null : campaign.getPerson(techId);
         if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
             tech = null;
@@ -74,7 +74,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         boolean hasTug = false;
 
         Hangar hangar = campaign.getHangar();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             if (!unit.isFullyCrewed()) {
                 continue;
             }
@@ -128,7 +128,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             }
         }
 
-        return new SalvageForceData(force,
+        return new SalvageForceData(formation,
               forceType,
               tech,
               maximumCargoCapacity,
@@ -165,11 +165,11 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         return tooltip.toString();
     }
 
-    public String getAllCrewTechTooltip(Campaign campaign, Force force) {
+    public String getAllCrewTechTooltip(Campaign campaign, Formation formation) {
         Hangar hangar = campaign.getHangar();
 
         StringBuilder tooltip = new StringBuilder();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             for (Person crew : unit.getCrew()) {
                 if (crew.isTechExpanded() && !crew.isEngineer()) {
                     tooltip.append(getTechTooltip(campaign, crew));
@@ -199,7 +199,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
     private Map<String, Double> getUnsortedMap(Hangar hangar, boolean isTow) {
         Map<String, Double> capacityMap = new HashMap<>();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             Entity entity = unit.getEntity();
             if (entity == null) {
                 continue;
@@ -237,7 +237,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
     public String getTugTooltip(Hangar hangar) {
         Map<String, Boolean> capacityMap = new HashMap<>();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             Entity entity = unit.getEntity();
             if (entity == null) {
                 continue;

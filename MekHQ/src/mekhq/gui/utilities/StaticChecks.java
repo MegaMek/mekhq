@@ -43,33 +43,33 @@ import java.util.stream.Stream;
 
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
-    public static boolean areAllForcesUnDeployed(final Campaign campaign, final List<Force> forces) {
-        return forces.stream().noneMatch(Force::isDeployed)
-                     && forces.stream().flatMap(force -> force.getAllUnits(false).stream())
+    public static boolean areAllForcesUnDeployed(final Campaign campaign, final List<Formation> formations) {
+        return formations.stream().noneMatch(Formation::isDeployed)
+                     && formations.stream().flatMap(force -> force.getAllUnits(false).stream())
                               .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
-    public static boolean areAllStandardForces(Vector<Force> forces) {
-        return forces.stream().allMatch(force -> force.isForceType(STANDARD));
+    public static boolean areAllStandardForces(Vector<Formation> formations) {
+        return formations.stream().allMatch(force -> force.isForceType(STANDARD));
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {
         return units.stream().allMatch(Unit::isAvailable);
     }
 
-    public static boolean areAllForcesDeployed(Vector<Force> forces) {
-        return forces.stream().allMatch(Force::isDeployed);
+    public static boolean areAllForcesDeployed(Vector<Formation> formations) {
+        return formations.stream().allMatch(Formation::isDeployed);
     }
 
-    public static boolean areAnyForcesDeployed(Vector<Force> forces) {
-        return forces.stream().anyMatch(Force::isDeployed);
+    public static boolean areAnyForcesDeployed(Vector<Formation> formations) {
+        return formations.stream().anyMatch(Formation::isDeployed);
     }
 
     public static boolean areAllUnitsDeployed(Vector<Unit> units) {

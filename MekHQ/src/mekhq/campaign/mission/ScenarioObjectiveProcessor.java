@@ -50,7 +50,7 @@ import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -114,9 +114,9 @@ public class ScenarioObjectiveProcessor {
                 continue;
             }
 
-            for (Force force : tracker.getCampaign().getAllForces()) {
-                if (force.getName().equals(forceName)) {
-                    for (UUID unitID : force.getUnits()) {
+            for (Formation formation : tracker.getCampaign().getAllForces()) {
+                if (formation.getName().equals(forceName)) {
+                    for (UUID unitID : formation.getUnits()) {
                         objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
                     }
                     forceFound = true;

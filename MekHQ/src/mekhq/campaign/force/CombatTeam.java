@@ -38,8 +38,8 @@ import static megamek.common.units.Entity.ETYPE_MEK;
 import static megamek.common.units.Entity.ETYPE_PROTOMEK;
 import static megamek.common.units.Entity.ETYPE_TANK;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
+import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_TRUE;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.LANCE;
 
@@ -134,8 +134,8 @@ public class CombatTeam {
     public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
 
-        Force force = campaign.getForce(forceId);
-        role = force != null ? force.getCombatRoleInMemory() : CombatRole.FRONTLINE;
+        Formation formation = campaign.getForce(forceId);
+        role = formation != null ? formation.getCombatRoleInMemory() : CombatRole.FRONTLINE;
 
         missionId = -1;
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
@@ -240,17 +240,17 @@ public class CombatTeam {
     private double getEffectiveLanceSize(Campaign campaign) {
         double numUnits = 0;
         double numInfantry = 0;
-        Force force = getForce(campaign);
+        Formation formation = getForce(campaign);
 
-        if (force == null) {
+        if (formation == null) {
             return numUnits;
         }
 
-        if (!force.isForceType(STANDARD)) {
+        if (!formation.isForceType(STANDARD)) {
             return numUnits;
         }
 
-        for (UUID unitId : force.getAllUnits(true)) {
+        for (UUID unitId : formation.getAllUnits(true)) {
             Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getHangar(), unitId);
 
             if (entity == null) {
@@ -321,17 +321,17 @@ public class CombatTeam {
          */
         double weight = calculateTotalWeight(campaign, forceId);
 
-        Force originForce = campaign.getForce(forceId);
+        Formation originFormation = campaign.getForce(forceId);
 
-        if (originForce == null) {
+        if (originFormation == null) {
             return WEIGHT_ULTRA_LIGHT;
         }
 
-        List<Force> subForces = originForce.getSubForces();
-        int subForcesCount = subForces.size();
+        List<Formation> subFormations = originFormation.getSubForces();
+        int subForcesCount = subFormations.size();
 
-        for (Force childForce : subForces) {
-            double childForceWeight = calculateTotalWeight(campaign, childForce.getId());
+        for (Formation childFormation : subFormations) {
+            double childForceWeight = calculateTotalWeight(campaign, childFormation.getId());
 
             if (childForceWeight > 0) {
                 weight += childForceWeight;
@@ -374,14 +374,14 @@ public class CombatTeam {
 
     public boolean isEligible(Campaign campaign) {
         // ensure the lance is marked as a combat force
-        final Force force = campaign.getForce(forceId);
+        final Formation formation = campaign.getForce(forceId);
 
-        if (force == null) {
+        if (formation == null) {
             return false;
         }
 
-        if (!force.isForceType(STANDARD)) {
-            force.setCombatTeamStatus(false);
+        if (!formation.isForceType(STANDARD)) {
+            formation.setCombatTeamStatus(false);
             return false;
         }
 
@@ -392,27 +392,27 @@ public class CombatTeam {
             int size = getSize(campaign);
             if (size < getStandardForceSize(campaign.getFaction()) - 1 ||
                       size > getStandardForceSize(campaign.getFaction()) + 2) {
-                force.setCombatTeamStatus(false);
+                formation.setCombatTeamStatus(false);
                 return false;
             }
         }
 
         if (campaign.getCampaignOptions().isLimitLanceWeight() &&
                   getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
-            force.setCombatTeamStatus(false);
+            formation.setCombatTeamStatus(false);
             return false;
         }
 
-        int isOverridden = force.getOverrideCombatTeam();
+        int isOverridden = formation.getOverrideCombatTeam();
         if (isOverridden != COMBAT_TEAM_OVERRIDE_NONE) {
             boolean overrideState = isOverridden == COMBAT_TEAM_OVERRIDE_TRUE;
-            force.setCombatTeamStatus(overrideState);
+            formation.setCombatTeamStatus(overrideState);
 
-            List<Force> associatedForces = force.getAllParents();
-            associatedForces.addAll(force.getAllSubForces());
+            List<Formation> associatedFormations = formation.getAllParents();
+            associatedFormations.addAll(formation.getAllSubForces());
 
-            for (Force associatedForce : associatedForces) {
-                associatedForce.setCombatTeamStatus(false);
+            for (Formation associatedFormation : associatedFormations) {
+                associatedFormation.setCombatTeamStatus(false);
             }
 
             return overrideState;
@@ -420,35 +420,35 @@ public class CombatTeam {
 
         // This should never be getAllUnits() as otherwise parent nodes will be assessed as being
         // automatically eligible to be Combat Teams preventing child nodes from being Combat Teams
-        if (force.getUnits().isEmpty()) {
-            force.setCombatTeamStatus(false);
+        if (formation.getUnits().isEmpty()) {
+            formation.setCombatTeamStatus(false);
             return false;
         }
 
-        List<Force> childForces = force.getAllSubForces();
+        List<Formation> childFormations = formation.getAllSubForces();
 
-        for (Force childForce : childForces) {
-            if (childForce.isCombatTeam()) {
-                force.setCombatTeamStatus(false);
+        for (Formation childFormation : childFormations) {
+            if (childFormation.isCombatTeam()) {
+                formation.setCombatTeamStatus(false);
                 return false;
             }
         }
 
-        List<Force> parentForces = force.getAllParents();
+        List<Formation> parentFormations = formation.getAllParents();
 
-        for (Force parentForce : parentForces) {
-            if (parentForce.isCombatTeam()) {
-                force.setCombatTeamStatus(false);
+        for (Formation parentFormation : parentFormations) {
+            if (parentFormation.isCombatTeam()) {
+                formation.setCombatTeamStatus(false);
                 return false;
             }
 
-            if (!parentForce.isForceType(STANDARD)) {
-                force.setCombatTeamStatus(false);
+            if (!parentFormation.isForceType(STANDARD)) {
+                formation.setCombatTeamStatus(false);
                 return false;
             }
         }
 
-        force.setCombatTeamStatus(true);
+        formation.setCombatTeamStatus(true);
         return true;
     }
 
@@ -800,7 +800,7 @@ public class CombatTeam {
     public static void recalculateCombatTeams(Campaign campaign) {
         Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
         CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
-        Force force = campaign.getForce(0);
+        Formation formation = campaign.getForce(0);
 
         // Does the force already exist in our hashtable? If so, update it accordingly
         if (combatTeam != null) {
@@ -810,7 +810,7 @@ public class CombatTeam {
                 campaign.removeCombatTeam(0);
             }
 
-            force.setCombatTeamStatus(isEligible);
+            formation.setCombatTeamStatus(isEligible);
             // Otherwise, create a new formation and then add it to the table, if appropriate
         } else {
             combatTeam = new CombatTeam(0, campaign);
@@ -820,12 +820,12 @@ public class CombatTeam {
                 campaign.addCombatTeam(combatTeam);
             }
 
-            force.setCombatTeamStatus(isEligible);
+            formation.setCombatTeamStatus(isEligible);
         }
 
         // Update the TO&E and then begin recursively walking it
-        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), force);
+        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), formation);
     }
 
     /**
@@ -836,13 +836,13 @@ public class CombatTeam {
      * recursively on each sub-force, effectively traversing the complete TO&E.
      *
      * @param campaign    the current {@link Campaign}.
-     * @param workingNode the {@link Force} node from which the method starts working down through all its sub-forces.
+     * @param workingNode the {@link Formation} node from which the method starts working down through all its sub-forces.
      */
     private static void recalculateSubForceStrategicStatus(Campaign campaign,
-          Hashtable<Integer, CombatTeam> combatTeamsTable, Force workingNode) {
+          Hashtable<Integer, CombatTeam> combatTeamsTable, Formation workingNode) {
 
-        for (Force force : workingNode.getSubForces()) {
-            int forceId = force.getId();
+        for (Formation formation : workingNode.getSubForces()) {
+            int forceId = formation.getId();
             CombatTeam combatTeam = combatTeamsTable.get(forceId);
 
             // Does the force already exist in our hashtable? If so, update it accordingly
@@ -853,7 +853,7 @@ public class CombatTeam {
                     campaign.removeCombatTeam(forceId);
                 }
 
-                force.setCombatTeamStatus(isEligible);
+                formation.setCombatTeamStatus(isEligible);
                 // Otherwise, create a new formation and then add it to the table, if appropriate
             } else {
                 combatTeam = new CombatTeam(forceId, campaign);
@@ -863,12 +863,12 @@ public class CombatTeam {
                     campaign.addCombatTeam(combatTeam);
                 }
 
-                force.setCombatTeamStatus(isEligible);
+                formation.setCombatTeamStatus(isEligible);
             }
 
             // Update the TO&E and then continue recursively walking it
-            MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), force);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), formation);
         }
     }
 
@@ -876,15 +876,15 @@ public class CombatTeam {
      * Retrieves the force associated with the given campaign using the stored force ID.
      *
      * <p>
-     * This method returns a {@link Force} object corresponding to the stored {@code forceId}, if it exists within the
+     * This method returns a {@link Formation} object corresponding to the stored {@code forceId}, if it exists within the
      * specified campaign. If no matching force is found, {@code null} is returned.
      * </p>
      *
      * @param campaign the campaign containing the forces to search for the specified {@code forceId}
      *
-     * @return the {@link Force} object associated with the {@code forceId}, or {@code null} if not found
+     * @return the {@link Formation} object associated with the {@code forceId}, or {@code null} if not found
      */
-    public @Nullable Force getForce(Campaign campaign) {
+    public @Nullable Formation getForce(Campaign campaign) {
         return campaign.getForce(forceId);
     }
 }

@@ -41,7 +41,7 @@ import static mekhq.campaign.force.ForceType.STANDARD;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.enums.CombatRole;
 
 public class ContractUtilities {
@@ -69,14 +69,14 @@ public class ContractUtilities {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force == null) {
+            Formation formation = combatTeam.getForce(campaign);
+            if (formation == null) {
                 continue;
             }
 
-            CombatRole roleInMemory = force.getCombatRoleInMemory();
+            CombatRole roleInMemory = formation.getCombatRoleInMemory();
             boolean hasCombatRole = roleInMemory.isCombatRole() || (isCadreDuty && roleInMemory.isCadre());
-            if (force.isForceType(STANDARD) && hasCombatRole) {
+            if (formation.isForceType(STANDARD) && hasCombatRole) {
                 combatForceCount++;
             }
         }
@@ -119,13 +119,13 @@ public class ContractUtilities {
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
-            Force force = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getForce(campaign);
 
-            if (force == null) {
+            if (formation == null) {
                 continue;
             }
 
-            if (!force.isForceType(STANDARD)) {
+            if (!formation.isForceType(STANDARD)) {
                 continue;
             }
 

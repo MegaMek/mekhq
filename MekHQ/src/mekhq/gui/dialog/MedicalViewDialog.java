@@ -64,7 +64,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData.Key;
 import mekhq.campaign.ExtraData.StringKey;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.personnel.Injury;
@@ -383,7 +383,7 @@ public class MedicalViewDialog extends JDialog {
                                  resourceMap.getString("baselinePhenotype.text") :
                                  p.getPhenotype().toString();
 
-        Force f = c.getForceFor(p);
+        Formation f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-";
 
         Person doc = c.getPerson(p.getDoctorId());

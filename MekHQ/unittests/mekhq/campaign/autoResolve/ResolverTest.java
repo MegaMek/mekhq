@@ -73,7 +73,7 @@ import megamek.common.units.Entity;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.camOpsReputation.ReputationController;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -238,7 +238,7 @@ public class ResolverTest {
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
         campaign.setReputation(reputationController);
-        var force = new Force("Heroes");
+        var force = new Formation("Heroes");
 
         campaign.addForce(force, campaign.getForce(0));
         return campaign;

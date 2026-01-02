@@ -42,7 +42,7 @@ import megamek.Version;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -249,7 +249,7 @@ public class ScenarioDeploymentLimit {
      *
      * @return the integer giving the quantity that this force counts toward in the appropriate units of CountType
      */
-    public int getForceQuantity(Force f, Campaign c) {
+    public int getForceQuantity(Formation f, Campaign c) {
         int quantity = 0;
 
         Vector<UUID> unitIds = f.getAllUnits(false);
@@ -340,7 +340,7 @@ public class ScenarioDeploymentLimit {
      * @return a boolean that evaluates to true if all required personnel are currently deployed in the scenario
      */
     public boolean checkRequiredPersonnel(Scenario s, Campaign c) {
-        Force f = s.getForces(c);
+        Formation f = s.getForces(c);
         if (null == f) {
             return false;
         }
@@ -362,13 +362,13 @@ public class ScenarioDeploymentLimit {
      * Determines whether a given Person is part of a Force
      *
      * @param personId - the id of a Person
-     * @param force    - a Force
+     * @param formation    - a Force
      * @param c        - a pointer to the campaign
      *
      * @return a boolean that evaluates to true if the person identified by personId is part of the force
      */
-    public boolean isPersonInForce(UUID personId, Force force, Campaign c) {
-        Vector<UUID> unitIds = force.getAllUnits(false);
+    public boolean isPersonInForce(UUID personId, Formation formation, Campaign c) {
+        Vector<UUID> unitIds = formation.getAllUnits(false);
         for (UUID unitId : unitIds) {
             Unit u = c.getUnit(unitId);
             for (Person p : u.getActiveCrew()) {
@@ -413,7 +413,7 @@ public class ScenarioDeploymentLimit {
      * @return a boolean that evaluates to true if all required units are currently deployed in the scenario
      */
     public boolean checkRequiredUnits(Scenario s, Campaign c) {
-        Force f = s.getForces(c);
+        Formation f = s.getForces(c);
         if (null == f) {
             return false;
         }
@@ -436,13 +436,13 @@ public class ScenarioDeploymentLimit {
      * Determines whether a given unit is part of a Force
      *
      * @param unitId   - the id of a Person
-     * @param force    - a Force
+     * @param formation    - a Force
      * @param campaign - a pointer to the campaign
      *
      * @return a boolean that evaluates to true if the unit identified by unitId is part of the force
      */
-    public boolean isUnitInForce(UUID unitId, Force force, Campaign campaign) {
-        Vector<UUID> unitIds = force.getAllUnits(false);
+    public boolean isUnitInForce(UUID unitId, Formation formation, Campaign campaign) {
+        Vector<UUID> unitIds = formation.getAllUnits(false);
         for (UUID id : unitIds) {
             if (id.equals(unitId)) {
                 return true;

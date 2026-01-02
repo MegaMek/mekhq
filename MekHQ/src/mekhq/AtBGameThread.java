@@ -70,7 +70,7 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import megamek.common.net.packets.InvalidPacketDataException;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -257,9 +257,9 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    Force force = campaign.getForceFor(unit);
-                    if (force != null) {
-                        entity.setForceString(force.getFullMMName());
+                    Formation formation = campaign.getForceFor(unit);
+                    if (formation != null) {
+                        entity.setForceString(formation.getFullMMName());
                     }
                     entities.add(entity);
 

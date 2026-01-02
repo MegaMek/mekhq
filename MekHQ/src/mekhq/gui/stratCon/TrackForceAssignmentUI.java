@@ -48,7 +48,7 @@ import javax.swing.ListSelectionModel;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConCoords;
@@ -69,7 +69,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
     private boolean restrictToSingleForce;
-    private final JList<Force> availableForceList = new JList<>();
+    private final JList<Formation> availableForceList = new JList<>();
     private final JButton btnConfirm;
     private final StratConPanel ownerPanel;
 
@@ -163,9 +163,9 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
                 }
             }
 
-            for (Force force : availableForceList.getSelectedValuesList()) {
+            for (Formation formation : availableForceList.getSelectedValuesList()) {
                 StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
-                      force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
+                      formation.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
             }
             setVisible(false);
             ownerPanel.repaint();

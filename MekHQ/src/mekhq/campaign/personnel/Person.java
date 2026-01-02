@@ -112,7 +112,7 @@ import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -6106,9 +6106,9 @@ public class Person {
             }
         }
 
-        for (final Force force : campaign.getAllForces()) {
-            if (getId().equals(force.getTechID())) {
-                force.setTechID(null);
+        for (final Formation formation : campaign.getAllForces()) {
+            if (getId().equals(formation.getTechID())) {
+                formation.setTechID(null);
             }
         }
     }

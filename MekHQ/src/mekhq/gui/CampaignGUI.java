@@ -35,7 +35,7 @@ package mekhq.gui;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -117,7 +117,7 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -2871,7 +2871,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void undeployUnit(Unit u) {
-        Force f = getCampaign().getForce(u.getForceId());
+        Formation f = getCampaign().getForce(u.getForceId());
         if (f != null) {
             undeployForce(f, false);
         }
@@ -2881,11 +2881,11 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
-    public void undeployForce(Force f) {
+    public void undeployForce(Formation f) {
         undeployForce(f, true);
     }
 
-    public void undeployForce(Force f, boolean killSubs) {
+    public void undeployForce(Formation f, boolean killSubs) {
         int sid = f.getScenarioId();
         Scenario scenario = getCampaign().getScenario(sid);
         if (null != scenario) {
@@ -2902,7 +2902,7 @@ public class CampaignGUI extends JPanel {
             }
 
             // We have to clear out the parents as well.
-            Force parent = f;
+            Formation parent = f;
             int prevId = f.getId();
             while ((parent = parent.getParentForce()) != null) {
                 if (parent.getScenarioId() == NO_ASSIGNED_SCENARIO) {
@@ -2910,7 +2910,7 @@ public class CampaignGUI extends JPanel {
                 }
                 parent.clearScenarioIds(getCampaign(), false);
                 scenario.removeForce(parent.getId());
-                for (Force sub : parent.getSubForces()) {
+                for (Formation sub : parent.getSubForces()) {
                     if (sub.getId() == prevId) {
                         continue;
                     }

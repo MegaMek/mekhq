@@ -40,27 +40,27 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 
 /**
  * List data model for the StratCon scenario wizard.
  *
  * @author NickAragua
  */
-public class ScenarioWizardLanceModel extends DefaultListModel<Force> {
+public class ScenarioWizardLanceModel extends DefaultListModel<Formation> {
     /**
      * Constructor - sometimes, you have a list of force IDs.
      */
     public ScenarioWizardLanceModel(Campaign campaign, Collection<Integer> forceIDs) {
-        List<Force> sortedForces = new ArrayList<>();
+        List<Formation> sortedFormations = new ArrayList<>();
 
         for (int forceID : forceIDs) {
-            sortedForces.add(campaign.getForce(forceID));
+            sortedFormations.add(campaign.getForce(forceID));
         }
 
         // let's sort these guys by alphabetical order
-        sortedForces.sort(Comparator.comparing(Force::getName));
+        sortedFormations.sort(Comparator.comparing(Formation::getName));
 
-        super.addAll(sortedForces);
+        super.addAll(sortedFormations);
     }
 }
