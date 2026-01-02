@@ -1399,6 +1399,10 @@ public class Campaign implements ITechManager {
     }
 
     public void moveForce(Force force, Force superForce) {
+        // Can't move a null force under a superforce and can't move a force under itself.
+        if (force == null || force.equals(superForce)) {
+            return;
+        }
         Force parentForce = force.getParentForce();
 
         if (null != parentForce) {
