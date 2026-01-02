@@ -37,7 +37,7 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.FormationType.STANDARD;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;

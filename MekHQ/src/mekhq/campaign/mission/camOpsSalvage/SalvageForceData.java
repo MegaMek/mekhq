@@ -50,20 +50,20 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 
-public record SalvageForceData(Formation formation, ForceType forceType, @Nullable Person tech, double maximumCargoCapacity,
+public record SalvageForceData(Formation formation, FormationType formationType, @Nullable Person tech, double maximumCargoCapacity,
                                double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForceData";
 
     public static SalvageForceData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
-        ForceType forceType = formation.getForceType();
+        FormationType formationType = formation.getForceType();
         UUID techId = formation.getTechID();
-        Person tech = techId == null || !forceType.isSalvage() ? null : campaign.getPerson(techId);
+        Person tech = techId == null || !formationType.isSalvage() ? null : campaign.getPerson(techId);
         if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
             tech = null;
         }
@@ -129,7 +129,7 @@ public record SalvageForceData(Formation formation, ForceType forceType, @Nullab
         }
 
         return new SalvageForceData(formation,
-              forceType,
+              formationType,
               tech,
               maximumCargoCapacity,
               maximumTowCapacity,

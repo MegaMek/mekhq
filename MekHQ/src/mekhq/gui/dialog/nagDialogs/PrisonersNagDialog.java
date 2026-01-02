@@ -35,7 +35,7 @@ package mekhq.gui.dialog.nagDialogs;
 import static mekhq.MHQConstants.NAG_PRISONERS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 
 import java.util.List;

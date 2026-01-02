@@ -53,7 +53,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -96,7 +96,7 @@ class CargoCapacityTest {
     private final CargoUnit cargoTank = new CargoUnit(CARGO_TANK, 0, 20, 60, 0);
 
     private static Stream<Arguments> getForceTypes() {
-        return Stream.of(Arguments.of(ForceType.CONVOY), Arguments.of(ForceType.SALVAGE));
+        return Stream.of(Arguments.of(FormationType.CONVOY), Arguments.of(FormationType.SALVAGE));
     }
 
     @BeforeEach
@@ -113,177 +113,177 @@ class CargoCapacityTest {
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoMek(ForceType forceType) {
+    public void testCargoCapacityOfCargoMek(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
-        testCargoTotal(entity, cargoMek.getTotalCargoCapacity(forceType), forceType);
+        testCargoTotal(entity, cargoMek.getTotalCargoCapacity(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoMekKilledLocations(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
-        assertNotNull(entity);
-        killCargoLocations(entity);
-        testCargoTotal(entity, cargoMek.getCargoCapacityOtherDestroyed(forceType), forceType);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoMekKilledBays(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
-        assertNotNull(entity);
-        killBays(entity);
-        testCargoTotal(entity, cargoMek.getCargoCapacityBaysDestroyed(forceType), forceType);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoMekKillEverything(ForceType forceType) {
+    public void testCargoCapacityOfCargoMekKilledLocations(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
-        killBays(entity);
-        testCargoTotal(entity, cargoMek.getCargoCapacityAllDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoMek.getCargoCapacityOtherDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfLiftHoistMek(ForceType forceType) {
+    public void testCargoCapacityOfCargoMekKilledBays(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
+        assertNotNull(entity);
+        killBays(entity);
+        testCargoTotal(entity, cargoMek.getCargoCapacityBaysDestroyed(formationType), formationType);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getForceTypes")
+    public void testCargoCapacityOfCargoMekKillEverything(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
+        assertNotNull(entity);
+        killCargoLocations(entity);
+        killBays(entity);
+        testCargoTotal(entity, cargoMek.getCargoCapacityAllDestroyed(formationType), formationType);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getForceTypes")
+    public void testCargoCapacityOfLiftHoistMek(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
-        testCargoTotal(entity, liftHoistMek.getTotalCargoCapacity(forceType), forceType);
+        testCargoTotal(entity, liftHoistMek.getTotalCargoCapacity(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfLiftHoistMekKilledLocations(ForceType forceType) {
+    public void testCargoCapacityOfLiftHoistMekKilledLocations(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, liftHoistMek.getCargoCapacityOtherDestroyed(forceType), forceType);
+        testCargoTotal(entity, liftHoistMek.getCargoCapacityOtherDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfLiftHoistMekKilledBays(ForceType forceType) {
+    public void testCargoCapacityOfLiftHoistMekKilledBays(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, liftHoistMek.getCargoCapacityBaysDestroyed(forceType), forceType);
+        testCargoTotal(entity, liftHoistMek.getCargoCapacityBaysDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfLiftHoistMekKillEverything(ForceType forceType) {
+    public void testCargoCapacityOfLiftHoistMekKillEverything(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, liftHoistMek.getCargoCapacityAllDestroyed(forceType), forceType);
+        testCargoTotal(entity, liftHoistMek.getCargoCapacityAllDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoDropShip(ForceType forceType) {
+    public void testCargoCapacityOfCargoDropShip(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
-        testCargoTotal(entity, cargoDropShip.getTotalCargoCapacity(forceType), forceType);
+        testCargoTotal(entity, cargoDropShip.getTotalCargoCapacity(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoDropShipKilledLocations(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
-        assertNotNull(entity);
-        killCargoLocations(entity);
-        testCargoTotal(entity, cargoDropShip.getCargoCapacityOtherDestroyed(forceType), forceType);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoDropShipKilledBays(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
-        assertNotNull(entity);
-        killBays(entity);
-        testCargoTotal(entity, cargoDropShip.getCargoCapacityBaysDestroyed(forceType), forceType);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoDropShipKillEverything(ForceType forceType) {
+    public void testCargoCapacityOfCargoDropShipKilledLocations(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
-        killBays(entity);
-        testCargoTotal(entity, cargoDropShip.getCargoCapacityAllDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoDropShip.getCargoCapacityOtherDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoFighter(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
-        testCargoTotal(entity, cargoFighter.getTotalCargoCapacity(forceType), forceType);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoFighterKilledLocations(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
-        assertNotNull(entity);
-        killCargoLocations(entity);
-        testCargoTotal(entity, cargoFighter.getCargoCapacityOtherDestroyed(forceType), forceType);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoFighterKilledBays(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
+    public void testCargoCapacityOfCargoDropShipKilledBays(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoFighter.getCargoCapacityBaysDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoDropShip.getCargoCapacityBaysDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoFighterKillEverything(ForceType forceType) {
-        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
+    public void testCargoCapacityOfCargoDropShipKillEverything(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoDropShip.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoFighter.getCargoCapacityAllDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoDropShip.getCargoCapacityAllDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoTank(ForceType forceType) {
+    public void testCargoCapacityOfCargoFighter(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
+        testCargoTotal(entity, cargoFighter.getTotalCargoCapacity(formationType), formationType);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getForceTypes")
+    public void testCargoCapacityOfCargoFighterKilledLocations(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
+        assertNotNull(entity);
+        killCargoLocations(entity);
+        testCargoTotal(entity, cargoFighter.getCargoCapacityOtherDestroyed(formationType), formationType);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getForceTypes")
+    public void testCargoCapacityOfCargoFighterKilledBays(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
+        assertNotNull(entity);
+        killBays(entity);
+        testCargoTotal(entity, cargoFighter.getCargoCapacityBaysDestroyed(formationType), formationType);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getForceTypes")
+    public void testCargoCapacityOfCargoFighterKillEverything(FormationType formationType) {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoFighter.name, true);
+        assertNotNull(entity);
+        killCargoLocations(entity);
+        killBays(entity);
+        testCargoTotal(entity, cargoFighter.getCargoCapacityAllDestroyed(formationType), formationType);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getForceTypes")
+    public void testCargoCapacityOfCargoTank(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
-        testCargoTotal(entity, cargoTank.getTotalCargoCapacity(forceType), forceType);
+        testCargoTotal(entity, cargoTank.getTotalCargoCapacity(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoTankKilledLocations(ForceType forceType) {
+    public void testCargoCapacityOfCargoTankKilledLocations(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
-        testCargoTotal(entity, cargoTank.getCargoCapacityOtherDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoTank.getCargoCapacityOtherDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoTankKilledBays(ForceType forceType) {
+    public void testCargoCapacityOfCargoTankKilledBays(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoTank.getCargoCapacityBaysDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoTank.getCargoCapacityBaysDestroyed(formationType), formationType);
     }
 
     @ParameterizedTest
     @MethodSource("getForceTypes")
-    public void testCargoCapacityOfCargoTankKillEverything(ForceType forceType) {
+    public void testCargoCapacityOfCargoTankKillEverything(FormationType formationType) {
         Entity entity = getEntityForUnitTestingCargoCapacity(cargoTank.name, true);
         assertNotNull(entity);
         killCargoLocations(entity);
         killBays(entity);
-        testCargoTotal(entity, cargoTank.getCargoCapacityAllDestroyed(forceType), forceType);
+        testCargoTotal(entity, cargoTank.getCargoCapacityAllDestroyed(formationType), formationType);
     }
 
     /**
@@ -351,32 +351,32 @@ class CargoCapacityTest {
          *
          * @return The total cargo capacity of the entity.
          */
-        public double getTotalCargoCapacity(ForceType forceType) {
-            if (forceType == ForceType.CONVOY) {
+        public double getTotalCargoCapacity(FormationType formationType) {
+            if (formationType == FormationType.CONVOY) {
                 return bayCargoCapacity + otherCargoCapacity;
             } else {
                 return bayCargoCapacity + otherCargoCapacity + roofCargoCapacity + liftHoistCapacity;
             }
         }
 
-        public double getCargoCapacityBaysDestroyed(ForceType forceType) {
-            if (forceType == ForceType.CONVOY) {
+        public double getCargoCapacityBaysDestroyed(FormationType formationType) {
+            if (formationType == FormationType.CONVOY) {
                 return otherCargoCapacity;
             } else {
                 return otherCargoCapacity + roofCargoCapacity + liftHoistCapacity;
             }
         }
 
-        public double getCargoCapacityOtherDestroyed(ForceType forceType) {
-            if (forceType == ForceType.CONVOY) {
+        public double getCargoCapacityOtherDestroyed(FormationType formationType) {
+            if (formationType == FormationType.CONVOY) {
                 return bayCargoCapacity;
             } else {
                 return bayCargoCapacity + roofCargoCapacity;
             }
         }
 
-        public double getCargoCapacityAllDestroyed(ForceType forceType) {
-            if (forceType == ForceType.CONVOY) {
+        public double getCargoCapacityAllDestroyed(FormationType formationType) {
+            if (formationType == FormationType.CONVOY) {
                 return 0;
             } else {
                 return roofCargoCapacity;
@@ -396,7 +396,7 @@ class CargoCapacityTest {
      * @param entity             The {@link Entity} whose cargo capacity is to be tested.
      * @param expectedCargoTotal The expected total cargo capacity for the provided entity.
      */
-    private void testCargoTotal(Entity entity, double expectedCargoTotal, ForceType forceType) {
+    private void testCargoTotal(Entity entity, double expectedCargoTotal, FormationType formationType) {
         Unit unit = new Unit(entity, mockCampaign);
 
         while (!unit.isFullyCrewed()) {
@@ -422,9 +422,9 @@ class CargoCapacityTest {
 
         double cargoCapacity;
 
-        if (forceType == ForceType.SALVAGE) {
+        if (formationType == FormationType.SALVAGE) {
             cargoCapacity = unit.getCargoCapacityForSalvage();
-        } else if (forceType == ForceType.CONVOY) {
+        } else if (formationType == FormationType.CONVOY) {
             cargoCapacity = unit.getCargoCapacityForConvoy();
         } else {
             cargoCapacity = unit.getCargoCapacity();

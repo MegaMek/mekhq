@@ -45,7 +45,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.enums.CombatRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest1LanceBypassVariance(CombatRole combatRole) {
-            mockCombatTeams.add(newMockCombatTeam(4, combatRole, ForceType.STANDARD));
+            mockCombatTeams.add(newMockCombatTeam(4, combatRole, FormationType.STANDARD));
             int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
 
             assertEquals(1, reqLances);
@@ -94,7 +94,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest3LancesBypassVariance(CombatRole combatRole) {
-            newMockCombatTeams(3, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(3, 4, combatRole, FormationType.STANDARD);
             int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
 
             assertEquals(3, reqLances);
@@ -103,7 +103,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest9LanceBypassVariance(CombatRole combatRole) {
-            newMockCombatTeams(9, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(9, 4, combatRole, FormationType.STANDARD);
             int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
 
             assertEquals(9, reqLances);
@@ -112,7 +112,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getNoncombatRoles")
         void calculateBaseNumberOfRequiredLancesTest1Lance(CombatRole combatRole) {
-            newMockCombatTeams(1, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(1, 4, combatRole, FormationType.STANDARD);
 
             for (int i = 0; i < 5; i++) {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
@@ -128,7 +128,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest3Lance(CombatRole combatRole) {
-            newMockCombatTeams(3, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(3, 4, combatRole, FormationType.STANDARD);
 
             for (int i = 0; i < 5; i++) {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
@@ -144,7 +144,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest9Lance(CombatRole combatRole) {
-            newMockCombatTeams(9, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(9, 4, combatRole, FormationType.STANDARD);
 
             for (int i = 0; i < 5; i++) {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
@@ -160,7 +160,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getNoncombatRoles")
         void calculateBaseNumberOfRequiredLancesTest9LanceBypassVarianceNonCombat(CombatRole combatRole) {
-            newMockCombatTeams(9, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(9, 4, combatRole, FormationType.STANDARD);
             int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
 
             assertEquals(1, reqLances);
@@ -169,7 +169,7 @@ public class ContractUtilitiesTest {
         @ParameterizedTest
         @MethodSource(value = "getNoncombatRoles")
         void calculateBaseNumberOfRequiredLancesTest9LanceNonCombat(CombatRole combatRole) {
-            newMockCombatTeams(9, 4, combatRole, ForceType.STANDARD);
+            newMockCombatTeams(9, 4, combatRole, FormationType.STANDARD);
 
             for (int i = 0; i < 5; i++) {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
@@ -184,15 +184,15 @@ public class ContractUtilitiesTest {
 
     }
 
-    void newMockCombatTeams(int numberOfCombatTeams, int size, CombatRole combatRole, ForceType forceType) {
+    void newMockCombatTeams(int numberOfCombatTeams, int size, CombatRole combatRole, FormationType formationType) {
         for (int i = 0; i < numberOfCombatTeams; i++) {
-            mockCombatTeams.add(newMockCombatTeam(size, combatRole, forceType));
+            mockCombatTeams.add(newMockCombatTeam(size, combatRole, formationType));
         }
     }
 
-    CombatTeam newMockCombatTeam(int size, CombatRole combatRole, ForceType forceType) {
+    CombatTeam newMockCombatTeam(int size, CombatRole combatRole, FormationType formationType) {
         Formation mockFormation = mock(Formation.class);
-        when(mockFormation.isForceType(forceType)).thenReturn(true);
+        when(mockFormation.isForceType(formationType)).thenReturn(true);
         when(mockFormation.getCombatRoleInMemory()).thenReturn(combatRole);
 
         CombatTeam mockCombatTeam = mock(CombatTeam.class);

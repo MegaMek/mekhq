@@ -49,7 +49,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORCE_NONE;
 import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
@@ -160,7 +160,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -855,7 +855,7 @@ public class Campaign implements ITechManager {
      * <p>This method provides a list of unique identifiers for all units currently included in the force's TOE
      * structure.</p>
      *
-     * @param standardForcesOnly if {@code true}, returns only units in {@link ForceType#STANDARD} forces; if
+     * @param standardForcesOnly if {@code true}, returns only units in {@link FormationType#STANDARD} forces; if
      *                           {@code false}, returns all units.
      *
      * @return a List of UUID objects representing all units in the TOE according to the specified filter
@@ -1405,17 +1405,17 @@ public class Campaign implements ITechManager {
         superFormation.addSubForce(formation, true);
         formation.setScenarioId(superFormation.getScenarioId(), this);
 
-        ForceType forceType = formation.getForceType();
+        FormationType formationType = formation.getForceType();
 
-        if (forceType.shouldStandardizeParents()) {
+        if (formationType.shouldStandardizeParents()) {
             for (Formation individualParentFormation : formation.getAllParents()) {
                 individualParentFormation.setForceType(STANDARD, false);
             }
         }
 
-        if (forceType.shouldChildrenInherit()) {
+        if (formationType.shouldChildrenInherit()) {
             for (Formation childFormation : formation.getAllSubForces()) {
-                childFormation.setForceType(forceType, false);
+                childFormation.setForceType(formationType, false);
             }
         }
 

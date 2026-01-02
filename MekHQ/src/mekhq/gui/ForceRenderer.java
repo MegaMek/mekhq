@@ -47,7 +47,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -194,8 +194,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     }
 
     private static String getFormattedForceName(Formation formation) {
-        ForceType forceType = formation.getForceType();
-        String typeKey = forceType.getSymbol();
+        FormationType formationType = formation.getForceType();
+        String typeKey = formationType.getSymbol();
 
         return String.format("<html>%s%s%s%s%s%s%s</html>",
               formation.isCombatTeam() ? "<b>" : "",

@@ -54,7 +54,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -218,13 +218,13 @@ public class ForceViewPanel extends JScrollablePanel {
         if (null != type) {
             lblType.setName("lblType");
 
-            ForceType forceType = formation.getForceType();
+            FormationType formationType = formation.getForceType();
 
             String forceLabel;
-            if (forceType.isStandard()) {
+            if (formationType.isStandard()) {
                 forceLabel = formation.getFormationLevel().toString();
             } else {
-                forceLabel = forceType.getDisplayName() + ' ' + formation.getFormationLevel().toString();
+                forceLabel = formationType.getDisplayName() + ' ' + formation.getFormationLevel().toString();
             }
 
             lblType.setText("<html><i>" + forceLabel + "</i></html>");

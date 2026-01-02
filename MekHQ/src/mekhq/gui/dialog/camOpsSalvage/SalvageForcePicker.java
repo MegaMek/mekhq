@@ -65,7 +65,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -375,7 +375,7 @@ public class SalvageForcePicker extends JDialog {
 
     /**
      * Comparator used for the Force Type column. Ensures types with the display name containing
-     * {@link ForceType#SALVAGE} sort before others, then falls back to natural-order comparison of the type labels.
+     * {@link FormationType#SALVAGE} sort before others, then falls back to natural-order comparison of the type labels.
      *
      * @param s1 first type display string
      * @param s2 second type display string
@@ -386,8 +386,8 @@ public class SalvageForcePicker extends JDialog {
      * @since 0.50.10
      */
     private static int forceTypeComparator(String s1, String s2) {
-        boolean isSalvage1 = s1.toLowerCase().contains(ForceType.SALVAGE.getDisplayName());
-        boolean isSalvage2 = s2.toLowerCase().contains(ForceType.SALVAGE.getDisplayName());
+        boolean isSalvage1 = s1.toLowerCase().contains(FormationType.SALVAGE.getDisplayName());
+        boolean isSalvage2 = s2.toLowerCase().contains(FormationType.SALVAGE.getDisplayName());
         if (isSalvage1 && !isSalvage2) {return -1;}
         if (!isSalvage1 && isSalvage2) {return 1;}
         return new NaturalOrderComparator().compare(s1, s2);
@@ -539,7 +539,7 @@ public class SalvageForcePicker extends JDialog {
             return switch (columnIndex) {
                 case COL_SELECT -> selected[rowIndex];
                 case COL_FORCE_NAME -> data.formation().getName();
-                case COL_FORCE_TYPE -> data.forceType().getDisplayName();
+                case COL_FORCE_TYPE -> data.formationType().getDisplayName();
                 case COL_TOE_TECH -> getTechLabel(data.tech());
                 case COL_CREW_TECHS -> getCrewTechCount(campaign.getHangar(), data.formation());
                 case COL_CARGO_CAPACITY -> data.maximumCargoCapacity();

@@ -32,7 +32,7 @@
  */
 package mekhq.gui.utilities;
 
-import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.util.Arrays;
 import java.util.List;

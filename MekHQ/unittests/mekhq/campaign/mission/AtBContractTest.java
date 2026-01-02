@@ -53,7 +53,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -500,7 +500,7 @@ public class AtBContractTest {
 
             Formation mockFormation = mock(Formation.class);
             when(mockFormation.getId()).thenReturn(forceId);
-            when(mockFormation.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockFormation.isForceType(FormationType.STANDARD)).thenReturn(true);
             when(mockFormation.getFormationLevel()).thenReturn(FormationLevel.INVALID);
             when(mockFormation.getAllChildren(mockCampaign)).thenReturn(mockUnits);
             when(mockFormation.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
@@ -518,7 +518,7 @@ public class AtBContractTest {
 
             Formation mockFormation2 = mock(Formation.class);
             when(mockFormation2.getId()).thenReturn(forceId);
-            when(mockFormation2.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockFormation2.isForceType(FormationType.STANDARD)).thenReturn(true);
             when(mockFormation2.getFormationLevel()).thenReturn(FormationLevel.INVALID);
             when(mockFormation2.getAllChildren(mockCampaign)).thenReturn(mockUnits2);
             when(mockFormation2.getAllUnits(anyBoolean())).thenReturn(mockUUIDs2);
@@ -536,7 +536,7 @@ public class AtBContractTest {
 
             Formation finalFormation = mock(Formation.class);
             when(finalFormation.getId()).thenReturn(forceId);
-            when(finalFormation.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(finalFormation.isForceType(FormationType.STANDARD)).thenReturn(true);
             when(finalFormation.getFormationLevel()).thenReturn(FormationLevel.LANCE);
             when(finalFormation.getAllChildren(mockCampaign)).thenReturn(allForces);
             when(finalFormation.getAllUnits(anyBoolean())).thenReturn(allMockUUIDs);
@@ -603,7 +603,7 @@ public class AtBContractTest {
 
             Formation mockFormation = mock(Formation.class);
             when(mockFormation.getId()).thenReturn(forceId);
-            when(mockFormation.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockFormation.isForceType(FormationType.STANDARD)).thenReturn(true);
             when(mockFormation.getFormationLevel()).thenReturn(FormationLevel.LANCE);
             when(mockFormation.getAllChildren(mockCampaign)).thenReturn(mockUnits);
             when(mockFormation.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);
@@ -640,7 +640,7 @@ public class AtBContractTest {
             }
 
             when(mockCompany.getId()).thenReturn(forceId);
-            when(mockCompany.isForceType(ForceType.STANDARD)).thenReturn(true);
+            when(mockCompany.isForceType(FormationType.STANDARD)).thenReturn(true);
             when(mockCompany.getFormationLevel()).thenReturn(FormationLevel.COMPANY);
             when(mockCompany.getAllChildren(mockCampaign)).thenReturn(subForces);
             when(mockCompany.getAllUnits(anyBoolean())).thenReturn(mockUUIDs);

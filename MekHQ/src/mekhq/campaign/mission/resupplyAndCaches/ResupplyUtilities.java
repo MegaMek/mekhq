@@ -35,7 +35,7 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;

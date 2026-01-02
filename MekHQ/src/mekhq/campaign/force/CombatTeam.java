@@ -40,7 +40,7 @@ import static megamek.common.units.Entity.ETYPE_TANK;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_TRUE;
-import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.LANCE;
 
 import java.io.PrintWriter;

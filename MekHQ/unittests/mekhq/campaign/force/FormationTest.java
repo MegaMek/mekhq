@@ -72,7 +72,7 @@ class FormationTest {
     void testGetAllUnits_ParentForceStandard_ChildForcesAlsoStandard() {
         // Arrange
         Formation formation = new Formation("Parent Force");
-        formation.setForceType(ForceType.STANDARD, true);
+        formation.setForceType(FormationType.STANDARD, true);
         UUID unit = UUID.randomUUID();
         formation.addUnit(unit);
 
@@ -97,7 +97,7 @@ class FormationTest {
     void testGetAllUnits_ParentForceStandard_ChildForcesNotStandard() {
         // Arrange
         Formation formation = new Formation("Parent Force");
-        formation.setForceType(ForceType.STANDARD, true);
+        formation.setForceType(FormationType.STANDARD, true);
         UUID unit = UUID.randomUUID();
         formation.addUnit(unit);
 
@@ -111,7 +111,7 @@ class FormationTest {
         childFormation2.addUnit(unit);
         childFormation.addSubForce(childFormation2, true);
 
-        childFormation.setForceType(ForceType.CONVOY, true);
+        childFormation.setForceType(FormationType.CONVOY, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(true);
@@ -137,7 +137,7 @@ class FormationTest {
         childFormation2.addUnit(unit);
         childFormation.addSubForce(childFormation2, true);
 
-        formation.setForceType(ForceType.SECURITY, true);
+        formation.setForceType(FormationType.SECURITY, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(true);
@@ -163,7 +163,7 @@ class FormationTest {
         childFormation2.addUnit(unit);
         childFormation.addSubForce(childFormation2, true);
 
-        formation.setForceType(ForceType.SECURITY, true);
+        formation.setForceType(FormationType.SECURITY, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(false);
@@ -176,7 +176,7 @@ class FormationTest {
     void testGetAllUnits_AllForcesStandard_SecondLayerEmpty() {
         // Arrange
         Formation formation = new Formation("Parent Force");
-        formation.setForceType(ForceType.STANDARD, true);
+        formation.setForceType(FormationType.STANDARD, true);
         UUID unit = UUID.randomUUID();
         formation.addUnit(unit);
 

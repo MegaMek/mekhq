@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.resupplyAndCaches;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

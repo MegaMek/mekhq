@@ -95,7 +95,7 @@ public class Formation {
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
-    private ForceType forceType;
+    private FormationType formationType;
     private boolean isCombatTeam;
     private int overrideCombatTeam;
     private FormationLevel formationLevel;
@@ -119,7 +119,7 @@ public class Formation {
         setForceIcon(new LayeredForceIcon());
         setCamouflage(new Camouflage());
         setDescription("");
-        this.forceType = ForceType.STANDARD;
+        this.formationType = FormationType.STANDARD;
         this.isCombatTeam = false;
         this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
@@ -182,20 +182,20 @@ public class Formation {
     /**
      * @return The {@code ForceType} currently assigned to this instance.
      */
-    public ForceType getForceType() {
-        return forceType;
+    public FormationType getForceType() {
+        return formationType;
     }
 
     /**
      * This method compares the provided {@code forceType} with the current instance's {@code ForceType} to determine if
      * they match.
      *
-     * @param forceType The {@code ForceType} to compare against.
+     * @param formationType The {@code ForceType} to compare against.
      *
      * @return {@code true} if the current instance matches the specified {@code forceType}; otherwise, {@code false}.
      */
-    public boolean isForceType(ForceType forceType) {
-        return this.forceType == forceType;
+    public boolean isForceType(FormationType formationType) {
+        return this.formationType == formationType;
     }
 
     /**
@@ -204,14 +204,14 @@ public class Formation {
      * <p>If the {@code setForSubForces} flag is {@code true}, the method recursively sets the
      * provided {@code forceType} for all sub-forces of this instance.</p>
      *
-     * @param forceType       The new {@code ForceType} to assign to this instance.
+     * @param formationType       The new {@code ForceType} to assign to this instance.
      * @param setForSubForces A flag indicating whether the change should also apply to sub-forces.
      */
-    public void setForceType(ForceType forceType, boolean setForSubForces) {
-        this.forceType = forceType;
+    public void setForceType(FormationType formationType, boolean setForSubForces) {
+        this.formationType = formationType;
         if (setForSubForces) {
             for (Formation formation : subFormations) {
-                formation.setForceType(forceType, true);
+                formation.setForceType(formationType, true);
             }
         }
     }
@@ -456,7 +456,7 @@ public class Formation {
     public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
         Vector<UUID> allUnits = new Vector<>();
 
-        if (!standardForcesOnly || forceType.isStandard()) {
+        if (!standardForcesOnly || formationType.isStandard()) {
             allUnits.addAll(units);
         }
 
@@ -825,7 +825,7 @@ public class Formation {
         if (!getDescription().isBlank()) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceType", forceType.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceType", formationType.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
@@ -875,7 +875,7 @@ public class Formation {
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     formation.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceType")) {
-                    formation.setForceType(ForceType.fromKey(Integer.parseInt(wn2.getTextContent().trim())), false);
+                    formation.setForceType(FormationType.fromKey(Integer.parseInt(wn2.getTextContent().trim())), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
                     formation.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {

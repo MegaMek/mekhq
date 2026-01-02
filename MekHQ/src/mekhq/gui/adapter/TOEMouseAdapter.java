@@ -39,11 +39,11 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_TRUE;
-import static mekhq.campaign.force.ForceType.CONVOY;
-import static mekhq.campaign.force.ForceType.SALVAGE;
-import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.force.ForceType.STANDARD;
-import static mekhq.campaign.force.ForceType.SUPPORT;
+import static mekhq.campaign.force.FormationType.CONVOY;
+import static mekhq.campaign.force.FormationType.SALVAGE;
+import static mekhq.campaign.force.FormationType.SECURITY;
+import static mekhq.campaign.force.FormationType.STANDARD;
+import static mekhq.campaign.force.FormationType.SUPPORT;
 
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -70,7 +70,7 @@ import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -483,27 +483,27 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            ForceType forceType = ForceType.STANDARD;
+            FormationType formationType = FormationType.STANDARD;
             if (command.contains(SUPPORT.name())) {
-                forceType = SUPPORT;
+                formationType = SUPPORT;
             }
 
             if (command.contains(CONVOY.name())) {
-                forceType = CONVOY;
+                formationType = CONVOY;
             }
 
             if (command.contains(SALVAGE.name())) {
-                forceType = SALVAGE;
+                formationType = SALVAGE;
             }
 
             if (command.contains(SECURITY.name())) {
-                forceType = SECURITY;
+                formationType = SECURITY;
             }
 
             for (final Formation formation : formations) {
-                formation.setForceType(forceType, forceType.shouldChildrenInherit());
+                formation.setForceType(formationType, formationType.shouldChildrenInherit());
 
-                if (forceType.shouldStandardizeParents()) {
+                if (formationType.shouldStandardizeParents()) {
                     for (Formation parentFormation : formation.getAllParents()) {
                         parentFormation.setForceType(STANDARD, false);
                     }

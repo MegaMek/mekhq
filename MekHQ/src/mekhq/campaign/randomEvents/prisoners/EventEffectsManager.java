@@ -38,7 +38,7 @@ import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
