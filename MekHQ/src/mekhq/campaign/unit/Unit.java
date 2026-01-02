@@ -5538,7 +5538,7 @@ public class Unit implements ITechnology {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
-        } else if (entity instanceof Tank) {
+        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity) {
             return SkillType.S_TECH_MECHANIC;
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
             return SkillType.S_TECH_VESSEL;
