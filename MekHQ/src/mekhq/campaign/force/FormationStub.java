@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
  * this is a hierarchical object that represents forces from the TO&amp;E using strings rather than unit objects. This
  * makes it static and thus usable to keep track of forces involved in completed scenarios
  *
- * Known as ForceStub prior to 0.50.12
+ * <p>Known as {@code ForceStub} prior to 0.50.12</p>
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since 0.50.12

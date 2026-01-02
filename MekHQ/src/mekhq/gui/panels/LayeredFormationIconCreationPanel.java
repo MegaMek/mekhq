@@ -61,6 +61,10 @@ import mekhq.gui.baseComponents.AbstractMHQPanel;
 /**
  * This panel is used to create, display, and export a LayeredFormationIcon based on a tabbed pane containing a
  * ForcePieceIconChooser for every potential LayeredFormationIconLayer layer.
+ *
+ * <p>Known as {@code LayeredForceIconCreationPanel} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
 public class LayeredFormationIconCreationPanel extends AbstractMHQPanel {
     private static final MMLogger LOGGER = MMLogger.create(LayeredFormationIconCreationPanel.class);

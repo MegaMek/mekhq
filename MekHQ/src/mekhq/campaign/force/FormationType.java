@@ -41,6 +41,9 @@ import megamek.logging.MMLogger;
  * <p>
  * It is used to classify and manipulate forces within the game.
  * </p>
+ *
+ * <p>Known as {@code ForceType} prior to 0.50.12</p>
+ * @since 0.50.12
  */
 public enum FormationType {
     // region Enum Declarations

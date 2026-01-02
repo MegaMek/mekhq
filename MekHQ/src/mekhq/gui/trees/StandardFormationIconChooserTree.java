@@ -43,7 +43,11 @@ import mekhq.MHQStaticDirectoryManager;
  * StandardFormationIconChooserTree is an implementation of AbstractIconChooserTree that initializes the tree using the
  * Formation Icon Directory.
  *
+ * <p>Known as {@code StandardForceIconChooserTree} prior to 0.50.12</p>
+ *
  * @see AbstractIconChooserTree
+ *
+ * @since 0.50.12
  */
 public class StandardFormationIconChooserTree extends AbstractIconChooserTree {
     //region Constructors

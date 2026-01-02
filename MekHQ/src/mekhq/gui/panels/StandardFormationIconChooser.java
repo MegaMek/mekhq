@@ -46,8 +46,12 @@ import mekhq.gui.trees.StandardFormationIconChooserTree;
  * StandardFormationIconChooser is an implementation of AbstractMHQIconChooser that is used to select a StandardFormationIcon
  * from the Formation Icon Directory.
  *
+ * <p>Known as {@code StandardForceIconChooser} prior to 0.50.12</p>
+ *
  * @see AbstractMHQIconChooser
  * @see abstractIconChooserPanel
+ *
+ * @since 0.50.12
  */
 public class StandardFormationIconChooser extends AbstractMHQIconChooser {
     //region Constructors

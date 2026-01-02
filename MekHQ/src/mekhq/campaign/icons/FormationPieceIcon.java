@@ -47,9 +47,13 @@ import org.w3c.dom.Node;
  * ForcePieceIcon is an implementation of StandardFormationIcon that contains and displays a Formation Icon Piece from the Force
  * Icon Directory's Pieces Subdirectory. These are then combined to form a single LayeredFormationIcon.
  *
+ * <p>Known as {@code ForcePieceIcon} prior to 0.50.12</p>
+ *
  * @see LayeredFormationIconLayer
  * @see LayeredFormationIcon
  * @see StandardFormationIcon
+ *
+ * @since 0.50.12
  */
 public class FormationPieceIcon extends StandardFormationIcon {
     private static final MMLogger logger = MMLogger.create(FormationPieceIcon.class);

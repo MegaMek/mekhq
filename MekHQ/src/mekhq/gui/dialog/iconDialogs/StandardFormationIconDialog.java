@@ -46,8 +46,13 @@ import mekhq.gui.panels.StandardFormationIconChooser;
  * StandardFormationIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to select a
  * StandardFormationIcon from the Formation Icon Directory.
  *
+ * <p>Known as {@code StandardForceIconDialog} prior to 0.50.12</p>
+ *
+ *
  * @see AbstractMHQIconChooserDialog
  * @see AbstractIconChooserDialog
+ *
+ * @since 0.50.12
  */
 public class StandardFormationIconDialog extends AbstractMHQIconChooserDialog {
     //region Constructors

@@ -59,10 +59,14 @@ import org.w3c.dom.NodeList;
  * allowing for the creation of a custom Formation Icon from the various Pieces located in the Formation Icon directory's Pieces
  * category.
  *
+ * <p>Known as {@code LayeredForceIcon} prior to 0.50.12</p>
+ *
  * @see LayeredFormationIconLayer
  * @see FormationPieceIcon
  * @see StandardFormationIcon
  * @see AbstractIcon
+ *
+ * @since 0.50.12
  */
 public class LayeredFormationIcon extends StandardFormationIcon {
     private static final MMLogger logger = MMLogger.create(LayeredFormationIcon.class);

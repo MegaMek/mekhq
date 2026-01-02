@@ -45,7 +45,11 @@ import org.w3c.dom.Node;
  * StandardFormationIcon is an implementation of AbstractIcon that contains and displays a StandardFormationIcon from the Force
  * Icon Directory.
  *
+ * <p>Known as {@code StandardForceIcon} prior to 0.50.12</p>
+ *
  * @see AbstractIcon
+ *
+ * @since 0.50.12
  */
 public class StandardFormationIcon extends AbstractIcon {
     private static final MMLogger LOGGER = MMLogger.create(StandardFormationIcon.class);

@@ -40,6 +40,10 @@ import mekhq.MekHQ;
 /**
  * This is the style of Operational Status indicator to use for a LayeredFormationIcon when automatically assigning and
  * updating the value based on the assigned units.
+ *
+ * <p>Known as {@code ForceIconOperationStatusStyle} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
 public enum FormationIconOperationalStatusStyle {
     //region Enum Declarations

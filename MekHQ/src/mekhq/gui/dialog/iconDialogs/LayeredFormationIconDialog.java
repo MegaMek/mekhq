@@ -55,6 +55,10 @@ import mekhq.gui.panels.StandardFormationIconChooser;
  * A LayeredFormationIconDialog is used to select a Formation Icon, which may be either a LayeredFormationIcon or a
  * StandardFormationIcon. It allows one to swap a force between the two types without issue, and handles having both types
  * open at the same time.
+ *
+ * <p>Known as {@code LayeredForceIconDialog} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
 public class LayeredFormationIconDialog extends AbstractMHQButtonDialog {
     private static final MMLogger LOGGER = MMLogger.create(LayeredFormationIconDialog.class);

@@ -71,7 +71,10 @@ import org.w3c.dom.NodeList;
  * TOE is refreshed in MekHQView, the force object can be traversed to generate a set of TreeNodes that can be applied
  * to the JTree showing the force TO&amp;E.
  *
+ * <p>Known as {@code Force} prior to 0.50.12</p>
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
+ * @since 0.50.12
  */
 public class Formation {
     private static final MMLogger LOGGER = MMLogger.create(Formation.class);

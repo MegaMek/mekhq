@@ -42,6 +42,10 @@ import mekhq.MekHQ;
 /**
  * This contains the individual layers of a LayeredFormationIcon, which are also the potential header folders within the
  * Pieces category of the Formation Icon Directory.
+ *
+ * <p>Known as {@code LayeredForceIconLayer} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
 public enum LayeredFormationIconLayer {
     //region Enum Declarations
