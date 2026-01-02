@@ -41,8 +41,8 @@ import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.icons.LayeredForceIcon;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.LayeredFormationIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -59,7 +59,7 @@ public class ForceStub {
 
     // region Variable Declarations
     private String name;
-    private StandardForceIcon forceIcon;
+    private StandardFormationIcon formationIcon;
     private final Vector<ForceStub> subForces;
     private final Vector<UnitStub> units;
     // endregion Variable Declarations
@@ -71,7 +71,7 @@ public class ForceStub {
 
     public ForceStub(final @Nullable Formation formation, final @Nullable Campaign campaign) {
         name = (formation == null) ? "" : formation.getFullName();
-        setForceIcon((formation == null) ? new LayeredForceIcon() : formation.getForceIcon().clone());
+        setFormationIcon((formation == null) ? new LayeredFormationIcon() : formation.getFormationIcon().clone());
 
         subForces = new Vector<>();
         if (formation != null) {
@@ -94,12 +94,12 @@ public class ForceStub {
     // endregion Constructors
 
     // region Getters/Setters
-    public StandardForceIcon getForceIcon() {
-        return forceIcon;
+    public StandardFormationIcon getFormationIcon() {
+        return formationIcon;
     }
 
-    public void setForceIcon(final StandardForceIcon forceIcon) {
-        this.forceIcon = forceIcon;
+    public void setFormationIcon(final StandardFormationIcon formationIcon) {
+        this.formationIcon = formationIcon;
     }
     // endregion Getters/Setters
 
@@ -115,7 +115,7 @@ public class ForceStub {
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
-        getForceIcon().writeToXML(pw, indent);
+        getFormationIcon().writeToXML(pw, indent);
 
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "units");
@@ -145,10 +145,10 @@ public class ForceStub {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
-                    retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
-                    retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(StandardFormationIcon.XML_TAG)) {
+                    retVal.setFormationIcon(StandardFormationIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredFormationIcon.XML_TAG)) {
+                    retVal.setFormationIcon(LayeredFormationIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

@@ -161,7 +161,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
@@ -399,7 +399,7 @@ public class Campaign implements ITechManager {
 
     private Camouflage camouflage = pickRandomCamouflage(3025, "Root");
     private PlayerColour colour = PlayerColour.BLUE;
-    private StandardForceIcon unitIcon = new UnitIcon(null, null);
+    private StandardFormationIcon unitIcon = new UnitIcon(null, null);
 
     private Finances finances;
 
@@ -6244,11 +6244,11 @@ public class Campaign implements ITechManager {
         this.colour = Objects.requireNonNull(colour, "Colour cannot be set to null");
     }
 
-    public StandardForceIcon getUnitIcon() {
+    public StandardFormationIcon getUnitIcon() {
         return unitIcon;
     }
 
-    public void setUnitIcon(final StandardForceIcon unitIcon) {
+    public void setUnitIcon(final StandardFormationIcon unitIcon) {
         this.unitIcon = unitIcon;
     }
 
@@ -9543,7 +9543,7 @@ public class Campaign implements ITechManager {
      */
     public ImageIcon getCampaignFactionIcon() {
         ImageIcon icon;
-        StandardForceIcon campaignIcon = getUnitIcon();
+        StandardFormationIcon campaignIcon = getUnitIcon();
 
         if (campaignIcon.getFilename() == null) {
             icon = getFactionLogo(currentDay.getYear(), getFaction().getShortName());

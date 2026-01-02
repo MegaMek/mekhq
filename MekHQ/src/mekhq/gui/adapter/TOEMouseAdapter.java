@@ -86,7 +86,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
+import mekhq.gui.dialog.iconDialogs.LayeredFormationIconDialog;
 import mekhq.gui.menus.AssignForceToShipTransportMenu;
 import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
 import mekhq.gui.menus.AssignForceToTowTransportMenu;
@@ -398,26 +398,26 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.contains(CHANGE_ICON)) {
             if (singleFormation != null) {
-                final LayeredForceIconDialog layeredForceIconDialog = new LayeredForceIconDialog(gui.getFrame(),
-                      singleFormation.getForceIcon());
-                if (layeredForceIconDialog.showDialog().isConfirmed() &&
-                          (layeredForceIconDialog.getSelectedItem() != null)) {
-                    singleFormation.setForceIcon(layeredForceIconDialog.getSelectedItem());
+                final LayeredFormationIconDialog layeredFormationIconDialog = new LayeredFormationIconDialog(gui.getFrame(),
+                      singleFormation.getFormationIcon());
+                if (layeredFormationIconDialog.showDialog().isConfirmed() &&
+                          (layeredFormationIconDialog.getSelectedItem() != null)) {
+                    singleFormation.setFormationIcon(layeredFormationIconDialog.getSelectedItem());
                     MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
                 }
             }
         } else if (command.contains(COPY_ICON)) {
             if (singleFormation != null) {
-                gui.setCopyForceIcon(singleFormation.getForceIcon().clone());
+                gui.setCopyFormationIcon(singleFormation.getFormationIcon().clone());
             }
         } else if (command.contains(PASTE_ICON)) {
-            if (gui.getCopyForceIcon() == null) {
+            if (gui.getCopyFormationIcon() == null) {
                 return;
             }
 
             final boolean subForces = command.contains(SUB_FORCES_PASTE_ICON);
             for (final Formation formation : formations) {
-                formation.setForceIcon(gui.getCopyForceIcon().clone(), subForces);
+                formation.setFormationIcon(gui.getCopyFormationIcon().clone(), subForces);
             }
             gui.getTOETab().refreshForceView();
         } else if (command.contains(CHANGE_CAMO)) {
@@ -1148,29 +1148,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            menu = new JMenu("Force Icon");
+            menu = new JMenu("Formation Icon");
             if (!multipleSelection) {
-                menuItem = new JMenuItem("Change Force Icon...");
+                menuItem = new JMenuItem("Change Formation Icon...");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Copy Force Icon");
-                menuItem.setName("miCopyForceIcon");
+                menuItem = new JMenuItem("Copy Formation Icon");
+                menuItem.setName("miCopyFormationIcon");
                 menuItem.setActionCommand(COMMAND_COPY_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
 
-            if (gui.getCopyForceIcon() != null) {
-                menuItem = new JMenuItem("Paste Force Icon");
-                menuItem.setName("miPasteForceIcon");
+            if (gui.getCopyFormationIcon() != null) {
+                menuItem = new JMenuItem("Paste Formation Icon");
+                menuItem.setName("miPasteFormationIcon");
                 menuItem.setActionCommand(COMMAND_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Paste Force Icon to Force and Sub forces");
-                menuItem.setName("miSubForcesPasteForceIcon");
+                menuItem = new JMenuItem("Paste Formation Icon to Force and Sub forces");
+                menuItem.setName("miSubForcesPasteFormationIcon");
                 menuItem.setActionCommand(COMMAND_SUB_FORCES_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);

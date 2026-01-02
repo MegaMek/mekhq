@@ -30,47 +30,33 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.iconDialogs;
+package mekhq.gui.trees;
 
-import javax.swing.JFrame;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
-import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
-import megamek.common.annotations.Nullable;
+import megamek.client.ui.trees.AbstractIconChooserTree;
 import megamek.common.icons.AbstractIcon;
-import mekhq.campaign.icons.StandardForceIcon;
-import mekhq.gui.dialog.AbstractMHQIconChooserDialog;
-import mekhq.gui.panels.AbstractMHQIconChooser;
-import mekhq.gui.panels.StandardForceIconChooser;
+import mekhq.MHQStaticDirectoryManager;
 
 /**
- * StandardForceIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to select a
- * StandardForceIcon from the Force Icon Directory.
+ * StandardFormationIconChooserTree is an implementation of AbstractIconChooserTree that initializes the tree using the
+ * Formation Icon Directory.
  *
- * @see AbstractMHQIconChooserDialog
- * @see AbstractIconChooserDialog
+ * @see AbstractIconChooserTree
  */
-public class StandardForceIconDialog extends AbstractMHQIconChooserDialog {
+public class StandardFormationIconChooserTree extends AbstractIconChooserTree {
     //region Constructors
-    public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
-        this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",
-              new StandardForceIconChooser(frame, icon));
-    }
-
-    protected StandardForceIconDialog(final JFrame frame, final String name, final String title,
-          final AbstractMHQIconChooser chooser) {
-        super(frame, name, title, chooser);
+    public StandardFormationIconChooserTree() {
+        super();
     }
     //endregion Constructors
 
-    //region Getters
+    //region Initialization
     @Override
-    protected StandardForceIconChooser getChooser() {
-        return (StandardForceIconChooser) super.getChooser();
+    protected DefaultTreeModel createTreeModel() {
+        return createTreeModel(new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY),
+              MHQStaticDirectoryManager.getFormationIcons());
     }
-
-    @Override
-    public @Nullable StandardForceIcon getSelectedItem() {
-        return getChooser().getSelectedItem();
-    }
-    //endregion Getters
+    //endregion Initialization
 }

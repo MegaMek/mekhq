@@ -42,12 +42,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Unit Icon is an implementation of StandardForceIcon that permits a null filename, thereby allowing it to purposefully
+ * Unit Icon is an implementation of StandardFormationIcon that permits a null filename, thereby allowing it to purposefully
  * return a null image when a unit icon is absent.
  *
- * @see StandardForceIcon
+ * @see StandardFormationIcon
  */
-public class UnitIcon extends StandardForceIcon {
+public class UnitIcon extends StandardFormationIcon {
     private static final MMLogger logger = MMLogger.create(UnitIcon.class);
 
     // region Variable Declarations

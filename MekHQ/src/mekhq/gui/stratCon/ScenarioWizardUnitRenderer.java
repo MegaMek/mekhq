@@ -33,7 +33,7 @@
 package mekhq.gui.stratCon;
 
 import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
-import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredFormationIconOperationalStatus;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -67,7 +67,7 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         Formation formation = campaign.getForce(valueForceId);
 
         // Determine name color
-        OperationalStatus operationalStatus = determineLayeredForceIconOperationalStatus(unit);
+        OperationalStatus operationalStatus = determineLayeredFormationIconOperationalStatus(unit);
 
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";

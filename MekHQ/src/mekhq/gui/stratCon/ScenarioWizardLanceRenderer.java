@@ -82,7 +82,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setBackground(background);
 
         // Determine name color
-        OperationalStatus operationalStatus = formation.updateForceIconOperationalStatus(campaign).get(0);
+        OperationalStatus operationalStatus = formation.updateFormationIconOperationalStatus(campaign).get(0);
 
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";

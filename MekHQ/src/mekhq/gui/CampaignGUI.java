@@ -118,7 +118,7 @@ import mekhq.campaign.events.transactions.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -237,7 +237,7 @@ public class CampaignGUI extends JPanel {
 
     private boolean logNagActive = false;
 
-    private transient StandardForceIcon copyForceIcon = null;
+    private transient StandardFormationIcon copyFormationIcon = null;
     // endregion Variable Declarations
 
     // region Constructors
@@ -285,14 +285,14 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * @return the force icon to paste
+     * @return the formation icon to paste
      */
-    public @Nullable StandardForceIcon getCopyForceIcon() {
-        return copyForceIcon;
+    public @Nullable StandardFormationIcon getCopyFormationIcon() {
+        return copyFormationIcon;
     }
 
-    public void setCopyForceIcon(final @Nullable StandardForceIcon copyForceIcon) {
-        this.copyForceIcon = copyForceIcon;
+    public void setCopyFormationIcon(final @Nullable StandardFormationIcon copyFormationIcon) {
+        this.copyFormationIcon = copyFormationIcon;
     }
     // endregion Getters/Setters
 
@@ -649,15 +649,15 @@ public class CampaignGUI extends JPanel {
         });
         menuRefresh.add(miRefreshPortraits);
 
-        JMenuItem miRefreshForceIcons = new JMenuItem(resourceMap.getString("miRefreshForceIcons.text"));
-        miRefreshForceIcons.setName("miRefreshForceIcons");
-        miRefreshForceIcons.setMnemonic(KeyEvent.VK_F);
-        miRefreshForceIcons.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
-        miRefreshForceIcons.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshForceIcons();
+        JMenuItem miRefreshFormationIcons = new JMenuItem(resourceMap.getString("miRefreshFormationIcons.text"));
+        miRefreshFormationIcons.setName("miRefreshFormationIcons");
+        miRefreshFormationIcons.setMnemonic(KeyEvent.VK_F);
+        miRefreshFormationIcons.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
+        miRefreshFormationIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshFormationIcons();
             refreshAllTabs();
         });
-        menuRefresh.add(miRefreshForceIcons);
+        menuRefresh.add(miRefreshFormationIcons);
 
         JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
         miRefreshAwards.setName("miRefreshAwards");

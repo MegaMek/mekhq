@@ -216,7 +216,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 return (person == null) ? null : person.getPortrait().getImageIcon(58);
             }
         } else if (node instanceof Formation) {
-            return ((Formation) node).getForceIcon().getImageIcon(58);
+            return ((Formation) node).getFormationIcon().getImageIcon(58);
         } else {
             return null;
         }

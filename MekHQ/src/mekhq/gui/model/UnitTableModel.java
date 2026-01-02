@@ -416,7 +416,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        final Image forceImage = formation.getForceIcon().getImage(54);
+                        final Image forceImage = formation.getFormationIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

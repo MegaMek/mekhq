@@ -50,10 +50,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.icons.ForcePieceIcon;
-import mekhq.campaign.icons.LayeredForceIcon;
-import mekhq.campaign.icons.StandardForceIcon;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.FormationPieceIcon;
+import mekhq.campaign.icons.LayeredFormationIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.Scenario;
@@ -77,7 +77,7 @@ public class Formation {
     private static final MMLogger LOGGER = MMLogger.create(Formation.class);
 
     // region Variable Declarations
-    // pathway to force icon
+    // pathway to formation icon
     public static final int FORCE_NONE = -1;
     /**
      * This is the id of the 'origin node'. The force from which all other forces descend. Normally named after the
@@ -92,7 +92,7 @@ public class Formation {
     public static final int NO_ASSIGNED_SCENARIO = -1;
 
     private String name;
-    private StandardForceIcon forceIcon;
+    private StandardFormationIcon formationIcon;
     private Camouflage camouflage;
     private String desc;
     private FormationType formationType;
@@ -116,7 +116,7 @@ public class Formation {
     // region Constructors
     public Formation(String name) {
         setName(name);
-        setForceIcon(new LayeredForceIcon());
+        setFormationIcon(new LayeredFormationIcon());
         setCamouflage(new Camouflage());
         setDescription("");
         this.formationType = FormationType.STANDARD;
@@ -140,19 +140,19 @@ public class Formation {
         this.name = n;
     }
 
-    public StandardForceIcon getForceIcon() {
-        return forceIcon;
+    public StandardFormationIcon getFormationIcon() {
+        return formationIcon;
     }
 
-    public void setForceIcon(final StandardForceIcon forceIcon) {
-        setForceIcon(forceIcon, false);
+    public void setFormationIcon(final StandardFormationIcon formationIcon) {
+        setFormationIcon(formationIcon, false);
     }
 
-    public void setForceIcon(final StandardForceIcon forceIcon, final boolean setForSubForces) {
-        this.forceIcon = forceIcon;
+    public void setFormationIcon(final StandardFormationIcon formationIcon, final boolean setForSubForces) {
+        this.formationIcon = formationIcon;
         if (setForSubForces) {
             for (final Formation formation : subFormations) {
-                formation.setForceIcon(forceIcon.clone(), true);
+                formation.setFormationIcon(formationIcon.clone(), true);
             }
         }
     }
@@ -768,11 +768,11 @@ public class Formation {
      *
      * @return a list of the operational statuses for units in this force and in all of its subForces.
      */
-    public List<OperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
+    public List<OperationalStatus> updateFormationIconOperationalStatus(final Campaign campaign) {
         // First, update all subForces, collecting their unit statuses into a single
         // list
         final List<OperationalStatus> statuses = getSubForces().stream()
-                                                       .flatMap(subForce -> subForce.updateForceIconOperationalStatus(
+                                                       .flatMap(subForce -> subForce.updateFormationIconOperationalStatus(
                                                              campaign).stream())
                                                        .collect(Collectors.toList());
 
@@ -780,19 +780,19 @@ public class Formation {
         statuses.addAll(getUnits().stream()
                               .map(campaign::getUnit)
                               .filter(Objects::nonNull)
-                              .map(OperationalStatus::determineLayeredForceIconOperationalStatus)
+                              .map(OperationalStatus::determineLayeredFormationIconOperationalStatus)
                               .toList());
 
-        // Can only update the icon for LayeredForceIcons, but still need to return the
+        // Can only update the icon for LayeredFormationIcons, but still need to return the
         // processed
         // units for parent force updates
-        if (!(getForceIcon() instanceof LayeredForceIcon)) {
+        if (!(getFormationIcon() instanceof LayeredFormationIcon)) {
             return statuses;
         }
 
         if (statuses.isEmpty()) {
             // No special modifier for empty forces
-            ((LayeredForceIcon) getForceIcon()).getPieces().remove(LayeredForceIconLayer.SPECIAL_MODIFIER);
+            ((LayeredFormationIcon) getFormationIcon()).getPieces().remove(LayeredFormationIconLayer.SPECIAL_MODIFIER);
         } else {
             // Sum the unit status ordinals, then divide by the overall number of statuses,
             // to get
@@ -800,12 +800,12 @@ public class Formation {
             // this.
             final int index = (int) round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
             final OperationalStatus status = OperationalStatus.values()[index];
-            ((LayeredForceIcon) getForceIcon()).getPieces()
-                  .put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
-            ((LayeredForceIcon) getForceIcon()).getPieces()
-                  .get(LayeredForceIconLayer.SPECIAL_MODIFIER)
-                  .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
-                        MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+            ((LayeredFormationIcon) getFormationIcon()).getPieces()
+                  .put(LayeredFormationIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
+            ((LayeredFormationIcon) getFormationIcon()).getPieces()
+                  .get(LayeredFormationIconLayer.SPECIAL_MODIFIER)
+                  .add(new FormationPieceIcon(LayeredFormationIconLayer.SPECIAL_MODIFIER,
+                        MekHQ.getMHQOptions().getNewDayFormationIconOperationalStatusStyle().getPath(),
                         status.getFilename()));
         }
 
@@ -820,7 +820,7 @@ public class Formation {
                           this.getClass().getName() +
                           "\">");
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "name", name);
-        getForceIcon().writeToXML(pw1, indent);
+        getFormationIcon().writeToXML(pw1, indent);
         getCamouflage().writeToXML(pw1, indent);
         if (!getDescription().isBlank()) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
@@ -866,10 +866,10 @@ public class Formation {
                 Node wn2 = childNodes.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     formation.setName(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
-                    formation.setForceIcon(StandardForceIcon.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
-                    formation.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(StandardFormationIcon.XML_TAG)) {
+                    formation.setFormationIcon(StandardFormationIcon.parseFromXML(wn2));
+                } else if (wn2.getNodeName().equalsIgnoreCase(LayeredFormationIcon.XML_TAG)) {
+                    formation.setFormationIcon(LayeredFormationIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     formation.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {

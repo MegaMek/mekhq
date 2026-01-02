@@ -39,47 +39,47 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.icons.StandardForceIcon;
-import mekhq.gui.trees.StandardForceIconChooserTree;
+import mekhq.campaign.icons.StandardFormationIcon;
+import mekhq.gui.trees.StandardFormationIconChooserTree;
 
 /**
- * StandardForceIconChooser is an implementation of AbstractMHQIconChooser that is used to select a StandardForceIcon
- * from the Force Icon Directory.
+ * StandardFormationIconChooser is an implementation of AbstractMHQIconChooser that is used to select a StandardFormationIcon
+ * from the Formation Icon Directory.
  *
  * @see AbstractMHQIconChooser
  * @see abstractIconChooserPanel
  */
-public class StandardForceIconChooser extends AbstractMHQIconChooser {
+public class StandardFormationIconChooser extends AbstractMHQIconChooser {
     //region Constructors
-    public StandardForceIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {
-        this(frame, "StandardForceIconChooser", icon);
+    public StandardFormationIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {
+        this(frame, "StandardFormationIconChooser", icon);
     }
 
-    protected StandardForceIconChooser(final JFrame frame, final String name,
+    protected StandardFormationIconChooser(final JFrame frame, final String name,
           final @Nullable AbstractIcon icon) {
-        super(frame, name, new StandardForceIconChooserTree(), icon);
+        super(frame, name, new StandardFormationIconChooserTree(), icon);
     }
     //endregion Constructors
 
     @Override
     protected @Nullable AbstractDirectory getDirectory() {
-        return MHQStaticDirectoryManager.getForceIcons();
+        return MHQStaticDirectoryManager.getFormationIcons();
     }
 
     @Override
-    protected StandardForceIcon createIcon(String category, final String filename) {
-        return new StandardForceIcon(category, filename);
+    protected StandardFormationIcon createIcon(String category, final String filename) {
+        return new StandardFormationIcon(category, filename);
     }
 
     @Override
-    public @Nullable StandardForceIcon getSelectedItem() {
+    public @Nullable StandardFormationIcon getSelectedItem() {
         final AbstractIcon icon = super.getSelectedItem();
-        return (icon instanceof StandardForceIcon) ? (StandardForceIcon) icon : null;
+        return (icon instanceof StandardFormationIcon) ? (StandardFormationIcon) icon : null;
     }
 
     @Override
     public void refreshDirectory() {
-        MHQStaticDirectoryManager.refreshForceIcons();
-        refreshDirectory(new StandardForceIconChooserTree());
+        MHQStaticDirectoryManager.refreshFormationIcons();
+        refreshDirectory(new StandardFormationIconChooserTree());
     }
 }

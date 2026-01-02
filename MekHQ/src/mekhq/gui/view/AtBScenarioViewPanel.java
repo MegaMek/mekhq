@@ -989,7 +989,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
-                return ((ForceStub) node).getForceIcon().getImageIcon(58);
+                return ((ForceStub) node).getFormationIcon().getImageIcon(58);
             } else {
                 return null;
             }

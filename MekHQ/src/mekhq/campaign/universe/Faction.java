@@ -76,10 +76,10 @@ public class Faction {
     private int[] eraMods;
     private Color color;
     private final String currencyCode = ""; // Currency of the faction, if any
-    private String layeredForceIconBackgroundCategory;
-    private String layeredForceIconBackgroundFilename;
-    private String layeredForceIconLogoCategory;
-    private String layeredForceIconLogoFilename;
+    private String layeredFormationIconBackgroundCategory;
+    private String layeredFormationIconBackgroundFilename;
+    private String layeredFormationIconLogoCategory;
+    private String layeredFormationIconLogoFilename;
     private Set<FactionTag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
@@ -101,10 +101,10 @@ public class Faction {
         color = Color.LIGHT_GRAY;
         startingPlanet = "Terra";
         eraMods = null;
-        setLayeredForceIconBackgroundCategory("");
-        setLayeredForceIconBackgroundFilename(null);
-        setLayeredForceIconLogoCategory("");
-        setLayeredForceIconLogoFilename(null);
+        setLayeredFormationIconBackgroundCategory("");
+        setLayeredFormationIconBackgroundFilename(null);
+        setLayeredFormationIconLogoCategory("");
+        setLayeredFormationIconLogoFilename(null);
         tags = EnumSet.noneOf(FactionTag.class);
         start = 0;
         end = 9999;
@@ -123,16 +123,16 @@ public class Faction {
         if (faction2.getBackground() != null) {
             Path backgroundPath = Path.of(faction2.getBackground());
             if (backgroundPath.getParent() != null) {
-                layeredForceIconBackgroundCategory = backgroundPath.getParent().toString();
+                layeredFormationIconBackgroundCategory = backgroundPath.getParent().toString();
             }
-            layeredForceIconBackgroundFilename = backgroundPath.getFileName().toString();
+            layeredFormationIconBackgroundFilename = backgroundPath.getFileName().toString();
         }
         if (faction2.getLogo() != null) {
             Path logoPath = Path.of(faction2.getLogo());
             if (logoPath.getParent() != null) {
-                layeredForceIconLogoCategory = logoPath.getParent().toString();
+                layeredFormationIconLogoCategory = logoPath.getParent().toString();
             }
-            layeredForceIconLogoFilename = logoPath.getFileName().toString();
+            layeredFormationIconLogoFilename = logoPath.getFileName().toString();
         }
         alternativeFactionCodes = faction2.getFallBackFactions().toArray(new String[0]);
         nameChanges = faction2.getNameChanges();
@@ -274,36 +274,36 @@ public class Faction {
         return currencyCode;
     }
 
-    public String getLayeredForceIconBackgroundCategory() {
-        return layeredForceIconBackgroundCategory;
+    public String getLayeredFormationIconBackgroundCategory() {
+        return layeredFormationIconBackgroundCategory;
     }
 
-    public void setLayeredForceIconBackgroundCategory(final String layeredForceIconBackgroundCategory) {
-        this.layeredForceIconBackgroundCategory = layeredForceIconBackgroundCategory;
+    public void setLayeredFormationIconBackgroundCategory(final String layeredFormationIconBackgroundCategory) {
+        this.layeredFormationIconBackgroundCategory = layeredFormationIconBackgroundCategory;
     }
 
-    public @Nullable String getLayeredForceIconBackgroundFilename() {
-        return layeredForceIconBackgroundFilename;
+    public @Nullable String getLayeredFormationIconBackgroundFilename() {
+        return layeredFormationIconBackgroundFilename;
     }
 
-    public void setLayeredForceIconBackgroundFilename(final @Nullable String layeredForceIconBackgroundFilename) {
-        this.layeredForceIconBackgroundFilename = layeredForceIconBackgroundFilename;
+    public void setLayeredFormationIconBackgroundFilename(final @Nullable String layeredFormationIconBackgroundFilename) {
+        this.layeredFormationIconBackgroundFilename = layeredFormationIconBackgroundFilename;
     }
 
-    public String getLayeredForceIconLogoCategory() {
-        return layeredForceIconLogoCategory;
+    public String getLayeredFormationIconLogoCategory() {
+        return layeredFormationIconLogoCategory;
     }
 
-    public void setLayeredForceIconLogoCategory(final String layeredForceIconLogoCategory) {
-        this.layeredForceIconLogoCategory = layeredForceIconLogoCategory;
+    public void setLayeredFormationIconLogoCategory(final String layeredFormationIconLogoCategory) {
+        this.layeredFormationIconLogoCategory = layeredFormationIconLogoCategory;
     }
 
-    public @Nullable String getLayeredForceIconLogoFilename() {
-        return layeredForceIconLogoFilename;
+    public @Nullable String getLayeredFormationIconLogoFilename() {
+        return layeredFormationIconLogoFilename;
     }
 
-    public void setLayeredForceIconLogoFilename(final @Nullable String layeredForceIconLogoFilename) {
-        this.layeredForceIconLogoFilename = layeredForceIconLogoFilename;
+    public void setLayeredFormationIconLogoFilename(final @Nullable String layeredFormationIconLogoFilename) {
+        this.layeredFormationIconLogoFilename = layeredFormationIconLogoFilename;
     }
 
     // region Checks

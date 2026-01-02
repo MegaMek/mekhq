@@ -629,7 +629,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
             } else if (node instanceof ForceStub) {
-                return ((ForceStub) node).getForceIcon().getImageIcon(50);
+                return ((ForceStub) node).getFormationIcon().getImageIcon(50);
             } else {
                 return null;
             }

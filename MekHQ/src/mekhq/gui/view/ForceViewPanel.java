@@ -93,9 +93,9 @@ public class ForceViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        lblIcon.setIcon(formation.getForceIcon().getImageIcon(150));
+        lblIcon.setIcon(formation.getFormationIcon().getImageIcon(150));
         lblIcon.setName("lblIcon");
-        lblIcon.getAccessibleContext().setAccessibleName("Force Icon");
+        lblIcon.getAccessibleContext().setAccessibleName("Formation Icon");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -426,7 +426,7 @@ public class ForceViewPanel extends JScrollablePanel {
         for (Formation subFormation : formation.getSubForces()) {
             lblForce = new JLabel();
             lblForce.setText(getForceSummary(subFormation));
-            lblForce.setIcon(subFormation.getForceIcon().getImageIcon(72));
+            lblForce.setIcon(subFormation.getFormationIcon().getImageIcon(72));
             nextY++;
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;

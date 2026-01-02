@@ -684,7 +684,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Worker function to render force icons to the given surface.
+     * Worker function to render formation icons to the given surface.
      */
     private void drawForces(Graphics2D g2D) {
         int xRadius = HEX_X_RADIUS / 3;

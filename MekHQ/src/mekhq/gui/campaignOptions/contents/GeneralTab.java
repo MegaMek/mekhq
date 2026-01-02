@@ -67,7 +67,7 @@ import megamek.common.util.DateUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -122,7 +122,7 @@ public class GeneralTab {
     private Camouflage camouflage;
     private JLabel lblIcon;
     private RoundedJButton btnIcon;
-    private StandardForceIcon unitIcon;
+    private StandardFormationIcon unitIcon;
 
     /**
      * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.

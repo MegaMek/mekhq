@@ -1201,9 +1201,9 @@ public class CampaignNewDayManager {
         Formation.populateFormationLevelsFromOrigin(campaign);
         recalculateCombatTeams(campaign);
 
-        // Update the force icons based on the end-of-day unit status if desired
-        if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
-            campaign.getForces().updateForceIconOperationalStatus(campaign);
+        // Update the formation icons based on the end-of-day unit status if desired
+        if (MekHQ.getMHQOptions().getNewDayFormationIconOperationalStatus()) {
+            campaign.getForces().updateFormationIconOperationalStatus(campaign);
         }
     }
 

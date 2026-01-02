@@ -44,51 +44,51 @@ import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.icons.LayeredForceIcon;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.LayeredFormationIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.panels.LayeredForceIconCreationPanel;
-import mekhq.gui.panels.StandardForceIconChooser;
+import mekhq.gui.panels.LayeredFormationIconCreationPanel;
+import mekhq.gui.panels.StandardFormationIconChooser;
 
 /**
- * A LayeredForceIconDialog is used to select a Force Icon, which may be either a LayeredForceIcon or a
- * StandardForceIcon. It allows one to swap a force between the two types without issue, and handles having both types
+ * A LayeredFormationIconDialog is used to select a Formation Icon, which may be either a LayeredFormationIcon or a
+ * StandardFormationIcon. It allows one to swap a force between the two types without issue, and handles having both types
  * open at the same time.
  */
-public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
-    private static final MMLogger LOGGER = MMLogger.create(LayeredForceIconDialog.class);
+public class LayeredFormationIconDialog extends AbstractMHQButtonDialog {
+    private static final MMLogger LOGGER = MMLogger.create(LayeredFormationIconDialog.class);
 
     // region Variable Declarations
-    private StandardForceIcon originalForceIcon;
+    private StandardFormationIcon originalFormationIcon;
 
     private JTabbedPane tabbedPane;
-    private StandardForceIconChooser standardForceIconChooser;
-    private LayeredForceIconCreationPanel layeredForceIconCreationPanel;
+    private StandardFormationIconChooser standardFormationIconChooser;
+    private LayeredFormationIconCreationPanel layeredFormationIconCreationPanel;
     // endregion Variable Declarations
 
     // region Constructors
-    public LayeredForceIconDialog(final JFrame parent, final @Nullable StandardForceIcon originalForceIcon) {
-        super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
-        if (originalForceIcon instanceof UnitIcon) {
+    public LayeredFormationIconDialog(final JFrame parent, final @Nullable StandardFormationIcon originalFormationIcon) {
+        super(parent, "LayeredFormationIconDialog", "LayeredFormationIconDialog.title");
+        if (originalFormationIcon instanceof UnitIcon) {
             LOGGER.error(
-                  "This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
-            setOriginalForceIcon(
-                  new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
+                  "This dialog was never designed for Unit Icon selection. Creating a standard formation icon based on it, using the base null protections that provides.");
+            setOriginalFormationIcon(
+                  new StandardFormationIcon(originalFormationIcon.getCategory(), originalFormationIcon.getFilename()));
         } else {
-            setOriginalForceIcon(originalForceIcon);
+            setOriginalFormationIcon(originalFormationIcon);
         }
         initialize();
     }
     // endregion Constructors
 
     // region Getters/Setters
-    public @Nullable StandardForceIcon getOriginalForceIcon() {
-        return originalForceIcon;
+    public @Nullable StandardFormationIcon getOriginalFormationIcon() {
+        return originalFormationIcon;
     }
 
-    public void setOriginalForceIcon(final @Nullable StandardForceIcon originalForceIcon) {
-        this.originalForceIcon = originalForceIcon;
+    public void setOriginalFormationIcon(final @Nullable StandardFormationIcon originalFormationIcon) {
+        this.originalFormationIcon = originalFormationIcon;
     }
 
     public JTabbedPane getTabbedPane() {
@@ -99,32 +99,32 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         this.tabbedPane = tabbedPane;
     }
 
-    public StandardForceIconChooser getStandardForceIconChooser() {
-        return standardForceIconChooser;
+    public StandardFormationIconChooser getStandardFormationIconChooser() {
+        return standardFormationIconChooser;
     }
 
-    public void setStandardForceIconChooser(final StandardForceIconChooser standardForceIconChooser) {
-        this.standardForceIconChooser = standardForceIconChooser;
+    public void setStandardFormationIconChooser(final StandardFormationIconChooser standardFormationIconChooser) {
+        this.standardFormationIconChooser = standardFormationIconChooser;
     }
 
-    public LayeredForceIconCreationPanel getLayeredForceIconCreationPanel() {
-        return layeredForceIconCreationPanel;
+    public LayeredFormationIconCreationPanel getLayeredFormationIconCreationPanel() {
+        return layeredFormationIconCreationPanel;
     }
 
-    public void setLayeredForceIconCreationPanel(final LayeredForceIconCreationPanel layeredForceIconCreationPanel) {
-        this.layeredForceIconCreationPanel = layeredForceIconCreationPanel;
+    public void setLayeredFormationIconCreationPanel(final LayeredFormationIconCreationPanel layeredFormationIconCreationPanel) {
+        this.layeredFormationIconCreationPanel = layeredFormationIconCreationPanel;
     }
 
     /**
      * @return the selected icon for this dialog, or null if no icon is selected
      */
-    public @Nullable StandardForceIcon getSelectedItem() {
+    public @Nullable StandardFormationIcon getSelectedItem() {
         if (getResult().isCancelled()) {
-            return getOriginalForceIcon();
-        } else if (getStandardForceIconChooser().equals(getTabbedPane().getSelectedComponent())) {
-            return getStandardForceIconChooser().getSelectedItem();
+            return getOriginalFormationIcon();
+        } else if (getStandardFormationIconChooser().equals(getTabbedPane().getSelectedComponent())) {
+            return getStandardFormationIconChooser().getSelectedItem();
         } else {
-            return getLayeredForceIconCreationPanel().createForceIcon();
+            return getLayeredFormationIconCreationPanel().createFormationIcon();
         }
     }
     // endregion Getters/Setters
@@ -135,11 +135,11 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         setTabbedPane(new JTabbedPane());
         getTabbedPane().setName("iconSelectionPane");
 
-        setStandardForceIconChooser(new StandardForceIconChooser(getFrame(), getOriginalForceIcon()));
-        getTabbedPane().addTab(resources.getString("StandardIconTab.title"), getStandardForceIconChooser());
+        setStandardFormationIconChooser(new StandardFormationIconChooser(getFrame(), getOriginalFormationIcon()));
+        getTabbedPane().addTab(resources.getString("StandardIconTab.title"), getStandardFormationIconChooser());
 
-        setLayeredForceIconCreationPanel(new LayeredForceIconCreationPanel(getFrame(), getOriginalForceIcon(), false));
-        getTabbedPane().addTab(resources.getString("LayeredIconTab.title"), getLayeredForceIconCreationPanel());
+        setLayeredFormationIconCreationPanel(new LayeredFormationIconCreationPanel(getFrame(), getOriginalFormationIcon(), false));
+        getTabbedPane().addTab(resources.getString("LayeredIconTab.title"), getLayeredFormationIconCreationPanel());
         return getTabbedPane();
     }
 
@@ -162,30 +162,30 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
     protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
 
-        if (getOriginalForceIcon() instanceof LayeredForceIcon) {
-            getTabbedPane().setSelectedComponent(getLayeredForceIconCreationPanel());
+        if (getOriginalFormationIcon() instanceof LayeredFormationIcon) {
+            getTabbedPane().setSelectedComponent(getLayeredFormationIconCreationPanel());
         }
     }
 
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
-        preferences.manage(new JSplitPanePreference(getStandardForceIconChooser().getSplitPane()));
+        preferences.manage(new JSplitPanePreference(getStandardFormationIconChooser().getSplitPane()));
     }
     // endregion Initialization
 
     // region Button Actions
 
     /**
-     * This does a complete directory refresh, starting with the StandardForceIconChooser (which refreshes the Force
+     * This does a complete directory refresh, starting with the StandardFormationIconChooser (which refreshes the Force
      * Icon directory and implements it), and then refreshing the implementations under the
-     * LayeredForceIconCreationPanel without actually refreshing the Force Icon Directory.
+     * LayeredFormationIconCreationPanel without actually refreshing the Formation Icon Directory.
      *
      * @param evt the triggering event
      */
     public void refreshDirectory(final @Nullable ActionEvent evt) {
-        getStandardForceIconChooser().refreshDirectory();
-        getLayeredForceIconCreationPanel().refreshDirectory(false);
+        getStandardFormationIconChooser().refreshDirectory();
+        getLayeredFormationIconCreationPanel().refreshDirectory(false);
     }
     // endregion Button Actions
 }

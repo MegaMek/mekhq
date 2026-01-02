@@ -448,7 +448,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc.append("</html>");
                     setHtmlText(desc.toString());
-                    final Image forceImage = formation.getForceIcon().getImage(40);
+                    final Image forceImage = formation.getFormationIcon().getImage(40);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {

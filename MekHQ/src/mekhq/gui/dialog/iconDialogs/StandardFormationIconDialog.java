@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,41 +30,47 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.panels;
+package mekhq.gui.dialog.iconDialogs;
 
 import javax.swing.JFrame;
 
-import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
+import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
+import mekhq.gui.dialog.AbstractMHQIconChooserDialog;
+import mekhq.gui.panels.AbstractMHQIconChooser;
+import mekhq.gui.panels.StandardFormationIconChooser;
 
 /**
- * UnitIconChooser is an implementation of StandardFormationIconChooser that is used to select a UnitIcon from the Force
- * Icon Directory.
- * <p>
- * The only differences from its originator are that it specifies the icon creation and selection methods to be for a
- * UnitIcon instead of a StandardFormationIcon.
+ * StandardFormationIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to select a
+ * StandardFormationIcon from the Formation Icon Directory.
  *
- * @see StandardFormationIconChooser
- * @see AbstractMHQIconChooser
- * @see abstractIconChooserPanel
+ * @see AbstractMHQIconChooserDialog
+ * @see AbstractIconChooserDialog
  */
-public class UnitIconChooser extends StandardFormationIconChooser {
+public class StandardFormationIconDialog extends AbstractMHQIconChooserDialog {
     //region Constructors
-    public UnitIconChooser(final JFrame frame, final @Nullable AbstractIcon icon) {
-        super(frame, "UnitIconChooser", icon);
+    public StandardFormationIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
+        this(frame, "StandardFormationIconDialog", "StandardFormationIconDialog.title",
+              new StandardFormationIconChooser(frame, icon));
+    }
+
+    protected StandardFormationIconDialog(final JFrame frame, final String name, final String title,
+          final AbstractMHQIconChooser chooser) {
+        super(frame, name, title, chooser);
     }
     //endregion Constructors
 
+    //region Getters
     @Override
-    protected UnitIcon createIcon(String category, final String filename) {
-        return new UnitIcon(category, filename);
+    protected StandardFormationIconChooser getChooser() {
+        return (StandardFormationIconChooser) super.getChooser();
     }
 
     @Override
-    public @Nullable UnitIcon getSelectedItem() {
-        final AbstractIcon icon = super.getSelectedItem();
-        return (icon instanceof UnitIcon) ? (UnitIcon) icon : null;
+    public @Nullable StandardFormationIcon getSelectedItem() {
+        return getChooser().getSelectedItem();
     }
+    //endregion Getters
 }

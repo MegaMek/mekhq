@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
 
 public class FormationIconOperationalStatusStyleTest {
     //region Variable Declarations
-    private static final ForceIconOperationalStatusStyle[] styles = ForceIconOperationalStatusStyle.values();
+    private static final FormationIconOperationalStatusStyle[] styles = FormationIconOperationalStatusStyle.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -53,40 +53,40 @@ public class FormationIconOperationalStatusStyleTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        assertEquals(resources.getString("ForceIconOperationalStatusStyle.BORDER.toolTipText"),
-              ForceIconOperationalStatusStyle.BORDER.getToolTipText());
-        assertEquals(resources.getString("ForceIconOperationalStatusStyle.TAB.toolTipText"),
-              ForceIconOperationalStatusStyle.TAB.getToolTipText());
+        assertEquals(resources.getString("FormationIconOperationalStatusStyle.BORDER.toolTipText"),
+              FormationIconOperationalStatusStyle.BORDER.getToolTipText());
+        assertEquals(resources.getString("FormationIconOperationalStatusStyle.TAB.toolTipText"),
+              FormationIconOperationalStatusStyle.TAB.getToolTipText());
     }
 
     @Test
     public void testGetPath() {
         assertEquals(MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH,
-              ForceIconOperationalStatusStyle.BORDER.getPath());
+              FormationIconOperationalStatusStyle.BORDER.getPath());
         assertEquals(MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH,
-              ForceIconOperationalStatusStyle.TAB.getPath());
+              FormationIconOperationalStatusStyle.TAB.getPath());
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
     @Test
     public void testIsBorder() {
-        for (final ForceIconOperationalStatusStyle forceIconOperationalStatusStyle : styles) {
-            if (forceIconOperationalStatusStyle == ForceIconOperationalStatusStyle.BORDER) {
-                assertTrue(forceIconOperationalStatusStyle.isBorder());
+        for (final FormationIconOperationalStatusStyle formationIconOperationalStatusStyle : styles) {
+            if (formationIconOperationalStatusStyle == FormationIconOperationalStatusStyle.BORDER) {
+                assertTrue(formationIconOperationalStatusStyle.isBorder());
             } else {
-                assertFalse(forceIconOperationalStatusStyle.isBorder());
+                assertFalse(formationIconOperationalStatusStyle.isBorder());
             }
         }
     }
 
     @Test
     public void testIsTab() {
-        for (final ForceIconOperationalStatusStyle forceIconOperationalStatusStyle : styles) {
-            if (forceIconOperationalStatusStyle == ForceIconOperationalStatusStyle.TAB) {
-                assertTrue(forceIconOperationalStatusStyle.isTab());
+        for (final FormationIconOperationalStatusStyle formationIconOperationalStatusStyle : styles) {
+            if (formationIconOperationalStatusStyle == FormationIconOperationalStatusStyle.TAB) {
+                assertTrue(formationIconOperationalStatusStyle.isTab());
             } else {
-                assertFalse(forceIconOperationalStatusStyle.isTab());
+                assertFalse(formationIconOperationalStatusStyle.isTab());
             }
         }
     }
@@ -94,9 +94,9 @@ public class FormationIconOperationalStatusStyleTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("ForceIconOperationalStatusStyle.BORDER.text"),
-              ForceIconOperationalStatusStyle.BORDER.toString());
-        assertEquals(resources.getString("ForceIconOperationalStatusStyle.TAB.text"),
-              ForceIconOperationalStatusStyle.TAB.toString());
+        assertEquals(resources.getString("FormationIconOperationalStatusStyle.BORDER.text"),
+              FormationIconOperationalStatusStyle.BORDER.toString());
+        assertEquals(resources.getString("FormationIconOperationalStatusStyle.TAB.text"),
+              FormationIconOperationalStatusStyle.TAB.toString());
     }
 }
