@@ -175,6 +175,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
+    public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
     public static final String SELF_CORRECT_MAINTENANCE = "SelfCorrectMaintenance";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayForceIconOperationalStatus";
@@ -208,8 +209,10 @@ public final class MHQConstants extends SuiteConstants {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String NAG_ADMIN_STRAIN = "nagAdminStrain";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
+    @Deprecated(since = "0.50.11", forRemoval = true)
     public static final String NAG_NO_COMMANDER = "nagNoCommander";
     public static final String NAG_CONTRACT_ENDED = "nagContractEnded";
+    public static final String NAG_SINGLE_DROP_SET_UP = "nagSingleDropSetUp";
     public static final String NAG_INSUFFICIENT_AS_TECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";

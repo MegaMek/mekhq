@@ -931,7 +931,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, false, false, false);
+        person.processConfusion(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -946,7 +946,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, false, true, false);
+        person.processConfusion(mockCampaign, false, false, true, false);
         assertEquals(0, person.getInjuries().size());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -965,7 +965,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, false, true, true);
+        person.processConfusion(mockCampaign, false, false, true, true);
         assertTrue(person.getInjuries().isEmpty());
         assertTrue(person.getHits() > 0);
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -984,7 +984,7 @@ public class PersonTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
-        person.processConfusion(mockCampaign, true, true, true);
+        person.processConfusion(mockCampaign, true, false, true, true);
         assertFalse(person.getInjuries().isEmpty());
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
@@ -1009,7 +1009,7 @@ public class PersonTest {
         Person person = new Person(mockCampaign);
         person.setHits(5);
 
-        person.processConfusion(mockCampaign, false, true, true);
+        person.processConfusion(mockCampaign, false, false, true, true);
         assertTrue(person.getInjuries().isEmpty());
         assertTrue(person.getHits() > 5);
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());
@@ -1036,7 +1036,7 @@ public class PersonTest {
             person.addInjury(new Injury());
         }
 
-        person.processConfusion(mockCampaign, true, true, true);
+        person.processConfusion(mockCampaign, true, false, true, true);
         assertTrue(person.getInjuries().size() > 5);
         assertEquals(0, person.getHits());
         assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, person.getStatus());

@@ -53,7 +53,7 @@ public enum Phenotype {
      * Individual external phenotypes.
      */
     MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9, 8, 0), new ArrayList<>()),
-    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8, 8, 0), List.of("atow_toughness")),
+    ELEMENTAL(true, true, 2, 1, 0, -1, new Attributes(9, 9, 8, 7, 8, 9, 8, 8, 0), List.of("atow_toughness")),
     AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8, 8, 0), List.of("flaw_glass_jaw")),
     // ATOW doesn't cover a vehicle phenotype, but as the linked attributes for vehicle skills are also reflexes and
     // dexterity, I copied the MekWarrior phenotype

@@ -418,6 +418,12 @@ public class Campaign implements ITechManager {
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private MekHQ app;
 
+    /**
+     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
+     * applied to Campaign.
+     */
+    private transient CampaignEventProcessor campaignEventProcessor;
+
     private ShoppingList shoppingList;
 
     private NewPersonnelMarket newPersonnelMarket;
@@ -1062,6 +1068,10 @@ public class Campaign implements ITechManager {
         return unitGenerator;
     }
 
+    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
+        campaignEventProcessor = processor;
+    }
+
     public void setAtBEventProcessor(AtBEventProcessor processor) {
         atbEventProcessor = processor;
     }
@@ -1382,6 +1392,10 @@ public class Campaign implements ITechManager {
     }
 
     public void moveForce(Force force, Force superForce) {
+        // Can't move a null force under a superforce and can't move a force under itself.
+        if (force == null || force.equals(superForce)) {
+            return;
+        }
         Force parentForce = force.getParentForce();
 
         if (null != parentForce) {
@@ -3989,30 +4003,66 @@ public class Campaign implements ITechManager {
     private Person[] findTopCommanders() {
         Person flaggedCommander = getFlaggedCommander();
         Person commander = flaggedCommander;
-        Person secondInCommand = null;
+
+        Person flaggedSecondInCommand = getFlaggedSecondInCommand();
+        Person secondInCommand = flaggedSecondInCommand;
+
+        if (flaggedCommander != null && flaggedSecondInCommand != null) {
+            return new Person[] { commander, secondInCommand };
+        }
 
         for (Person person : getActivePersonnel(false, false)) {
-            // If we have a flagged commander, skip them
-            if (flaggedCommander != null) {
-                if (person.equals(flaggedCommander)) {
-                    continue;
-                }
-                // Second in command is best among non-flagged
-                if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                    secondInCommand = person;
-                }
-            } else {
+            if (person == null) {
+                continue;
+            }
+
+            if (person.equals(flaggedCommander) || person.equals(flaggedSecondInCommand)) {
+                continue;
+            }
+
+            // Commander selection (if not locked)
+            if (flaggedCommander == null) {
                 if (commander == null) {
                     commander = person;
-                } else if (person.outRanksUsingSkillTiebreaker(this, commander)) {
-                    secondInCommand = commander;
+                    continue;
+                }
+
+                if (!person.equals(commander) && person.outRanksUsingSkillTiebreaker(this, commander)) {
+                    Person previousCommander = commander;
                     commander = person;
-                } else if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                    if (!person.equals(commander)) {
-                        secondInCommand = person;
+
+                    // Previous commander becomes a candidate for second-in-command (if not locked)
+                    if (flaggedSecondInCommand == null && !previousCommander.equals(commander)) {
+                        if (secondInCommand == null) {
+                            secondInCommand = previousCommander;
+                        } else if (!previousCommander.equals(secondInCommand)
+                                         && previousCommander.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                            secondInCommand = previousCommander;
+                        }
                     }
+                    continue;
                 }
             }
+
+            // Second-in-command selection (if not locked), excluding commander
+            if (flaggedSecondInCommand == null) {
+                if (person.equals(commander)) {
+                    continue;
+                }
+
+                if (secondInCommand == null) {
+                    secondInCommand = person;
+                    continue;
+                }
+
+                if (!person.equals(secondInCommand) && person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    secondInCommand = person;
+                }
+            }
+        }
+
+        if (commander != null && commander.equals(secondInCommand)) {
+            secondInCommand = null;
         }
 
         return new Person[] { commander, secondInCommand };
@@ -5472,6 +5522,17 @@ public class Campaign implements ITechManager {
      */
     public @Nullable Person getFlaggedCommander() {
         return getPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
+    }
+
+    /**
+     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns {@code null}.
+     *
+     * <p><b>Usage:</b> consider using {@link #getSecondInCommand()} instead.</p>
+     *
+     * @return the flagged second-in-command if present, otherwise {@code null}
+     */
+    public @Nullable Person getFlaggedSecondInCommand() {
+        return getPersonnel().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
 
     /**
