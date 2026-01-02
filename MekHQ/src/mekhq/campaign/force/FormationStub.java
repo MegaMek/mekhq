@@ -52,31 +52,34 @@ import org.w3c.dom.NodeList;
  * this is a hierarchical object that represents forces from the TO&amp;E using strings rather than unit objects. This
  * makes it static and thus usable to keep track of forces involved in completed scenarios
  *
+ * Known as ForceStub prior to 0.50.12
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
+ * @since 0.50.12
  */
-public class ForceStub {
-    private static final MMLogger LOGGER = MMLogger.create(ForceStub.class);
+public class FormationStub {
+    private static final MMLogger LOGGER = MMLogger.create(FormationStub.class);
 
     // region Variable Declarations
     private String name;
     private StandardFormationIcon formationIcon;
-    private final Vector<ForceStub> subForces;
+    private final Vector<FormationStub> subForces;
     private final Vector<UnitStub> units;
     // endregion Variable Declarations
 
     // region Constructors
-    public ForceStub() {
+    public FormationStub() {
         this(null, null);
     }
 
-    public ForceStub(final @Nullable Formation formation, final @Nullable Campaign campaign) {
+    public FormationStub(final @Nullable Formation formation, final @Nullable Campaign campaign) {
         name = (formation == null) ? "" : formation.getFullName();
         setFormationIcon((formation == null) ? new LayeredFormationIcon() : formation.getFormationIcon().clone());
 
         subForces = new Vector<>();
         if (formation != null) {
             for (Formation sub : formation.getSubForces()) {
-                ForceStub stub = new ForceStub(sub, campaign);
+                FormationStub stub = new FormationStub(sub, campaign);
                 subForces.add(stub);
             }
         }
@@ -127,7 +130,7 @@ public class ForceStub {
 
         if (!subForces.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subForces");
-            for (ForceStub sub : subForces) {
+            for (FormationStub sub : subForces) {
                 sub.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subForces");
@@ -135,8 +138,8 @@ public class ForceStub {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
 
-    public static ForceStub generateInstanceFromXML(final Node wn, final Version version) {
-        final ForceStub retVal = new ForceStub();
+    public static FormationStub generateInstanceFromXML(final Node wn, final Version version) {
+        final FormationStub retVal = new FormationStub();
 
         try {
             NodeList nl = wn.getChildNodes();

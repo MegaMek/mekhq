@@ -65,7 +65,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -106,7 +106,7 @@ public class Scenario implements IPlayerSettings {
     private final List<UUID> salvageTechs;
     private int id = S_DEFAULT_ID;
     private int missionId;
-    private ForceStub stub;
+    private FormationStub stub;
     private boolean cloaked;
 
     // allow multiple loot objects for meeting different scenario objectives
@@ -752,14 +752,14 @@ public class Scenario implements IPlayerSettings {
     }
 
     public void generateStub(Campaign c) {
-        stub = new ForceStub(getForces(c), c);
+        stub = new FormationStub(getForces(c), c);
         for (BotForce bf : botForces) {
             botForcesStubs.add(bf.generateStub(c));
         }
         botForces.clear();
     }
 
-    public ForceStub getForceStub() {
+    public FormationStub getForceStub() {
         return stub;
     }
 
@@ -1154,7 +1154,7 @@ public class Scenario implements IPlayerSettings {
                 } else if (wn2.getNodeName().equalsIgnoreCase("report")) {
                     retVal.setReport(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
-                    retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
+                    retVal.stub = FormationStub.generateInstanceFromXML(wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("linkedScenarioID")) {
                     retVal.linkedScenarioID = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {

@@ -71,7 +71,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -152,10 +152,10 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         this.campaign = c;
         botStubs = new ArrayList<>();
 
-        ForceStub playerForces;
+        FormationStub playerForces;
         if (s.getStatus().isCurrent()) {
             s.refresh(c);
-            playerForces = new ForceStub(s.getForces(campaign), campaign);
+            playerForces = new FormationStub(s.getForces(campaign), campaign);
             attachedAllyStub = Utilities.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
                 botStubs.add(s.getBotForce(i).generateStub(campaign));
@@ -918,26 +918,26 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class StubTreeModel implements TreeModel {
-        private final ForceStub rootForce;
+        private final FormationStub rootForce;
         private final Vector<TreeModelListener> listeners = new Vector<>();
 
-        public StubTreeModel(ForceStub root) {
+        public StubTreeModel(FormationStub root) {
             rootForce = root;
         }
 
         @Override
         public @Nullable Object getChild(final @Nullable Object parent, final int index) {
-            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().get(index) : null;
+            return (parent instanceof FormationStub) ? ((FormationStub) parent).getAllChildren().get(index) : null;
         }
 
         @Override
         public int getChildCount(final @Nullable Object parent) {
-            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().size() : 0;
+            return (parent instanceof FormationStub) ? ((FormationStub) parent).getAllChildren().size() : 0;
         }
 
         @Override
         public int getIndexOfChild(final @Nullable Object parent, final @Nullable Object child) {
-            return (parent instanceof ForceStub) ? ((ForceStub) parent).getAllChildren().indexOf(child) : 0;
+            return (parent instanceof FormationStub) ? ((FormationStub) parent).getAllChildren().indexOf(child) : 0;
         }
 
         @Override
@@ -948,7 +948,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         @Override
         public boolean isLeaf(final @Nullable Object node) {
             return (node instanceof UnitStub) ||
-                         ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
+                         ((node instanceof FormationStub) && ((FormationStub) node).getAllChildren().isEmpty());
         }
 
         @Override
@@ -988,8 +988,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         protected @Nullable Icon getIcon(final @Nullable Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
-            } else if (node instanceof ForceStub) {
-                return ((ForceStub) node).getFormationIcon().getImageIcon(58);
+            } else if (node instanceof FormationStub) {
+                return ((FormationStub) node).getFormationIcon().getImageIcon(58);
             } else {
                 return null;
             }

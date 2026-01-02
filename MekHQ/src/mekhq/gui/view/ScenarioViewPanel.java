@@ -63,7 +63,7 @@ import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
@@ -101,8 +101,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         super();
         this.scenario = scenario;
         this.campaign = campaign;
-        ForceStub forces = scenario.getStatus().isCurrent() ?
-                                 new ForceStub(scenario.getForces(campaign), campaign) :
+        FormationStub forces = scenario.getStatus().isCurrent() ?
+                                 new FormationStub(scenario.getForces(campaign), campaign) :
                                  scenario.getForceStub();
         forceModel = new StubTreeModel(forces);
 
@@ -549,33 +549,33 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     protected static class StubTreeModel implements TreeModel {
-        private final ForceStub rootForce;
+        private final FormationStub rootForce;
         private final Vector<TreeModelListener> listeners = new Vector<>();
 
-        public StubTreeModel(ForceStub root) {
+        public StubTreeModel(FormationStub root) {
             rootForce = root;
         }
 
         @Override
         public Object getChild(Object parent, int index) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub) parent).getAllChildren().get(index);
+            if (parent instanceof FormationStub) {
+                return ((FormationStub) parent).getAllChildren().get(index);
             }
             return null;
         }
 
         @Override
         public int getChildCount(Object parent) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub) parent).getAllChildren().size();
+            if (parent instanceof FormationStub) {
+                return ((FormationStub) parent).getAllChildren().size();
             }
             return 0;
         }
 
         @Override
         public int getIndexOfChild(Object parent, Object child) {
-            if (parent instanceof ForceStub) {
-                return ((ForceStub) parent).getAllChildren().indexOf(child);
+            if (parent instanceof FormationStub) {
+                return ((FormationStub) parent).getAllChildren().indexOf(child);
             }
             return 0;
         }
@@ -588,7 +588,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         @Override
         public boolean isLeaf(Object node) {
             return (node instanceof UnitStub)
-                         || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
+                         || ((node instanceof FormationStub) && ((FormationStub) node).getAllChildren().isEmpty());
         }
 
         @Override
@@ -628,8 +628,8 @@ public class ScenarioViewPanel extends JScrollablePanel {
         protected @Nullable Icon getIcon(final Object node) {
             if (node instanceof UnitStub) {
                 return ((UnitStub) node).getPortrait().getImageIcon(50);
-            } else if (node instanceof ForceStub) {
-                return ((ForceStub) node).getFormationIcon().getImageIcon(50);
+            } else if (node instanceof FormationStub) {
+                return ((FormationStub) node).getFormationIcon().getImageIcon(50);
             } else {
                 return null;
             }
