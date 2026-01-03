@@ -1159,44 +1159,6 @@ public enum PersonnelTableModelColumn {
     }
 
     public @Nullable String getToolTipText(final Person person, final boolean loadAssignmentFromMarket) {
-        return getToolTipText(person, loadAssignmentFromMarket, null);
-    }
-
-    /**
-     * Returns the tooltip text for this column, optionally including color reason explanations.
-     *
-     * @param person                   the person for this row
-     * @param loadAssignmentFromMarket whether to load assignment from market
-     * @param colorReasonKeys          list of i18n keys for color reasons, or null/empty if no special coloring
-     *
-     * @return the tooltip text, or null if no tooltip
-     */
-    public @Nullable String getToolTipText(final Person person, final boolean loadAssignmentFromMarket,
-          final @Nullable java.util.List<String> colorReasonKeys) {
-        String baseTooltip = getBaseToolTipText(person, loadAssignmentFromMarket);
-
-        // For name, rank, and status columns, append color reasons if present
-        if (colorReasonKeys != null && !colorReasonKeys.isEmpty() && isNameRankOrStatusColumn()) {
-            StringBuilder colorReasons = new StringBuilder();
-            for (String key : colorReasonKeys) {
-                if (colorReasons.length() > 0) {
-                    colorReasons.append("<br>");
-                }
-                colorReasons.append(resources.getString(key));
-            }
-
-            if (baseTooltip != null) {
-                // Combine existing tooltip with color reasons
-                return "<html>" + stripHtmlTags(baseTooltip) + "<br><i>" + colorReasons + "</i></html>";
-            } else {
-                return "<html><i>" + colorReasons + "</i></html>";
-            }
-        }
-
-        return baseTooltip;
-    }
-
-    private @Nullable String getBaseToolTipText(final Person person, final boolean loadAssignmentFromMarket) {
         switch (this) {
             case PERSONNEL_STATUS:
                 return person.getStatus().getToolTipText();
@@ -1217,26 +1179,6 @@ public enum PersonnelTableModelColumn {
             default:
                 return null;
         }
-    }
-
-    /**
-     * Returns true if this column should display color reason tooltips. Applies to name columns, rank column, and
-     * status column.
-     */
-    private boolean isNameRankOrStatusColumn() {
-        return this == PERSON || this == FIRST_NAME || this == LAST_NAME ||
-                     this == GIVEN_NAME || this == SURNAME || this == BLOODNAME ||
-                     this == RANK || this == PERSONNEL_STATUS;
-    }
-
-    /**
-     * Strips HTML tags from a tooltip string for re-wrapping.
-     */
-    private String stripHtmlTags(String text) {
-        if (text == null) {
-            return null;
-        }
-        return text.replaceAll("</?html>", "").replaceAll("</?HTML>", "");
     }
 
     public int getWidth() {
