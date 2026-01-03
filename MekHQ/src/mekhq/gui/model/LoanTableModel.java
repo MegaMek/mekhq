@@ -32,8 +32,6 @@
  */
 package mekhq.gui.model;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
@@ -140,8 +138,6 @@ public class LoanTableModel extends DataTableModel<Loan> {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
-        private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
-
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
               boolean hasFocus, int row, int column) {
@@ -154,15 +150,12 @@ public class LoanTableModel extends DataTableModel<Loan> {
             if (isSelected) {
                 setBackground(UIManager.getColor("Table.selectionBackground"));
                 setForeground(UIManager.getColor("Table.selectionForeground"));
-                setToolTipText(null);
             } else {
                 if (loan.isOverdue()) {
                     setForeground(MekHQ.getMHQOptions().getLoanOverdueForeground());
                     setBackground(MekHQ.getMHQOptions().getLoanOverdueBackground());
-                    setToolTipText(getTextAt(GUI_RESOURCE_BUNDLE, "colorReason.loan.overdue"));
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
-                    setToolTipText(null);
                 }
             }
 
