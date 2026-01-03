@@ -604,10 +604,53 @@ public class Contract extends Mission {
     }
 
     /**
+     * Calculates the employer's transport reimbursement based on the contract's transport compensation percentage.
+     *
+     * <p>This represents the amount the employer pays toward your transport costs. For example, if transport
+     * compensation is 50% and the full transport cost is 1,000,000 C-bills, the employer reimburses you 500,000.</p>
+     *
+     * @param campaign the current {@link Campaign} used for transport cost calculation
+     *
+     * @return the {@link Money} amount the employer reimburses for transport
+     */
+    public Money getEmployerTransportReimbursement(Campaign campaign) {
+        if ((null == getSystem()) || !campaign.getCampaignOptions().isPayForTransport()) {
+            return Money.zero();
+        }
+
+        Money fullTransportCost = getTransportCost(campaign, false);
+        return fullTransportCost.multipliedBy(transportComp / 100.0);
+    }
+
+    /**
+     * Calculates the player's out-of-pocket transport cost after the employer's reimbursement.
+     *
+     * <p>This is the full transport cost minus the employer's reimbursement. For example, if transport compensation
+     * is 50% and the full transport cost is 1,000,000 C-bills, the player pays 500,000.</p>
+     *
+     * @param campaign the current {@link Campaign} used for transport cost calculation
+     *
+     * @return the {@link Money} amount the player pays for transport after employer reimbursement
+     */
+    public Money getPlayerTransportCost(Campaign campaign) {
+        if ((null == getSystem()) || !campaign.getCampaignOptions().isPayForTransport()) {
+            return Money.zero();
+        }
+
+        Money fullTransportCost = getTransportCost(campaign, false);
+        Money employerReimbursement = fullTransportCost.multipliedBy(transportComp / 100.0);
+        return fullTransportCost.minus(employerReimbursement);
+    }
+
+    /**
      * Get the estimated total profit for this contract. The total profit is the total contract payment including fees
      * and bonuses, minus overhead, maintenance, payroll, spare parts, and other monthly expenses. The duration used for
      * monthly expenses is the contract duration plus the travel time from the unit's current world to the contract
      * world and back.
+     *
+     * <p>Transport costs are handled as follows: the employer's transport reimbursement is included in the contract
+     * income (via {@link #getTotalAmount()}), and the full transport cost is subtracted here. The net effect is that
+     * profit is reduced by the player's out-of-pocket transport cost (full cost minus employer reimbursement).</p>
      *
      * @param campaign The campaign with which this contract is associated.
      *
@@ -616,7 +659,7 @@ public class Contract extends Mission {
     public Money getEstimatedTotalProfit(Campaign campaign) {
         return getTotalAdvanceAmount()
                      .plus(getTotalMonthlyPayOut(campaign))
-                     .minus(getTransportCost(campaign, true));
+                     .minus(getTotalTransportationFees(campaign));
     }
 
     /**
@@ -688,9 +731,10 @@ public class Contract extends Mission {
                                   .dividedBy(100);
         }
 
-        // calculate transportation costs
+        // calculate employer's transport reimbursement (this is income - what they pay you toward transport)
+        // The full transport cost will be subtracted in getEstimatedTotalProfit()
         if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
-            transportAmount = getTransportCost(campaign, true);
+            transportAmount = getEmployerTransportReimbursement(campaign);
         } else {
             transportAmount = Money.zero();
         }

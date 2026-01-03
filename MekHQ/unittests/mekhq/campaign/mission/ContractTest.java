@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
@@ -80,8 +81,11 @@ public class ContractTest {
 
     @Test
     public void testGetTransportAmount() {
+        // With 100% transport compensation, transportAmount is employer's full reimbursement
+        // Full transport cost = 5 (jumpCost) * 2 (two-way) = 10
+        // Employer reimburses 100% = 10
         initializeTest();
-        assertEquals(Money.of(0), contract.getTransportAmount());
+        assertEquals(Money.of(10), contract.getTransportAmount());
     }
 
     @Test
@@ -92,50 +96,112 @@ public class ContractTest {
 
     @Test
     public void testSigningBonusAmount() {
+        // Signing bonus = (base + overhead + transport + transit + support) * signBonus%
+        // = (130 + 10 + 10 + 30 + 10) * 10% = 190 * 10% = 19
         initializeTest();
-        assertEquals(Money.of(18.0), contract.getSigningBonusAmount());
+        assertEquals(Money.of(19.0), contract.getSigningBonusAmount());
     }
 
     @Test
     public void testGetFeeAmount() {
+        // Fee = (base + overhead + transport + transit + support) * 5%
+        // = 190 * 5% = 9.5
         initializeTest();
-        assertEquals(Money.of(9.0), contract.getFeeAmount());
+        assertEquals(Money.of(9.5), contract.getFeeAmount());
     }
 
     @Test
     public void testGetTotalAmount() {
+        // Total = base + support + overhead + transportAmount + transit
+        // = 130 + 10 + 10 + 10 + 30 = 190
         initializeTest();
-        assertEquals(Money.of(180.0), contract.getTotalAmount());
+        assertEquals(Money.of(190.0), contract.getTotalAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFees() {
+        // TotalPlusFees = Total - feeAmount = 190 - 9.5 = 180.5
         initializeTest();
-        assertEquals(Money.of(171.0), contract.getTotalAmountPlusFees());
+        assertEquals(Money.of(180.5), contract.getTotalAmountPlusFees());
     }
 
     @Test
     public void testGetAdvanceAmount() {
+        // Advance = TotalAmountPlusFees * advancePct% = 180.5 * 10% = 18.05
         initializeTest();
-        assertEquals(Money.of(17.1), contract.getAdvanceAmount());
+        assertEquals(Money.of(18.05), contract.getAdvanceAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
+        // = TotalAmountPlusFees + signingAmount = 180.5 + 19 = 199.5
         initializeTest();
-        assertEquals(Money.of(189.0), contract.getTotalAmountPlusFeesAndBonuses());
+        assertEquals(Money.of(199.5), contract.getTotalAmountPlusFeesAndBonuses());
     }
 
     @Test
     public void testGetMonthlyPayout() {
+        // MonthlyPayout = (TotalAmountPlusFeesAndBonuses - TotalAdvanceAmount) / length
+        // TotalAdvanceAmount = advanceAmount + signingAmount = 18.05 + 19 = 37.05
+        // = (199.5 - 37.05) / 10 = 16.245 (rounded to 16.24)
         initializeTest();
-        assertEquals(Money.of(15.39), contract.getMonthlyPayOut());
+        assertEquals(Money.of(16.24), contract.getMonthlyPayOut());
     }
 
     @Test
     public void testGetSharesPercentDefaultsTo30() {
         initializeTest();
         assertEquals(30, contract.getSharesPercent());
+    }
+
+    @Test
+    public void testGetEmployerTransportReimbursement() {
+        // With 100% transport compensation, employer reimburses full transport cost
+        // Full transport cost = 5 (jumpCost) * 2 (two-way) = 10
+        initializeTest();
+        assertEquals(Money.of(10), contract.getEmployerTransportReimbursement(mockCampaign));
+    }
+
+    @Test
+    public void testGetPlayerTransportCost() {
+        // With 100% transport compensation, player pays nothing
+        initializeTest();
+        assertEquals(Money.of(0), contract.getPlayerTransportCost(mockCampaign));
+    }
+
+    @Test
+    public void testGetTotalTransportationFees() {
+        // Returns full transport cost regardless of compensation
+        // = 5 (jumpCost) * 2 (two-way) = 10
+        initializeTest();
+        assertEquals(Money.of(10), contract.getTotalTransportationFees(mockCampaign));
+    }
+
+    @Test
+    public void testTransportReimbursementWithPartialCompensation() {
+        // Test with 50% transport compensation
+        initializeTestWithTransportComp(50);
+
+        // Full transport cost = 10
+        // Employer reimburses 50% = 5
+        assertEquals(Money.of(5), contract.getEmployerTransportReimbursement(mockCampaign));
+        assertEquals(Money.of(5), contract.getPlayerTransportCost(mockCampaign));
+        assertEquals(Money.of(5), contract.getTransportAmount()); // Stored employer reimbursement
+    }
+
+    @Test
+    public void testBetterTransportTermsIncreaseReimbursement() {
+        // 50% compensation
+        initializeTestWithTransportComp(50);
+        Money reimbursement50 = contract.getEmployerTransportReimbursement(mockCampaign);
+
+        // 75% compensation (better terms)
+        initializeTestWithTransportComp(75);
+        Money reimbursement75 = contract.getEmployerTransportReimbursement(mockCampaign);
+
+        // Better terms should result in higher reimbursement
+        assertTrue(reimbursement75.isGreaterThan(reimbursement50),
+              "75% transport compensation should reimburse more than 50%");
     }
 
     private void initializeTest() {
@@ -201,5 +267,36 @@ public class ContractTest {
         when(mockCampaign.getTransportCostCalculation(EXP_REGULAR)).thenReturn(mockTransportCostCalculation);
         when(mockTransportCostCalculation.calculateJumpCostForEntireJourney(any(Integer.class),
               any(Integer.class))).thenReturn(jumpCost);
+    }
+
+    private void initializeTestWithTransportComp(int transportCompPercent) {
+        final PlanetarySystem mockPlanetarySystem = mock(PlanetarySystem.class);
+
+        final JumpPath mockJumpPath = mock(JumpPath.class);
+        when(mockJumpPath.getJumps()).thenReturn(2);
+        when(mockJumpPath.getFirstSystem()).thenReturn(mockPlanetarySystem);
+
+        initCampaign(mockJumpPath);
+        initContractWithTransportComp(transportCompPercent);
+        contract.calculateContract(mockCampaign);
+    }
+
+    private void initContractWithTransportComp(int transportCompPercent) {
+        contract = spy(new Contract());
+
+        contract.setOverheadComp(2); // Full overhead compensation
+        contract.setMultiplier(1.3);
+
+        contract.setLength(10);
+
+        contract.setStraightSupport(100);
+        contract.setTransportComp(transportCompPercent);
+
+        contract.setSigningBonusPct(10);
+        contract.setMRBCFee(true);
+        contract.setAdvancePct(10);
+
+        when(contract.getSystem()).thenReturn(new PlanetarySystem());
+        when(mockCampaign.isUseCommandCircuitForContract(contract)).thenReturn(false);
     }
 }
