@@ -659,7 +659,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 int baseCost = selectedPerson.getCostToImprove(skillName,
                       getCampaignOptions().isUseReasoningXpMultiplier());
-                skill.changeXpProgress(-baseCost);
+                if (skill != null) {
+                    skill.changeXpProgress(-baseCost);
+                }
 
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.improveSkill(skillName);

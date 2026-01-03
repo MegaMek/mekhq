@@ -465,7 +465,7 @@ public final class BatchXPDialog extends JDialog {
                         return false;
                     }
 
-                    cost = max(0, cost - skill.getCostToImprove());
+                    cost = max(0, cost - skill.getXpProgress());
                     return skill.getLevel() < maxSkillLevel && cost <= person.getXP();
                 }
             }
