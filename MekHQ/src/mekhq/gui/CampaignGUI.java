@@ -102,14 +102,7 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
-import mekhq.campaign.events.AsTechPoolChangedEvent;
-import mekhq.campaign.events.DayEndingEvent;
-import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.events.LocationChangedEvent;
-import mekhq.campaign.events.MedicPoolChangedEvent;
-import mekhq.campaign.events.NewDayEvent;
-import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.*;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
@@ -212,7 +205,25 @@ public class CampaignGUI extends JPanel {
     private JLabel lblFunds;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
+    private JLabel lblTempSoldiers;
+    private JLabel lblTempBattleArmor;
+    private JLabel lblTempVehicleCrewGround;
+    private JLabel lblTempVehicleCrewVTOL;
+    private JLabel lblTempVehicleCrewNaval;
+    private JLabel lblTempVesselPilot;
+    private JLabel lblTempVesselGunner;
+    private JLabel lblTempVesselCrew;
     private JLabel lblPartsAvailabilityRating;
+
+    // Blob crew menu references for visibility control
+    private JMenu menuSoldierPool;
+    private JMenu menuBattleArmorPool;
+    private JMenu menuVehicleCrewGroundPool;
+    private JMenu menuVehicleCrewVTOLPool;
+    private JMenu menuVehicleCrewNavalPool;
+    private JMenu menuVesselPilotPool;
+    private JMenu menuVesselGunnerPool;
+    private JMenu menuVesselCrewPool;
 
     /* for the top button panel */
     private JPanel pnlTop;
@@ -353,6 +364,14 @@ public class CampaignGUI extends JPanel {
         refreshLocation();
         refreshTempAsTechs();
         refreshTempMedics();
+        refreshTempSoldiers();
+        refreshTempBattleArmor();
+        refreshTempVehicleCrewGround();
+        refreshTempVehicleCrewVTOL();
+        refreshTempVehicleCrewNaval();
+        refreshTempVesselPilot();
+        refreshTempVesselGunner();
+        refreshTempVesselCrew();
         refreshPartsAvailability();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -956,6 +975,390 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(menuMedicPool);
         // endregion Medic Pool
 
+        // region Soldier Pool
+        menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
+        menuSoldierPool.setMnemonic(KeyEvent.VK_S);
+        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
+
+        JMenuItem miHireSoldiers = new JMenuItem(resourceMap.getString("miHireSoldiers.text"));
+        miHireSoldiers.setMnemonic(KeyEvent.VK_H);
+        miHireSoldiers.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireSoldiersNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuSoldierPool.add(miHireSoldiers);
+
+        JMenuItem miFireSoldiers = new JMenuItem(resourceMap.getString("miFireSoldiers.text"));
+        miFireSoldiers.setMnemonic(KeyEvent.VK_E);
+        miFireSoldiers.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireSoldiersNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.SOLDIER));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuSoldierPool.add(miFireSoldiers);
+
+        JMenuItem miFullStrengthSoldiers = new JMenuItem(resourceMap.getString("miFullStrengthSoldiers.text"));
+        miFullStrengthSoldiers.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthSoldiers.addActionListener(evt -> {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
+        });
+        menuSoldierPool.add(miFullStrengthSoldiers);
+
+        JMenuItem miFireAllSoldiers = new JMenuItem(resourceMap.getString("miFireAllSoldiers.text"));
+        miFireAllSoldiers.setMnemonic(KeyEvent.VK_R);
+        miFireAllSoldiers.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.SOLDIER));
+        menuSoldierPool.add(miFireAllSoldiers);
+        menuMarket.add(menuSoldierPool);
+        // endregion Soldier Pool
+
+        // region Battle Armor Pool
+        menuBattleArmorPool = new JMenu(resourceMap.getString("menuBattleArmorPool.text"));
+        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
+
+        JMenuItem miHireBattleArmor = new JMenuItem(resourceMap.getString("miHireBattleArmor.text"));
+        miHireBattleArmor.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireBattleArmorNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuBattleArmorPool.add(miHireBattleArmor);
+
+        JMenuItem miFireBattleArmor = new JMenuItem(resourceMap.getString("miFireBattleArmor.text"));
+        miFireBattleArmor.setMnemonic(KeyEvent.VK_E);
+        miFireBattleArmor.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireBattleArmorNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuBattleArmorPool.add(miFireBattleArmor);
+
+        JMenuItem miFullStrengthBattleArmor = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmor.text"));
+        miFullStrengthBattleArmor.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthBattleArmor.addActionListener(evt -> {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
+        });
+        menuBattleArmorPool.add(miFullStrengthBattleArmor);
+
+        JMenuItem miFireAllBattleArmor = new JMenuItem(resourceMap.getString("miFireAllBattleArmor.text"));
+        miFireAllBattleArmor.setMnemonic(KeyEvent.VK_R);
+        miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR));
+        menuBattleArmorPool.add(miFireAllBattleArmor);
+        menuMarket.add(menuBattleArmorPool);
+        // endregion Battle Armor Pool
+
+        // region Vehicle Crew Ground Pool
+        menuVehicleCrewGroundPool = new JMenu(resourceMap.getString("menuVehicleCrewGroundPool.text"));
+        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
+
+        JMenuItem miHireVehicleCrewGround = new JMenuItem(resourceMap.getString("miHireVehicleCrewGround.text"));
+        miHireVehicleCrewGround.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireVehicleCrewGroundNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVehicleCrewGroundPool.add(miHireVehicleCrewGround);
+
+        JMenuItem miFireVehicleCrewGround = new JMenuItem(resourceMap.getString("miFireVehicleCrewGround.text"));
+        miFireVehicleCrewGround.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireVehicleCrewGroundNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVehicleCrewGroundPool.add(miFireVehicleCrewGround);
+
+        JMenuItem miFullStrengthVehicleCrewGround = new JMenuItem(resourceMap.getString("miFullStrengthVehicleCrewGround.text"));
+        miFullStrengthVehicleCrewGround.addActionListener(evt -> {
+            getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
+        });
+        menuVehicleCrewGroundPool.add(miFullStrengthVehicleCrewGround);
+
+        JMenuItem miFireAllVehicleCrewGround = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewGround.text"));
+        miFireAllVehicleCrewGround.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 0));
+        menuVehicleCrewGroundPool.add(miFireAllVehicleCrewGround);
+        menuMarket.add(menuVehicleCrewGroundPool);
+        // endregion Vehicle Crew Ground Pool
+
+        // region Vehicle Crew VTOL Pool
+        menuVehicleCrewVTOLPool = new JMenu(resourceMap.getString("menuVehicleCrewVTOLPool.text"));
+        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
+
+        JMenuItem miHireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miHireVehicleCrewVTOL.text"));
+        miHireVehicleCrewVTOL.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireVehicleCrewVTOLNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVehicleCrewVTOLPool.add(miHireVehicleCrewVTOL);
+
+        JMenuItem miFireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFireVehicleCrewVTOL.text"));
+        miFireVehicleCrewVTOL.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireVehicleCrewVTOLNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVehicleCrewVTOLPool.add(miFireVehicleCrewVTOL);
+
+        JMenuItem miFullStrengthVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFullStrengthVehicleCrewVTOL.text"));
+        miFullStrengthVehicleCrewVTOL.addActionListener(evt -> {
+            getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, 0);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
+        });
+        menuVehicleCrewVTOLPool.add(miFullStrengthVehicleCrewVTOL);
+
+        JMenuItem miFireAllVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewVTOL.text"));
+        miFireAllVehicleCrewVTOL.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, 0));
+        menuVehicleCrewVTOLPool.add(miFireAllVehicleCrewVTOL);
+        menuMarket.add(menuVehicleCrewVTOLPool);
+        // endregion Vehicle Crew VTOL Pool
+
+        // region Vehicle Crew Naval Pool
+        menuVehicleCrewNavalPool = new JMenu(resourceMap.getString("menuVehicleCrewNavalPool.text"));
+        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
+
+        JMenuItem miHireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miHireVehicleCrewNaval.text"));
+        miHireVehicleCrewNaval.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireVehicleCrewNavalNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVehicleCrewNavalPool.add(miHireVehicleCrewNaval);
+
+        JMenuItem miFireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFireVehicleCrewNaval.text"));
+        miFireVehicleCrewNaval.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireVehicleCrewNavalNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVehicleCrewNavalPool.add(miFireVehicleCrewNaval);
+
+        JMenuItem miFullStrengthVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFullStrengthVehicleCrewNaval.text"));
+        miFullStrengthVehicleCrewNaval.addActionListener(evt -> {
+            getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, 0);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
+        });
+        menuVehicleCrewNavalPool.add(miFullStrengthVehicleCrewNaval);
+
+        JMenuItem miFireAllVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewNaval.text"));
+        miFireAllVehicleCrewNaval.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, 0));
+        menuVehicleCrewNavalPool.add(miFireAllVehicleCrewNaval);
+        menuMarket.add(menuVehicleCrewNavalPool);
+        // endregion Vehicle Crew Naval Pool
+
+        // region Vessel Pilot Pool
+        menuVesselPilotPool = new JMenu(resourceMap.getString("menuVesselPilotPool.text"));
+        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
+
+        JMenuItem miHireVesselPilot = new JMenuItem(resourceMap.getString("miHireVesselPilot.text"));
+        miHireVesselPilot.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireVesselPilotNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_PILOT, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVesselPilotPool.add(miHireVesselPilot);
+
+        JMenuItem miFireVesselPilot = new JMenuItem(resourceMap.getString("miFireVesselPilot.text"));
+        miFireVesselPilot.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireVesselPilotNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_PILOT, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVesselPilotPool.add(miFireVesselPilot);
+
+        JMenuItem miFullStrengthVesselPilot = new JMenuItem(resourceMap.getString("miFullStrengthVesselPilot.text"));
+        miFullStrengthVesselPilot.addActionListener(evt -> {
+            getCampaign().setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
+        });
+        menuVesselPilotPool.add(miFullStrengthVesselPilot);
+
+        JMenuItem miFireAllVesselPilot = new JMenuItem(resourceMap.getString("miFireAllVesselPilot.text"));
+        miFireAllVesselPilot.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0));
+        menuVesselPilotPool.add(miFireAllVesselPilot);
+        menuMarket.add(menuVesselPilotPool);
+        // endregion Vessel Pilot Pool
+
+        // region Vessel Gunner Pool
+        menuVesselGunnerPool = new JMenu(resourceMap.getString("menuVesselGunnerPool.text"));
+        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
+
+        JMenuItem miHireVesselGunner = new JMenuItem(resourceMap.getString("miHireVesselGunner.text"));
+        miHireVesselGunner.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireVesselGunnerNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_GUNNER, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVesselGunnerPool.add(miHireVesselGunner);
+
+        JMenuItem miFireVesselGunner = new JMenuItem(resourceMap.getString("miFireVesselGunner.text"));
+        miFireVesselGunner.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireVesselGunnerNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_GUNNER, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVesselGunnerPool.add(miFireVesselGunner);
+
+        JMenuItem miFullStrengthVesselGunner = new JMenuItem(resourceMap.getString("miFullStrengthVesselGunner.text"));
+        miFullStrengthVesselGunner.addActionListener(evt -> {
+            getCampaign().setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
+        });
+        menuVesselGunnerPool.add(miFullStrengthVesselGunner);
+
+        JMenuItem miFireAllVesselGunner = new JMenuItem(resourceMap.getString("miFireAllVesselGunner.text"));
+        miFireAllVesselGunner.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0));
+        menuVesselGunnerPool.add(miFireAllVesselGunner);
+        menuMarket.add(menuVesselGunnerPool);
+        // endregion Vessel Gunner Pool
+
+        // region Vessel Crew Pool
+        menuVesselCrewPool = new JMenu(resourceMap.getString("menuVesselCrewPool.text"));
+        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
+
+        JMenuItem miHireVesselCrew = new JMenuItem(resourceMap.getString("miHireVesselCrew.text"));
+        miHireVesselCrew.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupHireVesselCrewNum.text"),
+                  1,
+                  0,
+                  CampaignGUI.MAX_QUANTITY_SPINNER);
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_CREW, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVesselCrewPool.add(miHireVesselCrew);
+
+        JMenuItem miFireVesselCrew = new JMenuItem(resourceMap.getString("miFireVesselCrew.text"));
+        miFireVesselCrew.addActionListener(evt -> {
+            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
+                  true,
+                  resourceMap.getString("popupFireVesselCrewNum.text"),
+                  1,
+                  0,
+                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW));
+            popupValueChoiceDialog.setVisible(true);
+            if (popupValueChoiceDialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, popupValueChoiceDialog.getValue());
+            }
+        });
+        menuVesselCrewPool.add(miFireVesselCrew);
+
+        JMenuItem miFullStrengthVesselCrew = new JMenuItem(resourceMap.getString("miFullStrengthVesselCrew.text"));
+        miFullStrengthVesselCrew.addActionListener(evt -> {
+            getCampaign().setTempCrewPool(PersonnelRole.VESSEL_CREW, 0);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
+        });
+        menuVesselCrewPool.add(miFullStrengthVesselCrew);
+
+        JMenuItem miFireAllVesselCrew = new JMenuItem(resourceMap.getString("miFireAllVesselCrew.text"));
+        miFireAllVesselCrew.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_CREW, 0));
+        menuVesselCrewPool.add(miFireAllVesselCrew);
+        menuMarket.add(menuVesselCrewPool);
+        // endregion Vessel Crew Pool
+
         menuBar.add(menuMarket);
         // endregion Marketplace Menu
 
@@ -1177,11 +1580,27 @@ public class CampaignGUI extends JPanel {
         lblFunds = new JLabel();
         lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
+        lblTempSoldiers = new JLabel();
+        lblTempBattleArmor = new JLabel();
+        lblTempVehicleCrewGround = new JLabel();
+        lblTempVehicleCrewVTOL = new JLabel();
+        lblTempVehicleCrewNaval = new JLabel();
+        lblTempVesselPilot = new JLabel();
+        lblTempVesselGunner = new JLabel();
+        lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
+        statusPanel.add(lblTempSoldiers);
+        statusPanel.add(lblTempBattleArmor);
+        statusPanel.add(lblTempVehicleCrewGround);
+        statusPanel.add(lblTempVehicleCrewVTOL);
+        statusPanel.add(lblTempVehicleCrewNaval);
+        statusPanel.add(lblTempVesselPilot);
+        statusPanel.add(lblTempVesselGunner);
+        statusPanel.add(lblTempVesselCrew);
         statusPanel.add(lblPartsAvailabilityRating);
     }
 
@@ -2833,6 +3252,95 @@ public class CampaignGUI extends JPanel {
         lblTempMedics.setText(text);
     }
 
+    private void refreshTempSoldiers() {
+        if (!getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            lblTempSoldiers.setVisible(false);
+            return;
+        }
+        lblTempSoldiers.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTempCrewPool(PersonnelRole.SOLDIER) + "</html>";
+        lblTempSoldiers.setText(text);
+    }
+
+    private void refreshTempBattleArmor() {
+        if (!getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            lblTempBattleArmor.setVisible(false);
+            return;
+        }
+        lblTempBattleArmor.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Battle Armor</b>: " + getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR) +
+                            "</html>";
+        lblTempBattleArmor.setText(text);
+    }
+
+    private void refreshTempVehicleCrewGround() {
+        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            lblTempVehicleCrewGround.setVisible(false);
+            return;
+        }
+        lblTempVehicleCrewGround.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Vehicle Crew (Ground)</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND) + "</html>";
+        lblTempVehicleCrewGround.setText(text);
+    }
+
+    private void refreshTempVehicleCrewVTOL() {
+        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            lblTempVehicleCrewVTOL.setVisible(false);
+            return;
+        }
+        lblTempVehicleCrewVTOL.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Vehicle Crew (VTOL)</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL) + "</html>";
+        lblTempVehicleCrewVTOL.setText(text);
+    }
+
+    private void refreshTempVehicleCrewNaval() {
+        if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            lblTempVehicleCrewNaval.setVisible(false);
+            return;
+        }
+        lblTempVehicleCrewNaval.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Vehicle Crew (Naval)</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL) + "</html>";
+        lblTempVehicleCrewNaval.setText(text);
+    }
+
+    private void refreshTempVesselPilot() {
+        if (!getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            lblTempVesselPilot.setVisible(false);
+            return;
+        }
+        lblTempVesselPilot.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Vessel Pilots</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT) + "</html>";
+        lblTempVesselPilot.setText(text);
+    }
+
+    private void refreshTempVesselGunner() {
+        if (!getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            lblTempVesselGunner.setVisible(false);
+            return;
+        }
+        lblTempVesselGunner.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Vessel Gunners</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER) + "</html>";
+        lblTempVesselGunner.setText(text);
+    }
+
+    private void refreshTempVesselCrew() {
+        if (!getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            lblTempVesselCrew.setVisible(false);
+            return;
+        }
+        lblTempVesselCrew.setVisible(true);
+        // FIXME : Localize
+        String text = "<html><b>Temp Vessel Crew</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW) + "</html>";
+        lblTempVesselCrew.setText(text);
+    }
+
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().isUseAtB() ||
                   getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
@@ -3199,6 +3707,26 @@ public class CampaignGUI extends JPanel {
             addStandardTab(MHQTabType.STRAT_CON);
         }
 
+        // Update blob crew menu visibility based on campaign options
+        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
+        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
+        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
+        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
+        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
+        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
+        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
+        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
+
+        // Update blob crew label visibility
+        refreshTempSoldiers();
+        refreshTempBattleArmor();
+        refreshTempVehicleCrewGround();
+        refreshTempVehicleCrewVTOL();
+        refreshTempVehicleCrewNaval();
+        refreshTempVesselPilot();
+        refreshTempVesselGunner();
+        refreshTempVesselCrew();
+
         refreshAllTabs();
         fundsScheduler.schedule();
         refreshPartsAvailability();
@@ -3290,6 +3818,126 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(MedicPoolChangedEvent medicPoolChangedEvent) {
         refreshTempMedics();
+    }
+
+    /**
+     * Handles updates when the pool of available soldiers changes.
+     *
+     * <p>Refreshes the temporary soldier pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param soldierPoolChangedEvent the event indicating a change in the soldier pool
+     */
+    @Subscribe
+    public void handle(SoldierPoolChangedEvent soldierPoolChangedEvent) {
+        refreshTempSoldiers();
+    }
+
+    /**
+     * Handles updates when the pool of available battle armor personnel changes.
+     *
+     * <p>Refreshes the temporary battle armor pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param battleArmorPoolChangedEvent the event indicating a change in the battle armor pool
+     */
+    @Subscribe
+    public void handle(BattleArmorPoolChangedEvent battleArmorPoolChangedEvent) {
+        refreshTempBattleArmor();
+    }
+
+    /**
+     * Handles updates when the pool of available ground vehicle crew changes.
+     *
+     * <p>Refreshes the temporary ground vehicle crew pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param vehicleCrewGroundPoolChangedEvent the event indicating a change in the vehicle crew ground pool
+     */
+    @Subscribe
+    public void handle(VehicleCrewGroundPoolChangedEvent vehicleCrewGroundPoolChangedEvent) {
+        refreshTempVehicleCrewGround();
+    }
+
+    /**
+     * Handles updates when the pool of available VTOL crew changes.
+     *
+     * <p>Refreshes the temporary VTOL crew pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param vehicleCrewVTOLPoolChangedEvent the event indicating a change in the vehicle crew VTOL pool
+     */
+    @Subscribe
+    public void handle(VehicleCrewVTOLPoolChangedEvent vehicleCrewVTOLPoolChangedEvent) {
+        refreshTempVehicleCrewVTOL();
+    }
+
+    /**
+     * Handles updates when the pool of available naval vehicle crew changes.
+     *
+     * <p>Refreshes the temporary naval vehicle crew pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param vehicleCrewNavalPoolChangedEvent the event indicating a change in the vehicle crew naval pool
+     */
+    @Subscribe
+    public void handle(VehicleCrewNavalPoolChangedEvent vehicleCrewNavalPoolChangedEvent) {
+        refreshTempVehicleCrewNaval();
+    }
+
+    /**
+     * Handles updates when the pool of available vessel pilots changes.
+     *
+     * <p>Refreshes the temporary vessel pilot pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param vesselPilotPoolChangedEvent the event indicating a change in the vessel pilot pool
+     */
+    @Subscribe
+    public void handle(VesselPilotPoolChangedEvent vesselPilotPoolChangedEvent) {
+        refreshTempVesselPilot();
+    }
+
+    /**
+     * Handles updates when the pool of available vessel gunners changes.
+     *
+     * <p>Refreshes the temporary vessel gunner pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param vesselGunnerPoolChangedEvent the event indicating a change in the vessel gunner pool
+     */
+    @Subscribe
+    public void handle(VesselGunnerPoolChangedEvent vesselGunnerPoolChangedEvent) {
+        refreshTempVesselGunner();
+    }
+
+    /**
+     * Handles updates when the pool of available vessel crew changes.
+     *
+     * <p>Refreshes the temporary vessel crew pool, updating the related UI and game state.</p>
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param vesselCrewPoolChangedEvent the event indicating a change in the vessel crew pool
+     */
+    @Subscribe
+    public void handle(VesselCrewPoolChangedEvent vesselCrewPoolChangedEvent) {
+        refreshTempVesselCrew();
     }
 
     /**

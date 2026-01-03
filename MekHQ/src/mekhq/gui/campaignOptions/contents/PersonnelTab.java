@@ -119,6 +119,16 @@ public class PersonnelTab {
     private JPanel pnlAdministrators;
     private JCheckBox chkAdminsHaveNegotiation;
     private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
+
+    private JPanel pnlBlobCrew;
+    private JCheckBox chkUseBlobInfantry;
+    private JCheckBox chkUseBlobBattleArmor;
+    private JCheckBox chkUseBlobVehicleCrewGround;
+    private JCheckBox chkUseBlobVehicleCrewVTOL;
+    private JCheckBox chkUseBlobVehicleCrewNaval;
+    private JCheckBox chkUseBlobVesselPilot;
+    private JCheckBox chkUseBlobVesselGunner;
+    private JCheckBox chkUseBlobVesselCrew;
     //end General Tab
 
     //start Personnel Logs Tab
@@ -391,6 +401,16 @@ public class PersonnelTab {
         pnlAdministrators = new JPanel();
         chkAdminsHaveNegotiation = new JCheckBox();
         chkAdminExperienceLevelIncludeNegotiation = new JCheckBox();
+
+        pnlBlobCrew = new JPanel();
+        chkUseBlobInfantry = new JCheckBox();
+        chkUseBlobBattleArmor = new JCheckBox();
+        chkUseBlobVehicleCrewGround = new JCheckBox();
+        chkUseBlobVehicleCrewVTOL = new JCheckBox();
+        chkUseBlobVehicleCrewNaval = new JCheckBox();
+        chkUseBlobVesselPilot = new JCheckBox();
+        chkUseBlobVesselGunner = new JCheckBox();
+        chkUseBlobVesselCrew = new JCheckBox();
     }
 
     /**
@@ -409,6 +429,7 @@ public class PersonnelTab {
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
         pnlPersonnelCleanup = createPersonnelCleanUpPanel();
         pnlAdministrators = createAdministratorsPanel();
+        pnlBlobCrew = createBlobCrewPanel();
 
         // Layout the Panels
         final JPanel panelRight = new CampaignOptionsStandardPanel("RightPanel");
@@ -421,6 +442,9 @@ public class PersonnelTab {
 
         layoutRight.gridy++;
         panelRight.add(pnlAdministrators, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(pnlBlobCrew, layoutRight);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
         GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -593,6 +617,62 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkAdminExperienceLevelIncludeNegotiation, layout);
+
+        return panel;
+    }
+
+    /**
+     * Creates the panel for blob crew settings in the General Tab.
+     *
+     * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools).
+     */
+    private JPanel createBlobCrewPanel() {
+        // Contents
+        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry");
+        chkUseBlobInfantry.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobInfantry"));
+        chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor");
+        chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmor"));
+        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround");
+        chkUseBlobVehicleCrewGround.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewGround"));
+        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL");
+        chkUseBlobVehicleCrewVTOL.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewVTOL"));
+        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval");
+        chkUseBlobVehicleCrewNaval.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewNaval"));
+        chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot");
+        chkUseBlobVesselPilot.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselPilot"));
+        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner");
+        chkUseBlobVesselGunner.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselGunner"));
+        chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew");
+        chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselCrew"));
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("BlobCrewPanel", true, "BlobCrewPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseBlobInfantry, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobBattleArmor, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobVehicleCrewGround, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobVehicleCrewVTOL, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobVehicleCrewNaval, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobVesselPilot, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobVesselGunner, layout);
+
+        layout.gridy++;
+        panel.add(chkUseBlobVesselCrew, layout);
 
         return panel;
     }
@@ -1358,6 +1438,14 @@ public class PersonnelTab {
         chkUseRemovalExemptRetirees.setSelected(options.isUseRemovalExemptRetirees());
         chkAdminsHaveNegotiation.setSelected(options.isAdminsHaveNegotiation());
         chkAdminExperienceLevelIncludeNegotiation.setSelected(options.isAdminExperienceLevelIncludeNegotiation());
+        chkUseBlobInfantry.setSelected(options.isUseBlobInfantry());
+        chkUseBlobBattleArmor.setSelected(options.isUseBlobBattleArmor());
+        chkUseBlobVehicleCrewGround.setSelected(options.isUseBlobVehicleCrewGround());
+        chkUseBlobVehicleCrewVTOL.setSelected(options.isUseBlobVehicleCrewVTOL());
+        chkUseBlobVehicleCrewNaval.setSelected(options.isUseBlobVehicleCrewNaval());
+        chkUseBlobVesselPilot.setSelected(options.isUseBlobVesselPilot());
+        chkUseBlobVesselGunner.setSelected(options.isUseBlobVesselGunner());
+        chkUseBlobVesselCrew.setSelected(options.isUseBlobVesselCrew());
 
         // Personnel Log
         chkUseTransfers.setSelected(options.isUseTransfers());
@@ -1460,6 +1548,14 @@ public class PersonnelTab {
         options.setUseRemovalExemptRetirees(chkUseRemovalExemptRetirees.isSelected());
         options.setAdminsHaveNegotiation(chkAdminsHaveNegotiation.isSelected());
         options.setAdminExperienceLevelIncludeNegotiation(chkAdminExperienceLevelIncludeNegotiation.isSelected());
+        options.setUseBlobInfantry(chkUseBlobInfantry.isSelected());
+        options.setUseBlobBattleArmor(chkUseBlobBattleArmor.isSelected());
+        options.setUseBlobVehicleCrewGround(chkUseBlobVehicleCrewGround.isSelected());
+        options.setUseBlobVehicleCrewVTOL(chkUseBlobVehicleCrewVTOL.isSelected());
+        options.setUseBlobVehicleCrewNaval(chkUseBlobVehicleCrewNaval.isSelected());
+        options.setUseBlobVesselPilot(chkUseBlobVesselPilot.isSelected());
+        options.setUseBlobVesselGunner(chkUseBlobVesselGunner.isSelected());
+        options.setUseBlobVesselCrew(chkUseBlobVesselCrew.isSelected());
 
         // Personnel Log
         options.setUseTransfers(chkUseTransfers.isSelected());
