@@ -107,6 +107,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
@@ -172,6 +173,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
+    public static final String COMMAND_FILL_TEMP_CREW = "FILL_TEMP_CREW";
+    public static final String COMMAND_REMOVE_TEMP_CREW = "REMOVE_TEMP_CREW";
     public static final String COMMAND_DISBAND = "DISBAND";
     public static final String COMMAND_SELL = "SELL";
     public static final String COMMAND_LOSS = "LOSS";
@@ -503,6 +506,50 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               person,
                               person.getPrimaryRole(),
                               skillLevel);
+                    }
+                }
+            }
+        } else if (command.equals(COMMAND_FILL_TEMP_CREW)) {
+            // Only works on single selected unit
+            if (units.length == 1) {
+                Unit unit = units[0];
+                int currentCrew = unit.getActiveCrew().size();
+                int fullCrew = unit.getFullCrewSize();
+
+                // Can't add temp crew if no real Person exists
+                if (currentCrew == 0) {
+                    return;
+                }
+
+                // Maximum temp crew for this unit is (fullCrewSize - currentCrew)
+                // This ensures the unit is at full strength
+                int maxTempCrewForUnit = fullCrew - currentCrew;
+
+                // Determine the appropriate crew role for this unit
+                PersonnelRole crewRole = unit.getDriverRole();
+
+                if (crewRole != null && gui.getCampaign().isBlobCrewEnabled(crewRole)) {
+                    int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
+                    int needed = maxTempCrewForUnit - currentTempCrew;
+
+                    if (needed > 0) {
+                        // Check available pool for this crew type
+                        int availableInPool = gui.getCampaign().getAvailableTempCrewPool(crewRole);
+                        int toAssign = Math.min(needed, availableInPool);
+
+                        if (toAssign > 0) {
+                            unit.setTempCrew(crewRole, currentTempCrew + toAssign);
+                        }
+                    }
+                }
+            }
+        } else if (command.equals(COMMAND_REMOVE_TEMP_CREW)) {
+            // Remove all temp crew from selected unit(s)
+            for (Unit unit : units) {
+                // Clear all temp crew by iterating through all personnel roles
+                for (PersonnelRole role : PersonnelRole.values()) {
+                    if (unit.getTempCrewByPersonnelRole(role) > 0) {
+                        unit.setTempCrew(role, 0);
                     }
                 }
             }
@@ -1111,6 +1158,34 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
+            // fill with temp crew (blob crew)
+            if (oneSelected) {
+                boolean canFillWithTempCrew = canUnitUseTempCrew(unit);
+
+                if (canFillWithTempCrew && unit.getActiveCrew().size() > 0) {
+                    int currentCrew = unit.getActiveCrew().size();
+                    int currentTempCrew = unit.getTotalTempCrew();
+                    int fullCrew = unit.getFullCrewSize();
+                    int maxTempCrew = fullCrew - 1; // At least one must be a real Person
+
+                    // Only show if unit can accept more temp crew
+                    if (currentCrew + currentTempCrew < maxTempCrew) {
+                        menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
+                        menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+
+                    // Show "Remove temp crew" if unit has any temp crew
+                    if (currentTempCrew > 0) {
+                        menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
+                        menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+                }
+            }
+
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
                 menuItem = new JMenuItem(gui.getResourceMap().getString("customizeMenu.individualCamo.text"));
                 menuItem.setActionCommand(COMMAND_INDI_CAMO);
@@ -1345,5 +1420,41 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.getCampaign().addCustom(unitName);
         }
         MekSummaryCache.refreshUnitData(false);
+    }
+
+    /**
+     * Determines if the specified unit can use temporary crew based on its type
+     * and campaign settings.
+     *
+     * @param unit the unit to check
+     * @return true if the unit can use temp crew, false otherwise
+     */
+    private boolean canUnitUseTempCrew(Unit unit) {
+        if (unit == null || unit.getEntity() == null) {
+            return false;
+        }
+
+        PersonnelRole driverRole = unit.getDriverRole();
+        PersonnelRole gunnerRole = unit.getGunnerRole();
+
+        // Check if driver role is enabled
+        if (driverRole != null && gui.getCampaign().isBlobCrewEnabled(driverRole)) {
+            return true;
+        }
+
+        // Check if gunner role is enabled (and different from driver)
+        if (gunnerRole != null && !gunnerRole.equals(driverRole) &&
+            gui.getCampaign().isBlobCrewEnabled(gunnerRole)) {
+            return true;
+        }
+
+        // For vessels, also check vessel crew
+        if (unit.getEntity().isSmallCraft() || unit.getEntity().isLargeCraft()) {
+            if (gui.getCampaign().isBlobCrewEnabled(PersonnelRole.VESSEL_CREW)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

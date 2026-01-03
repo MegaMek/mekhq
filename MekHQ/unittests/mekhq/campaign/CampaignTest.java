@@ -43,7 +43,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -57,10 +59,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.Vector;
+import java.util.stream.Stream;
 
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.Mounted;
+import megamek.common.icons.Portrait;
+import megamek.common.enums.Gender;
+import megamek.common.units.Crew;
 import megamek.common.units.Dropship;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
@@ -72,9 +82,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.TestSystems;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -399,4 +411,565 @@ public class CampaignTest {
         assertNull(result[1], "Second-in-command must be null when only one eligible person exists");
         assertArrayEquals(new Person[] { only, null }, result);
     }
+
+    // region Nested Test Classes for Temp Crew
+    /**
+     * Parent nested test class for all temp crew tests.
+     * Contains shared setup and helper methods used across all temp crew role tests.
+     */
+    @Nested
+    class TempCrewTests {
+        private Campaign testCampaign;
+        private CampaignOptions campaignOptions;
+
+        @BeforeEach
+        void setupTempCrewTests() {
+            testCampaign = MHQTestUtilities.getTestCampaign();
+            campaignOptions = testCampaign.getCampaignOptions();
+        }
+
+        /**
+         * Provides all temp crew roles for parameterized tests
+         */
+        private static Stream<PersonnelRole> getTempCrewRoles() {
+            return Stream.of(
+                PersonnelRole.SOLDIER,
+                PersonnelRole.BATTLE_ARMOUR,
+                PersonnelRole.VEHICLE_CREW_GROUND,
+                PersonnelRole.VEHICLE_CREW_VTOL,
+                PersonnelRole.VEHICLE_CREW_NAVAL,
+                PersonnelRole.VESSEL_PILOT,
+                PersonnelRole.VESSEL_GUNNER,
+                PersonnelRole.VESSEL_CREW
+            );
+        }
+
+        /**
+         * Creates a mock Unit with a mock Entity configured for the specified personnel role.
+         * The unit will be properly configured to use the specified temp crew type.
+         *
+         * @param role The personnel role this unit should be configured for
+         * @param withCrew If true, unit will have 1 active crew member; if false, no crew
+         */
+        private Unit createMockUnitForRole(PersonnelRole role, boolean withCrew) {
+            // Create mock entity based on role
+            megamek.common.units.Entity mockEntity;
+
+            // Configure entity type based on role
+            switch (role) {
+                case SOLDIER -> {
+                    megamek.common.units.Infantry mockInfantry = mock(megamek.common.units.Infantry.class);
+                    when(mockInfantry.isInfantry()).thenReturn(true);
+                    when(mockInfantry.isBattleArmor()).thenReturn(false);
+                    when(mockInfantry.getUnitType()).thenReturn(UnitType.INFANTRY);
+                    when(mockInfantry.isConventionalInfantry()).thenReturn(true);
+                    when(mockInfantry.getSquadSize()).thenReturn(5);
+                    when(mockInfantry.getSquadCount()).thenReturn(5);
+                    mockEntity = mockInfantry;
+                }
+                case BATTLE_ARMOUR -> {
+                    Mounted<?> mockMounted = mock(Mounted.class);
+                    when(mockMounted.isMissingForTrooper(anyInt())).thenReturn(false);
+
+                    megamek.common.battleArmor.BattleArmor mockBattleArmor =
+                          mock(megamek.common.battleArmor.BattleArmor.class);
+                    when(mockBattleArmor.isInfantry()).thenReturn(true);
+                    when(mockBattleArmor.isBattleArmor()).thenReturn(true);
+                    when(mockBattleArmor.getUnitType()).thenReturn(UnitType.BATTLE_ARMOR);
+                    when(mockBattleArmor.isConventionalInfantry()).thenReturn(false);
+                    when(mockBattleArmor.locations()).thenReturn(4);
+                    when(mockBattleArmor.getInternal(anyInt())).thenReturn(1);
+                    when(mockBattleArmor.getEquipment()).thenReturn(List.of(mockMounted));
+                    mockEntity = mockBattleArmor;
+                }
+                case VEHICLE_CREW_GROUND -> {
+                    mockEntity = mock(megamek.common.units.Tank.class);
+                    when(mockEntity.isVehicle()).thenReturn(true);
+                    when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.TRACKED);
+                    when(mockEntity.getUnitType()).thenReturn(UnitType.TANK);
+                    when(mockEntity.getWeight()).thenReturn(60.0);
+                }
+                case VEHICLE_CREW_VTOL -> {
+                    mockEntity = mock(megamek.common.units.VTOL.class);
+                    when(mockEntity.isVehicle()).thenReturn(true);
+                    when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.VTOL);
+                    when(mockEntity.getUnitType()).thenReturn(UnitType.VTOL);
+                    when(mockEntity.getWeight()).thenReturn(20.0);
+                }
+                case VEHICLE_CREW_NAVAL -> {
+                    mockEntity = mock(megamek.common.units.Tank.class);
+                    when(mockEntity.isVehicle()).thenReturn(true);
+                    when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.NAVAL);
+                    when(mockEntity.getUnitType()).thenReturn(UnitType.NAVAL);
+                    when(mockEntity.getWeight()).thenReturn(60.0);
+                }
+                case VESSEL_PILOT, VESSEL_GUNNER, VESSEL_CREW -> {
+                    mockEntity = mock(megamek.common.units.Dropship.class);
+                    when(mockEntity.isLargeCraft()).thenReturn(true);
+                    when(mockEntity.getUnitType()).thenReturn(UnitType.DROPSHIP);
+                }
+                default -> mockEntity = mock(megamek.common.units.Entity.class);
+            }
+
+            // Set common entity properties
+            when(mockEntity.getId()).thenReturn(1);
+
+            // Mock Crew
+            Crew mockCrew = mock(Crew.class);
+            //when(mockCrew.getSlotCount()).thenReturn(1); // Single pilot/crew
+            doNothing().when(mockCrew).resetGameState();
+            doNothing().when(mockCrew).setCommandBonus(anyInt());
+            doNothing().when(mockCrew).setMissing(anyBoolean(), anyInt());
+            doNothing().when(mockCrew).setName(any(), anyInt());
+            doNothing().when(mockCrew).setNickname(any(), anyInt());
+            doNothing().when(mockCrew).setGender(any(), anyInt());
+            doNothing().when(mockCrew).setClanPilot(anyBoolean(), anyInt());
+            doNothing().when(mockCrew).setPortrait(any(), anyInt());
+            doNothing().when(mockCrew).setExternalIdAsString(any(), anyInt());
+            doNothing().when(mockCrew).setToughness(anyInt(), anyInt());
+            when(mockCrew.isMissing(anyInt())).thenReturn(false);
+            when(mockEntity.getCrew()).thenReturn(mockCrew);
+
+            when(mockEntity.getTransports()).thenReturn(new Vector<>());
+            when(mockEntity.getSensors()).thenReturn(new Vector<>()); // Prevent NPE in clearGameData
+            when(mockEntity.hasBAP()).thenReturn(false);
+
+            // Mock all the setter methods called by clearGameData and resetPilotAndEntity
+            doNothing().when(mockEntity).setPassedThrough(any());
+            doNothing().when(mockEntity).resetFiringArcs();
+            doNothing().when(mockEntity).resetBays();
+            doNothing().when(mockEntity).setEvading(anyBoolean());
+            doNothing().when(mockEntity).setFacing(anyInt());
+            doNothing().when(mockEntity).setPosition(any());
+            doNothing().when(mockEntity).setProne(anyBoolean());
+            doNothing().when(mockEntity).setHullDown(anyBoolean());
+            doNothing().when(mockEntity).setTransportId(anyInt());
+            doNothing().when(mockEntity).resetTransporter();
+            doNothing().when(mockEntity).setDeployRound(anyInt());
+            doNothing().when(mockEntity).setSwarmAttackerId(anyInt());
+            doNothing().when(mockEntity).setSwarmTargetId(anyInt());
+            doNothing().when(mockEntity).setUnloaded(anyBoolean());
+            doNothing().when(mockEntity).setDone(anyBoolean());
+            doNothing().when(mockEntity).setLastTarget(anyInt());
+            doNothing().when(mockEntity).setNeverDeployed(anyBoolean());
+            doNothing().when(mockEntity).setStuck(anyBoolean());
+            doNothing().when(mockEntity).resetCoolantFailureAmount();
+            doNothing().when(mockEntity).setConversionMode(anyInt());
+            doNothing().when(mockEntity).setDoomed(anyBoolean());
+            doNothing().when(mockEntity).setDestroyed(anyBoolean());
+            doNothing().when(mockEntity).setHidden(anyBoolean());
+            doNothing().when(mockEntity).clearNarcAndiNarcPods();
+            doNothing().when(mockEntity).setShutDown(anyBoolean());
+            doNothing().when(mockEntity).setSearchlightState(anyBoolean());
+            doNothing().when(mockEntity).setNextSensor(any());
+            doNothing().when(mockEntity).setCommander(anyBoolean());
+            doNothing().when(mockEntity).resetPickedUpMekWarriors();
+            doNothing().when(mockEntity).setStartingPos(anyInt());
+
+            // Create Unit with the mock entity and spy it so we can stub methods
+            Unit unit = spy(new Unit(mockEntity, testCampaign));
+
+            // Set up commander based on withCrew parameter
+            if (withCrew) {
+                setupMockCommander(unit);
+            } else {
+                when(unit.getCommander()).thenReturn(null);
+            }
+
+            // Configure unit crew needs based on role
+            int crewSize = switch (role) {
+                case SOLDIER, BATTLE_ARMOUR -> 5; // Squad size
+                case VEHICLE_CREW_GROUND, VEHICLE_CREW_VTOL, VEHICLE_CREW_NAVAL -> 3; // Vehicle crew
+                case VESSEL_PILOT -> 2; // Pilot team (can have temp crew backup)
+                case VESSEL_GUNNER -> 3; // Gunner crew (multiple gun positions)
+                case VESSEL_CREW -> 10; // Large crew
+                default -> 1;
+            };
+
+            // Mock the crew list
+            List<Person> activeCrew = new ArrayList<>();
+            if (withCrew) {
+                Person mockPerson = mock(Person.class);
+                activeCrew.add(mockPerson);
+            }
+            when(unit.getActiveCrew()).thenReturn(activeCrew);
+            when(unit.getFullCrewSize()).thenReturn(crewSize);
+
+            // Mock role methods so unitCanUseTempCrewRole returns true
+            switch (role) {
+                case SOLDIER, BATTLE_ARMOUR, VEHICLE_CREW_GROUND,
+                     VEHICLE_CREW_VTOL, VEHICLE_CREW_NAVAL, VESSEL_PILOT -> {
+                    when(unit.getDriverRole()).thenReturn(role);
+                }
+                case VESSEL_GUNNER -> {
+                    when(unit.getGunnerRole()).thenReturn(role);
+                }
+                case VESSEL_CREW -> {
+                    // Can take more crew if not fully crewed (activeCrew.size() < fullCrewSize)
+                    when(unit.canTakeMoreVesselCrew()).thenReturn(activeCrew.size() < crewSize);
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + role);
+            }
+
+            return unit;
+        }
+
+        /**
+         * Convenience method to create a unit without crew
+         */
+        private Unit createMockUnitForRole(PersonnelRole role) {
+            return createMockUnitForRole(role, false);
+        }
+
+        /**
+         * Helper method to set up a mock commander for a unit.
+         * Call this in the Arrange phase when you need a unit with a commander.
+         */
+        private void setupMockCommander(Unit unit) {
+            Person mockCommander = mock(Person.class);
+            when(mockCommander.getFullTitle()).thenReturn("Test Commander");
+            when(mockCommander.getCallsign()).thenReturn("TestPilot");
+            when(mockCommander.getGender()).thenReturn(Gender.MALE);
+            when(mockCommander.isClanPersonnel()).thenReturn(false);
+
+            // Mock Portrait and make it cloneable
+            Portrait mockPortrait = mock(Portrait.class);
+            when(mockPortrait.clone()).thenReturn(mockPortrait);
+            when(mockCommander.getPortrait()).thenReturn(mockPortrait);
+
+            when(mockCommander.getId()).thenReturn(UUID.randomUUID());
+            when(mockCommander.getAdjustedToughness()).thenReturn(0);
+            when(mockCommander.getHits()).thenReturn(0);
+
+            when(unit.getCommander()).thenReturn(mockCommander);
+        }
+
+        /**
+         * Helper method to enable blob crew for a specific role
+         */
+        private void enableBlobCrewForRole(PersonnelRole role) {
+            switch (role) {
+                case SOLDIER -> campaignOptions.setUseBlobInfantry(true);
+                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(true);
+                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(true);
+                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(true);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(true);
+                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(true);
+                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(true);
+                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(true);
+                default -> throw new IllegalStateException("Unexpected value: " + role);
+            }
+        }
+
+        /**
+         * Helper method to disable blob crew for a specific role
+         */
+        private void disableBlobCrewForRole(PersonnelRole role) {
+            switch (role) {
+                case SOLDIER -> campaignOptions.setUseBlobInfantry(false);
+                case BATTLE_ARMOUR -> campaignOptions.setUseBlobBattleArmor(false);
+                case VEHICLE_CREW_GROUND -> campaignOptions.setUseBlobVehicleCrewGround(false);
+                case VEHICLE_CREW_VTOL -> campaignOptions.setUseBlobVehicleCrewVTOL(false);
+                case VEHICLE_CREW_NAVAL -> campaignOptions.setUseBlobVehicleCrewNaval(false);
+                case VESSEL_PILOT -> campaignOptions.setUseBlobVesselPilot(false);
+                case VESSEL_GUNNER -> campaignOptions.setUseBlobVesselGunner(false);
+                case VESSEL_CREW -> campaignOptions.setUseBlobVesselCrew(false);
+                default -> throw new IllegalStateException("Unexpected value: " + role);
+            }
+        }
+
+        /**
+         * Tests that initial pool state is zero for each temp crew role.
+         * Tests {@link Campaign#getTempCrewPool(PersonnelRole)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testInitialPoolStateIsZero(PersonnelRole role) {
+            assertEquals(0, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests setting pool to a positive value.
+         * Tests {@link Campaign#setTempCrewPool(PersonnelRole, int)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testSetPoolToPositiveValue(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 0);
+
+            // Act
+            testCampaign.setTempCrewPool(role, 10);
+
+            // Assert
+            assertEquals(10, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests that setting pool to negative value results in zero.
+         * Tests {@link Campaign#setTempCrewPool(PersonnelRole, int)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testSetPoolToNegativeValueResultsInZero(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 5);
+
+            // Act
+            testCampaign.setTempCrewPool(role, -5);
+
+            // Assert
+            assertEquals(0, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests that disabling blob crew option disables it for the role.
+         * Tests {@link Campaign#isBlobCrewEnabled(PersonnelRole)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testDisablingBlobCrewOptionDisablesRole(PersonnelRole role) {
+            // Arrange
+            enableBlobCrewForRole(role);
+
+            // Act
+            disableBlobCrewForRole(role);
+
+            // Assert
+            assertTrue(!testCampaign.isBlobCrewEnabled(role));
+        }
+
+        /**
+         * Tests that enabling blob crew option enables it for the role.
+         * Tests {@link Campaign#isBlobCrewEnabled(PersonnelRole)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testEnablingBlobCrewOptionEnablesRole(PersonnelRole role) {
+            // Arrange
+            disableBlobCrewForRole(role);
+
+            // Act
+            enableBlobCrewForRole(role);
+
+            // Assert
+            assertTrue(testCampaign.isBlobCrewEnabled(role));
+        }
+
+        /**
+         * Tests that clearing blob crew for a specific role only affects that role.
+         * Tests {@link Campaign#clearBlobCrewForRole(PersonnelRole)}.
+         */
+        @Test
+        void testClearBlobCrewForRoleIsolation() {
+            // Arrange
+            testCampaign.setTempCrewPool(PersonnelRole.SOLDIER, 10);
+            testCampaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 20);
+            testCampaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 30);
+
+            // Act
+            testCampaign.clearBlobCrewForRole(PersonnelRole.SOLDIER);
+
+            // Assert
+            assertEquals(0, testCampaign.getTempCrewPool(PersonnelRole.SOLDIER));
+            assertEquals(20, testCampaign.getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
+            assertEquals(30, testCampaign.getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND));
+        }
+
+        /**
+         * Tests {@link Campaign#increaseTempCrewPool(PersonnelRole, int)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testIncreaseTempCrewPool(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 10);
+
+            // Act
+            testCampaign.increaseTempCrewPool(role, 5);
+
+            // Assert
+            assertEquals(15, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests {@link Campaign#decreaseTempCrewPool(PersonnelRole, int)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testDecreaseTempCrewPool(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 10);
+
+            // Act
+            testCampaign.decreaseTempCrewPool(role, 3);
+
+            // Assert
+            assertEquals(7, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests that {@link Campaign#decreaseTempCrewPool(PersonnelRole, int)} never goes below zero.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testDecreasePoolMoreThanAvailableResultsInZero(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 5);
+
+            // Act
+            testCampaign.decreaseTempCrewPool(role, 20);
+
+            // Assert
+            assertEquals(0, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests {@link Campaign#emptyTempCrewPoolForRole(PersonnelRole)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testEmptyTempCrewPool(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 50);
+            enableBlobCrewForRole(role);
+
+            // Act
+            testCampaign.emptyTempCrewPoolForRole(role);
+
+            // Assert
+            assertEquals(0, testCampaign.getTempCrewPool(role));
+        }
+
+        /**
+         * Tests {@link Campaign#fillTempCrewPoolForRole(PersonnelRole)} correctly calculates crew needs
+         * from units WITH at least 1 crew. Units need at least 1 real crew member to be able to use temp crew.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testFillTempCrewPoolCalculatesNeedsFromUnitsWithCrew(PersonnelRole role) {
+            // Arrange - Enable blob crew for this role
+            enableBlobCrewForRole(role);
+
+            // Create a mock unit WITH 1 crew member (can use temp crew)
+            Unit mockUnit = createMockUnitForRole(role, true);
+            testCampaign.importUnit(mockUnit);
+
+            // Start with empty pool
+            testCampaign.setTempCrewPool(role, 0);
+
+            // Act - Fill the pool
+            testCampaign.fillTempCrewPoolForRole(role);
+
+            // Assert - Pool should be filled to match unit needs (fullCrewSize - activeCrew)
+            int fullCrewSize = mockUnit.getFullCrewSize();
+            int activeCrew = mockUnit.getActiveCrew().size();
+            int expectedNeed = fullCrewSize - activeCrew;
+
+            assertTrue(expectedNeed > 0);
+            assertEquals(expectedNeed, testCampaign.getTempCrewPool(role),
+                "Pool should be filled to match unit crew needs for " + role +
+                " (fullCrew=" + fullCrewSize + " - activeCrew=" + activeCrew + ")");
+        }
+
+        /**
+         * Tests that {@link Campaign#fillTempCrewPoolForRole(PersonnelRole)} does NOT count units WITHOUT any crew.
+         * Units must have at least 1 real crew member to be able to use temp crew.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testFillTempCrewPoolIgnoresUnitsWithoutCrew(PersonnelRole role) {
+            // Arrange - Enable blob crew for this role
+            enableBlobCrewForRole(role);
+
+            // Create a mock unit with NO crew (cannot use temp crew)
+            Unit mockUnitWithoutCrew = createMockUnitForRole(role, false);
+            testCampaign.importUnit(mockUnitWithoutCrew);
+
+            // Start with empty pool
+            testCampaign.setTempCrewPool(role, 0);
+
+            // Act - Fill the pool
+            testCampaign.fillTempCrewPoolForRole(role);
+
+            // Assert - Pool should remain 0 because unit has no crew
+            assertEquals(0, testCampaign.getTempCrewPool(role),
+                "Pool should not be filled for units without any crew for " + role);
+        }
+
+        /**
+         * Tests {@link Campaign#getTempCrewInUse(PersonnelRole)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testGetTempCrewInUse(PersonnelRole role) {
+            // Arrange
+            Unit mockUnit = createMockUnitForRole(role);
+            mockUnit.setTempCrew(role, 3);
+            testCampaign.importUnit(mockUnit);
+
+            // Act
+            int inUse = testCampaign.getTempCrewInUse(role);
+
+            // Assert
+            assertEquals(3, inUse);
+        }
+
+        /**
+         * Tests {@link Campaign#getAvailableTempCrewPool(PersonnelRole)}.
+         */
+        @ParameterizedTest
+        @MethodSource("getTempCrewRoles")
+        void testGetAvailableTempCrewPool(PersonnelRole role) {
+            // Arrange
+            testCampaign.setTempCrewPool(role, 10);
+            Unit mockUnit = createMockUnitForRole(role);
+            mockUnit.setTempCrew(role, 3);
+            testCampaign.importUnit(mockUnit);
+
+            // Act
+            int available = testCampaign.getAvailableTempCrewPool(role);
+
+            // Assert
+            assertEquals(7, available);
+        }
+
+        /**
+         * Tests that {@link Campaign#getAvailableTempCrewPool(PersonnelRole)} never returns negative values.
+         */
+        @Test
+        void testAvailablePoolNeverGoesNegative() {
+            // Arrange
+            PersonnelRole testRole = PersonnelRole.SOLDIER;
+            testCampaign.setTempCrewPool(testRole, 5);
+
+            Unit mockUnit = createMockUnitForRole(testRole);
+            mockUnit.setTempCrew(testRole, 10);
+            testCampaign.importUnit(mockUnit);
+
+            // Act
+            int available = testCampaign.getAvailableTempCrewPool(testRole);
+
+            // Assert - Available should never be negative
+            assertEquals(0, available, "Available pool should not go negative");
+        }
+
+        /**
+         * Tests that {@link Campaign#clearBlobCrewForRole(PersonnelRole)} only affects the specified role.
+         */
+        @Test
+        void testClearBlobCrewForRoleDoesNotAffectOtherRoles() {
+            // Arrange
+            testCampaign.setTempCrewPool(PersonnelRole.SOLDIER, 10);
+            testCampaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 8);
+
+            // Act
+            testCampaign.clearBlobCrewForRole(PersonnelRole.SOLDIER);
+
+            // Assert
+            assertEquals(0, testCampaign.getTempCrewPool(PersonnelRole.SOLDIER));
+            assertEquals(8, testCampaign.getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
+        }
+    }
+    // endregion Nested Test Classes for Temp Crew
 }

@@ -110,6 +110,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
@@ -212,6 +213,8 @@ public class Unit implements ITechnology {
     private Person navigator;
     // this is the id of the tech assigned for maintenance if any
     private Person tech;
+    // blob crew - temporary personnel not represented by Person objects
+    private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
 
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
@@ -263,6 +266,7 @@ public class Unit implements ITechnology {
         this.lastMaintenanceReport = "";
         this.fluffName = "";
         this.maintenanceMultiplier = 4;
+        this.tempPersonnelRoleMap = new HashMap<>();
         initializeAllTransportSpace();
         reCalc();
     }
@@ -355,11 +359,11 @@ public class Unit implements ITechnology {
         if (getTech() != null) {
             if (uncrewed) {
                 return CrewAssignmentState.UNCREWED;
-            } else if (canTakeMoreDrivers() ||
+            } else if ((needsMoreDrivers() ||
                              canTakeMoreVesselCrew() ||
                              canTakeTechOfficer() ||
-                             canTakeMoreGunners() ||
-                             canTakeNavigator()) {
+                             needsMoreGunners() ||
+                             canTakeNavigator())) {
                 return CrewAssignmentState.PARTIALLY_CREWED;
             } else {
                 return CrewAssignmentState.FULLY_CREWED;
@@ -2732,6 +2736,18 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
+        // Blob crew
+        if (!tempPersonnelRoleMap.isEmpty()) {
+            pw.println(MHQXMLUtility.indentStr(indent++) + "<tempCrewMap>");
+            for (Map.Entry<PersonnelRole, Integer> entry : tempPersonnelRoleMap.entrySet()) {
+                pw.println(MHQXMLUtility.indentStr(indent++) + "<tempCrew>");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "role", entry.getKey().name());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "count", entry.getValue());
+                pw.println(MHQXMLUtility.indentStr(--indent) + "</tempCrew>");
+            }
+            pw.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewMap>");
+        }
+
         // If this entity is assigned to a transport ship, write that
         if (hasTransportShipAssignment()) {
             pw.println(MHQXMLUtility.indentStr(indent) +
@@ -2931,6 +2947,43 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.tech = new UnitPersonRef(UUID.fromString(wn2.getTextContent()));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("tempSoldiers")) {
+                    // Backward compatibility: read old format
+                    retVal.setTempCrew(PersonnelRole.SOLDIER, Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("tempBattleArmor")) {
+                    // Backward compatibility: read old format
+                    retVal.setTempCrew(PersonnelRole.BATTLE_ARMOUR, Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("tempCrewMap")) {
+                    // New format: read map structure
+                    NodeList tempCrewNodes = wn2.getChildNodes();
+                    for (int i = 0; i < tempCrewNodes.getLength(); i++) {
+                        Node tempCrewNode = tempCrewNodes.item(i);
+                        if (tempCrewNode.getNodeName().equalsIgnoreCase("tempCrew")) {
+                            String roleStr = null;
+                            int count = 0;
+
+                            NodeList crewDataNodes = tempCrewNode.getChildNodes();
+                            for (int j = 0; j < crewDataNodes.getLength(); j++) {
+                                Node dataNode = crewDataNodes.item(j);
+                                String dataNodeName = dataNode.getNodeName();
+
+                                if (dataNodeName.equalsIgnoreCase("role")) {
+                                    roleStr = dataNode.getTextContent().trim();
+                                } else if (dataNodeName.equalsIgnoreCase("count")) {
+                                    count = Integer.parseInt(dataNode.getTextContent().trim());
+                                }
+                            }
+
+                            if (roleStr != null) {
+                                try {
+                                    PersonnelRole role = PersonnelRole.valueOf(roleStr);
+                                    retVal.setTempCrew(role, count);
+                                } catch (IllegalArgumentException e) {
+                                    LOGGER.warn("Unknown PersonnelRole: " + roleStr);
+                                }
+                            }
+                        }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     NamedNodeMap attributes = wn2.getAttributes();
@@ -4770,8 +4823,20 @@ public class Unit implements ITechnology {
                         slot++;
                     }
                 }
+                // Fill remaining slots with temp crew or mark as missing
+                // At this point we should have accurate list of temp
+                // crew, if we don't we should fix that upstream
+                int availableTempCrew = getTotalTempCrew();
+
                 while (slot < entity.getCrew().getSlotCount()) {
-                    entity.getCrew().setMissing(true, slot++);
+                    if (availableTempCrew > 0) {
+                        // Fill slot with temp crew (don't mark as missing)
+                        entity.getCrew().setMissing(false, slot);
+                        availableTempCrew--;
+                    } else {
+                        entity.getCrew().setMissing(true, slot);
+                    }
+                    slot++;
                 }
             } else {
                 // tripod, quadvee, or dual cockpit; driver and gunner are assigned separately
@@ -5220,7 +5285,92 @@ public class Unit implements ITechnology {
                     }
                 }
             }
+
+            // Do this after reordering BA so real people have better armor, when applicable
+            // Add temp crew to fill shortfall for infantry and BA
+            if (entity instanceof Infantry && !isBattleArmor()
+                      && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+                nGunners += getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
+            } else if (isBattleArmor()
+                             && getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+                nGunners += getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
+            }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
+        }
+
+        // Add temp crew for tanks/vehicles with intelligent allocation
+        if (entity instanceof Tank) {
+            PersonnelRole driverRole = getDriverRole();
+            PersonnelRole gunnerRole = getGunnerRole();
+
+            // Get available temp crew for this vehicle type
+            int availableTempCrew = 0;
+            if (driverRole != null && getCampaign().isBlobCrewEnabled(driverRole)) {
+                availableTempCrew = getTempCrewByPersonnelRole(driverRole);
+            }
+
+            // Calculate how many drivers and gunners we need
+            int driverNeeds = getTotalDriverNeeds();
+            int gunnerNeeds = getTotalGunnerNeeds();
+
+            // Calculate how many we already have from real crew
+            int driversStillNeeded = Math.max(0, driverNeeds - nDrivers);
+            int gunnersStillNeeded = Math.max(0, gunnerNeeds - nGunners);
+
+            // Allocate temp crew with priority:
+            // 1. At least 1 driver (if needed)
+            // 2. At least 1 gunner (if needed)
+            // 3. Fill remaining drivers
+            // 4. Fill remaining gunners
+
+            int tempCrewRemaining = availableTempCrew;
+            int tempDriversToAdd = 0;
+            int tempGunnersToAdd = 0;
+
+            // Priority 1: Ensure at least 1 driver (if we need drivers)
+            if (driversStillNeeded > 0 && tempCrewRemaining > 0) {
+                tempDriversToAdd = 1;
+                tempCrewRemaining--;
+                driversStillNeeded--;
+            }
+
+            // Priority 2: Ensure at least 1 gunner (if we need gunners)
+            if (gunnersStillNeeded > 0 && tempCrewRemaining > 0) {
+                tempGunnersToAdd = 1;
+                tempCrewRemaining--;
+                gunnersStillNeeded--;
+            }
+
+            // Priority 3: Fill remaining drivers
+            if (driversStillNeeded > 0 && tempCrewRemaining > 0) {
+                int driversToFill = Math.min(driversStillNeeded, tempCrewRemaining);
+                tempDriversToAdd += driversToFill;
+                tempCrewRemaining -= driversToFill;
+                driversStillNeeded -= driversToFill;
+            }
+
+            // Priority 4: Fill remaining gunners
+            if (gunnersStillNeeded > 0 && tempCrewRemaining > 0) {
+                int gunnersToFill = Math.min(gunnersStillNeeded, tempCrewRemaining);
+                tempGunnersToAdd += gunnersToFill;
+                tempCrewRemaining -= gunnersToFill;
+            }
+
+            nDrivers += tempDriversToAdd;
+            nGunners += tempGunnersToAdd;
+        }
+
+        // Add temp crew for large aero vessels
+        if ((entity instanceof SmallCraft || entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
+            if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+                nCrew += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+            }
+            if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+                nGunners += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+            }
+            if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+                nDrivers += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            }
         }
 
         if (entity instanceof Tank) {
@@ -5511,6 +5661,23 @@ public class Unit implements ITechnology {
         return nDrivers < getTotalDriverNeeds();
     }
 
+    public boolean needsMoreDrivers() {
+        int nDrivers = drivers.size() + getTempDrivers();
+        return nDrivers < getTotalDriverNeeds();
+    }
+
+    /**
+     * Not to be confused with vehicle drivers
+     */
+    private int getTempDrivers() {
+        if (isConventionalInfantry()) {
+            return getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
+        } else if (isBattleArmor()) {
+            return getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        return 0;
+    }
+
     public boolean canTakeMoreVesselCrew() {
         int nCrew = vesselCrew.size();
         return nCrew < getTotalCrewNeeds();
@@ -5552,6 +5719,20 @@ public class Unit implements ITechnology {
     public boolean canTakeMoreGunners() {
         int nGunners = gunners.size();
         return nGunners < getTotalGunnerNeeds();
+    }
+
+    public boolean needsMoreGunners() {
+        int nGunners = gunners.size() + getTempGunners();
+        return nGunners < getTotalGunnerNeeds();
+    }
+
+    private int getTempGunners() {
+        if (isConventionalInfantry()) {
+            return getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
+        } else if (isBattleArmor()) {
+            return getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        return 0;
     }
 
     public int getTotalGunnerNeeds() {
@@ -5734,7 +5915,16 @@ public class Unit implements ITechnology {
             gunners.add(person);
         }
         person.setUnit(this);
-        resetPilotAndEntity();
+
+        // Remove one temp crew member when adding a real Person
+        PersonnelRole role = person.getPrimaryRole();
+        int currentTempCrew = getTempCrewByPersonnelRole(role);
+        if (currentTempCrew > 0) {
+            setTempCrew(role, currentTempCrew - 1);
+        } else {
+            resetPilotAndEntity();
+        }
+
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
             AssignmentLogger.reassignedTOEForce(getCampaign(),
@@ -6227,11 +6417,52 @@ public class Unit implements ITechnology {
         return crew;
     }
 
+    public int getTempCrewByPersonnelRole(PersonnelRole personnelRole) {
+        return tempPersonnelRoleMap.getOrDefault(personnelRole, 0);
+    }
+
+    /**
+     * Sets the number of temporary crew for a specific personnel role
+     * @param personnelRole the personnel role
+     * @param count the number of temp crew
+     */
+    public void setTempCrew(PersonnelRole personnelRole, int count) {
+        if (count <= 0) {
+            tempPersonnelRoleMap.remove(personnelRole);
+        } else {
+            tempPersonnelRoleMap.put(personnelRole, count);
+        }
+        resetPilotAndEntity();
+        MekHQ.triggerEvent(new UnitChangedEvent(this));
+    }
+
+    /**
+     * @return the number of temporary crew (blob crew) assigned to this unit
+     */
+    public int getTotalTempCrew() {
+        return tempPersonnelRoleMap.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * Returns true if this unit is using any type of blob crew
+     * @return true if unit has any temp crew assigned
+     */
+    public boolean isUsingBlobCrew() {
+        return getTotalTempCrew() > 0;
+    }
+
+    /**
+     * @return the total crew size including both Person objects and blob crew
+     */
+    public int getTotalCrewSize() {
+        return getActiveCrew().size() + getTotalTempCrew();
+    }
+
     /**
      * @return true if the unit is fully crewed, false otherwise.
      */
     public boolean isFullyCrewed() {
-        return getActiveCrew().size() == getFullCrewSize();
+        return getTotalCrewSize() == getFullCrewSize();
     }
 
     /**
@@ -7513,36 +7744,36 @@ public class Unit implements ITechnology {
      * @since 0.50.10
      */
     public @Nullable PersonnelRole getDriverRole() {
-        if (entity == null) {
+        if (getEntity() == null) {
             return null;
         }
 
-        if (entity instanceof LandAirMek) {
+        if (getEntity() instanceof LandAirMek) {
             return PersonnelRole.LAM_PILOT;
-        } else if (entity.isMek()) {
+        } else if (getEntity().isMek()) {
             return PersonnelRole.MEKWARRIOR;
-        } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
-            if (entity.getMovementMode().isMarine()) {
+        } else if (getEntity() instanceof Tank) { // instanceof to include Gun Emplacements
+            if (getEntity().getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
-            } else if (entity.getMovementMode().isVTOL()) {
+            } else if (getEntity().getMovementMode().isVTOL()) {
                 return PersonnelRole.VEHICLE_CREW_VTOL;
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
+        } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (entity.isLargeCraft()) {
+        } else if (getEntity().isLargeCraft()) {
             return PersonnelRole.VESSEL_PILOT;
-        } else if (entity.isAerospace()) {
+        } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity.isBattleArmor()) {
+        } else if (getEntity().isBattleArmor()) {
             return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity.isConventionalInfantry()) {
+        } else if (getEntity().isConventionalInfantry()) {
             return PersonnelRole.SOLDIER;
-        } else if (entity.isProtoMek()) {
+        } else if (getEntity().isProtoMek()) {
             return PersonnelRole.PROTOMEK_PILOT;
         } else {
-            LOGGER.info("Unknown unit type parsed into getDriverRole(): {}", entity.getUnitType());
+            LOGGER.info("Unknown unit type parsed into getDriverRole(): {}", getEntity().getUnitType());
             return null;
         }
     }
@@ -7561,36 +7792,36 @@ public class Unit implements ITechnology {
      * @since 0.50.10
      */
     public @Nullable PersonnelRole getGunnerRole() {
-        if (entity == null) {
+        if (getEntity() == null) {
             return null;
         }
 
-        if (entity instanceof LandAirMek) {
+        if (getEntity() instanceof LandAirMek) {
             return PersonnelRole.LAM_PILOT;
-        } else if (entity.isMek()) {
+        } else if (getEntity().isMek()) {
             return PersonnelRole.MEKWARRIOR;
-        } else if (entity instanceof Tank) { // instanceof to include Gun Emplacements
-            if (entity.getMovementMode().isMarine()) {
+        } else if (getEntity() instanceof Tank) { // instanceof to include Gun Emplacements
+            if (getEntity().getMovementMode().isMarine()) {
                 return PersonnelRole.VEHICLE_CREW_NAVAL;
-            } else if (entity.getMovementMode().isVTOL()) {
+            } else if (getEntity().getMovementMode().isVTOL()) {
                 return PersonnelRole.VEHICLE_CREW_VTOL;
             } else {
                 return PersonnelRole.VEHICLE_CREW_GROUND;
             }
-        } else if (entity instanceof ConvFighter) { // do not use entity.isConventionalFighter here
+        } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (entity.isSmallCraft() || entity.isLargeCraft()) {
+        } else if (getEntity().isSmallCraft() || entity.isLargeCraft()) {
             return PersonnelRole.VESSEL_GUNNER;
-        } else if (entity.isAerospace()) {
+        } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity.isBattleArmor()) {
+        } else if (getEntity().isBattleArmor()) {
             return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity.isConventionalInfantry()) {
+        } else if (getEntity().isConventionalInfantry()) {
             return PersonnelRole.SOLDIER;
-        } else if (entity.isProtoMek()) {
+        } else if (getEntity().isProtoMek()) {
             return PersonnelRole.PROTOMEK_PILOT;
         } else {
-            LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", entity.getUnitType());
+            LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", getEntity().getUnitType());
             return null;
         }
     }

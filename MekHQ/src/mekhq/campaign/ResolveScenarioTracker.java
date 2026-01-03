@@ -39,6 +39,7 @@ import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
@@ -83,6 +84,7 @@ import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -131,6 +133,8 @@ public class ResolveScenarioTracker {
 
     /* AtB */ int contractBreaches = 0;
     int bonusRolls = 0;
+
+    /* Blob crew casualties */ Map<PersonnelRole, Integer> killedTempCrew = new HashMap<>();
 
     Campaign campaign;
     Scenario scenario;
@@ -692,10 +696,12 @@ public class ResolveScenarioTracker {
                     infantry.applyDamage();
                     // If reading from a MUL, the shooting strength is set to Integer.MAX_VALUE if
                     // there is no damage.
-                    int strength = Math.min(infantry.getShootingStrength(), crew.size());
-                    casualties = crew.size() - strength;
+                    // Include blob crew in total crew count for casualty calculation
+                    int totalCrewSize = u.getTotalCrewSize();
+                    int strength = Math.min(infantry.getShootingStrength(), totalCrewSize);
+                    casualties = totalCrewSize - strength;
                     if (unitStatus.isTotalLoss()) {
-                        casualties = crew.size();
+                        casualties = totalCrewSize;
                     }
                     // If a tank has already taken hits to the commander or driver, do not assign
                     // them again.
@@ -801,12 +807,10 @@ public class ResolveScenarioTracker {
                             }
                         }
                         if (casualtiesAssigned < casualties) {
+                            CasualtyAssignment assignment = assignTempCrewCasualty(u, status);
                             casualtiesAssigned++;
-                            if (Compute.d6(2) >= 7) {
+                            if (assignment == CasualtyAssignment.PERSON_WOUNDED) {
                                 wounded = true;
-                            } else {
-                                status.setHits(6);
-                                status.setDead(true);
                             }
                         }
                         if (wounded) {
@@ -830,6 +834,75 @@ public class ResolveScenarioTracker {
         if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isNone()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
+        }
+    }
+
+    /**
+     * Result type for temp crew casualty assignment.
+     */
+    private enum CasualtyAssignment {
+        /** Casualty was assigned to blob crew (temp crew) */
+        BLOB_CREW,
+        /** Casualty was assigned to a Person who was wounded */
+        PERSON_WOUNDED,
+        /** Casualty was assigned to a Person who was killed */
+        PERSON_DEAD
+    }
+
+    /**
+     * Attempts to assign a casualty to temp crew members (blob crew) if any exist.
+     * Casualties are randomly distributed across all temp crew types proportional to their numbers.
+     * If no blob crew exists or the random roll indicates a Person should be hit, the casualty
+     * is assigned to the Person instead (setting dead or wounded status). This can be expanded in the
+     * future to include support for wounding temp crew.
+     *
+     * @param unit The unit with potential temp crew
+     * @param status The personnel status object to update if casualty assigned to a Person
+     * @return The type of casualty assignment that occurred
+     */
+    private CasualtyAssignment assignTempCrewCasualty(Unit unit, PersonStatus status) {
+        int totalCrew = unit.getTotalCrewSize();
+
+        // Calculate total blob crew across all PersonnelRole types
+        int totalBlobCrew = 0;
+        Map<PersonnelRole, Integer> tempCrewCounts = new HashMap<>();
+        for (PersonnelRole role : PersonnelRole.values()) {
+            int count = unit.getTempCrewByPersonnelRole(role);
+            if (count > 0) {
+                tempCrewCounts.put(role, count);
+                totalBlobCrew += count;
+            }
+        }
+
+        // Determine if blob crew is hit (proportional to blob crew / total crew)
+        boolean hitBlobCrew = false;
+        if (totalBlobCrew > 0 && totalCrew > 0) {
+            hitBlobCrew = Compute.randomInt(totalCrew) < totalBlobCrew;
+        }
+
+        if (hitBlobCrew) {
+            // Randomly select which PersonnelRole to decrement (proportional to their counts)
+            int roll = Compute.randomInt(totalBlobCrew);
+            int cumulative = 0;
+
+            for (Map.Entry<PersonnelRole, Integer> entry : tempCrewCounts.entrySet()) {
+                cumulative += entry.getValue();
+                if (roll < cumulative) {
+                    PersonnelRole role = entry.getKey();
+                    unit.setTempCrew(role, entry.getValue() - 1);
+                    killedTempCrew.merge(role, 1, Integer::sum);
+                    return CasualtyAssignment.BLOB_CREW;
+                }
+            }
+        }
+
+        // Casualty goes to a Person - determine if wounded or dead
+        if (Compute.d6(2) >= 7) {
+            return CasualtyAssignment.PERSON_WOUNDED;
+        } else {
+            status.setHits(6);
+            status.setDead(true);
+            return CasualtyAssignment.PERSON_DEAD;
         }
     }
 
@@ -1122,7 +1195,9 @@ public class ResolveScenarioTracker {
             if (entity instanceof Infantry) {
                 entity.applyDamage();
                 int strength = ((Infantry) entity).getShootingStrength();
-                casualties = crew.size() - strength;
+                // Include blob crew in total crew count for casualty calculation
+                int totalCrewSize = unit.getTotalCrewSize();
+                casualties = totalCrewSize - strength;
             }
 
             if ((entity instanceof Aero) && !unit.usesSoloPilot()) {
@@ -1213,12 +1288,10 @@ public class ResolveScenarioTracker {
                         }
                     } else if (entity instanceof Infantry || entity instanceof Aero) {
                         if (casualtiesAssigned < casualties) {
+                            CasualtyAssignment assignment = assignTempCrewCasualty(unit, status);
                             casualtiesAssigned++;
-                            if (Compute.d6(2) >= 7) {
+                            if (assignment == CasualtyAssignment.PERSON_WOUNDED) {
                                 wounded = true;
-                            } else {
-                                status.setHits(6);
-                                status.setDead(true);
                             }
                         }
                     }
@@ -1563,6 +1636,67 @@ public class ResolveScenarioTracker {
         return campaign.getMission(scenario.getMissionId()).getId();
     }
 
+    /**
+     * Processes death payouts for killed temp crew (blob crew).
+     * Calculates appropriate compensation based on role base salaries and
+     * campaign payout settings.
+     */
+    private void processTempCrewDeathPayouts() {
+        CampaignOptions options = campaign.getCampaignOptions();
+        Money totalPayout = Money.zero();
+        int totalKilled = 0;
+
+        // Calculate payout for each killed temp crew role
+        for (Map.Entry<PersonnelRole, Integer> entry : killedTempCrew.entrySet()) {
+            PersonnelRole role = entry.getKey();
+            int count = entry.getValue();
+
+            if (count > 0) {
+                Money baseSalary = options.getRoleBaseSalaries()[role.ordinal()];
+                Money payout = calculateTempCrewPayout(baseSalary, false);
+                totalPayout = totalPayout.plus(payout.multipliedBy(count));
+                totalKilled += count;
+            }
+        }
+
+        // Debit the total payout from campaign finances
+        if (totalPayout.isPositive()) {
+            campaign.getFinances().debit(
+                TransactionType.SALARIES,
+                campaign.getLocalDate(),
+                totalPayout,
+                getTextAt(RESOURCE_BUNDLE, "tempCrewDeathBenefitsTransaction")
+            );
+
+            // Add a report entry
+            campaign.addReport(
+                mekhq.campaign.enums.DailyReportType.PERSONNEL,
+                getFormattedTextAt(RESOURCE_BUNDLE, "tempCrewDeathBenefitsReport",
+                    totalPayout.toAmountAndSymbolString(),
+                    totalKilled)
+            );
+        }
+    }
+
+    /**
+     * Calculates the payout amount for a temp crew member based on base salary.
+     * Uses the same multipliers as regular personnel death benefits.
+     *
+     * @param baseSalary The base salary for the role
+     * @param isOfficer Whether the crew member is an officer (always false for temp crew)
+     * @return The calculated payout amount
+     */
+    private Money calculateTempCrewPayout(Money baseSalary, boolean isOfficer) {
+        CampaignOptions options = campaign.getCampaignOptions();
+        double bonusMultiplier = options.getPayoutRateEnlisted();
+
+        if (isOfficer) {
+            bonusMultiplier = options.getPayoutRateOfficer();
+        }
+
+        return baseSalary.multipliedBy(bonusMultiplier);
+    }
+
     public int getScenarioId() {
         return scenario.getId();
     }
@@ -1656,6 +1790,11 @@ public class ResolveScenarioTracker {
             if (status.toRemove()) {
                 getCampaign().removePerson(person, false);
             }
+        }
+
+        // Process payouts for killed temp crew (blob crew)
+        if (!killedTempCrew.isEmpty()) {
+            processTempCrewDeathPayouts();
         }
 
         // region Prisoners
