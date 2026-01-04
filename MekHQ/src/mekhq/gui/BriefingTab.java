@@ -1680,7 +1680,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // Do not include Turrets
             List<Entity> filteredEntityList =
                   botForce.getFixedEntityList().stream().filter(
-                        e -> !(e instanceof GunEmplacement)
+                        e -> !(e.isBuildingEntityOrGunEmplacement())
                   ).toList();
             if (botForce.getName().contains(allyFaction)) {
                 // Stuff with our employer's name should be with us.

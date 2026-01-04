@@ -327,4 +327,16 @@ public interface IUnitGenerator {
      * @return List of turrets
      */
     List<MekSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear);
+
+    /**
+     * Generates a list of TO:AR Advanced Building gun emplacements given a skill level, quality and year
+     *
+     * @param num         How many gun emplacements to generate
+     * @param skill       The skill level of the gun emplacement operator
+     * @param quality     The quality level of the gun emplacement
+     * @param currentYear The current year
+     *
+     * @return List of gun emplacements
+     */
+    List<MekSummary> generateGunEmplacements(int num, SkillLevel skill, int quality, int currentYear);
 }

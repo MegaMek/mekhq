@@ -615,6 +615,7 @@ public class CampaignOptions {
     private boolean instantUnitMarketDelivery;
     private boolean mothballUnitMarketDeliveries;
     private boolean unitMarketReportRefresh;
+    private boolean useAdvancedBuildingGunEmplacements;
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
@@ -1286,6 +1287,7 @@ public class CampaignOptions {
         setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
+        setUseAdvancedBuildingGunEmplacements(false);
 
         // Contract Market
         setContractMarketMethod(ContractMarketMethod.NONE);
@@ -4026,6 +4028,14 @@ public class CampaignOptions {
 
     public void setUnitMarketReportRefresh(final boolean unitMarketReportRefresh) {
         this.unitMarketReportRefresh = unitMarketReportRefresh;
+    }
+
+    public boolean isUseAdvancedBuildingGunEmplacements() {
+        return useAdvancedBuildingGunEmplacements;
+    }
+
+    public void setUseAdvancedBuildingGunEmplacements(final boolean useAdvancedBuildingGunEmplacements) {
+        this.useAdvancedBuildingGunEmplacements = useAdvancedBuildingGunEmplacements;
     }
     // endregion Unit Market
 

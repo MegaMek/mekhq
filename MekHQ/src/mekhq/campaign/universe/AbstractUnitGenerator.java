@@ -57,6 +57,9 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
     private final TreeSet<Integer> turretRatYears = new TreeSet<>();
     private final Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
 
+    private final TreeSet<Integer> gunEmplacementRatYears = new TreeSet<>();
+    private final Map<Integer, Map<String, String>> gunEmplacementRatNames = new HashMap<>();
+
     /**
      * Worker function to initialize the mapping between a numeric quality rating level and an alphabetic one (such as
      * one used in the RATs)
@@ -131,6 +134,69 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // now that we have the year, we need to determine which turret RAT we're going
         // to use
         String ratName = turretRatNames.get(ratYear).get(ratRatingMappings.get(quality));
+
+        RandomUnitGenerator.getInstance().setChosenRAT(ratName);
+        return RandomUnitGenerator.getInstance().generate(num);
+    }
+
+    /**
+     * Generates a list of TO:AR Advanced Building gun emplacements given a skill level, quality and year
+     *
+     * @param num         How many gun emplacements to generate
+     * @param skill       The skill level of the gun emplacement operator
+     * @param quality     The quality level of the gun emplacement
+     * @param currentYear The current year
+     *
+     * @return List of gun emplacements
+     */
+    @Override
+    public List<MekSummary> generateGunEmplacements(int num, SkillLevel skill, int quality, int currentYear) {
+        Integer ratYear;
+
+        // Copied from turrets for the time being
+        // less dirty hack
+        // we loop through the names of available gun emplacement RATs
+        // and pick the latest one
+        // gunEmplacement rat file names appear to follow the pattern of "GunEmplacements YYYY Q"
+        // where YYYY is the four-digit year
+        // and Q is the quality level of the force.
+        // This way, as long as the gunEmplacement RAT names follow the above-described pattern,
+        // we can handle any number of them.
+        initializeRatRatingMappings();
+
+        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext(); ) {
+            String currentName = rats.next();
+            if (currentName.contains("Gun Emplacements")) {
+                String gunEmplacementQuality = currentName.substring(currentName.length() - 1);
+                int year = Integer.parseInt(currentName.replaceAll("\\D", ""));
+
+                gunEmplacementRatYears.add(year);
+
+                if (!gunEmplacementRatNames.containsKey(year)) {
+                    gunEmplacementRatNames.put(year, new HashMap<>());
+                }
+
+                gunEmplacementRatNames.get(year).put(gunEmplacementQuality, currentName);
+            }
+        }
+
+        // We don't have rats for *every* year, so we find the nearest previous one. If
+        // there is no
+        // RAT for the current or previous year, use the earliest available.
+        // If there are no gunEmplacement RATs, return an empty list
+        if (gunEmplacementRatYears.isEmpty()) {
+            logger.warn("No gunEmplacement RATs found.");
+            return Collections.emptyList();
+        } else if (currentYear < gunEmplacementRatYears.first()) {
+            logger.warn("Earliest gunEmplacement RAT is later than campaign year.");
+            ratYear = gunEmplacementRatYears.first();
+        } else {
+            ratYear = gunEmplacementRatYears.floor(currentYear);
+        }
+
+        // now that we have the year, we need to determine which gunEmplacement RAT we're going
+        // to use
+        String ratName = gunEmplacementRatNames.get(ratYear).get(ratRatingMappings.get(quality));
 
         RandomUnitGenerator.getInstance().setChosenRAT(ratName);
         return RandomUnitGenerator.getInstance().generate(num);

@@ -1015,6 +1015,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "unitMarketReportRefresh",
               campaignOptions.isUnitMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useAdvancedBuildingGunEmplacements",
+              campaignOptions.isUseAdvancedBuildingGunEmplacements());
         // endregion Unit Market
 
         // region Contract Market

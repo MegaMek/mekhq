@@ -816,6 +816,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "unitMarketReportRefresh" -> campaignOptions.setUnitMarketReportRefresh(parseBoolean(
                   nodeContents));
+            case "useAdvancedBuildingGunEmplacements" -> campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
+                  nodeContents));
             case "contractMarketMethod" -> campaignOptions.setContractMarketMethod(ContractMarketMethod.valueOf(
                   nodeContents));
             case "contractSearchRadius" -> campaignOptions.setContractSearchRadius(parseInt(nodeContents));
