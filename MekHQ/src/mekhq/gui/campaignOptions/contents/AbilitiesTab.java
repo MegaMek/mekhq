@@ -376,7 +376,7 @@ public class AbilitiesTab {
         JLabel lblIncompatible = createAbilityLabel("incompatible.text", ability.getInvalidDesc());
         JLabel lblRemoves = createAbilityLabel("removes.text", ability.getRemovedDesc());
 
-        RoundedJButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", null);
+        RoundedJButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", (Integer) null);
         btnCustomizeAbility.addActionListener(e -> {
             if (editSPA(ability)) {
                 // This will run on the SWT thread

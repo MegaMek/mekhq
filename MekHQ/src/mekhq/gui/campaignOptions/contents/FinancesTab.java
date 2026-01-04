@@ -33,9 +33,11 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.GridBagConstraints;
 import javax.swing.JCheckBox;
@@ -53,6 +55,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -561,7 +564,8 @@ public class FinancesTab {
 
     private JPanel createRentedFacilitiesPanel() {
         // Contents
-        lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds");
+        lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostHospitalBeds"));
         spnRentedFacilitiesCostHospitalBeds = new CampaignOptionsSpinner("RentedFacilitiesCostHospitalBeds",
@@ -569,7 +573,8 @@ public class FinancesTab {
         spnRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostHospitalBeds"));
 
-        lblRentedFacilitiesCostKitchens = new CampaignOptionsLabel("RentedFacilitiesCostKitchens");
+        lblRentedFacilitiesCostKitchens = new CampaignOptionsLabel("RentedFacilitiesCostKitchens",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostKitchens"));
         spnRentedFacilitiesCostKitchens = new CampaignOptionsSpinner("RentedFacilitiesCostKitchens",
@@ -577,7 +582,8 @@ public class FinancesTab {
         spnRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostKitchens"));
 
-        lblRentedFacilitiesCostHoldingCells = new CampaignOptionsLabel("RentedFacilitiesCostHoldingCells");
+        lblRentedFacilitiesCostHoldingCells = new CampaignOptionsLabel("RentedFacilitiesCostHoldingCells",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostHoldingCells"));
         spnRentedFacilitiesCostHoldingCells = new CampaignOptionsSpinner("RentedFacilitiesCostHoldingCells",
@@ -585,7 +591,8 @@ public class FinancesTab {
         spnRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostHoldingCells"));
 
-        lblRentedFacilitiesCostRepairBays = new CampaignOptionsLabel("RentedFacilitiesCostRepairBays");
+        lblRentedFacilitiesCostRepairBays = new CampaignOptionsLabel("RentedFacilitiesCostRepairBays",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostRepairBays"));
         spnRentedFacilitiesCostRepairBays = new CampaignOptionsSpinner("RentedFacilitiesCostRepairBays",
@@ -594,7 +601,8 @@ public class FinancesTab {
               "RentedFacilitiesCostRepairBays"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RentedFacilitiesPanel", true, "RentedFacilitiesPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("RentedFacilitiesPanel", true, "RentedFacilitiesPanel",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;

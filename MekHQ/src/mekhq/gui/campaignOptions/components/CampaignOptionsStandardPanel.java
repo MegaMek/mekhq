@@ -40,7 +40,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 
+import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
+import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 
 /**
  * A specialized {@link JPanel} tailored for use in campaign options dialogs.
@@ -89,9 +92,29 @@ public class CampaignOptionsStandardPanel extends JPanel {
      * @param borderTitle   the resource bundle key for the border's title; an empty string indicates no title
      */
     public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle) {
+        this(name, includeBorder, borderTitle, null);
+    }
+
+    /**
+     * Constructs a {@link CampaignOptionsStandardPanel} with an optional titled border and metadata.
+     * <p>
+     * If {@code includeBorder} is {@code true}, a border is applied to the panel. If {@code borderTitle} is provided,
+     * it is used to fetch the localized string for the border's title from the resource bundle. The metadata is used
+     * to display version badges and special flag symbols alongside the border title text. The name of the panel is set
+     * to {@code "pnl" + name}. The layout should be configured using {@code createGroupLayout} and assigned to the
+     * panel using {@code setLayout}.
+     *
+     * @param name          the name of the panel, used to set its internal name
+     * @param includeBorder {@code true} if the panel should include a border
+     * @param borderTitle   the resource bundle key for the border's title; an empty string indicates no title
+     * @param metadata      version and flag metadata for displaying badges, or {@code null} for no badges
+     */
+    public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle,
+                                        @Nullable CampaignOptionsMetadata metadata) {
         borderTitle = borderTitle.isBlank() ?
                             "" :
-                            getTextAt(getCampaignOptionsResourceBundle(), "lbl" + borderTitle + ".text");
+                            getTextAt(getCampaignOptionsResourceBundle(), "lbl" + borderTitle + ".text")
+                                  + CampaignOptionsUtilities.formatBadges(metadata);
 
         // Set a standardized panel behavior and preferred size scaling
         new JPanel() {

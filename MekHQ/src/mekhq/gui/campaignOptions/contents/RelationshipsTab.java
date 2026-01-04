@@ -32,9 +32,11 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -52,6 +54,7 @@ import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -852,7 +855,8 @@ public class RelationshipsTab {
 
     private JPanel createRandomSexualityPanel() {
         // Contents
-        lblNoInterestInRelationshipsDiceSize = new CampaignOptionsLabel("NoInterestInRelationshipsDiceSize");
+        lblNoInterestInRelationshipsDiceSize = new CampaignOptionsLabel("NoInterestInRelationshipsDiceSize",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "NoInterestInRelationshipsDiceSize"));
         spnNoInterestInRelationshipsDiceSize = new CampaignOptionsSpinner("NoInterestInRelationshipsDiceSize",
@@ -860,7 +864,8 @@ public class RelationshipsTab {
         spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "NoInterestInRelationshipsDiceSize"));
 
-        lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize");
+        lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "PrefersSameSexDiceSize"));
         spnPrefersSameSexDiceSize = new CampaignOptionsSpinner("PrefersSameSexDiceSize",
@@ -868,7 +873,8 @@ public class RelationshipsTab {
         spnPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "PrefersSameSexDiceSize"));
 
-        lblPrefersBothSexesDiceSize = new CampaignOptionsLabel("PrefersBothSexesDiceSize");
+        lblPrefersBothSexesDiceSize = new CampaignOptionsLabel("PrefersBothSexesDiceSize",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
               "PrefersBothSexesDiceSize"));
         spnPrefersBothSexesDiceSize = new CampaignOptionsSpinner("PrefersBothSexesDiceSize",

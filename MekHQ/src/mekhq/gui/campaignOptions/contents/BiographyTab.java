@@ -33,10 +33,12 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
@@ -65,6 +67,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -523,7 +526,8 @@ public class BiographyTab {
               "AnnounceRecruitmentAnniversaries"));
         chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly");
         chkAnnounceOfficersOnly.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceOfficersOnly"));
-        chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays");
+        chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkAnnounceChildBirthdays.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceChildBirthdays"));
 
         // Layout the Panel
@@ -580,13 +584,15 @@ public class BiographyTab {
 
     private JPanel createComingOfAgePanel() {
         // Contents
-        chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs");
+        chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         chkVeterancySPAs.addMouseListener(createTipPanelUpdater(generalHeader, "VeterancySPAs"));
 
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
         chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(generalHeader, "ComingOfAgeAbilities"));
 
-        chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills");
+        chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkRewardComingOfAgeRPSkills.addMouseListener(createTipPanelUpdater(generalHeader,
               "ComingOfAgeRPSkills"));
 
@@ -1340,7 +1346,8 @@ public class BiographyTab {
         chkAllowDuplicatePortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "AllowDuplicatePortraits"));
 
-        chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly");
+        chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly",
+              getMetadata(VERSION_BEFORE_METADATA));
         chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "UseGenderedPortraitsOnly"));
 

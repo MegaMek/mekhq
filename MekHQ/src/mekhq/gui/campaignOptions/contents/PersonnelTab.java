@@ -34,10 +34,13 @@ package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_CURRENT;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
@@ -53,6 +56,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -484,13 +488,16 @@ public class PersonnelTab {
         chkUseArtillery.addMouseListener(createTipPanelUpdater(generalHeader, "UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater(generalHeader, "UseAbilities"));
-        chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles");
+        chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles",
+              getMetadata(VERSION_BEFORE_METADATA));
         chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater(generalHeader,
               "OnlyCommandersMatterVehicles"));
-        chkOnlyCommandersMatterInfantry = new CampaignOptionsCheckBox("OnlyCommandersMatterInfantry");
+        chkOnlyCommandersMatterInfantry = new CampaignOptionsCheckBox("OnlyCommandersMatterInfantry",
+              getMetadata(VERSION_BEFORE_METADATA));
         chkOnlyCommandersMatterInfantry.addMouseListener(createTipPanelUpdater(generalHeader,
               "OnlyCommandersMatterInfantry"));
-        chkOnlyCommandersMatterBattleArmor = new CampaignOptionsCheckBox("OnlyCommandersMatterBattleArmor");
+        chkOnlyCommandersMatterBattleArmor = new CampaignOptionsCheckBox("OnlyCommandersMatterBattleArmor",
+              getMetadata(VERSION_BEFORE_METADATA));
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader,
               "OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
@@ -628,25 +635,26 @@ public class PersonnelTab {
      */
     private JPanel createBlobCrewPanel() {
         // Contents
-        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry");
+        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(VERSION_CURRENT));
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobInfantry"));
-        chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor");
+        chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor", getMetadata(VERSION_CURRENT));
         chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmor"));
-        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround");
+        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround", getMetadata(VERSION_CURRENT));
         chkUseBlobVehicleCrewGround.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewGround"));
-        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL");
+        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL", getMetadata(VERSION_CURRENT));
         chkUseBlobVehicleCrewVTOL.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewVTOL"));
-        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval");
+        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval", getMetadata(VERSION_CURRENT));
         chkUseBlobVehicleCrewNaval.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewNaval"));
-        chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot");
+        chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot", getMetadata(VERSION_CURRENT));
         chkUseBlobVesselPilot.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselPilot"));
-        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner");
+        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner", getMetadata(VERSION_CURRENT));
         chkUseBlobVesselGunner.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselGunner"));
-        chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew");
+        chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew", getMetadata(VERSION_CURRENT));
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselCrew"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BlobCrewPanel", true, "BlobCrewPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("BlobCrewPanel", true, "BlobCrewPanel",
+              getMetadata(VERSION_CURRENT));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -928,7 +936,8 @@ public class PersonnelTab {
         chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing");
         chkUseTougherHealing.addMouseListener(createTipPanelUpdater(medicalHeader, "UseTougherHealing"));
 
-        chkUseAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseAlternativeAdvancedMedical");
+        chkUseAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseAlternativeAdvancedMedical",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         chkUseAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader,
               "UseAlternativeAdvancedMedical"));
 
@@ -936,7 +945,8 @@ public class PersonnelTab {
         chkUseKinderAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader,
               "UseKinderAlternativeAdvancedMedical"));
 
-        chkUseRandomDiseases = new CampaignOptionsCheckBox("UseRandomDiseases");
+        chkUseRandomDiseases = new CampaignOptionsCheckBox("UseRandomDiseases",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         chkUseRandomDiseases.addMouseListener(createTipPanelUpdater(medicalHeader,
               "UseRandomDiseases"));
 
@@ -948,13 +958,16 @@ public class PersonnelTab {
         chkDoctorsUseAdministration = new CampaignOptionsCheckBox("DoctorsUseAdministration");
         chkDoctorsUseAdministration.addMouseListener(createTipPanelUpdater(medicalHeader, "DoctorsUseAdministration"));
 
-        chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics");
+        chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseUsefulMedics.addMouseListener(createTipPanelUpdater(medicalHeader, "UseUsefulMedics"));
 
-        chkUseMASHTheatres = new CampaignOptionsCheckBox("UseMASHTheatres");
+        chkUseMASHTheatres = new CampaignOptionsCheckBox("UseMASHTheatres",
+              getMetadata(VERSION_BEFORE_METADATA));
         chkUseMASHTheatres.addMouseListener(createTipPanelUpdater(medicalHeader, "UseMASHTheatres"));
 
-        lblMASHTheatreCapacity = new CampaignOptionsLabel("MASHTheatreCapacity");
+        lblMASHTheatreCapacity = new CampaignOptionsLabel("MASHTheatreCapacity",
+              getMetadata(VERSION_BEFORE_METADATA));
         lblMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
         spnMASHTheatreCapacity = new CampaignOptionsSpinner("MASHTheatreCapacity", 25, 1, 100, 1);
         spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
@@ -1164,7 +1177,8 @@ public class PersonnelTab {
         chkDisplayMedicalRecord = new CampaignOptionsCheckBox("DisplayMedicalRecord");
         chkDisplayMedicalRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
               "DisplayMedicalRecord"));
-        chkDisplayPatientRecord = new CampaignOptionsCheckBox("DisplayPatientRecord");
+        chkDisplayPatientRecord = new CampaignOptionsCheckBox("DisplayPatientRecord",
+              getMetadata(VERSION_BEFORE_METADATA));
         chkDisplayPatientRecord.addMouseListener(createTipPanelUpdater(personnelInformationHeader,
               "DisplayPatientRecord"));
         chkDisplayAssignmentRecord = new CampaignOptionsCheckBox("DisplayAssignmentRecord");
@@ -1326,7 +1340,8 @@ public class PersonnelTab {
         chkUseRandomDependentRemoval.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "UseRandomDependentRemoval"));
 
-        lblDependentProfessionDieSize = new CampaignOptionsLabel("DependentProfessionDieSize");
+        lblDependentProfessionDieSize = new CampaignOptionsLabel("DependentProfessionDieSize",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblDependentProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "DependentProfessionDieSize"));
         spnDependentProfessionDieSize = new CampaignOptionsSpinner("DependentProfessionDieSize",
@@ -1334,7 +1349,8 @@ public class PersonnelTab {
         spnDependentProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "DependentProfessionDieSize"));
 
-        lblCivilianProfessionDieSize = new CampaignOptionsLabel("CivilianProfessionDieSize");
+        lblCivilianProfessionDieSize = new CampaignOptionsLabel("CivilianProfessionDieSize",
+              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCivilianProfessionDieSize.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "CivilianProfessionDieSize"));
         spnCivilianProfessionDieSize = new CampaignOptionsSpinner("CivilianProfessionDieSize",
