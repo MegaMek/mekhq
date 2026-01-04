@@ -816,8 +816,6 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "unitMarketReportRefresh" -> campaignOptions.setUnitMarketReportRefresh(parseBoolean(
                   nodeContents));
-            case "useAdvancedBuildingGunEmplacements" -> campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
-                  nodeContents));
             case "contractMarketMethod" -> campaignOptions.setContractMarketMethod(ContractMarketMethod.valueOf(
                   nodeContents));
             case "contractSearchRadius" -> campaignOptions.setContractSearchRadius(parseInt(nodeContents));
@@ -906,6 +904,8 @@ public class CampaignOptionsUnmarshaller {
             case "usePlanetaryConditions" -> campaignOptions.setUsePlanetaryConditions(parseBoolean(nodeContents));
             case "restrictPartsByMission" -> campaignOptions.setRestrictPartsByMission(parseBoolean(nodeContents));
             case "fixedMapChance" -> campaignOptions.setFixedMapChance(parseInt(nodeContents));
+            case "useAdvancedBuildingGunEmplacements" -> campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
+                  nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));

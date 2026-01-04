@@ -373,8 +373,12 @@ public class BuildingLocation extends Part {
 
     @Override
     public void doMaintenanceDamage(int d) {
+        if (null == unit) {
+            LOGGER.error("Tried to damage a building location without a unit");
+            return;
+        }
         // Damage armor first
-        if (unit != null && unit.getEntity().getArmor(loc) > 0) {
+        if (unit.getEntity().getArmor(loc) > 0) {
             int armor = unit.getEntity().getArmor(loc);
             armor = Math.max(armor - d, 0);
             unit.getEntity().setArmor(armor, loc);

@@ -132,7 +132,6 @@ public class MarketsTab {
     private JCheckBox chkInstantUnitMarketDelivery;
     private JCheckBox chkMothballUnitMarketDeliveries;
     private JCheckBox chkUnitMarketReportRefresh;
-    private JCheckBox chkUseAdvancedBuildingGunEmplacements;
     //end Unit Market
 
     //start Contract Market
@@ -487,10 +486,6 @@ public class MarketsTab {
         chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
         chkUnitMarketReportRefresh.addMouseListener(createTipPanelUpdater(unitMarketHeader, "UnitMarketReportRefresh"));
 
-        chkUseAdvancedBuildingGunEmplacements = new CampaignOptionsCheckBox("UseAdvancedBuildingGunEmplacements");
-        chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater(unitMarketHeader,
-              "UseAdvancedBuildingGunEmplacements"));
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true, "");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -533,9 +528,6 @@ public class MarketsTab {
 
         layout.gridy++;
         panel.add(chkUnitMarketReportRefresh, layout);
-
-        layout.gridy++;
-        panel.add(chkUseAdvancedBuildingGunEmplacements, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "UnitMarketTab");
@@ -945,7 +937,6 @@ public class MarketsTab {
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkMothballUnitMarketDeliveries.setSelected(options.isMothballUnitMarketDeliveries());
         chkUnitMarketReportRefresh.setSelected(options.isUnitMarketReportRefresh());
-        chkUseAdvancedBuildingGunEmplacements.setSelected(options.isUseAdvancedBuildingGunEmplacements());
 
         // Contract Market
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
@@ -1020,7 +1011,6 @@ public class MarketsTab {
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
         options.setMothballUnitMarketDeliveries(chkMothballUnitMarketDeliveries.isSelected());
         options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
-        options.setUseAdvancedBuildingGunEmplacements(chkUseAdvancedBuildingGunEmplacements.isSelected());
 
         // Contract Market
         options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
