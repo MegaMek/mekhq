@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_CURRENT;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -635,26 +634,26 @@ public class PersonnelTab {
      */
     private JPanel createBlobCrewPanel() {
         // Contents
-        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(VERSION_CURRENT));
+        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version(0, 50, 12)));
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobInfantry"));
-        chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor", getMetadata(VERSION_CURRENT));
+        chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor", getMetadata(new Version(0, 50, 12)));
         chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmor"));
-        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround", getMetadata(VERSION_CURRENT));
+        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewGround.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewGround"));
-        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL", getMetadata(VERSION_CURRENT));
+        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewVTOL.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewVTOL"));
-        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval", getMetadata(VERSION_CURRENT));
+        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewNaval.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewNaval"));
-        chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot", getMetadata(VERSION_CURRENT));
+        chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselPilot.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselPilot"));
-        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner", getMetadata(VERSION_CURRENT));
+        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselGunner.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselGunner"));
-        chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew", getMetadata(VERSION_CURRENT));
+        chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselCrew"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("BlobCrewPanel", true, "BlobCrewPanel",
-              getMetadata(VERSION_CURRENT));
+              getMetadata(new Version(0, 50, 12)));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;

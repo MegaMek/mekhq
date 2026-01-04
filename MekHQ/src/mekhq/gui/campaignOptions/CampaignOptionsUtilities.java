@@ -95,16 +95,10 @@ public class CampaignOptionsUtilities {
     public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
 
     /**
-     * Version marker for campaign options that existed before the metadata system was implemented.
-     * Use this for options added in version 0.50.10.
+     * Version marker for campaign options that existed before the metadata system was implemented,
+     * but still since the most recent milestone.
      */
     public static final Version VERSION_BEFORE_METADATA = new Version(0, 50, 10);
-
-    /**
-     * Current development version marker for campaign options added in the current version.
-     * Use this for options added in version 0.50.12.
-     */
-    public static final Version VERSION_CURRENT = new Version(0, 50, 12);
 
     /**
      * Cache for reusing CampaignOptionMetadata instances to avoid creating duplicate objects.
