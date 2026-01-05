@@ -638,7 +638,7 @@ public class Contract extends Mission {
         }
 
         Money fullTransportCost = getTransportCost(campaign, false);
-        Money employerReimbursement = fullTransportCost.multipliedBy(transportComp / 100.0);
+        Money employerReimbursement = getEmployerTransportReimbursement(campaign);
         return fullTransportCost.minus(employerReimbursement);
     }
 
@@ -954,6 +954,16 @@ public class Contract extends Mission {
                 }
             } catch (Exception ex) {
                 logger.error("", ex);
+            }
+        }
+
+        // Version compatibility fix: Prior to 0.50.12, transportAmount stored the player's out-of-pocket
+        // transport cost. Now it stores the employer's transport reimbursement. Recalculate for old saves.
+        if (version.isLowerThan(new Version("0.50.12"))) {
+            if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
+                transportAmount = getEmployerTransportReimbursement(campaign);
+            } else {
+                transportAmount = Money.zero();
             }
         }
     }

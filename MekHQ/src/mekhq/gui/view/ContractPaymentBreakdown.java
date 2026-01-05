@@ -397,7 +397,7 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblTransportationExpenses2() {
-        // Show full transport cost as expense (what you actually pay out of pocket)
+        // Show full transport cost as expense (employer reimbursement shown separately in income section offsets this)
         lblTransportationExpenses2.setText("-" +
                                                  contract.getTotalTransportationFees(campaign)
                                                        .toAmountAndSymbolString());
