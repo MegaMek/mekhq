@@ -884,7 +884,7 @@ public class AtBDynamicScenarioFactory {
                     rp.groundMap = onGround;
                     rp.spaceEnvironment = (mapLocation == MapLocation.Space);
                     MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
-                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
+                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp, null);
                 } else {
                     // Load the fighters with bombs
                     tlg.populateAeroBombs(generatedLance,
@@ -1902,8 +1902,6 @@ public class AtBDynamicScenarioFactory {
         if (mapParameters.isUseStandardAtBSizing()) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
             BoardScalingType boardScaling = campaignOptions.getBoardScalingType();
-            int heightModifier = boardScaling.getHeightModifier();
-            int minimumWidth = boardScaling.getMinimumWidth();
 
             // We're using this as a shortcut, rather than fetching the player force directly
             int unitCount = getUnitCountWithoutUsingASeedForce(campaign);
@@ -1920,21 +1918,23 @@ public class AtBDynamicScenarioFactory {
             int mapSheetWidth = 16;
             int mapSheetHeight = 17;
 
-            // TW suggests one map sheet per 4 units. We floor as we want to veer towards smaller maps, rather than
-            // larger.
-            double totalMapSheets = floor(unitCount / 4.0);
+            // Height
+            final int defaultSheetsTall = 2;
+            int minimumHeight = max(1, defaultSheetsTall + boardScaling.getHeightModifier());
+            int totalSheetsTall = max(1, minimumHeight + mapParameters.getAdditionalMapSheetTall());
 
-            // We want to keep scenario heights low to avoid players needing to spend several turns just traveling.
-            // We received feedback that while this allowed for more tactical maneuvers, it wasn't fun.
-            int mapSheetsTall = totalMapSheets >= 4 ? (int) floor(totalMapSheets / 2.0) : 1;
-            mapSheetsTall = max(1, mapSheetsTall + heightModifier + mapParameters.getAdditionalMapSheetTall());
+            mapSizeY = mapSheetHeight * totalSheetsTall;
 
-            // This creates a wide area of engagement which should help reduce the tendency for forces to 'death ball'
-            int mapSheetsWide = (int) floor(totalMapSheets / mapSheetsTall);
-            mapSheetsWide = max(minimumWidth, mapSheetsWide + mapParameters.getAdditionalMapSheetWide());
+            // Width
+            // TW suggests one map sheet per 4 units. As we have a minimum height, we use that to determine how much
+            // we should divide unit count by. We floor the result as players generally prefer smaller maps.
+            int minimumWidth = max(1, boardScaling.getMinimumWidth());
+            double unitDivider = 4 * totalSheetsTall;
 
-            mapSizeX = mapSheetWidth * mapSheetsWide;
-            mapSizeY = mapSheetHeight * mapSheetsTall;
+            int totalSheetsWide = (int) max(minimumWidth, floor(unitCount / unitDivider));
+            totalSheetsWide = max(1, totalSheetsWide + mapParameters.getAdditionalMapSheetWide());
+
+            mapSizeX = mapSheetWidth * totalSheetsWide;
         } else {
             mapSizeX = mapParameters.getBaseWidth();
             mapSizeY = mapParameters.getBaseHeight();
@@ -2951,8 +2951,11 @@ public class AtBDynamicScenarioFactory {
         // Assign the crew to the unit
         entity.setCrew(entityCrew);
 
-        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
-            entity.getCrew().setCommandBonus(getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction));
+        int tacticsInitiativeBonus = getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction);
+        if (campaignOptions.isUseTactics()) {
+            entity.getCrew().setCommandBonus(tacticsInitiativeBonus);
+        } else if (campaignOptions.isUseInitiativeBonus()) {
+            entity.getCrew().setInitBonus(tacticsInitiativeBonus);
         }
 
         entity.setExternalIdAsString(UUID.randomUUID().toString());

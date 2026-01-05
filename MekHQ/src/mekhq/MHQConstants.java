@@ -173,8 +173,17 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_NODE = "mekhq/prefs/newDay";
     public static final String NEW_DAY_AS_TECH_POOL_FILL = "newDayAstechPoolFill";
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
+    public static final String NEW_DAY_SOLDIER_POOL_FILL = "newDaySoldierPoolFill";
+    public static final String NEW_DAY_BATTLE_ARMOR_POOL_FILL = "newDayBattleArmorPoolFill";
+    public static final String NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL = "newDayVehicleCrewGroundPoolFill";
+    public static final String NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL = "newDayVehicleCrewVTOLPoolFill";
+    public static final String NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL = "newDayVehicleCrewNavalPoolFill";
+    public static final String NEW_DAY_VESSEL_PILOT_POOL_FILL = "newDayVesselPilotPoolFill";
+    public static final String NEW_DAY_VESSEL_GUNNER_POOL_FILL = "newDayVesselGunnerPoolFill";
+    public static final String NEW_DAY_VESSEL_CREW_POOL_FILL = "newDayVesselCrewPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
+    public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
     public static final String SELF_CORRECT_MAINTENANCE = "SelfCorrectMaintenance";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayForceIconOperationalStatus";
@@ -185,6 +194,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String XML_SAVES_NODE = "mekhq/prefs/xmlsaves";
     public static final String PREFER_GZIPPED_CAMPAIGN_FILE = "preferGzippedCampaignFile";
     public static final String WRITE_CUSTOMS_TO_XML = "writeCustomsToXML";
+    public static final String WRITE_ALL_UNITS_TO_XML = "writeAllUnitsToXML";
     public static final String SAVE_MOTHBALL_STATE = "saveMothballState";
     // endregion Campaign XML Save Options
 
@@ -207,8 +217,10 @@ public final class MHQConstants extends SuiteConstants {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String NAG_ADMIN_STRAIN = "nagAdminStrain";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
+    @Deprecated(since = "0.50.11", forRemoval = true)
     public static final String NAG_NO_COMMANDER = "nagNoCommander";
     public static final String NAG_CONTRACT_ENDED = "nagContractEnded";
+    public static final String NAG_SINGLE_DROP_SET_UP = "nagSingleDropSetUp";
     public static final String NAG_INSUFFICIENT_AS_TECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
@@ -228,6 +240,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
+    public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
     // endregion Nag Tab
 
     // region Miscellaneous Options

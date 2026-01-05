@@ -103,6 +103,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
@@ -138,6 +139,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.ExtraIncome;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -174,6 +176,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
+import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
@@ -221,6 +224,13 @@ public class CampaignNewDayManager {
      * @return <code>true</code> if the new day arrived
      */
     public boolean newDay() {
+        // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
+        // posted prior to this point).
+        CommandCenterTab commandCenter = campaign.getApp().getCampaigngui().getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
+
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
@@ -231,6 +241,46 @@ public class CampaignNewDayManager {
 
         if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
             campaign.resetMedicPool();
+        }
+
+        if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.SOLDIER, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVehicleCrewVTOLPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVehicleCrewNavalPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVesselPilotPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVesselGunnerPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
+        }
+
+        if (MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill()) {
+            campaign.setTempCrewPool(PersonnelRole.VESSEL_CREW, 0);
+            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
         }
 
         // Ensure we don't have anything that would prevent the new day
@@ -614,6 +664,16 @@ public class CampaignNewDayManager {
             PersonnelOptions personnelOptions = person.getOptions();
 
             // Daily events
+            medicalController.processMedicalEvents(person,
+                  campaignOptions.isUseAgeEffects(),
+                  campaign.isClanCampaign(),
+                  today);
+
+            // The character can die during the prior step, if so we stop processing them.
+            if (person.getStatus().isDead()) {
+                continue;
+            }
+
             if (person.getStatus().isMIA()) {
                 recovery.attemptRescueOfPlayerCharacter(person);
             }
@@ -633,11 +693,6 @@ public class CampaignNewDayManager {
 
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
-
-            medicalController.processMedicalEvents(person,
-                  campaignOptions.isUseAgeEffects(),
-                  campaign.isClanCampaign(),
-                  today);
 
             processAnniversaries(person);
 
@@ -660,8 +715,14 @@ public class CampaignNewDayManager {
                     processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
-                processCompulsionsAndMadness(person, personnelOptions, isUseAdvancedMedical, isUseAltAdvancedMedical,
-                      isUseFatigue, fatigueRate);
+                if (person.getStatus().isActiveFlexible() && person.getPrisonerStatus().isFreeOrBondsman()) {
+                    processCompulsionsAndMadness(person,
+                          personnelOptions,
+                          isUseAdvancedMedical,
+                          isUseAltAdvancedMedical,
+                          isUseFatigue,
+                          fatigueRate);
+                }
             }
 
             // Monthly events
@@ -1285,19 +1346,10 @@ public class CampaignNewDayManager {
             }
 
             // Accolade check
-            boolean ignoreEmployer = relevantFaction.isMercenaryOrganization();
-            boolean isOnMission = FactionStandingUtilities.isIsOnMission(
-                  !isInTransit,
-                  campaign.getActiveAtBContracts(),
-                  activeMissions,
-                  relevantFactionCode,
-                  updatedLocation.getCurrentSystem(),
-                  ignoreEmployer);
-
             FactionAccoladeLevel newAccoladeLevel = campaign.getFactionStandings().checkForAccolade(
-                  relevantFaction, today, isOnMission);
+                  relevantFaction, today);
 
-            if (newAccoladeLevel != null) {
+            if (newAccoladeLevel != null && newAccoladeLevel != FactionAccoladeLevel.NO_ACCOLADE) {
                 new FactionAccoladeEvent(campaign, relevantFaction, newAccoladeLevel,
                       faction.equals(relevantFaction));
             }
@@ -1588,7 +1640,11 @@ public class CampaignNewDayManager {
             int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
             boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
                   null, modifier);
-            String report = person.processHysteria(campaign, true, isUseAdvancedMedical, failedWillpowerCheck);
+            String report = person.processHysteria(campaign,
+                  true,
+                  isUseAdvancedMedical,
+                  isUseAltAdvancedMedical,
+                  failedWillpowerCheck);
             if (!report.isBlank()) {
                 campaign.addReport(MEDICAL, report);
             }
@@ -1804,16 +1860,11 @@ public class CampaignNewDayManager {
         // Second, we process them and any already generated scenarios
         for (AtBContract contract : contracts) {
             /*
-             * Situations like a delayed start or running out of funds during transit can
-             * delay arrival until after the contract start. In that case, shift the
-             * starting and ending dates before making any battle rolls. We check that the
-             * unit is actually on route to the planet in case the user is using a custom
-             * system for transport or splitting the unit, etc.
+             * Situations like a delayed start or running out of funds during transit can delay arrival until after
+             * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
              */
-            if (!updatedLocation.isOnPlanet() &&
-                      !updatedLocation.getJumpPath().isEmpty() &&
-                      updatedLocation.getJumpPath().getLastSystem().getId().equals(contract.getSystemId())) {
-                // transitTime is measured in days; so we round up to the next whole day
+            if (!updatedLocation.getCurrentSystem().getId().equals(contract.getSystem().getId())) {
+                // transitTime is measured in days, so we round up to the next whole day
                 contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
                 campaign.addReport(GENERAL, "The start and end dates of " +
                                                   contract.getHyperlinkedName() +

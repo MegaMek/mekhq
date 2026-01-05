@@ -872,8 +872,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             }
             // Use bay replacement time of 1 month (30 days) for each bay to be resized, plus another month for any
-            // bays to be added or removed.
-            time += Math.max(oldUnitBays.size(), newUnitBays.size()) * WORK_MONTH;
+            // bays to be added or removed. Note this only applies to large craft, CVs use 120 minutes. CO 205
+            int bayDuration = getNewEntity().isLargeCraft() ? WORK_MONTH : WORK_HOUR * 2;
+            time += Math.max(oldUnitBays.size(), newUnitBays.size()) * bayDuration;
             int deltaDoors = oldUnitBays.stream().mapToInt(Bay::getDoors).sum() -
                                    newUnitBays.stream().mapToInt(Bay::getDoors).sum();
             if (deltaDoors < 0) {
@@ -881,7 +882,9 @@ public class Refit extends Part implements IAcquisitionWork {
             } else {
                 doorsRemoved = Math.max(0, doorsRemoved + deltaDoors);
             }
-            time += (doorsAdded + doorsRemoved) * WORK_HOUR;
+            // Doors for large craft take 10 hours. Doors for others take 120 minutes. CO 205
+            int doorDuration = getNewEntity().isLargeCraft() ? WORK_HOUR * 10 : WORK_HOUR * 2;
+            time += (doorsAdded + doorsRemoved) * doorDuration;
         }
 
         // Step 4: loop through remaining equipment on old unit parts and add time for removing.

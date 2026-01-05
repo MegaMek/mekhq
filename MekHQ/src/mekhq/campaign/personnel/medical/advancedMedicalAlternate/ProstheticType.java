@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.options.OptionsConstants.*;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_ATTRACTIVE;
@@ -840,7 +841,7 @@ public enum ProstheticType {
           false,
           true,
           List.of(),
-          List.of(MD_VDNI),
+          List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     PROSTHETIC_ARM("PROSTHETIC_ARM",
           STANDARD,
@@ -1008,6 +1009,20 @@ public enum ProstheticType {
           false,
           false,
           List.of()),
+    PROTOTYPE_VDNI("PROTOTYPE_VDNI",
+          ENHANCED,
+          5,
+          AlternateInjuries.PROTOTYPE_VDNI,
+          Money.of(2500000),
+          PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          false,
+          List.of(),
+          List.of(MD_PROTO_DNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     VDNI("VDNI",
           ENHANCED,
           5,
@@ -1083,7 +1098,7 @@ public enum ProstheticType {
     private static final double AVAILABILITY_MULTIPLIER_D = 1.25;
     private static final double AVAILABILITY_MULTIPLIER_E = 1.5;
     private static final double AVAILABILITY_MULTIPLIER_F = 10.0;
-    private static final double AVAILABILITY_MULTIPLIER_F_STAR = 0.0;
+    private static final double AVAILABILITY_MULTIPLIER_F_STAR = 20.0;
     private static final double AVAILABILITY_MULTIPLIER_X = 0.0;
 
     /**
@@ -1325,7 +1340,7 @@ public enum ProstheticType {
     public @Nullable Money getCost(Faction campaignFaction, int currentYear) {
         boolean isWrongAffiliation = isWrongAffiliation(campaignFaction);
         double availabilityMultiplier = getAvailabilityMultiplier(currentYear, isWrongAffiliation);
-        if (availabilityMultiplier == 0.0) {
+        if (availabilityMultiplier == 0.0) { // Item is unavailable in era
             return null;
         }
 
@@ -1410,9 +1425,9 @@ public enum ProstheticType {
      * derived from {@link ATOWLegalityRating#getBlackMarketMultiplier(AvailabilityValue)} using the resolved
      * availability.</p>
      *
-     * @param gameYear             the current in-universe year used to resolve availability
-     * @param outsideFactionAccess {@code true} if the purchase is attempted without normal faction access (e.g., on the
-     *                             black market); {@code false} for standard in-faction access
+     * @param gameYear           the current in-universe year used to resolve availability
+     * @param isWrongAffiliation {@code true} if the purchase is attempted without normal faction access (e.g., on the
+     *                           black market); {@code false} for standard in-faction access
      *
      * @return the price multiplier to apply; {@code 1.0} when adjusted legality is A→C, otherwise the black-market
      *       multiplier for the resolved availability under the adjusted legality
@@ -1420,9 +1435,9 @@ public enum ProstheticType {
      * @author Illiani
      * @since 0.50.11
      */
-    public double getLegalityMultiplier(int gameYear, boolean outsideFactionAccess) {
+    public double getLegalityMultiplier(int gameYear, boolean isWrongAffiliation) {
         AvailabilityValue availability = getAvailability(gameYear);
-        ATOWLegalityRating adjustedLegality = getAdjustedLegality(outsideFactionAccess);
+        ATOWLegalityRating adjustedLegality = getAdjustedLegality(isWrongAffiliation);
 
         // The player is not required to go through the black market
         if (adjustedLegality == ATOWLegalityRating.A ||
@@ -1431,7 +1446,17 @@ public enum ProstheticType {
             return 1.0;
         }
 
-        return adjustedLegality.getBlackMarketMultiplier(availability);
+        double multiplier = adjustedLegality.getBlackMarketMultiplier(availability);
+        if (isWrongAffiliation) {
+            return multiplier;
+        }
+
+        return switch (adjustedLegality) {
+            case D -> min(1.5, multiplier);
+            case E -> min(2.0, multiplier);
+            case F -> min(2.5, multiplier);
+            default -> min(1.0, multiplier);
+        };
     }
 
     /**

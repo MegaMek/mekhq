@@ -191,6 +191,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "warShipContractPercent",
               campaignOptions.getWarShipContractPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternatePaymentMode",
+              campaignOptions.isUseAlternatePaymentMode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDiminishingContractPay",
+              campaignOptions.isUseDiminishingContractPay());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractBase",
               campaignOptions.isEquipmentContractBase());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractSaleValue",
@@ -372,6 +376,11 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMASHTheatres", campaignOptions.isUseMASHTheatres());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mashTheatreCapacity", campaignOptions.getMASHTheatreCapacity());
         // endregion Medical
+
+        // region Blob Crew
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobInfantry", campaignOptions.isUseBlobInfantry());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobBattleArmor", campaignOptions.isUseBlobBattleArmor());
+        // endregion Blob Crew
 
         // region Prisoners
         MHQXMLUtility.writeSimpleXMLTag(pw,

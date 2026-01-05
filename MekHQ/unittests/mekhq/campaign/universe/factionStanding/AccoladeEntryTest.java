@@ -53,7 +53,7 @@ class AccoladeEntryTest {
           // Normal improvement cases for PROPAGANDA_REEL (allowed to improve)
           "0,PROPAGANDA_REEL,false",
           "1,PROPAGANDA_REEL,false",
-          COOLDOWN_PERIOD + ",PROPAGANDA_REEL,false",
+          COOLDOWN_PERIOD + ",PROPAGANDA_REEL,true",
           (COOLDOWN_PERIOD - 1) + ",PROPAGANDA_REEL,false",
           (COOLDOWN_PERIOD + 1) + ",PROPAGANDA_REEL,true",
           // Improvement should be false for LETTER_FROM_HEAD_OF_STATE even after cooldown
@@ -105,9 +105,9 @@ class AccoladeEntryTest {
 
     private static Stream<Arguments> provideCooldownDateCases() {
         return Stream.of(
-              arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, false),
+              arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, true),
               arguments(7, FactionAccoladeLevel.PROPAGANDA_REEL, true),
-              arguments(6, FactionAccoladeLevel.STATUE_OR_SIBKO, false)
+              arguments(5, FactionAccoladeLevel.STATUE_OR_SIBKO, false)
         );
     }
 

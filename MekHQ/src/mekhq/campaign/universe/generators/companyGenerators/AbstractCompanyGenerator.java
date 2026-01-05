@@ -396,6 +396,12 @@ public abstract class AbstractCompanyGenerator {
         generateOfficers(sortedTrackers);
         generateStandardMekWarriors(campaign, sortedTrackers);
 
+        // Dynamically fetch the second-in-command
+        Person secondInCommand = campaign.getFlaggedSecondInCommand();
+        if (secondInCommand != null) {
+            secondInCommand.setSecondInCommand(true);
+        }
+
         return sortedTrackers;
     }
 

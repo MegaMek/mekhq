@@ -38,9 +38,12 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -49,13 +52,11 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -68,6 +69,7 @@ import javax.swing.JTable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.AmmoType;
@@ -99,13 +101,13 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
@@ -120,6 +122,7 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
@@ -140,6 +143,8 @@ import mekhq.gui.utilities.StaticChecks;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger LOGGER = MMLogger.create(UnitTableMouseAdapter.class);
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     // region Variable Declarations
     private final CampaignGUI gui;
@@ -168,6 +173,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
+    public static final String COMMAND_FILL_TEMP_CREW = "FILL_TEMP_CREW";
+    public static final String COMMAND_REMOVE_TEMP_CREW = "REMOVE_TEMP_CREW";
     public static final String COMMAND_DISBAND = "DISBAND";
     public static final String COMMAND_SELL = "SELL";
     public static final String COMMAND_LOSS = "LOSS";
@@ -208,6 +215,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     // endregion GM Commands
     // endregion Commands
 
+    @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
@@ -285,17 +293,65 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
+            Money totalValue = Money.zero();
+            List<Unit> sellableUnits = new ArrayList<>();
             for (Unit unit : units) {
+                if (unit == null) {
+                    continue;
+                }
                 if (!unit.isDeployed()) {
-                    Money sellValue = unit.getSellValue();
-                    String text = sellValue.toAmountAndSymbolString();
-                    if (0 ==
-                              JOptionPane.showConfirmDialog(null,
-                                    "Do you really want to sell " + unit.getName() + " for " + text,
-                                    "Sell Unit?",
-                                    JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().getQuartermaster().sellUnit(unit);
-                    }
+                    sellableUnits.add(unit);
+                    totalValue = totalValue.plus(unit.getSellValue());
+                }
+            }
+
+            if (sellableUnits.isEmpty()) {
+                return;
+            }
+
+            Campaign campaign = gui.getCampaign();
+            String commanderAddress = campaign.getCommanderAddress();
+            Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
+
+            // Cancel is first (index 0), so closing dialog via X defaults to cancel
+            List<String> buttons = List.of(
+                  getFormattedTextAt(RESOURCE_BUNDLE, "sellUnit.buttonCancel"),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "sellUnit.buttonConfirm"));
+
+            final int confirmDialogIndex = 1;
+
+            String message;
+            if (sellableUnits.size() == 1) {
+                Unit unit = sellableUnits.get(0);
+                message = getFormattedTextAt(
+                      RESOURCE_BUNDLE,
+                      "sellUnit.message.single",
+                      commanderAddress,
+                      unit.getName(),
+                      unit.getSellValueBreakdown());
+            } else {
+                message = getFormattedTextAt(
+                      RESOURCE_BUNDLE,
+                      "sellUnit.message.multiple",
+                      commanderAddress,
+                      totalValue.toAmountString());
+            }
+
+            ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
+                  campaign,
+                  logisticsAdmin,
+                  null,
+                  message,
+                  buttons,
+                  null,
+                  null,
+                  true);
+
+            boolean wasConfirmed = dialog.getDialogChoice() == confirmDialogIndex;
+
+            if (wasConfirmed) {
+                for (Unit unit : sellableUnits) {
+                    campaign.getQuartermaster().sellUnit(unit);
                 }
             }
         } else if (command.equals(COMMAND_LOSS)) {
@@ -321,59 +377,26 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.contains(COMMAND_CHANGE_SITE)) {
-            try {
-                int selected = Integer.parseInt(command.split(":")[1]);
-                boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
-                if (!selectedIsValid) {
-                    return;
-                }
+            int selected = MathUtility.parseInt(command.split(":")[1], SITE_FIELD_WORKSHOP);
+            boolean selectedIsValid = selected > -1 && selected < Unit.SITE_UNKNOWN;
+            if (!selectedIsValid) {
+                return;
+            }
 
-                boolean wasSiteChangeSuccessful = true;
+            boolean wasSiteChangeSuccessful = true;
+            Campaign campaign = gui.getCampaign();
+            if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
+                      campaign.getCampaignOptions().getRentedFacilitiesCostRepairBays() > 0) {
+                wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
+            }
 
-                if (selected >= Unit.SITE_FACILITY_MAINTENANCE) {
-                    Campaign campaign = gui.getCampaign();
-
-                    // This counts how many units are eligible and how many are eligible and a large craft. We handle
-                    // it this way to allow us to fetch the counts in a single pass
-                    Predicate<Unit> eligibleForBayRental =
-                          u -> !FacilityRentals.shouldBeIgnoredByBayRentals(u);
-                    long[] counts = Arrays.stream(units)
-                                          .filter(eligibleForBayRental)
-                                          .collect(() -> new long[2], (arr, u) -> {
-                                              arr[0]++; // eligible
-                                              if (u.getEntity().isLargeCraft()) {
-                                                  arr[1]++; // large vessel
-                                              }
-                                          }, (a, b) -> {
-                                              a[0] += b[0];
-                                              a[1] += b[1];
-                                          });
-
-                    int eligibleUnitCount = (int) counts[0];
-                    int eligibleLargeVesselCount = (int) counts[1];
-
-                    ContractRentalType rentalType = switch (selected) {
-                        case Unit.SITE_FACILITY_MAINTENANCE -> ContractRentalType.MAINTENANCE_BAYS;
-                        case Unit.SITE_FACTORY_CONDITIONS -> ContractRentalType.FACTORY_CONDITIONS;
-                        default -> null; // Should never happen as we're already filtering out invalid sites
-                    };
-
-                    wasSiteChangeSuccessful = FacilityRentals.offerBayRentalOpportunity(campaign,
-                          eligibleUnitCount,
-                          eligibleLargeVesselCount,
-                          rentalType);
-                }
-
-                if (wasSiteChangeSuccessful) {
-                    for (Unit unit : units) {
-                        if (!unit.isDeployed()) {
-                            unit.setSite(selected);
-                            MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
-                        }
+            if (wasSiteChangeSuccessful) {
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        unit.setSite(selected);
+                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
             }
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
@@ -483,6 +506,50 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               person,
                               person.getPrimaryRole(),
                               skillLevel);
+                    }
+                }
+            }
+        } else if (command.equals(COMMAND_FILL_TEMP_CREW)) {
+            // Only works on single selected unit
+            if (units.length == 1) {
+                Unit unit = units[0];
+                int currentCrew = unit.getActiveCrew().size();
+                int fullCrew = unit.getFullCrewSize();
+
+                // Can't add temp crew if no real Person exists
+                if (currentCrew == 0) {
+                    return;
+                }
+
+                // Maximum temp crew for this unit is (fullCrewSize - currentCrew)
+                // This ensures the unit is at full strength
+                int maxTempCrewForUnit = fullCrew - currentCrew;
+
+                // Determine the appropriate crew role for this unit
+                PersonnelRole crewRole = unit.getDriverRole();
+
+                if (crewRole != null && gui.getCampaign().isBlobCrewEnabled(crewRole)) {
+                    int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
+                    int needed = maxTempCrewForUnit - currentTempCrew;
+
+                    if (needed > 0) {
+                        // Check available pool for this crew type
+                        int availableInPool = gui.getCampaign().getAvailableTempCrewPool(crewRole);
+                        int toAssign = Math.min(needed, availableInPool);
+
+                        if (toAssign > 0) {
+                            unit.setTempCrew(crewRole, currentTempCrew + toAssign);
+                        }
+                    }
+                }
+            }
+        } else if (command.equals(COMMAND_REMOVE_TEMP_CREW)) {
+            // Remove all temp crew from selected unit(s)
+            for (Unit unit : units) {
+                // Clear all temp crew by iterating through all personnel roles
+                for (PersonnelRole role : PersonnelRole.values()) {
+                    if (unit.getTempCrewByPersonnelRole(role) > 0) {
+                        unit.setTempCrew(role, 0);
                     }
                 }
             }
@@ -852,7 +919,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // endregion Determine if to Display
 
             // change the location
-            menu = new JMenu("Change site");
+            menu = new JMenu("Change Site");
             boolean allSameSite = StaticChecks.areAllSameSite(units);
 
             for (int i = 0; i < Unit.SITE_UNKNOWN; i++) {
@@ -1091,6 +1158,34 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
+            // fill with temp crew (blob crew)
+            if (oneSelected) {
+                boolean canFillWithTempCrew = canUnitUseTempCrew(unit);
+
+                if (canFillWithTempCrew && unit.getActiveCrew().size() > 0) {
+                    int currentCrew = unit.getActiveCrew().size();
+                    int currentTempCrew = unit.getTotalTempCrew();
+                    int fullCrew = unit.getFullCrewSize();
+                    int maxTempCrew = fullCrew - 1; // At least one must be a real Person
+
+                    // Only show if unit can accept more temp crew
+                    if (currentCrew + currentTempCrew < maxTempCrew) {
+                        menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
+                        menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+
+                    // Show "Remove temp crew" if unit has any temp crew
+                    if (currentTempCrew > 0) {
+                        menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
+                        menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+                }
+            }
+
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
                 menuItem = new JMenuItem(gui.getResourceMap().getString("customizeMenu.individualCamo.text"));
                 menuItem.setActionCommand(COMMAND_INDI_CAMO);
@@ -1325,5 +1420,41 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.getCampaign().addCustom(unitName);
         }
         MekSummaryCache.refreshUnitData(false);
+    }
+
+    /**
+     * Determines if the specified unit can use temporary crew based on its type
+     * and campaign settings.
+     *
+     * @param unit the unit to check
+     * @return true if the unit can use temp crew, false otherwise
+     */
+    private boolean canUnitUseTempCrew(Unit unit) {
+        if (unit == null || unit.getEntity() == null) {
+            return false;
+        }
+
+        PersonnelRole driverRole = unit.getDriverRole();
+        PersonnelRole gunnerRole = unit.getGunnerRole();
+
+        // Check if driver role is enabled
+        if (driverRole != null && gui.getCampaign().isBlobCrewEnabled(driverRole)) {
+            return true;
+        }
+
+        // Check if gunner role is enabled (and different from driver)
+        if (gunnerRole != null && !gunnerRole.equals(driverRole) &&
+            gui.getCampaign().isBlobCrewEnabled(gunnerRole)) {
+            return true;
+        }
+
+        // For vessels, also check vessel crew
+        if (unit.getEntity().isSmallCraft() || unit.getEntity().isLargeCraft()) {
+            if (gui.getCampaign().isBlobCrewEnabled(PersonnelRole.VESSEL_CREW)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

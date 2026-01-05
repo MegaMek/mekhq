@@ -59,7 +59,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_ASTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
@@ -75,6 +74,7 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -281,7 +281,7 @@ public class Campaign implements ITechManager {
      * When using the 'useful assistants' campaign options, the relevant skill levels possessed by each assistant is
      * divided by this value and then floored.\
      */
-    private static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
+    public static final double ASSISTANT_SKILL_LEVEL_DIVIDER = 2.5;
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
@@ -299,6 +299,12 @@ public class Campaign implements ITechManager {
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
+
+    /**
+     * This can easily be expanded for other personnel lists by providing a unique String as the map's key.
+     */
+    private transient Map<String, List<Person>> activePersonnelCache = new HashMap<>();
+
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private final TreeMap<Integer, Mission> missions = new TreeMap<>();
@@ -316,6 +322,12 @@ public class Campaign implements ITechManager {
     private int asTechPoolMinutes;
     private int asTechPoolOvertime;
     private int medicPool;
+    /**
+     * Map of PersonnelRole to temp crew pool size. Tracks TOTAL pool (not available). Use
+     * {@link #getAvailableTempCrewPool(PersonnelRole)} for available count
+     *
+     *  */
+    private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
 
     private int lastForceId;
     private int lastMissionId;
@@ -411,6 +423,12 @@ public class Campaign implements ITechManager {
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private MekHQ app;
+
+    /**
+     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
+     * applied to Campaign.
+     */
+    private transient CampaignEventProcessor campaignEventProcessor;
 
     private ShoppingList shoppingList;
 
@@ -607,6 +625,7 @@ public class Campaign implements ITechManager {
         combatTeams = new Hashtable<>();
         asTechPool = 0;
         medicPool = 0;
+        tempPersonnelRoleMap = new HashMap<>();
         customs = new ArrayList<>();
         personnelWhoAdvancedInXP = new ArrayList<>();
         turnoverRetirementInformation = new ArrayList<>();
@@ -1056,6 +1075,10 @@ public class Campaign implements ITechManager {
         return unitGenerator;
     }
 
+    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
+        campaignEventProcessor = processor;
+    }
+
     public void setAtBEventProcessor(AtBEventProcessor processor) {
         atbEventProcessor = processor;
     }
@@ -1376,6 +1399,10 @@ public class Campaign implements ITechManager {
     }
 
     public void moveForce(Force force, Force superForce) {
+        // Can't move a null force under a superforce and can't move a force under itself.
+        if (force == null || force.equals(superForce)) {
+            return;
+        }
         Force parentForce = force.getParentForce();
 
         if (null != parentForce) {
@@ -3022,6 +3049,17 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects matching the criteria
      */
     public List<Person> getActivePersonnel(boolean includePrisoners, boolean includeCampFollowers) {
+        String cacheKey = "includePrisoners:" + includePrisoners + "_" + "includeCampFollowers:" + includeCampFollowers;
+
+        // If the cache value is known and not empty, let's just use that
+        // An empty list will be cached after loading so we will always
+        // recalculate if it's empty. And if it's empty, it should be quick, right?
+        if (activePersonnelCache != null &&
+                  activePersonnelCache.containsKey(cacheKey) &&
+                  !activePersonnelCache.get(cacheKey).isEmpty()) {
+            return new ArrayList<>(activePersonnelCache.get(cacheKey));
+        }
+
         List<Person> activePersonnel = new ArrayList<>();
 
         for (Person person : getPersonnel()) {
@@ -3046,7 +3084,18 @@ public class Campaign implements ITechManager {
             activePersonnel.add(person);
         }
 
+        if (activePersonnelCache == null) {
+            activePersonnelCache = new HashMap<>();
+        }
+        activePersonnelCache.put(cacheKey, new ArrayList<>(activePersonnel));
         return activePersonnel;
+    }
+
+    /**
+     * Clears the {@code activePersonnelCache} so it's recalculated next time we getActivePersonnel
+     */
+    public void invalidateActivePersonnelCache() {
+        activePersonnelCache.clear();
     }
 
     /**
@@ -3961,30 +4010,66 @@ public class Campaign implements ITechManager {
     private Person[] findTopCommanders() {
         Person flaggedCommander = getFlaggedCommander();
         Person commander = flaggedCommander;
-        Person secondInCommand = null;
+
+        Person flaggedSecondInCommand = getFlaggedSecondInCommand();
+        Person secondInCommand = flaggedSecondInCommand;
+
+        if (flaggedCommander != null && flaggedSecondInCommand != null) {
+            return new Person[] { commander, secondInCommand };
+        }
 
         for (Person person : getActivePersonnel(false, false)) {
-            // If we have a flagged commander, skip them
-            if (flaggedCommander != null) {
-                if (person.equals(flaggedCommander)) {
-                    continue;
-                }
-                // Second in command is best among non-flagged
-                if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                    secondInCommand = person;
-                }
-            } else {
+            if (person == null) {
+                continue;
+            }
+
+            if (person.equals(flaggedCommander) || person.equals(flaggedSecondInCommand)) {
+                continue;
+            }
+
+            // Commander selection (if not locked)
+            if (flaggedCommander == null) {
                 if (commander == null) {
                     commander = person;
-                } else if (person.outRanksUsingSkillTiebreaker(this, commander)) {
-                    secondInCommand = commander;
+                    continue;
+                }
+
+                if (!person.equals(commander) && person.outRanksUsingSkillTiebreaker(this, commander)) {
+                    Person previousCommander = commander;
                     commander = person;
-                } else if (secondInCommand == null || person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
-                    if (!person.equals(commander)) {
-                        secondInCommand = person;
+
+                    // Previous commander becomes a candidate for second-in-command (if not locked)
+                    if (flaggedSecondInCommand == null && !previousCommander.equals(commander)) {
+                        if (secondInCommand == null) {
+                            secondInCommand = previousCommander;
+                        } else if (!previousCommander.equals(secondInCommand)
+                                         && previousCommander.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                            secondInCommand = previousCommander;
+                        }
                     }
+                    continue;
                 }
             }
+
+            // Second-in-command selection (if not locked), excluding commander
+            if (flaggedSecondInCommand == null) {
+                if (person.equals(commander)) {
+                    continue;
+                }
+
+                if (secondInCommand == null) {
+                    secondInCommand = person;
+                    continue;
+                }
+
+                if (!person.equals(secondInCommand) && person.outRanksUsingSkillTiebreaker(this, secondInCommand)) {
+                    secondInCommand = person;
+                }
+            }
+        }
+
+        if (commander != null && commander.equals(secondInCommand)) {
+            secondInCommand = null;
         }
 
         return new Person[] { commander, secondInCommand };
@@ -5447,6 +5532,17 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns {@code null}.
+     *
+     * <p><b>Usage:</b> consider using {@link #getSecondInCommand()} instead.</p>
+     *
+     * @return the flagged second-in-command if present, otherwise {@code null}
+     */
+    public @Nullable Person getFlaggedSecondInCommand() {
+        return getPersonnel().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
+    }
+
+    /**
      * Use {@link #getCommander()} instead
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -6210,7 +6306,43 @@ public class Campaign implements ITechManager {
     }
 
     public void setCampaignOptions(CampaignOptions options) {
+        // Check if blob crew was disabled for each role
+        boolean infantryWasEnabled = campaignOptions.isUseBlobInfantry();
+        boolean baWasEnabled = campaignOptions.isUseBlobBattleArmor();
+        boolean vehicleGroundWasEnabled = campaignOptions.isUseBlobVehicleCrewGround();
+        boolean vehicleVTOLWasEnabled = campaignOptions.isUseBlobVehicleCrewVTOL();
+        boolean vehicleNavalWasEnabled = campaignOptions.isUseBlobVehicleCrewNaval();
+        boolean vesselPilotWasEnabled = campaignOptions.isUseBlobVesselPilot();
+        boolean vesselGunnerWasEnabled = campaignOptions.isUseBlobVesselGunner();
+        boolean vesselCrewWasEnabled = campaignOptions.isUseBlobVesselCrew();
+
         campaignOptions = options;
+
+        // If blob crew was disabled for a specific role, clear only that role's blob crew
+        if (infantryWasEnabled && !options.isUseBlobInfantry()) {
+            clearBlobCrewForRole(PersonnelRole.SOLDIER);
+        }
+        if (baWasEnabled && !options.isUseBlobBattleArmor()) {
+            clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (vehicleGroundWasEnabled && !options.isUseBlobVehicleCrewGround()) {
+            clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (vehicleVTOLWasEnabled && !options.isUseBlobVehicleCrewVTOL()) {
+            clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (vehicleNavalWasEnabled && !options.isUseBlobVehicleCrewNaval()) {
+            clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (vesselPilotWasEnabled && !options.isUseBlobVesselPilot()) {
+            clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
+        }
+        if (vesselGunnerWasEnabled && !options.isUseBlobVesselGunner()) {
+            clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (vesselCrewWasEnabled && !options.isUseBlobVesselCrew()) {
+            clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        }
     }
 
     public StoryArc getStoryArc() {
@@ -6357,6 +6489,19 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolMinutes", asTechPoolMinutes);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "asTechPoolOvertime", asTechPoolOvertime);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "medicPool", medicPool);
+
+        // Write temp crew pools
+        if (!tempPersonnelRoleMap.isEmpty()) {
+            writer.println(MHQXMLUtility.indentStr(indent++) + "<tempCrewPools>");
+            for (Map.Entry<PersonnelRole, Integer> entry : tempPersonnelRoleMap.entrySet()) {
+                writer.println(MHQXMLUtility.indentStr(indent++) + "<tempCrewPool>");
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "role", entry.getKey().name());
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "size", entry.getValue());
+                writer.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewPool>");
+            }
+            writer.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewPools>");
+        }
+
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "fieldKitchenWithinCapacity", fieldKitchenWithinCapacity);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mashTheatreCapacity", mashTheatreCapacity);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "repairBaysRented", repairBaysRented);
@@ -6560,8 +6705,10 @@ public class Campaign implements ITechManager {
         writePartInUseToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "partsInUse");
 
-        if (isBugReportPrep || MekHQ.getMHQOptions().getWriteCustomsToXML()) {
-            writeCustoms(writer, isBugReportPrep);
+        boolean shouldSaveAllUnits = isBugReportPrep || MekHQ.getMHQOptions().getWriteAllUnitsToXML();
+        boolean shouldSaveCustomsOnly = !shouldSaveAllUnits && MekHQ.getMHQOptions().getWriteCustomsToXML();
+        if (shouldSaveAllUnits || shouldSaveCustomsOnly) {
+            writeUnitDefinitionsIntoSave(writer, shouldSaveAllUnits, shouldSaveCustomsOnly);
         }
 
         // Okay, we're done.
@@ -6570,73 +6717,104 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Writes serialized custom unit definitions to the provided {@link PrintWriter}.
+     * Writes custom unit definitions to the campaign XML output.
      *
-     * <p>When invoked for bug report preparation, this method scans all units currently present in the campaign,
-     * extracts their raw short names, and treats them as custom entries to be exported. Each candidate name is resolved
-     * via the {@link MekSummaryCache}; if a definition is found, the source entity is parsed and serialized into
-     * XML.</p>
+     * <p>This method can operate in two modes:</p>
+     * <ul>
+     *     <li>If {@code shouldSaveAllUnits} is {@code true}, it scans all units currently present in the campaign
+     *     and collects each unit's raw short name (via {@code entity.getShortNameRaw()}) as a candidate custom
+     *     definition.</li>
+     *     <li>Else, if {@code shouldSaveAllCustoms} is {@code true}, it writes all names already present in the
+     *     campaign's {@code customs} collection.</li>
+     * </ul>
      *
-     * <p>BattleMeks are exported using embedded MTF data wrapped in CDATA; all other supported entity types are
-     * exported as BLK content, line-by-line and wrapped in CDATA.</p>
+     * <p>For each collected name, the corresponding {@link MekSummary} is looked up via {@link MekSummaryCache}. If
+     * a summary and source file can be resolved, the source entity is parsed and serialized:</p>
+     * <ul>
+     *     <li>{@link Mek} entities are exported as embedded MTF text inside a CDATA section.</li>
+     *     <li>All other supported entities are exported as BLK content (non-empty lines only) inside a CDATA
+     *     section.</li>
+     * </ul>
      *
-     * <p>Units that cannot be located in the cache or that fail parsing are skipped, with errors logged. The
-     * ordering of exported units depends on the underlying {@link Set} implementation.</p>
+     * <p>Entries that cannot be resolved (missing/blank short name, missing {@link MekSummary}, missing source file,
+     * parse failures, null parsed entity, or save failures) are skipped and logged.</p>
      *
-     * <p><b>Note:</b> When {@code isBugReportPrep} is {@code false}, this method replaces the custom set.</p>
+     * <p><b>Note:</b> This method is for enshrining unit definition data into the save (the BLK for the unit) and
+     * not general unit data (who is crewing the unit, etc).</p>
      *
-     * @param printWriter     the output writer used to emit formatted {@code <custom>} elements
-     * @param isBugReportPrep whether campaign unit names should be collected for export; if {@code false}, no custom
-     *                        entities will be written by this method
+     * @param printWriter          the output writer that receives {@code <custom>} XML elements; must not be
+     *                             {@code null}
+     * @param shouldSaveAllUnits   when {@code true}, derive the custom list by scanning all current units
+     * @param shouldSaveAllCustoms when {@code true} (and {@code shouldSaveAllUnits} is {@code false}), write all names
+     *                             from the campaign's stored customs list
      */
-    private void writeCustoms(PrintWriter printWriter, boolean isBugReportPrep) {
+    private void writeUnitDefinitionsIntoSave(PrintWriter printWriter, boolean shouldSaveAllUnits,
+          boolean shouldSaveAllCustoms) {
         Set<String> customUnits = new HashSet<>();
-        if (isBugReportPrep) {
+        if (shouldSaveAllUnits) {
             for (Unit unit : units.getUnits()) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
-                    customUnits.add(entity.getShortNameRaw());
+                    String shortName = entity.getShortNameRaw();
+                    if (!StringUtility.isNullOrBlank(shortName)) {
+                        customUnits.add(shortName);
+                    } else {
+                        LOGGER.warn("shortName was null or blank for {}. Skipping", unit.getName());
+                    }
                 }
             }
-        } else {
+        } else if (shouldSaveAllCustoms) {
             customUnits = new HashSet<>(customs);
         }
 
         for (String name : customUnits) {
-            MekSummary ms = MekSummaryCache.getInstance().getMek(name);
-            if (ms == null) {
+            MekSummary mekSummary = MekSummaryCache.getInstance().getMek(name);
+            if (mekSummary == null) {
+                LOGGER.warn("mekSummary was null for {}", name);
                 continue;
             }
 
             MekFileParser mekFileParser = null;
             try {
-                mekFileParser = new MekFileParser(ms.getSourceFile());
+                File sourceFile = mekSummary.getSourceFile();
+                if (sourceFile == null) {
+                    LOGGER.warn("sourceFile was null for {}", name);
+                    continue;
+                }
+
+                mekFileParser = new MekFileParser(sourceFile, mekSummary.getEntryName());
             } catch (EntityLoadingException ex) {
-                LOGGER.error("", ex);
-            }
-            if (mekFileParser == null) {
+                LOGGER.error("Failed to fetch MekFileParser for {} // {}",
+                      mekSummary.getSourceFile(), mekSummary.getEntryName(), ex);
                 continue;
             }
-            Entity en = mekFileParser.getEntity();
+
+            Entity entity = mekFileParser.getEntity();
+            if (entity == null) {
+                LOGGER.warn("mekFileParser returned a null entity {}", name);
+                continue;
+            }
+
             printWriter.println("\t<custom>");
-            printWriter.println("\t\t<name>" + name + "</name>");
-            if (en instanceof Mek) {
+            String escapedName = MHQXMLUtility.escape(name);
+            printWriter.println("\t\t<name>" + escapedName + "</name>");
+            if (entity instanceof Mek) {
                 printWriter.print("\t\t<mtf><![CDATA[");
-                printWriter.print(((Mek) en).getMtf());
+                printWriter.print(((Mek) entity).getMtf());
                 printWriter.println("]]></mtf>");
             } else {
                 try {
-                    BuildingBlock blk = BLKFile.getBlock(en);
+                    BuildingBlock block = BLKFile.getBlock(entity);
                     printWriter.print("\t\t<blk><![CDATA[");
-                    for (String s : blk.getAllDataAsString()) {
-                        if (s.isEmpty()) {
+                    for (String data : block.getAllDataAsString()) {
+                        if (data.isEmpty()) {
                             continue;
                         }
-                        printWriter.println(s);
+                        printWriter.println(data);
                     }
                     printWriter.println("]]></blk>");
                 } catch (EntitySavingException e) {
-                    LOGGER.error("Failed to save custom entity {}", en.getDisplayName(), e);
+                    LOGGER.error("Failed to save custom entity {}", entity.getDisplayName(), e);
                 }
             }
             printWriter.println("\t</custom>");
@@ -7680,6 +7858,71 @@ public class Campaign implements ITechManager {
         return medicPool;
     }
 
+    /**
+     * Gets the total temp crew pool size for a specific personnel role
+     * @param role the personnel role
+     * @return the total number of temp crew in the pool for this role
+     */
+    public int getTempCrewPool(PersonnelRole role) {
+        return tempPersonnelRoleMap.getOrDefault(role, 0);
+    }
+
+    public Set<PersonnelRole> getTempCrewRoleKeys() {
+        return tempPersonnelRoleMap.keySet();
+    }
+
+    /**
+     * Sets the total temp crew pool size for a specific personnel role
+     * @param role the personnel role
+     * @param size the total number of temp crew in the pool
+     */
+    public void setTempCrewPool(PersonnelRole role, int size) {
+        if (size <= 0) {
+            tempPersonnelRoleMap.remove(role);
+        } else {
+            tempPersonnelRoleMap.put(role, size);
+        }
+    }
+
+    /**
+     * Checks if a specific blob crew type is enabled in campaign options
+     * @param role the personnel role to check
+     * @return true if this blob crew type is enabled
+     */
+    public boolean isBlobCrewEnabled(PersonnelRole role) {
+        return switch (role) {
+            case SOLDIER -> getCampaignOptions().isUseBlobInfantry();
+            case BATTLE_ARMOUR -> getCampaignOptions().isUseBlobBattleArmor();
+            case VEHICLE_CREW_GROUND -> getCampaignOptions().isUseBlobVehicleCrewGround();
+            case VEHICLE_CREW_VTOL -> getCampaignOptions().isUseBlobVehicleCrewVTOL();
+            case VEHICLE_CREW_NAVAL -> getCampaignOptions().isUseBlobVehicleCrewNaval();
+            case VESSEL_PILOT -> getCampaignOptions().isUseBlobVesselPilot();
+            case VESSEL_GUNNER -> getCampaignOptions().isUseBlobVesselGunner();
+            case VESSEL_CREW -> getCampaignOptions().isUseBlobVesselCrew();
+            default -> false;
+        };
+    }
+
+    /**
+     * Gets the number of temp crew currently in use by units for a specific role
+     * @param role the personnel role
+     * @return the number of temp crew in use
+     */
+    public int getTempCrewInUse(PersonnelRole role) {
+        return getUnits().stream()
+            .mapToInt(unit -> unit.getTempCrewByPersonnelRole(role))
+            .sum();
+    }
+
+    /**
+     * Gets the number of temp crew available for assignment for a specific role
+     * @param role the personnel role
+     * @return total pool minus crew currently in use
+     */
+    public int getAvailableTempCrewPool(PersonnelRole role) {
+        return Math.max(0, getTempCrewPool(role) - getTempCrewInUse(role));
+    }
+
     public boolean requiresAdditionalAsTechs() {
         return getAsTechNeed() > 0;
     }
@@ -7764,23 +8007,10 @@ public class Campaign implements ITechManager {
      *
      * @return the total skill level for {@link SkillType#S_ASTECH}, or {@code 0} if not present
      *
-     * @author Illiani
      * @since 0.50.07
      */
     private static int getAdvancedAsTechContribution(Person person) {
-        Skill asTechSkill = person.getSkill(S_ASTECH);
-        if (asTechSkill != null) {
-            PersonnelOptions options = person.getOptions();
-            Attributes attributes = person.getATOWAttributes();
-
-            // It is possible for very poorly skilled characters to actually be a detriment to their teams. This is
-            // by design.
-            SkillModifierData skillModifierData = person.getSkillModifierData();
-            int totalSkillLevel = asTechSkill.getTotalSkillLevel(skillModifierData);
-            return (int) floor(totalSkillLevel / ASSISTANT_SKILL_LEVEL_DIVIDER);
-        }
-
-        return 0;
+        return person.getAdvancedAsTechContribution();
     }
 
     /**
@@ -7976,6 +8206,198 @@ public class Campaign implements ITechManager {
         medicPool = max(0, medicPool - i);
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
+
+    /**
+     * Increases the temp crew pool for a specific personnel role and fires the appropriate event
+     * @param role the personnel role
+     * @param amount the amount to increase by
+     */
+    public void increaseTempCrewPool(PersonnelRole role, int amount) {
+        setTempCrewPool(role, getTempCrewPool(role) + amount);
+        fireTempCrewPoolChangedEvent(role, amount);
+    }
+
+    /**
+     * Decreases the temp crew pool for a specific personnel role and fires the appropriate event
+     * @param role the personnel role
+     * @param amount the amount to decrease by
+     */
+    public void decreaseTempCrewPool(PersonnelRole role, int amount) {
+        setTempCrewPool(role, Math.max(0, getTempCrewPool(role) - amount));
+        fireTempCrewPoolChangedEvent(role, -amount);
+    }
+
+    /**
+     * Fires the appropriate pool changed event for a specific personnel role
+     * @param role the personnel role
+     * @param change the change amount (positive for increase, negative for decrease)
+     */
+    private void fireTempCrewPoolChangedEvent(PersonnelRole role, int change) {
+        switch (role) {
+            case SOLDIER -> MekHQ.triggerEvent(new SoldierPoolChangedEvent(this, change));
+            case BATTLE_ARMOUR -> MekHQ.triggerEvent(new BattleArmorPoolChangedEvent(this, change));
+            case VEHICLE_CREW_GROUND -> MekHQ.triggerEvent(new VehicleCrewGroundPoolChangedEvent(this, change));
+            case VEHICLE_CREW_VTOL -> MekHQ.triggerEvent(new VehicleCrewVTOLPoolChangedEvent(this, change));
+            case VEHICLE_CREW_NAVAL -> MekHQ.triggerEvent(new VehicleCrewNavalPoolChangedEvent(this, change));
+            case VESSEL_PILOT -> MekHQ.triggerEvent(new VesselPilotPoolChangedEvent(this, change));
+            case VESSEL_GUNNER -> MekHQ.triggerEvent(new VesselGunnerPoolChangedEvent(this, change));
+            case VESSEL_CREW -> MekHQ.triggerEvent(new VesselCrewPoolChangedEvent(this, change));
+            default -> throw new IllegalStateException("Unexpected value: " + role);
+        }
+    }
+
+    /**
+     * Empties the temp crew pool for a specific role by setting it to 0.
+     * @param role the personnel role to empty
+     */
+    public void emptyTempCrewPoolForRole(PersonnelRole role) {
+        setTempCrewPool(role, 0);
+    }
+
+    /**
+     * Fills the temp crew pool for a specific role by calculating crew needs across all units.
+     * Only runs if the corresponding blob crew option is enabled.
+     * @param role the personnel role to fill
+     */
+    public void fillTempCrewPoolForRole(PersonnelRole role) {
+        if (!isBlobCrewEnabled(role)) {
+            return;
+        }
+
+        int need = 0;
+        for (Unit unit : getUnits()) {
+            if (unitCanUseTempCrewRole(unit, role)) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
+                int fullCrew = unit.getFullCrewSize();
+                int totalCurrentCrew = currentCrew + currentTempCrew;
+                if (fullCrew > totalCurrentCrew) {
+                    need += (fullCrew - totalCurrentCrew);
+                }
+            }
+        }
+
+        if (need > 0) {
+            increaseTempCrewPool(role, need);
+        }
+    }
+
+    /**
+     * Resets the temp crew pool for a specific role by emptying and then filling it.
+     * @param role the personnel role to reset
+     */
+    public void resetTempCrewPoolForRole(PersonnelRole role) {
+        emptyTempCrewPoolForRole(role);
+        fillTempCrewPoolForRole(role);
+    }
+
+
+    /**
+     * Clears blob crew for a specific personnel role from units and empties the campaign pool.
+     * Should be called when a specific blob crew option is disabled.
+     * @param role the personnel role to clear
+     */
+    public void clearBlobCrewForRole(PersonnelRole role) {
+        // Clear temp crew from all units for this specific role
+        for (Unit unit : getUnits()) {
+            if (unit.getTempCrewByPersonnelRole(role) > 0) {
+                unit.setTempCrew(role, 0);
+            }
+        }
+
+        // Empty the campaign pool for this specific role
+        if (getTempCrewPool(role) > 0) {
+            setTempCrewPool(role, 0);
+        }
+    }
+
+    /**
+     * Clears all blob crew from units and empties all campaign pools.
+     * Should be called when all blob crew options are disabled.
+     * @deprecated Use {@link #clearBlobCrewForRole(PersonnelRole)} to clear specific roles instead
+     */
+    @Deprecated
+    public void clearBlobCrew() {
+        // Clear temp crew from all units
+        for (Unit unit : getUnits()) {
+            for (PersonnelRole role : PersonnelRole.values()) {
+                if (unit.getTempCrewByPersonnelRole(role) > 0) {
+                    unit.setTempCrew(role, 0);
+                }
+            }
+        }
+
+        // Empty all campaign pools
+        for (PersonnelRole role : PersonnelRole.values()) {
+            if (getTempCrewPool(role) > 0) {
+                setTempCrewPool(role, 0);
+            }
+        }
+    }
+
+    /**
+     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use
+     * temp crew - checks if the commander is null
+     * @param unit the unit to check
+     * @param role the personnel role
+     * @return true if the unit can use this type of temp crew
+     */
+    private boolean unitCanUseTempCrewRole(Unit unit, PersonnelRole role) {
+        if (unit.getCommander() == null || unit.getEntity() == null) {
+            return false;
+        }
+
+        return switch (role) {
+            case SOLDIER,
+                 BATTLE_ARMOUR,
+                 VEHICLE_CREW_GROUND,
+                 VEHICLE_CREW_VTOL,
+                 VEHICLE_CREW_NAVAL,
+                 VESSEL_PILOT -> unit.getDriverRole() == role;
+            case VESSEL_GUNNER -> unit.getGunnerRole() == role;
+            case VESSEL_CREW -> unit.canTakeMoreVesselCrew(); // ??
+            default -> false;
+        };
+    }
+
+    /**
+     * Distributes temp crew from the pool to units that need crew for a specific personnel role.
+     * Each unit can be filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     * @param role the personnel role to distribute
+     */
+    public void distributeTempCrewPoolToUnits(PersonnelRole role) {
+        if (!isBlobCrewEnabled(role)) {
+            return;
+        }
+
+        int availablePool = getAvailableTempCrewPool(role);
+        for (Unit unit : getUnits()) {
+            if (availablePool <= 0) {
+                break;
+            }
+
+            if (unitCanUseTempCrewRole(unit, role)) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
+                int fullCrew = unit.getFullCrewSize();
+
+
+                // Maximum temp crew is (fullCrewSize - 1) to ensure at least one real Person
+                int maxTempCrew = fullCrew - 1;
+                int totalCurrentCrew = currentCrew + unit.getTotalTempCrew();
+                int needed = maxTempCrew - (totalCurrentCrew - currentCrew);
+
+                if (needed > 0) {
+                    int toAssign = Math.min(needed, availablePool);
+                    unit.setTempCrew(role, currentTempCrew + toAssign);
+                    availablePool -= toAssign;
+                }
+            }
+        }
+        // Note: No need to decrease the total pool - it's tracked by units automatically
+        // The pool represents the TOTAL, and "in use" is calculated from units
+    }
+
 
     public GameOptions getGameOptions() {
         return gameOptions;

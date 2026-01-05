@@ -1823,7 +1823,7 @@ public enum InjuryEffect {
             effects.append(formatEffect(entry.getKey(), entry.getValue()));
         }
 
-        return "<html>" + effects + "</html>";
+        return effects.toString();
     }
 
     private static String formatEffect(InjuryEffect effect, long count) {

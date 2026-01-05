@@ -273,6 +273,16 @@ public class CampaignOptions {
     private boolean useMASHTheatres;
     private int mashTheatreCapacity;
 
+    // Blob Crew
+    private boolean useBlobInfantry;
+    private boolean useBlobBattleArmor;
+    private boolean useBlobVehicleCrewGround;
+    private boolean useBlobVehicleCrewVTOL;
+    private boolean useBlobVehicleCrewNaval;
+    private boolean useBlobVesselPilot;
+    private boolean useBlobVesselGunner;
+    private boolean useBlobVesselCrew;
+
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
     private boolean useFunctionalEscapeArtist;
@@ -526,6 +536,8 @@ public class CampaignOptions {
     // endregion Finance Tab
 
     // region Mercenary Tab
+    private boolean useAlternatePaymentMode;
+    private boolean useDiminishingContractPay;
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
@@ -741,6 +753,7 @@ public class CampaignOptions {
         // region Supplies and Acquisitions Tab
         // Acquisition
         waitingPeriod = 7;
+        acquisitionsType = AcquisitionsType.ANY_TECH;
         useFunctionalAppraisal = false;
         acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty = 0;
@@ -862,6 +875,16 @@ public class CampaignOptions {
         useUsefulMedics = false;
         useMASHTheatres = false;
         mashTheatreCapacity = 25;
+
+        // Blob Crew
+        useBlobInfantry = false;
+        useBlobBattleArmor = false;
+        useBlobVehicleCrewGround = false;
+        useBlobVehicleCrewVTOL = false;
+        useBlobVehicleCrewNaval = false;
+        useBlobVesselPilot = false;
+        useBlobVesselGunner = false;
+        useBlobVesselCrew = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1176,6 +1199,8 @@ public class CampaignOptions {
         // endregion Finances Tab
 
         // region Mercenary Tab
+        useAlternatePaymentMode = false;
+        useDiminishingContractPay = false;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
@@ -2096,6 +2121,70 @@ public class CampaignOptions {
 
     public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
         this.useUsefulMedics = useUsefulMedics;
+    }
+
+    public boolean isUseBlobInfantry() {
+        return useBlobInfantry;
+    }
+
+    public void setUseBlobInfantry(final boolean useBlobInfantry) {
+        this.useBlobInfantry = useBlobInfantry;
+    }
+
+    public boolean isUseBlobBattleArmor() {
+        return useBlobBattleArmor;
+    }
+
+    public void setUseBlobBattleArmor(final boolean useBlobBattleArmor) {
+        this.useBlobBattleArmor = useBlobBattleArmor;
+    }
+
+    public boolean isUseBlobVehicleCrewGround() {
+        return useBlobVehicleCrewGround;
+    }
+
+    public void setUseBlobVehicleCrewGround(final boolean useBlobVehicleCrewGround) {
+        this.useBlobVehicleCrewGround = useBlobVehicleCrewGround;
+    }
+
+    public boolean isUseBlobVehicleCrewVTOL() {
+        return useBlobVehicleCrewVTOL;
+    }
+
+    public void setUseBlobVehicleCrewVTOL(final boolean useBlobVehicleCrewVTOL) {
+        this.useBlobVehicleCrewVTOL = useBlobVehicleCrewVTOL;
+    }
+
+    public boolean isUseBlobVehicleCrewNaval() {
+        return useBlobVehicleCrewNaval;
+    }
+
+    public void setUseBlobVehicleCrewNaval(final boolean useBlobVehicleCrewNaval) {
+        this.useBlobVehicleCrewNaval = useBlobVehicleCrewNaval;
+    }
+
+    public boolean isUseBlobVesselPilot() {
+        return useBlobVesselPilot;
+    }
+
+    public void setUseBlobVesselPilot(final boolean useBlobVesselPilot) {
+        this.useBlobVesselPilot = useBlobVesselPilot;
+    }
+
+    public boolean isUseBlobVesselGunner() {
+        return useBlobVesselGunner;
+    }
+
+    public void setUseBlobVesselGunner(final boolean useBlobVesselGunner) {
+        this.useBlobVesselGunner = useBlobVesselGunner;
+    }
+
+    public boolean isUseBlobVesselCrew() {
+        return useBlobVesselCrew;
+    }
+
+    public void setUseBlobVesselCrew(final boolean useBlobVesselCrew) {
+        this.useBlobVesselCrew = useBlobVesselCrew;
     }
 
     public boolean isUseMASHTheatres() {
@@ -4587,6 +4676,22 @@ public class CampaignOptions {
 
     public void setEquipmentContractPercent(final double equipmentContractPercent) {
         this.equipmentContractPercent = Math.min(equipmentContractPercent, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
+    }
+
+    public boolean isUseAlternatePaymentMode() {
+        return useAlternatePaymentMode;
+    }
+
+    public void setUseAlternatePaymentMode(final boolean useAlternatePaymentMode) {
+        this.useAlternatePaymentMode = useAlternatePaymentMode;
+    }
+
+    public boolean isUseDiminishingContractPay() {
+        return useDiminishingContractPay;
+    }
+
+    public void setUseDiminishingContractPay(final boolean useDiminishingContractPay) {
+        this.useDiminishingContractPay = useDiminishingContractPay;
     }
 
     public boolean isEquipmentContractBase() {

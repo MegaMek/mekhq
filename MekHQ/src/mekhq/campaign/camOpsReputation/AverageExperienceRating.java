@@ -32,12 +32,18 @@
  */
 package mekhq.campaign.camOpsReputation;
 
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
@@ -145,19 +151,59 @@ public class AverageExperienceRating {
                     continue;
                 }
 
-                // CamOps treats all units as single entities. Tracking down to the individual crew level is a MekHQ
-                // invention. To keep as close to CamOps as possible, we only consider the unit commander when
-                // calculating experience rating.
-                Person commander = unit.getCommander();
-                if (commander == null) { // Unit is uncrewed
-                    continue;
+                int pilotingTargetNumber;
+                int gunneryTargetNumber;
+                if (entity instanceof SmallCraft) { // includes DropShips
+                    // For Small Craft & DropShips we average the piloting and gunnery of the personnel in those roles
+                    double totalPilotingTargetNumbers = 0;
+                    List<Person> drivers = unit.getDrivers();
+                    for (Person driver : drivers) {
+                        SkillModifierData skillModifierData = driver.getSkillModifierData(true);
+                        totalPilotingTargetNumbers += getSkillTargetNumber(driver, entity, skillModifierData, true);
+                    }
+                    int driverCount = drivers.size();
+                    pilotingTargetNumber = driverCount == 0 ? 0 : (int) round(totalPilotingTargetNumbers / driverCount);
+
+                    if (driverCount > 1) {
+                        hasAtLeastOneCrew = true;
+                    }
+
+                    double totalGunneryTargetNumbers = 0;
+                    Set<Person> gunners = unit.getGunners();
+                    for (Person gunner : gunners) {
+                        SkillModifierData skillModifierData = gunner.getSkillModifierData(true);
+                        totalGunneryTargetNumbers += getSkillTargetNumber(gunner, entity, skillModifierData, false);
+                    }
+                    int gunnerCount = gunners.size();
+                    gunneryTargetNumber = gunnerCount == 0 ? 0 : (int) round(totalGunneryTargetNumbers / gunnerCount);
+
+                    if (gunnerCount > 1) {
+                        hasAtLeastOneCrew = true;
+                    }
                 } else {
-                    hasAtLeastOneCrew = true;
+                    // CamOps treats all units as single entities. Tracking down to the individual crew level is a MekHQ
+                    // invention. To keep as close to CamOps as possible, we only consider the unit commander when
+                    // calculating experience rating.
+                    Person commander = unit.getCommander();
+                    if (commander == null) { // Unit is uncrewed
+                        continue;
+                    } else {
+                        hasAtLeastOneCrew = true;
+                    }
+
+                    SkillModifierData skillModifierData = commander.getSkillModifierData(true);
+                    pilotingTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, true);
+                    if (entity.isInfantry()) {
+                        // Total War has infantry without Anti-Mek calculated as if they had Anti-Mek 8+. While
+                        // CamOps doesn't explicitly state that applies here, it does stand to reason that it would.
+                        // Otherwise, infantry units in the players' campaign (without Anti-Mek) would utterly tank
+                        // the players' average experience level.
+                        pilotingTargetNumber = max(8, pilotingTargetNumber);
+                    }
+
+                    gunneryTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, false);
                 }
 
-                SkillModifierData skillModifierData = commander.getSkillModifierData(true);
-                int pilotingTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, true);
-                int gunneryTargetNumber = getSkillTargetNumber(commander, entity, skillModifierData, false);
                 totalExperience += pilotingTargetNumber + gunneryTargetNumber;
                 unitCount++;
             }
@@ -228,7 +274,7 @@ public class AverageExperienceRating {
                   skillType, entity);
             return SkillType.getType(skillType).getTarget() + 1; // Returning the base target number +1
         } else {
-            return Math.max(0, skill.getFinalSkillValue(skillModifierData));
+            return max(0, skill.getFinalSkillValue(skillModifierData));
         }
     }
 }

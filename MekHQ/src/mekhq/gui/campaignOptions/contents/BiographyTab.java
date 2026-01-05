@@ -105,7 +105,6 @@ public class BiographyTab {
     private JSpinner spnNonBinaryDiceSize;
     private JLabel lblFamilyDisplayLevel;
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
-    private JCheckBox chkUseAgeEffects;
     private JPanel pnlAnniversariesPanel;
     private JCheckBox chkAnnounceOfficersOnly;
     private JCheckBox chkAnnounceBirthdays;
@@ -382,7 +381,6 @@ public class BiographyTab {
         lblFamilyDisplayLevel = new JLabel();
         comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel",
               FamilialRelationshipDisplayLevel.values());
-        chkUseAgeEffects = new JCheckBox();
 
         pnlAnniversariesPanel = new JPanel();
         chkAnnounceOfficersOnly = new JCheckBox();
@@ -451,9 +449,6 @@ public class BiographyTab {
         lblFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
         comboFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
 
-        chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects");
-        chkUseAgeEffects.addMouseListener(createTipPanelUpdater(generalHeader, "UseAgeEffects"));
-
         pnlAnniversariesPanel = createAnniversariesPanel();
 
         pnlLifeEvents = createLifeEventsPanel();
@@ -486,10 +481,6 @@ public class BiographyTab {
         panelLeft.add(lblFamilyDisplayLevel, layoutLeft);
         layoutLeft.gridx++;
         panelLeft.add(comboFamilyDisplayLevel, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseAgeEffects, layoutLeft);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -1538,7 +1529,6 @@ public class BiographyTab {
         sldGender.setValue(getPercentFemale()); // 'getPercentFemale' is not stored in a Preset
         spnNonBinaryDiceSize.setValue(options.getNonBinaryDiceSize());
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
-        chkUseAgeEffects.setSelected(options.isUseAgeEffects());
         chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
         chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
         chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
@@ -1616,12 +1606,10 @@ public class BiographyTab {
      * If a preset options object is provided, the changes are applied there. Otherwise, they are applied to the current
      * campaign's options.
      *
-     * @param isCampaignUpgrade     Is triggered as part of the campaign upgrade process
      * @param presetCampaignOptions A {@link CampaignOptions} object to update with the current UI settings, or
      *                              {@code null} to apply changes to the campaign's options directly.
      */
-    public void applyCampaignOptionsToCampaign(boolean isCampaignUpgrade,
-          @Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         RandomOriginOptions originOptions;
         if (presetCampaignOptions == null) {
@@ -1636,7 +1624,6 @@ public class BiographyTab {
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
         options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
-        options.setUseAgeEffects(chkUseAgeEffects.isSelected());
         options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
         options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
         options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());
@@ -1713,10 +1700,6 @@ public class BiographyTab {
         }
 
         // Ranks
-        if (!isCampaignUpgrade) {
-            // We don't change rank when upgrade the campaign across versions, otherwise the players' rank system
-            // will be changed if the campaign rank system and the one in the preset don't match.`
-            rankSystemsPane.applyToCampaign();
-        }
+        rankSystemsPane.applyToCampaign();
     }
 }

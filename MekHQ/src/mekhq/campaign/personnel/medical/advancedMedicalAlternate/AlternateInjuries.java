@@ -89,6 +89,7 @@ public class AlternateInjuries {
     private static final int WEEKLY_CHECK_ILLNESS_HEALING_DAYS = 7;
     private static final int POSTPARTUM_RECOVERY_HEALING_DAYS = 21; // Internet says 6 weeks
     private static final int TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS = 1;
+    private static final int OLD_WOUND_HEALING_DAYS = 7;
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -149,6 +150,8 @@ public class AlternateInjuries {
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
     public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
     public static final InjuryType CATATONIA = new ChronicDisassociation();
+    public static final InjuryType TERRIBLE_BRUISES = new TerribleBruises();
+    public static final InjuryType OLD_WOUND = new OldWound();
     // Diseases
     public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
     public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
@@ -277,6 +280,7 @@ public class AlternateInjuries {
     public static final InjuryType DERMAL_MYOMER_LEG_ARMOR = new DermalMyomerArmorLeg();
     public static final InjuryType DERMAL_MYOMER_LEG_CAMO = new DermalMyomerCamoLeg();
     public static final InjuryType DERMAL_MYOMER_LEG_TRIPLE = new DermalMyomerTripleLeg();
+    public static final InjuryType PROTOTYPE_VDNI = new PrototypeVDNI();
     public static final InjuryType VEHICULAR_DNI = new VehicularDNI();
     public static final InjuryType BUFFERED_VDNI = new BufferedVDNI();
     public static final InjuryType BUFFERED_VDNI_TRIPLE_CORE = new BufferedVDNITripleCore();
@@ -2111,6 +2115,17 @@ public class AlternateInjuries {
         }
     }
 
+    public static final class PrototypeVDNI extends Prosthetic {
+        PrototypeVDNI() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.PROTOTYPE_VDNI.simpleName");
+            this.injurySubType = IMPLANT_VDNI;
+            this.allowedLocations = Set.of(BRAIN);
+            this.injuryEffect = NONE;
+        }
+    }
+
     public static final class VehicularDNI extends Prosthetic {
         VehicularDNI() {
             super();
@@ -2296,6 +2311,30 @@ public class AlternateInjuries {
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.CATATONIA.simpleName");
             this.injurySubType = FLAW;
+        }
+    }
+
+    public static final class TerribleBruises extends BaseInjury {
+        TerribleBruises() {
+            super(WEEKLY_CHECK_ILLNESS_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.TERRIBLE_BRUISES.simpleName");
+            this.injurySubType = FLAW;
+        }
+    }
+
+    public static final class OldWound extends BaseInjury {
+        OldWound() {
+            super(OLD_WOUND_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.OLD_WOUND.simpleName");
         }
     }
 }

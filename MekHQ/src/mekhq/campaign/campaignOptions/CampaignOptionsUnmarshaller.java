@@ -250,6 +250,9 @@ public class CampaignOptionsUnmarshaller {
             case "dropShipContractPercent" -> campaignOptions.setDropShipContractPercent(parseDouble(nodeContents));
             case "jumpShipContractPercent" -> campaignOptions.setJumpShipContractPercent(parseDouble(nodeContents));
             case "warShipContractPercent" -> campaignOptions.setWarShipContractPercent(parseDouble(nodeContents));
+            case "useAlternatePaymentMode" -> campaignOptions.setUseAlternatePaymentMode(parseBoolean(nodeContents));
+            case "useDiminishingContractPay" ->
+                  campaignOptions.setUseDiminishingContractPay(parseBoolean(nodeContents));
             case "equipmentContractBase" -> campaignOptions.setEquipmentContractBase(parseBoolean(nodeContents));
             case "equipmentContractSaleValue" -> campaignOptions.setEquipmentContractSaleValue(parseBoolean(
                   nodeContents));
@@ -384,6 +387,8 @@ public class CampaignOptionsUnmarshaller {
             case "useUsefulMedics" -> campaignOptions.setIsUseUsefulMedics(parseBoolean(nodeContents));
             case "useMASHTheatres" -> campaignOptions.setIsUseMASHTheatres(parseBoolean(nodeContents));
             case "mashTheatreCapacity" -> campaignOptions.setMASHTheatreCapacity(parseInt(nodeContents));
+            case "useBlobInfantry" -> campaignOptions.setUseBlobInfantry(parseBoolean(nodeContents));
+            case "useBlobBattleArmor" -> campaignOptions.setUseBlobBattleArmor(parseBoolean(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
                   nodeContents));
             case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
