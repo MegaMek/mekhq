@@ -1187,7 +1187,11 @@ public enum PersonnelTableModelColumn {
 
             if (baseTooltip != null) {
                 // Combine existing tooltip with color reasons
-                return "<html>" + stripHtmlTags(baseTooltip) + "<br><i>" + colorReasons + "</i></html>";
+                return "<html>" +
+                             ReportingUtilities.stripHtmlTags(baseTooltip) +
+                             "<br><i>" +
+                             colorReasons +
+                             "</i></html>";
             } else {
                 return "<html><i>" + colorReasons + "</i></html>";
             }
@@ -1227,16 +1231,6 @@ public enum PersonnelTableModelColumn {
         return this == PERSON || this == FIRST_NAME || this == LAST_NAME ||
                      this == GIVEN_NAME || this == SURNAME || this == BLOODNAME ||
                      this == RANK || this == PERSONNEL_STATUS;
-    }
-
-    /**
-     * Strips HTML tags from a tooltip string for re-wrapping.
-     */
-    private String stripHtmlTags(String text) {
-        if (text == null) {
-            return null;
-        }
-        return text.replaceAll("</?html>", "").replaceAll("</?HTML>", "");
     }
 
     public int getWidth() {

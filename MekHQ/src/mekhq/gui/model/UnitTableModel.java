@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table Model for displaying information about units
@@ -379,7 +380,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
                     if (tooltip != null) {
                         // Strip existing html tags and wrap combined tooltip
-                        String baseText = tooltip.replaceAll("</?html>", "").replaceAll("</?HTML>", "");
+                        String baseText = ReportingUtilities.stripHtmlTags(tooltip);
                         tooltip = "<html>" + baseText + "<br><i>" + colorReasons + "</i></html>";
                     } else {
                         tooltip = "<html><i>" + colorReasons + "</i></html>";
