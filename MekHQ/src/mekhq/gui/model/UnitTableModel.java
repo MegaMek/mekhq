@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table Model for displaying information about units
@@ -301,7 +302,17 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 Force force = unit.getCampaign().getForce(unit.getForceId());
                 yield (force != null) ? force.getFullName() : "-";
             }
-            case COL_CREW -> unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+            case COL_CREW -> {
+                int totalTempCrew = unit.getTotalTempCrew();
+
+                if (totalTempCrew == 0) {
+                    yield unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+                } else {
+                    yield (totalTempCrew + unit.getActiveCrew().size()) +
+                        "(" + unit.getActiveCrew().size() + ")" +
+                        "/" + unit.getFullCrewSize();
+                }
+            }
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
             case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
             case COL_MAINTAIN_CYCLE -> {
@@ -341,6 +352,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
+        private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
               int row, int column) {
@@ -349,14 +362,43 @@ public class UnitTableModel extends DataTableModel<Unit> {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             setHorizontalAlignment(getAlignment(actualCol));
-            setToolTipText(getTooltip(actualRow, actualCol));
+
             Unit u = getUnit(actualRow);
+
+            // Get base tooltip and potentially append all color reasons for key columns
+            String tooltip = getTooltip(actualRow, actualCol);
+            if (isColorTooltipColumn(actualCol)) {
+                List<String> colorReasonKeys = u.getColorReasonKeys();
+                if (!colorReasonKeys.isEmpty()) {
+                    StringBuilder colorReasons = new StringBuilder();
+                    for (String key : colorReasonKeys) {
+                        if (colorReasons.length() > 0) {
+                            colorReasons.append("<br>");
+                        }
+                        colorReasons.append(getTextAt(GUI_RESOURCE_BUNDLE, key));
+                    }
+
+                    if (tooltip != null) {
+                        // Strip existing html tags and wrap combined tooltip
+                        String baseText = ReportingUtilities.stripHtmlTags(tooltip);
+                        tooltip = "<html>" + baseText + "<br><i>" + colorReasons + "</i></html>";
+                    } else {
+                        tooltip = "<html><i>" + colorReasons + "</i></html>";
+                    }
+                }
+            }
+            setToolTipText(tooltip);
 
             if (!isSelected) {
                 setForeground(u.determineForegroundColor("Table"));
                 setBackground(u.determineBackgroundColor("Table"));
             }
             return this;
+        }
+
+        private boolean isColorTooltipColumn(int columnIndex) {
+            return columnIndex == COL_NAME || columnIndex == COL_TYPE ||
+                         columnIndex == COL_WEIGHT_CLASS || columnIndex == COL_STATUS;
         }
     }
 

@@ -1553,7 +1553,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     protected void addTurrets(List<Entity> list, int num, SkillLevel skill, int quality, Campaign campaign,
           Faction faction) {
-        list.addAll(AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction));
+        List<Entity> turrets =
+              campaign.getCampaignOptions().isUseAdvancedBuildingGunEmplacements()
+                   ? AtBDynamicScenarioFactory.generateGunEmplacements(num, skill, quality, campaign, faction)
+                   : AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction);
+        list.addAll(turrets);
     }
 
     /**

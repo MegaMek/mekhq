@@ -336,8 +336,8 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblTransportAmount2() {
-        lblTransportAmount2.setText("-" + contract.getTotalTransportationFees(campaign)
-                                                .toAmountAndSymbolString());
+        // Show employer's transport reimbursement as positive income
+        lblTransportAmount2.setText(contract.getTransportAmount().toAmountAndSymbolString());
     }
 
     private void setLblFeeAmount2() {
@@ -397,8 +397,10 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblTransportationExpenses2() {
+        // Show full transport cost as expense (employer reimbursement shown separately in income section offsets this)
         lblTransportationExpenses2.setText("-" +
-                                                 contract.getTransportAmount().toAmountAndSymbolString());
+                                                 contract.getTotalTransportationFees(campaign)
+                                                       .toAmountAndSymbolString());
     }
 
     private void setLblEstimatedProfit2() {

@@ -202,7 +202,7 @@ public class AdvancedMedicalAlternateHealing {
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
                 if (injury.getTime() <= 0) { // Time to try and fully heal the injury
-                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess);
+                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, null, injury, marginOfSuccess);
                 } else if (marginOfSuccess <= -6) { // The injury became permanent
                     injury.setPermanent(true);
@@ -330,7 +330,7 @@ public class AdvancedMedicalAlternateHealing {
                     int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(doctor, modifiers, miscPenalty, useEdge);
 
-                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess);
+                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, doctor, injury, marginOfSuccess);
                 }
             }
@@ -441,14 +441,14 @@ public class AdvancedMedicalAlternateHealing {
      * @since 0.50.10
      */
     private static void processHealingEffects(boolean isUseFatigue, int fatigueRate, Person patient, Injury injury,
-          int marginOfSuccess) {
+          int marginOfSuccess, LocalDate today) {
         HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess);
         if (isUseFatigue) {
             patient.changeFatigue(healingEffect.getFatigueDamage() * fatigueRate);
         }
 
         if (healingEffect.isHealed()) {
-            patient.removeInjury(injury);
+            patient.removeInjury(injury, today);
 
             if (patient.getInjuries().isEmpty()) {
                 // AAM doesn't use 'days to wait for healing' so we just set it to '1.' If the player toggles AAM off,

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.adapter;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
@@ -653,12 +654,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_IMPROVE: {
-                String type = data[1];
-                int cost = MathUtility.parseInt(data[2]);
-                selectedPerson.improveSkill(type);
-                selectedPerson.spendXPOnSkills(getCampaign(), cost);
+                String skillName = data[1];
+                Skill skill = selectedPerson.getSkill(skillName);
 
-                Skill skill = selectedPerson.getSkill(type);
+                int baseCost = selectedPerson.getCostToImprove(skillName,
+                      getCampaignOptions().isUseReasoningXpMultiplier());
+                if (skill != null) {
+                    skill.changeXpProgress(-baseCost);
+                }
+
+                int cost = MathUtility.parseInt(data[2]);
+                selectedPerson.improveSkill(skillName);
+                selectedPerson.spendXPOnSkills(getCampaign(), cost);
                 SkillType skillType = skill.getType();
 
                 PerformanceLogger.improvedSkill(getCampaignOptions().isPersonnelLogSkillGain(),
@@ -668,7 +675,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       skill.getLevel());
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
-                      type));
+                      skillName));
 
                 getCampaign().personUpdated(selectedPerson);
                 break;
@@ -1565,7 +1572,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_CLEAR_INJURIES: {
                 for (Person person : people) {
-                    person.clearInjuriesExcludingProsthetics();
+                    person.clearInjuriesExcludingProsthetics(getCampaign().getLocalDate());
                     Unit unit = person.getUnit();
                     if (null != unit) {
                         unit.resetPilotAndEntity();
@@ -1575,7 +1582,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_CLEAR_PROSTHETICS: {
                 for (Person person : people) {
-                    person.clearProstheticInjuries();
+                    person.clearProstheticInjuries(getCampaign().getLocalDate());
                     Unit unit = person.getUnit();
                     if (null != unit) {
                         unit.resetPilotAndEntity();
@@ -1593,7 +1600,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
                 if (toRemove != null) {
-                    selectedPerson.removeInjury(toRemove);
+                    selectedPerson.removeInjury(toRemove, getCampaign().getLocalDate());
                 }
                 Unit u = selectedPerson.getUnit();
                 if (null != u) {
@@ -1624,7 +1631,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
                 Inoculations.triggerDiseaseSpreadMessages(getCampaign(), !getCampaign().getLocation().isOnPlanet(),
-                      Collections.singleton(disease.getSimpleName()));
+                      Set.of(disease.getSimpleName()));
                 for (Person person : people) {
                     Inoculations.applyDisease(getCampaign(), person, disease);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -1919,7 +1926,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Injury newInjury = REPLACEMENT_LIMB_RECOVERY.newInjury(campaign, selectedPerson, location, hitCount);
                 newInjury.setWorkedOn(true);
 
-                selectedPerson.removeInjury(injury);
+                selectedPerson.removeInjury(injury, campaign.getLocalDate());
                 selectedPerson.addInjury(newInjury);
                 break;
             }
@@ -2979,6 +2986,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
+                    Skill skill = person.getSkill(typeName);
+                    if (skill != null) {
+                        cost = max(0, cost - skill.getXpProgress());
+                    }
+
                     if (Objects.equals(typeName, S_ARTILLERY)) {
                         if (!getCampaignOptions().isUseArtillery()) {
                             continue;
@@ -3006,8 +3018,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.setActionCommand(makeCommand(CMD_IMPROVE, typeName, String.valueOf(cost)));
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(person.getXP() >= cost);
-                    if (person.hasSkill(typeName)) {
-                        Skill skill = person.getSkill(typeName);
+                    if (skill != null) {
                         if (skill.isImprovementLegal()) {
                             SkillType skillType = getType(typeName);
                             if (skillType == null) {

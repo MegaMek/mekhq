@@ -273,6 +273,16 @@ public class CampaignOptions {
     private boolean useMASHTheatres;
     private int mashTheatreCapacity;
 
+    // Blob Crew
+    private boolean useBlobInfantry;
+    private boolean useBlobBattleArmor;
+    private boolean useBlobVehicleCrewGround;
+    private boolean useBlobVehicleCrewVTOL;
+    private boolean useBlobVehicleCrewNaval;
+    private boolean useBlobVesselPilot;
+    private boolean useBlobVesselGunner;
+    private boolean useBlobVesselCrew;
+
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
     private boolean useFunctionalEscapeArtist;
@@ -655,6 +665,7 @@ public class CampaignOptions {
     private boolean usePlanetaryConditions;
     private boolean useNoTornadoes;
     private int fixedMapChance;
+    private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
     private int scenarioModMax;
     private int scenarioModChance;
@@ -865,6 +876,16 @@ public class CampaignOptions {
         useUsefulMedics = false;
         useMASHTheatres = false;
         mashTheatreCapacity = 25;
+
+        // Blob Crew
+        useBlobInfantry = false;
+        useBlobBattleArmor = false;
+        useBlobVehicleCrewGround = false;
+        useBlobVehicleCrewVTOL = false;
+        useBlobVehicleCrewNaval = false;
+        useBlobVesselPilot = false;
+        useBlobVesselGunner = false;
+        useBlobVesselCrew = false;
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1319,6 +1340,7 @@ public class CampaignOptions {
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
         setFixedMapChance(25);
+        setUseAdvancedBuildingGunEmplacements(false);
         setSpaUpgradeIntensity(0);
         regionalMekVariations = false;
         attachedPlayerCamouflage = true;
@@ -2101,6 +2123,70 @@ public class CampaignOptions {
 
     public void setIsUseUsefulMedics(final boolean useUsefulMedics) {
         this.useUsefulMedics = useUsefulMedics;
+    }
+
+    public boolean isUseBlobInfantry() {
+        return useBlobInfantry;
+    }
+
+    public void setUseBlobInfantry(final boolean useBlobInfantry) {
+        this.useBlobInfantry = useBlobInfantry;
+    }
+
+    public boolean isUseBlobBattleArmor() {
+        return useBlobBattleArmor;
+    }
+
+    public void setUseBlobBattleArmor(final boolean useBlobBattleArmor) {
+        this.useBlobBattleArmor = useBlobBattleArmor;
+    }
+
+    public boolean isUseBlobVehicleCrewGround() {
+        return useBlobVehicleCrewGround;
+    }
+
+    public void setUseBlobVehicleCrewGround(final boolean useBlobVehicleCrewGround) {
+        this.useBlobVehicleCrewGround = useBlobVehicleCrewGround;
+    }
+
+    public boolean isUseBlobVehicleCrewVTOL() {
+        return useBlobVehicleCrewVTOL;
+    }
+
+    public void setUseBlobVehicleCrewVTOL(final boolean useBlobVehicleCrewVTOL) {
+        this.useBlobVehicleCrewVTOL = useBlobVehicleCrewVTOL;
+    }
+
+    public boolean isUseBlobVehicleCrewNaval() {
+        return useBlobVehicleCrewNaval;
+    }
+
+    public void setUseBlobVehicleCrewNaval(final boolean useBlobVehicleCrewNaval) {
+        this.useBlobVehicleCrewNaval = useBlobVehicleCrewNaval;
+    }
+
+    public boolean isUseBlobVesselPilot() {
+        return useBlobVesselPilot;
+    }
+
+    public void setUseBlobVesselPilot(final boolean useBlobVesselPilot) {
+        this.useBlobVesselPilot = useBlobVesselPilot;
+    }
+
+    public boolean isUseBlobVesselGunner() {
+        return useBlobVesselGunner;
+    }
+
+    public void setUseBlobVesselGunner(final boolean useBlobVesselGunner) {
+        this.useBlobVesselGunner = useBlobVesselGunner;
+    }
+
+    public boolean isUseBlobVesselCrew() {
+        return useBlobVesselCrew;
+    }
+
+    public void setUseBlobVesselCrew(final boolean useBlobVesselCrew) {
+        this.useBlobVesselCrew = useBlobVesselCrew;
     }
 
     public boolean isUseMASHTheatres() {
@@ -5258,6 +5344,14 @@ public class CampaignOptions {
 
     public void setFixedMapChance(final int fixedMapChance) {
         this.fixedMapChance = fixedMapChance;
+    }
+
+    public boolean isUseAdvancedBuildingGunEmplacements() {
+        return useAdvancedBuildingGunEmplacements;
+    }
+
+    public void setUseAdvancedBuildingGunEmplacements(final boolean useAdvancedBuildingGunEmplacements) {
+        this.useAdvancedBuildingGunEmplacements = useAdvancedBuildingGunEmplacements;
     }
 
     public int getSpaUpgradeIntensity() {

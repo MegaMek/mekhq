@@ -321,8 +321,58 @@ public final class InjuryTypes {
             InjuryType.register(192, "alt:IMPLANT_REMOVAL_RECOVERY", AlternateInjuries.IMPLANT_REMOVAL_RECOVERY);
             InjuryType.register(193, "alt:SECONDARY_POWER_SUPPLY", AlternateInjuries.SECONDARY_POWER_SUPPLY);
             InjuryType.register(194, "alt:PROTOTYPE_VDNI", AlternateInjuries.PROTOTYPE_VDNI);
-            InjuryType.register(195, "alt:TERRIBLE_BRUISES", AlternateInjuries.TERRIBLE_BRUISES);
-            InjuryType.register(196, "alt:OLD_WOUND", AlternateInjuries.OLD_WOUND);
+            InjuryType.register(195, "alt:ALARION_HANTA_VIRUS", AlternateInjuries.ALARION_HANTA_VIRUS);
+            InjuryType.register(196, "alt:ALBIERO_CONSUMPTION", AlternateInjuries.ALBIERO_CONSUMPTION);
+            InjuryType.register(197, "alt:ALGEDI_BLOOD_BURN", AlternateInjuries.ALGEDI_BLOOD_BURN);
+            InjuryType.register(198, "alt:ANCHA_VIRUS", AlternateInjuries.ANCHA_VIRUS);
+            InjuryType.register(199, "alt:BETHOLD_SYNDROME", AlternateInjuries.BETHOLD_SYNDROME);
+            InjuryType.register(200, "alt:BLACK_MARSH_FEVER", AlternateInjuries.BLACK_MARSH_FEVER);
+            InjuryType.register(201, "alt:BRISBANE_VIRUS", AlternateInjuries.BRISBANE_VIRUS);
+            InjuryType.register(202, "alt:CHELOSIAN_VIRUS", AlternateInjuries.CHELOSIAN_VIRUS);
+            InjuryType.register(203, "alt:CHILDUS_FEVER", AlternateInjuries.CHILDUS_FEVER);
+            InjuryType.register(204, "alt:CHUNGALOMENINGITIS_AMARIS", AlternateInjuries.CHUNGALOMENINGITIS_AMARIS);
+            InjuryType.register(205,
+                  "alt:CHUNGALOMENINGITIS_TRADITIONAL",
+                  AlternateInjuries.CHUNGALOMENINGITIS_TRADITIONAL);
+            InjuryType.register(206, "alt:CROMARTY_SUPERFLU", AlternateInjuries.CROMARTY_SUPERFLU);
+            InjuryType.register(207, "alt:CURSE_OF_EDEN", AlternateInjuries.CURSE_OF_EDEN);
+            InjuryType.register(208, "alt:CURSE_OF_GALEDON", AlternateInjuries.CURSE_OF_GALEDON);
+            InjuryType.register(209, "alt:CUSSET_CRUD", AlternateInjuries.CUSSET_CRUD);
+            InjuryType.register(210, "alt:DANGMARS_FEVER", AlternateInjuries.DANGMARS_FEVER);
+            InjuryType.register(211, "alt:DARRS_DISEASE", AlternateInjuries.DARRS_DISEASE);
+            InjuryType.register(212, "alt:DELPHI_CURSE", AlternateInjuries.DELPHI_CURSE);
+            InjuryType.register(213, "alt:DEVILITCH", AlternateInjuries.DEVILITCH);
+            InjuryType.register(214, "alt:DOWNING_POLTURS_DISEASE", AlternateInjuries.DOWNING_POLTURS_DISEASE);
+            InjuryType.register(215, "alt:EDISON_WHITE_FLU", AlternateInjuries.EDISON_WHITE_FLU);
+            InjuryType.register(216, "alt:ELTANIN_BRAIN_FEVER", AlternateInjuries.ELTANIN_BRAIN_FEVER);
+            InjuryType.register(217, "alt:FENRIS_PLAGUE", AlternateInjuries.FENRIS_PLAGUE);
+            InjuryType.register(218, "alt:GALAX_PATHOGEN", AlternateInjuries.GALAX_PATHOGEN);
+            InjuryType.register(219, "alt:GARMS_SYNDROME", AlternateInjuries.GARMS_SYNDROME);
+            InjuryType.register(220, "alt:GENOAN_SPINAL_MENINGITIS", AlternateInjuries.GENOAN_SPINAL_MENINGITIS);
+            InjuryType.register(221, "alt:HYBORIAN_BLOOD_PLAGUE", AlternateInjuries.HYBORIAN_BLOOD_PLAGUE);
+            InjuryType.register(222, "alt:KAER_PATHOGEN", AlternateInjuries.KAER_PATHOGEN);
+            InjuryType.register(223, "alt:KILEN_WATTS_SYNDROME", AlternateInjuries.KILEN_WATTS_SYNDROME);
+            InjuryType.register(224, "alt:KNIGHTS_GRASSE_SYNDROME", AlternateInjuries.KNIGHTS_GRASSE_SYNDROME);
+            InjuryType.register(225, "alt:LAENS_REGRET", AlternateInjuries.LAENS_REGRET);
+            InjuryType.register(226, "alt:LANDMARK_SUPERVIRUS", AlternateInjuries.LANDMARK_SUPERVIRUS);
+            InjuryType.register(227, "alt:MIAPLACIDUS_PLAGUE", AlternateInjuries.MIAPLACIDUS_PLAGUE);
+            InjuryType.register(228, "alt:NEISSERIA_MALTHUSIA", AlternateInjuries.NEISSERIA_MALTHUSIA);
+            InjuryType.register(229, "alt:NEO_SMALLPOX", AlternateInjuries.NEO_SMALLPOX);
+            InjuryType.register(230, "alt:NOTILC_SWEATS", AlternateInjuries.NOTILC_SWEATS);
+            InjuryType.register(231, "alt:NYKVARN_VIRUS", AlternateInjuries.NYKVARN_VIRUS);
+            InjuryType.register(232, "alt:OCKHAMS_BLOOD_DISEASE", AlternateInjuries.OCKHAMS_BLOOD_DISEASE);
+            InjuryType.register(233, "alt:PINGREE_FEVER", AlternateInjuries.PINGREE_FEVER);
+            InjuryType.register(234, "alt:REDBURN_VIRUS", AlternateInjuries.REDBURN_VIRUS);
+            InjuryType.register(235, "alt:ROCKLAND_FEVER", AlternateInjuries.ROCKLAND_FEVER);
+            InjuryType.register(236, "alt:SCOURGE_PLAGUE", AlternateInjuries.SCOURGE_PLAGUE);
+            InjuryType.register(237, "alt:SKOKIE_SHIVERS", AlternateInjuries.SKOKIE_SHIVERS);
+            InjuryType.register(238, "alt:TOXOPLASMA_GONDII_HARDCOREA", AlternateInjuries.TOXOPLASMA_GONDII_HARDCOREA);
+            InjuryType.register(239, "alt:UNOLE_FLU", AlternateInjuries.UNOLE_FLU);
+            InjuryType.register(240, "alt:WINSONS_REGRET", AlternateInjuries.WINSONS_REGRET);
+            InjuryType.register(241, "alt:YIMPISEE_FEVER", AlternateInjuries.YIMPISEE_FEVER);
+            InjuryType.register(242, "alt:BIRTH_DEFECT", AlternateInjuries.BIRTH_DEFECT);
+            InjuryType.register(243, "alt:TERRIBLE_BRUISES", AlternateInjuries.TERRIBLE_BRUISES);
+            InjuryType.register(244, "alt:OLD_WOUND", AlternateInjuries.OLD_WOUND);
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
             InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
@@ -478,18 +528,18 @@ public final class InjuryTypes {
         }
 
         @Override
-        public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
+        public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
             String secondEffectFluff = "development of a chronic traumatic encephalopathy";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
                 secondEffectFluff = worseningChance + "% chance of " + secondEffectFluff;
             }
-            return Arrays.asList(newResetRecoveryTimeAction(i), new GameEffect(secondEffectFluff, rnd -> {
+            return Arrays.asList(newResetRecoveryTimeAction(injury), new GameEffect(secondEffectFluff, rnd -> {
                 if (rnd.applyAsInt(6) + hits >= 5) {
-                    Injury cte = CTE.newInjury(c, p, BodyLocation.HEAD, 1);
-                    p.addInjury(cte);
-                    p.removeInjury(i);
-                    MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(p, c.getLocalDate());
+                    Injury cte = CTE.newInjury(campaign, person, BodyLocation.HEAD, 1);
+                    person.addInjury(cte);
+                    person.removeInjury(injury, campaign.getLocalDate());
+                    MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(person, campaign.getLocalDate());
                     LOGGER.info(entry.toString());
                 }
             }));
@@ -832,25 +882,26 @@ public final class InjuryTypes {
         }
 
         @Override
-        public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
-            String secondEffectFluff = (i.getHits() == 1) ?
+        public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
+            String secondEffectFluff = (injury.getHits() == 1) ?
                                              "concussion worsening" :
                                              "development of a cerebral contusion";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
                 secondEffectFluff = worseningChance + "% chance of " + secondEffectFluff;
             }
-            return Arrays.asList(newResetRecoveryTimeAction(i), new GameEffect(secondEffectFluff, rnd -> {
+            return Arrays.asList(newResetRecoveryTimeAction(injury), new GameEffect(secondEffectFluff, rnd -> {
                 if (rnd.applyAsInt(6) + hits >= 5) {
-                    if (i.getHits() == 1) {
-                        i.setHits(2);
-                        MedicalLogEntry entry = MedicalLogger.concussionWorsened(p, c.getLocalDate());
+                    if (injury.getHits() == 1) {
+                        injury.setHits(2);
+                        MedicalLogEntry entry = MedicalLogger.concussionWorsened(person, campaign.getLocalDate());
                         LOGGER.info(entry.toString());
                     } else {
-                        Injury cerebralContusion = CEREBRAL_CONTUSION.newInjury(c, p, BodyLocation.HEAD, 1);
-                        p.addInjury(cerebralContusion);
-                        p.removeInjury(i);
-                        MedicalLogEntry entry = MedicalLogger.developedCerebralContusion(p, c.getLocalDate());
+                        Injury cerebralContusion = CEREBRAL_CONTUSION.newInjury(campaign, person, BodyLocation.HEAD, 1);
+                        person.addInjury(cerebralContusion);
+                        person.removeInjury(injury, campaign.getLocalDate());
+                        MedicalLogEntry entry = MedicalLogger.developedCerebralContusion(person,
+                              campaign.getLocalDate());
                         LOGGER.info(entry.toString());
                     }
                 }

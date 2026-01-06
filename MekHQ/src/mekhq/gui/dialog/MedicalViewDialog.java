@@ -41,6 +41,7 @@ import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -199,11 +200,11 @@ public class MedicalViewDialog extends JDialog {
                     if (!locationPicked) {
                         // Heal all injuries
                         for (Injury injury : new ArrayList<>(person.getInjuries())) {
-                            person.removeInjury(injury);
+                            person.removeInjury(injury, campaign.getLocalDate());
                         }
                     } else {
                         for (Injury injury : getInjuriesAtLocation(bodyLocation)) {
-                            person.removeInjury(injury);
+                            person.removeInjury(injury, campaign.getLocalDate());
                         }
                     }
                     revalidate();
@@ -550,7 +551,8 @@ public class MedicalViewDialog extends JDialog {
                 }
 
                 if (campaign.isGM()) {
-                    injuryLabel.addMouseListener(new InjuryLabelMouseAdapter(injuryLabel, person, injury));
+                    injuryLabel.addMouseListener(new InjuryLabelMouseAdapter(injuryLabel, campaign.getLocalDate(),
+                          person, injury));
                 }
 
                 JPanel wrapper = new JPanel();
@@ -635,6 +637,7 @@ public class MedicalViewDialog extends JDialog {
     }
 
     private static class InjuryLabelMouseAdapter extends MouseAdapter {
+        private final LocalDate today;
         private final JLabel label;
         private final Person person;
         private final Injury injury;
@@ -642,8 +645,9 @@ public class MedicalViewDialog extends JDialog {
         private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
               MekHQ.getMHQOptions().getLocale());
 
-        public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {
+        public InjuryLabelMouseAdapter(JLabel label, LocalDate today, Person person, Injury injury) {
             this.label = label;
+            this.today = today;
             this.person = person;
             this.injury = injury;
             this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage()
@@ -679,7 +683,7 @@ public class MedicalViewDialog extends JDialog {
                 popup.add(edit);
                 JMenuItem remove = new JMenuItem(resourceMap.getString("menuRemove.text"), healImageIcon);
                 remove.addActionListener(ae -> {
-                    person.removeInjury(injury);
+                    person.removeInjury(injury, today);
                     label.getRootPane().getParent().revalidate();
                 });
                 popup.add(remove);

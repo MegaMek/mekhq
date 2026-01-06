@@ -41,13 +41,18 @@ import static mekhq.campaign.market.contractMarket.ContractAutomation.performAut
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -58,6 +63,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
@@ -66,7 +72,9 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -292,6 +300,7 @@ public class CurrentLocation {
      */
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
+        LocalDate today = campaign.getLocalDate();
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
@@ -301,7 +310,7 @@ public class CurrentLocation {
         // recharge even if there is no jump path
         // because JumpShips don't go anywhere
         double hours = 24.0;
-        double neededRechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit);
+        double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
             campaign.addReport(GENERAL, "JumpShips spent " +
@@ -334,9 +343,9 @@ public class CurrentLocation {
                 if (campaignOptions.isUseAbilities()) {
                     checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
-                campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(campaign.getLocalDate()));
+                campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
                 currentSystem = jumpPath.get(1);
-                jumpZenith = pickJumpPoint(campaign.getLocalDate());
+                jumpZenith = pickJumpPoint(today);
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
                 // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is
@@ -372,6 +381,10 @@ public class CurrentLocation {
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
             }
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
+            }
         }
 
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
@@ -388,6 +401,53 @@ public class CurrentLocation {
             }
 
             testForEarlyArrival(campaign);
+        }
+    }
+
+    private void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(currentSystem.getId(),
+              today, true);
+
+        // Check for bioweapon attacks
+        Set<InjuryType> activeBioweapons = getAllActiveBioweapons(currentSystem.getId(), today, true);
+        for (InjuryType bioweapon : activeBioweapons) {
+            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
+                  campaign.getCommanderAddress());
+            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.outOfCharacter",
+                  currentSystem.getName(today), bioweapon.getSimpleName());
+            if (availableCures.contains(bioweapon)) {
+                bottomMessage += getTextAt(RESOURCE_BUNDLE,
+                      "disease.outOfCharacter.vaccineStatus.available");
+            } else {
+                bottomMessage += getTextAt(RESOURCE_BUNDLE,
+                      "disease.outOfCharacter.vaccineStatus.none");
+            }
+
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorMedicalPerson(),
+                  null,
+                  centerMessage,
+                  null,
+                  bottomMessage,
+                  null,
+                  false,
+                  ImmersiveDialogWidth.LARGE);
+        }
+
+        // Check for active disease outbreaks
+        Set<InjuryType> activeDiseases = getAllActiveDiseases(currentSystem.getId(), today, true);
+        for (InjuryType disease : activeDiseases) {
+            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter",
+                  campaign.getCommanderAddress());
+            if (availableCures.contains(disease)) {
+                centerMessage += getTextAt(RESOURCE_BUNDLE,
+                      "disease.outOfCharacter.vaccineStatus.available");
+            } else {
+                centerMessage += getTextAt(RESOURCE_BUNDLE,
+                      "disease.outOfCharacter.vaccineStatus.none");
+            }
+
+            new ImmersiveDialogNotification(campaign, centerMessage, true);
         }
     }
 

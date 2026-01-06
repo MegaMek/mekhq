@@ -58,6 +58,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.AbstractBuildingEntity;
 import megamek.common.units.Aero;
 import megamek.common.units.ConvFighter;
 import megamek.common.units.Entity;
@@ -1141,7 +1142,7 @@ public class SkillType {
     }
 
     public static String getDrivingSkillFor(Entity en) {
-        if (en instanceof Tank) {
+        if (en instanceof Tank || en instanceof AbstractBuildingEntity) {
             return switch (en.getMovementMode()) {
                 case VTOL -> S_PILOT_VTOL;
                 case NAVAL, HYDROFOIL, SUBMARINE -> S_PILOT_NVEE;
@@ -1163,7 +1164,7 @@ public class SkillType {
     }
 
     public static String getGunnerySkillFor(Entity en) {
-        if (en instanceof Tank) {
+        if (en instanceof Tank || en instanceof AbstractBuildingEntity) {
             return S_GUN_VEE;
         } else if ((en instanceof SmallCraft) || (en instanceof Jumpship)) {
             return S_GUN_SPACE;
