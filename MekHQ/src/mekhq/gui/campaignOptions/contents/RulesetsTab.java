@@ -111,6 +111,7 @@ public class RulesetsTab {
 
     private JCheckBox chkAttachedPlayerCamouflage;
     private JCheckBox chkPlayerControlsAttachedUnits;
+    private JCheckBox chkUseAdvancedBuildingGunEmplacements;
     private JLabel lblSPAUpgradeIntensity;
     private JSpinner spnSPAUpgradeIntensity;
     private JCheckBox chkAutoConfigMunitions;
@@ -305,6 +306,7 @@ public class RulesetsTab {
 
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
         chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
+        chkUseAdvancedBuildingGunEmplacements = new CampaignOptionsCheckBox("UseAdvancedBuildingGunEmplacements");
         lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity",
               0, -1, 3, 1);
@@ -374,6 +376,9 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkAutoConfigMunitions, layout);
+
+        layout.gridy++;
+        panel.add(chkUseAdvancedBuildingGunEmplacements, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -806,6 +811,8 @@ public class RulesetsTab {
         chkAttachedPlayerCamouflage.addMouseListener(createTipPanelUpdater(stratConHeader, "AttachedPlayerCamouflage"));
         chkPlayerControlsAttachedUnits.addMouseListener(createTipPanelUpdater(stratConHeader,
               "PlayerControlsAttachedUnits"));
+        chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "UseAdvancedBuildingGunEmplacements"));
         lblSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater(stratConHeader, "SPAUpgradeIntensity"));
         spnSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater(stratConHeader, "SPAUpgradeIntensity"));
         chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
@@ -944,6 +951,7 @@ public class RulesetsTab {
         options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
         options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
+        options.setUseAdvancedBuildingGunEmplacements(chkUseAdvancedBuildingGunEmplacements.isSelected());
         options.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
         options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
         options.setScenarioModMax((int) spnScenarioModMax.getValue());
@@ -1008,6 +1016,7 @@ public class RulesetsTab {
         chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
+        chkUseAdvancedBuildingGunEmplacements.setSelected(options.isUseAdvancedBuildingGunEmplacements());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
         chkAutoConfigMunitions.setSelected(options.isAutoConfigMunitions());
         spnScenarioModMax.setValue(options.getScenarioModMax());

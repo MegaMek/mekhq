@@ -3707,6 +3707,12 @@ public class Unit implements ITechnology {
                     BattleArmorSuit baSuit = new BattleArmorSuit((BattleArmor) entity, i, getCampaign());
                     addPart(baSuit);
                     partsToAdd.add(baSuit);
+                } else if ((entity instanceof AbstractBuildingEntity abstractBuildingEntity)) {
+                    BuildingLocation buildingLocation = new BuildingLocation(i,
+                          abstractBuildingEntity.getBuildingType(), abstractBuildingEntity.getBldgClass(),
+                          getCampaign());
+                    addPart(buildingLocation);
+                    partsToAdd.add(buildingLocation);
                 }
             }
             if (null == armor[i]) {
@@ -5699,7 +5705,7 @@ public class Unit implements ITechnology {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
-        } else if (entity instanceof Tank) {
+        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity) {
             return SkillType.S_TECH_MECHANIC;
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
             return SkillType.S_TECH_VESSEL;
