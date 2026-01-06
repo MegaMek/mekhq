@@ -61,6 +61,10 @@ import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreed
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.SECONDARY_POWER_SUPPLY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllNewCures;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getNewBioweaponAttack;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getNewDiseaseOutbreaks;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
@@ -131,6 +135,7 @@ import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
@@ -167,6 +172,7 @@ import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
@@ -178,6 +184,8 @@ import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
 
@@ -377,6 +385,16 @@ public class CampaignNewDayManager {
 
         processNewDayPersonnel();
 
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            PlanetarySystem currentSystem = updatedLocation.getCurrentSystem();
+            String currentSystemName = currentSystem.getName(today);
+            String currentSystemId = currentSystem.getId();
+
+            checkForBioweaponAttacksOrNewVaccines(currentSystemName, currentSystemId);
+            checkForDiseaseOutbreaks(currentSystemName, currentSystemId);
+            checkForNewVaccines(currentSystemId);
+        }
+
         if (isMonday) {
             Fatigue.processDeploymentFatigueResponses(campaign);
 
@@ -482,6 +500,50 @@ public class CampaignNewDayManager {
         // campaign must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(campaign));
         return true;
+    }
+
+    private void checkForBioweaponAttacksOrNewVaccines(String systemName, String systemId) {
+        InjuryType newBioweaponAttack = getNewBioweaponAttack(systemId, today, false);
+        if (newBioweaponAttack != null) {
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorMedicalPerson(),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
+                        campaign.getCommanderAddress()),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.outOfCharacter",
+                        newBioweaponAttack.getSimpleName(), systemName),
+                  null,
+                  false,
+                  ImmersiveDialogWidth.LARGE);
+        }
+    }
+
+    private void checkForDiseaseOutbreaks(String systemName, String systemId) {
+        Set<InjuryType> newOutbreaks = getNewDiseaseOutbreaks(systemId, today, false);
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemId, today, false);
+        for (InjuryType disease : newOutbreaks) {
+            String keySuffix = availableCures.contains(disease) ? "yesCure" : "noCure";
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorMedicalPerson(),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter." + keySuffix,
+                        campaign.getCommanderAddress()),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter." + keySuffix,
+                        disease.getSimpleName(), systemName),
+                  null,
+                  false,
+                  ImmersiveDialogWidth.LARGE);
+        }
+    }
+
+    private void checkForNewVaccines(String systemId) {
+        Set<InjuryType> newCures = getAllNewCures(systemId, today);
+        for (InjuryType injuryType : newCures) {
+            new ImmersiveDialogNotification(campaign, getFormattedTextAt(RESOURCE_BUNDLE, "disease.newCure",
+                  injuryType.getSimpleName()), true);
+        }
     }
 
     /**
