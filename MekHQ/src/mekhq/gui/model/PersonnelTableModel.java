@@ -179,10 +179,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 setText(displayText);
             }
 
-            // Tool Tips
-            setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
-
-            // Colouring
+            // Colouring - determine color and collect ALL applicable color reasons
             boolean personIsDamaged;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
                 personIsDamaged = person.hasInjuries(true);
@@ -196,7 +193,12 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                                                     person.isClanPersonnel(),
                                                     person.getSkillLevel(campaign, false, true)) >= 5));
 
+            // Collect all applicable color reasons for tooltip
+            List<String> colorReasonKeys = new ArrayList<>();
+
             if (!isSelected) {
+                // Set color based on priority (first match wins for display color)
+                // But collect ALL applicable reasons for tooltip
                 if (person.getStatus().isAbsent()) {
                     setBackground(MekHQ.getMHQOptions().getAbsentBackground());
                     setForeground(MekHQ.getMHQOptions().getAbsentForeground());
@@ -222,7 +224,34 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));
                 }
+
+                // Now collect ALL applicable reasons (not mutually exclusive)
+                if (person.getStatus().isAbsent()) {
+                    colorReasonKeys.add("colorReason.personnel.absent");
+                }
+                if (person.getStatus().isDepartedUnit()) {
+                    colorReasonKeys.add("colorReason.personnel.departed");
+                }
+                if (person.isDeployed()) {
+                    colorReasonKeys.add("colorReason.personnel.deployed");
+                }
+                if (personIsDamaged) {
+                    colorReasonKeys.add("colorReason.personnel.injured");
+                }
+                if (person.isPregnant()) {
+                    colorReasonKeys.add("colorReason.personnel.pregnant");
+                }
+                if (personIsFatigued) {
+                    colorReasonKeys.add("colorReason.personnel.fatigued");
+                }
+                if (person.hasOnlyHealedPermanentInjuries()) {
+                    colorReasonKeys.add("colorReason.personnel.healedInjuries");
+                }
             }
+
+            // Tool Tips - includes all applicable color reasons for name/rank/status columns
+            setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket, colorReasonKeys));
+
             return this;
         }
     }

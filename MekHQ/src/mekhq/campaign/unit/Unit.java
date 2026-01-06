@@ -4721,6 +4721,49 @@ public class Unit implements ITechnology {
     }
 
     /**
+     * Returns all i18n keys for reasons this unit has special coloring. The returned keys can be looked up in the GUI
+     * resource bundle. Multiple reasons may apply simultaneously (e.g., unmaintained AND uncrewed).
+     *
+     * @return list of color reason i18n keys, empty if no special coloring applies
+     */
+    public List<String> getColorReasonKeys() {
+        List<String> reasons = new ArrayList<>();
+
+        if (isDeployed()) {
+            reasons.add("colorReason.unit.deployed");
+        }
+        if (!isPresent()) {
+            reasons.add("colorReason.unit.inTransit");
+        }
+        if (isRefitting()) {
+            reasons.add("colorReason.unit.refitting");
+        }
+        if (isMothballing()) {
+            reasons.add("colorReason.unit.mothballing");
+        }
+        if (isMothballed()) {
+            reasons.add("colorReason.unit.mothballed");
+        }
+        if (getCampaign().getCampaignOptions().isCheckMaintenance() && isUnmaintained()) {
+            reasons.add("colorReason.unit.unmaintained");
+        }
+        if (!isRepairable()) {
+            reasons.add("colorReason.unit.notRepairable");
+        }
+        if (!isFunctional()) {
+            reasons.add("colorReason.unit.nonFunctional");
+        }
+        if (hasPartsNeedingFixing()) {
+            reasons.add("colorReason.unit.needsPartsFix");
+        }
+        if (getActiveCrew().size() < getFullCrewSize()) {
+            reasons.add("colorReason.unit.uncrewed");
+        }
+
+        return reasons;
+    }
+
+    /**
      * Gets the commander of this unit based on rank and skill tiebreaker.
      *
      * <p>The commander is determined by comparing all crew members and selecting the one with the highest rank. If
