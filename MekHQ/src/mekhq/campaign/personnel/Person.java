@@ -6463,7 +6463,7 @@ public class Person {
         boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
         if (isForConventionalInfantry) {
             SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
-            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
+            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel(), 0);
         }
 
         Skill skill = getSkillForWorkingOn(unit);
