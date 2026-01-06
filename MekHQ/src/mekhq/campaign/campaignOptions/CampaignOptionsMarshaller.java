@@ -380,6 +380,15 @@ public class CampaignOptionsMarshaller {
         // region Blob Crew
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobInfantry", campaignOptions.isUseBlobInfantry());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobBattleArmor", campaignOptions.isUseBlobBattleArmor());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVehicleCrewGround",
+              campaignOptions.isUseBlobVehicleCrewGround());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVehicleCrewVTOL",
+              campaignOptions.isUseBlobVehicleCrewVTOL());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVehicleCrewNaval",
+              campaignOptions.isUseBlobVehicleCrewNaval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselGunner", campaignOptions.isUseBlobVesselGunner());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselPilot", campaignOptions.isUseBlobVesselPilot());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselCrew", campaignOptions.isUseBlobVesselCrew());
         // endregion Blob Crew
 
         // region Prisoners

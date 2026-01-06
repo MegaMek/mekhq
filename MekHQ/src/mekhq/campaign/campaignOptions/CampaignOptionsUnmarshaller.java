@@ -389,6 +389,12 @@ public class CampaignOptionsUnmarshaller {
             case "mashTheatreCapacity" -> campaignOptions.setMASHTheatreCapacity(parseInt(nodeContents));
             case "useBlobInfantry" -> campaignOptions.setUseBlobInfantry(parseBoolean(nodeContents));
             case "useBlobBattleArmor" -> campaignOptions.setUseBlobBattleArmor(parseBoolean(nodeContents));
+            case "useBlobVehicleCrewGround" -> campaignOptions.setUseBlobVehicleCrewGround(parseBoolean(nodeContents));
+            case "useBlobVehicleCrewVTOL" -> campaignOptions.setUseBlobVehicleCrewVTOL(parseBoolean(nodeContents));
+            case "useBlobVehicleCrewNaval" -> campaignOptions.setUseBlobVehicleCrewNaval(parseBoolean(nodeContents));
+            case "useBlobVesselGunner" -> campaignOptions.setUseBlobVesselGunner(parseBoolean(nodeContents));
+            case "useBlobVesselPilot" -> campaignOptions.setUseBlobVesselPilot(parseBoolean(nodeContents));
+            case "useBlobVesselCrew" -> campaignOptions.setUseBlobVesselCrew(parseBoolean(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
                   nodeContents));
             case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
