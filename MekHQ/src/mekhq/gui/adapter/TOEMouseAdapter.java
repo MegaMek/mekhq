@@ -1329,7 +1329,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             for (int i = 1; i < units.size(); i++) {
                 unitIds.append('|').append(units.get(i).getId().toString());
             }
-            JMenu networkMenu = new JMenu("Network");
+            JScrollableMenu networkMenu = new JScrollableMenu("networkMenu", "Network");
             JMenu availMenu;
             if (StaticChecks.areAllUnitsC3Slaves(units)) {
                 availMenu = new JMenu("Slave to");
@@ -1350,7 +1350,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         availMenu.add(menuItem);
                     }
                 }
-                JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                networkMenu.add(availMenu);
             }
 
             if (StaticChecks.areAllUnitsIndependentC3Masters(units)) {
@@ -1377,7 +1377,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         availMenu.add(menuItem);
                     }
                 }
-                JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                networkMenu.add(availMenu);
             }
 
             if (StaticChecks.areAllUnitsCompanyLevelMasters(units)) {
@@ -1427,7 +1427,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             availMenu.add(menuItem);
                         }
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                    networkMenu.add(availMenu);
                 }
 
                 if (StaticChecks.areAllUnitsNC3Networked(units)) {
@@ -1477,7 +1477,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             availMenu.add(menuItem);
                         }
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                    networkMenu.add(availMenu);
                 }
 
                 if (StaticChecks.areAllUnitsC3iNetworked(units)) {
@@ -1528,7 +1528,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             availMenu.add(menuItem);
                         }
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                    networkMenu.add(availMenu);
                 }
 
                 if (StaticChecks.areAllUnitsNovaCEWSNetworked(units)) {
@@ -1546,7 +1546,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, networkMenu);
+            if (networkMenu.getItemCount() > 0) {
+                popup.add(networkMenu);
+            }
 
             menuItem = new JMenuItem("Remove Unit from TO&E");
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_UNIT + unitIds);
