@@ -1320,6 +1320,12 @@ public class UnitPersonTest {
         // Mock origin planet (required for recruitPerson)
         mekhq.campaign.universe.Planet mockPlanet = mock(mekhq.campaign.universe.Planet.class);
         when(mockPlanet.getId()).thenReturn("test-planet");
+
+        // Mock parent system (required for Campaign.recruitPerson disease inoculation checks)
+        mekhq.campaign.universe.PlanetarySystem mockSystem = mock(mekhq.campaign.universe.PlanetarySystem.class);
+        when(mockSystem.getId()).thenReturn("test-system");
+        when(mockPlanet.getParentSystem()).thenReturn(mockSystem);
+
         when(mockCommander.getOriginPlanet()).thenReturn(mockPlanet);
         return mockCommander;
     }
