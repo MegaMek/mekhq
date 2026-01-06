@@ -5832,6 +5832,14 @@ public class Campaign implements ITechManager {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
                 u.getEntity().setC3Master(null, true);
                 refreshNetworks();
+            } else if (u.getEntity().hasNovaCEWS() && u.getEntity().calculateFreeC3Nodes() < 2) {
+                // Nova CEWS max is 3 nodes, so < 2 free means unit is networked
+                Vector<Unit> removedUnits = new Vector<>();
+                removedUnits.add(u);
+                removeUnitsFromNetwork(removedUnits);
+                u.getEntity().setC3MasterIsUUIDAsString(null);
+                u.getEntity().setC3Master(null, true);
+                refreshNetworks();
             }
             if (u.getEntity().hasC3M()) {
                 removeUnitsFromC3Master(u);
@@ -8955,7 +8963,7 @@ public class Campaign implements ITechManager {
             if (null == en) {
                 continue;
             }
-            if (en.hasC3i() && en.calculateFreeC3Nodes() < 5 && en.calculateFreeC3Nodes() > 0) {
+            if (en.hasC3i() && en.calculateFreeC3Nodes() <= 5 && en.calculateFreeC3Nodes() > 0) {
                 String[] network = new String[2];
                 network[0] = en.getC3NetId();
                 network[1] = "" + en.calculateFreeC3Nodes();
@@ -8986,7 +8994,39 @@ public class Campaign implements ITechManager {
             if (null == en) {
                 continue;
             }
-            if (en.hasNavalC3() && en.calculateFreeC3Nodes() < 5 && en.calculateFreeC3Nodes() > 0) {
+            if (en.hasNavalC3() && en.calculateFreeC3Nodes() <= 5 && en.calculateFreeC3Nodes() > 0) {
+                String[] network = new String[2];
+                network[0] = en.getC3NetId();
+                network[1] = "" + en.calculateFreeC3Nodes();
+                if (!networkNames.contains(network[0])) {
+                    networks.add(network);
+                    networkNames.add(network[0]);
+                }
+            }
+        }
+        return networks;
+    }
+
+    /**
+     * @return returns a Vector of the unique name Strings of all Nova CEWS networks that have at least 1 free node Nova
+     *       CEWS networks support a maximum of 3 units
+     */
+    public Vector<String[]> getAvailableNovaCEWSNetworks() {
+        Vector<String[]> networks = new Vector<>();
+        Vector<String> networkNames = new Vector<>();
+
+        for (Unit u : getUnits()) {
+
+            if (u.getForceId() < 0) {
+                // only units currently in the TO&E
+                continue;
+            }
+            Entity en = u.getEntity();
+            if (null == en) {
+                continue;
+            }
+            // Nova CEWS max is 3 nodes, so unnetworked unit has 2 free nodes
+            if (en.hasNovaCEWS() && en.calculateFreeC3Nodes() <= 2 && en.calculateFreeC3Nodes() > 0) {
                 String[] network = new String[2];
                 network[0] = en.getC3NetId();
                 network[1] = "" + en.calculateFreeC3Nodes();
