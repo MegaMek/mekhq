@@ -386,8 +386,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isUseBlobVehicleCrewVTOL());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVehicleCrewNaval",
               campaignOptions.isUseBlobVehicleCrewNaval());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselGunner", campaignOptions.isUseBlobVesselGunner());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselPilot", campaignOptions.isUseBlobVesselPilot());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselGunner", campaignOptions.isUseBlobVesselGunner());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useBlobVesselCrew", campaignOptions.isUseBlobVesselCrew());
         // endregion Blob Crew
 
