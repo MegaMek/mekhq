@@ -80,8 +80,9 @@ public class ContractTest {
 
     @Test
     public void testGetTransportAmount() {
+        // With 100% transportComp, employer reimburses full transport cost (10)
         initializeTest();
-        assertEquals(Money.of(0), contract.getTransportAmount());
+        assertEquals(Money.of(10), contract.getTransportAmount());
     }
 
     @Test
@@ -92,50 +93,102 @@ public class ContractTest {
 
     @Test
     public void testSigningBonusAmount() {
+        // 10% of getTotalAmount (190) = 19
         initializeTest();
-        assertEquals(Money.of(18.0), contract.getSigningBonusAmount());
+        assertEquals(Money.of(19), contract.getSigningBonusAmount());
     }
 
     @Test
     public void testGetFeeAmount() {
+        // 5% of getTotalAmount (190) = 9.5
         initializeTest();
-        assertEquals(Money.of(9.0), contract.getFeeAmount());
+        assertEquals(Money.of(9.5), contract.getFeeAmount());
     }
 
     @Test
     public void testGetTotalAmount() {
+        // base(130) + overhead(10) + support(10) + transport(10) + transit(30) = 190
         initializeTest();
-        assertEquals(Money.of(180.0), contract.getTotalAmount());
+        assertEquals(Money.of(190), contract.getTotalAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFees() {
+        // getTotalAmount(190) - getFeeAmount(9.5) = 180.5
         initializeTest();
-        assertEquals(Money.of(171.0), contract.getTotalAmountPlusFees());
+        assertEquals(Money.of(180.5), contract.getTotalAmountPlusFees());
     }
 
     @Test
     public void testGetAdvanceAmount() {
+        // 10% of getTotalAmountPlusFees(180.5) = 18.05
         initializeTest();
-        assertEquals(Money.of(17.1), contract.getAdvanceAmount());
+        assertEquals(Money.of(18.05), contract.getAdvanceAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
+        // getTotalAmountPlusFees(180.5) + signingBonus(19) = 199.5
         initializeTest();
-        assertEquals(Money.of(189.0), contract.getTotalAmountPlusFeesAndBonuses());
+        assertEquals(Money.of(199.5), contract.getTotalAmountPlusFeesAndBonuses());
     }
 
     @Test
     public void testGetMonthlyPayout() {
+        // getTotalAmountPlusFees(180.5) * 90% / 10 months = 16.245 -> rounds to 16.24
         initializeTest();
-        assertEquals(Money.of(15.39), contract.getMonthlyPayOut());
+        assertEquals(Money.of(16.24), contract.getMonthlyPayOut());
     }
 
     @Test
     public void testGetSharesPercentDefaultsTo30() {
         initializeTest();
         assertEquals(30, contract.getSharesPercent());
+    }
+
+    @Test
+    public void testGetEmployerTransportReimbursement() {
+        // With 100% transportComp, employer reimburses full transport cost (10)
+        initializeTest();
+        assertEquals(Money.of(10), contract.getEmployerTransportReimbursement(mockCampaign));
+    }
+
+    @Test
+    public void testGetPlayerTransportCost() {
+        // With 100% transportComp, player pays nothing (employer covers all)
+        initializeTest();
+        assertEquals(Money.of(0), contract.getPlayerTransportCost(mockCampaign));
+    }
+
+    @Test
+    public void testBetterTransportTermsIncreaseReimbursement() {
+        // Test that higher transportComp means MORE reimbursement (better for player)
+        initializeTestWithTransportComp(50);
+        Money reimbursementAt50Percent = contract.getEmployerTransportReimbursement(mockCampaign);
+
+        initializeTestWithTransportComp(75);
+        Money reimbursementAt75Percent = contract.getEmployerTransportReimbursement(mockCampaign);
+
+        // 75% should give more reimbursement than 50%
+        assertEquals(1, reimbursementAt75Percent.compareTo(reimbursementAt50Percent));
+    }
+
+    @Test
+    public void testZeroTransportCompMeansNoReimbursement() {
+        // With 0% transportComp, employer reimburses nothing
+        initializeTestWithTransportComp(0);
+        assertEquals(Money.of(0), contract.getEmployerTransportReimbursement(mockCampaign));
+        // Player pays full transport cost
+        assertEquals(Money.of(10), contract.getPlayerTransportCost(mockCampaign));
+    }
+
+    @Test
+    public void testPartialTransportCompGivesPartialReimbursement() {
+        // With 50% transportComp, employer reimburses half
+        initializeTestWithTransportComp(50);
+        assertEquals(Money.of(5), contract.getEmployerTransportReimbursement(mockCampaign));
+        // Player pays the other half
+        assertEquals(Money.of(5), contract.getPlayerTransportCost(mockCampaign));
     }
 
     private void initializeTest() {
@@ -201,5 +254,36 @@ public class ContractTest {
         when(mockCampaign.getTransportCostCalculation(EXP_REGULAR)).thenReturn(mockTransportCostCalculation);
         when(mockTransportCostCalculation.calculateJumpCostForEntireJourney(any(Integer.class),
               any(Integer.class))).thenReturn(jumpCost);
+    }
+
+    private void initializeTestWithTransportComp(int transportComp) {
+        final PlanetarySystem mockPlanetarySystem = mock(PlanetarySystem.class);
+
+        final JumpPath mockJumpPath = mock(JumpPath.class);
+        when(mockJumpPath.getJumps()).thenReturn(2);
+        when(mockJumpPath.getFirstSystem()).thenReturn(mockPlanetarySystem);
+
+        initCampaign(mockJumpPath);
+        initContractWithTransportComp(transportComp);
+        contract.calculateContract(mockCampaign);
+    }
+
+    private void initContractWithTransportComp(int transportComp) {
+        contract = spy(new Contract());
+
+        contract.setOverheadComp(2); // Full overhead compensation
+        contract.setMultiplier(1.3);
+
+        contract.setLength(10);
+
+        contract.setStraightSupport(100);
+        contract.setTransportComp(transportComp);
+
+        contract.setSigningBonusPct(10);
+        contract.setMRBCFee(true);
+        contract.setAdvancePct(10);
+
+        when(contract.getSystem()).thenReturn(new PlanetarySystem());
+        when(mockCampaign.isUseCommandCircuitForContract(contract)).thenReturn(false);
     }
 }
