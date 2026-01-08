@@ -36,6 +36,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JLabel;
@@ -119,12 +120,8 @@ public class CampaignOptionsLabel extends JLabel {
      */
     public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize, boolean noTooltip,
                                 @Nullable CampaignOptionsMetadata metadata) {
-        // Fetch base text and append badges
-        // Set the label's text using the resource bundle with HTML formatting for better rendering
-        super(String.format("<html>%s%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"),
-              CampaignOptionsUtilities.formatBadges(metadata)));
-
+        // Set the label's text using HTML formatting for better rendering
+        super(String.format("<html>%s</html>", buildLabelText(name, metadata)));
 
         // Configure the tooltip if not excluded
         if (!noTooltip) {
@@ -137,5 +134,25 @@ public class CampaignOptionsLabel extends JLabel {
 
         // Apply font scaling
         setFontScaling(this, false, 1);
+    }
+
+    /**
+     * Builds the label text with badges either inserted at %s placeholders or appended to the end.
+     *
+     * @param name     the base name of the label
+     * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
+     * @return the formatted label text with badges
+     */
+    private static String buildLabelText(String name, @Nullable CampaignOptionsMetadata metadata) {
+        String baseText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text");
+
+        // If the text contains {0}, use getFormattedTextAt to insert badges at the placeholder location
+        if (baseText.contains("{0}")) {
+            return getFormattedTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text",
+                  CampaignOptionsUtilities.formatBadges(metadata));
+        } else {
+            // Otherwise, append badges to the end (legacy behavior)
+            return baseText + CampaignOptionsUtilities.formatBadges(metadata);
+        }
     }
 }

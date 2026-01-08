@@ -94,11 +94,19 @@ public class CampaignOptionsUtilities {
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
     public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
 
+
+    /**
+     * Version marker for campaign options that existed before the metadata system was implemented
+     * and shouldn't have a version badge.
+     */
+    public static final Version LEGACY_RULE_BEFORE_METADATA = null;
+
     /**
      * Version marker for campaign options that existed before the metadata system was implemented,
-     * but still since the most recent milestone.
+     * but still since the most recent milestone. This variable should be deprecated once the next milestone is
+     * declared.
      */
-    public static final Version VERSION_BEFORE_METADATA = new Version(0, 50, 10);
+    public static final Version MILESTONE_BEFORE_METADATA = new Version(0, 50, 10);
 
     /**
      * Cache for reusing CampaignOptionMetadata instances to avoid creating duplicate objects.

@@ -33,7 +33,8 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -443,12 +444,14 @@ public class BiographyTab {
         sldGender.setPaintLabels(true);
         sldGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
 
-        lblNonBinaryDiceSize = new CampaignOptionsLabel("NonBinaryDiceSize");
+        lblNonBinaryDiceSize = new CampaignOptionsLabel("NonBinaryDiceSize",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblNonBinaryDiceSize.addMouseListener(createTipPanelUpdater(generalHeader, "NonBinaryDiceSize"));
         spnNonBinaryDiceSize = new CampaignOptionsSpinner("NonBinaryDiceSize", 60, 0, 100000, 1);
         spnNonBinaryDiceSize.addMouseListener(createTipPanelUpdater(generalHeader, "NonBinaryDiceSize"));
 
-        lblFamilyDisplayLevel = new CampaignOptionsLabel("FamilyDisplayLevel");
+        lblFamilyDisplayLevel = new CampaignOptionsLabel("FamilyDisplayLevel",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
         comboFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
 
@@ -485,7 +488,8 @@ public class BiographyTab {
         layoutLeft.gridx++;
         panelLeft.add(comboFamilyDisplayLevel, layoutLeft);
 
-        final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
+        final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true, "BiographyGeneralTab",
+              getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
         layoutParent.gridwidth = 5;
         layoutParent.gridx = 0;
@@ -527,7 +531,7 @@ public class BiographyTab {
         chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly");
         chkAnnounceOfficersOnly.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceOfficersOnly"));
         chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkAnnounceChildBirthdays.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceChildBirthdays"));
 
         // Layout the Panel
@@ -585,14 +589,15 @@ public class BiographyTab {
     private JPanel createComingOfAgePanel() {
         // Contents
         chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         chkVeterancySPAs.addMouseListener(createTipPanelUpdater(generalHeader, "VeterancySPAs"));
 
-        chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
+        chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities",
+              getMetadata(null, CampaignOptionFlag.RECOMMENDED));
         chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(generalHeader, "ComingOfAgeAbilities"));
 
         chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkRewardComingOfAgeRPSkills.addMouseListener(createTipPanelUpdater(generalHeader,
               "ComingOfAgeRPSkills"));
 
@@ -634,7 +639,8 @@ public class BiographyTab {
         pnlRandomBackgrounds = createRandomBackgroundsPanel();
 
         // Layout the Panels
-        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true, "BackgroundsTab",
+              getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 5;
@@ -668,7 +674,8 @@ public class BiographyTab {
      */
     JPanel createRandomBackgroundsPanel() {
         // Contents
-        chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities");
+        chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         chkUseRandomPersonalities.addMouseListener(createTipPanelUpdater(backgroundHeader, "UseRandomPersonalities"));
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
         chkUseRandomPersonalityReputation.addMouseListener(createTipPanelUpdater(backgroundHeader,
@@ -676,7 +683,8 @@ public class BiographyTab {
         chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier");
         chkUseReasoningXpMultiplier.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "UseReasoningXpMultiplier"));
-        chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships");
+        chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseSimulatedRelationships.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "UseSimulatedRelationships"));
 
@@ -724,7 +732,8 @@ public class BiographyTab {
         chkRandomizeAroundSpecifiedPlanet.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "RandomizeAroundSpecifiedPlanet"));
 
-        chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific");
+        chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
         chkSpecifiedSystemFactionSpecific.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "SpecifiedSystemFactionSpecific"));
@@ -780,7 +789,8 @@ public class BiographyTab {
         spnOriginSearchRadius = new CampaignOptionsSpinner("OriginSearchRadius", 0, 0, 2000, 25);
         spnOriginSearchRadius.addMouseListener(createTipPanelUpdater(backgroundHeader, "OriginSearchRadius"));
 
-        lblOriginDistanceScale = new CampaignOptionsLabel("OriginDistanceScale");
+        lblOriginDistanceScale = new CampaignOptionsLabel("OriginDistanceScale",
+              getMetadata(null, CampaignOptionFlag.IMPORTANT));
         lblOriginDistanceScale.addMouseListener(createTipPanelUpdater(backgroundHeader, "OriginDistanceScale"));
         spnOriginDistanceScale = new CampaignOptionsSpinner("OriginDistanceScale", 0.6, 0.1, 2.0, 0.1);
         spnOriginDistanceScale.addMouseListener(createTipPanelUpdater(backgroundHeader, "OriginDistanceScale"));
@@ -945,7 +955,8 @@ public class BiographyTab {
               5);
 
         // Contents
-        lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier");
+        lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED, CampaignOptionFlag.IMPORTANT));
         lblRandomDeathMultiplier.addMouseListener(createTipPanelUpdater(deathHeader, "RandomDeathMultiplier"));
         spnRandomDeathMultiplier = new CampaignOptionsSpinner("RandomDeathMultiplier", 1.0, 0, 100.0, 0.01);
         spnRandomDeathMultiplier.addMouseListener(createTipPanelUpdater(deathHeader, "RandomDeathMultiplier"));
@@ -1055,14 +1066,16 @@ public class BiographyTab {
         chkUseReeducationCamps = new CampaignOptionsCheckBox("UseReeducationCamps");
         chkUseReeducationCamps.addMouseListener(createTipPanelUpdater(educationHeader, "UseReeducationCamps"));
 
-        chkEnableOverrideRequirements = new CampaignOptionsCheckBox("EnableOverrideRequirements");
+        chkEnableOverrideRequirements = new CampaignOptionsCheckBox("EnableOverrideRequirements",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkEnableOverrideRequirements.addMouseListener(createTipPanelUpdater(educationHeader,
               "EnableOverrideRequirements"));
 
         chkShowIneligibleAcademies = new CampaignOptionsCheckBox("ShowIneligibleAcademies");
         chkShowIneligibleAcademies.addMouseListener(createTipPanelUpdater(educationHeader, "ShowIneligibleAcademies"));
 
-        lblEntranceExamBaseTargetNumber = new CampaignOptionsLabel("EntranceExamBaseTargetNumber");
+        lblEntranceExamBaseTargetNumber = new CampaignOptionsLabel("EntranceExamBaseTargetNumber",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblEntranceExamBaseTargetNumber.addMouseListener(createTipPanelUpdater(educationHeader,
               "EntranceExamBaseTargetNumber"));
         spnEntranceExamBaseTargetNumber = new CampaignOptionsSpinner("EntranceExamBaseTargetNumber", 14, 0, 20, 1);
@@ -1347,7 +1360,7 @@ public class BiographyTab {
               "AllowDuplicatePortraits"));
 
         chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly",
-              getMetadata(VERSION_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "UseGenderedPortraitsOnly"));
 

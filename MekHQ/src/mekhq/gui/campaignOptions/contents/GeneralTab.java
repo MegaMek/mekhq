@@ -35,7 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -204,7 +204,7 @@ public class GeneralTab {
               getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Randomize faction
-        btnRandomFaction = new CampaignOptionsButton("RandomFaction", getMetadata(VERSION_BEFORE_METADATA));
+        btnRandomFaction = new CampaignOptionsButton("RandomFaction", getMetadata(MILESTONE_BEFORE_METADATA));
         btnRandomFaction.addActionListener(e -> {
             FactionDisplay randomFaction = pickRandomFaction();
             if (randomFaction != null) {
@@ -219,7 +219,7 @@ public class GeneralTab {
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Randomize starting date
-        btnRandomDate = new CampaignOptionsButton("RandomDate", getMetadata(VERSION_BEFORE_METADATA));
+        btnRandomDate = new CampaignOptionsButton("RandomDate", getMetadata(MILESTONE_BEFORE_METADATA));
         btnRandomDate.addActionListener(e -> {
             LocalDate randomDate = DateUtilities.getRandomDateBetween(RANDOM_DATE_EARLIEST, RANDOM_DATE_LATEST);
             setDate(randomDate);

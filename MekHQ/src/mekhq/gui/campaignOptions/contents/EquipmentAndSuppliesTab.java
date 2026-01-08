@@ -32,7 +32,8 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -386,7 +387,7 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
 
         chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater(acquisitionHeader, "UseFunctionalAppraisal"));
 
         lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
@@ -418,7 +419,7 @@ public class EquipmentAndSuppliesTab {
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
 
         chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit",
-              getMetadata(VERSION_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
 
         // Layout the Panel
@@ -631,7 +632,8 @@ public class EquipmentAndSuppliesTab {
      * @return a {@code JPanel} containing the campaign options panel for planetary acquisitions.
      */
     private JPanel createOptionsPanel() {
-        usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions");
+        usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         usePlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "UsePlanetaryAcquisitions"));
 
@@ -662,7 +664,8 @@ public class EquipmentAndSuppliesTab {
         spnPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "PenaltyClanPartsFromIS"));
 
-        usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose");
+        usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         usePlanetaryAcquisitionsVerbose.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "UsePlanetaryAcquisitionsVerbose"));
 
@@ -1027,11 +1030,13 @@ public class EquipmentAndSuppliesTab {
               getTextAt(getCampaignOptionsResourceBundle(), "lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
-        variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox");
+        variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         variableTechLevelBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "VariableTechLevelBox"));
 
         // Ammo by Type
-        useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox");
+        useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         useAmmoByTypeBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "UseAmmoByTypeBox"));
 
         // Layout the Panel

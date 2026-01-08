@@ -33,7 +33,8 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -324,9 +325,11 @@ public class FinancesTab {
         payForTransportBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForTransportBox"));
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
         payForRecruitmentBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRecruitmentBox"));
-        payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox");
+        payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         payForFoodBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
-        payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox");
+        payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         payForHousingBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
 
         // Layout the Panel
@@ -405,9 +408,11 @@ public class FinancesTab {
      */
     private JPanel createGeneralOptionsPanel() {
         // Contents
-        useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox");
+        useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         useLoanLimitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseLoanLimitsBox"));
-        usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox");
+        usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "UsePercentageMaintenanceBox"));
         useExtendedPartsModifierBox = new CampaignOptionsCheckBox("UseExtendedPartsModifierBox");
@@ -418,7 +423,8 @@ public class FinancesTab {
         showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox");
         showPeacetimeCostBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "ShowPeacetimeCostBox"));
 
-        lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration");
+        lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblFinancialYearDuration.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "FinancialYearDuration"));
         comboFinancialYearDuration.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
@@ -515,7 +521,8 @@ public class FinancesTab {
         spnTaxesPercentage.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "TaxesPercentage"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true, "TaxesPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true, "TaxesPanel",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -548,7 +555,8 @@ public class FinancesTab {
         chkSharesForAll.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SharesForAll"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true, "SharesPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true, "SharesPanel",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -565,7 +573,7 @@ public class FinancesTab {
     private JPanel createRentedFacilitiesPanel() {
         // Contents
         lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostHospitalBeds"));
         spnRentedFacilitiesCostHospitalBeds = new CampaignOptionsSpinner("RentedFacilitiesCostHospitalBeds",
@@ -574,7 +582,7 @@ public class FinancesTab {
               "RentedFacilitiesCostHospitalBeds"));
 
         lblRentedFacilitiesCostKitchens = new CampaignOptionsLabel("RentedFacilitiesCostKitchens",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostKitchens"));
         spnRentedFacilitiesCostKitchens = new CampaignOptionsSpinner("RentedFacilitiesCostKitchens",
@@ -583,7 +591,7 @@ public class FinancesTab {
               "RentedFacilitiesCostKitchens"));
 
         lblRentedFacilitiesCostHoldingCells = new CampaignOptionsLabel("RentedFacilitiesCostHoldingCells",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostHoldingCells"));
         spnRentedFacilitiesCostHoldingCells = new CampaignOptionsSpinner("RentedFacilitiesCostHoldingCells",
@@ -592,7 +600,7 @@ public class FinancesTab {
               "RentedFacilitiesCostHoldingCells"));
 
         lblRentedFacilitiesCostRepairBays = new CampaignOptionsLabel("RentedFacilitiesCostRepairBays",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
               "RentedFacilitiesCostRepairBays"));
         spnRentedFacilitiesCostRepairBays = new CampaignOptionsSpinner("RentedFacilitiesCostRepairBays",
@@ -602,7 +610,7 @@ public class FinancesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RentedFacilitiesPanel", true, "RentedFacilitiesPanel",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;

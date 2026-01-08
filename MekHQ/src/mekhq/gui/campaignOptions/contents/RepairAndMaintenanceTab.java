@@ -32,7 +32,8 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.VERSION_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -198,11 +199,12 @@ public class RepairAndMaintenanceTab {
         CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
               getImageDirectory() + "logo_clan_burrock.png", 3);
 
-        chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
+        chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));
 
         chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs",
-              getMetadata(VERSION_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUsefulAsTechs.addMouseListener(createTipPanelUpdater(repairHeader, "UsefulAsTechs"));
 
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
@@ -259,7 +261,8 @@ public class RepairAndMaintenanceTab {
         panelLeft.add(useQuirksBox, layoutLeft);
 
         final JPanel panelRight = new CampaignOptionsStandardPanel("RepairTabRight", true,
-              "RepairTabRight");
+              "RepairTabRight",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
         layoutRight.gridx = 0;
@@ -332,25 +335,30 @@ public class RepairAndMaintenanceTab {
               0, -13, 13, 1);
         spnMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
 
-        lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime");
+        lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
               1, 1, 4, 1);
         spnDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
 
-        useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance");
+        useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         useQualityMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseQualityMaintenance"));
 
-        reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames");
+        reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         reverseQualityNames.addMouseListener(createTipPanelUpdater(maintenanceHeader, "ReverseQualityNames"));
 
-        chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities");
+        chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRandomUnitQualities.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseRandomUnitQualities"));
 
         chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
         chkUsePlanetaryModifiers.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UsePlanetaryModifiers"));
 
-        useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance");
+        useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         useUnofficialMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseUnofficialMaintenance"));
 
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");

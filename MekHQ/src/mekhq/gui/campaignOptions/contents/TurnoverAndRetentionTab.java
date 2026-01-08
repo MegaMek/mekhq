@@ -32,9 +32,11 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -49,6 +51,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -281,13 +284,15 @@ public class TurnoverAndRetentionTab {
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
         chkUseFatigue.addMouseListener(createTipPanelUpdater(fatigueHeader, "UseFatigue"));
 
-        lblFatigueRate = new CampaignOptionsLabel("FatigueRate");
+        lblFatigueRate = new CampaignOptionsLabel("FatigueRate",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblFatigueRate.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueRate"));
         spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
               1, 1, 10, 1);
         spnFatigueRate.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueRate"));
 
-        chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue");
+        chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseInjuryFatigue.addMouseListener(createTipPanelUpdater(fatigueHeader, "UseInjuryFatigue"));
 
         lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
@@ -300,7 +305,8 @@ public class TurnoverAndRetentionTab {
         chkFieldKitchenIgnoreNonCombatants.addMouseListener(createTipPanelUpdater(fatigueHeader,
               "FieldKitchenIgnoreNonCombatants"));
 
-        lblFatigueUndeploymentThreshold = new CampaignOptionsLabel("FatigueUndeploymentThreshold");
+        lblFatigueUndeploymentThreshold = new CampaignOptionsLabel("FatigueUndeploymentThreshold",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         lblFatigueUndeploymentThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader,
               "FatigueUndeploymentThreshold"));
         spnFatigueUndeploymentThreshold = new CampaignOptionsSpinner("FatigueUndeploymentThreshold",
@@ -308,7 +314,8 @@ public class TurnoverAndRetentionTab {
         spnFatigueUndeploymentThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader,
               "FatigueUndeploymentThreshold"));
 
-        lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
+        lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         lblFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
         spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",
               13, 0, 17, 1);
@@ -437,7 +444,8 @@ public class TurnoverAndRetentionTab {
         spnTurnoverFixedTargetNumber.addMouseListener(createTipPanelUpdater(turnoverHeader,
               "TurnoverFixedTargetNumber"));
 
-        lblTurnoverFrequency = new CampaignOptionsLabel("TurnoverFrequency");
+        lblTurnoverFrequency = new CampaignOptionsLabel("TurnoverFrequency",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         lblTurnoverFrequency.addMouseListener(createTipPanelUpdater(turnoverHeader, "TurnoverFrequency"));
         comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
             @Override

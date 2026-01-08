@@ -101,42 +101,14 @@ public record CampaignOptionsMetadata(
 
     /**
      * Canonical constructor that ensures flags is never null.
+     * <br><br>
+     * Should not be used directly, use {@link CampaignOptionsUtilities#getMetadata(Version, CampaignOptionFlag...)}
+     * so don't create unnecessary duplicate records.
      */
     public CampaignOptionsMetadata {
         flags = (flags == null) ? EnumSet.noneOf(CampaignOptionFlag.class) : (flags.isEmpty() ?
                                                                                     Collections.emptySet() :
                                                                                     EnumSet.copyOf(flags));
-    }
-
-    /**
-     * Constructor for campaign options that were recently added (no flags).
-     *
-     * @param version the version when this option was added
-     */
-    public CampaignOptionsMetadata(Version version) {
-        this(version, EnumSet.noneOf(CampaignOptionFlag.class));
-    }
-
-    /**
-     * Constructor for campaign options with one or more flags (not recently added).
-     *
-     * @param firstFlag       the first flag
-     * @param additionalFlags optional additional flags
-     */
-    CampaignOptionsMetadata(CampaignOptionFlag firstFlag, CampaignOptionFlag... additionalFlags) {
-        this(null, EnumSet.of(firstFlag, additionalFlags));
-    }
-
-    /**
-     * Constructor for campaign options that were recently added and have one or more flags.
-     *
-     * @param version         the version when this option was added
-     * @param firstFlag       the first flag
-     * @param additionalFlags optional additional flags
-     */
-    public CampaignOptionsMetadata(Version version, CampaignOptionFlag firstFlag,
-                                   CampaignOptionFlag... additionalFlags) {
-        this(version, EnumSet.of(firstFlag, additionalFlags));
     }
 
     /**
