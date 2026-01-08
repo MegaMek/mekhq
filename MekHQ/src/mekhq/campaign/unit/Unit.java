@@ -4687,7 +4687,7 @@ public class Unit implements ITechnology {
             return MekHQ.getMHQOptions().getNonFunctionalForeground();
         } else if (hasPartsNeedingFixing()) {
             return MekHQ.getMHQOptions().getNeedsPartsFixedForeground();
-        } else if (getActiveCrew().size() < getFullCrewSize()) {
+        } else if (getTotalCrewSize() < getFullCrewSize()) {
             return MekHQ.getMHQOptions().getUncrewedForeground();
         } else {
             return UIManager.getColor(type + ".Foreground");
@@ -4713,7 +4713,7 @@ public class Unit implements ITechnology {
             return MekHQ.getMHQOptions().getNonFunctionalBackground();
         } else if (hasPartsNeedingFixing()) {
             return MekHQ.getMHQOptions().getNeedsPartsFixedBackground();
-        } else if (getActiveCrew().size() < getFullCrewSize()) {
+        } else if (getTotalCrewSize() < getFullCrewSize()) {
             return MekHQ.getMHQOptions().getUncrewedBackground();
         } else {
             return UIManager.getColor(type + ".Background");

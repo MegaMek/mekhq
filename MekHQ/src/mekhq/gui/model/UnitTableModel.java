@@ -210,40 +210,83 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
         Campaign campaign = unit.getCampaign();
         boolean isClanCampaign = campaign != null && campaign.isClanCampaign();
+
+        // Check if driver and gunner use the same role (e.g., VEHICLE_CREW_GROUND)
+        PersonnelRole driverRole = unit.getDriverRole();
+        PersonnelRole gunnerRole = unit.getGunnerRole();
+        boolean sameRole = (driverRole != null && driverRole.equals(gunnerRole));
+
+        int tempDrivers = 0;
         if (driversNeeded > 0 && soldiersNeeded == 0) {
-            PersonnelRole driverRole = unit.getDriverRole();
             String driverDisplay = driverRole == null ? getTextAt(RESOURCE_BUNDLE,
                   "UnitTableModel.crewNeeds.unknown") : driverRole.getLabel(isClanCampaign);
+
+
+            if (sameRole && driverRole != null) {
+                // Driver and gunner share the same role - need to distribute temp crew
+                int totalTempCrew = unit.getTempCrewByPersonnelRole(driverRole);
+                int driverShortfall = Math.max(0, driversNeeded - driversAssigned);
+                // Allocate temp crew to driver slots first
+                tempDrivers = Math.min(totalTempCrew, driverShortfall);
+            } else if (driverRole != null) {
+                // Driver has its own unique role
+                tempDrivers = unit.getTempCrewByPersonnelRole(driverRole);
+            }
+
             appendReport(reports,
                   getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers", driverDisplay),
                   driversAssigned,
+                  tempDrivers,
                   driversNeeded);
         }
 
+        int tempGunners = 0;
         if (gunnersNeeded > 0 && soldiersNeeded == 0) {
-            PersonnelRole gunnerRole = unit.getGunnerRole();
             String gunnerDisplay = gunnerRole == null ? getTextAt(RESOURCE_BUNDLE,
                   "UnitTableModel.crewNeeds.unknown") : gunnerRole.getLabel(isClanCampaign);
+
+
+            if (sameRole && gunnerRole != null) {
+                // Driver and gunner share the same role - get remaining temp crew after driver allocation
+                int totalTempCrew = unit.getTempCrewByPersonnelRole(gunnerRole);
+                int driverShortfall = Math.max(0, driversNeeded - driversAssigned);
+                int tempCrewAfterDrivers = Math.max(0, totalTempCrew - driverShortfall);
+                int gunnerShortfall = Math.max(0, gunnersNeeded - gunnersAssigned);
+                // Remaining temp crew goes to gunner slots
+                tempGunners = Math.min(tempCrewAfterDrivers, gunnerShortfall);
+            } else if (gunnerRole != null) {
+                // Gunner has its own unique role
+                tempGunners = unit.getTempCrewByPersonnelRole(gunnerRole);
+            }
 
             appendReport(reports,
                   getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners", gunnerDisplay),
                   gunnersAssigned,
+                  tempGunners,
                   gunnersNeeded);
         }
 
         if (soldiersNeeded > 0) {
+            int tempSoldiers = unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
             appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.soldiers"), soldiersAssigned,
-                  soldiersNeeded);
+                  tempSoldiers, soldiersNeeded);
         }
 
         if (crewNeeded > 0) {
-            String key = entity.isLargeCraft() ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
-            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, crewNeeded);
+            boolean isLargeCraft = entity.isLargeCraft();
+            String key = isLargeCraft ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
+
+            // If it isn't a large craft, we can use getDriverRole() to get the right crew type for the unit. If
+            // vehicle ground crew differentiation returns, this'll need updated.
+            int tempCrew = isLargeCraft ? unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) :
+                                 unit.getTempCrewByPersonnelRole(unit.getDriverRole()) - tempDrivers - tempGunners;
+            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, tempCrew, crewNeeded);
         }
 
         if (navigatorsNeeded > 0) {
+            int tempNavigators = unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
             appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.navigator"), navigatorsAssigned,
-                  navigatorsNeeded);
+                  tempNavigators, navigatorsNeeded);
         }
 
         String finalReport = reports.isEmpty() ?
@@ -258,10 +301,15 @@ public class UnitTableModel extends DataTableModel<Unit> {
      * @param report   the {@link List} to add to
      * @param title    the title of the crew role (e.g., "Driver", "Gunner")
      * @param assigned the number of crew members assigned to the role
+     * @param tempCrew the number of temp crew members assigned to the role
      * @param needed   the number of crew members needed for the role
      */
-    private static void appendReport(List<String> report, String title, int assigned, int needed) {
-        report.add(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
+    private static void appendReport(List<String> report, String title, int assigned, int tempCrew, int needed) {
+        if (tempCrew == 0) {
+            report.add(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
+        } else {
+            report.add(String.format("<b>%s: </b>%d(%d)/%d", title, tempCrew + assigned, assigned, needed));
+        }
     }
 
     @Override
