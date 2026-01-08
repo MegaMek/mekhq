@@ -437,13 +437,11 @@ public class CampaignOptionsUtilities {
     /**
      * Formats version and flag badges for campaign options based on metadata.
      *
-     * <p>
      * The badges include:
      * <ul>
      *   <li>Special flag symbols (if any) - displayed first, uncolored</li>
      *   <li>Added since badge - colored star indicating when the option was added</li>
      * </ul>
-     * </p>
      *
      * <p>
      * Development releases use a filled purple star (★), while milestone releases use a hollow green star (☆).
