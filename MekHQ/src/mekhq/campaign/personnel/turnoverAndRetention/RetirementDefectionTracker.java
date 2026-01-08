@@ -205,7 +205,7 @@ public class RetirementDefectionTracker {
             // Fatigue modifier
             if ((campaign.getCampaignOptions().isUseFatigue()) &&
                       (campaign.getCampaignOptions().isUseFatigueModifiers())) {
-                int fatigueModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
+                int fatigueModifier = MathUtility.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
 
                 if (fatigueModifier > 0) {
                     targetNumber.addModifier(fatigueModifier, resources.getString("fatigue.text"));

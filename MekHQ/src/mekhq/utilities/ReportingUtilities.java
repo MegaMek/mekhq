@@ -170,4 +170,19 @@ public class ReportingUtilities {
     public static String getNegativeColor() {
         return MekHQ.getMHQOptions().getFontColorNegativeHexColor();
     }
+
+    /**
+     * Strips all HTML tags from a string. Useful for re-wrapping tooltip text that may already contain HTML
+     * formatting.
+     *
+     * @param text the text to strip HTML tags from
+     *
+     * @return the text with all HTML tags removed, or null if input was null
+     */
+    public static String stripHtmlTags(String text) {
+        if (text == null) {
+            return null;
+        }
+        return text.replaceAll("<[^>]*>", "");
+    }
 }

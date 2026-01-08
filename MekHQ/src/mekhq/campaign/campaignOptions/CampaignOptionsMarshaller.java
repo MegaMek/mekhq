@@ -1136,6 +1136,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenderedPortraitsOnly",
               campaignOptions.isUseGenderedPortraitsOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useAdvancedBuildingGunEmplacements",
+              campaignOptions.isUseAdvancedBuildingGunEmplacements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());

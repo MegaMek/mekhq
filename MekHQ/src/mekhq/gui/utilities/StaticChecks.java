@@ -324,6 +324,63 @@ public class StaticChecks {
                                                   (u.getEntity().getC3Master() != null) &&
                                                   !u.getEntity().C3MasterIs(u.getEntity()));
     }
+
+    /**
+     * Tests a selection of units to see if all of them have Nova CEWS equipment
+     *
+     * @param units A vector of units to test for Nova CEWS equipment
+     *
+     * @return false if any unit in the selection does not have a functioning Nova CEWS
+     */
+    public static boolean doAllUnitsHaveNovaCEWS(Vector<Unit> units) {
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNovaCEWS());
+    }
+
+    /**
+     * Tests a selection of units to see if all of them have no Nova CEWS network assigned
+     *
+     * @param units A vector of units to test for Nova CEWS network assignment
+     *
+     * @return false if any unit in the selection does not have a functioning Nova CEWS or is already on a Nova network
+     */
+    public static boolean areAllUnitsNotNovaCEWSNetworked(Vector<Unit> units) {
+        // Nova CEWS max is 3 nodes, so unnetworked unit has 2 free nodes
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNovaCEWS()
+                                                  && (u.getEntity().calculateFreeC3Nodes() == 2));
+    }
+
+    /**
+     * Tests a selection of units to see if all of them are on a Nova CEWS network
+     *
+     * @param units A vector of units to test for Nova CEWS network assignment
+     *
+     * @return false if any unit in the selection does not have a functioning Nova CEWS or is not on a Nova network
+     */
+    public static boolean areAllUnitsNovaCEWSNetworked(Vector<Unit> units) {
+        // Nova CEWS max is 3 nodes, so networked unit has < 2 free nodes
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNovaCEWS()
+                                                  && (u.getEntity().calculateFreeC3Nodes() != 2));
+    }
+
+    /**
+     * Tests a selection of units to see if all of them are on the same Nova CEWS network by ID
+     *
+     * @param units A vector of units to test for Nova CEWS network assignment
+     *
+     * @return false if any unit in the selection does not have a functioning Nova CEWS, or is not on a Nova network, or
+     *       if any of the units is on a different Nova network from the others.
+     */
+    public static boolean areAllUnitsOnSameNovaCEWSNetwork(Vector<Unit> units) {
+        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+            return false;
+        }
+        final String network = units.get(0).getEntity().getC3NetId();
+        if (network == null) {
+            return false;
+        }
+        return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasNovaCEWS()
+                                                  && network.equals(u.getEntity().getC3NetId()));
+    }
     //endregion C3
 
     /**

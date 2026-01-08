@@ -48,6 +48,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -68,6 +69,8 @@ import mekhq.campaign.universe.factionHints.FactionHints;
 @XmlRootElement(name = "academy")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Academy implements Comparable<Academy> {
+    private static final MMLogger LOGGER = MMLogger.create(Academy.class);
+
     @XmlElement(name = "name")
     private String name = "Error: Name Missing";
 
@@ -808,139 +811,148 @@ public class Academy implements Comparable<Academy> {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
               MekHQ.getMHQOptions().getLocale());
 
-        StringBuilder tooltip = new StringBuilder().append("<html><body style='width: 200px'>");
-        tooltip.append("<i>").append(description).append("</i><br><br>");
-        tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
+        try {
+            StringBuilder tooltip = new StringBuilder().append("<html><body style='width: 200px'>");
+            tooltip.append("<i>").append(description).append("</i><br><br>");
+            tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
-        Person person = personnel.get(0);
+            Person person = personnel.get(0);
 
-        int educationLevel = 0;
-
-        if (personnel.size() == 1) {
-            educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
-        }
-
-        // here we display the skills
-        String[] skillNames = curriculums.get(courseIndex).split(",");
-
-        skillNames = Arrays.stream(skillNames).map(String::trim).toArray(String[]::new);
-
-        if (personnel.size() == 1) {
-            for (String skillName : skillNames) {
-                if (skillName.equalsIgnoreCase("xp")) {
-                    tooltip.append(skillName.toUpperCase()).append(" (");
-
-                    if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
-                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
-                    } else {
-                        tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate())
-                              .append(")<br>");
-                    }
-                } else if (!skillName.equalsIgnoreCase("none")) {
-                    String skillParsed = skillParser(skillName);
-                    tooltip.append(skillParsed).append(" (");
-
-                    Skill skill = person.getSkill(skillParsed);
-
-                    if (skill != null) {
-                        int skillLevel = skill.getLevel();
-                        SkillType skillType = skill.getType();
-                        if (skillType.getExperienceLevel(skillLevel) >= educationLevel) {
-                            tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
-                            continue;
-                        }
-                    }
-
-                    tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
-                }
-            }
-        } else {
-            for (String skill : skillNames) {
-                tooltip.append(skill).append("<br>");
-            }
-        }
-
-        tooltip.append("<br>");
-
-        // with the skill content resolved, we can move onto the rest of the tooltip
-        if (!isLocal && !isHomeSchool) {
-            int targetNumber = campaign.getCampaignOptions().getEntranceExamBaseTargetNumber() - facultySkill;
-            tooltip.append("<b>")
-                  .append(resources.getString("entranceExam.text"))
-                  .append("</b> ")
-                  .append(' ')
-                  .append(targetNumber)
-                  .append("+<br>");
-        }
-
-        if (personnel.size() == 1) {
-            tooltip.append("<b>")
-                  .append(resources.getString("tuition.text"))
-                  .append("</b> ")
-                  .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person))
-                  .append(" CSB")
-                  .append("<br>");
-        }
-
-        if (isPrepSchool) {
-            tooltip.append("<b>")
-                  .append(resources.getString("duration.text"))
-                  .append("</b> ")
-                  .append(' ')
-                  .append(String.format(resources.getString("durationAge.text"), ageMax))
-                  .append("<br>");
-        } else {
-            tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
-
-            tooltip.append(durationDays).append(' ').append(resources.getString("durationDays.text")).append("<br>");
-        }
-
-        // we need to do a little extra work to get travel time, to cover academies with
-        // multiple campuses
-        if (!isHomeSchool) {
-            int distance = campaign.getSimplifiedTravelTime(destination);
-
-            tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
-
-            tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
-
-            tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
-        }
-
-        // with travel time out the way, all that's left is to add the last couple of
-        // entries
-        if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
-            tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
+            int educationLevel = 0;
 
             if (personnel.size() == 1) {
-                if (!Objects.equals(person.getOriginFaction().getShortName(), campaign.getFaction().getShortName())) {
-                    tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
-                } else {
-                    tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
+                educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
+            }
+
+            // here we display the skills
+            String[] skillNames = curriculums.get(courseIndex).split(",");
+
+            skillNames = Arrays.stream(skillNames).map(String::trim).toArray(String[]::new);
+
+            if (personnel.size() == 1) {
+                for (String skillName : skillNames) {
+                    if (skillName.equalsIgnoreCase("xp")) {
+                        tooltip.append(skillName.toUpperCase()).append(" (");
+
+                        if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
+                            tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                        } else {
+                            tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate())
+                                  .append(")<br>");
+                        }
+                    } else if (!skillName.equalsIgnoreCase("none")) {
+                        String skillParsed = skillParser(skillName);
+                        tooltip.append(skillParsed).append(" (");
+
+                        Skill skill = person.getSkill(skillParsed);
+
+                        if (skill != null) {
+                            int skillLevel = skill.getLevel();
+                            SkillType skillType = skill.getType();
+                            if (skillType.getExperienceLevel(skillLevel) >= educationLevel) {
+                                tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                                continue;
+                            }
+                        }
+
+                        tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    }
                 }
             } else {
-                tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                for (String skill : skillNames) {
+                    tooltip.append(skill).append("<br>");
+                }
             }
 
             tooltip.append("<br>");
-        }
 
-        tooltip.append("<b>")
-              .append(resources.getString("facultySkill.text"))
-              .append("</b> ")
-              .append(facultySkill)
-              .append('+')
-              .append("<br>");
+            // with the skill content resolved, we can move onto the rest of the tooltip
+            if (!isLocal && !isHomeSchool) {
+                int targetNumber = campaign.getCampaignOptions().getEntranceExamBaseTargetNumber() - facultySkill;
+                tooltip.append("<b>")
+                      .append(resources.getString("entranceExam.text"))
+                      .append("</b> ")
+                      .append(' ')
+                      .append(targetNumber)
+                      .append("+<br>");
+            }
 
-        if (personnel.size() == 1) {
+            if (personnel.size() == 1) {
+                tooltip.append("<b>")
+                      .append(resources.getString("tuition.text"))
+                      .append("</b> ")
+                      .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person))
+                      .append(" CSB")
+                      .append("<br>");
+            }
+
+            if (isPrepSchool) {
+                tooltip.append("<b>")
+                      .append(resources.getString("duration.text"))
+                      .append("</b> ")
+                      .append(' ')
+                      .append(String.format(resources.getString("durationAge.text"), ageMax))
+                      .append("<br>");
+            } else {
+                tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
+
+                tooltip.append(durationDays)
+                      .append(' ')
+                      .append(resources.getString("durationDays.text"))
+                      .append("<br>");
+            }
+
+            // we need to do a little extra work to get travel time, to cover academies with
+            // multiple campuses
+            if (!isHomeSchool) {
+                int distance = campaign.getSimplifiedTravelTime(destination);
+
+                tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
+
+                tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
+
+                tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
+            }
+
+            // with travel time out the way, all that's left is to add the last couple of
+            // entries
+            if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
+                tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
+
+                if (personnel.size() == 1) {
+                    if (!Objects.equals(person.getOriginFaction().getShortName(),
+                          campaign.getFaction().getShortName())) {
+                        tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                    } else {
+                        tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
+                    }
+                } else {
+                    tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                }
+
+                tooltip.append("<br>");
+            }
+
             tooltip.append("<b>")
-                  .append(resources.getString("educationLevel.text"))
+                  .append(resources.getString("facultySkill.text"))
                   .append("</b> ")
-                  .append(EducationLevel.fromString(String.valueOf(getEducationLevel(person))))
+                  .append(facultySkill)
+                  .append('+')
                   .append("<br>");
-        }
 
-        return tooltip.append("</html>").toString();
+            if (personnel.size() == 1) {
+                tooltip.append("<b>")
+                      .append(resources.getString("educationLevel.text"))
+                      .append("</b> ")
+                      .append(EducationLevel.fromString(String.valueOf(getEducationLevel(person))))
+                      .append("<br>");
+            }
+
+            return tooltip.append("</html>").toString();
+        } catch (Exception e) {
+            LOGGER.error(e, "Error while building academy tooltip for {}", name);
+            return "Error while building academy tooltip. Please report to MegaMek Team";
+        }
     }
 
     /**

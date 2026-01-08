@@ -51,6 +51,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import javax.swing.Box;
@@ -245,6 +246,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
     }
 
     public static void processInjuryTransferral(Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
         List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
         for (Person person : personnel) {
             // First, Total Warfare-scale 'Hits'
@@ -275,7 +277,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
                     BodyLocation oldInjuryLocation = oldInjury.getLocation();
                     InjuryType newInjuryType = SEVERED_LIMB_TRANSLATION_MAP.get(oldInjuryLocation);
                     if (newInjuryType != null) {
-                        person.removeInjury(oldInjury);
+                        person.removeInjury(oldInjury, today);
 
                         Injury newInjury = newInjuryType.newInjury(campaign, person, oldInjuryLocation, 1);
                         if (newInjury != null) { // This will happen if there is an unexpected location match-up
@@ -288,7 +290,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
                 }
 
                 // Handler for non-missing locations
-                person.removeInjury(oldInjury);
+                person.removeInjury(oldInjury, today);
 
                 Injury newInjury = AlternateInjuries.OLD_WOUND.newInjury(campaign, person, GENERIC, 1);
                 newInjury.setOriginalTime(oldInjury.getOriginalTime());

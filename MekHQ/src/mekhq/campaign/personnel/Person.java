@@ -116,6 +116,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
+import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
@@ -328,6 +329,7 @@ public class Person {
     // region Advanced Medical
     private List<Injury> injuries;
     private List<String> planetaryInoculations;
+    private List<String> canonDiseaseInoculations;
     // endregion Advanced Medical
 
     // region Against the Bot
@@ -575,6 +577,7 @@ public class Person {
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
         planetaryInoculations = new ArrayList<>();
+        canonDiseaseInoculations = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
@@ -2285,8 +2288,35 @@ public class Person {
         this.storedLoyalty = storedLoyalty;
     }
 
-    public int getFatigue() {
+    /**
+     * Retrieves the fatigue value for the current person.
+     *
+     * <p><b>Usage:</b> This method gets the character's raw fatigue score. Generally you likely want to use
+     * {@link #getAdjustedFatigue()} instead, as that includes adjustments for the character's SPAs and Flaws.</p>
+     *
+     * @return The character's raw fatigue value
+     */
+    public int getFatigueDirect() {
         return fatigue;
+    }
+
+    /**
+     * Retrieves the adjusted fatigue value for the current person.
+     *
+     * <p>This method modifies raw Fatigue based on the presence of Fatigue effecting SPAs or Flaws.</p>
+     *
+     * @return The adjusted fatigue value after accounting for the person's SPAs and Flaws
+     */
+    public int getAdjustedFatigue() {
+        boolean hasDobrowskiSyndrome = options.booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME);
+
+        int modifier = 0;
+
+        if (hasDobrowskiSyndrome) {
+            modifier += 2;
+        }
+
+        return getFatigueDirect() + modifier;
     }
 
     public void setFatigue(final int fatigue) {
@@ -3364,7 +3394,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getBaseLoyalty());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigueDirect());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "permanentFatigue", getPermanentFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
@@ -3468,6 +3498,14 @@ public class Person {
                     MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetaryInoculation", planetaryInoculation);
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planetaryInoculations");
+            }
+
+            if (!canonDiseaseInoculations.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "canonDiseaseInoculations");
+                for (String planetaryInoculation : canonDiseaseInoculations) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "canonDiseaseInoculation", planetaryInoculation);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "canonDiseaseInoculations");
             }
 
             if (originalUnitWeight != EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
@@ -4149,6 +4187,22 @@ public class Person {
                             continue;
                         }
                         person.planetaryInoculations.add(wn3.getTextContent());
+                    }
+                } else if (nodeName.equalsIgnoreCase("canonDiseaseInoculations")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("canonDiseaseInoculation")) {
+                            LOGGER.error("Unknown node type not loaded in Canon Disease Inoculations nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+                        person.canonDiseaseInoculations.add(wn3.getTextContent());
                     }
                 } else if (nodeName.equalsIgnoreCase("originalUnitWeight")) {
                     person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent().trim());
@@ -5715,9 +5769,13 @@ public class Person {
     public int getAdjustedEdge() {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
         boolean hasInForLife = options.booleanOption(FLAW_IN_FOR_LIFE);
+        boolean hasDobrowskiSyndrome = options.booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME);
+
         int traumaticPastModifier = hasTraumaticPast ? -1 : 0;
         int inForLifeModifier = hasInForLife ? -1 : 0;
-        return getEdge() - unlucky + traumaticPastModifier + inForLifeModifier;
+        int dobrowskiModifier = hasDobrowskiSyndrome ? -1 : 0;
+
+        return getEdge() - unlucky + traumaticPastModifier + inForLifeModifier + dobrowskiModifier;
     }
 
     public void setEdge(final int edge) {
@@ -6405,7 +6463,7 @@ public class Person {
         boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
         if (isForConventionalInfantry) {
             SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
-            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel());
+            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel(), 0);
         }
 
         Skill skill = getSkillForWorkingOn(unit);
@@ -7145,6 +7203,16 @@ public class Person {
         return new ArrayList<>(injuries);
     }
 
+    public Set<InjuryType> getActiveInjuryTypes() {
+        Set<InjuryType> activeInjuryTypes = new HashSet<>();
+
+        for (Injury injury : injuries) {
+            activeInjuryTypes.add(injury.getType());
+        }
+
+        return activeInjuryTypes;
+    }
+
     public List<InjuryEffect> getActiveInjuryEffects() {
         boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
         return AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
@@ -7203,8 +7271,8 @@ public class Person {
      * Removes all non-prosthetic injuries from this person.
      *
      * <p>Any injury whose subtype does <em>not</em> identify as a prosthetic is removed via
-     * {@link #removeInjury(Injury)}. Prosthetic injuries are left intact. If removal results in the person having no
-     * remaining injuries, the assigned {@code doctorId} is cleared.</p>
+     * {@link #removeInjury(Injury, LocalDate)}. Prosthetic injuries are left intact. If removal results in the person
+     * having no remaining injuries, the assigned {@code doctorId} is cleared.</p>
      *
      * <p>After modifications are complete, a {@link PersonChangedEvent} is fired to notify the campaign of the
      * update.</p>
@@ -7212,11 +7280,11 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    public void clearInjuriesExcludingProsthetics() {
+    public void clearInjuriesExcludingProsthetics(LocalDate today) {
         for (Injury injury : new ArrayList<>(injuries)) {
             InjurySubType injurySubType = injury.getSubType();
             if (!injurySubType.isPermanentModification()) {
-                removeInjury(injury);
+                removeInjury(injury, today);
             }
         }
 
@@ -7230,7 +7298,7 @@ public class Person {
     /**
      * Removes all prosthetic-related injuries from this person.
      *
-     * <p>Any injury whose subtype identifies as a prosthetic is removed via {@link #removeInjury(Injury)}.
+     * <p>Any injury whose subtype identifies as a prosthetic is removed via {@link #removeInjury(Injury, LocalDate)}.
      * Non-prosthetic injuries remain untouched. If removal results in the person having no remaining injuries, the
      * assigned {@code doctorId} is cleared.</p>
      *
@@ -7240,11 +7308,11 @@ public class Person {
      * @author Illiani
      * @since 0.50.10
      */
-    public void clearProstheticInjuries() {
+    public void clearProstheticInjuries(LocalDate today) {
         for (Injury injury : new ArrayList<>(injuries)) {
             InjurySubType injurySubType = injury.getSubType();
             if (injurySubType.isPermanentModification()) {
-                removeInjury(injury);
+                removeInjury(injury, today);
             }
         }
 
@@ -7255,17 +7323,20 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public void removeInjury(final Injury injury) {
+    public void removeInjury(final Injury injury, final LocalDate today) {
         injuries.remove(injury);
 
         // We need to make sure we also remove any associated abilities and implants
         AdvancedMedicalAlternate.removeAssociatedInjuryOptions(injury, injuries, options);
 
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
+        InjuryType type = injury.getType();
+        InjurySubType subType = injury.getSubType();
+        if (subType.isCanonDisease()) {
+            addCanonDiseaseInoculation(type.getSimpleName());
+            MedicalLogger.specificAntibodies(this, today, type.getSimpleName());
+        }
 
-    public List<String> getPlanetaryInoculations() {
-        return planetaryInoculations;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public boolean hasPlanetaryInoculation(String planetId) {
@@ -7275,6 +7346,16 @@ public class Person {
     public void addPlanetaryInoculation(String planetId) {
         if (!hasPlanetaryInoculation(planetId)) {
             planetaryInoculations.add(planetId);
+        }
+    }
+
+    public boolean hasCanonDiseaseInoculation(String injuryTypeKey) {
+        return canonDiseaseInoculations.contains(injuryTypeKey);
+    }
+
+    public void addCanonDiseaseInoculation(String injuryKey) {
+        if (!hasCanonDiseaseInoculation(injuryKey)) {
+            canonDiseaseInoculations.add(injuryKey);
         }
     }
 

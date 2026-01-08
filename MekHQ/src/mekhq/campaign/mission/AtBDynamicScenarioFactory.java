@@ -756,7 +756,11 @@ public class AtBDynamicScenarioFactory {
 
                 // Gun emplacements use fixed tables instead of the force generator system
                 if (actualUnitType == GUN_EMPLACEMENT) {
-                    generatedLance = generateTurrets(4, skill, quality, campaign, faction);
+                    if (campaign.getCampaignOptions().isUseAdvancedBuildingGunEmplacements()) {
+                        generatedLance = generateGunEmplacements(4, skill, quality, campaign, faction);
+                    } else {
+                        generatedLance = generateTurrets(4, skill, quality, campaign, faction);
+                    }
 
                     // All other unit types use the force generator system to randomly select units
                 } else {
@@ -868,7 +872,7 @@ public class AtBDynamicScenarioFactory {
                 if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
                     // Configure non-Turret generated units with appropriate munitions (for BV calculations)
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(
-                          generatedLance.stream().filter(e -> !(e instanceof GunEmplacement)).toList()
+                          generatedLance.stream().filter(e -> !(e.isBuildingEntityOrGunEmplacement())).toList()
                     );
                     // bin fill ratio will be adjusted by the load out generator based on piracy and
                     // quality
@@ -1533,6 +1537,26 @@ public class AtBDynamicScenarioFactory {
                      .filter(Objects::nonNull)
                      .collect(Collectors.toList());
     }
+
+    /**
+     * Generates the indicated number of gun emplacement entities. Lifted from AtBScenario.java
+     *
+     * @param num      The number of gun emplacements to generate
+     * @param skill    The skill level of the weapon operators
+     * @param quality  The quality level of the gun emplacements
+     * @param campaign The campaign for which the gun emplacements are being generated.
+     * @param faction  The faction to generate gun emplacements for
+     */
+    public static List<Entity> generateGunEmplacements(int num, SkillLevel skill, int quality, Campaign campaign,
+          Faction faction) {
+        return campaign.getUnitGenerator()
+                     .generateGunEmplacements(num, skill, quality, campaign.getGameYear())
+                     .stream()
+                     .map(ms -> createEntityWithCrew(faction, skill, campaign, ms))
+                     .filter(Objects::nonNull)
+                     .collect(Collectors.toList());
+    }
+
 
     /**
      * Takes all the "bot" forces where the template says they should be player-controlled and transforms them into

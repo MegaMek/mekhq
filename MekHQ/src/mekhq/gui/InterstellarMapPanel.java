@@ -32,7 +32,10 @@
  */
 package mekhq.gui;
 
+import static java.lang.Math.min;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
@@ -74,6 +77,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.HPGLink;
@@ -121,6 +125,7 @@ public class InterstellarMapPanel extends JPanel {
     private final JRadioButton optRecharge;
     private final JRadioButton optAcademies;
     private final JRadioButton optHiringHalls;
+    private final JRadioButton optDiseases;
 
     private final JCheckBox optEmptySystems;
     private final JCheckBox optHPGNetwork;
@@ -166,8 +171,8 @@ public class InterstellarMapPanel extends JPanel {
                     width = Math.max(width - maxWidth / 5, minWidth);
                     height = Math.max(height - maxHeight / 5, minHeight);
                 } else if (!optionPanelHidden && ((width != maxWidth) || (height != maxHeight))) {
-                    width = Math.min(width + maxWidth / 5, maxWidth);
-                    height = Math.min(height + maxHeight / 5, maxHeight);
+                    width = min(width + maxWidth / 5, maxWidth);
+                    height = min(height + maxHeight / 5, maxHeight);
                 } else {
                     optionPanelTimer.stop();
                     return;
@@ -443,7 +448,7 @@ public class InterstellarMapPanel extends JPanel {
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 double size = 1 + 5 * Math.log(conf.scale);
-                size = Math.max(Math.min(size, conf.maxDotSize), conf.minDotSize);
+                size = Math.max(min(size, conf.maxDotSize), conf.minDotSize);
 
                 final Stroke thick = new BasicStroke(2.0f);
                 final Stroke thin = new BasicStroke(1.2f);
@@ -907,6 +912,8 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optAcademies);
         optHiringHalls = createOptionRadioButton("Hiring Halls", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optHiringHalls);
+        optDiseases = createOptionRadioButton("Disease Outbreaks", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optDiseases);
 
         ButtonGroup colorChoice = new ButtonGroup();
         colorChoice.add(optFactions);
@@ -920,6 +927,7 @@ public class InterstellarMapPanel extends JPanel {
         colorChoice.add(optRecharge);
         colorChoice.add(optAcademies);
         colorChoice.add(optHiringHalls);
+        colorChoice.add(optDiseases);
         // factions by default
         optFactions.setSelected(true);
 
@@ -1155,20 +1163,20 @@ public class InterstellarMapPanel extends JPanel {
     /**
      * Return a planet color based on what the user has selected from the radio button options
      *
-     * @param p PlanetarySystem object
+     * @param system PlanetarySystem object
      *
      * @return a Color
      */
-    public Color getSystemColor(PlanetarySystem p) {
+    public Color getSystemColor(PlanetarySystem system) {
         // color shading is from the Viridis color palettes
-        long pop = p.getPopulation(campaign.getLocalDate());
+        long pop = system.getPopulation(campaign.getLocalDate());
 
         // if no population, then just return black no matter what we asked for
         if (pop == 0L) {
             return Color.BLACK;
         }
 
-        SocioIndustrialData socio = p.getSocioIndustrial(campaign.getLocalDate());
+        SocioIndustrialData socio = system.getSocioIndustrial(campaign.getLocalDate());
 
         if (null != socio && optTech.isSelected()) {
             return switch (socio.tech) {
@@ -1245,7 +1253,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optHPG.isSelected()) {
-            HPGRating hpg = p.getHPG(campaign.getLocalDate());
+            HPGRating hpg = system.getHPG(campaign.getLocalDate());
             if (null == hpg) {
                 return Color.BLACK;
             }
@@ -1261,7 +1269,7 @@ public class InterstellarMapPanel extends JPanel {
 
         if (optRecharge.isSelected()) {
             // use two shades of gray for C and D as this is pony express
-            return switch (p.getNumberRechargeStations(campaign.getLocalDate())) {
+            return switch (system.getNumberRechargeStations(campaign.getLocalDate())) {
                 case 2 -> new Color(240, 249, 33);
                 case 1 -> new Color(225, 100, 98);
                 case 0 -> new Color(128, 128, 128);
@@ -1270,7 +1278,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optAcademies.isSelected()) {
-            int academyCount = MathUtility.clamp(p.getFilteredAcademies(campaign).size(), 0, 6);
+            int academyCount = MathUtility.clamp(system.getFilteredAcademies(campaign).size(), 0, 6);
 
             return switch (academyCount) {
                 case 6 -> new Color(253, 231, 37);
@@ -1284,7 +1292,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optHiringHalls.isSelected()) {
-            return switch (p.getHiringHallLevel(campaign.getLocalDate())) {
+            return switch (system.getHiringHallLevel(campaign.getLocalDate())) {
                 case QUESTIONABLE -> new Color(187, 55, 84);
                 case MINOR -> new Color(249, 140, 10);
                 case STANDARD -> new Color(253, 231, 37);
@@ -1292,6 +1300,21 @@ public class InterstellarMapPanel extends JPanel {
                 default -> Color.BLACK;
             };
         }
+
+        if (optDiseases.isSelected()) {
+            Set<InjuryType> diseases = getAllActiveDiseases(system.getId(), campaign.getLocalDate(), true);
+            diseases.addAll(getAllActiveBioweapons(system.getId(), campaign.getLocalDate(), true));
+            
+            int diseaseCount = min(4, diseases.size());
+            return switch (diseaseCount) {
+                case 1 -> new Color(253, 231, 37);
+                case 2 -> new Color(249, 140, 10);
+                case 3 -> new Color(187, 55, 84);
+                case 4 -> new Color(126, 3, 168);
+                default -> Color.BLACK;
+            };
+        }
+
         return Color.GRAY;
     }
 

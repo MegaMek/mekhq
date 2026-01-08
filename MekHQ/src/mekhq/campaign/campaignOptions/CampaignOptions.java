@@ -665,6 +665,7 @@ public class CampaignOptions {
     private boolean usePlanetaryConditions;
     private boolean useNoTornadoes;
     private int fixedMapChance;
+    private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
     private int scenarioModMax;
     private int scenarioModChance;
@@ -1339,6 +1340,7 @@ public class CampaignOptions {
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
         setFixedMapChance(25);
+        setUseAdvancedBuildingGunEmplacements(false);
         setSpaUpgradeIntensity(0);
         regionalMekVariations = false;
         attachedPlayerCamouflage = true;
@@ -5342,6 +5344,14 @@ public class CampaignOptions {
 
     public void setFixedMapChance(final int fixedMapChance) {
         this.fixedMapChance = fixedMapChance;
+    }
+
+    public boolean isUseAdvancedBuildingGunEmplacements() {
+        return useAdvancedBuildingGunEmplacements;
+    }
+
+    public void setUseAdvancedBuildingGunEmplacements(final boolean useAdvancedBuildingGunEmplacements) {
+        this.useAdvancedBuildingGunEmplacements = useAdvancedBuildingGunEmplacements;
     }
 
     public int getSpaUpgradeIntensity() {

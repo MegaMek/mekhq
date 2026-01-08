@@ -57,6 +57,8 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
@@ -165,6 +167,7 @@ import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
@@ -200,6 +203,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.protomeks.ProtoMekArmor;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -2557,12 +2561,56 @@ public class Campaign implements ITechManager {
 
         // Inoculations
         if (location.isOnPlanet()) {
-            String planetId = location.getPlanet().getId();
-            person.addPlanetaryInoculation(planetId);
+            Planet planet = location.getPlanet();
+            String planetId = planet.getId();
+            String systemId = planet.getParentSystem().getId();
+
+            if (!person.hasPlanetaryInoculation(planetId)) {
+                person.addPlanetaryInoculation(planetId);
+                MedicalLogger.inoculation(person, currentDay, planet.getName(currentDay));
+            }
+
+            Set<InjuryType> activeCures = getAllSystemSpecificDiseasesWithCures(systemId, currentDay, true);
+            for (InjuryType injuryType : activeCures) {
+                if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
+                    person.addCanonDiseaseInoculation(injuryType.getKey());
+                    MedicalLogger.specificInoculation(person, currentDay, injuryType.getSimpleName());
+                }
+            }
         }
 
-        String originPlanetId = person.getOriginPlanet().getId();
-        person.addPlanetaryInoculation(originPlanetId);
+        Planet planet = person.getOriginPlanet();
+        if (planet != location.getPlanet()) {
+            String planetName = planet.getName(currentDay);
+            String planetId = planet.getId();
+            String systemId = planet.getParentSystem().getId();
+
+            if (!person.hasPlanetaryInoculation(planetId)) {
+                person.addPlanetaryInoculation(planetId);
+                MedicalLogger.antibodies(person, currentDay, planetName);
+            }
+
+            // As a generosity we grant antibodies (inoculation) against all diseases found in the origin system,
+            // even those without external vaccines. This is to account for herd immunity in the origin system, as
+            // well as certain diseases that are only effective against non-natives. We specifically only check for
+            // diseases here, as bioweapons are not considered to be able to achieve herd immunity in this sense.
+            // Instead, we have a follow-up check to fetch any bioweapons that have active cures.
+            Set<InjuryType> activeDiseases = getAllActiveDiseases(systemId, currentDay, true);
+            for (InjuryType injuryType : activeDiseases) {
+                if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
+                    person.addCanonDiseaseInoculation(injuryType.getKey());
+                    MedicalLogger.specificAntibodies(person, currentDay, injuryType.getSimpleName());
+                }
+            }
+
+            Set<InjuryType> activeCures = getAllSystemSpecificDiseasesWithCures(systemId, currentDay, true);
+            for (InjuryType injuryType : activeCures) {
+                if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
+                    person.addCanonDiseaseInoculation(injuryType.getKey());
+                    MedicalLogger.specificAntibodies(person, currentDay, injuryType.getSimpleName());
+                }
+            }
+        }
 
         MekHQ.triggerEvent(new PersonNewEvent(person));
         return true;
@@ -3961,6 +4009,23 @@ public class Campaign implements ITechManager {
                 }
             }
         }
+        return seniorAdmin;
+    }
+
+    public @Nullable Person getSeniorMedicalPerson() {
+        Person seniorAdmin = null;
+
+        for (Person person : getDoctors()) {
+            if (seniorAdmin == null) {
+                seniorAdmin = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(this, seniorAdmin)) {
+                seniorAdmin = person;
+            }
+        }
+
         return seniorAdmin;
     }
 
@@ -5761,6 +5826,14 @@ public class Campaign implements ITechManager {
                 u.getEntity().setC3Master(null, true);
                 refreshNetworks();
             } else if (u.getEntity().hasC3i() && u.getEntity().calculateFreeC3Nodes() < 5) {
+                Vector<Unit> removedUnits = new Vector<>();
+                removedUnits.add(u);
+                removeUnitsFromNetwork(removedUnits);
+                u.getEntity().setC3MasterIsUUIDAsString(null);
+                u.getEntity().setC3Master(null, true);
+                refreshNetworks();
+            } else if (u.getEntity().hasNovaCEWS() && u.getEntity().calculateFreeC3Nodes() < 2) {
+                // Nova CEWS max is 3 nodes, so < 2 free means unit is networked
                 Vector<Unit> removedUnits = new Vector<>();
                 removedUnits.add(u);
                 removeUnitsFromNetwork(removedUnits);
@@ -8890,7 +8963,7 @@ public class Campaign implements ITechManager {
             if (null == en) {
                 continue;
             }
-            if (en.hasC3i() && en.calculateFreeC3Nodes() < 5 && en.calculateFreeC3Nodes() > 0) {
+            if (en.hasC3i() && en.calculateFreeC3Nodes() <= 5 && en.calculateFreeC3Nodes() > 0) {
                 String[] network = new String[2];
                 network[0] = en.getC3NetId();
                 network[1] = "" + en.calculateFreeC3Nodes();
@@ -8921,7 +8994,39 @@ public class Campaign implements ITechManager {
             if (null == en) {
                 continue;
             }
-            if (en.hasNavalC3() && en.calculateFreeC3Nodes() < 5 && en.calculateFreeC3Nodes() > 0) {
+            if (en.hasNavalC3() && en.calculateFreeC3Nodes() <= 5 && en.calculateFreeC3Nodes() > 0) {
+                String[] network = new String[2];
+                network[0] = en.getC3NetId();
+                network[1] = "" + en.calculateFreeC3Nodes();
+                if (!networkNames.contains(network[0])) {
+                    networks.add(network);
+                    networkNames.add(network[0]);
+                }
+            }
+        }
+        return networks;
+    }
+
+    /**
+     * @return returns a Vector of the unique name Strings of all Nova CEWS networks that have at least 1 free node Nova
+     *       CEWS networks support a maximum of 3 units
+     */
+    public Vector<String[]> getAvailableNovaCEWSNetworks() {
+        Vector<String[]> networks = new Vector<>();
+        Vector<String> networkNames = new Vector<>();
+
+        for (Unit u : getUnits()) {
+
+            if (u.getForceId() < 0) {
+                // only units currently in the TO&E
+                continue;
+            }
+            Entity en = u.getEntity();
+            if (null == en) {
+                continue;
+            }
+            // Nova CEWS max is 3 nodes, so unnetworked unit has 2 free nodes
+            if (en.hasNovaCEWS() && en.calculateFreeC3Nodes() <= 2 && en.calculateFreeC3Nodes() > 0) {
                 String[] network = new String[2];
                 network[0] = en.getC3NetId();
                 network[1] = "" + en.calculateFreeC3Nodes();
