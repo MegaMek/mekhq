@@ -324,7 +324,7 @@ public class MHQMorale {
      *     <ul>
      *         <li><strong>Rebels, minor powers, mercenaries, pirates:</strong> {@code +1} modifier (better for the
      *         player).</li>
-     *         <li><strong>Clans:</strong> an additional {@code -1} modifier (“double-dip”), making Clan morale
+     *         <li><strong>Clans:</strong> an additional {@code -1} modifier (“double-dip"), making Clan morale
      *         harder to break.</li>
      *     </ul>
      *     </li>
