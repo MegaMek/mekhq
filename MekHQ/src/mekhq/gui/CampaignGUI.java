@@ -1113,7 +1113,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthVehicleCrewGround = new JMenuItem(resourceMap.getString("miFullStrengthVehicleCrewGround.text"));
         miFullStrengthVehicleCrewGround.addActionListener(evt -> {
-            getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
             getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
         });
         menuVehicleCrewGroundPool.add(miFullStrengthVehicleCrewGround);
@@ -1160,7 +1160,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFullStrengthVehicleCrewVTOL.text"));
         miFullStrengthVehicleCrewVTOL.addActionListener(evt -> {
-            getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, 0);
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
             getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
         });
         menuVehicleCrewVTOLPool.add(miFullStrengthVehicleCrewVTOL);
@@ -1207,7 +1207,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFullStrengthVehicleCrewNaval.text"));
         miFullStrengthVehicleCrewNaval.addActionListener(evt -> {
-            getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, 0);
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
             getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
         });
         menuVehicleCrewNavalPool.add(miFullStrengthVehicleCrewNaval);
@@ -1254,7 +1254,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthVesselPilot = new JMenuItem(resourceMap.getString("miFullStrengthVesselPilot.text"));
         miFullStrengthVesselPilot.addActionListener(evt -> {
-            getCampaign().setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0);
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
             getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
         });
         menuVesselPilotPool.add(miFullStrengthVesselPilot);
@@ -1301,7 +1301,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthVesselGunner = new JMenuItem(resourceMap.getString("miFullStrengthVesselGunner.text"));
         miFullStrengthVesselGunner.addActionListener(evt -> {
-            getCampaign().setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0);
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
             getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
         });
         menuVesselGunnerPool.add(miFullStrengthVesselGunner);
@@ -1348,7 +1348,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthVesselCrew = new JMenuItem(resourceMap.getString("miFullStrengthVesselCrew.text"));
         miFullStrengthVesselCrew.addActionListener(evt -> {
-            getCampaign().setTempCrewPool(PersonnelRole.VESSEL_CREW, 0);
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
             getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
         });
         menuVesselCrewPool.add(miFullStrengthVesselCrew);
