@@ -252,42 +252,42 @@ public class CampaignNewDayManager {
         }
 
         if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.SOLDIER, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
         }
 
         if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVehicleCrewVTOLPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVehicleCrewNavalPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVesselPilotPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVesselGunnerPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
         }
 
         if (MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill()) {
-            campaign.setTempCrewPool(PersonnelRole.VESSEL_CREW, 0);
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
         }
 

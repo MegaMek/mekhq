@@ -1166,10 +1166,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     int currentCrew = unit.getActiveCrew().size();
                     int currentTempCrew = unit.getTotalTempCrew();
                     int fullCrew = unit.getFullCrewSize();
-                    int maxTempCrew = fullCrew - 1; // At least one must be a real Person
 
                     // Only show if unit can accept more temp crew
-                    if (currentCrew + currentTempCrew < maxTempCrew) {
+                    if (currentCrew + currentTempCrew < fullCrew) {
                         menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
                         menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
                         menuItem.addActionListener(this);
