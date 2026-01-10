@@ -7972,11 +7972,18 @@ public class Campaign implements ITechManager {
      * @param size the total number of temp crew in the pool
      */
     public void setTempCrewPool(PersonnelRole role, int size) {
+        int oldSize = tempPersonnelRoleMap.getOrDefault(role, 0);
         if (size <= 0) {
             tempPersonnelRoleMap.remove(role);
         } else {
             tempPersonnelRoleMap.put(role, size);
         }
+
+        // If the size changed (sizes aren't equal, or both values are less than or equal to 0) fire the event
+        if (size != oldSize || !(size <= 0 && oldSize <= 0)) {
+            fireTempCrewPoolChangedEvent(role, size - oldSize);
+        }
+
     }
 
     /**
@@ -8015,7 +8022,9 @@ public class Campaign implements ITechManager {
      * @return total pool minus crew currently in use
      */
     public int getAvailableTempCrewPool(PersonnelRole role) {
-        return Math.max(0, getTempCrewPool(role) - getTempCrewInUse(role));
+        int pool = getTempCrewPool(role);
+        int inUse = getTempCrewInUse(role);
+        return Math.max(0, pool - inUse);
     }
 
     public boolean requiresAdditionalAsTechs() {
@@ -8308,8 +8317,8 @@ public class Campaign implements ITechManager {
      * @param amount the amount to increase by
      */
     public void increaseTempCrewPool(PersonnelRole role, int amount) {
+        // Event is fired in setTempCrewPool
         setTempCrewPool(role, getTempCrewPool(role) + amount);
-        fireTempCrewPoolChangedEvent(role, amount);
     }
 
     /**
@@ -8318,8 +8327,8 @@ public class Campaign implements ITechManager {
      * @param amount the amount to decrease by
      */
     public void decreaseTempCrewPool(PersonnelRole role, int amount) {
+        // Event is fired in setTempCrewPool
         setTempCrewPool(role, Math.max(0, getTempCrewPool(role) - amount));
-        fireTempCrewPoolChangedEvent(role, -amount);
     }
 
     /**
@@ -8342,11 +8351,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Empties the temp crew pool for a specific role by setting it to 0.
-     * @param role the personnel role to empty
+     * Empties the temp crew pool for a specific role by setting it to the number of active temp crew for that role.
+     * @param role the personnel role to reduce to the minimum
      */
     public void emptyTempCrewPoolForRole(PersonnelRole role) {
-        setTempCrewPool(role, 0);
+        setTempCrewPool(role, getTempCrewInUse(role));
     }
 
     /**
@@ -8476,11 +8485,8 @@ public class Campaign implements ITechManager {
                 int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
                 int fullCrew = unit.getFullCrewSize();
 
-
-                // Maximum temp crew is (fullCrewSize - 1) to ensure at least one real Person
-                int maxTempCrew = fullCrew - 1;
                 int totalCurrentCrew = currentCrew + unit.getTotalTempCrew();
-                int needed = maxTempCrew - (totalCurrentCrew - currentCrew);
+                int needed = fullCrew - totalCurrentCrew;
 
                 if (needed > 0) {
                     int toAssign = Math.min(needed, availablePool);
