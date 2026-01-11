@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -67,6 +69,7 @@ import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevise
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -75,6 +78,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 /**
  * The {@code MarketsTab} class represents the campaign options tab related to market settings. This tab provides
@@ -287,7 +292,8 @@ public class MarketsTab {
      */
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
-        lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle");
+        lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader, "PersonnelMarketStyle"));
         comboPersonnelMarketStyle.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
               "PersonnelMarketStyle"));
@@ -308,7 +314,8 @@ public class MarketsTab {
         chkPersonnelMarketReportRefresh.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
               "PersonnelMarketReportRefresh"));
 
-        chkUsePersonnelHireHiringHallOnly = new CampaignOptionsCheckBox("UsePersonnelHireHiringHallOnly");
+        chkUsePersonnelHireHiringHallOnly = new CampaignOptionsCheckBox("UsePersonnelHireHiringHallOnly",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUsePersonnelHireHiringHallOnly.addMouseListener(createTipPanelUpdater(personnelMarketHeader,
               "UsePersonnelHireHiringHallOnly"));
 
@@ -639,26 +646,31 @@ public class MarketsTab {
         chkVariableContractLength.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "VariableContractLength"));
 
-        chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay");
+        chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseTwoWayPay.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseTwoWayPay"));
 
-        chkUseCamOpsSalvage = new CampaignOptionsCheckBox("UseCamOpsSalvage");
+        chkUseCamOpsSalvage = new CampaignOptionsCheckBox("UseCamOpsSalvage",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseCamOpsSalvage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseCamOpsSalvage"));
 
-        chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage");
+        chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseRiskySalvage"));
 
-        chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault");
+        chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "EnableSalvageFlagByDefault"));
 
         chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
         chkUseDynamicDifficulty.addMouseListener(createTipPanelUpdater(contractMarketHeader, "UseDynamicDifficulty"));
 
-        chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill");
+        chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseBolsterContractSkill"));
 
@@ -766,11 +778,13 @@ public class MarketsTab {
         contractGroup.add(btnContractEquipment);
         contractGroup.add(btnContractPersonnel);
 
-        chkUseAlternatePaymentMode = new CampaignOptionsCheckBox("UseAlternatePaymentMode");
+        chkUseAlternatePaymentMode = new CampaignOptionsCheckBox("UseAlternatePaymentMode",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAlternatePaymentMode.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseAlternatePaymentMode"));
 
-        chkUseDiminishingContractPay = new CampaignOptionsCheckBox("UseDiminishingContractPay");
+        chkUseDiminishingContractPay = new CampaignOptionsCheckBox("UseDiminishingContractPay",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseDiminishingContractPay.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseDiminishingContractPay"));
 
