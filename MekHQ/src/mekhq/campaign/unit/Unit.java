@@ -6475,8 +6475,12 @@ public class Unit implements ITechnology {
         } else {
             tempPersonnelRoleMap.put(personnelRole, count);
         }
-        resetPilotAndEntity();
-        MekHQ.triggerEvent(new UnitChangedEvent(this));
+
+        if (getCampaign() != null) {
+            resetPilotAndEntity();
+            MekHQ.triggerEvent(new UnitChangedEvent(this));
+        }
+
     }
 
     /**
