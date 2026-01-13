@@ -1234,7 +1234,7 @@ public class Unit implements ITechnology {
         if (isRefitting()) {
             return "unit is being refit";
         }
-        if (entity instanceof Tank && getActiveCrew().size() < getFullCrewSize()) {
+        if (entity instanceof Tank && getTotalCrewSize() < getFullCrewSize()) {
             return "This vehicle requires a crew of " + getFullCrewSize();
         }
         // Taharqa: I am not going to allow BattleArmor units with unmanned suits to
@@ -4756,7 +4756,7 @@ public class Unit implements ITechnology {
         if (hasPartsNeedingFixing()) {
             reasons.add("colorReason.unit.needsPartsFix");
         }
-        if (getActiveCrew().size() < getFullCrewSize()) {
+        if (getTotalCrewSize() < getFullCrewSize()) {
             reasons.add("colorReason.unit.uncrewed");
         }
 
