@@ -38,6 +38,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 import megamek.Version;
@@ -64,6 +66,8 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathIO;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -186,6 +190,7 @@ public class CampaignFactory {
         Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
         FactionStandingUltimatumsLibrary ultimatums = null;
+        Map<UUID, LifePath> lifePaths = null;
 
         RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
         AutosaveService autosave = new AutosaveService();
@@ -224,12 +229,11 @@ public class CampaignFactory {
         }
 
         try {
-            campaignConfig = new CampaignConfiguration(name, date, options,
-                  faction, techFaction, currencyManager, reputationController,
-                  factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
-                  retirementDefectionTracker, autosave, behaviorSettings,
-                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
-                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+            campaignConfig = new CampaignConfiguration(name, date, options, faction, techFaction, currencyManager,
+                  reputationController, factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
+                  lifePaths, retirementDefectionTracker, autosave, behaviorSettings, personnelMarket,
+                  atbMonthlyContractMarket, disabledUnitMarket, disabledRandomDivorce, disabledRandomMarriage,
+                  disabledRandomProcreation);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }
@@ -315,6 +319,19 @@ public class CampaignFactory {
             campaign = new Campaign(campaignConfig);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
+        }
+
+        // TODO this is currently bolted in here, but really we need to remove Immersive Dialog's reliance on
+        //  Campaign. Once that has been handled this can get shifted to CampaignConfiguration
+        if (campaign != null) {
+            try {
+                Map<UUID, LifePath> lifePathLibrary = LifePathIO.loadAllLifePaths(campaign);
+                campaignConfig.setLifePathLibrary(lifePathLibrary);
+                campaign.setLifePathLibrary(lifePathLibrary);
+            } catch (Exception ex) {
+                LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this " +
+                                   "must be investigated.", ex);
+            }
         }
 
         return campaign;

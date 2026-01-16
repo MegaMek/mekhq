@@ -101,8 +101,32 @@ public class Factions {
         return getFactions().stream().filter(Faction::isPlayable).collect(Collectors.toList());
     }
 
+    /**
+     * Returns a collection of all {@link Faction} objects, optionally including command subfactions.
+     *
+     * <p>If {@code includeCommands} is {@code false}, factions whose short name contains a period ({@code '.'}) will
+     * be excluded.</p>
+     *
+     * @param includeCommands if true, include factions that represent command subfactions; if false, exclude them
+     *
+     * @return a {@link Collection} of {@link Faction} objects, filtered as specified
+     */
+    public Collection<Faction> getFactions(boolean includeCommands) {
+        return factions.values().stream()
+                     .filter(f -> (includeCommands || !f.getShortName().contains(".")))
+                     .toList();
+    }
+
+    /**
+     * Returns a collection of all {@link Faction} objects, excluding command subfactions (those whose short name
+     * contains a period ({@code '.'})).
+     *
+     * <p>This is a convenience method equivalent to calling {@link #getFactions(boolean)} with {@code true}.</p>
+     *
+     * @return a {@link Collection} of {@link Faction} objects, excluding commands
+     */
     public Collection<Faction> getFactions() {
-        return factions.values();
+        return getFactions(true);
     }
 
     /**

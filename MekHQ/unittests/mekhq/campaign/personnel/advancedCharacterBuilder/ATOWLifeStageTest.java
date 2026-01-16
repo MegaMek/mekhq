@@ -37,7 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -125,7 +127,7 @@ class ATOWLifeStageTest {
     @Test
     void testFromOrder_InvalidOrder() {
         assertNull(ATOWLifeStage.fromOrder(-1));
-        assertNull(ATOWLifeStage.fromOrder(5));
+        assertNull(ATOWLifeStage.fromOrder(46));
         assertNull(ATOWLifeStage.fromOrder(100));
     }
 
@@ -158,5 +160,19 @@ class ATOWLifeStageTest {
         assertNull(ATOWLifeStage.fromString("-1"), "Expected null for negative number.");
         assertNull(ATOWLifeStage.fromString(null), "Expected null for null input.");
         assertNull(ATOWLifeStage.fromString("   "), "Expected null for whitespace string.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(ATOWLifeStage.class)
+    void testGetDisplayName_isValidKey(ATOWLifeStage lifeStage) {
+        assertTrue(MHQInternationalization.isResourceKeyValid(lifeStage.getDisplayName()),
+              "Invalid key for " + lifeStage.name());
+    }
+
+    @ParameterizedTest
+    @EnumSource(ATOWLifeStage.class)
+    void testGetDescription_isValidKey(ATOWLifeStage lifeStage) {
+        assertTrue(MHQInternationalization.isResourceKeyValid(lifeStage.getDescription()),
+              "Invalid key for " + lifeStage.name());
     }
 }

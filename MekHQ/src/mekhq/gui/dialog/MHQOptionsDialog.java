@@ -238,6 +238,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionStratConBatchallBreachConfirmation;
     private JCheckBox optionStratConDeployConfirmation;
     private JCheckBox optionAbandonUnitsConfirmation;
+    private JCheckBox optionNewLifePathConfirmation;
+    private JCheckBox optionRegenPathIdConfirmation;
+    private JCheckBox optionUpgradeLifePathsConfirmation;
 
     // endregion Nag Tab
 
@@ -1283,6 +1286,24 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionAbandonUnitsConfirmation.toolTipText"));
         optionAbandonUnitsConfirmation.setName("optionAbandonUnitsConfirmation");
 
+        optionNewLifePathConfirmation = new JCheckBox(resources.getString(
+              "optionNewLifePathConfirmation.text"));
+        optionNewLifePathConfirmation.setToolTipText(resources.getString(
+              "optionNewLifePathConfirmation.toolTipText"));
+        optionNewLifePathConfirmation.setName("optionNewLifePathConfirmation");
+
+        optionRegenPathIdConfirmation = new JCheckBox(resources.getString(
+              "optionRegenPathIdConfirmation.text"));
+        optionRegenPathIdConfirmation.setToolTipText(resources.getString(
+              "optionRegenPathIdConfirmation.toolTipText"));
+        optionRegenPathIdConfirmation.setName("optionRegenPathIdConfirmation");
+
+        optionUpgradeLifePathsConfirmation = new JCheckBox(resources.getString(
+              "optionUpgradeLifePathsConfirmation.text"));
+        optionUpgradeLifePathsConfirmation.setToolTipText(resources.getString(
+              "optionUpgradeLifePathsConfirmation.toolTipText"));
+        optionUpgradeLifePathsConfirmation.setName("optionUpgradeLifePathsConfirmation");
+
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -1319,7 +1340,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionBeginTransitConfirmation)
                                       .addComponent(optionStratConBatchallBreachConfirmation)
                                       .addComponent(optionStratConDeployConfirmation)
-                                      .addComponent(optionAbandonUnitsConfirmation));
+                                      .addComponent(optionAbandonUnitsConfirmation)
+                                      .addComponent(optionStratConDeployConfirmation)
+                                      .addComponent(optionNewLifePathConfirmation)
+                                      .addComponent(optionRegenPathIdConfirmation)
+                                      .addComponent(optionUpgradeLifePathsConfirmation));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionUnmaintainedUnitsNag)
@@ -1348,7 +1373,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionBeginTransitConfirmation)
                                         .addComponent(optionStratConBatchallBreachConfirmation)
                                         .addComponent(optionStratConDeployConfirmation)
-                                        .addComponent(optionAbandonUnitsConfirmation));
+                                        .addComponent(optionAbandonUnitsConfirmation)
+                                        .addComponent(optionStratConDeployConfirmation)
+                                        .addComponent(optionNewLifePathConfirmation)
+                                        .addComponent(optionRegenPathIdConfirmation)
+                                        .addComponent(optionUpgradeLifePathsConfirmation));
 
         return panel;
     }
@@ -1712,6 +1741,15 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS,
                     optionAbandonUnitsConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_NEW_LIFE_PATH,
+                    optionNewLifePathConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_REGEN_PATH_ID,
+                    optionRegenPathIdConfirmation.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_UPGRADE_LIFE_PATHS,
+                    optionUpgradeLifePathsConfirmation.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1908,6 +1946,15 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY));
         optionAbandonUnitsConfirmation.setSelected(options
                                                          .getNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS));
+
+        optionNewLifePathConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                        .getNagDialogIgnore(MHQConstants.CONFIRMATION_NEW_LIFE_PATH));
+
+        optionRegenPathIdConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                        .getNagDialogIgnore(MHQConstants.CONFIRMATION_REGEN_PATH_ID));
+
+        optionUpgradeLifePathsConfirmation.setSelected(MekHQ.getMHQOptions()
+                                                             .getNagDialogIgnore(MHQConstants.CONFIRMATION_UPGRADE_LIFE_PATHS));
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(options.getStartGameDelay());
         spnStartGameClientDelay.setValue(options.getStartGameClientDelay());

@@ -175,15 +175,28 @@ public class Person {
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
     // Traits
+    // TODO convert these into an enum
     public static final int TRAIT_MODIFICATION_COST = 100;
 
     public static final String CONNECTIONS_LABEL = "CONNECTIONS";
     public static final int MINIMUM_CONNECTIONS = 0;
     public static final int MAXIMUM_CONNECTIONS = 10;
 
+    public static final String ENEMY_LABEL = "ENEMY";
+    public static final int MINIMUM_ENEMY = -10;
+    public static final int MAXIMUM_ENEMY = 0;
+
+    public static final String PROPERTY_LABEL = "PROPERTY";
+    public static final int MINIMUM_PROPERTY = 0;
+    public static final int MAXIMUM_PROPERTY = 10;
+
     public static final String REPUTATION_LABEL = "REPUTATION";
     public static final int MINIMUM_REPUTATION = -5;
     public static final int MAXIMUM_REPUTATION = 5;
+
+    public static final String TITLE_LABEL = "TITLE";
+    public static final int MINIMUM_TITLE = 0;
+    public static final int MAXIMUM_TITLE = 10;
 
     public static final String WEALTH_LABEL = "WEALTH";
     public static final int MINIMUM_WEALTH = -1;

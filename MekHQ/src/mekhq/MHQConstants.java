@@ -241,6 +241,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
+    public static final String CONFIRMATION_NEW_LIFE_PATH = "confirmationNewLifePath";
+    public static final String CONFIRMATION_REGEN_PATH_ID = "confirmationRegenPathId";
+    public static final String CONFIRMATION_UPGRADE_LIFE_PATHS = "confirmationUpgradeLifePaths";
     // endregion Nag Tab
 
     // region Miscellaneous Options
@@ -291,6 +294,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWARDS_IMAGE_DIRECTORY_PATH = "data/images/awards";
     public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
     public static final String RAT_INFO_DIR = "data/universe/ratdata/";
+    public static final String LIFE_PATHS_DEFAULT_DIRECTORY_PATH = "data/advancedCharacterBuilder/lifePaths";
+    public static final String LIFE_PATHS_USER_DIRECTORY_PATH = "/advancedCharacterBuilder/lifePaths";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";

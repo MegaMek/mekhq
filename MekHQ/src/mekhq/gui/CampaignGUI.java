@@ -150,6 +150,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -1488,6 +1489,14 @@ public class CampaignGUI extends JPanel {
         });
 
         menuManage.add(miAutoResolveBehaviorEditor);
+
+        JMenu menuRoleplay = new JMenu(resourceMap.getString("menuRoleplay.text"));
+        JMenuItem miLifePathBuilder = new JMenuItem(resourceMap.getString("miLifePathBuilder.text"));
+        miLifePathBuilder.addActionListener(evt -> {
+            new LifePathBuilderDialog(getCampaign(), getFrame());
+        });
+        menuRoleplay.add(miLifePathBuilder);
+        menuManage.add(menuRoleplay);
 
         menuBar.add(menuManage);
         // endregion Manage Campaign Menu
