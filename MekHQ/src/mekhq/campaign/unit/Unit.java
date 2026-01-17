@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1234,7 +1234,7 @@ public class Unit implements ITechnology {
         if (isRefitting()) {
             return "unit is being refit";
         }
-        if (entity instanceof Tank && getActiveCrew().size() < getFullCrewSize()) {
+        if (entity instanceof Tank && getTotalCrewSize() < getFullCrewSize()) {
             return "This vehicle requires a crew of " + getFullCrewSize();
         }
         // Taharqa: I am not going to allow BattleArmor units with unmanned suits to
@@ -4756,7 +4756,7 @@ public class Unit implements ITechnology {
         if (hasPartsNeedingFixing()) {
             reasons.add("colorReason.unit.needsPartsFix");
         }
-        if (getActiveCrew().size() < getFullCrewSize()) {
+        if (getTotalCrewSize() < getFullCrewSize()) {
             reasons.add("colorReason.unit.uncrewed");
         }
 
