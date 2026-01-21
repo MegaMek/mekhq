@@ -79,7 +79,7 @@ import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
@@ -605,8 +605,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      *
      * @return true if the force is eligible to deploy, otherwise false
      */
-    public boolean canDeploy(Force force, Campaign campaign) {
-        Vector<UUID> units = force.getAllUnits(false);
+    public boolean canDeploy(Formation formation, Campaign campaign) {
+        Vector<UUID> units = formation.getAllUnits(false);
         if (isBigBattle() && getForces(campaign).getAllUnits(false).size() + units.size() > 8) {
             return false;
         } else if (isSpecialScenario() && getForces(campaign).getAllUnits(false).size() + units.size() > 0) {
@@ -642,16 +642,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines whether a list of forces is eligible to deploy to the scenario.
      *
-     * @param forces list of forces
+     * @param formations list of forces
      * @param c      the campaign that the forces are part of
      *
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
     @Override
-    public boolean canDeployForces(Vector<Force> forces, Campaign c) {
+    public boolean canDeployForces(Vector<Formation> formations, Campaign c) {
         int total = 0;
-        for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits(false);
+        for (Formation formation : formations) {
+            Vector<UUID> units = formation.getAllUnits(false);
             total += units.size();
             if (isBigBattle()) {
                 return getForces(c).getAllUnits(false).size() + units.size() <= 8;

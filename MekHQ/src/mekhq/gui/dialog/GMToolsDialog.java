@@ -89,7 +89,7 @@ import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import mekhq.gui.panels.LayeredForceIconCreationPanel;
+import mekhq.gui.panels.LayeredFormationIconCreationPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class GMToolsDialog extends AbstractMHQDialogBasic {
@@ -556,7 +556,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         getTabbedPane().setName("GMToolsTabbedPane");
         getTabbedPane().addTab(resources.getString("generalTab.title"), createGeneralTab());
         getTabbedPane().addTab(resources.getString("namesTab.title"), createNamesTab());
-        getTabbedPane().addTab(resources.getString("layeredForceIconTab.title"), createLayeredForceIconTab());
+        getTabbedPane().addTab(resources.getString("layeredFormationIconTab.title"), createLayeredFormationIconTab());
         return getTabbedPane();
     }
 
@@ -1376,11 +1376,11 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
     }
     // endregion Personnel Module Tab
 
-    // region Layered Force Icon Tab
-    private JPanel createLayeredForceIconTab() {
-        return new LayeredForceIconCreationPanel(getFrame(), null, true);
+    // region Layered Formation Icon Tab
+    private JPanel createLayeredFormationIconTab() {
+        return new LayeredFormationIconCreationPanel(getFrame(), null, true);
     }
-    // endregion Layered Force Icon Tab
+    // endregion Layered Formation Icon Tab
 
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {

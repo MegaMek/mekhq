@@ -52,7 +52,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -294,16 +294,16 @@ public class AtBScenarioModifierApplicator {
                         continue;
                     }
 
-                    Force playerForce = campaign.getForce(forceID);
+                    Formation playerFormation = campaign.getForce(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep
                     // at least one visible
                     // as the bot is unable to handle an invisible op for at the moment.
-                    int maxHiddenUnits = Math.min(playerForce.getAllUnits(false).size() - 1,
+                    int maxHiddenUnits = Math.min(playerFormation.getAllUnits(false).size() - 1,
                           scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
                     int numHiddenUnits = 0;
 
-                    for (UUID unitID : playerForce.getAllUnits(false)) {
+                    for (UUID unitID : playerFormation.getAllUnits(false)) {
                         if (numHiddenUnits >= maxHiddenUnits) {
                             break;
                         }

@@ -49,7 +49,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     private static final MMLogger LOGGER = MMLogger.create(MHQStaticDirectoryManager.class);
 
     // region Variable Declarations
-    private static AbstractDirectory forceIconDirectory;
+    private static AbstractDirectory formationIconDirectory;
     private static AbstractDirectory awardIconDirectory;
     private static AbstractDirectory storySplashDirectory;
     private static AbstractDirectory userStorySplashDirectory;
@@ -60,7 +60,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // should be reparsed, and are used to avoid reparsing the directory
     // repeatedly when there's
     // an error.
-    private static boolean parseForceIconDirectory = true;
+    private static boolean parseFormationIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
     private static boolean parseStorySplashDirectory = true;
     private static boolean parseUserStorySplashDirectory = true;
@@ -80,35 +80,35 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      */
     public static void initialize() {
         MMStaticDirectoryManager.initialize();
-        initializeForceIcons();
+        initializeFormationIcons();
         initializeAwardIcons();
         initializeStorySplash();
     }
 
     /**
-     * Parses MekHQ's force icon folder when first called or when it was refreshed.
+     * Parses MekHQ's formation icon folder when first called or when it was refreshed.
      *
-     * @see #refreshForceIcons()
+     * @see #refreshFormationIcons()
      */
-    private static void initializeForceIcons() {
-        // Read in and parse MekHQ's force icon folder only when first called or when
+    private static void initializeFormationIcons() {
+        // Read in and parse MekHQ's formation icon folder only when first called or when
         // refreshed
-        if (parseForceIconDirectory) {
-            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
+        if (parseFormationIconDirectory) {
+            // Set parseFormationIconDirectory too false to avoid parsing repeatedly when
             // something fails
-            parseForceIconDirectory = false;
+            parseFormationIconDirectory = false;
             try {
-                forceIconDirectory = new DirectoryItems(new File(MHQConstants.FORCE_ICON_PATH), new ImageFileFactory());
+                formationIconDirectory = new DirectoryItems(new File(MHQConstants.FORCE_ICON_PATH), new ImageFileFactory());
 
                 String userDir = PreferenceManager.getClientPreferences().getUserDir();
-                File forceIconUserDir = new File(userDir + "/" + MHQConstants.FORCE_ICON_PATH);
-                if (!userDir.isBlank() && forceIconUserDir.isDirectory()) {
-                    DirectoryItems userDirForceIcon = new DirectoryItems(forceIconUserDir, new ImageFileFactory());
-                    forceIconDirectory.merge(userDirForceIcon);
+                File formationIconUserDir = new File(userDir + "/" + MHQConstants.FORCE_ICON_PATH);
+                if (!userDir.isBlank() && formationIconUserDir.isDirectory()) {
+                    DirectoryItems userDirFormationIcon = new DirectoryItems(formationIconUserDir, new ImageFileFactory());
+                    formationIconDirectory.merge(userDirFormationIcon);
                 }
 
             } catch (Exception e) {
-                LOGGER.error("Could not parse the force icon directory!", e);
+                LOGGER.error("Could not parse the formation icon directory!", e);
             }
         }
     }
@@ -146,10 +146,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      * @see #refreshStorySplash()
      */
     private static void initializeStorySplash() {
-        // Read in and parse MekHQ's force icon folder only when first called or when
+        // Read in and parse MekHQ's formation icon folder only when first called or when
         // refreshed
         if (parseStorySplashDirectory) {
-            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
+            // Set parseFormationIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseStorySplashDirectory = false;
             try {
@@ -167,10 +167,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      * Parses the user's Story Arc portraits directory when first called or when it was refreshed
      */
     public static void initializeUserStoryPortraits(String path) {
-        // Read in and parse MekHQ's force icon folder only when first called or when
+        // Read in and parse MekHQ's formation icon folder only when first called or when
         // refreshed
         if (parseUserStoryPortraitDirectory) {
-            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
+            // Set parseFormationIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseUserStoryPortraitDirectory = false;
             try {
@@ -188,10 +188,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
      * Parses the user's Story Arc story arcs directory when first called or when it was refreshed
      */
     public static void initializeUserStorySplash(String path) {
-        // Read in and parse MekHQ's force icon folder only when first called or when
+        // Read in and parse MekHQ's formation icon folder only when first called or when
         // refreshed
         if (parseUserStorySplashDirectory) {
-            // Set parseForceIconDirectory too false to avoid parsing repeatedly when
+            // Set parseFormationIconDirectory too false to avoid parsing repeatedly when
             // something fails
             parseUserStorySplashDirectory = false;
             try {
@@ -209,14 +209,14 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // region Getters
 
     /**
-     * Returns an AbstractDirectory object containing all force icon filenames found in MekHQ's force icon folder.
+     * Returns an AbstractDirectory object containing all formation icon filenames found in MekHQ's formation icon folder.
      *
-     * @return an AbstractDirectory object with the force icon folders and filenames. May be null if the directory
+     * @return an AbstractDirectory object with the formation icon folders and filenames. May be null if the directory
      *       cannot be parsed.
      */
-    public static @Nullable AbstractDirectory getForceIcons() {
-        initializeForceIcons();
-        return forceIconDirectory;
+    public static @Nullable AbstractDirectory getFormationIcons() {
+        initializeFormationIcons();
+        return formationIconDirectory;
     }
 
     /**
@@ -269,15 +269,15 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     // region Refreshers
 
     /**
-     * Re-reads MekHQ's force icon folder and returns the updated AbstractDirectory object. This will update the
-     * AbstractDirectory object with changes to the force icons (like added image files and folders) while MekHQ is
+     * Re-reads MekHQ's formation icon folder and returns the updated AbstractDirectory object. This will update the
+     * AbstractDirectory object with changes to the formation icons (like added image files and folders) while MekHQ is
      * running.
      *
-     * @see #getForceIcons()
+     * @see #getFormationIcons()
      */
-    public static AbstractDirectory refreshForceIcons() {
-        parseForceIconDirectory = true;
-        return getForceIcons();
+    public static AbstractDirectory refreshFormationIcons() {
+        parseFormationIconDirectory = true;
+        return getFormationIcons();
     }
 
     /**

@@ -59,7 +59,7 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
@@ -89,10 +89,10 @@ public class DialogInterception extends JDialog {
      *
      * @param resupply     the {@link Resupply} instance containing the current campaign and contract details. Used to
      *                     access mission context, player commander information, and employer details.
-     * @param targetConvoy the optional {@link Force} representing the convoy involved in the interception. If
+     * @param targetConvoy the optional {@link Formation} representing the convoy involved in the interception. If
      *                     {@code null}, the dialog will use default values for the speaker and faction visuals.
      */
-    public DialogInterception(Resupply resupply, @Nullable Force targetConvoy) {
+    public DialogInterception(Resupply resupply, @Nullable Formation targetConvoy) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 

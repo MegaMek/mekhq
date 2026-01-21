@@ -51,7 +51,7 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -96,12 +96,12 @@ public class DialogRoleplayEvent extends JDialog {
      *
      * @param campaign     the {@link Campaign} instance, providing context for accessing relevant personnel and dynamic
      *                     game data like the player commander address.
-     * @param playerConvoy the {@link Force} instance representing the player's convoy. This is used to retrieve the
+     * @param playerConvoy the {@link Formation} instance representing the player's convoy. This is used to retrieve the
      *                     force commander and the convoy's name if no commander is available.
      * @param eventText    the narrative text describing the roleplay event. This string may include formatting
      *                     placeholders ({@code %s}) to dynamically incorporate campaign-specific details.
      */
-    public DialogRoleplayEvent(Campaign campaign, Force playerConvoy, String eventText) {
+    public DialogRoleplayEvent(Campaign campaign, Formation playerConvoy, String eventText) {
         setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes

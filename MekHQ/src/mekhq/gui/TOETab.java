@@ -58,7 +58,7 @@ import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
@@ -241,34 +241,34 @@ public final class TOETab extends CampaignGuiTab {
      */
     private void deployToRegularScenario(Scenario selectedScenario) {
         // Get available forces
-        List<Force> forceOptions = getCampaign().getCombatTeamsAsList().stream()
+        List<Formation> formationOptions = getCampaign().getCombatTeamsAsList().stream()
                                          .map(combatTeam -> getCampaign().getForce(combatTeam.getForceId()))
                                          .filter(force -> force != null && !force.isDeployed())
-                                         .sorted(Comparator.comparing(Force::getFullName))
+                                         .sorted(Comparator.comparing(Formation::getFullName))
                                          .toList();
 
         // Show force picker
-        MaplessStratConForcePicker forcePicker = new MaplessStratConForcePicker(getCampaign(), forceOptions);
+        MaplessStratConForcePicker forcePicker = new MaplessStratConForcePicker(getCampaign(), formationOptions);
         if (!forcePicker.wasConfirmed()) {
             return;
         }
 
-        Force selectedForce = forceOptions.get(forcePicker.getComboBoxChoiceIndex());
+        Formation selectedFormation = formationOptions.get(forcePicker.getComboBoxChoiceIndex());
 
         // Deploy force to scenario
         if (selectedScenario instanceof AtBDynamicScenario dynamicScenario) {
             new ForceTemplateAssignmentDialog(getCampaignGui(),
-                  new Vector<>(List.of(selectedForce)),
+                  new Vector<>(List.of(selectedFormation)),
                   null,
                   dynamicScenario);
         } else {
-            getCampaignGui().undeployForce(selectedForce);
-            selectedForce.clearScenarioIds(getCampaign(), true);
+            getCampaignGui().undeployForce(selectedFormation);
+            selectedFormation.clearScenarioIds(getCampaign(), true);
             if (selectedScenario != null) {
-                selectedScenario.addForces(selectedForce.getId());
-                selectedForce.setScenarioId(selectedScenario.getId(), getCampaign());
+                selectedScenario.addForces(selectedFormation.getId());
+                selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             }
-            MekHQ.triggerEvent(new DeploymentChangedEvent(selectedForce, selectedScenario));
+            MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
         }
     }
 
@@ -335,8 +335,8 @@ public final class TOETab extends CampaignGuiTab {
             } catch (IndexOutOfBoundsException ignored) {}
             // We can ignore here because if the selected index is out of bounds, we're just going
             // to not select the unit in the TO&E.
-        } else if (node instanceof Force) {
-            final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Force) node, getCampaign()));
+        } else if (node instanceof Formation) {
+            final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Formation) node, getCampaign()));
             scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             panForceView.setBorder(null);

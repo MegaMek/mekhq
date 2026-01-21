@@ -263,7 +263,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          *     <li>Factions</li>
          *     <li>Names</li>
          *     <li>Planetary Systems</li>
-         *     <li>Portraits, Camouflage, Mek Tileset, Force Icons, Awards</li>
+         *     <li>Portraits, Camouflage, Mek Tileset, Formation Icons, Awards</li>
          *     <li>Units</li>
          *     <li>New Campaign / Campaign Loading</li>
          *     <li>Campaign Application</li>

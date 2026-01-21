@@ -41,7 +41,7 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORCE_NONE;
 import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
 import static mekhq.gui.dialog.glossary.NewGlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -71,7 +71,7 @@ import megamek.common.icons.Portrait;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -803,10 +803,10 @@ public class ImmersiveDialogCore extends JDialog {
                 int forceId = assignedUnit.getForceId();
 
                 if (forceId != FORCE_NONE) {
-                    Force force = campaign.getForce(forceId);
+                    Formation formation = campaign.getForce(forceId);
 
-                    if (force != null) {
-                        speakerDescription.append("<br>").append(force.getName());
+                    if (formation != null) {
+                        speakerDescription.append("<br>").append(formation.getName());
                     }
                 }
             }

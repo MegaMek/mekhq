@@ -49,7 +49,7 @@ import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -91,11 +91,11 @@ class AverageExperienceRatingTest {
         Hangar hangar = mock(Hangar.class);
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force trainingForce = mock(Force.class, RETURNS_DEEP_STUBS);
-        when(trainingForce.getCombatRoleInMemory().isTraining()).thenReturn(true);
+        Formation trainingFormation = mock(Formation.class, RETURNS_DEEP_STUBS);
+        when(trainingFormation.getCombatRoleInMemory().isTraining()).thenReturn(true);
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(trainingForce);
+        when(team.getForce(campaign)).thenReturn(trainingFormation);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -113,12 +113,12 @@ class AverageExperienceRatingTest {
         when(unit.getEntity()).thenReturn(entity);
         when(unit.getCommander()).thenReturn(null); // uncrewed
 
-        Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-        when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+        Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+        when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+        when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(force);
+        when(team.getForce(campaign)).thenReturn(formation);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -135,12 +135,12 @@ class AverageExperienceRatingTest {
         Unit unit = mock(Unit.class);
         when(unit.getEntity()).thenReturn(jumpship);
 
-        Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-        when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+        Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+        when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+        when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(force);
+        when(team.getForce(campaign)).thenReturn(formation);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -177,12 +177,12 @@ class AverageExperienceRatingTest {
             when(unit.getEntity()).thenReturn(entity);
             when(unit.getCommander()).thenReturn(commander);
 
-            Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-            when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+            when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(force);
+            when(team.getForce(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -237,12 +237,12 @@ class AverageExperienceRatingTest {
             when(unitB.getEntity()).thenReturn(entityB);
             when(unitB.getCommander()).thenReturn(commanderB);
 
-            Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-            when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unitA, unitB));
+            Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+            when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unitA, unitB));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(force);
+            when(team.getForce(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -281,12 +281,12 @@ class AverageExperienceRatingTest {
             when(unit.getEntity()).thenReturn(entity);
             when(unit.getCommander()).thenReturn(commander);
 
-            Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-            when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+            when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(force);
+            when(team.getForce(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -342,12 +342,12 @@ class AverageExperienceRatingTest {
             when(unit.getDrivers()).thenReturn(List.of(driver1, driver2));
             when(unit.getGunners()).thenReturn(Set.of(gunner1, gunner2));
 
-            Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-            when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+            when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(force);
+            when(team.getForce(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -389,12 +389,12 @@ class AverageExperienceRatingTest {
             when(unit.getDrivers()).thenReturn(List.of(driver));
             when(unit.getGunners()).thenReturn(Set.of(gunner));
 
-            Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-            when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+            when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(force);
+            when(team.getForce(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -429,12 +429,12 @@ class AverageExperienceRatingTest {
             when(unit.getEntity()).thenReturn(entity);
             when(unit.getCommander()).thenReturn(commander);
 
-            Force force = mock(Force.class, RETURNS_DEEP_STUBS);
-            when(force.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(force.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+            when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(force);
+            when(team.getForce(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 

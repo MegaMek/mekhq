@@ -37,22 +37,22 @@ import javax.swing.tree.DefaultTreeModel;
 
 import megamek.client.ui.trees.AbstractIconChooserTree;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 
 /**
  * ForcePieceIconChooserTree is an implementation of AbstractIconChooserTree that uses a delayed initialization so that
- * the layer can first be specified, and then initializes the tree using the subset of the Force Icon Directory
+ * the layer can first be specified, and then initializes the tree using the subset of the Formation Icon Directory
  * specified by the layer's path.
  *
  * @see AbstractIconChooserTree
  */
 public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
     //region Variable Declarations
-    private LayeredForceIconLayer layer;
+    private LayeredFormationIconLayer layer;
     //endregion Variable Declarations
 
     //region Constructors
-    public ForcePieceIconChooserTree(final LayeredForceIconLayer layer) {
+    public ForcePieceIconChooserTree(final LayeredFormationIconLayer layer) {
         super(false);
         setLayer(layer);
         setModel(createTreeModel());
@@ -60,11 +60,11 @@ public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
     //endregion Constructors
 
     //region Getters/Setters
-    public LayeredForceIconLayer getLayer() {
+    public LayeredFormationIconLayer getLayer() {
         return layer;
     }
 
-    public void setLayer(final LayeredForceIconLayer layer) {
+    public void setLayer(final LayeredFormationIconLayer layer) {
         this.layer = layer;
     }
     //endregion Getters/Setters
@@ -73,7 +73,7 @@ public class ForcePieceIconChooserTree extends AbstractIconChooserTree {
     @Override
     protected DefaultTreeModel createTreeModel() {
         return createTreeModel(new DefaultMutableTreeNode(getLayer()),
-              MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath()));
+              MHQStaticDirectoryManager.getFormationIcons().getCategory(getLayer().getLayerPath()));
     }
     //endregion Initialization
 }

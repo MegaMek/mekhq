@@ -32,10 +32,10 @@
  */
 package mekhq.campaign.events.persons;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORCE_NONE;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -47,7 +47,7 @@ import mekhq.campaign.unit.Unit;
  * {@link Unit} involved in the assignment or removal.</p>
  *
  * <p>If the {@link Unit} is associated with a force, the force's commander information will
- * be updated accordingly through the {@link Force#updateCommander(Campaign)} method.</p>
+ * be updated accordingly through the {@link Formation#updateCommander(Campaign)} method.</p>
  */
 public class PersonCrewAssignmentEvent extends PersonChangedEvent {
 
@@ -61,7 +61,7 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
      * @param unit     The {@link Unit} involved in the assignment or removal.
      *
      *                 <p>If the {@code unit} is associated with a force, the force's commander information is updated
-     *                 during the construction of this event by calling {@link Force#updateCommander(Campaign)}.</p>
+     *                 during the construction of this event by calling {@link Formation#updateCommander(Campaign)}.</p>
      */
     public PersonCrewAssignmentEvent(Campaign campaign, Person crew, Unit unit) {
         super(crew);
@@ -70,10 +70,10 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
         int forceId = unit.getForceId();
 
         if (forceId != FORCE_NONE) {
-            Force force = campaign.getForce(forceId);
+            Formation formation = campaign.getForce(forceId);
 
-            if (force != null) {
-                force.updateCommander(campaign);
+            if (formation != null) {
+                formation.updateCommander(campaign);
             }
         }
     }

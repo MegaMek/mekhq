@@ -54,7 +54,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
@@ -881,10 +881,10 @@ public class MRMSService {
             boolean assigned = false;
 
             if ((unit != null) && configuredOptions.isUseAssignedTechsFirst()) {
-                Force force = campaign.getForce(unit.getForceId());
+                Formation formation = campaign.getForce(unit.getForceId());
 
-                if ((force != null) && (force.getTechID()) != null) {
-                    assigned = force.getTechID().toString().equals(tech.getId().toString());
+                if ((formation != null) && (formation.getTechID()) != null) {
+                    assigned = formation.getTechID().toString().equals(tech.getId().toString());
                 }
 
                 if (!assigned && !tech.getTechUnits().isEmpty()) {

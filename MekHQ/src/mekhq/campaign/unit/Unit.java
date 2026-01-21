@@ -112,8 +112,8 @@ import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -260,7 +260,7 @@ public class Unit implements ITechnology {
         this.drivers = new ArrayList<>();
         this.gunners = new HashSet<>();
         this.vesselCrew = new ArrayList<>();
-        forceId = Force.FORCE_NONE;
+        forceId = Formation.FORCE_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
         this.history = "";
         this.lastMaintenanceReport = "";
@@ -1726,11 +1726,11 @@ public class Unit implements ITechnology {
     }
 
     public double getCargoCapacityForSalvage() {
-        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), ForceType.SALVAGE);
+        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), FormationType.SALVAGE);
     }
 
     public double getCargoCapacityForConvoy() {
-        return getCargoCapacity(0, ForceType.CONVOY);
+        return getCargoCapacity(0, FormationType.CONVOY);
     }
 
     /**
@@ -1768,7 +1768,7 @@ public class Unit implements ITechnology {
      */
     @Deprecated(since = "0.50.10")
     public double getCargoCapacity() {
-        return getCargoCapacity(0, ForceType.CONVOY);
+        return getCargoCapacity(0, FormationType.CONVOY);
     }
 
     /**
@@ -1800,12 +1800,12 @@ public class Unit implements ITechnology {
      * </ul>
      *
      * @param maximumMpPenalty the maximum movement penalty that can be applied to the entity.
-     * @param forceType        the type of force (e.g., convoy) which determines certain restrictions on transportation
+     * @param formationType        the type of force (e.g., convoy) which determines certain restrictions on transportation
      *                         capacity.
      *
      * @return the total cargo capacity of the entity. Returns 0.0 if the entity is not fully crewed.
      */
-    public double getCargoCapacity(int maximumMpPenalty, ForceType forceType) {
+    public double getCargoCapacity(int maximumMpPenalty, FormationType formationType) {
         if (!isFullyCrewed()) {
             return 0.0;
         }
@@ -1836,7 +1836,7 @@ public class Unit implements ITechnology {
             } else {
                 // No using your arms, roof rack, or lift hoists for convoys!
                 if (transporter instanceof ExternalCargo) {
-                    if (forceType != ForceType.CONVOY) {
+                    if (formationType != FormationType.CONVOY) {
                         if (transporter instanceof RoofRack) {
                             roofRackCapacity += actualCapacity;
                             continue;
@@ -1870,7 +1870,7 @@ public class Unit implements ITechnology {
         }
 
         // No using your arms, roof rack, or lift hoists for convoys!
-        if (forceType != ForceType.CONVOY) {
+        if (formationType != FormationType.CONVOY) {
             if (liftHoistCount > 0) {
                 double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
                 // Lift Hoist
@@ -2832,7 +2832,7 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
 
-        if (forceId != Force.FORCE_NONE) {
+        if (forceId != Formation.FORCE_NONE) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
         }
 
@@ -4649,8 +4649,8 @@ public class Unit implements ITechnology {
 
     public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
-            final Force force = campaign.getForce(getForceId());
-            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
+            final Formation formation = campaign.getForce(getForceId());
+            return (formation != null) ? formation.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
         } else {
             return getCamouflage();
         }

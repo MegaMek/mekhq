@@ -54,7 +54,7 @@ import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Scenario;
@@ -136,12 +136,12 @@ public class StratConScenario implements IStratConDisplayable {
      * Add a force to the backing scenario, trying to associate it with the given template. Does some scenario and force
      * house-keeping, fires a deployment changed event.
      */
-    public void addForce(Force force, String templateID, Campaign campaign) {
-        if (!getBackingScenario().getForceIDs().contains(force.getId())) {
-            backingScenario.addForce(force.getId(), templateID);
-            force.setScenarioId(getBackingScenarioID(), campaign);
+    public void addForce(Formation formation, String templateID, Campaign campaign) {
+        if (!getBackingScenario().getForceIDs().contains(formation.getId())) {
+            backingScenario.addForce(formation.getId(), templateID);
+            formation.setScenarioId(getBackingScenarioID(), campaign);
 
-            for (UUID unitID : force.getAllUnits(true)) {
+            for (UUID unitID : formation.getAllUnits(true)) {
                 Unit unit = campaign.getUnit(unitID);
 
                 if (unit == null) {
@@ -151,7 +151,7 @@ public class StratConScenario implements IStratConDisplayable {
                 addPlayerTransportRelationships(unit);
             }
 
-            MekHQ.triggerEvent(new DeploymentChangedEvent(force, getBackingScenario()));
+            MekHQ.triggerEvent(new DeploymentChangedEvent(formation, getBackingScenario()));
         }
     }
 
@@ -615,12 +615,12 @@ public class StratConScenario implements IStratConDisplayable {
             StratConCampaignState campaignState = contract.getStratconCampaignState();
 
             StratConTrackState track = getTrackForScenario(campaign, campaignState);
-            for (Force force : campaign.getAllForces()) {
-                if (force.getScenarioId() == backingScenarioId) {
-                    force.clearScenarioIds(campaign, true);
-                    backingScenario.removeForce(force.getId());
+            for (Formation formation : campaign.getAllForces()) {
+                if (formation.getScenarioId() == backingScenarioId) {
+                    formation.clearScenarioIds(campaign, true);
+                    backingScenario.removeForce(formation.getId());
 
-                    for (UUID uid : force.getAllUnits(false)) {
+                    for (UUID uid : formation.getAllUnits(false)) {
                         Unit unit = campaign.getUnit(uid);
                         if (unit != null) {
                             backingScenario.removeUnit(unit.getId());
@@ -628,8 +628,8 @@ public class StratConScenario implements IStratConDisplayable {
                         }
                     }
 
-                    track.unassignForce(force.getId());
-                    MekHQ.triggerEvent(new DeploymentChangedEvent(force, backingScenario));
+                    track.unassignForce(formation.getId());
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(formation, backingScenario));
                 }
             }
 
