@@ -1935,7 +1935,7 @@ public class StratConRulesManager {
         String maneuverRoleReport = "";
         if (reinforcementType == AUXILIARY) {
             int secondRoll = d6(2);
-            maneuverRoleReport = String.format(" (%s)", roll, secondRoll);
+            maneuverRoleReport = String.format(" (%s,%s)", roll, secondRoll);
             roll = max(roll, secondRoll);
         }
 
