@@ -59,6 +59,8 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -96,7 +98,8 @@ public class StratConContractInitializer {
         // when objective is allied/hostile facility, place those facilities
 
         int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
-        int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
+        // Use the contract's destination planet, not the campaign's current location
+        int planetaryTemperature = getContractPlanetTemperature(contract, campaign);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
@@ -308,6 +311,45 @@ public class StratConContractInitializer {
      */
     public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
         return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+    }
+
+    /**
+     * Gets the temperature of the contract's destination planet.
+     *
+     * <p>Uses the contract's system (where the contract takes place), not the campaign's
+     * current location. Falls back to 25C (standard room temperature) if the planet or temperature data is
+     * unavailable.</p>
+     *
+     * @param contract the contract being initialized
+     * @param campaign the campaign (used to get the current date)
+     *
+     * @return the planetary temperature in Celsius
+     */
+    private static int getContractPlanetTemperature(AtBContract contract, Campaign campaign) {
+        final int DEFAULT_TEMPERATURE = 25; // Standard room temperature as fallback
+
+        PlanetarySystem system = contract.getSystem();
+        if (system == null) {
+            LOGGER.warn("Contract {} has no system, using default temperature",
+                  contract.getName());
+            return DEFAULT_TEMPERATURE;
+        }
+
+        Planet planet = system.getPrimaryPlanet();
+        if (planet == null) {
+            LOGGER.warn("System {} has no primary planet, using default temperature",
+                  system.getName(campaign.getLocalDate()));
+            return DEFAULT_TEMPERATURE;
+        }
+
+        Integer temperature = planet.getTemperature(campaign.getLocalDate());
+        if (temperature == null) {
+            LOGGER.warn("Planet {} has no temperature data, using default temperature",
+                  planet.getName(campaign.getLocalDate()));
+            return DEFAULT_TEMPERATURE;
+        }
+
+        return temperature;
     }
 
     /**

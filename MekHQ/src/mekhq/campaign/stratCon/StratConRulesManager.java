@@ -832,9 +832,12 @@ public class StratConRulesManager {
             // if facility doesn't have a biome temp map or no entry for the current
             // temperature, use the default one
             if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
-                facilityBiome = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
-                                      .floorEntry(kelvinTemp)
-                                      .getValue();
+                var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+                var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
+                if (biomeEntry == null) {
+                    biomeEntry = defaultTempMap.firstEntry();
+                }
+                facilityBiome = biomeEntry.getValue();
             } else {
                 facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
             }

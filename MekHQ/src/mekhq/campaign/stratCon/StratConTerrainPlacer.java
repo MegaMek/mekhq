@@ -53,8 +53,14 @@ public class StratConTerrainPlacer {
         // TODO: Maybe more than one of each biome?
         // TODO: Map category being displayed for some reason
         int kelvinTemp = track.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-        StratConBiome biome = StratConBiomeManifest.getInstance().getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                    .floorEntry(kelvinTemp).getValue();
+        var tempMap = StratConBiomeManifest.getInstance().getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+        var biomeEntry = tempMap.floorEntry(kelvinTemp);
+        // If temperature is below minimum (e.g., planet colder than absolute zero in data),
+        // fall back to the coldest available biome
+        if (biomeEntry == null) {
+            biomeEntry = tempMap.firstEntry();
+        }
+        StratConBiome biome = biomeEntry.getValue();
 
         int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
 

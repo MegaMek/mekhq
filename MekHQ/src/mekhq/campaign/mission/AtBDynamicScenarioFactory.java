@@ -88,7 +88,6 @@ import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
-import megamek.common.equipment.GunEmplacement;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
@@ -1828,9 +1827,12 @@ public class AtBDynamicScenarioFactory {
             scenario.setBoardType(T_GROUND);
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                                .floorEntry(kelvinTemp)
-                                                .getValue().allowedTerrainTypes;
+            var tempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+            var biomeEntry = tempMap.floorEntry(kelvinTemp);
+            if (biomeEntry == null) {
+                biomeEntry = tempMap.firstEntry();
+            }
+            List<String> allowedTerrain = biomeEntry.getValue().allowedTerrainTypes;
 
             int terrainIndex = randomInt(allowedTerrain.size());
             scenario.setTerrainType(allowedTerrain.get(terrainIndex));
@@ -1847,12 +1849,18 @@ public class AtBDynamicScenarioFactory {
         } else {
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedFacility = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
-                                                 .floorEntry(kelvinTemp)
-                                                 .getValue().allowedTerrainTypes;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                                .floorEntry(kelvinTemp)
-                                                .getValue().allowedTerrainTypes;
+            var facilityTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+            var facilityBiomeEntry = facilityTempMap.floorEntry(kelvinTemp);
+            if (facilityBiomeEntry == null) {
+                facilityBiomeEntry = facilityTempMap.firstEntry();
+            }
+            List<String> allowedFacility = facilityBiomeEntry.getValue().allowedTerrainTypes;
+            var terrainTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+            var terrainBiomeEntry = terrainTempMap.floorEntry(kelvinTemp);
+            if (terrainBiomeEntry == null) {
+                terrainBiomeEntry = terrainTempMap.firstEntry();
+            }
+            List<String> allowedTerrain = terrainBiomeEntry.getValue().allowedTerrainTypes;
             List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
             // try to filter on temp
             allowedTerrain.addAll(allowedFacility);
