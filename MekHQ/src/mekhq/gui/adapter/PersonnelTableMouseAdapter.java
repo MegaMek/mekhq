@@ -666,6 +666,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.improveSkill(skillName);
                 selectedPerson.spendXPOnSkills(getCampaign(), cost);
+                skill = selectedPerson.getSkill(skillName);
                 SkillType skillType = skill.getType();
 
                 PerformanceLogger.improvedSkill(getCampaignOptions().isPersonnelLogSkillGain(),
