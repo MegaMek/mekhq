@@ -40,7 +40,6 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -339,7 +338,16 @@ public class RandomFactionGenerator {
             }
 
             String[] fallbacks = candidate.getAlternativeFactionCodes();
-            if (fallbacks != null && Arrays.asList(fallbacks).contains(factionKey)) {
+            boolean matchesFallback = false;
+            if (fallbacks != null) {
+                for (String fallback : fallbacks) {
+                    if (factionKey.equals(fallback)) {
+                        matchesFallback = true;
+                        break;
+                    }
+                }
+            }
+            if (matchesFallback) {
                 LOGGER.info("Found super-state faction {} for {} during {}",
                       candidate.getShortName(), factionKey, currentYear);
                 return candidate;
