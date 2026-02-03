@@ -142,7 +142,28 @@ public class AcademyFactory {
                 academy.setSet(currentSetName);
                 tempAcademyMap.put(academy.getName(), academy);
             }
-            academyMap.put(currentSetName, tempAcademyMap);
+
+            // Merge with existing academies instead of replacing the entire set.
+            // This allows user academy files to override specific academies while
+            // preserving base academies that aren't in the user's file.
+            Map<String, Academy> existingMap = academyMap.get(currentSetName);
+            if (existingMap != null) {
+                // Find the max ID from existing academies to avoid ID conflicts
+                int maxId = existingMap.values().stream()
+                                  .mapToInt(Academy::getId)
+                                  .max().orElse(-1);
+                // Reassign IDs to new academies starting after the max existing ID
+                int newId = maxId + 1;
+                for (Academy academy : tempAcademyMap.values()) {
+                    // Only reassign ID if this is a new academy (not overriding an existing one)
+                    if (!existingMap.containsKey(academy.getName())) {
+                        academy.setId(newId++);
+                    }
+                }
+                existingMap.putAll(tempAcademyMap);
+            } else {
+                academyMap.put(currentSetName, tempAcademyMap);
+            }
         } catch (JAXBException e) {
             LOGGER.error("Error loading XML for academies", e);
         }
