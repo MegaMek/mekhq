@@ -50,6 +50,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.ui.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.enums.DailyReportType;
 
@@ -60,8 +61,6 @@ import mekhq.campaign.enums.DailyReportType;
  * @author Jay Lawson
  */
 public class DailyReportLogPanel extends JPanel {
-    private static final DateTimeFormatter DAILY_REPORT_DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
-
     //region Variable Declarations
     private final CampaignGUI gui;
     final JScrollPane logPanel = new FastJScrollPane();
@@ -208,7 +207,12 @@ public class DailyReportLogPanel extends JPanel {
                 String line = reports.get(0);
                 String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
 
-                LocalDate.parse(inner, DAILY_REPORT_DATE_FORMAT);
+                // Use the user's configured date format and locale to match what's displayed
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                      MekHQ.getMHQOptions().getLongDisplayDateFormat()
+                ).withLocale(MekHQ.getMHQOptions().getDateLocale());
+
+                LocalDate.parse(inner, formatter);
                 isDateOnly = true;
             } catch (Exception ignored) {
                 // Not a formatted date — do nothing
