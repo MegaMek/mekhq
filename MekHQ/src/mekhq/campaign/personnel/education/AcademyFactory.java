@@ -140,6 +140,8 @@ public class AcademyFactory {
                 academy.setId(id);
                 id++;
                 academy.setSet(currentSetName);
+                // Validate that parallel lists have matching sizes
+                academy.validateListSizes();
                 tempAcademyMap.put(academy.getName(), academy);
             }
             academyMap.put(currentSetName, tempAcademyMap);
