@@ -184,8 +184,7 @@ public class DailyReportLogPanel extends JPanel {
      * <ul>
      *     <li>{@code reports} contains exactly one element,</li>
      *     <li>that element is wrapped in {@code <b>} and {@code </b>} tags, and</li>
-     *     <li>the inner text parses successfully as a {@link LocalDate} using the {@link #DAILY_REPORT_DATE_FORMAT}
-     *     formatter.</li>
+     *     <li>the inner text parses successfully as a {@link LocalDate} using the user's configured date format.</li>
      * </ul>
      *
      * <p>If the list size is not exactly one, the element is not correctly formatted, or the inner text cannot be
