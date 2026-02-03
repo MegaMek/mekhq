@@ -53,8 +53,8 @@ public class ContractScore {
     private static final int MARGINAL_DEFEAT = -1;
     private static final int DEFEAT = -2;
     private static final int DECISIVE_DEFEAT = -3;
-    private static final int FLEET_IN_BEING = 2;
-    private static final int REFUSED_ENGAGEMENT = 2;
+    private static final int FLEET_IN_BEING = -2;
+    private static final int REFUSED_ENGAGEMENT = -3;
 
     /**
      * Calculates the overall contract score based on the outcomes of all completed scenarios.
