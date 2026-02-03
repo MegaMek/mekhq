@@ -152,11 +152,15 @@ public class AcademyFactory {
                 int maxId = existingMap.values().stream()
                                   .mapToInt(Academy::getId)
                                   .max().orElse(-1);
-                // Reassign IDs to new academies starting after the max existing ID
+                // Reassign IDs: preserve IDs for overrides, assign new IDs for new academies
                 int newId = maxId + 1;
                 for (Academy academy : tempAcademyMap.values()) {
-                    // Only reassign ID if this is a new academy (not overriding an existing one)
-                    if (!existingMap.containsKey(academy.getName())) {
+                    Academy existing = existingMap.get(academy.getName());
+                    if (existing != null) {
+                        // Preserve the original ID when overriding an existing academy
+                        academy.setId(existing.getId());
+                    } else {
+                        // Assign a new, non-conflicting ID for new academies
                         academy.setId(newId++);
                     }
                 }
