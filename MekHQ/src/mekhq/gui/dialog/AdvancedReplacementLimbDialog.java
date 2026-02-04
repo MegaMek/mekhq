@@ -522,12 +522,14 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                           "AdvancedReplacementLimbDialog.status.localSurgeon.transit"));
                 }
             } else {
-                int targetNumber = surgeon.getSkill(S_SURGERY).getFinalSkillValue(surgeon.getSkillModifierData());
-                targetNumber -= surgeon.getOptions().booleanOption(UNOFFICIAL_BIOLOGICAL_MACHINIST) ? -2 : 0;
+                Skill surgerySkill = surgeon.getSkill(S_SURGERY);
+                SkillModifierData modifierData = surgeon.getSkillModifierData();
+                int surgeonSkillLevel = surgerySkill.getTotalSkillLevel(modifierData);
+                int targetNumber = surgerySkill.getFinalSkillValue(modifierData);
 
                 summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
                       "AdvancedReplacementLimbDialog.status.surgeon",
-                      surgeon.getFullTitle(), targetNumber));
+                      surgeon.getFullTitle(), surgeonSkillLevel, targetNumber));
             }
 
             if (totalCost.isPositive()) {
