@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -148,7 +148,32 @@ public class AcademyFactory {
                 }
                 tempAcademyMap.put(academy.getName(), academy);
             }
-            academyMap.put(currentSetName, tempAcademyMap);
+
+            // Merge with existing academies instead of replacing the entire set.
+            // This allows user academy files to override specific academies while
+            // preserving base academies that aren't in the user's file.
+            Map<String, Academy> existingMap = academyMap.get(currentSetName);
+            if (existingMap != null) {
+                // Find the max ID from existing academies to avoid ID conflicts
+                int maxId = existingMap.values().stream()
+                                  .mapToInt(Academy::getId)
+                                  .max().orElse(-1);
+                // Reassign IDs: preserve IDs for overrides, assign new IDs for new academies
+                int newId = maxId + 1;
+                for (Academy academy : tempAcademyMap.values()) {
+                    Academy existing = existingMap.get(academy.getName());
+                    if (existing != null) {
+                        // Preserve the original ID when overriding an existing academy
+                        academy.setId(existing.getId());
+                    } else {
+                        // Assign a new, non-conflicting ID for new academies
+                        academy.setId(newId++);
+                    }
+                }
+                existingMap.putAll(tempAcademyMap);
+            } else {
+                academyMap.put(currentSetName, tempAcademyMap);
+            }
         } catch (JAXBException e) {
             LOGGER.error("Error loading XML for academies", e);
         }
