@@ -550,6 +550,26 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
+     * Validates that the parallel lists (qualifications, curriculums, qualificationStartYears) have matching sizes.
+     * Logs a warning if they don't match.
+     *
+     * @return true if lists are valid (same size or all null/empty), false if mismatched
+     */
+    public boolean validateListSizes() {
+        int qualCount = (qualifications == null) ? 0 : qualifications.size();
+        int currCount = (curriculums == null) ? 0 : curriculums.size();
+        int yearCount = (qualificationStartYears == null) ? 0 : qualificationStartYears.size();
+
+        if (qualCount != currCount || qualCount != yearCount) {
+            LOGGER.warn("Academy '{}' has mismatched list sizes: qualifications={}, curriculums={}, startYears={}. "
+                              + "This may cause errors when viewing course tooltips.",
+                  name, qualCount, currCount, yearCount);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Retrieves the base skill level granted by this academy.
      *
      * @return the base skill level granted by this academy as an Integer
@@ -812,6 +832,13 @@ public class Academy implements Comparable<Academy> {
               MekHQ.getMHQOptions().getLocale());
 
         try {
+            // Bounds check: ensure courseIndex is valid for curriculums list
+            if (curriculums == null || courseIndex < 0 || courseIndex >= curriculums.size()) {
+                LOGGER.error("Invalid courseIndex {} for academy '{}' with {} curriculums",
+                      courseIndex, name, curriculums == null ? 0 : curriculums.size());
+                return "<html><body style='width: 200px'><i>Error: Invalid course data</i></body></html>";
+            }
+
             StringBuilder tooltip = new StringBuilder().append("<html><body style='width: 200px'>");
             tooltip.append("<i>").append(description).append("</i><br><br>");
             tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
