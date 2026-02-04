@@ -147,14 +147,45 @@ public class StratConBiomeManifest {
     private static StratConBiomeManifest instance;
 
     /**
-     * Gets the singleton biome manifest instance
+     * Gets the singleton biome manifest instance.
+     * If the manifest file cannot be loaded, returns a default instance with minimal biome data.
      */
     public static StratConBiomeManifest getInstance() {
         if (instance == null) {
             instance = load();
+            if (instance == null) {
+                logger.warn("Failed to load biome manifest, using default instance");
+                instance = createDefaultInstance();
+            }
         }
 
         return instance;
+    }
+
+    /**
+     * Creates a default biome manifest with minimal data for fallback/testing scenarios. This ensures the system can
+     * function even when the XML configuration is unavailable.
+     */
+    private static StratConBiomeManifest createDefaultInstance() {
+        StratConBiomeManifest manifest = new StratConBiomeManifest();
+
+        // Create a default biome that covers all temperature ranges
+        StratConBiome defaultBiome = new StratConBiome();
+        defaultBiome.biomeCategory = TERRAN_BIOME;
+        defaultBiome.allowedTemperatureLowerBound = Integer.MIN_VALUE;
+        defaultBiome.allowedTemperatureUpperBound = Integer.MAX_VALUE;
+        defaultBiome.allowedTerrainTypes = new ArrayList<>();
+        defaultBiome.allowedTerrainTypes.add("Grasslands");
+
+        TreeMap<Integer, StratConBiome> defaultTempMap = new TreeMap<>();
+        defaultTempMap.put(Integer.MIN_VALUE, defaultBiome);
+
+        manifest.biomeTempMap.put(TERRAN_BIOME, defaultTempMap);
+        manifest.biomeTempMap.put(TERRAN_FACILITY_BIOME, defaultTempMap);
+
+        manifest.biomes.add(defaultBiome);
+
+        return manifest;
     }
 
     private static StratConBiomeManifest load() {
