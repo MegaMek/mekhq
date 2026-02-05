@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,6 +91,20 @@ public class PartsTableModel extends DataTableModel<Part> {
      */
     public PartsTableModel(@Nullable Set<PartInUse> partsInUse) {
         data = new ArrayList<>();
+        updatePartsInUse(partsInUse);
+    }
+
+    /**
+     * Updates the cached parts-in-use data with fresh values.
+     *
+     * <p>This method should be called whenever parts are added to or removed from units
+     * to ensure the "In Use" column displays accurate counts.</p>
+     *
+     * @param partsInUse a {@link Set} of {@link PartInUse} objects with current usage data,
+     *                   or {@code null} to clear the cache
+     */
+    public void updatePartsInUse(@Nullable Set<PartInUse> partsInUse) {
+        partsUseData.clear();
 
         if (partsInUse != null) {
             for (PartInUse partInUse : partsInUse) {
