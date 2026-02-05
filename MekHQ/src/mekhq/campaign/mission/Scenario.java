@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.mission;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORCE_NONE;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -64,8 +64,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -106,7 +106,7 @@ public class Scenario implements IPlayerSettings {
     private final List<UUID> salvageTechs;
     private int id = S_DEFAULT_ID;
     private int missionId;
-    private ForceStub stub;
+    private FormationStub stub;
     private boolean cloaked;
 
     // allow multiple loot objects for meeting different scenario objectives
@@ -631,18 +631,18 @@ public class Scenario implements IPlayerSettings {
         return subForceIds;
     }
 
-    public Force getForces(Campaign campaign) {
-        Force force = new Force("Assigned Forces");
+    public Formation getForces(Campaign campaign) {
+        Formation formation = new Formation("Assigned Forces");
         for (int subid : subForceIds) {
-            Force sub = campaign.getForce(subid);
+            Formation sub = campaign.getForce(subid);
             if (null != sub) {
-                force.addSubForce(sub, false);
+                formation.addSubForce(sub, false);
             }
         }
         for (UUID uid : unitIds) {
-            force.addUnit(uid);
+            formation.addUnit(uid);
         }
-        return force;
+        return formation;
     }
 
     public List<Integer> getSalvageForces() {
@@ -725,7 +725,7 @@ public class Scenario implements IPlayerSettings {
 
     public void clearAllForcesAndPersonnel(Campaign campaign) {
         for (int fid : subForceIds) {
-            Force f = campaign.getForce(fid);
+            Formation f = campaign.getForce(fid);
             if (null != f) {
                 f.clearScenarioIds(campaign);
                 MekHQ.triggerEvent(new DeploymentChangedEvent(f, this));
@@ -752,14 +752,14 @@ public class Scenario implements IPlayerSettings {
     }
 
     public void generateStub(Campaign c) {
-        stub = new ForceStub(getForces(c), c);
+        stub = new FormationStub(getForces(c), c);
         for (BotForce bf : botForces) {
             botForcesStubs.add(bf.generateStub(c));
         }
         botForces.clear();
     }
 
-    public ForceStub getForceStub() {
+    public FormationStub getForceStub() {
         return stub;
     }
 
@@ -923,22 +923,22 @@ public class Scenario implements IPlayerSettings {
     /**
      * Determines whether a list of forces is eligible to deploy to the scenario.
      *
-     * @param forces list of forces
+     * @param formations list of forces
      * @param c      the campaign that the forces are part of
      *
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
-    public boolean canDeployForces(Vector<Force> forces, Campaign c) {
+    public boolean canDeployForces(Vector<Formation> formations, Campaign c) {
         int additionalQuantity = 0;
-        for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits(false);
+        for (Formation formation : formations) {
+            Vector<UUID> units = formation.getAllUnits(false);
             for (UUID id : units) {
                 if (!canDeploy(c.getUnit(id), c)) {
                     return false;
                 }
             }
             if (null != deploymentLimit) {
-                additionalQuantity += deploymentLimit.getForceQuantity(force, c);
+                additionalQuantity += deploymentLimit.getForceQuantity(formation, c);
             }
         }
         if (null != deploymentLimit) {
@@ -1154,7 +1154,7 @@ public class Scenario implements IPlayerSettings {
                 } else if (wn2.getNodeName().equalsIgnoreCase("report")) {
                     retVal.setReport(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
-                    retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
+                    retVal.stub = FormationStub.generateInstanceFromXML(wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("linkedScenarioID")) {
                     retVal.linkedScenarioID = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {

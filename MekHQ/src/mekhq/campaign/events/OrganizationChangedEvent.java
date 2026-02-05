@@ -34,7 +34,7 @@ package mekhq.campaign.events;
 
 import megamek.common.event.MMEvent;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -42,41 +42,41 @@ import mekhq.campaign.unit.Unit;
  */
 public class OrganizationChangedEvent extends MMEvent {
 
-    private final Force force;
+    private final Formation formation;
     private final Unit unit;
 
     /**
      * This version also populates formation levels
      */
-    public OrganizationChangedEvent(Campaign campaign, Force force) {
-        this.force = force;
+    public OrganizationChangedEvent(Campaign campaign, Formation formation) {
+        this.formation = formation;
         this.unit = null;
 
-        Force.populateFormationLevelsFromOrigin(campaign);
+        Formation.populateFormationLevelsFromOrigin(campaign);
     }
 
-    public OrganizationChangedEvent(Force force) {
-        this.force = force;
+    public OrganizationChangedEvent(Formation formation) {
+        this.formation = formation;
         this.unit = null;
     }
 
     public OrganizationChangedEvent(Unit unit) {
-        this.force = null;
+        this.formation = null;
         this.unit = unit;
     }
 
     /**
      * This version also populates formation levels
      */
-    public OrganizationChangedEvent(Campaign campaign, Force force, Unit unit) {
-        this.force = force;
+    public OrganizationChangedEvent(Campaign campaign, Formation formation, Unit unit) {
+        this.formation = formation;
         this.unit = unit;
 
-        Force.populateFormationLevelsFromOrigin(campaign);
+        Formation.populateFormationLevelsFromOrigin(campaign);
     }
 
-    public Force getForce() {
-        return force;
+    public Formation getForce() {
+        return formation;
     }
 
     public Unit getUnit() {

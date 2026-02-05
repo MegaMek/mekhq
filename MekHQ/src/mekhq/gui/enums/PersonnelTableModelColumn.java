@@ -54,7 +54,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -776,8 +776,8 @@ public enum PersonnelTableModelColumn {
                 return "-";
 
             case FORCE:
-                final Force force = campaign.getForceFor(person);
-                return (force == null) ? "-" : force.getName();
+                final Formation formation = campaign.getForceFor(person);
+                return (formation == null) ? "-" : formation.getName();
             case DEPLOYED:
                 final Unit unit = person.getUnit();
                 if (unit == null || !unit.isDeployed()) {

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.force.Force.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;

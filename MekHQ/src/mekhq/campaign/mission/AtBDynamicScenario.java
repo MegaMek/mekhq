@@ -54,7 +54,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -716,7 +716,7 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         if (isAllied) {
-            Force playerForces = this.getForces(campaign);
+            Formation playerForces = this.getForces(campaign);
 
             for (UUID unitID : playerForces.getAllUnits(false)) {
                 try {

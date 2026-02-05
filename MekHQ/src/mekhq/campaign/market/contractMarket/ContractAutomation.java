@@ -50,7 +50,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
@@ -171,7 +171,7 @@ public class ContractAutomation {
     }
 
     /**
-     * This method identifies all non-mothballed units within a campaign that are currently assigned to a {@link Force}.
+     * This method identifies all non-mothballed units within a campaign that are currently assigned to a {@link Formation}.
      * Those units are then GM Mothballed.
      *
      * @param campaign The current campaign.
@@ -182,8 +182,8 @@ public class ContractAutomation {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
-        for (Force force : campaign.getAllForces()) {
-            List<UUID> iterationSafeUnitIds = new ArrayList<>(force.getUnits());
+        for (Formation formation : campaign.getAllForces()) {
+            List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
             for (UUID unitId : iterationSafeUnitIds) {
                 Unit unit = campaign.getUnit(unitId);
 

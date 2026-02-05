@@ -34,7 +34,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import java.util.List;
 
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -48,7 +48,7 @@ public class PregnantCombatantNagLogic {
      *     <li>The campaign has an active contract.</li>
      *     <li>There are pregnant personnel in the list of active personnel.</li>
      *     <li>A pregnant person is assigned to a unit that is part of a combat force
-     *         (i.e., a force with an ID other than {@link Force#FORCE_NONE}).</li>
+     *         (i.e., a force with an ID other than {@link Formation#FORCE_NONE}).</li>
      * </ul>
      *
      * <p>If no active contract exists in the campaign, the method immediately returns {@code false}.
@@ -70,7 +70,7 @@ public class PregnantCombatantNagLogic {
                 Unit unit = person.getUnit();
 
                 if (unit != null) {
-                    if (unit.getForceId() != Force.FORCE_NONE) {
+                    if (unit.getForceId() != Formation.FORCE_NONE) {
                         return true;
                     }
                 }

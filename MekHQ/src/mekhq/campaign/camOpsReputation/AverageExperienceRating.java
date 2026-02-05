@@ -48,7 +48,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -133,19 +133,19 @@ public class AverageExperienceRating {
 
         boolean hasAtLeastOneCrew = false;
         for (CombatTeam combatTeam : combatTeams) {
-            Force force = combatTeam.getForce(campaign);
-            if (force == null) {
+            Formation formation = combatTeam.getForce(campaign);
+            if (formation == null) {
                 LOGGER.warn("Force returned null for forceId {}", combatTeam.getForceId());
                 continue;
             }
 
             // CamOps is explicit in that we should only be counting combat forces. A decision was made during 50.10
             // to not consider Training forces combat forces. We're extending that logic here, too.
-            if (force.getCombatRoleInMemory().isTraining()) {
+            if (formation.getCombatRoleInMemory().isTraining()) {
                 continue;
             }
 
-            for (Unit unit : force.getAllUnitsAsUnits(hangar, true)) {
+            for (Unit unit : formation.getAllUnitsAsUnits(hangar, true)) {
                 Entity entity = unit.getEntity();
                 if (entity == null || entity instanceof Jumpship) {
                     continue;

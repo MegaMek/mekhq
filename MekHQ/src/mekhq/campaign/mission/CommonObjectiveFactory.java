@@ -43,7 +43,7 @@ import megamek.common.OffBoardDirection;
 import megamek.common.units.Dropship;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
@@ -226,9 +226,9 @@ public class CommonObjectiveFactory {
         // some scenarios have a lance assigned
         // some scenarios have individual units assigned
         if (scenario.getCombatTeamId() != AtBScenario.NO_COMBAT_TEAM) {
-            Force force = campaign.getForce(scenario.getCombatTeamId());
+            Formation formation = campaign.getForce(scenario.getCombatTeamId());
 
-            if (force != null) {
+            if (formation != null) {
                 objective.addForce(campaign.getForce(scenario.getCombatTeamId()).getName());
             }
         } else {
