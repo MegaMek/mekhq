@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -733,7 +733,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = cl;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
+            this.name += " (" + (cl ? "Clan " : "IS ") + ArmorType.of(type, cl).getName() + ')';
         }
     }
 

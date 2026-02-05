@@ -166,10 +166,15 @@ public class PartsTableModel extends DataTableModel<Part> {
         if (col == COL_COL_IN_USE) {
             int useCount = 0;
 
+            // Find the maximum useCount among all matching part types.
+            // This handles edge cases where parts might be incorrectly
+            // tracked in separate PartInUse entries due to name mismatches.
             for (Part comparisonPart : partsUseData.keySet()) {
                 if (comparisonPart.isSamePartType(part)) {
-                    useCount = partsUseData.get(comparisonPart);
-                    break;
+                    int count = partsUseData.get(comparisonPart);
+                    if (count > useCount) {
+                        useCount = count;
+                    }
                 }
             }
 
