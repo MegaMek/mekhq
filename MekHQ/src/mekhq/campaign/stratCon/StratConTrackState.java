@@ -459,10 +459,14 @@ public class StratConTrackState {
 
     /**
      * Convenience method to fail an objective at the given coordinates.
+     * Does nothing if the objective has already been completed.
      */
     public void failObjective(StratConCoords coords) {
         if (getObjectivesByCoords().containsKey(coords)) {
-            getObjectivesByCoords().get(coords).setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+            StratConStrategicObjective objective = getObjectivesByCoords().get(coords);
+            if (!objective.isObjectiveCompleted(this)) {
+                objective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+            }
         }
     }
 
