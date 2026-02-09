@@ -1,14 +1,11 @@
-name: MekHQ CI with Gradle
+name: Checkstyle
 
 on:
   pull_request:
     branches: [ main ]
 
-env:
-  GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
-
 jobs:
-  pr_ci:
+  checkstyle:
     runs-on: ${{ matrix.os }}
 
     outputs:
@@ -21,7 +18,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java-distribution: [ temurin ]
-        java-version: [ 17, 21, 25 ]
+        java-version: [ 25 ]
       fail-fast: false
 
     steps:
@@ -58,12 +55,6 @@ jobs:
           ref: ${{ steps.find_mm.outputs.mmBranch }}
           path: megamek
 
-      - name: Add MM Hash
-        run: |
-          cd megamek
-          calculatedSha=$(git rev-parse HEAD)
-          echo "$calculatedSha" >> megamek/docs/mm-revision.txt
-
       - name: Find the Right MegaMekLab Branch
         id: find_mml
         shell: bash {0}
@@ -86,12 +77,6 @@ jobs:
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
-      - name: Add MML Hash
-        run: |
-          cd megameklab
-          calculatedSha=$(git rev-parse HEAD)
-          echo "$calculatedSha" >> megameklab/docs/mml-revision.txt
-
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v5
         with:
@@ -100,32 +85,10 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
-        with:
-          build-scan-publish: true
-          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
-          build-scan-terms-of-use-agree: "yes"
 
-      - name: Set short git commit SHA
-        id: vars
-        run: |
-          cd mekhq
-          calculatedSha=$(git rev-parse --short ${{ github.sha }})
-          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
-
-      - name: "Output branch information to Version file"
-        run: |
-          echo "branch=PR-${{ github.event.number }}" >> megamek/megamek/resources/extraVersion.properties
-          echo "gitHash=${{ env.COMMIT_SHORT_SHA }}" >> megamek/megamek/resources/extraVersion.properties
-
-      - name: Add MHQRevision file
-        run: |
-          echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
-
-      - name: Test All
+      - name: Checkstyle
         working-directory: mekhq
-        run: ./gradlew testAll  --stacktrace --scan -i --continue -x checkstyleMain -x checkstyleTest
-        env:
-          mm.profile: dev
+        run: ./gradlew checkstyleMain checkstyleTest
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v6
@@ -133,21 +96,3 @@ jobs:
         with:
           name: cd-failure-logs
           path: ./mekhq/MekHQ/build/reports/
-          overwrite: true
-
-      - name: Build with Gradle
-        working-directory: mekhq
-        run: ./gradlew build -x test -PextraVersion="PR-${{ github.event.number }}-${{ env.COMMIT_SHORT_SHA }}"
-
-      - name: CodeCov.io Coverage Report
-        uses: codecov/codecov-action@v5
-        with:
-          directory: ./mekhq/MekHQ/build/reports/jacoco/test
-          fail_ci_if_error: false
-          verbose: true
-
-      - name: Upload Tar GZ Artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: mekhq/MekHQ/build/distributions/*.tar.gz
