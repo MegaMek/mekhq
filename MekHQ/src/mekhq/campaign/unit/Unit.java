@@ -4640,7 +4640,34 @@ public class Unit implements ITechnology {
                 ammo.add((AmmoBin) part);
             }
         }
+
+        // If no AmmoBin parts found but entity has ammo equipment, reinitialize parts
+        // This can happen with units from older save files or after certain refits
+        if (ammo.isEmpty() && (entity != null) && entityHasAmmoEquipment()) {
+            initializeParts(true);
+            // Re-collect after initialization
+            for (Part part : parts) {
+                if (part instanceof AmmoBin) {
+                    ammo.add((AmmoBin) part);
+                }
+            }
+        }
+
         return ammo;
+    }
+
+    /**
+     * Checks if the entity has any AmmoType equipment that should have AmmoBin parts.
+     *
+     * @return true if the entity has ammo equipment
+     */
+    private boolean entityHasAmmoEquipment() {
+        for (Mounted<?> m : entity.getEquipment()) {
+            if (m.getType() instanceof AmmoType) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Camouflage getCamouflage() {
