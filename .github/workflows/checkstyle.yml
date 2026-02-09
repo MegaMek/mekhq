@@ -5,8 +5,14 @@ on:
     branches: [ main ]
 
 jobs:
-  pr_build:
+  checkstyle:
     runs-on: ${{ matrix.os }}
+
+    outputs:
+      mmRepo: ${{ steps.find_mm.outputs.mmRepo }}
+      mmBranch: ${{ steps.find_mm.outputs.mmBranch }}
+      mmlRepo: ${{ steps.find_mml.outputs.mmRepo }}
+      mmlBranch: ${{ steps.find_mml.outputs.mmBranch }}
 
     strategy:
       matrix:
@@ -16,14 +22,67 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: "Check out MekHQ"
+      - name: Checkout Data Repo
         uses: actions/checkout@v6
+        with:
+          repository: megamek/mm-data
+          path: mm-data
+
+      - name: Checkout out MekHQ
+        uses: actions/checkout@v6
+        with:
+          path: mekhq
+
+      - name: Find the Right MegaMek Branch
+        id: find_mm
+        shell: bash {0}
+        run: |
+          git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
+          if [ "$?" == "0" ]
+          then
+            echo "mmRepo=${{ github.event.pull_request.head.repo.owner.login }}/megamek" >> $GITHUB_OUTPUT
+            echo "mmBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "mmRepo=MegaMek/megamek" >> $GITHUB_OUTPUT
+            echo "mmBranch=main" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
+      - name: Checkout MegaMek
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.find_mm.outputs.mmRepo }}
+          ref: ${{ steps.find_mm.outputs.mmBranch }}
+          path: megamek
+
+      - name: Find the Right MegaMekLab Branch
+        id: find_mml
+        shell: bash {0}
+        run: |
+          git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
+          if [ "$?" == "0" ]
+          then
+            echo "mmlRepo=${{ github.event.pull_request.head.repo.owner.login }}/megameklab" >> $GITHUB_OUTPUT
+            echo "mmlBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "mmlRepo=MegaMek/megameklab" >> $GITHUB_OUTPUT
+            echo "mmlBranch=main" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
+      - name: Checkout MegaMekLab
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.find_mml.outputs.mmlRepo }}
+          ref: ${{ steps.find_mml.outputs.mmlBranch }}
+          path: megameklab
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
       - name: Checkstyle
-        run: ./gradlew checkstyleMain
+        working-directory: mekhq
+        run: ./gradlew checkstyleMain checkstyleTest
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v6
