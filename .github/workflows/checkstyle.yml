@@ -77,6 +77,12 @@ jobs:
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
+      - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ matrix.java-distribution }}
+          java-version: ${{ matrix.java-version }}
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
@@ -89,4 +95,4 @@ jobs:
         if: failure()
         with:
           name: cd-failure-logs
-          path: ./megamek/megamek/build/reports/
+          path: ./mekhq/MekHQ/build/reports/
