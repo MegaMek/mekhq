@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -277,8 +277,16 @@ public class RandomFactionGenerator {
         }
 
         Faction enemy = null;
+        Faction originalEmployer = employer;
         if (!borderTracker.getFactionsInRegion().contains(employer)) {
+            // First, try the contained faction host (from factionhints.xml)
             employer = factionHints.getContainedFactionHost(employer, getCurrentDate());
+
+            // If that fails, look for a "super-state" faction that has this faction as a fallback
+            // This handles cases like FS during the Federated Commonwealth era (3028-3067)
+            if (employer == null) {
+                employer = findSuperStateFaction(originalEmployer);
+            }
         }
         if (null != employer) {
             employerName = employer.getShortName();
@@ -298,6 +306,55 @@ public class RandomFactionGenerator {
 
         // Fallback; there are always pirates.
         return PIRATE_FACTION_CODE;
+    }
+
+    /**
+     * Finds a "super-state" faction that controls planets in the current region and has the given faction listed as one
+     * of its fallback factions.
+     *
+     * <p>This handles cases where a faction exists but doesn't directly control planets during a
+     * certain era because a larger state controls them. For example, during the Federated Commonwealth era (3028-3067),
+     * the Federated Suns (FS) and Lyran Commonwealth (LA) don't directly control planets - the Federated Commonwealth
+     * (FC) does. FC lists both FS and LA as its fallback factions, so this method will return FC when given FS or LA
+     * during that era.</p>
+     *
+     * @param faction The faction to find a super-state for
+     *
+     * @return The super-state faction if found, or {@code null} if no matching faction exists
+     */
+    private @Nullable Faction findSuperStateFaction(Faction faction) {
+        if (faction == null) {
+            return null;
+        }
+
+        String factionKey = faction.getShortName();
+        LocalDate currentDate = getCurrentDate();
+        int currentYear = currentDate.getYear();
+
+        for (Faction candidate : borderTracker.getFactionsInRegion()) {
+            // Skip if candidate isn't valid for the current date
+            if (!candidate.validIn(currentYear)) {
+                continue;
+            }
+
+            String[] fallbacks = candidate.getAlternativeFactionCodes();
+            boolean matchesFallback = false;
+            if (fallbacks != null) {
+                for (String fallback : fallbacks) {
+                    if (factionKey.equals(fallback)) {
+                        matchesFallback = true;
+                        break;
+                    }
+                }
+            }
+            if (matchesFallback) {
+                LOGGER.info("Found super-state faction {} for {} during {}",
+                      candidate.getShortName(), factionKey, currentYear);
+                return candidate;
+            }
+        }
+
+        return null;
     }
 
     /**

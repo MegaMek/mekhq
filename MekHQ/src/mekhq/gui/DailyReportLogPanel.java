@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,6 +50,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.ui.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.enums.DailyReportType;
 
@@ -60,8 +61,6 @@ import mekhq.campaign.enums.DailyReportType;
  * @author Jay Lawson
  */
 public class DailyReportLogPanel extends JPanel {
-    private static final DateTimeFormatter DAILY_REPORT_DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
-
     //region Variable Declarations
     private final CampaignGUI gui;
     final JScrollPane logPanel = new FastJScrollPane();
@@ -185,8 +184,7 @@ public class DailyReportLogPanel extends JPanel {
      * <ul>
      *     <li>{@code reports} contains exactly one element,</li>
      *     <li>that element is wrapped in {@code <b>} and {@code </b>} tags, and</li>
-     *     <li>the inner text parses successfully as a {@link LocalDate} using the {@link #DAILY_REPORT_DATE_FORMAT}
-     *     formatter.</li>
+     *     <li>the inner text parses successfully as a {@link LocalDate} using the user's configured date format.</li>
      * </ul>
      *
      * <p>If the list size is not exactly one, the element is not correctly formatted, or the inner text cannot be
@@ -208,7 +206,12 @@ public class DailyReportLogPanel extends JPanel {
                 String line = reports.get(0);
                 String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
 
-                LocalDate.parse(inner, DAILY_REPORT_DATE_FORMAT);
+                // Use the user's configured date format and locale to match what's displayed
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+                      MekHQ.getMHQOptions().getLongDisplayDateFormat()
+                ).withLocale(MekHQ.getMHQOptions().getDateLocale());
+
+                LocalDate.parse(inner, formatter);
                 isDateOnly = true;
             } catch (Exception ignored) {
                 // Not a formatted date — do nothing
