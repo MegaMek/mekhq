@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.universe.Faction.DEFAULT_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
@@ -1221,7 +1222,7 @@ public class FactionStandings {
           @Nullable final Faction enemyFaction, final LocalDate today, final double regardMultiplier,
           final int contractDuration) {
         // If we're missing the relevant faction, alert the player and abort
-        if (enemyFaction == null) {
+        if (enemyFaction == null || DEFAULT_CODE.equals(enemyFaction.getShortName())) {
             return getMissingFactionReport();
         }
 
@@ -1285,9 +1286,15 @@ public class FactionStandings {
             return new ArrayList<>();
         }
 
-        double regardDeltaEmployer = getRegardDeltaEmployer(missionStatus, contractDuration);
-
         List<String> regardChangeReports = new ArrayList<>();
+
+        // If we're missing the relevant faction, alert the player and abort
+        if (employerFaction == null || DEFAULT_CODE.equals(employerFaction.getShortName())) {
+            regardChangeReports.add(getMissingFactionReport());
+            return regardChangeReports;
+        }
+
+        double regardDeltaEmployer = getRegardDeltaEmployer(missionStatus, contractDuration);
 
         String campaignFactionCode = campaignFaction.getShortName();
         int gameYear = today.getYear();
