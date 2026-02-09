@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,6 +91,20 @@ public class PartsTableModel extends DataTableModel<Part> {
      */
     public PartsTableModel(@Nullable Set<PartInUse> partsInUse) {
         data = new ArrayList<>();
+        updatePartsInUse(partsInUse);
+    }
+
+    /**
+     * Updates the cached parts-in-use data with fresh values.
+     *
+     * <p>This method should be called whenever parts are added to or removed from units
+     * to ensure the "In Use" column displays accurate counts.</p>
+     *
+     * @param partsInUse a {@link Set} of {@link PartInUse} objects with current usage data,
+     *                   or {@code null} to clear the cache
+     */
+    public void updatePartsInUse(@Nullable Set<PartInUse> partsInUse) {
+        partsUseData.clear();
 
         if (partsInUse != null) {
             for (PartInUse partInUse : partsInUse) {
@@ -152,10 +166,15 @@ public class PartsTableModel extends DataTableModel<Part> {
         if (col == COL_COL_IN_USE) {
             int useCount = 0;
 
+            // Find the maximum useCount among all matching part types.
+            // This handles edge cases where parts might be incorrectly
+            // tracked in separate PartInUse entries due to name mismatches.
             for (Part comparisonPart : partsUseData.keySet()) {
                 if (comparisonPart.isSamePartType(part)) {
-                    useCount = partsUseData.get(comparisonPart);
-                    break;
+                    int count = partsUseData.get(comparisonPart);
+                    if (count > useCount) {
+                        useCount = count;
+                    }
                 }
             }
 
