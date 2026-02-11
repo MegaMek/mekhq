@@ -29,6 +29,8 @@
 /MekHQ/mmconf/gameoptions.xml
 /MekHQ/mmconf/*.preferences
 /MekHQ/mmconf/*.properties
+/MekHQ/mmconf/searches/*.json
+/MekHQ/mmconf/recent-advanced-searches.json
 /MekHQ/out/
 /MekHQ/pkgdir/
 /MekHQ/savegames/
