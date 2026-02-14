@@ -10343,7 +10343,7 @@
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
+			<phenotype>MEKWARRIOR</phenotype>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>FEMALE</gender>

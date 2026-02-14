@@ -285,7 +285,7 @@ public class AdvancedMedicalAlternateImplants {
      *     <li><b>Buffered VDNI</b> — Increases the interval to every 3 years.</li>
      *     <li><b>Standard VDNI</b> — Sets the interval to every 2 years.</li>
      *     <li><b>Enhanced Imaging (EI)</b> — Occurs every year for most characters, but every 3rd year for those
-     *     with the Aerospace phenotype. This follows ATOW p. 317, though MekHQ simplifies the “every 3rd full year”
+     *     with the Aerospace phenotype. This follows ATOW p. 317, though MekHQ simplifies the “every 3rd full year"
      *     rule to every 3 canonical years to avoid additional state tracking.</li>
      * </ul>
      *

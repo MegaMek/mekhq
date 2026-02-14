@@ -183,6 +183,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     // C3 Network-related
     private static final String C3I = "C3I";
     private static final String NC3 = "NC3";
+    private static final String NOVA_CEWS = "NOVA_CEWS";
     private static final String ADD_NETWORK = "ADD_NETWORK";
     private static final String ADD_SLAVES = "ADD_SLAVES";
     private static final String DISBAND_NETWORK = "DISBAND_NETWORK";
@@ -197,6 +198,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_SET_IND_MASTER = "SET_IND_M|UNIT|empty|";
     private static final String COMMAND_CREATE_C3I = "C3I|UNIT|empty|";
     private static final String COMMAND_CREATE_NC3 = "NC3|UNIT|empty|";
+    private static final String COMMAND_CREATE_NOVA_CEWS = "NOVA_CEWS|UNIT|empty|";
     private static final String COMMAND_ADD_TO_NETWORK = "ADD_NETWORK|UNIT|";
     private static final String COMMAND_DISBAND_NETWORK = "DISBAND_NETWORK|UNIT|empty|";
     private static final String COMMAND_REMOVE_FROM_NETWORK = "REMOVE_NETWORK|UNIT|empty|";
@@ -667,6 +669,26 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             gui.getCampaign().refreshNetworks();
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains(TOEMouseAdapter.NC3)) {
+            Vector<String> uuids = new Vector<>();
+            for (Unit unit : units) {
+                if (null == unit.getEntity()) {
+                    continue;
+                }
+                uuids.add(unit.getEntity().getC3UUIDAsString());
+            }
+
+            for (int pos = 0; pos < uuids.size(); pos++) {
+                for (Unit unit : units) {
+                    if (null == unit.getEntity()) {
+                        continue;
+                    }
+                    unit.getEntity().setNC3NextUUIDAsString(pos, uuids.get(pos));
+                }
+            }
+            gui.getCampaign().refreshNetworks();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
+        } else if (command.contains(TOEMouseAdapter.NOVA_CEWS)) {
+            // Nova CEWS shares UUID array infrastructure with Naval C3 (NC3)
             Vector<String> uuids = new Vector<>();
             for (Unit unit : units) {
                 if (null == unit.getEntity()) {
@@ -1307,7 +1329,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             for (int i = 1; i < units.size(); i++) {
                 unitIds.append('|').append(units.get(i).getId().toString());
             }
-            JMenu networkMenu = new JMenu("Network");
+            JScrollableMenu networkMenu = new JScrollableMenu("networkMenu", "Network");
             JMenu availMenu;
             if (StaticChecks.areAllUnitsC3Slaves(units)) {
                 availMenu = new JMenu("Slave to");
@@ -1328,7 +1350,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         availMenu.add(menuItem);
                     }
                 }
-                JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                networkMenu.add(availMenu);
             }
 
             if (StaticChecks.areAllUnitsIndependentC3Masters(units)) {
@@ -1355,7 +1377,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         availMenu.add(menuItem);
                     }
                 }
-                JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                networkMenu.add(availMenu);
             }
 
             if (StaticChecks.areAllUnitsCompanyLevelMasters(units)) {
@@ -1405,7 +1427,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             availMenu.add(menuItem);
                         }
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                    networkMenu.add(availMenu);
                 }
 
                 if (StaticChecks.areAllUnitsNC3Networked(units)) {
@@ -1455,7 +1477,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             availMenu.add(menuItem);
                         }
                     }
-                    JMenuHelpers.addMenuIfNonEmpty(networkMenu, availMenu);
+                    networkMenu.add(availMenu);
                 }
 
                 if (StaticChecks.areAllUnitsC3iNetworked(units)) {
@@ -1473,7 +1495,60 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, networkMenu);
+
+            // Nova CEWS network checks (max 3 units per network)
+            if (StaticChecks.doAllUnitsHaveNovaCEWS(units)) {
+                if (multipleSelection && StaticChecks.areAllUnitsNotNovaCEWSNetworked(units) && (units.size() < 4)) {
+                    menuItem = new JMenuItem("Create new Nova CEWS network");
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CREATE_NOVA_CEWS + unitIds);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
+                    networkMenu.add(menuItem);
+                }
+
+                if (StaticChecks.areAllUnitsNotNovaCEWSNetworked(units)) {
+                    availMenu = new JMenu("Add to Nova network");
+                    for (String[] network : gui.getCampaign().getAvailableNovaCEWSNetworks()) {
+                        final int nodesFree;
+                        try {
+                            nodesFree = Integer.parseInt(network[1]);
+                        } catch (Exception ex) {
+                            LOGGER.error("", ex);
+                            continue;
+                        }
+
+                        if (nodesFree >= units.size()) {
+                            menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK +
+                                                            network[0] +
+                                                            '|' +
+                                                            unitIds);
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(true);
+                            availMenu.add(menuItem);
+                        }
+                    }
+                    networkMenu.add(availMenu);
+                }
+
+                if (StaticChecks.areAllUnitsNovaCEWSNetworked(units)) {
+                    menuItem = new JMenuItem("Remove from network");
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FROM_NETWORK + unitIds);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
+                    networkMenu.add(menuItem);
+                    if (StaticChecks.areAllUnitsOnSameNovaCEWSNetwork(units)) {
+                        menuItem = new JMenuItem("Disband this network");
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DISBAND_NETWORK + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        networkMenu.add(menuItem);
+                    }
+                }
+            }
+            if (networkMenu.getItemCount() > 0) {
+                popup.add(networkMenu);
+            }
 
             menuItem = new JMenuItem("Remove Unit from TO&E");
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_UNIT + unitIds);

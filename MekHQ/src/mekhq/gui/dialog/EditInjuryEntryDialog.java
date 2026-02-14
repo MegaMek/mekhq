@@ -43,7 +43,6 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -53,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
+import jakarta.annotation.Nonnull;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;

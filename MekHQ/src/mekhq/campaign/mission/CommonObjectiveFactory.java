@@ -37,8 +37,8 @@ import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.OffBoardDirection;
 import megamek.common.units.Dropship;
 import mekhq.MekHQ;

@@ -106,6 +106,7 @@ public class Skill {
     private SkillType type;
     private int level;
     private int bonus;
+    private int xpProgress;
     private boolean hasNaturalAptitude;
 
     protected Skill() {
@@ -117,26 +118,19 @@ public class Skill {
         this.level = this.type.getLevelFromExperience(EXP_REGULAR);
     }
 
-    public Skill(String type, int level) {
-        this(SkillType.getType(type), level, 0, false);
-    }
-
     public Skill(String type, int level, int bonus) {
-        this(SkillType.getType(type), level, bonus, false);
-    }
-
-    public Skill(String type, int level, int bonus, boolean hasNaturalAptitude) {
-        this(SkillType.getType(type), level, bonus, hasNaturalAptitude);
+        this(SkillType.getType(type), level, bonus, 0, false);
     }
 
     public Skill(SkillType type, int level, int bonus) {
-        this(type, level, bonus, false);
+        this(type, level, bonus, 0, false);
     }
 
-    public Skill(SkillType type, int level, int bonus, boolean hasNaturalAptitude) {
+    public Skill(SkillType type, int level, int bonus, int xpProgress, boolean hasNaturalAptitude) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
+        this.xpProgress = xpProgress;
         this.hasNaturalAptitude = hasNaturalAptitude;
     }
 
@@ -234,6 +228,14 @@ public class Skill {
 
     public void setBonus(int b) {
         this.bonus = b;
+    }
+
+    public int getXpProgress() {
+        return xpProgress;
+    }
+
+    public void changeXpProgress(int delta) {
+        xpProgress = max(0, xpProgress + delta);
     }
 
     public boolean getHasNaturalAptitude() {
@@ -708,6 +710,7 @@ public class Skill {
             cost = type.getCost(level + i);
             ++i;
         }
+
         return cost;
     }
 
@@ -880,6 +883,7 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpProgress", xpProgress);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -902,6 +906,8 @@ public class Skill {
                     retVal.level = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
                     retVal.bonus = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("xpProgress")) {
+                    retVal.xpProgress = MathUtility.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {

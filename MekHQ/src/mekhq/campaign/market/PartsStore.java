@@ -46,6 +46,8 @@ import megamek.common.equipment.Engine;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
+import megamek.common.equipment.enums.AmmoTypeFlag;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
@@ -170,12 +172,12 @@ public class PartsStore {
         for (Enumeration<EquipmentType> allTypes = EquipmentType.getAllTypes(); allTypes.hasMoreElements(); ) {
             EquipmentType equipmentType = allTypes.nextElement();
             if (!equipmentType.isHittable() &&
-                      !(equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_BA_MANIPULATOR))) {
+                      !(equipmentType instanceof MiscType && equipmentType.hasFlag(MiscTypeFlag.F_BA_MANIPULATOR))) {
                 continue;
             }
             // TODO: we are still adding a lot of non-hittable equipment
             if (equipmentType instanceof AmmoType ammoType) {
-                if (ammoType.hasFlag(AmmoType.F_BATTLEARMOR) && (ammoType.getKgPerShot() > 0)) {
+                if (ammoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR) && (ammoType.getKgPerShot() > 0)) {
                     // BA ammo has one shot listed as the amount. Do it as 1 ton blocks if using
                     // kg/shot.
                     int shots = (int) Math.floor(1000.0 / ammoType.getKgPerShot());
@@ -184,13 +186,13 @@ public class PartsStore {
                     parts.add(new AmmoStorage(0, ammoType, ammoType.getShots(), campaign));
                 }
             } else if (equipmentType instanceof MiscType
-                             && (equipmentType.hasFlag(MiscType.F_HEAT_SINK)
-                                       || equipmentType.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+                             && (equipmentType.hasFlag(MiscTypeFlag.F_HEAT_SINK)
+                                       || equipmentType.hasFlag(MiscTypeFlag.F_DOUBLE_HEAT_SINK))) {
                 Part part = new HeatSink(0, equipmentType, -1, false, campaign);
                 parts.add(part);
                 parts.add(new OmniPod(part, campaign));
                 parts.add(new HeatSink(0, equipmentType, -1, true, campaign));
-            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_JUMP_JET)) {
+            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscTypeFlag.F_JUMP_JET)) {
                 // need to do it by rating and unit tonnage
                 for (int ton = 10; ton <= 100; ton += 5) {
                     Part part = new JumpJet(ton, equipmentType, -1, false, campaign);
@@ -201,14 +203,14 @@ public class PartsStore {
                     }
                 }
             } else if ((equipmentType instanceof MiscType
-                              && equipmentType.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                              && equipmentType.hasFlag(MiscType.F_CHASSIS_MODIFICATION))
+                              && equipmentType.hasFlag(MiscTypeFlag.F_TANK_EQUIPMENT)
+                              && equipmentType.hasFlag(MiscTypeFlag.F_CHASSIS_MODIFICATION))
                              || equipmentType instanceof BayWeapon
                              || equipmentType instanceof InfantryAttack) {
-            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_BA_EQUIPMENT)
+            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscTypeFlag.F_BA_EQUIPMENT)
                              && !equipmentType.hasFlag(MiscType.F_BA_MANIPULATOR)) {
-            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscType.F_MASC)) {
-                if (equipmentType.hasSubType(MiscType.S_SUPERCHARGER)) {
+            } else if (equipmentType instanceof MiscType && equipmentType.hasFlag(MiscTypeFlag.F_MASC)) {
+                if (equipmentType.hasFlag(MiscTypeFlag.S_SUPERCHARGER)) {
                     for (int rating = 10; rating <= 400; rating += 5) {
                         // eton 0.5 to 10.5 inclusive
                         for (int i = 1; i <= 21; i++) {

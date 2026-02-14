@@ -34,8 +34,11 @@ package mekhq.campaign;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
 
 /**
  * For processing events that should trigger for any kind of campaign, AtB or otherwise.
@@ -74,5 +77,27 @@ public record CampaignEventProcessor(Campaign campaign) {
         campaign().invalidateActivePersonnelCache();
         Person person = personEvent.getPerson();
         person.invalidateAdvancedAsTechContribution();
+    }
+
+    /**
+     * Handles unit crew assignment events.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param personCrewAssignmentEvent the event containing the unit and crew assignment information
+     */
+    @Subscribe
+    public void handlePersonUnitAssignmentEvent(PersonCrewAssignmentEvent personCrewAssignmentEvent) {
+        Unit unit = personCrewAssignmentEvent.getUnit();
+
+        // If this unit has no commander, clear out any temporary crew assignments
+        if (unit != null && !unit.hasCommander() && unit.getTotalTempCrew() > 0) {
+            unit.setTempCrew(unit.getDriverRole(), 0);
+            unit.setTempCrew(unit.getGunnerRole(), 0);
+
+            // TODO: Better way to handle this case
+            unit.setTempCrew(PersonnelRole.VESSEL_CREW, 0);
+        }
     }
 }

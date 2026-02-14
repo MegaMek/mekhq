@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
+import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 
 /**
  * A specialized {@link RoundedJButton} used in the campaign options dialog.
@@ -62,7 +64,7 @@ public class CampaignOptionsButton extends RoundedJButton {
      * @param name the name used to fetch the button's text and tooltip and to set its name
      */
     public CampaignOptionsButton(String name) {
-        this(name, null);
+        this(name, null, null);
     }
 
     /**
@@ -81,8 +83,44 @@ public class CampaignOptionsButton extends RoundedJButton {
      *                       size
      */
     public CampaignOptionsButton(String name, @Nullable Integer customWrapSize) {
-        // Sets the button's text from the resource bundle
-        super(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+        this(name, customWrapSize, null);
+    }
+
+    /**
+     * Constructs a new instance of {@link CampaignOptionsButton} with the specified name and metadata.
+     * <p>
+     * The metadata is used to display version badges and special flag symbols alongside the button text.
+     *
+     * @param name     the name used to fetch the button's text and tooltip and to set its name
+     * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
+     */
+    public CampaignOptionsButton(String name, @Nullable CampaignOptionsMetadata metadata) {
+        this(name, null, metadata);
+    }
+
+    /**
+     * Constructs a new instance of {@link CampaignOptionsButton} with the specified name, custom tooltip wrap size,
+     * and metadata.
+     * <p>
+     * The name is used to determine the button's visible text and tooltip, as well as to generate its unique internal
+     * name. The text and tooltip are fetched from the resource bundle, located at keys {@code "lbl" + name + ".text"}
+     * and {@code "lbl" + name + ".tooltip"} respectively.
+     * <p>
+     * If a custom wrap size is provided, the tooltip text will be word-wrapped accordingly. If {@code customWrapSize}
+     * is {@code null}, a default wrap size is used.
+     * <p>
+     * The metadata is used to display version badges and special flag symbols alongside the button text.
+     *
+     * @param name           the name used to fetch the button's text and tooltip and to set its name
+     * @param customWrapSize the maximum number of characters per tooltip line, or {@code null} for the default wrap
+     *                       size
+     * @param metadata       version and flag metadata for displaying badges, or {@code null} for no badges
+     */
+    public CampaignOptionsButton(String name, @Nullable Integer customWrapSize,
+                                 @Nullable CampaignOptionsMetadata metadata) {
+        // Fetch base text and append badges & sets the button's text from the resource bundle
+        super(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text") +
+                    CampaignOptionsUtilities.formatBadges(metadata));
 
         // Sets the button's tooltip, applying word wrapping based on customWrapSize
         String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");

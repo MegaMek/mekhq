@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -832,9 +832,12 @@ public class StratConRulesManager {
             // if facility doesn't have a biome temp map or no entry for the current
             // temperature, use the default one
             if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
-                facilityBiome = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
-                                      .floorEntry(kelvinTemp)
-                                      .getValue();
+                var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+                var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
+                if (biomeEntry == null) {
+                    biomeEntry = defaultTempMap.firstEntry();
+                }
+                facilityBiome = biomeEntry.getValue();
             } else {
                 facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
             }
@@ -1935,8 +1938,8 @@ public class StratConRulesManager {
         String maneuverRoleReport = "";
         if (reinforcementType == AUXILIARY) {
             int secondRoll = d6(2);
+            maneuverRoleReport = String.format(" (%s,%s)", roll, secondRoll);
             roll = max(roll, secondRoll);
-            maneuverRoleReport = String.format(" (%s)", roll);
         }
 
         StringBuilder reportStatus = new StringBuilder();

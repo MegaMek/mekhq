@@ -38,6 +38,7 @@ import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 
@@ -85,7 +86,7 @@ public class JumpJet extends EquipmentPart {
                 ton = 0.5;
             }
         }
-        if (type.hasSubType(MiscType.S_IMPROVED)) {
+        if (type.hasFlag(MiscTypeFlag.S_IMPROVED)) {
             ton *= 2;
         }
         return ton;

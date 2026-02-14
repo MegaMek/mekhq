@@ -522,12 +522,14 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                           "AdvancedReplacementLimbDialog.status.localSurgeon.transit"));
                 }
             } else {
-                int targetNumber = surgeon.getSkill(S_SURGERY).getFinalSkillValue(surgeon.getSkillModifierData());
-                targetNumber -= surgeon.getOptions().booleanOption(UNOFFICIAL_BIOLOGICAL_MACHINIST) ? -2 : 0;
+                Skill surgerySkill = surgeon.getSkill(S_SURGERY);
+                SkillModifierData modifierData = surgeon.getSkillModifierData();
+                int surgeonSkillLevel = surgerySkill.getTotalSkillLevel(modifierData);
+                int targetNumber = surgerySkill.getFinalSkillValue(modifierData);
 
                 summary.add(getFormattedTextAt(RESOURCE_BUNDLE,
                       "AdvancedReplacementLimbDialog.status.surgeon",
-                      surgeon.getFullTitle(), targetNumber));
+                      surgeon.getFullTitle(), surgeonSkillLevel, targetNumber));
             }
 
             if (totalCost.isPositive()) {
@@ -893,6 +895,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         InjurySubType subType = surgeryInjuryType.getSubType();
         boolean surgeryIsImplant = subType.isImplant(); // Includes VDNI implants
         boolean surgeryIsVDNI = subType == IMPLANT_VDNI;
+        LocalDate today = campaign.getLocalDate();
 
         // Implants remove any other instances of the same implant, otherwise no removal occurs. Non-implants remove
         // all relevant injuries.
@@ -903,7 +906,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     // We only remove implants if we're adding an identical implant, or another VDNI implant
                     if ((surgeryIsVDNI && injurySubType == IMPLANT_VDNI) ||
                               (injury.getType() == surgeryInjuryType)) {
-                        patient.removeInjury(injury);
+                        patient.removeInjury(injury, today);
                     }
                 }
             }
@@ -911,7 +914,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
                 if (injury != null) {
                     if (injury.getSubType().isBurn() || !isBurnRemovalOnly) {
-                        patient.removeInjury(injury);
+                        patient.removeInjury(injury, today);
                     }
                 }
             }

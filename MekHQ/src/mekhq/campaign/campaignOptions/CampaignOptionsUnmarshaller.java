@@ -387,6 +387,14 @@ public class CampaignOptionsUnmarshaller {
             case "useUsefulMedics" -> campaignOptions.setIsUseUsefulMedics(parseBoolean(nodeContents));
             case "useMASHTheatres" -> campaignOptions.setIsUseMASHTheatres(parseBoolean(nodeContents));
             case "mashTheatreCapacity" -> campaignOptions.setMASHTheatreCapacity(parseInt(nodeContents));
+            case "useBlobInfantry" -> campaignOptions.setUseBlobInfantry(parseBoolean(nodeContents));
+            case "useBlobBattleArmor" -> campaignOptions.setUseBlobBattleArmor(parseBoolean(nodeContents));
+            case "useBlobVehicleCrewGround" -> campaignOptions.setUseBlobVehicleCrewGround(parseBoolean(nodeContents));
+            case "useBlobVehicleCrewVTOL" -> campaignOptions.setUseBlobVehicleCrewVTOL(parseBoolean(nodeContents));
+            case "useBlobVehicleCrewNaval" -> campaignOptions.setUseBlobVehicleCrewNaval(parseBoolean(nodeContents));
+            case "useBlobVesselPilot" -> campaignOptions.setUseBlobVesselPilot(parseBoolean(nodeContents));
+            case "useBlobVesselGunner" -> campaignOptions.setUseBlobVesselGunner(parseBoolean(nodeContents));
+            case "useBlobVesselCrew" -> campaignOptions.setUseBlobVesselCrew(parseBoolean(nodeContents));
             case "prisonerCaptureStyle" -> campaignOptions.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(
                   nodeContents));
             case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
@@ -902,6 +910,8 @@ public class CampaignOptionsUnmarshaller {
             case "usePlanetaryConditions" -> campaignOptions.setUsePlanetaryConditions(parseBoolean(nodeContents));
             case "restrictPartsByMission" -> campaignOptions.setRestrictPartsByMission(parseBoolean(nodeContents));
             case "fixedMapChance" -> campaignOptions.setFixedMapChance(parseInt(nodeContents));
+            case "useAdvancedBuildingGunEmplacements" -> campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
+                  nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));

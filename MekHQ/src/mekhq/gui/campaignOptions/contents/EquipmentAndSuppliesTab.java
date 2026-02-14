@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,10 +32,13 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
@@ -56,6 +59,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -382,7 +386,8 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
 
-        chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal");
+        chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater(acquisitionHeader, "UseFunctionalAppraisal"));
 
         lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
@@ -413,7 +418,8 @@ public class EquipmentAndSuppliesTab {
         lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
 
-        chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit");
+        chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
 
         // Layout the Panel
@@ -626,7 +632,8 @@ public class EquipmentAndSuppliesTab {
      * @return a {@code JPanel} containing the campaign options panel for planetary acquisitions.
      */
     private JPanel createOptionsPanel() {
-        usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions");
+        usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         usePlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "UsePlanetaryAcquisitions"));
 
@@ -657,7 +664,8 @@ public class EquipmentAndSuppliesTab {
         spnPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "PenaltyClanPartsFromIS"));
 
-        usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose");
+        usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         usePlanetaryAcquisitionsVerbose.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
               "UsePlanetaryAcquisitionsVerbose"));
 
@@ -1022,11 +1030,13 @@ public class EquipmentAndSuppliesTab {
               getTextAt(getCampaignOptionsResourceBundle(), "lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
-        variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox");
+        variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         variableTechLevelBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "VariableTechLevelBox"));
 
         // Ammo by Type
-        useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox");
+        useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         useAmmoByTypeBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "UseAmmoByTypeBox"));
 
         // Layout the Panel

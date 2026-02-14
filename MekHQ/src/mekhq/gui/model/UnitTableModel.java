@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table Model for displaying information about units
@@ -210,40 +211,83 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
         Campaign campaign = unit.getCampaign();
         boolean isClanCampaign = campaign != null && campaign.isClanCampaign();
+
+        // Check if driver and gunner use the same role (e.g., VEHICLE_CREW_GROUND)
+        PersonnelRole driverRole = unit.getDriverRole();
+        PersonnelRole gunnerRole = unit.getGunnerRole();
+        boolean sameRole = (driverRole != null && driverRole.equals(gunnerRole));
+
+        int tempDrivers = 0;
         if (driversNeeded > 0 && soldiersNeeded == 0) {
-            PersonnelRole driverRole = unit.getDriverRole();
             String driverDisplay = driverRole == null ? getTextAt(RESOURCE_BUNDLE,
                   "UnitTableModel.crewNeeds.unknown") : driverRole.getLabel(isClanCampaign);
+
+
+            if (sameRole && driverRole != null) {
+                // Driver and gunner share the same role - need to distribute temp crew
+                int totalTempCrew = unit.getTempCrewByPersonnelRole(driverRole);
+                int driverShortfall = Math.max(0, driversNeeded - driversAssigned);
+                // Allocate temp crew to driver slots first
+                tempDrivers = Math.min(totalTempCrew, driverShortfall);
+            } else if (driverRole != null) {
+                // Driver has its own unique role
+                tempDrivers = unit.getTempCrewByPersonnelRole(driverRole);
+            }
+
             appendReport(reports,
                   getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.drivers", driverDisplay),
                   driversAssigned,
+                  tempDrivers,
                   driversNeeded);
         }
 
+        int tempGunners = 0;
         if (gunnersNeeded > 0 && soldiersNeeded == 0) {
-            PersonnelRole gunnerRole = unit.getGunnerRole();
             String gunnerDisplay = gunnerRole == null ? getTextAt(RESOURCE_BUNDLE,
                   "UnitTableModel.crewNeeds.unknown") : gunnerRole.getLabel(isClanCampaign);
+
+
+            if (sameRole && gunnerRole != null) {
+                // Driver and gunner share the same role - get remaining temp crew after driver allocation
+                int totalTempCrew = unit.getTempCrewByPersonnelRole(gunnerRole);
+                int driverShortfall = Math.max(0, driversNeeded - driversAssigned);
+                int tempCrewAfterDrivers = Math.max(0, totalTempCrew - driverShortfall);
+                int gunnerShortfall = Math.max(0, gunnersNeeded - gunnersAssigned);
+                // Remaining temp crew goes to gunner slots
+                tempGunners = Math.min(tempCrewAfterDrivers, gunnerShortfall);
+            } else if (gunnerRole != null) {
+                // Gunner has its own unique role
+                tempGunners = unit.getTempCrewByPersonnelRole(gunnerRole);
+            }
 
             appendReport(reports,
                   getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.gunners", gunnerDisplay),
                   gunnersAssigned,
+                  tempGunners,
                   gunnersNeeded);
         }
 
         if (soldiersNeeded > 0) {
+            int tempSoldiers = unit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
             appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.soldiers"), soldiersAssigned,
-                  soldiersNeeded);
+                  tempSoldiers, soldiersNeeded);
         }
 
         if (crewNeeded > 0) {
-            String key = entity.isLargeCraft() ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
-            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, crewNeeded);
+            boolean isLargeCraft = entity.isLargeCraft();
+            String key = isLargeCraft ? "UnitTableModel.crewNeeds.crew" : "UnitTableModel.crewNeeds.other";
+
+            // If it isn't a large craft, we can use getDriverRole() to get the right crew type for the unit. If
+            // vehicle ground crew differentiation returns, this'll need updated.
+            int tempCrew = isLargeCraft ? unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) :
+                                 unit.getTempCrewByPersonnelRole(unit.getDriverRole()) - tempDrivers - tempGunners;
+            appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, tempCrew, crewNeeded);
         }
 
         if (navigatorsNeeded > 0) {
+            int tempNavigators = unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
             appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.navigator"), navigatorsAssigned,
-                  navigatorsNeeded);
+                  tempNavigators, navigatorsNeeded);
         }
 
         String finalReport = reports.isEmpty() ?
@@ -258,10 +302,15 @@ public class UnitTableModel extends DataTableModel<Unit> {
      * @param report   the {@link List} to add to
      * @param title    the title of the crew role (e.g., "Driver", "Gunner")
      * @param assigned the number of crew members assigned to the role
+     * @param tempCrew the number of temp crew members assigned to the role
      * @param needed   the number of crew members needed for the role
      */
-    private static void appendReport(List<String> report, String title, int assigned, int needed) {
-        report.add(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
+    private static void appendReport(List<String> report, String title, int assigned, int tempCrew, int needed) {
+        if (tempCrew == 0) {
+            report.add(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
+        } else {
+            report.add(String.format("<b>%s: </b>%d(%d)/%d", title, tempCrew + assigned, assigned, needed));
+        }
     }
 
     @Override
@@ -301,7 +350,17 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 Formation formation = unit.getCampaign().getForce(unit.getForceId());
                 yield (formation != null) ? formation.getFullName() : "-";
             }
-            case COL_CREW -> unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+            case COL_CREW -> {
+                int totalTempCrew = unit.getTotalTempCrew();
+
+                if (totalTempCrew == 0) {
+                    yield unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+                } else {
+                    yield (totalTempCrew + unit.getActiveCrew().size()) +
+                        "(" + unit.getActiveCrew().size() + ")" +
+                        "/" + unit.getFullCrewSize();
+                }
+            }
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
             case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
             case COL_MAINTAIN_CYCLE -> {
@@ -341,6 +400,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
     }
 
     public class Renderer extends DefaultTableCellRenderer {
+        private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
               int row, int column) {
@@ -349,14 +410,43 @@ public class UnitTableModel extends DataTableModel<Unit> {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             setHorizontalAlignment(getAlignment(actualCol));
-            setToolTipText(getTooltip(actualRow, actualCol));
+
             Unit u = getUnit(actualRow);
+
+            // Get base tooltip and potentially append all color reasons for key columns
+            String tooltip = getTooltip(actualRow, actualCol);
+            if (isColorTooltipColumn(actualCol)) {
+                List<String> colorReasonKeys = u.getColorReasonKeys();
+                if (!colorReasonKeys.isEmpty()) {
+                    StringBuilder colorReasons = new StringBuilder();
+                    for (String key : colorReasonKeys) {
+                        if (colorReasons.length() > 0) {
+                            colorReasons.append("<br>");
+                        }
+                        colorReasons.append(getTextAt(GUI_RESOURCE_BUNDLE, key));
+                    }
+
+                    if (tooltip != null) {
+                        // Strip existing html tags and wrap combined tooltip
+                        String baseText = ReportingUtilities.stripHtmlTags(tooltip);
+                        tooltip = "<html>" + baseText + "<br><i>" + colorReasons + "</i></html>";
+                    } else {
+                        tooltip = "<html><i>" + colorReasons + "</i></html>";
+                    }
+                }
+            }
+            setToolTipText(tooltip);
 
             if (!isSelected) {
                 setForeground(u.determineForegroundColor("Table"));
                 setBackground(u.determineBackgroundColor("Table"));
             }
             return this;
+        }
+
+        private boolean isColorTooltipColumn(int columnIndex) {
+            return columnIndex == COL_NAME || columnIndex == COL_TYPE ||
+                         columnIndex == COL_WEIGHT_CLASS || columnIndex == COL_STATUS;
         }
     }
 

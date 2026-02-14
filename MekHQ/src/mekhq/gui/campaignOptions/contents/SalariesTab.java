@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPan
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
@@ -66,6 +67,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -180,7 +182,8 @@ public class SalariesTab {
 
         // Contents
         if (type == PersonnelRoleSubType.COMBAT) {
-            chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
+            chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary",
+                  getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
             chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(combatSalariesHeader,
                   "DisableSecondaryRoleSalary"));
             pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();

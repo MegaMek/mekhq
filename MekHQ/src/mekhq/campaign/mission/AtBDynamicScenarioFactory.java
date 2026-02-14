@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -88,7 +88,6 @@ import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
-import megamek.common.equipment.GunEmplacement;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
@@ -756,7 +755,11 @@ public class AtBDynamicScenarioFactory {
 
                 // Gun emplacements use fixed tables instead of the force generator system
                 if (actualUnitType == GUN_EMPLACEMENT) {
-                    generatedLance = generateTurrets(4, skill, quality, campaign, faction);
+                    if (campaign.getCampaignOptions().isUseAdvancedBuildingGunEmplacements()) {
+                        generatedLance = generateGunEmplacements(4, skill, quality, campaign, faction);
+                    } else {
+                        generatedLance = generateTurrets(4, skill, quality, campaign, faction);
+                    }
 
                     // All other unit types use the force generator system to randomly select units
                 } else {
@@ -868,7 +871,7 @@ public class AtBDynamicScenarioFactory {
                 if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
                     // Configure non-Turret generated units with appropriate munitions (for BV calculations)
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(
-                          generatedLance.stream().filter(e -> !(e instanceof GunEmplacement)).toList()
+                          generatedLance.stream().filter(e -> !(e.isBuildingEntityOrGunEmplacement())).toList()
                     );
                     // bin fill ratio will be adjusted by the load out generator based on piracy and
                     // quality
@@ -1535,6 +1538,26 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Generates the indicated number of gun emplacement entities. Lifted from AtBScenario.java
+     *
+     * @param num      The number of gun emplacements to generate
+     * @param skill    The skill level of the weapon operators
+     * @param quality  The quality level of the gun emplacements
+     * @param campaign The campaign for which the gun emplacements are being generated.
+     * @param faction  The faction to generate gun emplacements for
+     */
+    public static List<Entity> generateGunEmplacements(int num, SkillLevel skill, int quality, Campaign campaign,
+          Faction faction) {
+        return campaign.getUnitGenerator()
+                     .generateGunEmplacements(num, skill, quality, campaign.getGameYear())
+                     .stream()
+                     .map(ms -> createEntityWithCrew(faction, skill, campaign, ms))
+                     .filter(Objects::nonNull)
+                     .collect(Collectors.toList());
+    }
+
+
+    /**
      * Takes all the "bot" forces where the template says they should be player-controlled and transforms them into
      * attached units.
      *
@@ -1804,9 +1827,12 @@ public class AtBDynamicScenarioFactory {
             scenario.setBoardType(T_GROUND);
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                                .floorEntry(kelvinTemp)
-                                                .getValue().allowedTerrainTypes;
+            var tempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+            var biomeEntry = tempMap.floorEntry(kelvinTemp);
+            if (biomeEntry == null) {
+                biomeEntry = tempMap.firstEntry();
+            }
+            List<String> allowedTerrain = biomeEntry.getValue().allowedTerrainTypes;
 
             int terrainIndex = randomInt(allowedTerrain.size());
             scenario.setTerrainType(allowedTerrain.get(terrainIndex));
@@ -1823,12 +1849,18 @@ public class AtBDynamicScenarioFactory {
         } else {
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedFacility = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
-                                                 .floorEntry(kelvinTemp)
-                                                 .getValue().allowedTerrainTypes;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                                .floorEntry(kelvinTemp)
-                                                .getValue().allowedTerrainTypes;
+            var facilityTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+            var facilityBiomeEntry = facilityTempMap.floorEntry(kelvinTemp);
+            if (facilityBiomeEntry == null) {
+                facilityBiomeEntry = facilityTempMap.firstEntry();
+            }
+            List<String> allowedFacility = facilityBiomeEntry.getValue().allowedTerrainTypes;
+            var terrainTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+            var terrainBiomeEntry = terrainTempMap.floorEntry(kelvinTemp);
+            if (terrainBiomeEntry == null) {
+                terrainBiomeEntry = terrainTempMap.firstEntry();
+            }
+            List<String> allowedTerrain = terrainBiomeEntry.getValue().allowedTerrainTypes;
             List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
             // try to filter on temp
             allowedTerrain.addAll(allowedFacility);

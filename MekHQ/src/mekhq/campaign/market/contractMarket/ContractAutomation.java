@@ -123,7 +123,9 @@ public class ContractAutomation {
         int travelDays = contract.getTravelDays(campaign);
 
         boolean isUseTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-        String totalCost = contract.getTransportAmount().dividedBy(isUseTwoWayPay ? 2 : 1).toAmountString();
+        String totalCost = contract.getTotalTransportationFees(campaign)
+                                 .dividedBy(isUseTwoWayPay ? 2 : 1)
+                                 .toAmountString();
 
         inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "transitDescription.text",
@@ -153,7 +155,8 @@ public class ContractAutomation {
 
             // This will return an empty string if the transaction was successful
             String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getFinances(), jumpPath,
-                  campaign.getLocalDate(), contract.getTransportAmount().dividedBy(useTwoWayPay ? 2 : 1),
+                  campaign.getLocalDate(),
+                  contract.getTotalTransportationFees(campaign).dividedBy(useTwoWayPay ? 2 : 1),
                   campaign.getCurrentSystem());
 
             if (jumpReport.isBlank()) {

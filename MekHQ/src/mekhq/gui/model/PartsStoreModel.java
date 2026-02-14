@@ -36,12 +36,12 @@ package mekhq.gui.model;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;

@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.medical.advancedMedical;
 
 import static java.lang.Math.ceil;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -123,7 +124,7 @@ public final class InjuryUtil {
     public static void resolveCombatDamage(Campaign campaign, Person person, int hits) {
         if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
             resolveCombatDamageUsingAlternateModel(campaign, person, hits,
-                  campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical());
+                  campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical(), campaign.getLocalDate());
         } else {
             resolveCombatDamageUsingStandardModel(campaign, person, hits);
         }
@@ -169,7 +170,7 @@ public final class InjuryUtil {
      * @since 0.50.10
      */
     private static void resolveCombatDamageUsingAlternateModel(Campaign campaign, Person person, int hits,
-          boolean isUseKinderMode) {
+          boolean isUseKinderMode, LocalDate today) {
         Collection<Injury> newInjuries = AdvancedMedicalAlternate.generateInjuriesFromHits(campaign, person, hits);
         for (Injury injury : newInjuries) {
             if (isUseKinderMode) {
@@ -183,7 +184,7 @@ public final class InjuryUtil {
         }
 
         // Remove injuries from limbs that have been severed
-        AdvancedMedicalAlternate.purgeIllogicalInjuries(person);
+        AdvancedMedicalAlternate.purgeIllogicalInjuries(person, today);
 
         // We double-check the injury has been added, as it might have been removed by purgeIllogicalInjuries
         boolean hasNewInjuries = false;
@@ -537,46 +538,46 @@ public final class InjuryUtil {
     }
 
     /** Generate the effects of "natural" healing (daily) */
-    public static List<GameEffect> genNaturalHealing(Campaign c, Person person) {
-        Objects.requireNonNull(c);
+    public static List<GameEffect> genNaturalHealing(Campaign campaign, Person person) {
+        Objects.requireNonNull(campaign);
         Objects.requireNonNull(person);
 
         List<GameEffect> result = new ArrayList<>();
 
-        person.getInjuries().forEach((i) -> {
-            if (i.getTime() <= 1 && !i.isPermanent()) {
-                InjuryType type = i.getType();
-                if (!i.isWorkedOn() &&
+        person.getInjuries().forEach((injury) -> {
+            if (injury.getTime() <= 1 && !injury.isPermanent()) {
+                InjuryType type = injury.getType();
+                if (!injury.isWorkedOn() &&
                           ((Objects.equals(type, InjuryTypes.BROKEN_LIMB)) ||
                                  (Objects.equals(type, InjuryTypes.TORN_MUSCLE)) ||
                                  (Objects.equals(type, InjuryTypes.CONCUSSION)) ||
                                  (Objects.equals(type, InjuryTypes.BROKEN_COLLAR_BONE)))) {
                     result.add(new GameEffect(String.format(
                           "83%% chance of %s healing, 17%% chance of it becoming permanent.",
-                          i.getName()), rnd -> {
-                        i.setTime(0);
+                          injury.getName()), rnd -> {
+                        injury.setTime(0);
                         if (rnd.applyAsInt(6) == 0) {
-                            i.setPermanent(true);
-                            MedicalLogger.injuryDidntHealProperly(person, c.getLocalDate(), i);
+                            injury.setPermanent(true);
+                            MedicalLogger.injuryDidntHealProperly(person, campaign.getLocalDate(), injury);
                         } else {
-                            person.removeInjury(i);
-                            MedicalLogger.injuryHealed(person, c.getLocalDate(), i);
+                            person.removeInjury(injury, campaign.getLocalDate());
+                            MedicalLogger.injuryHealed(person, campaign.getLocalDate(), injury);
                         }
                     }));
                 } else {
-                    result.add(new GameEffect(String.format("%s heals", i.getName()), rnd -> {
-                        i.setTime(0);
-                        person.removeInjury(i);
-                        MedicalLogger.injuryHealed(person, c.getLocalDate(), i);
+                    result.add(new GameEffect(String.format("%s heals", injury.getName()), rnd -> {
+                        injury.setTime(0);
+                        person.removeInjury(injury, campaign.getLocalDate());
+                        MedicalLogger.injuryHealed(person, campaign.getLocalDate(), injury);
                     }));
                 }
-            } else if (i.getTime() > 1) {
-                result.add(new GameEffect(String.format("%s continues healing", i.getName()),
-                      rnd -> i.setTime(Math.max(i.getTime() - 1, 0))));
-            } else if ((i.getTime() == 1) && i.isPermanent()) {
-                result.add(new GameEffect(String.format("%s becomes permanent", i.getName()), rnd -> {
-                    i.setTime(0);
-                    MedicalLogger.injuryBecamePermanent(person, c.getLocalDate(), i);
+            } else if (injury.getTime() > 1) {
+                result.add(new GameEffect(String.format("%s continues healing", injury.getName()),
+                      rnd -> injury.setTime(Math.max(injury.getTime() - 1, 0))));
+            } else if ((injury.getTime() == 1) && injury.isPermanent()) {
+                result.add(new GameEffect(String.format("%s becomes permanent", injury.getName()), rnd -> {
+                    injury.setTime(0);
+                    MedicalLogger.injuryBecamePermanent(person, campaign.getLocalDate(), injury);
                 }));
             }
         });
@@ -585,21 +586,21 @@ public final class InjuryUtil {
                 boolean dismissed = false;
                 if (person.getStatus().isDead()) {
                     dismissed = true;
-                    MedicalLogger.diedInInfirmary(person, c.getLocalDate());
+                    MedicalLogger.diedInInfirmary(person, campaign.getLocalDate());
                 } else if (person.getStatus().isMIA()) {
                     // What? How?
                     dismissed = true;
-                    MedicalLogger.abductedFromInfirmary(person, c.getLocalDate());
+                    MedicalLogger.abductedFromInfirmary(person, campaign.getLocalDate());
                 } else if (person.getStatus().isRetired()) {
                     dismissed = true;
-                    MedicalLogger.retiredAndTransferredFromInfirmary(person, c.getLocalDate());
+                    MedicalLogger.retiredAndTransferredFromInfirmary(person, campaign.getLocalDate());
                 } else if (!person.needsFixing()) {
                     dismissed = true;
-                    MedicalLogger.dismissedFromInfirmary(person, c.getLocalDate());
+                    MedicalLogger.dismissedFromInfirmary(person, campaign.getLocalDate());
                 }
 
                 if (dismissed) {
-                    person.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
+                    person.setDoctorId(null, campaign.getCampaignOptions().getHealingWaitingPeriod());
                 }
             }));
         }

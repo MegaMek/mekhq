@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -104,7 +105,7 @@ public class MASC extends EquipmentPart {
     }
 
     private boolean isSupercharger() {
-        return type.hasSubType(MiscType.S_SUPERCHARGER);
+        return type.hasFlag(MiscTypeFlag.S_SUPERCHARGER);
     }
 
     @Override

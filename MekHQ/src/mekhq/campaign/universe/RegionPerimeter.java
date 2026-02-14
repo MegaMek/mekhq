@@ -40,7 +40,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Given a list of planets, uses a convex hull algorithm to select the planets that form a polygon that completely

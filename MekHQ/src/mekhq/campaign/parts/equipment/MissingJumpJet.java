@@ -36,6 +36,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.Campaign;
 
 /**
@@ -74,7 +75,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
         } else if (getUnitTonnage() >= 60) {
             ton = 1.0;
         }
-        if (type.hasSubType(MiscType.S_IMPROVED)) {
+        if (type.hasFlag(MiscTypeFlag.S_IMPROVED)) {
             ton *= 2;
         }
         return ton;

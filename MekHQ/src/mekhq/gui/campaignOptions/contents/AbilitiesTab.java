@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -376,7 +376,7 @@ public class AbilitiesTab {
         JLabel lblIncompatible = createAbilityLabel("incompatible.text", ability.getInvalidDesc());
         JLabel lblRemoves = createAbilityLabel("removes.text", ability.getRemovedDesc());
 
-        RoundedJButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", null);
+        RoundedJButton btnCustomizeAbility = new CampaignOptionsButton("CustomizeAbility", (Integer) null);
         btnCustomizeAbility.addActionListener(e -> {
             if (editSPA(ability)) {
                 // This will run on the SWT thread
