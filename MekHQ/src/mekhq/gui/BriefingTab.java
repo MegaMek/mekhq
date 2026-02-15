@@ -112,7 +112,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
+import mekhq.campaign.mission.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -140,7 +140,7 @@ import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.camOpsSalvage.SalvageForcePicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
 import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
@@ -953,7 +953,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * Displays a dialog allowing the player to select forces for salvage operations.
      *
      * <p>This method gathers all available salvage-capable forces from the campaign and presents
-     * them to the player via a {@link SalvageForcePicker} dialog. Forces are filtered based on their salvage
+     * them to the player via a {@link SalvageFormationPicker} dialog. Forces are filtered based on their salvage
      * capabilities and whether they are deployed.</p>
      *
      * @param scenario the scenario for which salvage forces are being selected
@@ -969,17 +969,17 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(),
+        List<SalvageFormationData> salvageForceOptions = getSalvageForces(getCampaign(),
               isSpace,
               scenario.getSalvageFormations());
 
-        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace,
+        SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageForceOptions, isSpace,
               scenario.getSalvageFormations());
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageForces();
             Hangar hangar = getCampaign().getHangar();
-            List<Formation> selectedFormations = forcePicker.getSelectedForces();
+            List<Formation> selectedFormations = forcePicker.getSelectedFormations();
             for (Formation formation : selectedFormations) {
                 scenario.addSalvageForce(formation.getId());
                 if (formation.getTechID() != null) {
@@ -1144,9 +1144,9 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageForceData> getSalvageForces(Campaign campaign, boolean isSpaceScenario,
+    private List<SalvageFormationData> getSalvageForces(Campaign campaign, boolean isSpaceScenario,
           List<Integer> alreadyAssignedForces) {
-        List<SalvageForceData> salvageForceOptions = new ArrayList<>();
+        List<SalvageFormationData> salvageForceOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
         List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
@@ -1177,7 +1177,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         eligibleSalvageFormations.sort(Comparator.comparing(Formation::getFullName));
         for (Formation formation : eligibleSalvageFormations) {
-            SalvageForceData data = SalvageForceData.buildData(campaign, formation, isSpaceScenario);
+            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
             salvageForceOptions.add(data);
         }
 
@@ -1207,7 +1207,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         eligibleCombatTeams.sort(Comparator.comparing(Formation::getFullName));
         for (Formation formation : eligibleCombatTeams) {
-            SalvageForceData data = SalvageForceData.buildData(campaign, formation, isSpaceScenario);
+            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
             salvageForceOptions.add(data);
         }
 

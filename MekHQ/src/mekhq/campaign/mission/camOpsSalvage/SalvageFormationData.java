@@ -56,11 +56,11 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 
-public record SalvageForceData(Formation formation, FormationType formationType, @Nullable Person tech, double maximumCargoCapacity,
-                               double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForceData";
+public record SalvageFormationData(Formation formation, FormationType formationType, @Nullable Person tech, double maximumCargoCapacity,
+                                   double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageFormationData";
 
-    public static SalvageForceData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
+    public static SalvageFormationData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
         FormationType formationType = formation.getFormationType();
         UUID techId = formation.getTechID();
         Person tech = techId == null || !formationType.isSalvage() ? null : campaign.getPerson(techId);
@@ -128,7 +128,7 @@ public record SalvageForceData(Formation formation, FormationType formationType,
             }
         }
 
-        return new SalvageForceData(formation,
+        return new SalvageFormationData(formation,
               formationType,
               tech,
               maximumCargoCapacity,
@@ -141,7 +141,7 @@ public record SalvageForceData(Formation formation, FormationType formationType,
         StringBuilder tooltip = new StringBuilder();
 
         if (tech == null) {
-            String noTechLabel = getTextAt(RESOURCE_BUNDLE, "SalvageForceData.noTech");
+            String noTechLabel = getTextAt(RESOURCE_BUNDLE, "SalvageFormationData.noTech");
             tooltip.append(noTechLabel);
         } else {
             tooltip.append(tech.getFullTitle()).append("<br>");
@@ -152,10 +152,10 @@ public record SalvageForceData(Formation formation, FormationType formationType,
             String injuryLabelKey;
             int injuries;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-                injuryLabelKey = "SalvageForceData.injuries";
+                injuryLabelKey = "SalvageFormationData.injuries";
                 injuries = tech.getInjuries().size();
             } else {
-                injuryLabelKey = "SalvageForceData.hits";
+                injuryLabelKey = "SalvageFormationData.hits";
                 injuries = tech.getHits();
             }
             String injuriesLabel = getFormattedTextAt(RESOURCE_BUNDLE, injuryLabelKey, injuries);
@@ -266,7 +266,7 @@ public record SalvageForceData(Formation formation, FormationType formationType,
         }
 
         if (tooltip.isEmpty()) {
-            tooltip.append(getTextAt(RESOURCE_BUNDLE, "SalvageForceData.noTug"));
+            tooltip.append(getTextAt(RESOURCE_BUNDLE, "SalvageFormationData.noTug"));
         }
         return tooltip.toString();
     }
