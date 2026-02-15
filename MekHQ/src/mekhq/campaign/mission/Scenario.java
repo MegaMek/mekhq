@@ -649,17 +649,17 @@ public class Scenario implements IPlayerSettings {
         return new ArrayList<>(salvageFormations);
     }
 
-    public void removeSalvageForce(List<Integer> forceIds) {
+    public void removeSalvageFormation(List<Integer> forceIds) {
         salvageFormations.removeAll(forceIds);
     }
 
-    public void addSalvageForce(int forceId) {
+    public void addSalvageFormation(int forceId) {
         if (!salvageFormations.contains(forceId)) {
             salvageFormations.add(forceId);
         }
     }
 
-    public void clearSalvageForces() {
+    public void clearSalvageFormations() {
         salvageFormations.clear();
     }
 
@@ -1196,7 +1196,7 @@ public class Scenario implements IPlayerSettings {
                             continue;
                         }
                         // We need to use this method, as it includes additional safeties
-                        retVal.addSalvageForce(MathUtility.parseInt(wn3.getTextContent().trim(), FORMATION_NONE));
+                        retVal.addSalvageFormation(MathUtility.parseInt(wn3.getTextContent().trim(), FORMATION_NONE));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvageTechs")) {
                     NodeList nl2 = wn2.getChildNodes();

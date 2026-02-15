@@ -920,7 +920,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private boolean handleSalvageAssignments(Scenario scenario) {
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
-            if (!displaySalvageForcePicker(scenario)) {
+            if (!displaySalvageFormationPicker(scenario)) {
                 return true;
             }
 
@@ -963,25 +963,25 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private boolean displaySalvageForcePicker(Scenario scenario) {
+    private boolean displaySalvageFormationPicker(Scenario scenario) {
         if (!getCampaignOptions().isUseCamOpsSalvage()) {
             return true;
         }
 
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        List<SalvageFormationData> salvageForceOptions = getSalvageForces(getCampaign(),
+        List<SalvageFormationData> salvageFormationOptions = getSalvageFormations(getCampaign(),
               isSpace,
               scenario.getSalvageFormations());
 
-        SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageForceOptions, isSpace,
+        SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
               scenario.getSalvageFormations());
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
-            scenario.clearSalvageForces();
+            scenario.clearSalvageFormations();
             Hangar hangar = getCampaign().getHangar();
             List<Formation> selectedFormations = forcePicker.getSelectedFormations();
             for (Formation formation : selectedFormations) {
-                scenario.addSalvageForce(formation.getId());
+                scenario.addSalvageFormation(formation.getId());
                 if (formation.getTechID() != null) {
                     Person tech = getCampaign().getPerson(formation.getTechID());
                     if (tech != null && !tech.isEngineer()) {
@@ -1144,9 +1144,9 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageFormationData> getSalvageForces(Campaign campaign, boolean isSpaceScenario,
+    private List<SalvageFormationData> getSalvageFormations(Campaign campaign, boolean isSpaceScenario,
           List<Integer> alreadyAssignedForces) {
-        List<SalvageFormationData> salvageForceOptions = new ArrayList<>();
+        List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
         List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
@@ -1164,12 +1164,12 @@ public final class BriefingTab extends CampaignGuiTab {
             // forces will no longer be available for the salvage operations they were assigned to perform.
             boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
                                                  isForceDeployedToStratCon(activeContracts, formation.getId());
-            boolean isSalvageForce = formation.getFormationType().isSalvage();
+            boolean isSalvageFormation = formation.getFormationType().isSalvage();
             boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
             if (!isDeployedToScenario &&
                       !isDeployedToStratCon &&
-                      isSalvageForce &&
+                      isSalvageFormation &&
                       hasAtLeastOneSalvageUnit) {
                 eligibleSalvageFormations.add(formation);
             }
@@ -1178,7 +1178,7 @@ public final class BriefingTab extends CampaignGuiTab {
         eligibleSalvageFormations.sort(Comparator.comparing(Formation::getFullName));
         for (Formation formation : eligibleSalvageFormations) {
             SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
-            salvageForceOptions.add(data);
+            salvageFormationOptions.add(data);
         }
 
         // Collect eligible Combat Teams
@@ -1208,10 +1208,10 @@ public final class BriefingTab extends CampaignGuiTab {
         eligibleCombatTeams.sort(Comparator.comparing(Formation::getFullName));
         for (Formation formation : eligibleCombatTeams) {
             SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
-            salvageForceOptions.add(data);
+            salvageFormationOptions.add(data);
         }
 
-        return salvageForceOptions;
+        return salvageFormationOptions;
     }
 
     /**
