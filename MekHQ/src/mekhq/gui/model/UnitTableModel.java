@@ -123,7 +123,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_CREW_STATE -> "Crew State";
             case COL_QUALITY -> "Quality";
             case COL_PILOT -> "Assigned to";
-            case COL_FORCE -> "Force";
+            case COL_FORCE -> "Formation";
             case COL_CREW -> "Crew";
             case COL_TECH_CRW -> "Tech Crew";
             case COL_MAINTAIN -> "Maint. Cost";
