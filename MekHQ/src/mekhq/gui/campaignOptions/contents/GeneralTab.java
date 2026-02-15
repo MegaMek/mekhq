@@ -567,7 +567,7 @@ public class GeneralTab {
             campaign.setName(txtName.getText());
 
             if (isStartUp) {
-                campaign.getForces().setName(campaign.getName());
+                campaign.getFormations().setName(campaign.getName());
                 campaign.setLocalDate(date);
             }
 

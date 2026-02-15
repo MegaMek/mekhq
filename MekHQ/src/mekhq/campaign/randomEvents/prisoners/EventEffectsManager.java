@@ -211,8 +211,8 @@ public class EventEffectsManager {
     private List<Person> getAllPotentialTargets(final boolean isGuard) {
         List<Person> potentialTargets = new ArrayList<>();
         if (isGuard) {
-            for (Formation formation : campaign.getAllForces()) {
-                if (!formation.isForceType(SECURITY)) {
+            for (Formation formation : campaign.getAllFormations()) {
+                if (!formation.isFormationType(SECURITY)) {
                     continue;
                 }
 

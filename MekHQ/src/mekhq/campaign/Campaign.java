@@ -46,8 +46,8 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Formation.FORCE_NONE;
-import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
@@ -310,7 +310,7 @@ public class Campaign implements ITechManager {
     private transient Map<String, List<Person>> activePersonnelCache = new HashMap<>();
 
     private Warehouse parts = new Warehouse();
-    private final TreeMap<Integer, Formation> forceIds = new TreeMap<>();
+    private final TreeMap<Integer, Formation> formationIds = new TreeMap<>();
     private final TreeMap<Integer, Mission> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
@@ -333,7 +333,7 @@ public class Campaign implements ITechManager {
      *  */
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
 
-    private int lastForceId;
+    private int lastFormationId;
     private int lastMissionId;
     private int lastScenarioId;
 
@@ -349,8 +349,8 @@ public class Campaign implements ITechManager {
     private LocalDate currentDay;
     private LocalDate campaignStartDate;
 
-    // hierarchically structured Force object to define TO&E
-    private Formation forces;
+    // hierarchically structured Formation object to define TO&E
+    private Formation formations;
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
@@ -540,7 +540,7 @@ public class Campaign implements ITechManager {
               campConf.getReputationController(),
               campConf.getFactionStandings(),
               campConf.getRankSystem(),
-              campConf.getforce(),
+              campConf.getFormations(),
               campConf.getfinances(),
               campConf.getRandomEvents(),
               campConf.getUltimatums(),
@@ -586,8 +586,8 @@ public class Campaign implements ITechManager {
         location = startLocation;
         reputation = reputationController;
         this.factionStandings = factionStandings;
-        forces = formation;
-        forceIds.put(0, forces);
+        formations = formation;
+        formationIds.put(0, formations);
         this.finances = finances;
         randomEventLibraries = randomEvents;
         factionStandingUltimatumsLibrary = ultimatums;
@@ -844,29 +844,30 @@ public class Campaign implements ITechManager {
         return finances.getBalance();
     }
 
-    public void setForces(Formation f) {
-        forces = f;
+    public void setFormations(Formation f) {
+        formations = f;
     }
 
-    public Formation getForces() {
-        return forces;
+    public Formation getFormations() {
+        return formations;
     }
 
-    public List<Formation> getAllForces() {
-        return new ArrayList<>(forceIds.values());
+    public List<Formation> getAllFormations() {
+        return new ArrayList<>(formationIds.values());
     }
 
-    public TreeMap<Integer, Formation> getForceIds() {
-        return forceIds;
+    public TreeMap<Integer, Formation> getFormationIds() {
+        return formationIds;
     }
 
     /**
      * Retrieves all units in the Table of Organization and Equipment (TOE).
      *
-     * <p>This method provides a list of unique identifiers for all units currently included in the force's TOE
+     * <p>This method provides a list of unique identifiers for all units currently included in the formation's TOE
      * structure.</p>
      *
-     * @param standardForcesOnly if {@code true}, returns only units in {@link FormationType#STANDARD} forces; if
+     * @param standardFormationsOnly if {@code true}, returns only units in {@link FormationType#STANDARD}
+     *                              formations; if
      *                           {@code false}, returns all units.
      *
      * @return a List of UUID objects representing all units in the TOE according to the specified filter
@@ -874,30 +875,30 @@ public class Campaign implements ITechManager {
      * @author Illiani
      * @since 0.50.05
      */
-    public List<UUID> getAllUnitsInTheTOE(boolean standardForcesOnly) {
-        return forces.getAllUnits(standardForcesOnly);
+    public List<UUID> getAllUnitsInTheTOE(boolean standardFormationsOnly) {
+        return formations.getAllUnits(standardFormationsOnly);
     }
 
     /**
-     * Adds a {@link CombatTeam} to the {@code combatTeams} {@link Hashtable} using {@code forceId} as the key.
+     * Adds a {@link CombatTeam} to the {@code combatTeams} {@link Hashtable} using {@code formationId} as the key.
      *
      * @param combatTeam the {@link CombatTeam} to be added to the {@link Hashtable}
      */
     public void addCombatTeam(CombatTeam combatTeam) {
-        combatTeams.put(combatTeam.getForceId(), combatTeam);
+        combatTeams.put(combatTeam.getFormationId(), combatTeam);
     }
 
     /**
-     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using {@code forceId} as the key.
+     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using {@code formationId} as the key.
      *
-     * @param forceId the key of the {@link CombatTeam} to be removed from the {@link Hashtable}
+     * @param formationId the key of the {@link CombatTeam} to be removed from the {@link Hashtable}
      */
-    public void removeCombatTeam(final int forceId) {
-        this.combatTeams.remove(forceId);
+    public void removeCombatTeam(final int formationId) {
+        this.combatTeams.remove(formationId);
     }
 
     /**
-     * Returns the {@link Hashtable} using the combatTeam's {@code forceId} as the key and containing all the
+     * Returns the {@link Hashtable} using the combatTeam's {@code formationId} as the key and containing all the
      * {@link CombatTeam} objects after removing the ineligible ones. Although sanitization might not be necessary, it
      * ensures that there is no need for {@code isEligible()} checks when fetching the {@link Hashtable}.
      *
@@ -911,24 +912,24 @@ public class Campaign implements ITechManager {
         // sanitizing step should remove the need for isEligible() checks whenever we
         // fetch the
         // hashtable.
-        for (Formation formation : getAllForces()) {
-            int forceId = formation.getId();
-            if (combatTeams.containsKey(forceId)) {
-                CombatTeam combatTeam = combatTeams.get(forceId);
+        for (Formation formation : getAllFormations()) {
+            int formationId = formation.getId();
+            if (combatTeams.containsKey(formationId)) {
+                CombatTeam combatTeam = combatTeams.get(formationId);
 
                 if (combatTeam.isEligible(this)) {
                     continue;
                 }
             } else {
-                CombatTeam combatTeam = new CombatTeam(forceId, this);
+                CombatTeam combatTeam = new CombatTeam(formationId, this);
 
                 if (combatTeam.isEligible(this)) {
-                    combatTeams.put(forceId, combatTeam);
+                    combatTeams.put(formationId, combatTeam);
                     continue;
                 }
             }
 
-            combatTeams.remove(forceId);
+            combatTeams.remove(formationId);
         }
 
         return combatTeams;
@@ -948,7 +949,7 @@ public class Campaign implements ITechManager {
 
         return combatTeams.values()
                      .stream()
-                     .filter(l -> forceIds.containsKey(l.getForceId()))
+                     .filter(l -> formationIds.containsKey(l.getFormationId()))
                      .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -1381,19 +1382,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add force to an existing superforce. This method will also assign the force an id and place it in the forceId
+     * Add formation to an existing superformation. This method will also assign the formation an id and place it in the formationId
      * hash
      *
-     * @param formation      - the Force to add
-     * @param superFormation - the superforce to add the new force to
+     * @param formation      - the Formation to add
+     * @param superFormation - the superformation to add the new formation to
      */
-    public void addForce(Formation formation, Formation superFormation) {
-        int id = lastForceId + 1;
+    public void addFormation(Formation formation, Formation superFormation) {
+        int id = lastFormationId + 1;
         formation.setId(id);
-        superFormation.addSubForce(formation, true);
+        superFormation.addSubFormation(formation, true);
         formation.setScenarioId(superFormation.getScenarioId(), this);
-        forceIds.put(id, formation);
-        lastForceId = id;
+        formationIds.put(id, formation);
+        lastFormationId = id;
 
         formation.updateCommander(this);
 
@@ -1402,31 +1403,31 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public void moveForce(Formation formation, Formation superFormation) {
-        // Can't move a null force under a superforce and can't move a force under itself.
+    public void moveFormation(Formation formation, Formation superFormation) {
+        // Can't move a null formation under a subformation and can't move a formation under itself.
         if (formation == null || formation.equals(superFormation)) {
             return;
         }
-        Formation parentFormation = formation.getParentForce();
+        Formation parentFormation = formation.getParentFormation();
 
         if (null != parentFormation) {
-            parentFormation.removeSubForce(formation.getId());
+            parentFormation.removeSubFormation(formation.getId());
         }
 
-        superFormation.addSubForce(formation, true);
+        superFormation.addSubFormation(formation, true);
         formation.setScenarioId(superFormation.getScenarioId(), this);
 
-        FormationType formationType = formation.getForceType();
+        FormationType formationType = formation.getFormationType();
 
         if (formationType.shouldStandardizeParents()) {
             for (Formation individualParentFormation : formation.getAllParents()) {
-                individualParentFormation.setForceType(STANDARD, false);
+                individualParentFormation.setFormationType(STANDARD, false);
             }
         }
 
         if (formationType.shouldChildrenInherit()) {
-            for (Formation childFormation : formation.getAllSubForces()) {
-                childFormation.setForceType(formationType, false);
+            for (Formation childFormation : formation.getAllSubFormations()) {
+                childFormation.setFormationType(formationType, false);
             }
         }
 
@@ -1435,13 +1436,13 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This is used by the XML loader. The id should already be set for this force so don't increment
+     * This is used by the XML loader. The id should already be set for this formation so don't increment
      *
-     * @param formation Force to add
+     * @param formation Formation to add
      */
-    public void importForce(Formation formation) {
-        lastForceId = max(lastForceId, formation.getId());
-        forceIds.put(formation.getId(), formation);
+    public void importFormation(Formation formation) {
+        lastFormationId = max(lastFormationId, formation.getId());
+        formationIds.put(formation.getId(), formation);
     }
 
     /**
@@ -1454,31 +1455,31 @@ public class Campaign implements ITechManager {
         scenarios.put(scenario.getId(), scenario);
     }
 
-    public void addUnitToForce(final @Nullable Unit unit, final Formation formation) {
-        addUnitToForce(unit, formation.getId());
+    public void addUnitToFormation(final @Nullable Unit unit, final Formation formation) {
+        addUnitToFormation(unit, formation.getId());
     }
 
     /**
-     * Add unit to an existing force. This method will also assign that force's id to the unit.
+     * Add unit to an existing formation. This method will also assign that formation's id to the unit.
      *
-     * @param unit Unit to add to the existing force.
-     * @param id   Force ID to add unit to
+     * @param unit Unit to add to the existing formation.
+     * @param id   Formation ID to add unit to
      */
-    public void addUnitToForce(@Nullable Unit unit, int id) {
+    public void addUnitToFormation(@Nullable Unit unit, int id) {
         if (unit == null) {
             return;
         }
 
-        if (id == FORCE_NONE) {
-            Formation currentFormation = getForce(unit.getForceId());
-            unit.setForceId(FORCE_NONE);
+        if (id == FORMATION_NONE) {
+            Formation currentFormation = getFormation(unit.getFormationId());
+            unit.setFormationId(FORMATION_NONE);
             unit.setScenarioId(NO_ASSIGNED_SCENARIO);
             MekHQ.triggerEvent(new OrganizationChangedEvent(this, currentFormation, unit));
             return;
         }
 
-        Formation formation = forceIds.get(id);
-        Formation prevFormation = forceIds.get(unit.getForceId());
+        Formation formation = formationIds.get(id);
+        Formation prevFormation = formationIds.get(unit.getFormationId());
         boolean useTransfers = false;
         boolean transferLog = !getCampaignOptions().isUseTransfers();
 
@@ -1487,25 +1488,25 @@ public class Campaign implements ITechManager {
                 unit.removeTech();
             }
             // We log removal if we don't use transfers or if it can't be assigned to a new
-            // force
+            // formation
             prevFormation.removeUnit(this, unit.getId(), transferLog || (formation == null));
             useTransfers = !transferLog;
             MekHQ.triggerEvent(new OrganizationChangedEvent(this, prevFormation, unit));
         }
 
         if (null != formation) {
-            unit.setForceId(id);
+            unit.setFormationId(id);
             unit.setScenarioId(formation.getScenarioId());
             if (null != formation.getTechID()) {
-                Person forceTech = getPerson(formation.getTechID());
-                if (forceTech.canTech(unit.getEntity())) {
+                Person formationTech = getPerson(formation.getTechID());
+                if (formationTech.canTech(unit.getEntity())) {
                     if (null != unit.getTech()) {
                         unit.removeTech();
                     }
 
-                    unit.setTech(forceTech);
+                    unit.setTech(formationTech);
                 } else {
-                    String cantTech = forceTech.getFullName() +
+                    String cantTech = formationTech.getFullName() +
                                             " cannot maintain " +
                                             unit.getName() +
                                             '\n' +
@@ -1523,12 +1524,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Adds force and all its sub-forces to the Combat Teams table
+     * Adds formation and all its sub-formations to the Combat Teams table
      */
     private void addAllCombatTeams(Formation formation) {
         recalculateCombatTeams(this);
 
-        for (Formation subFormation : formation.getSubForces()) {
+        for (Formation subFormation : formation.getSubFormations()) {
             addAllCombatTeams(subFormation);
         }
     }
@@ -2064,8 +2065,8 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        // Added to avoid the 'default force bug' when calculating cargo
-        removeUnitFromForce(unit);
+        // Added to avoid the 'default formation bug' when calculating cargo
+        removeUnitFromFormation(unit);
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
@@ -2336,7 +2337,7 @@ public class Campaign implements ITechManager {
     }
 
     public int calculateMASHTheaterCapacity() {
-        List<Unit> unitsInTOE = getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units, false);
+        List<Unit> unitsInTOE = getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(units, false);
         int baseCapacity = MASHCapacity.checkMASHCapacity(unitsInTOE, campaignOptions.getMASHTheatreCapacity());
         int rentedCapacity = FacilityRentals.getCapacityIncreaseFromRentals(getActiveContracts(),
               ContractRentalType.HOSPITAL_BEDS);
@@ -3376,8 +3377,8 @@ public class Campaign implements ITechManager {
     }
 
     @Nullable
-    public Formation getForce(int id) {
-        return forceIds.get(id);
+    public Formation getFormation(int id) {
+        return formationIds.get(id);
     }
 
     public List<String> getCurrentReport() {
@@ -5645,8 +5646,8 @@ public class Campaign implements ITechManager {
             unit.remove(tech, true);
         }
 
-        // remove unit from any forces
-        removeUnitFromForce(unit);
+        // remove unit from any formations
+        removeUnitFromFormation(unit);
 
         // If this is a transport, remove it from the list of potential transports
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
@@ -5693,7 +5694,7 @@ public class Campaign implements ITechManager {
         }
 
 
-        Formation formation = getForceFor(person);
+        Formation formation = getFormationFor(person);
         if (formation != null) {
             formation.updateCommander(this);
         }
@@ -5732,7 +5733,7 @@ public class Campaign implements ITechManager {
     }
 
     public void removeScenario(final Scenario scenario) {
-        scenario.clearAllForcesAndPersonnel(this);
+        scenario.clearAllFormationsAndPersonnel(this);
         final Mission mission = getMission(scenario.getMissionId());
         if (mission != null) {
             mission.getScenarios().remove(scenario);
@@ -5752,7 +5753,7 @@ public class Campaign implements ITechManager {
     public void removeMission(final Mission mission) {
         // Loop through scenarios here! We need to remove them as well.
         for (Scenario scenario : mission.getScenarios()) {
-            scenario.clearAllForcesAndPersonnel(this);
+            scenario.clearAllFormationsAndPersonnel(this);
             scenarios.remove(scenario.getId());
         }
         mission.clearScenarios();
@@ -5771,38 +5772,38 @@ public class Campaign implements ITechManager {
         kills.remove(personID);
     }
 
-    public void removeForce(Formation formation) {
+    public void removeFormation(Formation formation) {
         int fid = formation.getId();
-        forceIds.remove(fid);
-        // clear forceIds of all personnel with this force
+        formationIds.remove(fid);
+        // clear formationIds of all personnel with this formation
         for (UUID uid : formation.getUnits()) {
             Unit u = getHangar().getUnit(uid);
             if (null == u) {
                 continue;
             }
-            if (u.getForceId() == fid) {
-                u.setForceId(FORCE_NONE);
+            if (u.getFormationId() == fid) {
+                u.setFormationId(FORMATION_NONE);
                 if (formation.isDeployed()) {
                     u.setScenarioId(NO_ASSIGNED_SCENARIO);
                 }
             }
         }
 
-        // also remove this force's id from any scenarios
+        // also remove this formation's id from any scenarios
         if (formation.isDeployed()) {
             Scenario s = getScenario(formation.getScenarioId());
-            s.removeForce(fid);
+            s.removeFormation(fid);
         }
 
-        if (null != formation.getParentForce()) {
-            formation.getParentForce().removeSubForce(fid);
+        if (null != formation.getParentFormation()) {
+            formation.getParentFormation().removeSubFormation(fid);
         }
 
-        // clear out StratCon force assignments
+        // clear out StratCon formation assignments
         for (AtBContract contract : getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() != null) {
                 for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
-                    track.unassignForce(fid);
+                    track.unassignFormation(fid);
                 }
             }
         }
@@ -5812,11 +5813,11 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public void removeUnitFromForce(Unit u) {
-        Formation formation = getForce(u.getForceId());
+    public void removeUnitFromFormation(Unit u) {
+        Formation formation = getFormation(u.getFormationId());
         if (null != formation) {
             formation.removeUnit(this, u.getId(), true);
-            u.setForceId(FORCE_NONE);
+            u.setFormationId(FORMATION_NONE);
             u.setScenarioId(NO_ASSIGNED_SCENARIO);
             if (u.getEntity().hasNavalC3() && u.getEntity().calculateFreeC3Nodes() < 5) {
                 Vector<Unit> removedUnits = new Vector<>();
@@ -5853,18 +5854,18 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public @Nullable Formation getForceFor(final @Nullable Unit unit) {
-        return (unit == null) ? null : getForce(unit.getForceId());
+    public @Nullable Formation getFormationFor(final @Nullable Unit unit) {
+        return (unit == null) ? null : getFormation(unit.getFormationId());
     }
 
-    public @Nullable Formation getForceFor(final Person person) {
+    public @Nullable Formation getFormationFor(final Person person) {
         final Unit unit = person.getUnit();
         if (unit != null) {
-            return getForceFor(unit);
+            return getFormationFor(unit);
         } else if (person.isTech()) {
-            return forceIds.values()
+            return formationIds.values()
                          .stream()
-                         .filter(force -> person.getId().equals(force.getTechID()))
+                         .filter(formation -> person.getId().equals(formation.getTechID()))
                          .findFirst()
                          .orElse(null);
         }
@@ -5956,17 +5957,17 @@ public class Campaign implements ITechManager {
             }
         }
 
-        // clean up non-existent unit references in force unit lists
-        for (Formation formation : forceIds.values()) {
-            List<UUID> orphanForceUnitIDs = new ArrayList<>();
+        // clean up non-existent unit references in formation unit lists
+        for (Formation formation : formationIds.values()) {
+            List<UUID> orphanFormationUnitIDs = new ArrayList<>();
 
             for (UUID unitID : formation.getUnits()) {
                 if (getHangar().getUnit(unitID) == null) {
-                    orphanForceUnitIDs.add(unitID);
+                    orphanFormationUnitIDs.add(unitID);
                 }
             }
 
-            for (UUID unitID : orphanForceUnitIDs) {
+            for (UUID unitID : orphanFormationUnitIDs) {
                 formation.removeUnit(this, unitID, false);
             }
         }
@@ -6581,7 +6582,7 @@ public class Campaign implements ITechManager {
         getCamouflage().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getColour().name());
         getUnitIcon().writeToXML(writer, indent);
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastForceId", lastForceId);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastFormationId", lastFormationId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeBonus", initiativeBonus);
@@ -6682,11 +6683,11 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "missions");
 
-        // the forces structure is hierarchical, but that should be handled
-        // internally from with writeToXML function for Force
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "forces");
-        forces.writeToXML(writer, indent);
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "forces");
+        // the formations structure is hierarchical, but that should be handled
+        // internally from with writeToXML function for Formation
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "formations");
+        formations.writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
         location.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
@@ -6746,7 +6747,7 @@ public class Campaign implements ITechManager {
             if (!combatTeams.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "combatTeams");
                 for (CombatTeam combatTeam : combatTeams.values()) {
-                    if (forceIds.containsKey(combatTeam.getForceId())) {
+                    if (formationIds.containsKey(combatTeam.getFormationId())) {
                         combatTeam.writeToXML(writer, indent);
                     }
                 }
@@ -7548,7 +7549,7 @@ public class Campaign implements ITechManager {
             u.resetPilotAndEntity();
         }
 
-        Formation formation = getForceFor(person);
+        Formation formation = getFormationFor(person);
         if (formation != null) {
             formation.updateCommander(this);
         }
@@ -8961,7 +8962,7 @@ public class Campaign implements ITechManager {
 
         for (Unit u : getUnits()) {
 
-            if (u.getForceId() < 0) {
+            if (u.getFormationId() < 0) {
                 // only units currently in the TO&E
                 continue;
             }
@@ -8992,7 +8993,7 @@ public class Campaign implements ITechManager {
 
         for (Unit u : getUnits()) {
 
-            if (u.getForceId() < 0) {
+            if (u.getFormationId() < 0) {
                 // only units currently in the TO&E
                 continue;
             }
@@ -9023,7 +9024,7 @@ public class Campaign implements ITechManager {
 
         for (Unit u : getUnits()) {
 
-            if (u.getForceId() < 0) {
+            if (u.getFormationId() < 0) {
                 // only units currently in the TO&E
                 continue;
             }
@@ -9051,7 +9052,7 @@ public class Campaign implements ITechManager {
 
         for (Unit u : getUnits()) {
 
-            if (u.getForceId() < 0) {
+            if (u.getFormationId() < 0) {
                 // only units currently in the TO&E
                 continue;
             }
@@ -9085,7 +9086,7 @@ public class Campaign implements ITechManager {
 
         for (Unit u : getUnits()) {
 
-            if (u.getForceId() < 0) {
+            if (u.getFormationId() < 0) {
                 // only units currently in the TO&E
                 continue;
             }
@@ -9623,7 +9624,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            addAllCombatTeams(this.forces);
+            addAllCombatTeams(this.formations);
 
             // Determine whether there is an active contract
             setHasActiveContract();
@@ -9991,14 +9992,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns a list of entities (units) from all combat forces.
+     * Returns a list of entities (units) from all combat formations.
      *
-     * @return a list of entities representing all combat units in the player force
+     * @return a list of entities representing all combat units in the player formation
      */
     public List<Entity> getAllCombatEntities() {
         List<Entity> units = new ArrayList<>();
         for (CombatTeam combatTeam : getCombatTeamsAsList()) {
-            Formation formation = getForce(combatTeam.getForceId());
+            Formation formation = getFormation(combatTeam.getFormationId());
             if (formation != null) {
                 for (Unit unit : formation.getAllUnitsAsUnits(getHangar(), true)) {
                     Entity entity = unit.getEntity();

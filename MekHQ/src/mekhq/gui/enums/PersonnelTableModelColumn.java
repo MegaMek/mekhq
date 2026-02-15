@@ -776,7 +776,7 @@ public enum PersonnelTableModelColumn {
                 return "-";
 
             case FORCE:
-                final Formation formation = campaign.getForceFor(person);
+                final Formation formation = campaign.getFormationFor(person);
                 return (formation == null) ? "-" : formation.getName();
             case DEPLOYED:
                 final Unit unit = person.getUnit();

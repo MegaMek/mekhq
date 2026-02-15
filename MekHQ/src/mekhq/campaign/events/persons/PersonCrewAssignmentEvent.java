@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.events.persons;
 
-import static mekhq.campaign.force.Formation.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -67,10 +67,10 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
         super(crew);
         this.unit = unit;
 
-        int forceId = unit.getForceId();
+        int forceId = unit.getFormationId();
 
-        if (forceId != FORCE_NONE) {
-            Formation formation = campaign.getForce(forceId);
+        if (forceId != FORMATION_NONE) {
+            Formation formation = campaign.getFormation(forceId);
 
             if (formation != null) {
                 formation.updateCommander(campaign);

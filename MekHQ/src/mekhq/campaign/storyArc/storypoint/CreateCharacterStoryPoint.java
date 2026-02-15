@@ -238,9 +238,9 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             if (null != u && u.isUnmanned()) {
                 u.addPilotOrSoldier(person, false);
                 // only assign to force if properly assigned to a unit
-                Formation formation = getCampaign().getForce(assignedForceId);
+                Formation formation = getCampaign().getFormation(assignedForceId);
                 if (null != formation && null != person.getUnit()) {
-                    getCampaign().addUnitToForce(u, formation.getId());
+                    getCampaign().addUnitToFormation(u, formation.getId());
                 }
             }
         }

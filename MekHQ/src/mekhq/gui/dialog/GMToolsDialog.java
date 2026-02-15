@@ -1134,8 +1134,8 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
      * @param evt the ActionEvent associated with the button click
      */
     private void assignCompanyName(ActionEvent evt) {
-        if (gui.getCampaign().getForce(0).getName().equals(gui.getCampaign().getName())) {
-            gui.getCampaign().getForce(0).setName(lastGeneratedCompanyName);
+        if (gui.getCampaign().getFormation(0).getName().equals(gui.getCampaign().getName())) {
+            gui.getCampaign().getFormation(0).setName(lastGeneratedCompanyName);
         }
         gui.getCampaign().setName(lastGeneratedCompanyName);
         gui.refreshAllTabs();

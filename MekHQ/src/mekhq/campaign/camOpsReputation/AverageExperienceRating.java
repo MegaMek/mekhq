@@ -133,9 +133,9 @@ public class AverageExperienceRating {
 
         boolean hasAtLeastOneCrew = false;
         for (CombatTeam combatTeam : combatTeams) {
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation == null) {
-                LOGGER.warn("Force returned null for forceId {}", combatTeam.getForceId());
+                LOGGER.warn("Force returned null for forceId {}", combatTeam.getFormationId());
                 continue;
             }
 

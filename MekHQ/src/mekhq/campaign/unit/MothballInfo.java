@@ -69,7 +69,7 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
-        forceId = Formation.FORCE_NONE;
+        forceId = Formation.FORMATION_NONE;
     }
 
     /**
@@ -92,7 +92,7 @@ public class MothballInfo {
             techId = tech.getId();
         }
 
-        forceId = unit.getForceId();
+        forceId = unit.getFormationId();
 
         List<Person> drivers = new ArrayList<>(unit.getDrivers());
         for (Person driver : drivers) {
@@ -175,7 +175,7 @@ public class MothballInfo {
         }
 
         // Attempt to return the unit to its last force assignment.
-        Formation formation = campaign.getForce(forceId);
+        Formation formation = campaign.getFormation(forceId);
         if (formation != null) {
             // If the force is deployed to a scenario, back out. We don't want to restore the unit to the original
             // force as that would cause them to teleport into the scenario. This will likely cause issues, so it's
@@ -200,7 +200,7 @@ public class MothballInfo {
             }
 
             // If all the checks have passed, restore the unit to its last force
-            campaign.addUnitToForce(unit, forceId);
+            campaign.addUnitToFormation(unit, forceId);
         }
 
         unit.resetEngineer();

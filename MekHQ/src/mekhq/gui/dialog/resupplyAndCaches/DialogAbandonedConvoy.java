@@ -91,7 +91,7 @@ public class DialogAbandonedConvoy extends JDialog {
         // Get speaker details
         Person speaker = null;
         if (targetConvoy != null) {
-            UUID speakerId = targetConvoy.getForceCommanderID();
+            UUID speakerId = targetConvoy.getFormationCommanderID();
             speaker = campaign.getPerson(speakerId);
         }
 

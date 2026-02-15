@@ -179,7 +179,7 @@ public class ForceViewPanel extends JScrollablePanel {
         String assigned = "";
         String type = null;
 
-        Person commanderPerson = campaign.getPerson(formation.getForceCommanderID());
+        Person commanderPerson = campaign.getPerson(formation.getFormationCommanderID());
 
         if (formation.getId() == 0) {
             commanderPerson = campaign.getCommander();
@@ -209,8 +209,8 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        if (null != formation.getParentForce()) {
-            assigned = formation.getParentForce().getName();
+        if (null != formation.getParentFormation()) {
+            assigned = formation.getParentFormation().getName();
         }
 
         int nextY = 0;
@@ -218,7 +218,7 @@ public class ForceViewPanel extends JScrollablePanel {
         if (null != type) {
             lblType.setName("lblType");
 
-            FormationType formationType = formation.getForceType();
+            FormationType formationType = formation.getFormationType();
 
             String forceLabel;
             if (formationType.isStandard()) {
@@ -423,7 +423,7 @@ public class ForceViewPanel extends JScrollablePanel {
         JLabel lblForce;
 
         int nextY = 0;
-        for (Formation subFormation : formation.getSubForces()) {
+        for (Formation subFormation : formation.getSubFormations()) {
             lblForce = new JLabel();
             lblForce.setText(getForceSummary(subFormation));
             lblForce.setIcon(subFormation.getFormationIcon().getImageIcon(72));
@@ -667,8 +667,8 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        if (formation.getForceCommanderID() != null) {
-            Person forceCommander = campaign.getPerson(formation.getForceCommanderID());
+        if (formation.getFormationCommanderID() != null) {
+            Person forceCommander = campaign.getPerson(formation.getFormationCommanderID());
 
             if (forceCommander != null) {
                 commander = forceCommander.getFullTitle();

@@ -182,7 +182,7 @@ public class ContractAutomation {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
-        for (Formation formation : campaign.getAllForces()) {
+        for (Formation formation : campaign.getAllFormations()) {
             List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
             for (UUID unitId : iterationSafeUnitIds) {
                 Unit unit = campaign.getUnit(unitId);

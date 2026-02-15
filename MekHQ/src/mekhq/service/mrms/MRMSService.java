@@ -881,7 +881,7 @@ public class MRMSService {
             boolean assigned = false;
 
             if ((unit != null) && configuredOptions.isUseAssignedTechsFirst()) {
-                Formation formation = campaign.getForce(unit.getForceId());
+                Formation formation = campaign.getFormation(unit.getFormationId());
 
                 if ((formation != null) && (formation.getTechID()) != null) {
                     assigned = formation.getTechID().toString().equals(tech.getId().toString());

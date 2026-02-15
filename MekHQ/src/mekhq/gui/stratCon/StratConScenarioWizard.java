@@ -280,7 +280,7 @@ public class StratConScenarioWizard extends JDialog {
     private String getForceNameReversed(Unit unit) {
         List<String> forceNames = new ArrayList<>();
 
-        Formation formation = campaign.getForce(unit.getForceId());
+        Formation formation = campaign.getFormation(unit.getFormationId());
 
         if (formation == null) {
             return "";
@@ -288,11 +288,11 @@ public class StratConScenarioWizard extends JDialog {
 
         forceNames.add(formation.getName());
 
-        Formation parentFormation = formation.getParentForce();
+        Formation parentFormation = formation.getParentFormation();
         while (parentFormation != null) {
             forceNames.add(parentFormation.getName());
 
-            parentFormation = parentFormation.getParentForce();
+            parentFormation = parentFormation.getParentFormation();
         }
 
         Collections.reverse(forceNames);
@@ -732,7 +732,7 @@ public class StratConScenarioWizard extends JDialog {
             String instructions;
             Formation primaryFormation = currentScenario.getBackingScenario()
                                        .getForces(campaign)
-                                       .getAllSubForces()
+                                       .getAllSubFormations()
                                        .stream()
                                        .findFirst()
                                        .orElse(null);

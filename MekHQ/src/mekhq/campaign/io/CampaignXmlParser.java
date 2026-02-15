@@ -34,7 +34,7 @@ package mekhq.campaign.io;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Formation.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
@@ -341,6 +341,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     processMissionNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("forces")) {
                     processForces(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("formations")) {
+                    processFormations(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("finances")) {
                     processFinances(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("location")) {
@@ -422,9 +424,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         long timestamp = System.currentTimeMillis();
 
         // loop through forces to set force id
-        for (Formation f : campaign.getAllForces()) {
+        for (Formation f : campaign.getAllFormations()) {
             Scenario s = campaign.getScenario(f.getScenarioId());
-            if (null != s && (null == f.getParentForce() || !f.getParentForce().isDeployed())) {
+            if (null != s && (null == f.getParentFormation() || !f.getParentFormation().isDeployed())) {
                 s.addForces(f.getId());
             }
             // some units may need force id set for backwards compatibility
@@ -432,7 +434,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             for (UUID uid : f.getUnits()) {
                 Unit u = campaign.getUnit(uid);
                 if (null != u) {
-                    u.setForceId(f.getId());
+                    u.setFormationId(f.getId());
                     if (f.isDeployed()) {
                         u.setScenarioId(f.getScenarioId());
                     }
@@ -443,7 +445,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
             Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
-            for (Formation f : campaign.getAllForces()) {
+            for (Formation f : campaign.getAllFormations()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new CombatTeam(f.getId(), campaign));
                     LOGGER.warn("Added missing Lance {} to AtB list", f.getName());
@@ -481,8 +483,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             // lets make sure the force id set actually corresponds to a force
             // TODO: we have some reports of force id relics - need to fix
-            if ((unit.getForceId() > 0) && (campaign.getForce(unit.getForceId()) == null)) {
-                unit.setForceId(FORCE_NONE);
+            if ((unit.getFormationId() > 0) && (campaign.getFormation(unit.getFormationId()) == null)) {
+                unit.setFormationId(FORMATION_NONE);
             }
 
             // It's annoying to have to do this, but this helps to ensure
@@ -593,7 +595,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         timestamp = System.currentTimeMillis();
 
         // This removes the risk of having forces with invalid leadership getting locked in
-        for (Formation formation : campaign.getAllForces()) {
+        for (Formation formation : campaign.getAllFormations()) {
             formation.updateCommander(campaign);
         }
 
@@ -1352,6 +1354,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load of Finances complete!");
     }
 
+    /**
+     * Legacy for milestone 0.50.11 saves. Replaced by {@link #processFormations}. Do not remove until the next
+     * milestone.
+     */
+    @Deprecated(since = "0.50.11")
     private static void processForces(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Force Organization from XML...");
 
@@ -1378,7 +1385,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (!foundForceAlready) {
                 Formation f = Formation.generateInstanceFromXML(wn2, retVal, version);
                 if (null != f) {
-                    retVal.setForces(f);
+                    retVal.setFormations(f);
                     foundForceAlready = true;
                 }
             } else {
@@ -1388,6 +1395,44 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         recalculateCombatTeams(retVal);
         LOGGER.info("Load of Force Organization complete!");
+    }
+
+    private static void processFormations(Campaign retVal, Node wn, Version version) {
+        LOGGER.info("Loading Formation Organization from XML...");
+
+        NodeList wList = wn.getChildNodes();
+
+        boolean foundFormationAlready = false;
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("formation")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                LOGGER.error("Unknown node type not loaded in Formations nodes: {}", wn2.getNodeName());
+
+                continue;
+            }
+
+            if (!foundFormationAlready) {
+                Formation f = Formation.generateInstanceFromXML(wn2, retVal, version);
+                if (null != f) {
+                    retVal.setFormations(f);
+                    foundFormationAlready = true;
+                }
+            } else {
+                LOGGER.error("More than one type-level formation found");
+            }
+        }
+
+        recalculateCombatTeams(retVal);
+        LOGGER.info("Load of Formation Organization complete!");
     }
 
     private static void processPersonnelNodes(Campaign campaign, Node wn, Version version) {

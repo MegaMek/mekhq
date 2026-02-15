@@ -55,7 +55,7 @@ public class ScenarioWizardLanceModel extends DefaultListModel<Formation> {
         List<Formation> sortedFormations = new ArrayList<>();
 
         for (int forceID : forceIDs) {
-            sortedFormations.add(campaign.getForce(forceID));
+            sortedFormations.add(campaign.getFormation(forceID));
         }
 
         // let's sort these guys by alphabetical order

@@ -61,7 +61,7 @@ public record SalvageForceData(Formation formation, FormationType formationType,
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForceData";
 
     public static SalvageForceData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
-        FormationType formationType = formation.getForceType();
+        FormationType formationType = formation.getFormationType();
         UUID techId = formation.getTechID();
         Person tech = techId == null || !formationType.isSalvage() ? null : campaign.getPerson(techId);
         if (tech != null && tech.isEngineer()) { // Engineers cannot salvage

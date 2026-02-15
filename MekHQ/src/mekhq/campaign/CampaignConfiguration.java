@@ -79,7 +79,7 @@ public class CampaignConfiguration {
     private String name;
     private LocalDate currentDay;
 
-    private Formation forces;
+    private Formation formations;
 
     private Faction faction;
     private megamek.common.enums.Faction techFaction;
@@ -182,7 +182,7 @@ public class CampaignConfiguration {
         this.reputation = reputationController;
         this.factionStandings = factionStandings;
         this.rankSystem = rankSystem;
-        this.forces = formation;
+        this.formations = formation;
         this.finances = finances;
         this.randomEventLibraries = randomEvents;
         this.factionStandingUltimatumsLibrary = ultimatums;
@@ -286,7 +286,7 @@ public class CampaignConfiguration {
         this.reputation = reputationController;
         this.factionStandings = factionStandings;
         this.rankSystem = rankSystem;
-        this.forces = formation;
+        this.formations = formation;
         this.finances = finances;
         this.randomEventLibraries = randomEvents;
         this.factionStandingUltimatumsLibrary = ultimatums;
@@ -373,8 +373,8 @@ public class CampaignConfiguration {
         return this.rankSystem;
     }
 
-    public Formation getforce() {
-        return this.forces;
+    public Formation getFormations() {
+        return this.formations;
     }
 
     public Finances getfinances() {
@@ -445,8 +445,8 @@ public class CampaignConfiguration {
         this.currentDay = currentDay;
     }
 
-    public void setForces(Formation forces) {
-        this.forces = forces;
+    public void setFormations(Formation formations) {
+        this.formations = formations;
     }
 
     public void setFaction(Faction faction) {

@@ -506,8 +506,8 @@ public class CamOpsSalvageUtilities {
         }
 
         findTrackAndCoords(scenario, state).ifPresent(loc -> {
-            for (int forceId : scenario.getSalvageForces()) {
-                Formation formation = campaign.getForce(forceId);
+            for (int forceId : scenario.getSalvageFormations()) {
+                Formation formation = campaign.getFormation(forceId);
                 if (formation != null) {
                     loc.track().assignForce(forceId, loc.coords(), campaign.getLocalDate(), false);
                 }

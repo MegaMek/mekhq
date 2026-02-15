@@ -349,10 +349,10 @@ public class SalvagePostScenarioPicker {
         List<Integer> salvageForces = new ArrayList<>();
         salvageUnits = new ArrayList<>();
         Hangar hangar = campaign.getHangar();
-        for (Integer forceId : scenario.getSalvageForces()) {
+        for (Integer forceId : scenario.getSalvageFormations()) {
             salvageForces.add(forceId);
 
-            Formation formation = campaign.getForce(forceId);
+            Formation formation = campaign.getFormation(forceId);
             if (formation == null) {
                 LOGGER.error("Force {} not found in campaign", forceId);
                 continue;

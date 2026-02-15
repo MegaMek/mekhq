@@ -402,7 +402,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
             entity.setNMarines(unit.getMarineCount());
         }
         // Calculate deployment round
-        var force = campaign.getForceFor(unit);
+        var force = campaign.getFormationFor(unit);
         if (force != null) {
             entity.setForceString(force.getFullMMName());
         } else if (!unit.getEntity().getForceString().isBlank()) {

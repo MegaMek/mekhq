@@ -280,7 +280,7 @@ public class ScenarioDeploymentLimit {
         if (quantityType == QuantityType.ABSOLUTE) {
             return quantityLimit;
         } else if (quantityType == QuantityType.PERCENT) {
-            int totalValue = getForceQuantity(c.getForces(), c);
+            int totalValue = getForceQuantity(c.getFormations(), c);
             return (int) Math.ceil(totalValue * ((double) quantityLimit / 100.0));
         } else {
             // should not get here

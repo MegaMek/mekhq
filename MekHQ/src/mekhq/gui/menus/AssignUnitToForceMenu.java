@@ -32,7 +32,7 @@
  */
 package mekhq.gui.menus;
 
-import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
 import java.util.Arrays;
@@ -55,8 +55,8 @@ import mekhq.utilities.MHQInternationalization;
  *
  * <p>This menu provides:</p>
  * <ul>
- *     <li>A "clear assignment" option that moves units to {@link Formation#FORCE_NONE}</li>
- *     <li>A hierarchical tree of all forces descending from {@link Formation#FORCE_ORIGIN}</li>
+ *     <li>A "clear assignment" option that moves units to {@link Formation#FORMATION_NONE}</li>
+ *     <li>A hierarchical tree of all forces descending from {@link Formation#FORMATION_ORIGIN}</li>
  *     <li>Per-force assignment actions for each force in the hierarchy</li>
  * </ul>
  *
@@ -117,7 +117,7 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
      *
      * <ul>
      *     <li>A "clear assignment" option that removes units from all forces</li>
-     *     <li>A recursive force hierarchy beginning with {@link Formation#FORCE_ORIGIN}</li>
+     *     <li>A recursive force hierarchy beginning with {@link Formation#FORMATION_ORIGIN}</li>
      * </ul>
      *
      * @param campaign the campaign whose forces are available
@@ -132,9 +132,9 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
         JMenuItem clearAssignment = new JMenuItem(MHQInternationalization.getText("AssignUnitToForceMenu.clear"));
         clearAssignment.addActionListener(ev -> {
             for (Unit unit : units) {
-                Formation parentFormation = campaign.getForceFor(unit);
+                Formation parentFormation = campaign.getFormationFor(unit);
                 if (null != parentFormation) {
-                    campaign.removeUnitFromForce(unit);
+                    campaign.removeUnitFromFormation(unit);
                     if (null != parentFormation.getTechID()) {
                         unit.removeTech();
                     }
@@ -147,7 +147,7 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
         });
         add(clearAssignment);
 
-        Formation originFormation = campaign.getForce(FORCE_ORIGIN); // All other forces descend from this force
+        Formation originFormation = campaign.getFormation(FORMATION_ORIGIN); // All other forces descend from this force
         addForceMenu(this, campaign, units, originFormation);
     }
 
@@ -182,7 +182,7 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
         forceMenu.add(assignHere);
 
         // Recurse for all children
-        for (Formation child : formation.getSubForces()) {
+        for (Formation child : formation.getSubFormations()) {
             addForceMenu(forceMenu, campaign, units, child);
         }
 
@@ -192,7 +192,7 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
     /**
      * Assigns all provided units to the specified force.
      *
-     * <p>This method wraps a call to {@link Campaign#addUnitToForce(Unit, int)}, ensuring that each unit is moved to
+     * <p>This method wraps a call to {@link Campaign#addUnitToFormation(Unit, int)}, ensuring that each unit is moved to
      * the provided force ID.</p>
      *
      * @param campaign    the campaign receiving the assignment update
@@ -204,7 +204,7 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
      */
     private static void addToForce(Campaign campaign, Unit[] units, Formation originFormation) {
         for (Unit unit : units) {
-            campaign.addUnitToForce(unit, originFormation.getId());
+            campaign.addUnitToFormation(unit, originFormation.getId());
         }
     }
 }

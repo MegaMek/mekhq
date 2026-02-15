@@ -188,8 +188,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    public void removeForce(int fid) {
-        super.removeForce(fid);
+    public void removeFormation(int fid) {
+        super.removeFormation(fid);
         playerForceTemplates.remove(fid);
     }
 
@@ -661,10 +661,10 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    public void clearAllForcesAndPersonnel(Campaign campaign) {
+    public void clearAllFormationsAndPersonnel(Campaign campaign) {
         playerUnitTemplates.clear();
         playerForceTemplates.clear();
-        super.clearAllForcesAndPersonnel(campaign);
+        super.clearAllFormationsAndPersonnel(campaign);
     }
 
     @Override

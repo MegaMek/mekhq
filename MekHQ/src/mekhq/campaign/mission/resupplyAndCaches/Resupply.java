@@ -409,13 +409,13 @@ public class Resupply {
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
         for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
-            Formation force = campaign.getForce(formation.getForceId());
+            Formation force = campaign.getFormation(formation.getFormationId());
 
             if (force == null) {
                 continue;
             }
 
-            if (!force.isForceType(STANDARD)) {
+            if (!force.isFormationType(STANDARD)) {
                 continue;
             }
 
@@ -837,13 +837,13 @@ public class Resupply {
         playerConvoys = new HashMap<>();
         totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllForces()) {
-            if (!formation.isForceType(CONVOY)) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (!formation.isFormationType(CONVOY)) {
                 continue;
             }
 
             // This ensures each convoy is only counted once
-            if (formation.getParentForce() != null && formation.getParentForce().isForceType(CONVOY)) {
+            if (formation.getParentFormation() != null && formation.getParentFormation().isFormationType(CONVOY)) {
                 continue;
             }
 

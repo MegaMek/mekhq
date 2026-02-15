@@ -445,8 +445,8 @@ public class PerformResupply {
             }
 
             // Non-ground convoys don't get roleplay events
-            if (convoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false) ||
-                      convoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (convoy.formationContainsOnlyVTOLForces(campaign.getHangar(), false) ||
+                      convoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 completeSuccessfulDelivery(resupply, convoyContents);
                 return;
             }
@@ -475,7 +475,7 @@ public class PerformResupply {
                       commanderAddress);
             }
 
-            Person speaker = campaign.getPerson(convoy.getForceCommanderID());
+            Person speaker = campaign.getPerson(convoy.getFormationCommanderID());
             String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "outOfCharacter.roleplay");
             new ImmersiveDialogSimple(campaign, speaker, null, eventText, null, outOfCharacterMessage, null, false);
 
@@ -534,9 +534,9 @@ public class PerformResupply {
         String templateAddress = GENERIC;
 
         if (targetConvoy != null) {
-            if (targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (targetConvoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 templateAddress = PLAYER_AEROSPACE_CONVOY;
-            } else if (targetConvoy.forceContainsMajorityVTOLForces(campaign.getHangar(), false)) {
+            } else if (targetConvoy.formationContainsMajorityVTOLForces(campaign.getHangar(), false)) {
                 templateAddress = PLAYER_VTOL_CONVOY;
             } else {
                 templateAddress = PLAYER_CONVOY;
@@ -645,11 +645,11 @@ public class PerformResupply {
         String inCharacterMessage = "";
         String commanderAddress = campaign.getCommanderAddress();
         if (targetConvoy != null) {
-            speaker = campaign.getPerson(targetConvoy.getForceCommanderID());
+            speaker = campaign.getPerson(targetConvoy.getFormationCommanderID());
 
             Hangar hangar = campaign.getHangar();
-            if (targetConvoy.forceContainsOnlyVTOLForces(hangar, false) ||
-                      targetConvoy.forceContainsOnlyAerialForces(hangar, false, false)) {
+            if (targetConvoy.formationContainsOnlyVTOLForces(hangar, false) ||
+                      targetConvoy.formationContainsOnlyAerialForces(hangar, false, false)) {
                 inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "statusUpdateIntercepted.boilerplate",
                       commanderAddress);

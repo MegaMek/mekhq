@@ -63,8 +63,8 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
           boolean isSelected, boolean cellHasFocus) {
         Campaign campaign = unit.getCampaign();
 
-        int valueForceId = unit.getForceId();
-        Formation formation = campaign.getForce(valueForceId);
+        int valueForceId = unit.getFormationId();
+        Formation formation = campaign.getFormation(valueForceId);
 
         // Determine name color
         OperationalStatus operationalStatus = determineLayeredFormationIconOperationalStatus(unit);
@@ -85,7 +85,7 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         String forceName = "";
         if (formation != null) {
             forceName = formation.getFullName();
-            String originNodeName = ", " + campaign.getForce(0).getName();
+            String originNodeName = ", " + campaign.getFormation(0).getName();
             forceName = forceName.replaceAll(originNodeName, "");
         }
 

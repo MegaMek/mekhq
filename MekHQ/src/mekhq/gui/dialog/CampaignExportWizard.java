@@ -269,7 +269,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupForceList() {
         forceList = new JList<>();
         DefaultListModel<Formation> forceListModel = new DefaultListModel<>();
-        for (Formation formation : sourceCampaign.getAllForces()) {
+        for (Formation formation : sourceCampaign.getAllFormations()) {
             forceListModel.addElement(formation);
         }
         forceList.setModel(forceListModel);
@@ -528,7 +528,7 @@ public class CampaignExportWizard extends JDialog {
         // to be exported
 
         for (Unit unit : unitList.getSelectedValuesList()) {
-            int sourceForceID = unit.getForceId();
+            int sourceForceID = unit.getFormationId();
 
             if (destinationCampaign.getUnit(unit.getId()) != null) {
                 destinationCampaign.removeUnit(unit.getId());
@@ -667,14 +667,14 @@ public class CampaignExportWizard extends JDialog {
 
     private void attemptToAssignToForce(Unit unit, int sourceForceID, Campaign sourceCampaign,
           Campaign destinationCampaign) {
-        Formation sourceFormation = sourceCampaign.getForce(sourceForceID);
+        Formation sourceFormation = sourceCampaign.getFormation(sourceForceID);
         if (sourceFormation == null) {
             return;
         }
 
         // this indicates a unit assigned to the root-level force
-        if (sourceFormation.getParentForce() == null) {
-            destinationCampaign.getForces().addUnit(unit.getId());
+        if (sourceFormation.getParentFormation() == null) {
+            destinationCampaign.getFormations().addUnit(unit.getId());
         }
 
         // first thing we will try is to identify a force with the same name and tree
@@ -686,12 +686,12 @@ public class CampaignExportWizard extends JDialog {
         // name with the destination root force name
         String sourceForceFullName = getDestinationFullName(sourceFormation, sourceCampaign, destinationCampaign);
 
-        Formation destFormation = findForce(sourceForceFullName, destinationCampaign.getForces());
+        Formation destFormation = findForce(sourceForceFullName, destinationCampaign.getFormations());
         if (destFormation != null) {
             destFormation.addUnit(unit.getId());
         } else {
             List<Formation> parentFormations = getForceAndParents(sourceFormation);
-            Formation currentDestinationFormation = destinationCampaign.getForces();
+            Formation currentDestinationFormation = destinationCampaign.getFormations();
 
             for (int x = parentFormations.size() - 1; x >= 0; x--) {
                 Formation nextSourceFormation = parentFormations.get(x);
@@ -703,7 +703,7 @@ public class CampaignExportWizard extends JDialog {
                 // if this level doesn't exist yet, add it to where we currently are
                 if (nextDestinationFormation == null) {
                     Formation formationCopy = new Formation(nextSourceFormation.getName());
-                    destinationCampaign.addForce(formationCopy, currentDestinationFormation);
+                    destinationCampaign.addFormation(formationCopy, currentDestinationFormation);
                     currentDestinationFormation = formationCopy;
                     // otherwise, update current location and move to next level
                 } else {
@@ -721,7 +721,7 @@ public class CampaignExportWizard extends JDialog {
      */
     private String getDestinationFullName(Formation sourceFormation, Campaign sourceCampaign, Campaign destinationCampaign) {
         return sourceFormation.getFullName()
-                     .replace(sourceCampaign.getForces().getName(), destinationCampaign.getForces().getName());
+                     .replace(sourceCampaign.getFormations().getName(), destinationCampaign.getFormations().getName());
     }
 
     /**
@@ -731,7 +731,7 @@ public class CampaignExportWizard extends JDialog {
         if (formation.getFullName().equals(forceName)) {
             return formation;
         } else {
-            for (Formation subFormation : formation.getSubForces()) {
+            for (Formation subFormation : formation.getSubFormations()) {
                 Formation foundFormation = findForce(forceName, subFormation);
 
                 if (foundFormation != null) {
@@ -752,11 +752,11 @@ public class CampaignExportWizard extends JDialog {
         retVal.add(formation);
 
         Formation ancestorFormation;
-        while (formation.getParentForce() != null) {
-            ancestorFormation = formation.getParentForce();
+        while (formation.getParentFormation() != null) {
+            ancestorFormation = formation.getParentFormation();
 
             // we don't want the top-level force
-            if (ancestorFormation.getParentForce() != null) {
+            if (ancestorFormation.getParentFormation() != null) {
                 retVal.add(ancestorFormation);
             }
 

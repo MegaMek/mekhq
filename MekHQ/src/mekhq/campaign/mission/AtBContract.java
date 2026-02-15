@@ -53,7 +53,7 @@ import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
@@ -282,8 +282,8 @@ public class AtBContract extends Contract {
     }
 
     public void initContractDetails(Campaign campaign) {
-        int companySize = getStandardForceSize(campaign.getFaction(), COMPANY.getDepth());
-        int battalionSize = getStandardForceSize(campaign.getFaction(), BATTALION.getDepth());
+        int companySize = getStandardFormationSize(campaign.getFaction(), COMPANY.getDepth());
+        int battalionSize = getStandardFormationSize(campaign.getFaction(), BATTALION.getDepth());
 
         if (ContractUtilities.getEffectiveNumUnits(campaign) <= companySize) {
             setOverheadComp(OH_FULL);

@@ -1614,12 +1614,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             if (box.isSelected()) {
                 UUID id = UUID.fromString(box.getActionCommand());
 
-                if (!linkedForces.containsKey(campaign.getUnit(id).getForceId())) {
+                if (!linkedForces.containsKey(campaign.getUnit(id).getFormationId())) {
                     List<UUID> unitList = new ArrayList<>();
-                    linkedForces.put(campaign.getUnit(id).getForceId(), unitList);
+                    linkedForces.put(campaign.getUnit(id).getFormationId(), unitList);
                     reinforcementsSent = true;
                 }
-                linkedForces.get(campaign.getUnit(id).getForceId()).add(id);
+                linkedForces.get(campaign.getUnit(id).getFormationId()).add(id);
             }
         }
 

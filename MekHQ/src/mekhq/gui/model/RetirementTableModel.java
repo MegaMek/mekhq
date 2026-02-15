@@ -227,7 +227,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return "-";
             case COL_FORCE:
-                Formation formation = campaign.getForceFor(person);
+                Formation formation = campaign.getFormationFor(person);
                 if (null != formation) {
                     return formation.getName();
                 } else {
@@ -435,16 +435,16 @@ public class RetirementTableModel extends AbstractTableModel {
                     clearImage();
                 }
             } else if (actualCol == COL_FORCE) {
-                Formation formation = campaign.getForceFor(p);
+                Formation formation = campaign.getFormationFor(p);
                 if (null != formation) {
                     StringBuilder desc = new StringBuilder("<html><b>" + formation.getName() + "</b>");
-                    Formation parent = formation.getParentForce();
+                    Formation parent = formation.getParentFormation();
                     // cut off after three lines and don't include the top level
                     int lines = 1;
-                    while ((parent != null) && (null != parent.getParentForce()) && (lines < 4)) {
+                    while ((parent != null) && (null != parent.getParentFormation()) && (lines < 4)) {
                         desc.append("<br>").append(parent.getName());
                         lines++;
-                        parent = parent.getParentForce();
+                        parent = parent.getParentFormation();
                     }
                     desc.append("</html>");
                     setHtmlText(desc.toString());

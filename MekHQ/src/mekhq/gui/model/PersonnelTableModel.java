@@ -305,17 +305,17 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                     }
                     break;
                 case FORCE:
-                    Formation formation = getCampaign().getForceFor(person);
+                    Formation formation = getCampaign().getFormationFor(person);
                     if (formation != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName())
                                                    .append("</b>");
-                        Formation parent = formation.getParentForce();
+                        Formation parent = formation.getParentFormation();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
-                        while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
+                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
                             desc.append("<br>").append(parent.getName());
                             lines++;
-                            parent = parent.getParentForce();
+                            parent = parent.getParentFormation();
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());

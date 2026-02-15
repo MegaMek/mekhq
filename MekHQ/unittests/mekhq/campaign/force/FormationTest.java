@@ -72,19 +72,19 @@ class FormationTest {
     void testGetAllUnits_ParentForceStandard_ChildForcesAlsoStandard() {
         // Arrange
         Formation formation = new Formation("Parent Force");
-        formation.setForceType(FormationType.STANDARD, true);
+        formation.setFormationType(FormationType.STANDARD, true);
         UUID unit = UUID.randomUUID();
         formation.addUnit(unit);
 
         Formation childFormation = new Formation("Child Force");
         unit = UUID.randomUUID();
         childFormation.addUnit(unit);
-        formation.addSubForce(childFormation, true);
+        formation.addSubFormation(childFormation, true);
 
         Formation childFormation2 = new Formation("Child Force (layer 2)");
         unit = UUID.randomUUID();
         childFormation2.addUnit(unit);
-        childFormation.addSubForce(childFormation2, true);
+        childFormation.addSubFormation(childFormation2, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(false);
@@ -97,21 +97,21 @@ class FormationTest {
     void testGetAllUnits_ParentForceStandard_ChildForcesNotStandard() {
         // Arrange
         Formation formation = new Formation("Parent Force");
-        formation.setForceType(FormationType.STANDARD, true);
+        formation.setFormationType(FormationType.STANDARD, true);
         UUID unit = UUID.randomUUID();
         formation.addUnit(unit);
 
         Formation childFormation = new Formation("Child Force");
         unit = UUID.randomUUID();
         childFormation.addUnit(unit);
-        formation.addSubForce(childFormation, true);
+        formation.addSubFormation(childFormation, true);
 
         Formation childFormation2 = new Formation("Child Force (layer 2)");
         unit = UUID.randomUUID();
         childFormation2.addUnit(unit);
-        childFormation.addSubForce(childFormation2, true);
+        childFormation.addSubFormation(childFormation2, true);
 
-        childFormation.setForceType(FormationType.CONVOY, true);
+        childFormation.setFormationType(FormationType.CONVOY, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(true);
@@ -130,14 +130,14 @@ class FormationTest {
         Formation childFormation = new Formation("Child Force");
         unit = UUID.randomUUID();
         childFormation.addUnit(unit);
-        formation.addSubForce(childFormation, true);
+        formation.addSubFormation(childFormation, true);
 
         Formation childFormation2 = new Formation("Child Force (layer 2)");
         unit = UUID.randomUUID();
         childFormation2.addUnit(unit);
-        childFormation.addSubForce(childFormation2, true);
+        childFormation.addSubFormation(childFormation2, true);
 
-        formation.setForceType(FormationType.SECURITY, true);
+        formation.setFormationType(FormationType.SECURITY, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(true);
@@ -156,14 +156,14 @@ class FormationTest {
         Formation childFormation = new Formation("Child Force");
         unit = UUID.randomUUID();
         childFormation.addUnit(unit);
-        formation.addSubForce(childFormation, true);
+        formation.addSubFormation(childFormation, true);
 
         Formation childFormation2 = new Formation("Child Force (layer 2)");
         unit = UUID.randomUUID();
         childFormation2.addUnit(unit);
-        childFormation.addSubForce(childFormation2, true);
+        childFormation.addSubFormation(childFormation2, true);
 
-        formation.setForceType(FormationType.SECURITY, true);
+        formation.setFormationType(FormationType.SECURITY, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(false);
@@ -176,22 +176,22 @@ class FormationTest {
     void testGetAllUnits_AllForcesStandard_SecondLayerEmpty() {
         // Arrange
         Formation formation = new Formation("Parent Force");
-        formation.setForceType(FormationType.STANDARD, true);
+        formation.setFormationType(FormationType.STANDARD, true);
         UUID unit = UUID.randomUUID();
         formation.addUnit(unit);
 
         Formation childFormation = new Formation("Child Force");
         unit = UUID.randomUUID();
         childFormation.addUnit(unit);
-        formation.addSubForce(childFormation, true);
+        formation.addSubFormation(childFormation, true);
 
         Formation childFormation2 = new Formation("Child Force (layer 2)");
-        childFormation.addSubForce(childFormation2, true);
+        childFormation.addSubFormation(childFormation2, true);
 
         Formation childFormation3 = new Formation("Child Force (layer 3)");
         unit = UUID.randomUUID();
         childFormation3.addUnit(unit);
-        childFormation.addSubForce(childFormation3, true);
+        childFormation.addSubFormation(childFormation3, true);
 
         // Act
         Vector<UUID> allUnits = formation.getAllUnits(false);
@@ -254,7 +254,7 @@ class FormationTest {
 
             // Act
             Formation formation = newTeam();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 0), formation.getFormationLevel());
@@ -268,7 +268,7 @@ class FormationTest {
 
             // Act
             Formation formation = newLance();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 1), formation.getFormationLevel());
@@ -282,7 +282,7 @@ class FormationTest {
 
             // Act
             Formation formation = newCompany();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 2), formation.getFormationLevel());
@@ -297,7 +297,7 @@ class FormationTest {
 
             // Act
             Formation formation = newBattalion();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 3), formation.getFormationLevel());
@@ -311,7 +311,7 @@ class FormationTest {
 
             // Act
             Formation formation = newRegiment();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 4), formation.getFormationLevel());
@@ -325,7 +325,7 @@ class FormationTest {
 
             // Act
             Formation formation = newBrigade();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 5), formation.getFormationLevel());
@@ -339,7 +339,7 @@ class FormationTest {
 
             // Act
             Formation formation = newDivision();
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 6), formation.getFormationLevel());
@@ -354,9 +354,9 @@ class FormationTest {
             // Act
             Formation formation1 = newRegiment();
             Formation formation2 = newCompany();
-            formation2.defaultFormationLevelForForce(mockCampaign); //Shouldn't change anything
-            formation1.addSubForce(formation2, true);
-            formation1.defaultFormationLevelForForce(mockCampaign);
+            formation2.defaultFormationLevelForFormation(mockCampaign); //Shouldn't change anything
+            formation1.addSubFormation(formation2, true);
+            formation1.defaultFormationLevelForFormation(mockCampaign);
 
 
             // Assert
@@ -378,7 +378,7 @@ class FormationTest {
                     formation.addUnit(unit);
                 }
             }
-            formation.defaultFormationLevelForForce(mockCampaign);
+            formation.defaultFormationLevelForFormation(mockCampaign);
             formation.setOverrideFormationLevel(FormationLevel.parseFromDepth(mockCampaign, 2));
 
             // Assert
@@ -394,9 +394,9 @@ class FormationTest {
             // Act
             Formation formation1 = new Formation("Test Lance");
             Formation formation2 = newTeam();
-            formation2.defaultFormationLevelForForce(mockCampaign); //Shouldn't change anything
-            formation1.addSubForce(formation2, true);
-            formation1.defaultFormationLevelForForce(mockCampaign);
+            formation2.defaultFormationLevelForFormation(mockCampaign); //Shouldn't change anything
+            formation1.addSubFormation(formation2, true);
+            formation1.defaultFormationLevelForFormation(mockCampaign);
 
             // Assert
             assertEquals(FormationLevel.parseFromDepth(mockCampaign, 1), formation1.getFormationLevel());
@@ -430,8 +430,8 @@ class FormationTest {
             Formation formation = new Formation("Test Company");
             for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
                 Formation newLance = newLance();
-                newLance.defaultFormationLevelForForce(mockCampaign);
-                formation.addSubForce(newLance, true);
+                newLance.defaultFormationLevelForFormation(mockCampaign);
+                formation.addSubFormation(newLance, true);
             }
             return formation;
         }
@@ -440,8 +440,8 @@ class FormationTest {
             Formation formation = new Formation("Test Battalion");
             for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
                 Formation newCompany = newCompany();
-                newCompany.defaultFormationLevelForForce(mockCampaign);
-                formation.addSubForce(newCompany, true);
+                newCompany.defaultFormationLevelForFormation(mockCampaign);
+                formation.addSubFormation(newCompany, true);
             }
             return formation;
         }
@@ -450,8 +450,8 @@ class FormationTest {
             Formation formation = new Formation("Test Regiment");
             for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
                 Formation newBattalion = newBattalion();
-                newBattalion.defaultFormationLevelForForce(mockCampaign);
-                formation.addSubForce(newBattalion, true);
+                newBattalion.defaultFormationLevelForFormation(mockCampaign);
+                formation.addSubFormation(newBattalion, true);
             }
             return formation;
         }
@@ -460,8 +460,8 @@ class FormationTest {
             Formation formation = new Formation("Test Brigade");
             for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
                 Formation newRegiment = newRegiment();
-                newRegiment.defaultFormationLevelForForce(mockCampaign);
-                formation.addSubForce(newRegiment, true);
+                newRegiment.defaultFormationLevelForFormation(mockCampaign);
+                formation.addSubFormation(newRegiment, true);
             }
             return formation;
         }
@@ -470,8 +470,8 @@ class FormationTest {
             Formation formation = new Formation("Test Division");
             for (int i = 0; i < mockFaction.getFormationGrouping(); i++) {
                 Formation newBrigade = newBrigade();
-                newBrigade.defaultFormationLevelForForce(mockCampaign);
-                formation.addSubForce(newBrigade, true);
+                newBrigade.defaultFormationLevelForFormation(mockCampaign);
+                formation.addSubFormation(newBrigade, true);
             }
             return formation;
         }

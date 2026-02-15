@@ -123,7 +123,7 @@ public class TOETransferHandler extends TransferHandler {
         if (parent instanceof Formation) {
             superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superFormation = gui.getCampaign().getForce(((Unit) parent).getForceId());
+            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
         }
 
         // Extract transfer data.
@@ -142,7 +142,7 @@ public class TOETransferHandler extends TransferHandler {
                 unit = gui.getCampaign().getUnit(UUID.fromString(id));
             }
             if (type.equals("FORCE")) {
-                formation = gui.getCampaign().getForce(Integer.parseInt(id));
+                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
             LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
@@ -178,7 +178,7 @@ public class TOETransferHandler extends TransferHandler {
                 }
             }
             if (type.equals("FORCE")) {
-                formation = gui.getCampaign().getForce(Integer.parseInt(id));
+                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
                 if (formation == null || formation.isDeployed()) {
                     return false;
                 }
@@ -198,16 +198,16 @@ public class TOETransferHandler extends TransferHandler {
         if (parent instanceof Formation) {
             superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superFormation = gui.getCampaign().getForce(((Unit) parent).getForceId());
+            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
         }
 
         if (superFormation != null) {
             if (unit != null) {
-                gui.getCampaign().addUnitToForce(unit, superFormation.getId());
+                gui.getCampaign().addUnitToFormation(unit, superFormation.getId());
                 return true;
             }
             if (formation != null) {
-                gui.getCampaign().moveForce(formation, superFormation);
+                gui.getCampaign().moveFormation(formation, superFormation);
                 return true;
             }
         }

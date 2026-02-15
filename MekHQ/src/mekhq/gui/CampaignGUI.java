@@ -2388,7 +2388,7 @@ public class CampaignGUI extends JPanel {
             if (newOptions.isUseAtB()) {
                 getCampaign().initAtB(false);
                 // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
             }
             if (newOptions.isUseAtB()) {
                 int loops = 0;
@@ -3379,7 +3379,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void undeployUnit(Unit u) {
-        Formation f = getCampaign().getForce(u.getForceId());
+        Formation f = getCampaign().getFormation(u.getFormationId());
         if (f != null) {
             undeployForce(f, false);
         }
@@ -3398,7 +3398,7 @@ public class CampaignGUI extends JPanel {
         Scenario scenario = getCampaign().getScenario(sid);
         if (null != scenario) {
             f.clearScenarioIds(getCampaign(), killSubs);
-            scenario.removeForce(f.getId());
+            scenario.removeFormation(f.getId());
             if (killSubs) {
                 for (UUID uid : f.getAllUnits(false)) {
                     Unit u = getCampaign().getUnit(uid);
@@ -3412,13 +3412,13 @@ public class CampaignGUI extends JPanel {
             // We have to clear out the parents as well.
             Formation parent = f;
             int prevId = f.getId();
-            while ((parent = parent.getParentForce()) != null) {
+            while ((parent = parent.getParentFormation()) != null) {
                 if (parent.getScenarioId() == NO_ASSIGNED_SCENARIO) {
                     break;
                 }
                 parent.clearScenarioIds(getCampaign(), false);
-                scenario.removeForce(parent.getId());
-                for (Formation sub : parent.getSubForces()) {
+                scenario.removeFormation(parent.getId());
+                for (Formation sub : parent.getSubFormations()) {
                     if (sub.getId() == prevId) {
                         continue;
                     }

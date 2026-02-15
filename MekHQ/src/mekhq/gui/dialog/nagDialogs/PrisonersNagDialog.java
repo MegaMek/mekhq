@@ -71,13 +71,13 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      */
     @Override
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Formation> formations = campaign.getAllForces();
+        List<Formation> formations = campaign.getAllFormations();
 
 
         Person speaker = null;
         for (Formation formation : formations) {
-            if (formation.isForceType(SECURITY)) {
-                UUID commanderId = formation.getForceCommanderID();
+            if (formation.isFormationType(SECURITY)) {
+                UUID commanderId = formation.getFormationCommanderID();
                 Person commander = campaign.getPerson(commanderId);
                 if (commander == null) {
                     continue;

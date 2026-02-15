@@ -127,7 +127,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -232,7 +232,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -340,7 +340,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -448,7 +448,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -565,7 +565,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -717,7 +717,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -825,7 +825,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -925,7 +925,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1033,7 +1033,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1137,7 +1137,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1245,7 +1245,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1353,7 +1353,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1461,7 +1461,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1568,7 +1568,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1677,7 +1677,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1785,7 +1785,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1894,7 +1894,7 @@ public class ContractMarketAtBGenerationTests {
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);

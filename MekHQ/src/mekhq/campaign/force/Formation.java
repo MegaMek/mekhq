@@ -66,10 +66,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is a hierarchical object to define forces for TO&amp;E. Each Force object can have a parent force object and a
- * vector of child force objects. Each force can also have a vector of PilotPerson objects. The idea is that any time
- * TOE is refreshed in MekHQView, the force object can be traversed to generate a set of TreeNodes that can be applied
- * to the JTree showing the force TO&amp;E.
+ * This is a hierarchical object to define formations for TO&amp;E. Each Formation object can have a parent formation object and a
+ * vector of child formation objects. Each formation can also have a vector of PilotPerson objects. The idea is that any time
+ * TOE is refreshed in MekHQView, the formation object can be traversed to generate a set of TreeNodes that can be applied
+ * to the JTree showing the formation TO&amp;E.
  *
  * <p>Known as {@code Force} prior to 0.50.12</p>
  *
@@ -81,12 +81,12 @@ public class Formation {
 
     // region Variable Declarations
     // pathway to formation icon
-    public static final int FORCE_NONE = -1;
+    public static final int FORMATION_NONE = -1;
     /**
-     * This is the id of the 'origin node'. The force from which all other forces descend. Normally named after the
+     * This is the id of the 'origin node'. The formation from which all other formations descend. Normally named after the
      * campaign.
      */
-    public static final int FORCE_ORIGIN = 0;
+    public static final int FORMATION_ORIGIN = 0;
 
     public static final int COMBAT_TEAM_OVERRIDE_NONE = -1;
     public static final int COMBAT_TEAM_OVERRIDE_FALSE = 0;
@@ -108,11 +108,11 @@ public class Formation {
     private final Vector<Formation> subFormations;
     private final Vector<UUID> units;
     private int scenarioId;
-    private UUID forceCommanderID;
-    private UUID overrideForceCommanderID;
+    private UUID formationCommanderID;
+    private UUID overrideFormationCommanderID;
     protected UUID techId;
 
-    // an ID so that forces can be tracked in Campaign hash
+    // an ID so that formations can be tracked in Campaign hash
     private int id;
     // endregion Variable Declarations
 
@@ -151,9 +151,9 @@ public class Formation {
         setFormationIcon(formationIcon, false);
     }
 
-    public void setFormationIcon(final StandardFormationIcon formationIcon, final boolean setForSubForces) {
+    public void setFormationIcon(final StandardFormationIcon formationIcon, final boolean setForSubFormations) {
         this.formationIcon = formationIcon;
-        if (setForSubForces) {
+        if (setForSubFormations) {
             for (final Formation formation : subFormations) {
                 formation.setFormationIcon(formationIcon.clone(), true);
             }
@@ -166,7 +166,7 @@ public class Formation {
 
     public Camouflage getCamouflageOrElse(final Camouflage camouflage) {
         return getCamouflage().hasDefaultCategory() ?
-                     ((getParentForce() == null) ? camouflage : getParentForce().getCamouflageOrElse(camouflage)) :
+                     ((getParentFormation() == null) ? camouflage : getParentFormation().getCamouflageOrElse(camouflage)) :
                      getCamouflage();
     }
 
@@ -183,38 +183,39 @@ public class Formation {
     }
 
     /**
-     * @return The {@code ForceType} currently assigned to this instance.
+     * @return The {@code FormationType} currently assigned to this instance.
      */
-    public FormationType getForceType() {
+    public FormationType getFormationType() {
         return formationType;
     }
 
     /**
-     * This method compares the provided {@code forceType} with the current instance's {@code ForceType} to determine if
+     * This method compares the provided {@code formationType} with the current instance's {@code FormationType} to determine if
      * they match.
      *
-     * @param formationType The {@code ForceType} to compare against.
+     * @param formationType The {@code FormationType} to compare against.
      *
-     * @return {@code true} if the current instance matches the specified {@code forceType}; otherwise, {@code false}.
+     * @return {@code true} if the current instance matches the specified {@code formationType}; otherwise, {@code
+     * false}.
      */
-    public boolean isForceType(FormationType formationType) {
+    public boolean isFormationType(FormationType formationType) {
         return this.formationType == formationType;
     }
 
     /**
-     * Updates the {@code ForceType} for this instance and optionally propagates the change to all sub-forces.
+     * Updates the {@code FormationType} for this instance and optionally propagates the change to all sub-formations.
      *
-     * <p>If the {@code setForSubForces} flag is {@code true}, the method recursively sets the
-     * provided {@code forceType} for all sub-forces of this instance.</p>
+     * <p>If the {@code setForSubFormations} flag is {@code true}, the method recursively sets the
+     * provided {@code formationType} for all sub-formations of this instance.</p>
      *
-     * @param formationType       The new {@code ForceType} to assign to this instance.
-     * @param setForSubForces A flag indicating whether the change should also apply to sub-forces.
+     * @param formationType       The new {@code FormationType} to assign to this instance.
+     * @param setForSubFormations A flag indicating whether the change should also apply to sub-formations.
      */
-    public void setForceType(FormationType formationType, boolean setForSubForces) {
+    public void setFormationType(FormationType formationType, boolean setForSubFormations) {
         this.formationType = formationType;
-        if (setForSubForces) {
+        if (setForSubFormations) {
             for (Formation formation : subFormations) {
-                formation.setForceType(formationType, true);
+                formation.setFormationType(formationType, true);
             }
         }
     }
@@ -274,14 +275,14 @@ public class Formation {
     }
 
     /**
-     * Set scenario ID (e.g. deploy to scenario) for a force and all of its subForces and units
+     * Set scenario ID (e.g. deploy to scenario) for a formation and all of its subFormations and units
      *
      * @param scenarioId scenario to deploy to
      * @param campaign   campaign - required to update units
      */
     public void setScenarioId(int scenarioId, Campaign campaign) {
         this.scenarioId = scenarioId;
-        for (Formation sub : getSubForces()) {
+        for (Formation sub : getSubFormations()) {
             sub.setScenarioId(scenarioId, campaign);
         }
         for (UUID uid : getUnits()) {
@@ -301,24 +302,24 @@ public class Formation {
     }
 
     public boolean isDeployed() {
-        // forces are deployed if their parent force is
+        // formations are deployed if their parent formation is
         if ((null != parentFormation) && parentFormation.isDeployed()) {
             return true;
         }
         return scenarioId != NO_ASSIGNED_SCENARIO;
     }
 
-    public @Nullable Formation getParentForce() {
+    public @Nullable Formation getParentFormation() {
         return parentFormation;
     }
 
     /**
-     * This method generates a list of all parent forces for the current force object in the hierarchy. It repeatedly
-     * fetches the parent force of the current force and adds it to a list until no more parent forces can be found
-     * (i.e., until the top of the force hierarchy is reached).
+     * This method generates a list of all parent formations for the current formation object in the hierarchy. It repeatedly
+     * fetches the parent formation of the current formation and adds it to a list until no more parent formations can be found
+     * (i.e., until the top of the formation hierarchy is reached).
      *
-     * @return A list of {@link Formation} objects representing all the parent forces of the current force object in the
-     *       hierarchy. The list will be empty if there are no parent forces.
+     * @return A list of {@link Formation} objects representing all the parent formations of the current formation object in the
+     *       hierarchy. The list will be empty if there are no parent formations.
      */
     public List<Formation> getAllParents() {
         List<Formation> parentFormations = new ArrayList<>();
@@ -330,7 +331,7 @@ public class Formation {
         }
 
         while (parentFormation != null) {
-            parentFormation = parentFormation.getParentForce();
+            parentFormation = parentFormation.getParentFormation();
 
             if (parentFormation != null) {
                 parentFormations.add(parentFormation);
@@ -340,54 +341,54 @@ public class Formation {
         return parentFormations;
     }
 
-    public void setParentForce(final @Nullable Formation parent) {
+    public void setParentFormation(final @Nullable Formation parent) {
         this.parentFormation = parent;
     }
 
-    public Vector<Formation> getSubForces() {
+    public Vector<Formation> getSubFormations() {
         return subFormations;
     }
 
     /**
-     * Returns a list of all of this forces' descendant forces. This includes direct child forces and their descendents
+     * Returns a list of all of this formations' descendant formations. This includes direct child formations and their descendents
      * recursively.
      * <p>
-     * This method works by first adding all direct child forces to the list, and then recursively adding their
-     * descendants by calling this method on each child force.
+     * This method works by first adding all direct child formations to the list, and then recursively adding their
+     * descendants by calling this method on each child formation.
      *
-     * @return A list of {@link Formation} objects representing all descendant forces. If there are no descendant forces,
+     * @return A list of {@link Formation} objects representing all descendant formations. If there are no descendant formations,
      *       this method will return an empty list.
      */
-    public List<Formation> getAllSubForces() {
+    public List<Formation> getAllSubFormations() {
         List<Formation> allSubFormations = new ArrayList<>();
 
         for (Formation subFormation : subFormations) {
             allSubFormations.add(subFormation);
 
-            allSubFormations.addAll(subFormation.getAllSubForces());
+            allSubFormations.addAll(subFormation.getAllSubFormations());
         }
 
         return allSubFormations;
     }
 
     public boolean isAncestorOf(Formation otherFormation) {
-        Formation pFormation = otherFormation.getParentForce();
+        Formation pFormation = otherFormation.getParentFormation();
         while (pFormation != null) {
             if (pFormation.getId() == getId()) {
                 return true;
             }
-            pFormation = pFormation.getParentForce();
+            pFormation = pFormation.getParentFormation();
         }
         return false;
     }
 
     /**
-     * @return the full hierarchical name of the force, including all parents (except the origin force)
+     * @return the full hierarchical name of the formation, including all parents (except the origin formation)
      */
     public String getFullName() {
         String toReturn = getName();
         if (null != parentFormation) {
-            if (parentFormation.getId() != FORCE_ORIGIN) {
+            if (parentFormation.getId() != FORMATION_ORIGIN) {
                 toReturn += ", " + parentFormation.getFullName();
             }
         }
@@ -395,7 +396,7 @@ public class Formation {
     }
 
     /**
-     * @return A String representation of the full hierarchical force including ID for MM export
+     * @return A String representation of the full hierarchical formation including ID for MM export
      */
     public String getFullMMName() {
         var ancestors = new ArrayList<Formation>();
@@ -424,25 +425,26 @@ public class Formation {
     }
 
     /**
-     * Add a sub force to the sub force vector. In general, this should not be called directly to add forces to the
-     * campaign because they will not be assigned an id. Use {@link Campaign#addForce(Formation, Formation)} instead The boolean
-     * assignParent here is set to false when assigning forces from the TOE to a scenario, because we don't want to
-     * switch this forces real parent
+     * Add a sub formation to the sub formation vector. In general, this should not be called directly to add formations
+     * to the campaign because they will not be assigned an id. Use {@link Campaign#addFormation(Formation, Formation)}
+     * instead The boolean assignParent here is set to false when assigning formations from the TOE to a scenario,
+     * because we don't want to switch this formations real parent
      *
-     * @param sub the sub force to add, which may be null from a load failure. This returns without adding in that case
+     * @param sub the sub formation to add, which may be null from a load failure. This returns without adding in that
+     *            case
      */
-    public void addSubForce(final @Nullable Formation sub, boolean assignParent) {
+    public void addSubFormation(final @Nullable Formation sub, boolean assignParent) {
         if (sub == null) {
             return;
         }
 
         if (equals(sub)) {
-            LOGGER.error("Cannot add a force as its own subforce!");
+            LOGGER.error("Cannot add a formation as its own subformation!");
             return;
         }
 
         if (assignParent) {
-            sub.setParentForce(this);
+            sub.setParentFormation(this);
         }
         subFormations.add(sub);
     }
@@ -452,41 +454,41 @@ public class Formation {
     }
 
     /**
-     * @param standardForcesOnly to only include combat forces or to also include support forces
+     * @param standardFormationsOnly to only include combat formations or to also include support formations
      *
-     * @return all the unit ids in this force and all of its subForces
+     * @return all the unit ids in this formation and all of its subFormations
      */
-    public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
+    public Vector<UUID> getAllUnits(boolean standardFormationsOnly) {
         Vector<UUID> allUnits = new Vector<>();
 
-        if (!standardForcesOnly || formationType.isStandard()) {
+        if (!standardFormationsOnly || formationType.isStandard()) {
             allUnits.addAll(units);
         }
 
         for (Formation formation : subFormations) {
-            allUnits.addAll(formation.getAllUnits(standardForcesOnly));
+            allUnits.addAll(formation.getAllUnits(standardFormationsOnly));
         }
 
         return allUnits;
     }
 
     /**
-     * Retrieves all units associated with the current force as {@link Unit} objects.
+     * Retrieves all units associated with the current formation as {@link Unit} objects.
      *
-     * <p>This method converts the list of unit IDs from the force into a list of
+     * <p>This method converts the list of unit IDs from the formation into a list of
      * {@link Unit} objects by fetching them from the provided {@link Hangar}. Units are only included if they can be
      * successfully resolved from the hangar.</p>
      *
      * @param hangar             the {@link Hangar} containing the units to retrieve.
-     * @param standardForcesOnly a flag indicating whether to include only standard forces. If {@code true}, only units
-     *                           belonging to standard forces are returned.
+     * @param standardFormationsOnly a flag indicating whether to include only standard formations. If {@code true}, only units
+     *                           belonging to standard formations are returned.
      *
-     * @return a list of {@link Unit} objects associated with the force.
+     * @return a list of {@link Unit} objects associated with the formation.
      */
-    public List<Unit> getAllUnitsAsUnits(Hangar hangar, boolean standardForcesOnly) {
+    public List<Unit> getAllUnitsAsUnits(Hangar hangar, boolean standardFormationsOnly) {
         List<Unit> allUnits = new ArrayList<>();
 
-        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+        for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Unit unit = hangar.getUnit(unitId);
             if (unit != null) {
                 allUnits.add(unit);
@@ -497,7 +499,7 @@ public class Formation {
     }
 
     /**
-     * Resolves and returns the {@link Unit} objects that belong to this force by looking them up in the provided
+     * Resolves and returns the {@link Unit} objects that belong to this formation by looking them up in the provided
      * {@link Hangar}.
      *
      * <p>This method iterates over the unit IDs returned by {@link #getUnits()} and attempts to retrieve each unit
@@ -508,7 +510,7 @@ public class Formation {
      *
      * @param hangar the {@link Hangar} used to resolve unit IDs into {@link Unit} instances; must not be {@code null}
      *
-     * @return a list of resolved {@link Unit} instances for this force; never {@code null}
+     * @return a list of resolved {@link Unit} instances for this formation; never {@code null}
      *
      * @author Illiani
      * @since 0.50.11
@@ -528,7 +530,7 @@ public class Formation {
 
     /**
      * Add a unit id to the units vector. In general, this should not be called directly to add unid because they will
-     * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)} instead
+     * not be assigned a formation id. Use {@link Campaign#addUnitToFormation(Unit, int)} instead
      */
     public void addUnit(UUID uid) {
         addUnit(null, uid, false, null);
@@ -545,9 +547,9 @@ public class Formation {
         if (unit != null) {
             for (Person person : unit.getCrew()) {
                 if (useTransfers) {
-                    AssignmentLogger.reassignedTOEForce(campaign, person, campaign.getLocalDate(), oldFormation, this);
+                    AssignmentLogger.reassignedTOEFormation(campaign, person, campaign.getLocalDate(), oldFormation, this);
                 } else {
-                    AssignmentLogger.addedToTOEForce(campaign, person, campaign.getLocalDate(), this);
+                    AssignmentLogger.addedToTOEFormation(campaign, person, campaign.getLocalDate(), this);
                 }
             }
         }
@@ -556,7 +558,7 @@ public class Formation {
     }
 
     /**
-     * This should not be directly called except by {@link Campaign#removeUnitFromForce(Unit)} instead
+     * This should not be directly called except by {@link Campaign#removeUnitFromFormation(Unit)} instead
      */
     public void removeUnit(Campaign campaign, UUID id, boolean log) {
         int idx = 0;
@@ -575,7 +577,7 @@ public class Formation {
                 Unit unit = campaign.getUnit(id);
                 if (unit != null) {
                     for (Person person : unit.getCrew()) {
-                        AssignmentLogger.removedFromTOEForce(campaign, person, campaign.getLocalDate(), this);
+                        AssignmentLogger.removedFromTOEFormation(campaign, person, campaign.getLocalDate(), this);
                     }
                 }
             }
@@ -596,11 +598,11 @@ public class Formation {
                     u.undeploy();
                 }
             }
-            // We only need to clear the subForces if we're killing everything.
-            for (Formation sub : getSubForces()) {
+            // We only need to clear the subFormations if we're killing everything.
+            for (Formation sub : getSubFormations()) {
                 Scenario s = c.getScenario(sub.getScenarioId());
                 if (s != null) {
-                    s.removeForce(sub.getId());
+                    s.removeFormation(sub.getId());
                 }
                 sub.clearScenarioIds(c);
             }
@@ -624,33 +626,33 @@ public class Formation {
         this.id = i;
     }
 
-    public @Nullable UUID getForceCommanderID() {
-        return forceCommanderID;
+    public @Nullable UUID getFormationCommanderID() {
+        return formationCommanderID;
     }
 
     /**
-     * Sets the force commander ID to the provided UUID. You probably want to use setOverrideForceCommanderID(UUID)
+     * Sets the formation commander ID to the provided UUID. You probably want to use setOverrideFormationCommanderID(UUID)
      * followed by updateCommander(campaign).
      *
      * @param commanderID UUID of the commander
      *
-     * @see #setOverrideForceCommanderID(UUID)
+     * @see #setOverrideFormationCommanderID(UUID)
      * @see #updateCommander(Campaign)
      */
-    private void setForceCommanderID(@Nullable UUID commanderID) {
-        forceCommanderID = commanderID;
+    private void setFormationCommanderID(@Nullable UUID commanderID) {
+        formationCommanderID = commanderID;
     }
 
-    public UUID getOverrideForceCommanderID() {
-        return overrideForceCommanderID;
+    public UUID getOverrideFormationCommanderID() {
+        return overrideFormationCommanderID;
     }
 
-    public void setOverrideForceCommanderID(UUID overrideForceCommanderID) {
-        this.overrideForceCommanderID = overrideForceCommanderID;
+    public void setOverrideFormationCommanderID(UUID overrideFormationCommanderID) {
+        this.overrideFormationCommanderID = overrideFormationCommanderID;
     }
 
     /**
-     * Returns a list of unit or force commanders eligible to be considered for the position of force commander.
+     * Returns a list of unit or formation commanders eligible to be considered for the position of formation commander.
      *
      * @param campaign the campaign to get eligible commanders from
      *
@@ -668,14 +670,14 @@ public class Formation {
             }
         }
 
-        // this means the force contains no Units, so we check against the leaders of
-        // the sub-forces
+        // this means the formation contains no Units, so we check against the leaders of
+        // the sub-formations
         if (eligibleCommanders.isEmpty()) {
-            for (Formation formation : getSubForces()) {
-                UUID forceCommander = formation.getForceCommanderID();
+            for (Formation formation : getSubFormations()) {
+                UUID formationCommander = formation.getFormationCommanderID();
 
-                if (forceCommander != null) {
-                    eligibleCommanders.add(forceCommander);
+                if (formationCommander != null) {
+                    eligibleCommanders.add(formationCommander);
                 }
             }
         }
@@ -684,7 +686,7 @@ public class Formation {
     }
 
     /**
-     * Updates the commander for a force based on the ranking of eligible commanders.
+     * Updates the commander for a formation based on the ranking of eligible commanders.
      *
      * @param campaign the current campaign
      */
@@ -692,23 +694,23 @@ public class Formation {
         List<UUID> eligibleCommanders = getEligibleCommanders(campaign);
 
         if (eligibleCommanders.isEmpty()) {
-            forceCommanderID = null;
-            overrideForceCommanderID = null;
+            formationCommanderID = null;
+            overrideFormationCommanderID = null;
             updateCombatTeamCommanderIfCombatTeam(campaign);
             return;
         }
 
-        if (overrideForceCommanderID != null) {
-            if (eligibleCommanders.contains(overrideForceCommanderID)) {
-                forceCommanderID = overrideForceCommanderID;
+        if (overrideFormationCommanderID != null) {
+            if (eligibleCommanders.contains(overrideFormationCommanderID)) {
+                formationCommanderID = overrideFormationCommanderID;
                 updateCombatTeamCommanderIfCombatTeam(campaign);
 
-                if (getParentForce() != null) {
-                    getParentForce().updateCommander(campaign);
+                if (getParentFormation() != null) {
+                    getParentFormation().updateCommander(campaign);
                 }
                 return;
             } else {
-                overrideForceCommanderID = null;
+                overrideFormationCommanderID = null;
             }
         }
 
@@ -727,16 +729,16 @@ public class Formation {
         }
 
         if (highestRankedPerson == null) {
-            LOGGER.info("Force {} has no eligible commanders", getName());
-            forceCommanderID = null;
+            LOGGER.info("Formation {} has no eligible commanders", getName());
+            formationCommanderID = null;
         } else {
-            forceCommanderID = highestRankedPerson.getId();
+            formationCommanderID = highestRankedPerson.getId();
         }
 
         updateCombatTeamCommanderIfCombatTeam(campaign);
 
-        if (getParentForce() != null) {
-            getParentForce().updateCommander(campaign);
+        if (getParentFormation() != null) {
+            getParentFormation().updateCommander(campaign);
         }
     }
 
@@ -744,16 +746,16 @@ public class Formation {
         if (isCombatTeam()) {
             CombatTeam combatTeam = campaign.getCombatTeamsAsMap().getOrDefault(getId(), null);
             if (combatTeam != null) {
-                combatTeam.setCommander(getForceCommanderID());
+                combatTeam.setCommander(getFormationCommanderID());
             }
         }
     }
 
-    public void removeSubForce(int id) {
+    public void removeSubFormation(int id) {
         int idx = 0;
         boolean found = false;
-        for (Formation sforce : getSubForces()) {
-            if (sforce.getId() == id) {
+        for (Formation sformation : getSubFormations()) {
+            if (sformation.getId() == id) {
                 found = true;
                 break;
             }
@@ -765,21 +767,21 @@ public class Formation {
     }
 
     /**
-     * This determines the proper operational status icon to use for this force and sets it.
+     * This determines the proper operational status icon to use for this formation and sets it.
      *
-     * @param campaign the campaign to determine the operational status of this force using
+     * @param campaign the campaign to determine the operational status of this formation using
      *
-     * @return a list of the operational statuses for units in this force and in all of its subForces.
+     * @return a list of the operational statuses for units in this formation and in all of its subFormations.
      */
     public List<OperationalStatus> updateFormationIconOperationalStatus(final Campaign campaign) {
-        // First, update all subForces, collecting their unit statuses into a single
+        // First, update all subFormations, collecting their unit statuses into a single
         // list
-        final List<OperationalStatus> statuses = getSubForces().stream()
-                                                       .flatMap(subForce -> subForce.updateFormationIconOperationalStatus(
+        final List<OperationalStatus> statuses = getSubFormations().stream()
+                                                       .flatMap(subFormation -> subFormation.updateFormationIconOperationalStatus(
                                                              campaign).stream())
                                                        .collect(Collectors.toList());
 
-        // Then, Add the units assigned to this force
+        // Then, Add the units assigned to this formation
         statuses.addAll(getUnits().stream()
                               .map(campaign::getUnit)
                               .filter(Objects::nonNull)
@@ -788,18 +790,18 @@ public class Formation {
 
         // Can only update the icon for LayeredFormationIcons, but still need to return the
         // processed
-        // units for parent force updates
+        // units for parent formation updates
         if (!(getFormationIcon() instanceof LayeredFormationIcon)) {
             return statuses;
         }
 
         if (statuses.isEmpty()) {
-            // No special modifier for empty forces
+            // No special modifier for empty formations
             ((LayeredFormationIcon) getFormationIcon()).getPieces().remove(LayeredFormationIconLayer.SPECIAL_MODIFIER);
         } else {
             // Sum the unit status ordinals, then divide by the overall number of statuses,
             // to get
-            // the ordinal of the force's status. Then assign the operational status to
+            // the ordinal of the formation's status. Then assign the operational status to
             // this.
             final int index = (int) round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
             final OperationalStatus status = OperationalStatus.values()[index];
@@ -817,7 +819,7 @@ public class Formation {
 
     public void writeToXML(PrintWriter pw1, int indent) {
         pw1.println(MHQXMLUtility.indentStr(indent++) +
-                          "<force id=\"" +
+                          "<formation id=\"" +
                           id +
                           "\" type=\"" +
                           this.getClass().getName() +
@@ -828,15 +830,15 @@ public class Formation {
         if (!getDescription().isBlank()) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceType", formationType.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationType", formationType.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "preferredRole", combatRoleInMemory.name());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideForceCommanderID", overrideForceCommanderID);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationCommanderID", overrideFormationCommanderID);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationCommanderID", formationCommanderID);
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "units");
             for (UUID uid : units) {
@@ -846,13 +848,13 @@ public class Formation {
         }
 
         if (!subFormations.isEmpty()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "subForces");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "subFormations");
             for (Formation sub : subFormations) {
                 sub.writeToXML(pw1, indent);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "subForces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "subFormations");
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "force");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "formation");
     }
 
     public static @Nullable Formation generateInstanceFromXML(Node workingNode, Campaign campaign, Version version) {
@@ -877,13 +879,17 @@ public class Formation {
                     formation.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     formation.setDescription(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("forceType")) {
-                    formation.setForceType(FormationType.fromKey(Integer.parseInt(wn2.getTextContent().trim())), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationType") ||
+                                 wn2.getNodeName().equalsIgnoreCase("forceType")) {
+                    formation.setFormationType(FormationType.fromKey(Integer.parseInt(wn2.getTextContent().trim())),
+                          false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
                     formation.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel") || wn2.getNodeName().equalsIgnoreCase(
+                      "forceLevel")) {
                     formation.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationLevel")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideForceLevel") || wn2.getNodeName().equalsIgnoreCase(
+                      "overrideFormationLevel")) {
                     formation.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("preferredRole")) {
                     formation.setCombatRoleInMemory(CombatRole.parseFromString(wn2.getTextContent().trim()));
@@ -891,13 +897,17 @@ public class Formation {
                     formation.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     formation.techId = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("overrideForceCommanderID")) {
-                    formation.overrideForceCommanderID = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
-                    formation.forceCommanderID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationCommanderId") ||
+                                 wn2.getNodeName().equalsIgnoreCase(
+                                       "overrideForceCommanderID")) {
+                    formation.overrideFormationCommanderID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationCommanderId") ||
+                                 wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
+                    formation.formationCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     processUnitNodes(formation, wn2, version);
-                } else if (wn2.getNodeName().equalsIgnoreCase("subForces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("subFormations") || wn2.getNodeName().equalsIgnoreCase(
+                      "subForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -906,18 +916,19 @@ public class Formation {
                             continue;
                         }
 
-                        if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            String message = String.format("Unknown node type not loaded in Forces nodes: %s",
+                        if (!wn3.getNodeName().equalsIgnoreCase("formation") && !wn3.getNodeName().equalsIgnoreCase(
+                              "force")) {
+                            String message = String.format("Unknown node type not loaded in Formations nodes: %s",
                                   wn3.getNodeName());
                             LOGGER.error(message);
                             continue;
                         }
 
-                        formation.addSubForce(generateInstanceFromXML(wn3, campaign, version), true);
+                        formation.addSubFormation(generateInstanceFromXML(wn3, campaign, version), true);
                     }
                 }
             }
-            campaign.importForce(formation);
+            campaign.importFormation(formation);
         } catch (Exception ex) {
             LOGGER.error("", ex);
             return null;
@@ -941,16 +952,16 @@ public class Formation {
     }
 
     /**
-     * Returns a vector containing all children of this force, including sub-forces and units, sorted by commander
+     * Returns a vector containing all children of this formation, including sub-formations and units, sorted by commander
      * rank.
      *
-     * <p>This method gathers all subordinate objects belonging to this force: first, it adds all sub-forces, then it
-     * adds all units under this force (with crewed units before uncrewed units), finally sorting crewed units by their
+     * <p>This method gathers all subordinate objects belonging to this formation: first, it adds all sub-formations, then it
+     * adds all units under this formation (with crewed units before uncrewed units), finally sorting crewed units by their
      * commander's numeric rank in descending order.</p>
      *
      * @param campaign The {@link Campaign} instance used to look up unit and personnel data.
      *
-     * @return A {@link Vector} of all child objects, including sub-forces and units, sorted such that crewed units
+     * @return A {@link Vector} of all child objects, including sub-formations and units, sorted such that crewed units
      *       appear before unmanned units, and crewed units are ordered by their commander's rank descending.
      */
     public Vector<Object> getAllChildren(Campaign campaign) {
@@ -994,25 +1005,25 @@ public class Formation {
     }
 
     /**
-     * Calculates the force's total BV, including sub forces.
+     * Calculates the formation's total BV, including sub formations.
      *
-     * @param campaign                 The working campaign. This is the campaign object that the force belongs to.
-     * @param forceStandardBattleValue Flag indicating whether to override campaign settings that call for the use of
+     * @param campaign                 The working campaign. This is the campaign object that the formation belongs to.
+     * @param formationStandardBattleValue Flag indicating whether to override campaign settings that call for the use of
      *                                 Generic BV
      *
-     * @return The total battle value (BV) of the force.
+     * @return The total battle value (BV) of the formation.
      */
-    public int getTotalBV(Campaign campaign, boolean forceStandardBattleValue) {
+    public int getTotalBV(Campaign campaign, boolean formationStandardBattleValue) {
         int bvTotal = 0;
 
         for (UUID unitId : getAllUnits(false)) {
-            // no idea how this would happen, but sometimes a unit in a forces unit ID list
+            // no idea how this would happen, but sometimes a unit in a formations unit ID list
             // has an invalid ID?
             if (campaign.getUnit(unitId) == null) {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBattleValue) {
+            if (campaign.getCampaignOptions().isUseGenericBattleValue() && !formationStandardBattleValue) {
                 bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
             } else {
                 bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
@@ -1023,18 +1034,18 @@ public class Formation {
     }
 
     /**
-     * Calculates the total count of units in the given force, including all sub forces.
+     * Calculates the total count of units in the given formation, including all sub formations.
      *
      * @param campaign      the current campaign
      * @param isClanBidding flag to indicate whether clan bidding is being performed
      *
-     * @return the total count of units in the force (including sub forces)
+     * @return the total count of units in the formation (including sub formations)
      */
     public int getTotalUnitCount(Campaign campaign, boolean isClanBidding) {
         int unitTotal = 0;
 
-        for (Formation subforce : getSubForces()) {
-            unitTotal += subforce.getTotalUnitCount(campaign, isClanBidding);
+        for (Formation subFormation : getSubFormations()) {
+            unitTotal += subFormation.getTotalUnitCount(campaign, isClanBidding);
         }
 
         // If we're getting the unit count specifically for Clan Bidding, we don't want to count
@@ -1062,7 +1073,7 @@ public class Formation {
     }
 
     /**
-     * Calculates the unit type most represented in this force and all subForces.
+     * Calculates the unit type most represented in this formation and all subFormations.
      *
      * @param campaign Working campaign
      *
@@ -1088,9 +1099,9 @@ public class Formation {
     }
 
     /**
-     * Finds the distance (depth) from the origin force
+     * Finds the distance (depth) from the origin formation
      *
-     * @param formation the force to get depth for
+     * @param formation the formation to get depth for
      *
      * @deprecated
      */
@@ -1098,21 +1109,21 @@ public class Formation {
     public static int getDepth(Formation formation) {
         int depth = 0;
 
-        Formation parent = formation.getParentForce();
+        Formation parent = formation.getParentFormation();
 
         while (parent != null) {
             depth++;
             formation = parent;
-            parent = formation.getParentForce();
+            parent = formation.getParentFormation();
         }
 
         return depth;
     }
 
     /**
-     * Uses a recursive search to find the maximum distance (depth) from the origin force
+     * Uses a recursive search to find the maximum distance (depth) from the origin formation
      *
-     * @param formation the current force. Should always equal campaign.getForce(0), if called remotely
+     * @param formation the current formation. Should always equal campaign.getFormation(0), if called remotely
      * @param depth the current recursive depth.
      *
      * @deprecated
@@ -1121,8 +1132,8 @@ public class Formation {
     public static int getMaximumDepth(Formation formation, Integer depth) {
         int maximumDepth = depth;
 
-        for (Formation subforce : formation.getSubForces()) {
-            int nextDepth = getMaximumDepth(subforce, depth + 1);
+        for (Formation subFormation : formation.getSubFormations()) {
+            int nextDepth = getMaximumDepth(subFormation, depth + 1);
 
             if (nextDepth > maximumDepth) {
                 maximumDepth = nextDepth;
@@ -1133,13 +1144,13 @@ public class Formation {
     }
 
     /**
-     * Populates the formation levels of a force hierarchy starting from the origin force. For all subforces, it will
+     * Populates the formation levels of a formation hierarchy starting from the origin formation. For all subformations, it will
      * determine the smallest formations - Teams/Lances - and then parent formations will be one formation higher.
      *
-     * @param campaign campaign that the force belongs to
+     * @param campaign campaign that the formation belongs to
      */
     public static void populateFormationLevelsFromOrigin(Campaign campaign) {
-        Formation formation = campaign.getForce(0);
+        Formation formation = campaign.getFormation(0);
 
         recursivelyUpdateFormationLevel(campaign, formation);
 
@@ -1147,20 +1158,20 @@ public class Formation {
     }
 
     private static void recursivelyUpdateFormationLevel(Campaign campaign, Formation formation) {
-        for (Formation subforce : formation.getSubForces()) {
-            recursivelyUpdateFormationLevel(campaign, subforce);
+        for (Formation subFormation : formation.getSubFormations()) {
+            recursivelyUpdateFormationLevel(campaign, subFormation);
         }
-        formation.defaultFormationLevelForForce(campaign);
+        formation.defaultFormationLevelForFormation(campaign);
     }
 
     /**
-     * Based on a force's subforces and units, set this unit's formation to the default.
+     * Based on a formation's subformations and units, set this unit's formation to the default.
      *
-     * @param campaign campaign that the force belongs to
+     * @param campaign campaign that the formation belongs to
      */
-    public void defaultFormationLevelForForce(Campaign campaign) {
+    public void defaultFormationLevelForFormation(Campaign campaign) {
         Formation largestSubFormation =
-              getAllSubForces().stream().max(Comparator.comparing(f -> f.getFormationLevel().getDepth())).orElse(null);
+              getAllSubFormations().stream().max(Comparator.comparing(f -> f.getFormationLevel().getDepth())).orElse(null);
         if (largestSubFormation == null) {
             int depth = 1;
             setFormationLevel(FormationLevel.parseFromDepth(campaign, depth + getOddFormationSizeModifier(campaign,
@@ -1184,28 +1195,28 @@ public class Formation {
     }
 
     /**
-     * Changes the formation level of a force and its sub-forces.
+     * Changes the formation level of a formation and its sub-formations.
      *
-     * @param formation                 the force whose formation level is to be changed
-     * @param currentFormationLevel the current formation level of the force
+     * @param formation                 the formation whose formation level is to be changed
+     * @param currentFormationLevel the current formation level of the formation
      * @param lowerBoundary         the lower boundary for the formation level
      *
      * @deprecated See {@link Formation#recursivelyUpdateFormationLevel}
      */
     @Deprecated(since = "0.50.10", forRemoval = true)
     private static void changeFormationLevel(Formation formation, int currentFormationLevel, int lowerBoundary) {
-        for (Formation subforce : formation.getSubForces()) {
+        for (Formation subFormation : formation.getSubFormations()) {
             if (currentFormationLevel - 1 < lowerBoundary) {
-                subforce.setFormationLevel(FormationLevel.INVALID);
-            } else if (subforce.getSubForces().isEmpty()) {
-                subforce.setFormationLevel(FormationLevel.parseFromInt(lowerBoundary));
+                subFormation.setFormationLevel(FormationLevel.INVALID);
+            } else if (subFormation.getSubFormations().isEmpty()) {
+                subFormation.setFormationLevel(FormationLevel.parseFromInt(lowerBoundary));
             } else {
-                subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
+                subFormation.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
             }
 
             MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
 
-            changeFormationLevel(subforce, currentFormationLevel - 1, lowerBoundary);
+            changeFormationLevel(subFormation, currentFormationLevel - 1, lowerBoundary);
         }
     }
 
@@ -1246,7 +1257,7 @@ public class Formation {
     }
 
     /**
-     * Populates the origin node (the force normally named after the campaign) with an appropriate Formation Level.
+     * Populates the origin node (the formation normally named after the campaign) with an appropriate Formation Level.
      *
      * @param campaign the current campaign
      * @param origin   the origin node
@@ -1273,27 +1284,27 @@ public class Formation {
     }
 
     /**
-     * Determines whether a force consists solely of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in Ground
+     * Determines whether a formation consists solely of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in Ground
      * Effect) units.
      *
-     * <p>This method evaluates the force by checking each unit to verify that all resolved units
+     * <p>This method evaluates the formation by checking each unit to verify that all resolved units
      * are either VTOLs or WIGE units.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
-     *   <li>Retrieves all units in the force based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Retrieves all units in the formation based on the {@code standardFormationsOnly} flag.</li>
      *   <li>Skips any unit that cannot be resolved (null entity).</li>
      *   <li>Returns {@code false} if any resolved unit is not categorized as a VTOL or WIGE unit.</li>
      *   <li>Returns {@code true} if all resolved units meet the VTOL or WIGE criteria.</li>
      * </ul>
      *
      * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardForcesOnly A flag to filter and include only standard forces from the force.
+     * @param standardFormationsOnly A flag to filter and include only standard formations from the formation.
      *
-     * @return {@code true} if all resolved units in the force are VTOL or WIGE units, {@code false} otherwise.
+     * @return {@code true} if all resolved units in the formation are VTOL or WIGE units, {@code false} otherwise.
      */
-    public boolean forceContainsOnlyVTOLForces(Hangar hangar, boolean standardForcesOnly) {
-        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+    public boolean formationContainsOnlyVTOLForces(Hangar hangar, boolean standardFormationsOnly) {
+        for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
 
             if (entity == null) {
@@ -1309,38 +1320,38 @@ public class Formation {
     }
 
     /**
-     * Determines whether a force contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in Ground
+     * Determines whether a formation contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in Ground
      * Effect) units.
      *
-     * <p>This method evaluates the force by calculating whether at least half of the resolved units
-     * in the force are categorized as VTOLs or WIGE units.</p>
+     * <p>This method evaluates the formation by calculating whether at least half of the resolved units
+     * in the formation are categorized as VTOLs or WIGE units.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
-     *   <li>Retrieves all units in the force based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Retrieves all units in the formation based on the {@code standardFormationsOnly} flag.</li>
      *   <li>Counts the number of units categorized as airborne VTOL or WIGE.</li>
-     *   <li>Adjusts the total force size if unresolved (null) entities are skipped without counting
+     *   <li>Adjusts the total formation size if unresolved (null) entities are skipped without counting
      *       them toward the total size.</li>
      *   <li>Stops counting early if a majority of VTOL or WIGE units is determined before evaluating
      *       all entities.</li>
      * </ul>
      *
      * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardForcesOnly A flag to filter and include only standard forces from the force.
+     * @param standardFormationsOnly A flag to filter and include only standard formations from the formation.
      *
-     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved force units, {@code false}
+     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved formation units, {@code false}
      *       otherwise.
      */
-    public boolean forceContainsMajorityVTOLForces(Hangar hangar, boolean standardForcesOnly) {
-        Vector<UUID> allUnits = getAllUnits(standardForcesOnly);
-        int forceSize = allUnits.size();
+    public boolean formationContainsMajorityVTOLForces(Hangar hangar, boolean standardFormationsOnly) {
+        Vector<UUID> allUnits = getAllUnits(standardFormationsOnly);
+        int formationSize = allUnits.size();
         int vtolCount = 0;
 
         for (UUID unitId : allUnits) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
 
             if (entity == null) {
-                forceSize--;
+                formationSize--;
                 continue;
             }
 
@@ -1348,43 +1359,43 @@ public class Formation {
                 vtolCount++;
             }
 
-            if (vtolCount >= forceSize / 2) {
+            if (vtolCount >= formationSize / 2) {
                 break;
             }
         }
 
-        return vtolCount >= floor((double) forceSize / 2);
+        return vtolCount >= floor((double) formationSize / 2);
     }
 
     /**
-     * Determines whether a force contains only aerospace or conventional fighters.
+     * Determines whether a formation contains only aerospace or conventional fighters.
      *
-     * <p>This method checks all units in the force to confirm if they consist exclusively of aerial
+     * <p>This method checks all units in the formation to confirm if they consist exclusively of aerial
      * units based on their type.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
-     *   <li>Filters the force's units based on the {@code standardForcesOnly} flag.</li>
-     *   <li>Iterates through all selected units in the force.</li>
+     *   <li>Filters the formation's units based on the {@code standardFormationsOnly} flag.</li>
+     *   <li>Iterates through all selected units in the formation.</li>
      *   <li>Skips any unit that cannot be resolved (null entity).</li>
-     *   <li>If {@code excludeConventionalFighters} is {@code true} and the force contains any
+     *   <li>If {@code excludeConventionalFighters} is {@code true} and the formation contains any
      *       conventional fighters, the method immediately returns {@code false}.</li>
-     *   <li>Returns {@code false} if any unit in the force is not an aerial unit (i.e., not an aerospace
+     *   <li>Returns {@code false} if any unit in the formation is not an aerial unit (i.e., not an aerospace
      *       unit or conventional fighter).</li>
-     *   <li>Returns {@code true} if all units in the force meet the aerial unit criteria.</li>
+     *   <li>Returns {@code true} if all units in the formation meet the aerial unit criteria.</li>
      * </ul>
      *
      * @param hangar                      The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardForcesOnly          A flag to filter and include only standard forces from the force.
+     * @param standardFormationsOnly          A flag to filter and include only standard formations from the formation.
      * @param excludeConventionalFighters A flag determining if conventional fighters should be excluded from the
      *                                    assessment.
      *
-     * @return {@code true} if the force consists only of aerial units (respecting the provided filters), {@code false}
+     * @return {@code true} if the formation consists only of aerial units (respecting the provided filters), {@code false}
      *       otherwise.
      */
-    public boolean forceContainsOnlyAerialForces(Hangar hangar, boolean standardForcesOnly,
+    public boolean formationContainsOnlyAerialForces(Hangar hangar, boolean standardFormationsOnly,
           boolean excludeConventionalFighters) {
-        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+        for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
 
             if (entity == null) {
@@ -1404,10 +1415,10 @@ public class Formation {
     }
 
     public int getSalvageUnitCount(Hangar hangar, boolean isInSpace) {
-        List<Unit> unitsInForce = getAllUnitsAsUnits(hangar, false);
+        List<Unit> unitsInFormation = getAllUnitsAsUnits(hangar, false);
 
         int unitCount = 0;
-        for (Unit unit : unitsInForce) {
+        for (Unit unit : unitsInFormation) {
             boolean canSurviveInSpace = false;
             Entity entity = unit.getEntity();
             if (entity != null) {

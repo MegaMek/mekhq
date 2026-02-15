@@ -113,7 +113,7 @@ public class DialogInterception extends JDialog {
         // Get speaker details
         Person speaker = null;
         if (targetConvoy != null) {
-            UUID speakerId = targetConvoy.getForceCommanderID();
+            UUID speakerId = targetConvoy.getFormationCommanderID();
             speaker = campaign.getPerson(speakerId);
         }
 
@@ -165,8 +165,8 @@ public class DialogInterception extends JDialog {
         String message = "";
 
         if (targetConvoy != null) {
-            if (targetConvoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false) ||
-                      targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (targetConvoy.formationContainsOnlyVTOLForces(campaign.getHangar(), false) ||
+                      targetConvoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 message = getFormattedTextAt(RESOURCE_BUNDLE,
                       "statusUpdateIntercepted.boilerplate",
                       campaign.getCommanderAddress(),

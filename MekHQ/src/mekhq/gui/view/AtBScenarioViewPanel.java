@@ -353,10 +353,10 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForce, gridBagConstraints);
 
             if (null != scenario.getCombatTeamById(campaign)) {
-                Formation formation = campaign.getForce(scenario.getCombatTeamId());
+                Formation formation = campaign.getFormation(scenario.getCombatTeamId());
 
                 if (formation != null) {
-                    lblForceDesc.setText(campaign.getForce(scenario.getCombatTeamId()).getFullName());
+                    lblForceDesc.setText(campaign.getFormation(scenario.getCombatTeamId()).getFullName());
                 } else {
                     lblForceDesc.setText("Unknown Force ID: " + scenario.getCombatTeamId());
                 }
@@ -365,7 +365,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 forceBuilder.append("<html>");
                 boolean chop = false;
                 for (int forceID : scenario.getForceIDs()) {
-                    forceBuilder.append(campaign.getForce(forceID).getFullName());
+                    forceBuilder.append(campaign.getFormation(forceID).getFullName());
                     forceBuilder.append("<br/>");
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates()
                                                            .get(forceID);

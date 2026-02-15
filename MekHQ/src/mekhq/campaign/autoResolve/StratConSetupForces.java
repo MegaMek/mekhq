@@ -148,7 +148,7 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
             if (!useDropship
                       && scenario.getCombatRole().isPatrol()
                       && (scenario.getCombatTeamById(campaign) != null)
-                      && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+                      && (scenario.getCombatTeamById(campaign).getFormationId() == scenario.getCombatTeamId())) {
                 deploymentRound = Math.max(deploymentRound, 6 - speed);
             }
         }
@@ -190,13 +190,13 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
             // Lances deployed in scout roles always deploy units in 6-walking speed turns
             if (scenario.getCombatRole().isPatrol()
                       && (scenario.getCombatTeamById(campaign) != null)
-                      && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
+                      && (scenario.getCombatTeamById(campaign).getFormationId() == scenario.getCombatTeamId())
                       && !useDropship) {
                 deploymentRound = Math.max(deploymentRound, 6 - speed);
             }
         }
         entity.setDeployRound(deploymentRound);
-        var force = campaign.getForceFor(unit);
+        var force = campaign.getFormationFor(unit);
         if (force != null) {
             entity.setForceString(force.getFullMMName());
         } else if (!unit.getEntity().getForceString().isBlank()) {

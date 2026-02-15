@@ -134,17 +134,17 @@ public class TrainingCombatTeams {
 
             StratConCampaignState campaignState = contract.getStratconCampaignState();
             boolean isForceDeployed = campaignState != null &&
-                                            campaignState.isForceDeployedHere(combatTeam.getForceId());
+                                            campaignState.isForceDeployedHere(combatTeam.getFormationId());
             if (isUsingStratCon) {
                 if (!isUsingMaplessMode && !isForceDeployed) {
                     continue;
                 }
             }
 
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             List<Formation> allFormations = new ArrayList<>();
             allFormations.add(formation); // We want to include the force itself in the training process
-            allFormations.addAll(formation.getAllSubForces());
+            allFormations.addAll(formation.getAllSubFormations());
 
             for (Formation trainingFormation : allFormations) {
                 processTraining(campaign, trainingFormation);
@@ -175,7 +175,7 @@ public class TrainingCombatTeams {
         }
 
         // Identify the Combat Team's commander (i.e., the Trainer)
-        UUID commanderID = formation.getForceCommanderID();
+        UUID commanderID = formation.getFormationCommanderID();
         Person commander = campaign.getPerson(commanderID);
 
         if (commander == null) {

@@ -224,7 +224,7 @@ public class ResolverTest {
         when(scenario.getBotForce(anyInt())).thenReturn(botForce);
         when(scenario.getNumBots()).thenReturn(1);
 
-        for (var force : campaign.getAllForces()) {
+        for (var force : campaign.getAllFormations()) {
             force.setScenarioId(11, campaign);
         }
 
@@ -240,7 +240,7 @@ public class ResolverTest {
         campaign.setReputation(reputationController);
         var force = new Formation("Heroes");
 
-        campaign.addForce(force, campaign.getForce(0));
+        campaign.addFormation(force, campaign.getFormation(0));
         return campaign;
     }
 

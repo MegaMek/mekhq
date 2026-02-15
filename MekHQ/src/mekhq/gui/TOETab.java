@@ -242,7 +242,7 @@ public final class TOETab extends CampaignGuiTab {
     private void deployToRegularScenario(Scenario selectedScenario) {
         // Get available forces
         List<Formation> formationOptions = getCampaign().getCombatTeamsAsList().stream()
-                                         .map(combatTeam -> getCampaign().getForce(combatTeam.getForceId()))
+                                         .map(combatTeam -> getCampaign().getFormation(combatTeam.getFormationId()))
                                          .filter(force -> force != null && !force.isDeployed())
                                          .sorted(Comparator.comparing(Formation::getFullName))
                                          .toList();

@@ -384,7 +384,7 @@ public class MedicalViewDialog extends JDialog {
                                  resourceMap.getString("baselinePhenotype.text") :
                                  p.getPhenotype().toString();
 
-        Formation f = c.getForceFor(p);
+        Formation f = c.getFormationFor(p);
         String force = (null != f) ? f.getFullName() : "-";
 
         Person doc = c.getPerson(p.getDoctorId());

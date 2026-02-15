@@ -538,7 +538,7 @@ public class StratConContractInitializer {
             StratConScenario scenario = StratConRulesManager.generateScenario(campaign,
                   contract,
                   trackState,
-                  Formation.FORCE_NONE,
+                  Formation.FORMATION_NONE,
                   coords,
                   template,
                   null);

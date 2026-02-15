@@ -139,7 +139,7 @@ public class LanceAssignmentView extends JPanel {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
                                 String forceName = (((Formation) value)).getFullName();
-                                String originNodeName = ", " + campaign.getForce(0).getName();
+                                String originNodeName = ", " + campaign.getFormation(0).getName();
                                 forceName = forceName.replaceAll(originNodeName, "");
                                 setText(forceName);
                             }
@@ -270,9 +270,9 @@ public class LanceAssignmentView extends JPanel {
         // different subForces of this one.
         Formation f = f1;
         while (!f.isAncestorOf(f2)) {
-            f = f.getParentForce();
+            f = f.getParentFormation();
         }
-        for (Formation sf : f.getSubForces()) {
+        for (Formation sf : f.getSubFormations()) {
             if (sf.isAncestorOf(f1) || sf.getId() == f1.getId()) {
                 return -1;
             }

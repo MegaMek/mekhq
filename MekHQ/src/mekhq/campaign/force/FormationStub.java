@@ -49,10 +49,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * this is a hierarchical object that represents forces from the TO&amp;E using strings rather than unit objects. This
- * makes it static and thus usable to keep track of forces involved in completed scenarios
+ * this is a hierarchical object that represents formations from the TO&amp;E using strings rather than unit objects. This
+ * makes it static and thus usable to keep track of formations involved in completed scenarios
  *
- * <p>Known as {@code ForceStub} prior to 0.50.12</p>
+ * <p>Known as {@code FormationStub} prior to 0.50.12</p>
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since 0.50.12
@@ -63,7 +63,7 @@ public class FormationStub {
     // region Variable Declarations
     private String name;
     private StandardFormationIcon formationIcon;
-    private final Vector<FormationStub> subForces;
+    private final Vector<FormationStub> subFormations;
     private final Vector<UnitStub> units;
     // endregion Variable Declarations
 
@@ -76,11 +76,11 @@ public class FormationStub {
         name = (formation == null) ? "" : formation.getFullName();
         setFormationIcon((formation == null) ? new LayeredFormationIcon() : formation.getFormationIcon().clone());
 
-        subForces = new Vector<>();
+        subFormations = new Vector<>();
         if (formation != null) {
-            for (Formation sub : formation.getSubForces()) {
+            for (Formation sub : formation.getSubFormations()) {
                 FormationStub stub = new FormationStub(sub, campaign);
-                subForces.add(stub);
+                subFormations.add(stub);
             }
         }
 
@@ -108,7 +108,7 @@ public class FormationStub {
 
     public Vector<Object> getAllChildren() {
         Vector<Object> children = new Vector<>();
-        children.addAll(subForces);
+        children.addAll(subFormations);
         children.addAll(units);
 
         return children;
@@ -116,7 +116,7 @@ public class FormationStub {
 
     // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "formationStub");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         getFormationIcon().writeToXML(pw, indent);
 
@@ -128,14 +128,14 @@ public class FormationStub {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
 
-        if (!subForces.isEmpty()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subForces");
-            for (FormationStub sub : subForces) {
+        if (!subFormations.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subFormations");
+            for (FormationStub sub : subFormations) {
                 sub.writeToXML(pw, indent);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subForces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subFormations");
         }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "formationStub");
     }
 
     public static FormationStub generateInstanceFromXML(final Node wn, final Version version) {
@@ -160,25 +160,27 @@ public class FormationStub {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
                             LOGGER
-                                  .error("Unknown node type not loaded in ForceStub nodes: {}", wn3.getNodeName());
+                                  .error("Unknown node type not loaded in FormationStub nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
                         retVal.units.add(UnitStub.generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("subForces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("subFormations") || wn2.getNodeName().equalsIgnoreCase(
+                      "subForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
-                        } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
+                        } else if (!wn3.getNodeName().equalsIgnoreCase("formationStub") &&
+                                         !wn3.getNodeName().equalsIgnoreCase("forceStub")) {
                             LOGGER
-                                  .error("Unknown node type not loaded in ForceStub nodes: {}", wn3.getNodeName());
+                                  .error("Unknown node type not loaded in FormationStub nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
-                        retVal.subForces.add(generateInstanceFromXML(wn3, version));
+                        retVal.subFormations.add(generateInstanceFromXML(wn3, version));
                     }
                 }
             }

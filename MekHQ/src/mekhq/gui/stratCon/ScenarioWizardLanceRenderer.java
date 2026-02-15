@@ -105,7 +105,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
 
         // Adjust force name to remove unnecessary information
         String forceName = formation.getFullName();
-        String originNodeName = ", " + campaign.getForce(0).getName();
+        String originNodeName = ", " + campaign.getFormation(0).getName();
         forceName = forceName.replaceAll(originNodeName, "");
 
         String fatigueReport = "";

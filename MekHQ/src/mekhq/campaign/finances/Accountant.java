@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.finances;
 
-import static mekhq.campaign.force.Formation.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.adjustValuesForDiminishingReturns;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.getDiminishingReturnsStart;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
@@ -387,7 +387,7 @@ public record Accountant(Campaign campaign) {
 
         return getHangar().getUnitCosts(
               // Is it in the TO&E and by extension in use?
-              unit -> unit.getForceId() != FORCE_NONE, unit -> unit.getFuelCost(hydrogenProduction));
+              unit -> unit.getFormationId() != FORMATION_NONE, unit -> unit.getFuelCost(hydrogenProduction));
     }
 
     public Money getMonthlyAmmo() {
@@ -443,8 +443,8 @@ public record Accountant(Campaign campaign) {
         List<Money> unitValues = new ArrayList<>();
 
         Money total = Money.zero();
-        for (Formation formation : campaign().getAllForces()) {
-            if (!formation.getForceType().isStandard()) {
+        for (Formation formation : campaign().getAllFormations()) {
+            if (!formation.getFormationType().isStandard()) {
                 continue;
             }
             if (!formation.getCombatRoleInMemory().isCombatRole()) {
@@ -574,7 +574,7 @@ public record Accountant(Campaign campaign) {
 
         if (getCampaignOptions().isUseAlternatePaymentMode()) {
             final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getFaction(),
-                  campaign.getAllForces(),
+                  campaign.getAllFormations(),
                   campaign.getHangar(),
                   useDiminishingContractPay,
                   excludeInfantry,

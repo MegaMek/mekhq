@@ -48,7 +48,7 @@ import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
@@ -553,7 +553,7 @@ public class AtBDynamicScenarioFactory {
         // Get the number of units in the typical ground tactical formation.
         // This will differ depending on whether the owner uses Inner Sphere lances,
         // Clan stars, or CS/WOB Level II formations.
-        int lanceSize = getStandardForceSize(faction);
+        int lanceSize = CombatTeam.getStandardFormationSize(faction);
 
         // determine generation parameters
         int forceBV = 0;
@@ -1655,7 +1655,7 @@ public class AtBDynamicScenarioFactory {
             if (templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
                       templateObjective.getAssociatedForceNames()
                             .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
-                objectiveForceNames.add(campaign.getForce(forceID).getName());
+                objectiveForceNames.add(campaign.getFormation(forceID).getName());
                 calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
             }
         }
@@ -1761,7 +1761,7 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
-                primaryUnitCount += campaign.getForce(forceID).getAllUnits(false).size();
+                primaryUnitCount += campaign.getFormation(forceID).getAllUnits(false).size();
             }
         }
 
@@ -3485,7 +3485,7 @@ public class AtBDynamicScenarioFactory {
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
                 if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                    Formation formation = campaign.getForce(forceID);
+                    Formation formation = campaign.getFormation(forceID);
                     if (formation != null) {
                         bvBudget += formation.getTotalBV(campaign, forceStandardBattleValue);
                         LOGGER.info("Forced BV contribution for {}: {}", formation.getName(), bvBudget);
@@ -3581,7 +3581,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
                 int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
@@ -3648,7 +3648,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
                 int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
@@ -3686,7 +3686,7 @@ public class AtBDynamicScenarioFactory {
             // deployed player forces:
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-                Formation formation = campaign.getForce(forceID);
+                Formation formation = campaign.getFormation(forceID);
 
                 if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && formation != null) {
                     unitCount += formation.getTotalUnitCount(campaign, isClanBidding);
@@ -3727,7 +3727,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>If the player has no qualifying forces (i.e., no forces with units in the valid role categories), the
      * method falls back to the faction’s standard default force size as determined by
-     * {@link CombatTeam#getStandardForceSize(Faction)}.</p>
+     * {@link CombatTeam#getStandardFormationSize(Faction)}.</p>
      *
      * @param campaign the {@link Campaign} from which Combat Teams and forces are obtained
      *
@@ -3738,7 +3738,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountForStratConSingles(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
 
         int forceCount = 0;
         int unitCount = 0;
@@ -3749,7 +3749,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
                 int unitsInForce = formation.getAllUnits(false).size();
                 if (unitsInForce != 0) {
@@ -3787,7 +3787,7 @@ public class AtBDynamicScenarioFactory {
      *     <li>Only forces belonging to valid roles are considered.</li>
      *     <li>Any force with a unit count of {@code 0} is ignored.</li>
      *     <li>If no qualifying forces are found, a default unit count is returned. This default is derived from
-     *     {@link CombatTeam#getStandardForceSize(Faction)}, using the faction of the current campaign.</li>
+     *     {@link CombatTeam#getStandardFormationSize(Faction)}, using the faction of the current campaign.</li>
      *     <li>If valid forces exist, their unit counts are combined using the Gaussian-weighted averaging method to
      *     produce a representative force size.</li>
      * </ul>
@@ -3800,7 +3800,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
 
         // We need to start by gathering the different unit counts. This is because we need that information for
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
@@ -3813,7 +3813,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
                 int unitCount = formation.getAllUnits(false).size();
                 if (unitCount > 0) {
@@ -4401,7 +4401,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         for (int forceID : scenario.getForceIDs()) {
-            Formation playerFormation = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getFormation(forceID);
 
             for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
@@ -4511,7 +4511,7 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             List<Entity> forceEntities = new ArrayList<>();
-            Formation playerFormation = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getFormation(forceID);
 
             for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
@@ -4691,7 +4691,7 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             List<Entity> forceEntities = new ArrayList<>();
-            Formation playerFormation = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getFormation(forceID);
 
             for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);

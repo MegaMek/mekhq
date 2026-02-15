@@ -208,7 +208,7 @@ public class StratConTrackState {
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
-            unassignForce(forceID);
+            unassignFormation(forceID);
 
             // scenario bookkeeping
             scenario.getPrimaryForceIDs().clear();
@@ -289,7 +289,7 @@ public class StratConTrackState {
     /**
      * Handles the unassignment of a force from this track.
      */
-    public void unassignForce(int forceID) {
+    public void unassignFormation(int forceID) {
         if (assignedForceCoords.containsKey(forceID)) {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
             assignedForceCoords.remove(forceID);

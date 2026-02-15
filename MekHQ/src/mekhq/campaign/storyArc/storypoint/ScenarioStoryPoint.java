@@ -98,7 +98,7 @@ public class ScenarioStoryPoint extends StoryPoint {
                 // set date for the scenario
                 scenario.setDate(getStoryArc().getCampaign().getLocalDate().plusDays(days));
                 getStoryArc().getCampaign().addScenario(scenario, m);
-                Formation formation = getCampaign().getForce(deployedForceId);
+                Formation formation = getCampaign().getFormation(deployedForceId);
                 if (null != formation) {
                     scenario.addForces(formation.getId());
                     formation.setScenarioId(scenario.getId(), getCampaign());

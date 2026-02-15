@@ -32,8 +32,8 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import static mekhq.campaign.force.Formation.FORCE_NONE;
-import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -102,7 +102,7 @@ class PregnantCombatantNagLogicTest {
     @Test
     void activeMissionsPregnancyYesUnitNoForce() {
         personPregnant.setUnit(unit);
-        when(unit.getForceId()).thenReturn(FORCE_NONE);
+        when(unit.getFormationId()).thenReturn(FORMATION_NONE);
 
         assertFalse(hasActivePregnantCombatant(true, List.of(personPregnant)));
     }
@@ -110,7 +110,7 @@ class PregnantCombatantNagLogicTest {
     @Test
     void activeMissionsPregnancyYesUnitYesForce() {
         personPregnant.setUnit(unit);
-        when(unit.getForceId()).thenReturn(FORCE_ORIGIN);
+        when(unit.getFormationId()).thenReturn(FORMATION_ORIGIN);
 
         assertTrue(hasActivePregnantCombatant(true, List.of(personPregnant)));
     }

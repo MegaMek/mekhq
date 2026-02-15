@@ -160,8 +160,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
             String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
-            Formation formation = unit.getCampaign().getForce(unit.getForceId());
-            if ((null != person) && (null != formation) && (person.getId().equals(formation.getForceCommanderID()))) {
+            Formation formation = unit.getCampaign().getFormation(unit.getFormationId());
+            if ((null != person) && (null != formation) && (person.getId().equals(formation.getFormationCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");
@@ -194,7 +194,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     }
 
     private static String getFormattedForceName(Formation formation) {
-        FormationType formationType = formation.getForceType();
+        FormationType formationType = formation.getFormationType();
         String typeKey = formationType.getSymbol();
 
         return String.format("<html>%s%s%s%s%s%s%s</html>",

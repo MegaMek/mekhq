@@ -46,7 +46,7 @@ import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Formation.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
@@ -561,8 +561,8 @@ public class CampaignNewDayManager {
     private Set<Integer> getAllScenariosWithAssignedStandardForces() {
         Set<Integer> scenarios = new HashSet<>();
 
-        for (Formation formation : campaign.getAllForces()) {
-            if (formation.getForceType().isStandard()) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (formation.getFormationType().isStandard()) {
                 int scenarioId = formation.getScenarioId();
                 if (scenarioId != NO_ASSIGNED_SCENARIO) {
                     scenarios.add(scenarioId);
@@ -624,7 +624,7 @@ public class CampaignNewDayManager {
     private void updateFieldKitchenCapacity() {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity =
-                  checkFieldKitchenCapacity(campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar,
+                  checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
@@ -1306,7 +1306,7 @@ public class CampaignNewDayManager {
 
         // Update the formation icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayFormationIconOperationalStatus()) {
-            campaign.getForces().updateFormationIconOperationalStatus(campaign);
+            campaign.getFormations().updateFormationIconOperationalStatus(campaign);
         }
     }
 
@@ -1984,7 +1984,7 @@ public class CampaignNewDayManager {
                             processAbandonedConvoy(campaign, contract, (AtBDynamicScenario) scenario);
                         }
 
-                        scenario.clearAllForcesAndPersonnel(campaign);
+                        scenario.clearAllFormationsAndPersonnel(campaign);
                     } else {
                         contract.addPlayerMinorBreach();
 
@@ -2013,11 +2013,11 @@ public class CampaignNewDayManager {
                 if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(today)) {
                     int forceId = atBScenario.getCombatTeamId();
                     if ((campaign.getCombatTeamsAsMap().get(forceId) != null) &&
-                              !campaign.getForceIds().get(forceId).isDeployed()) {
+                              !campaign.getFormationIds().get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : campaign.getForceIds().get(forceId).getAllUnits(false)) {
+                        for (UUID uid : campaign.getFormationIds().get(forceId).getAllUnits(false)) {
                             Unit u = hangar.getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
@@ -2026,14 +2026,14 @@ public class CampaignNewDayManager {
                         }
 
                         if (!forceUnderRepair) {
-                            campaign.getForceIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
+                            campaign.getFormationIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
                             atBScenario.addForces(forceId);
 
                             campaign.addReport(BATTLE, MessageFormat.format(resources.getString(
                                         "atbScenarioTodayWithForce.format"),
                                   atBScenario.getHyperlinkedName(),
-                                  campaign.getForceIds().get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getForceIds().get(forceId),
+                                  campaign.getFormationIds().get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getFormationIds().get(forceId),
                                   atBScenario));
                         } else {
                             if (atBScenario.getHasTrack()) {
@@ -2105,7 +2105,7 @@ public class CampaignNewDayManager {
     private void updateMASHTheatreCapacity() {
         if (campaignOptions.isUseMASHTheatres()) {
             int mashTheatreCapacity =
-                  MASHCapacity.checkMASHCapacity(campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar,
+                  MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
                         false), campaignOptions.getMASHTheatreCapacity());
             mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.HOSPITAL_BEDS);

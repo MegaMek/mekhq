@@ -1140,7 +1140,7 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateUnit(final Campaign campaign,
           final List<CompanyGenerationPersonTracker> trackers) {
-        final Formation originFormation = campaign.getForce(0);
+        final Formation originFormation = campaign.getFormation(0);
         final Alphabet[] alphabet = Alphabet.values();
         final Faction formationIconFaction = getOptions().isUseSpecifiedFactionToGenerateFormationIcons()
                                                ? getOptions().getSpecifiedFaction()
@@ -1211,7 +1211,7 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < getOptions().getCompanyCount(); i++) {
             final Formation company = new Formation(getOptions().getForceNamingMethod().getValue(alphabet[i])
                                                   + resources.getString("AbstractCompanyGenerator.Company.text"));
-            campaign.addForce(company, originFormation);
+            campaign.addFormation(company, originFormation);
             for (int y = 0; y < getOptions().getLancesPerCompany(); y++) {
                 createLance(campaign, formationIconFaction, company, trackers, alphabet[y], background);
             }
@@ -1261,9 +1261,9 @@ public abstract class AbstractCompanyGenerator {
                                   final Formation head, final List<CompanyGenerationPersonTracker> trackers,
                                   final String name, final @Nullable FormationPieceIcon background) {
         final Formation lance = new Formation(name);
-        campaign.addForce(lance, head);
+        campaign.addFormation(lance, head);
         for (int i = 0; (i < getOptions().getLanceSize()) && !trackers.isEmpty(); i++) {
-            campaign.addUnitToForce(trackers.remove(0).getPerson().getUnit(), lance);
+            campaign.addUnitToFormation(trackers.remove(0).getPerson().getUnit(), lance);
         }
 
         if (getOptions().isGenerateFormationIcons()) {

@@ -117,7 +117,7 @@ public class DialogRoleplayEvent extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        UUID speakerId = playerConvoy.getForceCommanderID();
+        UUID speakerId = playerConvoy.getFormationCommanderID();
         Person speaker = campaign.getPerson(speakerId);
 
         String speakerName;

@@ -347,7 +347,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_QUALITY -> unit.getQualityName();
             case COL_PILOT -> (unit.getCommander() != null) ? unit.getCommander().getHTMLTitle() : "-";
             case COL_FORCE -> {
-                Formation formation = unit.getCampaign().getForce(unit.getForceId());
+                Formation formation = unit.getCampaign().getFormation(unit.getFormationId());
                 yield (formation != null) ? formation.getFullName() : "-";
             }
             case COL_CREW -> {
@@ -493,16 +493,16 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     break;
                 }
                 case COL_FORCE: {
-                    Formation formation = getCampaign().getForceFor(u);
+                    Formation formation = getCampaign().getFormationFor(u);
                     if (formation != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
-                        Formation parent = formation.getParentForce();
+                        Formation parent = formation.getParentFormation();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
-                        while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
+                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
                             desc.append("<br>").append(parent.getName());
                             lines++;
-                            parent = parent.getParentForce();
+                            parent = parent.getParentFormation();
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());

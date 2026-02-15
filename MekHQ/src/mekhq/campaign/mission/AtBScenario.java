@@ -269,11 +269,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             combatTeamId = NO_COMBAT_TEAM;
             combatRole = CombatRole.RESERVE;
         } else {
-            this.combatTeamId = combatTeam.getForceId();
+            this.combatTeamId = combatTeam.getFormationId();
             combatRole = combatTeam.getRole();
             setMissionId(combatTeam.getMissionId());
 
-            for (UUID id : campaign.getForce(combatTeam.getForceId()).getAllUnits(true)) {
+            for (UUID id : campaign.getFormation(combatTeam.getFormationId()).getAllUnits(true)) {
                 entityIds.put(id, campaign.getUnit(id).getEntity());
             }
         }
@@ -2203,7 +2203,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setCombatTeam(CombatTeam combatTeam) {
-        combatTeamId = combatTeam.getForceId();
+        combatTeamId = combatTeam.getFormationId();
     }
 
     /**

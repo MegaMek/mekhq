@@ -45,7 +45,7 @@ import static megamek.common.units.UnitType.JUMPSHIP;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
-import static mekhq.campaign.force.Formation.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
@@ -260,7 +260,7 @@ public class StratConRulesManager {
 
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
               campaign.getHangar(),
-              campaign.getAllForces());
+              campaign.getAllFormations());
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
             List<StratConTrackState> tracks = campaignState.getTracks();
@@ -410,7 +410,7 @@ public class StratConRulesManager {
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
               campaign.getHangar(),
-              campaign.getAllForces());
+              campaign.getAllFormations());
 
         // Select the target coords.
         if (scenarioCoords == null) {
@@ -463,7 +463,7 @@ public class StratConRulesManager {
         // If we haven't generated a scenario yet, it's because we need to pick a random force.
         if (scenario == null) {
             int availableForces = availableForceIDs.size();
-            int randomForceID = FORCE_NONE;
+            int randomForceID = FORMATION_NONE;
 
             if (availableForces > 0) {
                 int randomForceIndex = randomInt(availableForces);
@@ -587,7 +587,7 @@ public class StratConRulesManager {
         StratConScenario scenario = StratConRulesManager.generateScenario(campaign,
               contract,
               trackState,
-              FORCE_NONE,
+              FORMATION_NONE,
               coords,
               template,
               daysTilDeployment);
@@ -664,11 +664,11 @@ public class StratConRulesManager {
         // Finally, finish scenario set up
         setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
         finalizeScenario(backingScenario, contract, campaign);
-        swapInPlayerUnits(scenario, campaign, FORCE_NONE);
+        swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
-                backingScenario.removeForce(forceID);
+                backingScenario.removeFormation(forceID);
             }
 
             scenario.setCurrentState(ScenarioState.UNRESOLVED);
@@ -967,7 +967,7 @@ public class StratConRulesManager {
     private static Collection<Unit> findPotentialUnits(Campaign campaign, int explicitForceID) {
         Collection<Unit> potentialUnits = new HashSet<>();
 
-        if (explicitForceID == FORCE_NONE) {
+        if (explicitForceID == FORMATION_NONE) {
             // Include all units in the campaign's TO&E
             List<UUID> allUnits = campaign.getAllUnitsInTheTOE(false);
             // We need to shuffle the list, otherwise the same unit will always be selected
@@ -982,7 +982,7 @@ public class StratConRulesManager {
             }
         } else {
             // Include only those units transporting the seed force
-            Formation formation = campaign.getForce(explicitForceID);
+            Formation formation = campaign.getFormation(explicitForceID);
 
             if (formation == null) {
                 return Collections.emptyList();
@@ -1212,7 +1212,7 @@ public class StratConRulesManager {
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
-                        forceID = combatTeam.getForceId();
+                        forceID = combatTeam.getFormationId();
                     } else {
                         // If the player doesn't have any combat teams (somehow), they get a free pass
                         return;
@@ -1460,9 +1460,9 @@ public class StratConRulesManager {
         scanNeighboringCoords(coords, forceID, campaign, track);
 
         // the force may be located in other places on the track - clear it out
-        track.unassignForce(forceID);
+        track.unassignFormation(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
-        MekHQ.triggerEvent(new StratConDeploymentEvent(campaign.getForce(forceID)));
+        MekHQ.triggerEvent(new StratConDeploymentEvent(campaign.getFormation(forceID)));
     }
 
     /**
@@ -1530,7 +1530,7 @@ public class StratConRulesManager {
         boolean isCommandersOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles();
         boolean isCommandersOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry();
         boolean isCommandersOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor();
-        Formation formation = campaign.getForce(forceID);
+        Formation formation = campaign.getFormation(forceID);
         Hangar hangar = campaign.getHangar();
         List<ScoutRecord> scouts = formation == null ? new ArrayList<>() : buildScoutMap(formation, hangar,
               isCommandersOnlyVehicles, isCommandersOnlyInfantry, isCommandersOnlyBattleArmor);
@@ -1851,7 +1851,7 @@ public class StratConRulesManager {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
         int fatigueRate = campaignOptions.getFatigueRate();
-        for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
+        for (UUID unit : campaign.getFormation(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.changeFatigue(fatigueRate);
 
@@ -2003,7 +2003,7 @@ public class StratConRulesManager {
               spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
               CLOSING_SPAN_TAG));
 
-        UUID commanderId = formation.getForceCommanderID();
+        UUID commanderId = formation.getFormationCommanderID();
 
         if (commanderId == null) {
             LOGGER.error("Force Commander ID is null.");
@@ -2103,11 +2103,11 @@ public class StratConRulesManager {
 
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
 
-        boolean airborneOnly = formation.forceContainsOnlyAerialForces(hangar, false, false);
+        boolean airborneOnly = formation.formationContainsOnlyAerialForces(hangar, false, false);
 
         boolean aerospaceOnly = false;
         if (airborneOnly) {
-            aerospaceOnly = formation.forceContainsOnlyAerialForces(hangar, false, true);
+            aerospaceOnly = formation.formationContainsOnlyAerialForces(hangar, false, true);
         }
 
         if (aerospaceOnly && (randomInt(3) == 0)) {
@@ -2265,7 +2265,7 @@ public class StratConRulesManager {
         }
 
         for (int forceID : scenario.getPlayerTemplateForceIDs()) {
-            Formation formation = campaign.getForce(forceID);
+            Formation formation = campaign.getFormation(forceID);
             formation.clearScenarioIds(campaign, true);
             formation.setScenarioId(scenario.getBackingScenarioID(), campaign);
         }
@@ -2281,7 +2281,7 @@ public class StratConRulesManager {
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                CombatTeam lance = campaign.getCombatTeamsAsMap().get(commanderUnit.getForceId());
+                CombatTeam lance = campaign.getCombatTeamsAsMap().get(commanderUnit.getFormationId());
 
                 return (lance != null) && lance.getRole().isFrontline();
             }
@@ -2346,11 +2346,11 @@ public class StratConRulesManager {
                 continue;
             }
 
-            airborneOnly = formation.forceContainsOnlyAerialForces(hangar, false, false);
+            airborneOnly = formation.formationContainsOnlyAerialForces(hangar, false, false);
 
             aerospaceOnly = false;
             if (airborneOnly) {
-                aerospaceOnly = formation.forceContainsOnlyAerialForces(hangar, false, true);
+                aerospaceOnly = formation.formationContainsOnlyAerialForces(hangar, false, true);
             }
 
             if (aerospaceOnly) {
@@ -2390,7 +2390,7 @@ public class StratConRulesManager {
         int unitType = MEK;
         ;
         if (forceID != null) {
-            unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+            unitType = campaign.getFormation(forceID).getPrimaryUnitType(campaign);
         }
 
         ScenarioTemplate template = StratConScenarioFactory.getRandomScenario(unitType);
@@ -2422,7 +2422,7 @@ public class StratConRulesManager {
      * @param campaign          the {@link Campaign} managing the gameplay state
      * @param contract          the {@link AtBContract} governing the StratCon campaign
      * @param track             the {@link StratConTrackState} to which the scenario belongs
-     * @param forceID           the ID of the force for which the scenario is generated, or {@link Formation#FORCE_NONE} if
+     * @param forceID           the ID of the force for which the scenario is generated, or {@link Formation#FORMATION_NONE} if
      *                          none
      * @param coords            the {@link StratConCoords} specifying where the scenario will be placed
      * @param template          the {@link ScenarioTemplate} to use for scenario generation; if {@code null}, a random
@@ -2438,14 +2438,14 @@ public class StratConRulesManager {
         StratConScenario scenario = new StratConScenario();
 
         if (forceID == null) {
-            forceID = FORCE_NONE;
+            forceID = FORMATION_NONE;
         }
 
         if (template == null) {
             int unitType = MEK;
 
             try {
-                unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
+                unitType = campaign.getFormation(forceID).getPrimaryUnitType(campaign);
             } catch (NullPointerException ignored) {
                 // This just means the player has no units
             }
@@ -2490,10 +2490,10 @@ public class StratConRulesManager {
         // dates, otherwise, the report messages for new scenarios look weird
         // also, suppress the "new scenario" report if not generating a scenario
         // for a specific force, as this indicates a contract initialization
-        campaign.addScenario(backingScenario, contract, forceID == FORCE_NONE);
+        campaign.addScenario(backingScenario, contract, forceID == FORMATION_NONE);
         scenario.setBackingScenarioID(backingScenario.getId());
 
-        if (forceID > FORCE_NONE) {
+        if (forceID > FORMATION_NONE) {
             scenario.addPrimaryForce(forceID);
         }
 
@@ -2681,7 +2681,7 @@ public class StratConRulesManager {
             }
 
             // If the combat team doesn't have a valid force (somehow), skip it.
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation == null) {
                 continue;
             }
@@ -2694,10 +2694,10 @@ public class StratConRulesManager {
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
             CombatRole combatRole = combatTeam.getRole();
             if (bypassRoleRestrictions) {
-                suitableForces.add(combatTeam.getForceId());
+                suitableForces.add(combatTeam.getFormationId());
             } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if (!combatRole.isTraining()) {
-                    suitableForces.add(combatTeam.getForceId());
+                    suitableForces.add(combatTeam.getFormationId());
                 }
             }
         }
@@ -2771,7 +2771,7 @@ public class StratConRulesManager {
         }
 
         for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
-            Formation force = campaign.getForce(formation.getForceId());
+            Formation force = campaign.getFormation(formation.getFormationId());
 
             if (force == null) {
                 continue;
@@ -2817,7 +2817,7 @@ public class StratConRulesManager {
                         continue;
                     }
 
-                    int standardForceSize = CombatTeam.getStandardForceSize(campaign.getFaction());
+                    int standardForceSize = CombatTeam.getStandardFormationSize(campaign.getFaction());
                     int formationSize = formation.getSize(campaign);
                     if (formationSize <= standardForceSize) {
                         retVal.add(force.getId());
@@ -2843,7 +2843,7 @@ public class StratConRulesManager {
             return true;
         }
 
-        return formation.getSubForces().stream().anyMatch(child -> subElementsOrSelfDeployed(child, campaign));
+        return formation.getSubFormations().stream().anyMatch(child -> subElementsOrSelfDeployed(child, campaign));
     }
 
     /**
@@ -2935,8 +2935,8 @@ public class StratConRulesManager {
      * @return {@code true} if the associated force is eligible; {@code false} otherwise.
      */
     private static boolean isForceEligible(Unit unit, Campaign campaign, StratConScenario currentScenario) {
-        int forceId = unit.getForceId();
-        Formation formation = campaign.getForce(forceId);
+        int forceId = unit.getFormationId();
+        Formation formation = campaign.getFormation(forceId);
 
         // If the force is deployed, skip; added check for insurance
         if (formation == null || formation.isDeployed()) {
@@ -3082,7 +3082,7 @@ public class StratConRulesManager {
                      .stream()
                      .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
                                                  contract.getStratconCampaignState()
-                                                       .isForceDeployedHere(unit.getForceId()));
+                                                       .isForceDeployedHere(unit.getFormationId()));
     }
 
     public static boolean isForceDeployedToStratCon(List<AtBContract> activeAtBContracts, int forceId) {
@@ -3102,7 +3102,7 @@ public class StratConRulesManager {
         int biggestBucketCount = 0;
 
         for (int forceID : forceIDs) {
-            Formation formation = campaign.getForce(forceID);
+            Formation formation = campaign.getFormation(forceID);
             if (formation == null) {
                 continue;
             }
@@ -3371,10 +3371,10 @@ public class StratConRulesManager {
                     //Go through each force that was in previous scenario undeploy it and check to see if entire force is moving on
                     //if so deploy whole force.  Otherwise, just deploy selected units.
                     for (int forceId : linkedForces.keySet()) {
-                        track.unassignForce(forceId);
+                        track.unassignFormation(forceId);
 
-                        if (linkedForces.get(forceId).size() == campaign.getForce(forceId).getAllUnits(false).size()) {
-                            scenario.addForce(campaign.getForce(forceId),
+                        if (linkedForces.get(forceId).size() == campaign.getFormation(forceId).getAllUnits(false).size()) {
+                            scenario.addForce(campaign.getFormation(forceId),
                                   ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID,
                                   campaign);
                         } else {
@@ -3459,7 +3459,7 @@ public class StratConRulesManager {
         // and the scenario has not yet occurred, undeploy it.
         // "return to base", unless it's been told to stay in the field
         for (int forceID : track.getAssignedForceReturnDates().keySet()) {
-            Formation formation = campaign.getForce(forceID);
+            Formation formation = campaign.getFormation(forceID);
             if (formation == null) {
                 continue;
             }
@@ -3495,7 +3495,7 @@ public class StratConRulesManager {
         }
 
         for (int forceID : forcesToUndeploy) {
-            track.unassignForce(forceID);
+            track.unassignFormation(forceID);
         }
     }
 

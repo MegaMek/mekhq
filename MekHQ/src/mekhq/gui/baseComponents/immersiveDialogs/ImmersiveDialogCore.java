@@ -41,7 +41,7 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.campaign.force.Formation.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
 import static mekhq.gui.dialog.glossary.NewGlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -800,10 +800,10 @@ public class ImmersiveDialogCore extends JDialog {
 
             Unit assignedUnit = speaker.getUnit();
             if (assignedUnit != null) {
-                int forceId = assignedUnit.getForceId();
+                int forceId = assignedUnit.getFormationId();
 
-                if (forceId != FORCE_NONE) {
-                    Formation formation = campaign.getForce(forceId);
+                if (forceId != FORMATION_NONE) {
+                    Formation formation = campaign.getFormation(forceId);
 
                     if (formation != null) {
                         speakerDescription.append("<br>").append(formation.getName());

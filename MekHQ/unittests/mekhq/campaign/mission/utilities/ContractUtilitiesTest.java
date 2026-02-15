@@ -192,13 +192,13 @@ public class ContractUtilitiesTest {
 
     CombatTeam newMockCombatTeam(int size, CombatRole combatRole, FormationType formationType) {
         Formation mockFormation = mock(Formation.class);
-        when(mockFormation.isForceType(formationType)).thenReturn(true);
+        when(mockFormation.isFormationType(formationType)).thenReturn(true);
         when(mockFormation.getCombatRoleInMemory()).thenReturn(combatRole);
 
         CombatTeam mockCombatTeam = mock(CombatTeam.class);
 
         when(mockCombatTeam.getSize(any())).thenReturn(size);
-        when(mockCombatTeam.getForce(any())).thenReturn(mockFormation);
+        when(mockCombatTeam.getFormation(any())).thenReturn(mockFormation);
 
         return mockCombatTeam;
     }

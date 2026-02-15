@@ -6164,7 +6164,7 @@ public class Person {
             }
         }
 
-        for (final Formation formation : campaign.getAllForces()) {
+        for (final Formation formation : campaign.getAllFormations()) {
             if (getId().equals(formation.getTechID())) {
                 formation.setTechID(null);
             }

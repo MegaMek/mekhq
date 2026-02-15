@@ -615,10 +615,10 @@ public class StratConScenario implements IStratConDisplayable {
             StratConCampaignState campaignState = contract.getStratconCampaignState();
 
             StratConTrackState track = getTrackForScenario(campaign, campaignState);
-            for (Formation formation : campaign.getAllForces()) {
+            for (Formation formation : campaign.getAllFormations()) {
                 if (formation.getScenarioId() == backingScenarioId) {
                     formation.clearScenarioIds(campaign, true);
-                    backingScenario.removeForce(formation.getId());
+                    backingScenario.removeFormation(formation.getId());
 
                     for (UUID uid : formation.getAllUnits(false)) {
                         Unit unit = campaign.getUnit(uid);
@@ -628,7 +628,7 @@ public class StratConScenario implements IStratConDisplayable {
                         }
                     }
 
-                    track.unassignForce(formation.getId());
+                    track.unassignFormation(formation.getId());
                     MekHQ.triggerEvent(new DeploymentChangedEvent(formation, backingScenario));
                 }
             }

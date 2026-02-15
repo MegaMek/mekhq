@@ -133,7 +133,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             Set<Unit> transports = campaign.getTransportsByType(campaignTransportType,
                   transporterType,
                   requiredTransportCapacity);
-            transports.removeIf(transport -> transport.getForceId() == Formation.FORCE_NONE);
+            transports.removeIf(transport -> transport.getFormationId() == Formation.FORMATION_NONE);
 
             if (!transports.isEmpty()) {
                 JScrollableMenu transporterTypeMenu = new JScrollableMenu(transporterType.toString(),

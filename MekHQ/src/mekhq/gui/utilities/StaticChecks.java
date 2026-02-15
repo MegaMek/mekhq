@@ -57,7 +57,7 @@ public class StaticChecks {
     }
 
     public static boolean areAllStandardForces(Vector<Formation> formations) {
-        return formations.stream().allMatch(force -> force.isForceType(STANDARD));
+        return formations.stream().allMatch(force -> force.isFormationType(STANDARD));
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {

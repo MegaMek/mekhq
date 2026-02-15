@@ -757,8 +757,8 @@ public class PrisonerEventManager {
 
         int prisonerCapacity = 0;
         double otherUnitMultiplier = 1.0;
-        for (Formation formation : campaign.getAllForces()) {
-            if (!formation.isForceType(SECURITY)) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (!formation.isFormationType(SECURITY)) {
                 continue;
             }
 
@@ -851,8 +851,8 @@ public class PrisonerEventManager {
     private @Nullable Person getSpeaker() {
         List<Formation> securityFormations = new ArrayList<>();
 
-        for (Formation formation : campaign.getAllForces()) {
-            if (formation.isForceType(SECURITY)) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (formation.isFormationType(SECURITY)) {
                 securityFormations.add(formation);
             }
         }
@@ -862,7 +862,7 @@ public class PrisonerEventManager {
         if (!securityFormations.isEmpty()) {
             Collections.shuffle(securityFormations);
             Formation designatedFormation = securityFormations.get(0);
-            UUID speakerId = designatedFormation.getForceCommanderID();
+            UUID speakerId = designatedFormation.getFormationCommanderID();
             if (speakerId != null) {
                 speaker = campaign.getPerson(speakerId);
             }

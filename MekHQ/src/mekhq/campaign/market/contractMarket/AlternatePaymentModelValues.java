@@ -197,7 +197,7 @@ public enum AlternatePaymentModelValues {
         List<Money> unitValues = new ArrayList<>();
 
         for (Formation formation : allFormations) {
-            if (!formation.getForceType().isStandard() || !formation.getCombatRoleInMemory().isCombatRole()) {
+            if (!formation.getFormationType().isStandard() || !formation.getCombatRoleInMemory().isCombatRole()) {
                 continue;
             }
 
@@ -400,7 +400,7 @@ public enum AlternatePaymentModelValues {
      *     <li>The input {@code unitValues} list is sorted in descending order so that the highest-value units are
      *     counted first at full value (i.e., the least valuable units are discounted first).</li>
      *     <li>A cutoff index is computed as {@code 2 * battalionSize}, where {@code battalionSize} is derived from
-     *     {@link CombatTeam#getStandardForceSize(Faction, int)} using {@link FormationLevel#BATTALION} depth.</li>
+     *     {@link CombatTeam#getStandardFormationSize(Faction, int)} using {@link FormationLevel#BATTALION} depth.</li>
      *     <li>For units beyond the cutoff, a diminishing multiplier is applied:
      *     {@code multiplier = 1 / (1 + slope * distanceFromCutOff)^power}.</li>
      *     <li>The multiplier is floored at {@code minMultiplier} so unit contributions never drop below a fixed
@@ -451,7 +451,7 @@ public enum AlternatePaymentModelValues {
      * Returns the unit-count index at which diminishing returns begin for the given campaign faction.
      *
      * <p>The cutoff is defined as {@code 2 * battalionSize}, where {@code battalionSize} is the faction-adjusted
-     * standard force size computed by {@link CombatTeam#getStandardForceSize(Faction, int)} for a
+     * standard force size computed by {@link CombatTeam#getStandardFormationSize(Faction, int)} for a
      * {@link FormationLevel#BATTALION} formation depth.</p>
      *
      * <p>Units with indices {@code 0 .. (start - 1)} are not discounted; the first discounted unit is at index
@@ -467,6 +467,6 @@ public enum AlternatePaymentModelValues {
      * @since 0.50.11
      */
     public static int getDiminishingReturnsStart(Faction campaignFaction) {
-        return CombatTeam.getStandardForceSize(campaignFaction, BATTALION.getDepth()) * 2;
+        return CombatTeam.getStandardFormationSize(campaignFaction, BATTALION.getDepth()) * 2;
     }
 }

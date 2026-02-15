@@ -107,12 +107,12 @@ public class DialogContractStart extends JDialog {
         int playerConvoys = 0;
         double totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllForces()) {
-            if (!formation.isForceType(CONVOY)) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (!formation.isFormationType(CONVOY)) {
                 continue;
             }
 
-            if (formation.getParentForce() != null && formation.getParentForce().isForceType(CONVOY)) {
+            if (formation.getParentFormation() != null && formation.getParentFormation().isFormationType(CONVOY)) {
                 continue;
             }
 

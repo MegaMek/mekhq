@@ -636,7 +636,7 @@ public class ResolveScenarioTracker {
                               campaign.getLocalDate(),
                               getMissionId(),
                               getScenarioId(),
-                              p.getUnit().getForceId(),
+                              p.getUnit().getFormationId(),
                               u.getEntity().getEntityType()));
                     }
                 }
@@ -1951,7 +1951,7 @@ public class ResolveScenarioTracker {
 
         scenario.setStatus(resolution);
         scenario.setReport(report);
-        scenario.clearAllForcesAndPersonnel(campaign);
+        scenario.clearAllFormationsAndPersonnel(campaign);
         // let's reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();

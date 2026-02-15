@@ -102,7 +102,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
             return "";
         }
         return switch (column) {
-            case COL_FORCE -> campaign.getForce(data.get(row).getForceId());
+            case COL_FORCE -> campaign.getFormation(data.get(row).getFormationId());
             case COL_WEIGHT_CLASS -> WEIGHT_CODES[data.get(row).getWeightClass(campaign)];
             case COL_CONTRACT -> campaign.getMission(data.get(row).getMissionId());
             case COL_ROLE -> data.get(row).getRole();
@@ -119,7 +119,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
                 data.get(row).setRole((CombatRole) value);
                 Formation chosenFormation = (Formation) getValueAt(row, COL_FORCE);
                 chosenFormation.setCombatRoleInMemory((CombatRole) value);
-                for (Formation formation : chosenFormation.getSubForces()) {
+                for (Formation formation : chosenFormation.getSubFormations()) {
                     formation.setCombatRoleInMemory((CombatRole) value);
                 }
             }

@@ -333,7 +333,7 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         int effectCombatTeams = 0;
         for (Map.Entry<Integer, CombatTeam> combatTeam : campaign.getCombatTeamsAsMap().entrySet()) {
-            Formation formation = campaign.getForce(combatTeam.getKey());
+            Formation formation = campaign.getFormation(combatTeam.getKey());
             if (formation != null) {
                 CombatRole combatRoleInMemory = formation.getCombatRoleInMemory();
                 if (combatRoleInMemory != CombatRole.TRAINING) {

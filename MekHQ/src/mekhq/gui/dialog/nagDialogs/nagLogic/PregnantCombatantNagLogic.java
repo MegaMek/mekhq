@@ -48,7 +48,7 @@ public class PregnantCombatantNagLogic {
      *     <li>The campaign has an active contract.</li>
      *     <li>There are pregnant personnel in the list of active personnel.</li>
      *     <li>A pregnant person is assigned to a unit that is part of a combat force
-     *         (i.e., a force with an ID other than {@link Formation#FORCE_NONE}).</li>
+     *         (i.e., a force with an ID other than {@link Formation#FORMATION_NONE}).</li>
      * </ul>
      *
      * <p>If no active contract exists in the campaign, the method immediately returns {@code false}.
@@ -70,7 +70,7 @@ public class PregnantCombatantNagLogic {
                 Unit unit = person.getUnit();
 
                 if (unit != null) {
-                    if (unit.getForceId() != Formation.FORCE_NONE) {
+                    if (unit.getFormationId() != Formation.FORMATION_NONE) {
                         return true;
                     }
                 }

@@ -98,15 +98,15 @@ public class ResupplyUtilities {
           AtBDynamicScenario scenario) {
         final int scenarioId = scenario.getId();
 
-        for (Formation formation : campaign.getAllForces()) {
-            Formation parentFormation = formation.getParentForce();
+        for (Formation formation : campaign.getAllFormations()) {
+            Formation parentFormation = formation.getParentFormation();
 
-            if (parentFormation != null && (formation.getParentForce().isForceType(CONVOY))) {
+            if (parentFormation != null && (formation.getParentFormation().isFormationType(CONVOY))) {
                 continue;
             }
 
-            if (formation.isForceType(CONVOY) && formation.getScenarioId() == scenarioId) {
-                Person speaker = campaign.getPerson(formation.getForceCommanderID());
+            if (formation.isFormationType(CONVOY) && formation.getScenarioId() == scenarioId) {
+                Person speaker = campaign.getPerson(formation.getFormationCommanderID());
 
                 String commanderAddress = campaign.getCommanderAddress();
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -191,12 +191,12 @@ public class ResupplyUtilities {
     public static int estimateAvailablePlayerCargo(Campaign campaign) {
         double totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllForces()) {
-            if (!formation.isForceType(CONVOY)) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (!formation.isFormationType(CONVOY)) {
                 continue;
             }
 
-            if (formation.getParentForce() != null && formation.getParentForce().isForceType(CONVOY)) {
+            if (formation.getParentFormation() != null && formation.getParentFormation().isFormationType(CONVOY)) {
                 continue;
             }
 

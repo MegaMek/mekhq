@@ -69,7 +69,7 @@ public class AssignmentLogger {
         person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
-    public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Formation formation) {
+    public static void addedToTOEFormation(Campaign campaign, Person person, LocalDate date, Formation formation) {
         if (formation != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
@@ -80,10 +80,10 @@ public class AssignmentLogger {
         }
     }
 
-    public static void reassignedTOEForce(final Campaign campaign, final Person person, final LocalDate date,
+    public static void reassignedTOEFormation(final Campaign campaign, final Person person, final LocalDate date,
                                           final @Nullable Formation oldFormation, final @Nullable Formation newFormation) {
         if ((oldFormation == null) && (newFormation == null)) {
-            LOGGER.error("Cannot reassign {} on {} because both specified forces are null",
+            LOGGER.error("Cannot reassign {} on {} because both specified formations are null",
                   person.getFullTitle(),
                   date);
             return;
@@ -100,13 +100,13 @@ public class AssignmentLogger {
                               newFormation.getFullName() :
                               newFormation.getName())));
         } else if (oldFormation == null) {
-            addedToTOEForce(campaign, person, date, newFormation);
+            addedToTOEFormation(campaign, person, date, newFormation);
         } else {
-            removedFromTOEForce(campaign, person, date, oldFormation);
+            removedFromTOEFormation(campaign, person, date, oldFormation);
         }
     }
 
-    public static void removedFromTOEForce(Campaign campaign, Person person, LocalDate date, Formation formation) {
+    public static void removedFromTOEFormation(Campaign campaign, Person person, LocalDate date, Formation formation) {
         if (formation != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,

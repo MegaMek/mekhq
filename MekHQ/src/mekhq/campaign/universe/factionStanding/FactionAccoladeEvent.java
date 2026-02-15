@@ -347,7 +347,7 @@ public class FactionAccoladeEvent {
 
         Faction faction = Factions.getInstance().getFaction(factionCode);
         boolean factionIsClan = faction.isClan();
-        int formationSize = CombatTeam.getStandardForceSize(faction, FormationLevel.COMPANY.getDepth());
+        int formationSize = CombatTeam.getStandardFormationSize(faction, FormationLevel.COMPANY.getDepth());
 
         int gameYear = campaign.getGameYear();
 

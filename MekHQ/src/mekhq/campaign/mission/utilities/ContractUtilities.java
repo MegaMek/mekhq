@@ -69,14 +69,14 @@ public class ContractUtilities {
                 continue;
             }
 
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation == null) {
                 continue;
             }
 
             CombatRole roleInMemory = formation.getCombatRoleInMemory();
             boolean hasCombatRole = roleInMemory.isCombatRole() || (isCadreDuty && roleInMemory.isCadre());
-            if (formation.isForceType(STANDARD) && hasCombatRole) {
+            if (formation.isFormationType(STANDARD) && hasCombatRole) {
                 combatForceCount++;
             }
         }
@@ -119,13 +119,13 @@ public class ContractUtilities {
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
 
             if (formation == null) {
                 continue;
             }
 
-            if (!formation.isForceType(STANDARD)) {
+            if (!formation.isFormationType(STANDARD)) {
                 continue;
             }
 

@@ -144,7 +144,7 @@ class AlternatePaymentModelValuesTest {
 
         // Make diminishingReturnsStart = 0 so the force is definitely "affected" (size > start).
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(0);
 
             Money actual = AlternatePaymentModelValues.getForceValue(
@@ -176,7 +176,7 @@ class AlternatePaymentModelValuesTest {
         // Make diminishingReturnsStart = 2 (standard force size=1 => cutoff=2),
         // so with 3 units we exceed the start and should see discounting.
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(1);
 
             Money actual = AlternatePaymentModelValues.getForceValue(
@@ -470,7 +470,7 @@ class AlternatePaymentModelValuesTest {
     private static Formation mockForce(boolean isStandard, boolean isCombatRole, List<Unit> units) {
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
 
-        when(formation.getForceType().isStandard()).thenReturn(isStandard);
+        when(formation.getFormationType().isStandard()).thenReturn(isStandard);
         when(formation.getCombatRoleInMemory().isCombatRole()).thenReturn(isCombatRole);
 
         when(formation.getUnitsAsUnits(any(Hangar.class))).thenReturn(units);
@@ -514,7 +514,7 @@ class AlternatePaymentModelValuesTest {
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
             // Even if this is called, it shouldn't matter for an empty list
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(36);
 
             Money result = invokeAdjustValuesForDiminishingReturns(faction, new ArrayList<>());
@@ -535,7 +535,7 @@ class AlternatePaymentModelValuesTest {
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
             // Start way after list size so no discount; we just verify sorting side-effect
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(999);
 
             Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
@@ -560,7 +560,7 @@ class AlternatePaymentModelValuesTest {
         ));
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(2);
 
             Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
@@ -587,7 +587,7 @@ class AlternatePaymentModelValuesTest {
         ));
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(1);
 
             // Build expected using the exact same math & Money operations as the method (avoids rounding mismatches)
@@ -636,7 +636,7 @@ class AlternatePaymentModelValuesTest {
         }
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(1);
 
             Money result = invokeAdjustValuesForDiminishingReturns(faction, values);
@@ -673,7 +673,7 @@ class AlternatePaymentModelValuesTest {
         ));
 
         try (MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            combatTeam.when(() -> CombatTeam.getStandardForceSize(any(), anyInt()))
+            combatTeam.when(() -> CombatTeam.getStandardFormationSize(any(), anyInt()))
                   .thenReturn(1);
 
             Money actual = invokeAdjustValuesForDiminishingReturns(faction, values);

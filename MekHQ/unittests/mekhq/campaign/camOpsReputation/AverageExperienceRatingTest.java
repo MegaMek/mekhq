@@ -77,8 +77,8 @@ class AverageExperienceRatingTest {
         when(campaign.getHangar()).thenReturn(hangar);
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(null);
-        when(team.getForceId()).thenReturn(123);
+        when(team.getFormation(campaign)).thenReturn(null);
+        when(team.getFormationId()).thenReturn(123);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -95,7 +95,7 @@ class AverageExperienceRatingTest {
         when(trainingFormation.getCombatRoleInMemory().isTraining()).thenReturn(true);
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(trainingFormation);
+        when(team.getFormation(campaign)).thenReturn(trainingFormation);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -118,7 +118,7 @@ class AverageExperienceRatingTest {
         when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(formation);
+        when(team.getFormation(campaign)).thenReturn(formation);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -140,7 +140,7 @@ class AverageExperienceRatingTest {
         when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
-        when(team.getForce(campaign)).thenReturn(formation);
+        when(team.getFormation(campaign)).thenReturn(formation);
 
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -182,7 +182,7 @@ class AverageExperienceRatingTest {
             when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(formation);
+            when(team.getFormation(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -242,7 +242,7 @@ class AverageExperienceRatingTest {
             when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unitA, unitB));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(formation);
+            when(team.getFormation(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -286,7 +286,7 @@ class AverageExperienceRatingTest {
             when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(formation);
+            when(team.getFormation(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -347,7 +347,7 @@ class AverageExperienceRatingTest {
             when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(formation);
+            when(team.getFormation(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -394,7 +394,7 @@ class AverageExperienceRatingTest {
             when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(formation);
+            when(team.getFormation(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 
@@ -434,7 +434,7 @@ class AverageExperienceRatingTest {
             when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
-            when(team.getForce(campaign)).thenReturn(formation);
+            when(team.getFormation(campaign)).thenReturn(formation);
 
             when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>(List.of(team)));
 

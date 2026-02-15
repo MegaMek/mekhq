@@ -235,7 +235,7 @@ class GameThread extends Thread implements CloseClientListener {
                     // Set the TempID for auto reporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     entity.setOwner(client.getLocalPlayer());
-                    Formation formation = campaign.getForceFor(unit);
+                    Formation formation = campaign.getFormationFor(unit);
                     entity.setForceString(formation.getFullMMName());
                     entities.add(entity);
                 }

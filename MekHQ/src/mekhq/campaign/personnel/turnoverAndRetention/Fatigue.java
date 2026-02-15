@@ -245,7 +245,7 @@ public class Fatigue {
         List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
 
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
-            Formation formation = combatTeam.getForce(campaign);
+            Formation formation = combatTeam.getFormation(campaign);
             if (formation == null || formation.isDeployed()) {
                 // 'isDeployed' will only return true if the force is deployed to a scenario. In which cases we don't
                 // want to yank the unit back until the next Monday checkpoint.
@@ -282,7 +282,7 @@ public class Fatigue {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
                     if (contract.getStratconCampaignState() != null) {
                         for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
-                            track.unassignForce(formation.getId());
+                            track.unassignFormation(formation.getId());
                         }
                     }
                 }

@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.atb;
 
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.*;
 
 import java.util.UUID;
@@ -52,6 +52,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.BotForce;
@@ -156,7 +157,7 @@ public class AtBScenarioModifierApplicator {
             }
 
             Faction faction = Factions.getInstance().getFaction(factionCode);
-            actualUnitsToRemove = getStandardForceSize(faction);
+            actualUnitsToRemove = CombatTeam.getStandardFormationSize(faction);
         }
 
         for (int x = 0; x < actualUnitsToRemove; x++) {
@@ -294,7 +295,7 @@ public class AtBScenarioModifierApplicator {
                         continue;
                     }
 
-                    Formation playerFormation = campaign.getForce(forceID);
+                    Formation playerFormation = campaign.getFormation(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep
                     // at least one visible

@@ -48,7 +48,7 @@ public class OrgTreeModel implements TreeModel {
 
     public OrgTreeModel(Campaign c) {
         campaign = c;
-        rootFormation = campaign.getForces();
+        rootFormation = campaign.getFormations();
     }
 
     @Override
