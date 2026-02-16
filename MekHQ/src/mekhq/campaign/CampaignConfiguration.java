@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -135,7 +135,7 @@ public class CampaignConfiguration {
      * @param reputationController     Default
      * @param factionStandings         Default
      * @param rankSystem               Default Rank System
-     * @param formation                    List of player's TOE forces
+     * @param formation                List of player's TOE formations
      * @param finances                 Default
      * @param randomEvents             Default RandomEventsLibraries
      * @param ultimatums               Default
@@ -221,7 +221,7 @@ public class CampaignConfiguration {
      * @param reputationController     Default
      * @param factionStandings         Default
      * @param rankSystem               Default Rank System
-     * @param formation                    List of player's TOE forces
+     * @param formation                List of player's TOE formations
      * @param finances                 Default
      * @param randomEvents             Default RandomEventsLibraries
      * @param ultimatums               Default

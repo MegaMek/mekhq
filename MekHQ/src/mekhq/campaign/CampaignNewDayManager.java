@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -457,7 +457,7 @@ public class CampaignNewDayManager {
 
         processNewDayUnits();
 
-        processNewDayForces();
+        processNewDayFormations();
 
         if (campaign.isProcessProcurement()) {
             campaign.setShoppingList(campaign.goShopping(campaign.getShoppingList()));
@@ -1299,7 +1299,7 @@ public class CampaignNewDayManager {
         }
     }
 
-    private void processNewDayForces() {
+    private void processNewDayFormations() {
         // update formation levels
         Formation.populateFormationLevelsFromOrigin(campaign);
         recalculateCombatTeams(campaign);
