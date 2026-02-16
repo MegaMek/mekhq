@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
