@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,7 +52,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -138,8 +138,8 @@ public class LanceAssignmentView extends JPanel {
                     switch (column) {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
-                                String forceName = (((Force) value)).getFullName();
-                                String originNodeName = ", " + campaign.getForce(0).getName();
+                                String forceName = (((Formation) value)).getFullName();
+                                String originNodeName = ", " + campaign.getFormation(0).getName();
                                 forceName = forceName.replaceAll(originNodeName, "");
                                 setText(forceName);
                             }
@@ -254,7 +254,7 @@ public class LanceAssignmentView extends JPanel {
     /**
      * Sorts Force objects according to where they appear on the TO&amp;E
      */
-    public Comparator<Force> forceComparator = (f1, f2) -> {
+    public Comparator<Formation> forceComparator = (f1, f2) -> {
         /* Check whether they are the same or one is an ancestor of the other */
         if (f1.getId() == f2.getId()) {
             return 0;
@@ -268,11 +268,11 @@ public class LanceAssignmentView extends JPanel {
 
         // Find the closest common ancestor. They must be either from the same force or descend from
         // different subForces of this one.
-        Force f = f1;
+        Formation f = f1;
         while (!f.isAncestorOf(f2)) {
-            f = f.getParentForce();
+            f = f.getParentFormation();
         }
-        for (Force sf : f.getSubForces()) {
+        for (Formation sf : f.getSubFormations()) {
             if (sf.isAncestorOf(f1) || sf.getId() == f1.getId()) {
                 return -1;
             }

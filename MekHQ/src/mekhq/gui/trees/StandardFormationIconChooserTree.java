@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,14 +40,18 @@ import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;
 
 /**
- * StandardForceIconChooserTree is an implementation of AbstractIconChooserTree that initializes the tree using the
- * Force Icon Directory.
+ * StandardFormationIconChooserTree is an implementation of AbstractIconChooserTree that initializes the tree using the
+ * Formation Icon Directory.
+ *
+ * <p>Known as {@code StandardForceIconChooserTree} prior to 0.50.12</p>
  *
  * @see AbstractIconChooserTree
+ *
+ * @since 0.50.12
  */
-public class StandardForceIconChooserTree extends AbstractIconChooserTree {
+public class StandardFormationIconChooserTree extends AbstractIconChooserTree {
     //region Constructors
-    public StandardForceIconChooserTree() {
+    public StandardFormationIconChooserTree() {
         super();
     }
     //endregion Constructors
@@ -56,7 +60,7 @@ public class StandardForceIconChooserTree extends AbstractIconChooserTree {
     @Override
     protected DefaultTreeModel createTreeModel() {
         return createTreeModel(new DefaultMutableTreeNode(AbstractIcon.ROOT_CATEGORY),
-              MHQStaticDirectoryManager.getForceIcons());
+              MHQStaticDirectoryManager.getFormationIcons());
     }
     //endregion Initialization
 }

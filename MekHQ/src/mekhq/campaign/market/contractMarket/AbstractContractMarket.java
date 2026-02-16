@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -62,7 +62,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -333,9 +333,9 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         int effectCombatTeams = 0;
         for (Map.Entry<Integer, CombatTeam> combatTeam : campaign.getCombatTeamsAsMap().entrySet()) {
-            Force force = campaign.getForce(combatTeam.getKey());
-            if (force != null) {
-                CombatRole combatRoleInMemory = force.getCombatRoleInMemory();
+            Formation formation = campaign.getFormation(combatTeam.getKey());
+            if (formation != null) {
+                CombatRole combatRoleInMemory = formation.getCombatRoleInMemory();
                 if (combatRoleInMemory != CombatRole.TRAINING) {
                     effectCombatTeams++;
                 }

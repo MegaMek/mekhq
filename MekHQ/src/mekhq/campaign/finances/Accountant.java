@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.finances;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.adjustValuesForDiminishingReturns;
 import static mekhq.campaign.market.contractMarket.AlternatePaymentModelValues.getDiminishingReturnsStart;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
@@ -52,7 +52,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -387,7 +387,7 @@ public record Accountant(Campaign campaign) {
 
         return getHangar().getUnitCosts(
               // Is it in the TO&E and by extension in use?
-              unit -> unit.getForceId() != FORCE_NONE, unit -> unit.getFuelCost(hydrogenProduction));
+              unit -> unit.getFormationId() != FORMATION_NONE, unit -> unit.getFuelCost(hydrogenProduction));
     }
 
     public Money getMonthlyAmmo() {
@@ -443,15 +443,15 @@ public record Accountant(Campaign campaign) {
         List<Money> unitValues = new ArrayList<>();
 
         Money total = Money.zero();
-        for (Force force : campaign().getAllForces()) {
-            if (!force.getForceType().isStandard()) {
+        for (Formation formation : campaign().getAllFormations()) {
+            if (!formation.getFormationType().isStandard()) {
                 continue;
             }
-            if (!force.getCombatRoleInMemory().isCombatRole()) {
+            if (!formation.getCombatRoleInMemory().isCombatRole()) {
                 continue;
             }
 
-            for (UUID uuid : force.getUnits()) {
+            for (UUID uuid : formation.getUnits()) {
                 Unit unit = getHangar().getUnit(uuid);
                 if (unit == null) {
                     continue;
@@ -574,7 +574,7 @@ public record Accountant(Campaign campaign) {
 
         if (getCampaignOptions().isUseAlternatePaymentMode()) {
             final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getFaction(),
-                  campaign.getAllForces(),
+                  campaign.getAllFormations(),
                   campaign.getHangar(),
                   useDiminishingContractPay,
                   excludeInfantry,

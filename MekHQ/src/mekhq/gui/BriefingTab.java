@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,7 @@ package mekhq.gui;
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
-import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
@@ -76,7 +76,6 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
-import megamek.common.equipment.GunEmplacement;
 import megamek.common.event.Subscribe;
 import megamek.common.game.Game;
 import megamek.common.options.OptionsConstants;
@@ -103,7 +102,7 @@ import mekhq.campaign.events.scenarios.ScenarioNewEvent;
 import mekhq.campaign.events.scenarios.ScenarioRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -113,7 +112,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.camOpsSalvage.SalvageForceData;
+import mekhq.campaign.mission.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -141,7 +140,7 @@ import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.camOpsSalvage.SalvageForcePicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
 import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
@@ -591,19 +590,19 @@ public final class BriefingTab extends CampaignGuiTab {
         // Undeploy forces & units
         boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
         boolean hadCadreForces = false;
-        for (Force force : getCampaign().getAllForces()) {
-            if (isCadreDuty && force.getCombatRoleInMemory().isCadre()) {
-                force.setCombatRoleInMemory(CombatRole.FRONTLINE);
+        for (Formation formation : getCampaign().getAllFormations()) {
+            if (isCadreDuty && formation.getCombatRoleInMemory().isCadre()) {
+                formation.setCombatRoleInMemory(CombatRole.FRONTLINE);
                 hadCadreForces = true;
             }
 
-            int scenarioAssignment = force.getScenarioId();
+            int scenarioAssignment = formation.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
                 Scenario scenario = getCampaign().getScenario(scenarioAssignment);
 
                 // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
                 if (scenario == null || scenario.getMissionId() == mission.getId()) {
-                    force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
+                    formation.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
                 }
             }
         }
@@ -741,9 +740,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Undeploy forces
         for (Scenario scenario : mission.getScenarios()) {
-            for (Force force : getCampaign().getAllForces()) {
-                if (force.getScenarioId() == scenario.getId()) {
-                    force.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
+            for (Formation formation : getCampaign().getAllFormations()) {
+                if (formation.getScenarioId() == scenario.getId()) {
+                    formation.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
                 }
             }
         }
@@ -824,7 +823,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
 
             // This handles Legacy AtB undeployment
-            scenario.clearAllForcesAndPersonnel(getCampaign());
+            scenario.clearAllFormationsAndPersonnel(getCampaign());
         }
     }
 
@@ -921,7 +920,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private boolean handleSalvageAssignments(Scenario scenario) {
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
-            if (!displaySalvageForcePicker(scenario)) {
+            if (!displaySalvageFormationPicker(scenario)) {
                 return true;
             }
 
@@ -954,7 +953,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * Displays a dialog allowing the player to select forces for salvage operations.
      *
      * <p>This method gathers all available salvage-capable forces from the campaign and presents
-     * them to the player via a {@link SalvageForcePicker} dialog. Forces are filtered based on their salvage
+     * them to the player via a {@link SalvageFormationPicker} dialog. Forces are filtered based on their salvage
      * capabilities and whether they are deployed.</p>
      *
      * @param scenario the scenario for which salvage forces are being selected
@@ -964,33 +963,33 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private boolean displaySalvageForcePicker(Scenario scenario) {
+    private boolean displaySalvageFormationPicker(Scenario scenario) {
         if (!getCampaignOptions().isUseCamOpsSalvage()) {
             return true;
         }
 
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        List<SalvageForceData> salvageForceOptions = getSalvageForces(getCampaign(),
+        List<SalvageFormationData> salvageFormationOptions = getSalvageFormations(getCampaign(),
               isSpace,
-              scenario.getSalvageForces());
+              scenario.getSalvageFormations());
 
-        SalvageForcePicker forcePicker = new SalvageForcePicker(getCampaign(), salvageForceOptions, isSpace,
-              scenario.getSalvageForces());
+        SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
+              scenario.getSalvageFormations());
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
-            scenario.clearSalvageForces();
+            scenario.clearSalvageFormations();
             Hangar hangar = getCampaign().getHangar();
-            List<Force> selectedForces = forcePicker.getSelectedForces();
-            for (Force force : selectedForces) {
-                scenario.addSalvageForce(force.getId());
-                if (force.getTechID() != null) {
-                    Person tech = getCampaign().getPerson(force.getTechID());
+            List<Formation> selectedFormations = forcePicker.getSelectedFormations();
+            for (Formation formation : selectedFormations) {
+                scenario.addSalvageFormation(formation.getId());
+                if (formation.getTechID() != null) {
+                    Person tech = getCampaign().getPerson(formation.getTechID());
                     if (tech != null && !tech.isEngineer()) {
-                        scenario.addSalvageTech(force.getTechID());
+                        scenario.addSalvageTech(formation.getTechID());
                     }
                 }
 
-                for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+                for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
                     if (unit.isSelfCrewed()) {
                         continue;
                     }
@@ -1034,14 +1033,14 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         List<UUID> priorSelectedTechs = new ArrayList<>();
-        List<Integer> forceIds = scenario.getSalvageForces();
+        List<Integer> forceIds = scenario.getSalvageFormations();
         for (Integer forceId : forceIds) {
-            Force force = getCampaign().getForce(forceId);
-            if (force != null && force.getForceType().isSalvage()) {
-                if (force.getTechID() != null) {
-                    Person tech = getCampaign().getPerson(force.getTechID());
+            Formation formation = getCampaign().getFormation(forceId);
+            if (formation != null && formation.getFormationType().isSalvage()) {
+                if (formation.getTechID() != null) {
+                    Person tech = getCampaign().getPerson(formation.getTechID());
                     if (tech != null && !tech.isEngineer()) {
-                        priorSelectedTechs.add(force.getTechID());
+                        priorSelectedTechs.add(formation.getTechID());
                     }
                 }
             }
@@ -1145,74 +1144,74 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageForceData> getSalvageForces(Campaign campaign, boolean isSpaceScenario,
+    private List<SalvageFormationData> getSalvageFormations(Campaign campaign, boolean isSpaceScenario,
           List<Integer> alreadyAssignedForces) {
-        List<SalvageForceData> salvageForceOptions = new ArrayList<>();
+        List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
         List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
         Hangar hangar = campaign.getHangar();
-        List<Force> eligibleSalvageForces = new ArrayList<>();
-        for (Force force : getCampaign().getAllForces()) {
-            Force parentForce = force.getParentForce();
-            if (parentForce != null && parentForce.getForceType().isSalvage()) {
+        List<Formation> eligibleSalvageFormations = new ArrayList<>();
+        for (Formation formation : getCampaign().getAllFormations()) {
+            Formation parentFormation = formation.getParentFormation();
+            if (parentFormation != null && parentFormation.getFormationType().isSalvage()) {
                 continue;
             }
 
-            boolean isDeployedToScenario = force.isDeployed();
+            boolean isDeployedToScenario = formation.isDeployed();
             // If the force is already assigned to this scenario, then we bypass the 'is deployed to StratCon' check.
             // Otherwise, if the player assigns a force and then cancels at the last minute, the already assigned
             // forces will no longer be available for the salvage operations they were assigned to perform.
-            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(force.getId()) &&
-                                                 isForceDeployedToStratCon(activeContracts, force.getId());
-            boolean isSalvageForce = force.getForceType().isSalvage();
-            boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
+                                                 isForceDeployedToStratCon(activeContracts, formation.getId());
+            boolean isSalvageFormation = formation.getFormationType().isSalvage();
+            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
             if (!isDeployedToScenario &&
                       !isDeployedToStratCon &&
-                      isSalvageForce &&
+                      isSalvageFormation &&
                       hasAtLeastOneSalvageUnit) {
-                eligibleSalvageForces.add(force);
+                eligibleSalvageFormations.add(formation);
             }
         }
 
-        eligibleSalvageForces.sort(Comparator.comparing(Force::getFullName));
-        for (Force force : eligibleSalvageForces) {
-            SalvageForceData data = SalvageForceData.buildData(campaign, force, isSpaceScenario);
-            salvageForceOptions.add(data);
+        eligibleSalvageFormations.sort(Comparator.comparing(Formation::getFullName));
+        for (Formation formation : eligibleSalvageFormations) {
+            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
+            salvageFormationOptions.add(data);
         }
 
         // Collect eligible Combat Teams
-        List<Force> eligibleCombatTeams = new ArrayList<>();
+        List<Formation> eligibleCombatTeams = new ArrayList<>();
         for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
-            int forceId = combatTeam.getForceId();
-            Force force = getCampaign().getForce(forceId);
-            if (force == null) {
+            int forceId = combatTeam.getFormationId();
+            Formation formation = getCampaign().getFormation(forceId);
+            if (formation == null) {
                 continue;
             }
 
-            boolean isDeployedToScenario = force.isDeployed();
+            boolean isDeployedToScenario = formation.isDeployed();
             // If the force is already assigned to this scenario, then we bypass the 'is deployed to StratCon' check.
             // Otherwise, if the player assigns a force and then cancels at the last minute, the already assigned
             // forces will no longer be available for the salvage operations they were assigned to perform.
-            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(force.getId()) &&
-                                                 isForceDeployedToStratCon(activeContracts, force.getId());
-            boolean hasAtLeastOneSalvageUnit = force.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
+                                                 isForceDeployedToStratCon(activeContracts, formation.getId());
+            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
 
             if (!isDeployedToScenario &&
                       !isDeployedToStratCon &&
                       hasAtLeastOneSalvageUnit) {
-                eligibleCombatTeams.add(force);
+                eligibleCombatTeams.add(formation);
             }
         }
 
-        eligibleCombatTeams.sort(Comparator.comparing(Force::getFullName));
-        for (Force force : eligibleCombatTeams) {
-            SalvageForceData data = SalvageForceData.buildData(campaign, force, isSpaceScenario);
-            salvageForceOptions.add(data);
+        eligibleCombatTeams.sort(Comparator.comparing(Formation::getFullName));
+        for (Formation formation : eligibleCombatTeams) {
+            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
+            salvageFormationOptions.add(data);
         }
 
-        return salvageForceOptions;
+        return salvageFormationOptions;
     }
 
     /**
@@ -1262,8 +1261,8 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         List<Person> forceCommanders = new ArrayList<>();
-        for (Force force : getCampaign().getAllForces()) {
-            Person commander = getCampaign().getPerson(force.getForceCommanderID());
+        for (Formation formation : getCampaign().getAllFormations()) {
+            Person commander = getCampaign().getPerson(formation.getFormationCommanderID());
             if (commander != null) {
                 forceCommanders.add(commander);
             }
@@ -1452,16 +1451,16 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Unit> prospectiveCommanders = new ArrayList<>();
 
         for (Unit unit : unitEntityMap.keySet()) {
-            int forceId = unit.getForceId();
-            Force force = getCampaign().getForce(forceId);
+            int forceId = unit.getFormationId();
+            Formation formation = getCampaign().getFormation(forceId);
 
             // This will occur if the unit doesn't have an associated force
-            if (force == null) {
+            if (formation == null) {
                 logger.error("Skipping unit {} because it's force is null", unit.getName());
                 continue;
             }
 
-            UUID forceCommanderId = force.getForceCommanderID();
+            UUID forceCommanderId = formation.getFormationCommanderID();
             Person unitCommander = unit.getCommander();
 
             if (unitCommander == null) {
@@ -1553,7 +1552,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             CombatTeam combatTeam = atBScenario.getCombatTeamById(getCampaign());
             if (combatTeam != null) {
-                int assignedForceId = combatTeam.getForceId();
+                int assignedForceId = combatTeam.getFormationId();
                 int cmdrStrategy = 0;
                 Person commander = getCampaign().getPerson(CombatTeam.findCommander(assignedForceId, getCampaign()));
                 if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
@@ -1562,7 +1561,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 List<Entity> reinforcementEntities = new ArrayList<>();
 
                 for (Unit unit : chosen) {
-                    if (unit.getForceId() != assignedForceId) {
+                    if (unit.getFormationId() != assignedForceId) {
                         reinforcementEntities.add(unit.getEntity());
                     }
                 }

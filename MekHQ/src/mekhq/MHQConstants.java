@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -186,8 +186,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
     public static final String SELF_CORRECT_MAINTENANCE = "SelfCorrectMaintenance";
-    public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayForceIconOperationalStatus";
-    public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayForceIconOperationalStatusStyle";
+    public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayFormationIconOperationalStatus";
+    public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayFormationIconOperationalStatusStyle";
     // endregion New Day
 
     // region Campaign XML Save Options
@@ -203,7 +203,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String RANK_SYSTEMS_DIRECTORY_PATH = "rankSystemsDirectoryPath";
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
-    public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredForceIconDirectoryPath";
+    public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredFormationIconDirectoryPath";
     public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.enums.ForceIconOperationalStatusStyle;
+import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 /**
@@ -198,8 +198,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
     private JCheckBox chkNewMonthQuickTrain;
     private JCheckBox chkSelfCorrectMaintenance;
-    private JCheckBox chkNewDayForceIconOperationalStatus;
-    private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
+    private JCheckBox chkNewDayFormationIconOperationalStatus;
+    private MMComboBox<FormationIconOperationalStatusStyle> comboNewDayFormationIconOperationalStatusStyle;
     // endregion New Day
 
     // region Campaign XML Save
@@ -951,8 +951,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     private JPanel createNewDayTab() {
         // Initialize Components Used in ActionListeners
-        final JLabel lblNewDayForceIconOperationalStatusStyle = new JLabel(resources.getString(
-              "lblNewDayForceIconOperationalStatusStyle.text"));
+        final JLabel lblNewDayFormationIconOperationalStatusStyle = new JLabel(resources.getString(
+              "lblNewDayFormationIconOperationalStatusStyle.text"));
 
         // Create Panel Components
         chkNewDayAsTechPoolFill = new JCheckBox(resources.getString("chkNewDayAstechPoolFill.text"));
@@ -1023,43 +1023,43 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "chkSelfCorrectMaintenance.toolTipText"));
         chkSelfCorrectMaintenance.setName("chkSelfCorrectMaintenance.text");
 
-        chkNewDayForceIconOperationalStatus = new JCheckBox(resources.getString(
-              "chkNewDayForceIconOperationalStatus.text"));
-        chkNewDayForceIconOperationalStatus.setToolTipText(resources.getString(
-              "chkNewDayForceIconOperationalStatus.toolTipText"));
-        chkNewDayForceIconOperationalStatus.setName("chkNewDayForceIconOperationalStatus");
-        chkNewDayForceIconOperationalStatus.addActionListener(evt -> {
-            final boolean selected = chkNewDayForceIconOperationalStatus.isSelected();
-            lblNewDayForceIconOperationalStatusStyle.setEnabled(selected);
-            comboNewDayForceIconOperationalStatusStyle.setEnabled(selected);
+        chkNewDayFormationIconOperationalStatus = new JCheckBox(resources.getString(
+              "chkNewDayFormationIconOperationalStatus.text"));
+        chkNewDayFormationIconOperationalStatus.setToolTipText(resources.getString(
+              "chkNewDayFormationIconOperationalStatus.toolTipText"));
+        chkNewDayFormationIconOperationalStatus.setName("chkNewDayFormationIconOperationalStatus");
+        chkNewDayFormationIconOperationalStatus.addActionListener(evt -> {
+            final boolean selected = chkNewDayFormationIconOperationalStatus.isSelected();
+            lblNewDayFormationIconOperationalStatusStyle.setEnabled(selected);
+            comboNewDayFormationIconOperationalStatusStyle.setEnabled(selected);
         });
 
-        lblNewDayForceIconOperationalStatusStyle.setToolTipText(resources.getString(
-              "lblNewDayForceIconOperationalStatusStyle.toolTipText"));
-        lblNewDayForceIconOperationalStatusStyle.setName("lblNewDayForceIconOperationalStatusStyle");
+        lblNewDayFormationIconOperationalStatusStyle.setToolTipText(resources.getString(
+              "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
+        lblNewDayFormationIconOperationalStatusStyle.setName("lblNewDayFormationIconOperationalStatusStyle");
 
-        comboNewDayForceIconOperationalStatusStyle = new MMComboBox<>("comboNewDayForceIconOperationalStatusStyle",
-              ForceIconOperationalStatusStyle.values());
-        comboNewDayForceIconOperationalStatusStyle.setToolTipText(resources.getString(
-              "lblNewDayForceIconOperationalStatusStyle.toolTipText"));
-        comboNewDayForceIconOperationalStatusStyle.setRenderer(new DefaultListCellRenderer() {
+        comboNewDayFormationIconOperationalStatusStyle = new MMComboBox<>("comboNewDayFormationIconOperationalStatusStyle",
+              FormationIconOperationalStatusStyle.values());
+        comboNewDayFormationIconOperationalStatusStyle.setToolTipText(resources.getString(
+              "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
+        comboNewDayFormationIconOperationalStatusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ForceIconOperationalStatusStyle) {
-                    list.setToolTipText(((ForceIconOperationalStatusStyle) value).getToolTipText());
+                if (value instanceof FormationIconOperationalStatusStyle) {
+                    list.setToolTipText(((FormationIconOperationalStatusStyle) value).getToolTipText());
                 }
                 return this;
             }
         });
 
         // Programmatically Assign Accessibility Labels
-        lblNewDayForceIconOperationalStatusStyle.setLabelFor(comboNewDayForceIconOperationalStatusStyle);
+        lblNewDayFormationIconOperationalStatusStyle.setLabelFor(comboNewDayFormationIconOperationalStatusStyle);
 
         // Disable Panel Portions by Default
-        chkNewDayForceIconOperationalStatus.setSelected(true);
-        chkNewDayForceIconOperationalStatus.doClick();
+        chkNewDayFormationIconOperationalStatus.setSelected(true);
+        chkNewDayFormationIconOperationalStatus.doClick();
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -1086,10 +1086,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
                                       .addComponent(chkNewMonthQuickTrain)
                                       .addComponent(chkSelfCorrectMaintenance)
-                                      .addComponent(chkNewDayForceIconOperationalStatus)
+                                      .addComponent(chkNewDayFormationIconOperationalStatus)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                                                      .addComponent(lblNewDayForceIconOperationalStatusStyle)
-                                                      .addComponent(comboNewDayForceIconOperationalStatusStyle,
+                                                      .addComponent(lblNewDayFormationIconOperationalStatusStyle)
+                                                      .addComponent(comboNewDayFormationIconOperationalStatusStyle,
                                                             GroupLayout.DEFAULT_SIZE,
                                                             GroupLayout.DEFAULT_SIZE,
                                                             40)));
@@ -1110,10 +1110,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
                                         .addComponent(chkNewMonthQuickTrain)
                                         .addComponent(chkSelfCorrectMaintenance)
-                                        .addComponent(chkNewDayForceIconOperationalStatus)
+                                        .addComponent(chkNewDayFormationIconOperationalStatus)
                                         .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(lblNewDayForceIconOperationalStatusStyle)
-                                                        .addComponent(comboNewDayForceIconOperationalStatusStyle)));
+                                                        .addComponent(lblNewDayFormationIconOperationalStatusStyle)
+                                                        .addComponent(comboNewDayFormationIconOperationalStatusStyle)));
 
         return panel;
     }
@@ -1641,10 +1641,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setNewDayAutomaticallyAssignUnmaintainedUnits(chkNewDayAutomaticallyAssignUnmaintainedUnits.isSelected());
         options.setNewMonthQuickTrain(chkNewMonthQuickTrain.isSelected());
         options.setSelfCorrectMaintenance(chkSelfCorrectMaintenance.isSelected());
-        options.setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
+        options.setNewDayFormationIconOperationalStatus(chkNewDayFormationIconOperationalStatus.isSelected());
         options
-              .setNewDayForceIconOperationalStatusStyle(Objects.requireNonNull(
-                    comboNewDayForceIconOperationalStatusStyle.getSelectedItem()));
+              .setNewDayFormationIconOperationalStatusStyle(Objects.requireNonNull(
+                    comboNewDayFormationIconOperationalStatusStyle.getSelectedItem()));
 
         options.setPreferGzippedOutput(optionPreferGzippedOutput.isSelected());
         options.setWriteCustomsToXML(optionWriteCustomsToXML.isSelected());
@@ -1844,12 +1844,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                         .getNewDayAutomaticallyAssignUnmaintainedUnits());
         chkNewMonthQuickTrain.setSelected(options.getNewMonthQuickTrain());
         chkSelfCorrectMaintenance.setSelected(options.getSelfCorrectMaintenance());
-        if (chkNewDayForceIconOperationalStatus.isSelected() !=
-                  options.getNewDayForceIconOperationalStatus()) {
-            chkNewDayForceIconOperationalStatus.doClick();
+        if (chkNewDayFormationIconOperationalStatus.isSelected() !=
+                  options.getNewDayFormationIconOperationalStatus()) {
+            chkNewDayFormationIconOperationalStatus.doClick();
         }
-        comboNewDayForceIconOperationalStatusStyle.setSelectedItem(options
-                                                                         .getNewDayForceIconOperationalStatusStyle());
+        comboNewDayFormationIconOperationalStatusStyle.setSelectedItem(options
+                                                                         .getNewDayFormationIconOperationalStatusStyle());
 
         optionPreferGzippedOutput.setSelected(options.getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(options.getWriteCustomsToXML());

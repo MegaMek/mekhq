@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -148,11 +148,11 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> exportLayeredForceIcon(final JFrame frame) {
-        Optional<File> value = GUI.fileDialogSave(frame, "Export Layered Force Icon",
-              FileType.PNG, MekHQ.getMHQOptions().getLayeredForceIconPath(),
-              "layeredForceIcon.png");
-        value.ifPresent(x -> MekHQ.getMHQOptions().setLayeredForceIconPath(x.getParent()));
+    public static Optional<File> exportLayeredFormationIcon(final JFrame frame) {
+        Optional<File> value = GUI.fileDialogSave(frame, "Export Layered Formation Icon",
+              FileType.PNG, MekHQ.getMHQOptions().getLayeredFormationIconPath(),
+              "layeredFormationIcon.png");
+        value.ifPresent(x -> MekHQ.getMHQOptions().setLayeredFormationIconPath(x.getParent()));
         return value;
     }
 

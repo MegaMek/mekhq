@@ -112,8 +112,8 @@ import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -197,7 +197,7 @@ public class Unit implements ITechnology {
     Set<AbstractTransportedUnitsSummary> transportedUnitsSummaries = new HashSet<>();
 
     // assignments
-    private int forceId;
+    private int formationId;
     protected int scenarioId;
 
     private final List<Person> drivers;
@@ -260,7 +260,7 @@ public class Unit implements ITechnology {
         this.drivers = new ArrayList<>();
         this.gunners = new HashSet<>();
         this.vesselCrew = new ArrayList<>();
-        forceId = Force.FORCE_NONE;
+        formationId = Formation.FORMATION_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
         this.history = "";
         this.lastMaintenanceReport = "";
@@ -1726,11 +1726,11 @@ public class Unit implements ITechnology {
     }
 
     public double getCargoCapacityForSalvage() {
-        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), ForceType.SALVAGE);
+        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), FormationType.SALVAGE);
     }
 
     public double getCargoCapacityForConvoy() {
-        return getCargoCapacity(0, ForceType.CONVOY);
+        return getCargoCapacity(0, FormationType.CONVOY);
     }
 
     /**
@@ -1768,7 +1768,7 @@ public class Unit implements ITechnology {
      */
     @Deprecated(since = "0.50.10")
     public double getCargoCapacity() {
-        return getCargoCapacity(0, ForceType.CONVOY);
+        return getCargoCapacity(0, FormationType.CONVOY);
     }
 
     /**
@@ -1800,12 +1800,12 @@ public class Unit implements ITechnology {
      * </ul>
      *
      * @param maximumMpPenalty the maximum movement penalty that can be applied to the entity.
-     * @param forceType        the type of force (e.g., convoy) which determines certain restrictions on transportation
+     * @param formationType        the type of force (e.g., convoy) which determines certain restrictions on transportation
      *                         capacity.
      *
      * @return the total cargo capacity of the entity. Returns 0.0 if the entity is not fully crewed.
      */
-    public double getCargoCapacity(int maximumMpPenalty, ForceType forceType) {
+    public double getCargoCapacity(int maximumMpPenalty, FormationType formationType) {
         if (!isFullyCrewed()) {
             return 0.0;
         }
@@ -1836,7 +1836,7 @@ public class Unit implements ITechnology {
             } else {
                 // No using your arms, roof rack, or lift hoists for convoys!
                 if (transporter instanceof ExternalCargo) {
-                    if (forceType != ForceType.CONVOY) {
+                    if (formationType != FormationType.CONVOY) {
                         if (transporter instanceof RoofRack) {
                             roofRackCapacity += actualCapacity;
                             continue;
@@ -1870,7 +1870,7 @@ public class Unit implements ITechnology {
         }
 
         // No using your arms, roof rack, or lift hoists for convoys!
-        if (forceType != ForceType.CONVOY) {
+        if (formationType != FormationType.CONVOY) {
             if (liftHoistCount > 0) {
                 double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
                 // Lift Hoist
@@ -2832,8 +2832,8 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
 
-        if (forceId != Force.FORCE_NONE) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+        if (formationId != Formation.FORMATION_NONE) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "formationId", formationId);
         }
 
         if (scenarioId != Scenario.S_DEFAULT_ID) {
@@ -3060,8 +3060,9 @@ public class Unit implements ITechnology {
                           "campaignTransportType").getTextContent());
                     retVal.addTransportedUnit(campaignTransportType,
                           new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
-                    retVal.forceId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationId") ||
+                                 wn2.getNodeName().equalsIgnoreCase("forceId")) {
+                    retVal.formationId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvaged")) {
@@ -4649,8 +4650,8 @@ public class Unit implements ITechnology {
 
     public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
-            final Force force = campaign.getForce(getForceId());
-            return (force != null) ? force.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
+            final Formation formation = campaign.getFormation(getFormationId());
+            return (formation != null) ? formation.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
         } else {
             return getCamouflage();
         }
@@ -5970,17 +5971,17 @@ public class Unit implements ITechnology {
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
-            AssignmentLogger.reassignedTOEForce(getCampaign(),
+            AssignmentLogger.reassignedTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getForceFor(oldUnit),
-                  getCampaign().getForceFor(this));
+                  getCampaign().getFormationFor(oldUnit),
+                  getCampaign().getFormationFor(this));
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
-            AssignmentLogger.addedToTOEForce(getCampaign(),
+            AssignmentLogger.addedToTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getForceFor(this));
+                  getCampaign().getFormationFor(this));
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -6030,10 +6031,10 @@ public class Unit implements ITechnology {
 
         if (log) {
             AssignmentLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
-            AssignmentLogger.removedFromTOEForce(getCampaign(),
+            AssignmentLogger.removedFromTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getForceFor(this));
+                  getCampaign().getFormationFor(this));
         }
     }
 
@@ -6069,12 +6070,12 @@ public class Unit implements ITechnology {
         return entity != null && entity.isNotCrewedEntityType();
     }
 
-    public int getForceId() {
-        return forceId;
+    public int getFormationId() {
+        return formationId;
     }
 
-    public void setForceId(int id) {
-        this.forceId = id;
+    public void setFormationId(int id) {
+        this.formationId = id;
     }
 
     public int getScenarioId() {
@@ -6233,7 +6234,7 @@ public class Unit implements ITechnology {
 
         // don't remove personnel yet, because self crewed units need their crews to
         // mothball
-        getCampaign().removeUnitFromForce(this);
+        getCampaign().removeUnitFromFormation(this);
 
         // clear any assigned tasks
         for (Part p : getParts()) {

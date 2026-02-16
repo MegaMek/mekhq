@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,7 +51,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -305,21 +305,21 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                     }
                     break;
                 case FORCE:
-                    Force force = getCampaign().getForceFor(person);
-                    if (force != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
+                    Formation formation = getCampaign().getFormationFor(person);
+                    if (formation != null) {
+                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName())
                                                    .append("</b>");
-                        Force parent = force.getParentForce();
+                        Formation parent = formation.getParentFormation();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
-                        while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
+                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
                             desc.append("<br>").append(parent.getName());
                             lines++;
-                            parent = parent.getParentForce();
+                            parent = parent.getParentFormation();
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        final Image forceImage = force.getForceIcon().getImage(54);
+                        final Image forceImage = formation.getFormationIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

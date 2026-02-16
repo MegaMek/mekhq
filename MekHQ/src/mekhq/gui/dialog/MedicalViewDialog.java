@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -65,7 +65,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData.Key;
 import mekhq.campaign.ExtraData.StringKey;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.personnel.Injury;
@@ -384,7 +384,7 @@ public class MedicalViewDialog extends JDialog {
                                  resourceMap.getString("baselinePhenotype.text") :
                                  p.getPhenotype().toString();
 
-        Force f = c.getForceFor(p);
+        Formation f = c.getFormationFor(p);
         String force = (null != f) ? f.getFullName() : "-";
 
         Person doc = c.getPerson(p.getDoctorId());

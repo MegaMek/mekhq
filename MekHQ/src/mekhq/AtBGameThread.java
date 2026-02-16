@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,7 @@ package mekhq;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -70,7 +70,8 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import megamek.common.net.packets.InvalidPacketDataException;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -251,15 +252,15 @@ public class AtBGameThread extends GameThread {
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
                         if (scenario.getCombatRole().isPatrol() &&
                                   (scenario.getCombatTeamById(campaign) != null) &&
-                                  (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId()) &&
+                                  (scenario.getCombatTeamById(campaign).getFormationId() == scenario.getCombatTeamId()) &&
                                   !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    Force force = campaign.getForceFor(unit);
-                    if (force != null) {
-                        entity.setForceString(force.getFullMMName());
+                    Formation formation = campaign.getFormationFor(unit);
+                    if (formation != null) {
+                        entity.setForceString(formation.getFullMMName());
                     }
                     entities.add(entity);
 
@@ -309,7 +310,7 @@ public class AtBGameThread extends GameThread {
                         if (!useDropship &&
                                   scenario.getCombatRole().isPatrol() &&
                                   (scenario.getCombatTeamById(campaign) != null) &&
-                                  (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+                                  (scenario.getCombatTeamById(campaign).getFormationId() == scenario.getCombatTeamId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
@@ -736,9 +737,9 @@ public class AtBGameThread extends GameThread {
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = getStandardForceSize(contract.getEnemy());
+            lanceSize = CombatTeam.getStandardFormationSize(contract.getEnemy());
         } else {
-            lanceSize = getStandardForceSize(contract.getEmployerFaction());
+            lanceSize = CombatTeam.getStandardFormationSize(contract.getEmployerFaction());
         }
 
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));

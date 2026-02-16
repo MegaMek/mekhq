@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,7 @@ package mekhq.gui;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -110,8 +110,8 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -248,7 +248,7 @@ public class CampaignGUI extends JPanel {
 
     private boolean logNagActive = false;
 
-    private transient StandardForceIcon copyForceIcon = null;
+    private transient StandardFormationIcon copyFormationIcon = null;
     // endregion Variable Declarations
 
     // region Constructors
@@ -296,14 +296,14 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * @return the force icon to paste
+     * @return the formation icon to paste
      */
-    public @Nullable StandardForceIcon getCopyForceIcon() {
-        return copyForceIcon;
+    public @Nullable StandardFormationIcon getCopyFormationIcon() {
+        return copyFormationIcon;
     }
 
-    public void setCopyForceIcon(final @Nullable StandardForceIcon copyForceIcon) {
-        this.copyForceIcon = copyForceIcon;
+    public void setCopyFormationIcon(final @Nullable StandardFormationIcon copyFormationIcon) {
+        this.copyFormationIcon = copyFormationIcon;
     }
     // endregion Getters/Setters
 
@@ -668,15 +668,15 @@ public class CampaignGUI extends JPanel {
         });
         menuRefresh.add(miRefreshPortraits);
 
-        JMenuItem miRefreshForceIcons = new JMenuItem(resourceMap.getString("miRefreshForceIcons.text"));
-        miRefreshForceIcons.setName("miRefreshForceIcons");
-        miRefreshForceIcons.setMnemonic(KeyEvent.VK_F);
-        miRefreshForceIcons.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
-        miRefreshForceIcons.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshForceIcons();
+        JMenuItem miRefreshFormationIcons = new JMenuItem(resourceMap.getString("miRefreshFormationIcons.text"));
+        miRefreshFormationIcons.setName("miRefreshFormationIcons");
+        miRefreshFormationIcons.setMnemonic(KeyEvent.VK_F);
+        miRefreshFormationIcons.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
+        miRefreshFormationIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshFormationIcons();
             refreshAllTabs();
         });
-        menuRefresh.add(miRefreshForceIcons);
+        menuRefresh.add(miRefreshFormationIcons);
 
         JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
         miRefreshAwards.setName("miRefreshAwards");
@@ -2388,7 +2388,7 @@ public class CampaignGUI extends JPanel {
             if (newOptions.isUseAtB()) {
                 getCampaign().initAtB(false);
                 // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
             }
             if (newOptions.isUseAtB()) {
                 int loops = 0;
@@ -3379,7 +3379,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void undeployUnit(Unit u) {
-        Force f = getCampaign().getForce(u.getForceId());
+        Formation f = getCampaign().getFormation(u.getFormationId());
         if (f != null) {
             undeployForce(f, false);
         }
@@ -3389,16 +3389,16 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
-    public void undeployForce(Force f) {
+    public void undeployForce(Formation f) {
         undeployForce(f, true);
     }
 
-    public void undeployForce(Force f, boolean killSubs) {
+    public void undeployForce(Formation f, boolean killSubs) {
         int sid = f.getScenarioId();
         Scenario scenario = getCampaign().getScenario(sid);
         if (null != scenario) {
             f.clearScenarioIds(getCampaign(), killSubs);
-            scenario.removeForce(f.getId());
+            scenario.removeFormation(f.getId());
             if (killSubs) {
                 for (UUID uid : f.getAllUnits(false)) {
                     Unit u = getCampaign().getUnit(uid);
@@ -3410,15 +3410,15 @@ public class CampaignGUI extends JPanel {
             }
 
             // We have to clear out the parents as well.
-            Force parent = f;
+            Formation parent = f;
             int prevId = f.getId();
-            while ((parent = parent.getParentForce()) != null) {
+            while ((parent = parent.getParentFormation()) != null) {
                 if (parent.getScenarioId() == NO_ASSIGNED_SCENARIO) {
                     break;
                 }
                 parent.clearScenarioIds(getCampaign(), false);
-                scenario.removeForce(parent.getId());
-                for (Force sub : parent.getSubForces()) {
+                scenario.removeFormation(parent.getId());
+                for (Formation sub : parent.getSubFormations()) {
                     if (sub.getId() == prevId) {
                         continue;
                     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,49 +51,53 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.icons.ForcePieceIcon;
-import mekhq.campaign.icons.LayeredForceIcon;
-import mekhq.campaign.icons.StandardForceIcon;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.FormationPieceIcon;
+import mekhq.campaign.icons.LayeredFormationIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 
 /**
- * This panel is used to create, display, and export a LayeredForceIcon based on a tabbed pane containing a
- * ForcePieceIconChooser for every potential LayeredForceIconLayer layer.
+ * This panel is used to create, display, and export a LayeredFormationIcon based on a tabbed pane containing a
+ * ForcePieceIconChooser for every potential LayeredFormationIconLayer layer.
+ *
+ * <p>Known as {@code LayeredForceIconCreationPanel} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
-public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
-    private static final MMLogger LOGGER = MMLogger.create(LayeredForceIconCreationPanel.class);
+public class LayeredFormationIconCreationPanel extends AbstractMHQPanel {
+    private static final MMLogger LOGGER = MMLogger.create(LayeredFormationIconCreationPanel.class);
 
     // region Variable Declarations
-    private LayeredForceIcon forceIcon;
+    private LayeredFormationIcon formationIcon;
     private final boolean includeRefreshButton;
 
     private JTabbedPane tabbedPane;
-    private Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers;
+    private Map<LayeredFormationIconLayer, ForcePieceIconChooser> choosers;
     private JLabel lblIcon;
     // endregion Variable Declarations
 
     // region Constructors
-    public LayeredForceIconCreationPanel(final JFrame frame,
-          final @Nullable StandardForceIcon forceIcon,
+    public LayeredFormationIconCreationPanel(final JFrame frame,
+          final @Nullable StandardFormationIcon formationIcon,
           final boolean includeRefreshButton) {
-        super(frame, "LayeredForceIconCreationPanel", new GridBagLayout());
-        setForceIcon((forceIcon instanceof LayeredForceIcon)
-                           ? ((LayeredForceIcon) forceIcon).clone()
-                           : new LayeredForceIcon());
+        super(frame, "LayeredFormationIconCreationPanel", new GridBagLayout());
+        setFormationIcon((formationIcon instanceof LayeredFormationIcon)
+                           ? ((LayeredFormationIcon) formationIcon).clone()
+                           : new LayeredFormationIcon());
         this.includeRefreshButton = includeRefreshButton;
         initialize();
     }
     // endregion Constructors
 
     // region Getters/Setters
-    public LayeredForceIcon getForceIcon() {
-        return forceIcon;
+    public LayeredFormationIcon getFormationIcon() {
+        return formationIcon;
     }
 
-    public void setForceIcon(final LayeredForceIcon forceIcon) {
-        this.forceIcon = forceIcon;
+    public void setFormationIcon(final LayeredFormationIcon formationIcon) {
+        this.formationIcon = formationIcon;
     }
 
     public boolean isIncludeRefreshButton() {
@@ -108,11 +112,11 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         this.tabbedPane = tabbedPane;
     }
 
-    public Map<LayeredForceIconLayer, ForcePieceIconChooser> getChoosers() {
+    public Map<LayeredFormationIconLayer, ForcePieceIconChooser> getChoosers() {
         return choosers;
     }
 
-    public void setChoosers(final Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers) {
+    public void setChoosers(final Map<LayeredFormationIconLayer, ForcePieceIconChooser> choosers) {
         this.choosers = choosers;
     }
 
@@ -141,18 +145,18 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         getTabbedPane().setName("piecesTabbedPane");
         getTabbedPane().setPreferredSize(new Dimension(700, 1100));
         setChoosers(new HashMap<>());
-        for (final LayeredForceIconLayer layer : LayeredForceIconLayer.values()) {
-            final ForcePieceIconChooser chooser = new ForcePieceIconChooser(getFrame(), layer, getForceIcon());
+        for (final LayeredFormationIconLayer layer : LayeredFormationIconLayer.values()) {
+            final ForcePieceIconChooser chooser = new ForcePieceIconChooser(getFrame(), layer, getFormationIcon());
             chooser.getImageList().addListSelectionListener(evt -> {
-                getForceIcon().getPieces().put(layer, chooser.getSelectedItems());
-                getLblIcon().setIcon(getForceIcon().getImageIcon());
+                getFormationIcon().getPieces().put(layer, chooser.getSelectedItems());
+                getLblIcon().setIcon(getFormationIcon().getImageIcon());
             });
             getChoosers().put(layer, chooser);
             getTabbedPane().addTab(layer.toString(), chooser);
         }
         add(getTabbedPane(), gbc);
 
-        setLblIcon(new JLabel(getForceIcon().getImageIcon()));
+        setLblIcon(new JLabel(getFormationIcon().getImageIcon()));
         getLblIcon().setName("lblIcon");
         getLblIcon().getAccessibleContext().setAccessibleName(resources.getString("lblIcon.accessibleName"));
         gbc.gridy++;
@@ -172,7 +176,7 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
 
         gbc.gridx++;
         add(new MMButton("btnExport", resources, "Export.text",
-              "LayeredForceIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
+              "LayeredFormationIconCreationPanel.btnExport.toolTipText", evt -> exportAction()), gbc);
 
         if (isIncludeRefreshButton()) {
             gbc.gridx++;
@@ -184,7 +188,7 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             setPreferences();
         } catch (Exception ex) {
             LOGGER.error(
-                  "Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.",
+                  "Error setting the Layered Formation Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.",
                   ex);
         }
     }
@@ -199,11 +203,11 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     // region Button Actions
 
     /**
-     * Creates a new LayeredForceIcon to use as both the current and original icon
+     * Creates a new LayeredFormationIcon to use as both the current and original icon
      */
     public void newIcon() {
-        final LayeredForceIcon icon = new LayeredForceIcon();
-        setForceIcon(icon);
+        final LayeredFormationIcon icon = new LayeredFormationIcon();
+        setFormationIcon(icon);
         for (final ForcePieceIconChooser chooser : getChoosers().values()) {
             chooser.setOriginalIcon(icon);
             chooser.setSelection(icon);
@@ -218,10 +222,10 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     }
 
     /**
-     * Exports the current LayeredForceIcon to a .png file
+     * Exports the current LayeredFormationIcon to a .png file
      */
     private void exportAction() {
-        File file = FileDialogs.exportLayeredForceIcon(getFrame()).orElse(null);
+        File file = FileDialogs.exportLayeredFormationIcon(getFrame()).orElse(null);
         if (file == null) {
             return;
         }
@@ -231,10 +235,10 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             file = new File(path);
         }
 
-        createForceIcon();
+        createFormationIcon();
 
         try {
-            final BufferedImage image = (BufferedImage) getForceIcon().getImage();
+            final BufferedImage image = (BufferedImage) getFormationIcon().getImage();
             ImageIO.write(image, "png", file);
         } catch (Exception ex) {
             LOGGER.error("", ex);
@@ -242,37 +246,37 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     }
 
     /**
-     * @param performDirectoryRefresh whether to perform the actual refresh of the Force Icons directory or just handle
+     * @param performDirectoryRefresh whether to perform the actual refresh of the Formation Icons directory or just handle
      *                                the changes required for an already refreshed directory.
      */
     public void refreshDirectory(final boolean performDirectoryRefresh) {
         if (performDirectoryRefresh) {
-            MHQStaticDirectoryManager.refreshForceIcons();
+            MHQStaticDirectoryManager.refreshFormationIcons();
         }
 
-        createForceIcon();
+        createFormationIcon();
         for (final ForcePieceIconChooser chooser : getChoosers().values()) {
-            chooser.setOriginalIcon(getForceIcon());
+            chooser.setOriginalIcon(getFormationIcon());
             chooser.refreshTree();
         }
     }
     // endregion Button Actions
 
     /**
-     * Creates a force icon based on the individual selections for each piece chooser, and then sets the force icon
+     * Creates a formation icon based on the individual selections for each piece chooser, and then sets the formation icon
      * stored in this panel to that new icon.
      *
-     * @return the newly created force icon
+     * @return the newly created formation icon
      */
-    public LayeredForceIcon createForceIcon() {
-        final LayeredForceIcon icon = new LayeredForceIcon();
-        for (final Map.Entry<LayeredForceIconLayer, ForcePieceIconChooser> entry : getChoosers().entrySet()) {
-            final List<ForcePieceIcon> pieces = entry.getValue().getSelectedItems();
+    public LayeredFormationIcon createFormationIcon() {
+        final LayeredFormationIcon icon = new LayeredFormationIcon();
+        for (final Map.Entry<LayeredFormationIconLayer, ForcePieceIconChooser> entry : getChoosers().entrySet()) {
+            final List<FormationPieceIcon> pieces = entry.getValue().getSelectedItems();
             if (!pieces.isEmpty()) {
                 icon.getPieces().put(entry.getKey(), pieces);
             }
         }
-        setForceIcon(icon);
+        setFormationIcon(icon);
         return icon;
     }
 }

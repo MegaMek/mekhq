@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,8 +38,8 @@ import static java.lang.Math.round;
 import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
-import static mekhq.campaign.force.ForceType.CONVOY;
-import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.FormationType.CONVOY;
+import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -58,7 +58,7 @@ import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
@@ -103,7 +103,7 @@ public class Resupply {
     private List<Part> partsPool;
     private double focusParts;
     private boolean usePlayerConvoy;
-    private Map<Force, Double> playerConvoys;
+    private Map<Formation, Double> playerConvoys;
     private final int targetCargoTonnage;
     private final int targetCargoTonnagePlayerConvoy;
     private double totalPlayerCargoCapacity;
@@ -373,10 +373,10 @@ public class Resupply {
      * Retrieves the player convoys and their corresponding cargo capacities. This method provides a mapping of
      * player-controlled forces to their available cargo capacity.
      *
-     * @return A {@link Map} where the key is a {@link Force} representing the player's convoy, and the value is a
+     * @return A {@link Map} where the key is a {@link Formation} representing the player's convoy, and the value is a
      *       {@link Double} indicating its cargo capacity.
      */
-    public Map<Force, Double> getPlayerConvoys() {
+    public Map<Formation, Double> getPlayerConvoys() {
         return playerConvoys;
     }
 
@@ -409,13 +409,13 @@ public class Resupply {
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
         for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
-            Force force = campaign.getForce(formation.getForceId());
+            Formation force = campaign.getFormation(formation.getFormationId());
 
             if (force == null) {
                 continue;
             }
 
-            if (!force.isForceType(STANDARD)) {
+            if (!force.isFormationType(STANDARD)) {
                 continue;
             }
 
@@ -837,19 +837,19 @@ public class Resupply {
         playerConvoys = new HashMap<>();
         totalPlayerCargoCapacity = 0;
 
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isForceType(CONVOY)) {
+        for (Formation formation : campaign.getAllFormations()) {
+            if (!formation.isFormationType(CONVOY)) {
                 continue;
             }
 
             // This ensures each convoy is only counted once
-            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
+            if (formation.getParentFormation() != null && formation.getParentFormation().isFormationType(CONVOY)) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
             boolean hasCargo = false;
-            for (UUID unitId : force.getAllUnits(false)) {
+            for (UUID unitId : formation.getAllUnits(false)) {
                 try {
                     Unit unit = campaign.getUnit(unitId);
                     Entity entity = unit.getEntity();
@@ -874,7 +874,7 @@ public class Resupply {
             if (hasCargo) {
                 if (cargoCapacitySubTotal > 0) {
                     totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                    playerConvoys.put(force, cargoCapacitySubTotal);
+                    playerConvoys.put(formation, cargoCapacitySubTotal);
                 }
             }
         }

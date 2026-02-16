@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,7 +72,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -245,9 +245,9 @@ public class SalvagePostScenarioPicker {
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
         setAvailableTechTime(campaign, scenario);
-        List<Integer> salvageForces = setSalvageUnits(campaign, scenario);
+        List<Integer> salvageFormations = setSalvageUnits(campaign, scenario);
         sanitizeOtherScenarioAssignments(campaign.getActiveScenarios(), scenario, scenario.getSalvageTechs(),
-              salvageForces);
+              salvageFormations);
 
         arrangeUnits(actualSalvage, soldSalvage);
         setRecoveryTimeDataMap(campaign, scenario);
@@ -285,20 +285,20 @@ public class SalvagePostScenarioPicker {
      * @param activeScenarios a list of scenarios marked as 'current' (i.e., unresolved)
      * @param currentScenario the current scenario, techs and forces won't be sanitized from this scenario
      * @param salvageTechs    a list of techs assigned to the salvage operation
-     * @param salvageForces   a list of forces assigned to the salvage operation
+     * @param salvageFormations   a list of forces assigned to the salvage operation
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static void sanitizeOtherScenarioAssignments(List<Scenario> activeScenarios, Scenario currentScenario,
           List<UUID> salvageTechs,
-          List<Integer> salvageForces) {
+          List<Integer> salvageFormations) {
         for (Scenario activeScenario : activeScenarios) {
             if (activeScenario == currentScenario) {
                 continue;
             }
 
-            activeScenario.removeSalvageForce(salvageForces);
+            activeScenario.removeSalvageFormation(salvageFormations);
             activeScenario.removeSalvageTechs(salvageTechs);
         }
     }
@@ -346,19 +346,19 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private List<Integer> setSalvageUnits(Campaign campaign, Scenario scenario) {
-        List<Integer> salvageForces = new ArrayList<>();
+        List<Integer> salvageFormations = new ArrayList<>();
         salvageUnits = new ArrayList<>();
         Hangar hangar = campaign.getHangar();
-        for (Integer forceId : scenario.getSalvageForces()) {
-            salvageForces.add(forceId);
+        for (Integer forceId : scenario.getSalvageFormations()) {
+            salvageFormations.add(forceId);
 
-            Force force = campaign.getForce(forceId);
-            if (force == null) {
+            Formation formation = campaign.getFormation(forceId);
+            if (formation == null) {
                 LOGGER.error("Force {} not found in campaign", forceId);
                 continue;
             }
 
-            for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+            for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
                 Entity entity = unit.getEntity();
                 if (entity == null) {
                     continue;
@@ -377,7 +377,7 @@ public class SalvagePostScenarioPicker {
             }
         }
 
-        return salvageForces;
+        return salvageFormations;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,15 +50,15 @@ import mekhq.gui.dialog.AbstractMHQIconChooserDialog;
 import mekhq.gui.panels.UnitIconChooser;
 
 /**
- * UnitIconDialog is an implementation of StandardForceIconDialog that is used to select a UnitIcon from the Force Icon
+ * UnitIconDialog is an implementation of StandardFormationIconDialog that is used to select a UnitIcon from the Formation Icon
  * Directory. It defaults to the Force/Units/ category, as that's the primary location for them, and allows the selected
  * icon to be overridden when necessary (such as when we want to specify that a Unit does not have an icon)
  *
- * @see StandardForceIconDialog
+ * @see StandardFormationIconDialog
  * @see AbstractMHQIconChooserDialog
  * @see AbstractIconChooserDialog
  */
-public class UnitIconDialog extends StandardForceIconDialog {
+public class UnitIconDialog extends StandardFormationIconDialog {
     //region Variable Declarations
     private UnitIcon override;
     //endregion Variable Declarations

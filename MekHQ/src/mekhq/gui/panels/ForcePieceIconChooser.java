@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,29 +43,29 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.icons.ForcePieceIcon;
-import mekhq.campaign.icons.LayeredForceIcon;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.FormationPieceIcon;
+import mekhq.campaign.icons.LayeredFormationIcon;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.gui.trees.ForcePieceIconChooserTree;
 
 /**
- * The ForcePieceIconChooser allows one to select ForcePieceIcons from a single LayeredForceIconLayer layer's directory
- * within the Force Icon Directory. It allows for single or multiple selection, based on the layer's individual
+ * The ForcePieceIconChooser allows one to select ForcePieceIcons from a single LayeredFormationIconLayer layer's directory
+ * within the Formation Icon Directory. It allows for single or multiple selection, based on the layer's individual
  * ListSelectionModel. Finally, it is coded to have multiple initializations, namely one per layer, and to handle their
  * individual preferences.
  * <p>
- * It is designed to be used as part of creating a LayeredForceIcon, and not to be used as its own chooser.
+ * It is designed to be used as part of creating a LayeredFormationIcon, and not to be used as its own chooser.
  *
  * @see AbstractMHQIconChooser
  * @see abstractIconChooserPanel
  */
 public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     //region Variable Declarations
-    private LayeredForceIconLayer layer;
+    private LayeredFormationIconLayer layer;
     //endregion Variable Declarations
 
     //region Constructors
-    public ForcePieceIconChooser(final JFrame frame, final LayeredForceIconLayer layer,
+    public ForcePieceIconChooser(final JFrame frame, final LayeredFormationIconLayer layer,
           final @Nullable AbstractIcon icon) {
         super(frame, layer.name() + "ForcePieceIconChooser", new ForcePieceIconChooserTree(layer),
               null, false);
@@ -76,11 +76,11 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
     //endregion Constructors
 
     //region Getters/Setters
-    public LayeredForceIconLayer getLayer() {
+    public LayeredFormationIconLayer getLayer() {
         return layer;
     }
 
-    public void setLayer(final LayeredForceIconLayer layer) {
+    public void setLayer(final LayeredFormationIconLayer layer) {
         this.layer = layer;
     }
     //endregion Getters/Setters
@@ -104,14 +104,14 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
 
     @Override
     protected @Nullable AbstractDirectory getDirectory() {
-        return (MHQStaticDirectoryManager.getForceIcons() == null) ? null
-                     : MHQStaticDirectoryManager.getForceIcons().getCategory(getLayer().getLayerPath());
+        return (MHQStaticDirectoryManager.getFormationIcons() == null) ? null
+                     : MHQStaticDirectoryManager.getFormationIcons().getCategory(getLayer().getLayerPath());
     }
 
     @Override
-    protected ForcePieceIcon createIcon(String category, final String filename) {
+    protected FormationPieceIcon createIcon(String category, final String filename) {
         category = category.replace(getLayer().getLayerPath(), "");
-        return new ForcePieceIcon(getLayer(), category, filename);
+        return new FormationPieceIcon(getLayer(), category, filename);
     }
 
     /**
@@ -120,17 +120,17 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
      * @return the first selected ForcePieceIcons, which may be null if there is nothing selected.
      */
     @Override
-    public @Nullable ForcePieceIcon getSelectedItem() {
+    public @Nullable FormationPieceIcon getSelectedItem() {
         final AbstractIcon icon = super.getSelectedItem();
-        return (icon instanceof ForcePieceIcon) ? (ForcePieceIcon) icon : null;
+        return (icon instanceof FormationPieceIcon) ? (FormationPieceIcon) icon : null;
     }
 
     /**
      * @return the selected ForcePieceIcons, which may be empty if there are no selected icons
      */
-    public List<ForcePieceIcon> getSelectedItems() {
+    public List<FormationPieceIcon> getSelectedItems() {
         return getImageList().getSelectedValuesList().stream()
-                     .map(icon -> (ForcePieceIcon) icon)
+                     .map(icon -> (FormationPieceIcon) icon)
                      .collect(Collectors.toList());
     }
 
@@ -139,12 +139,12 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
      */
     @Override
     public void refreshDirectory() {
-        MHQStaticDirectoryManager.refreshForceIcons();
+        MHQStaticDirectoryManager.refreshFormationIcons();
         refreshTree();
     }
 
     /**
-     * This is separated as the general use case for refreshing is to have the force icon directory refreshed first,
+     * This is separated as the general use case for refreshing is to have the formation icon directory refreshed first,
      * which is then followed by refreshing each individual force piece icon chooser without refreshing the actual
      * directory.
      */
@@ -158,7 +158,7 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
      * Selects the given categories in the tree, updates the shown images to these categories, and selects the items
      * given by the filenames in the image list.
      *
-     * @param icon the icon to select, which should be a LayeredForceIcon. It may be null to set the origin alone as
+     * @param icon the icon to select, which should be a LayeredFormationIcon. It may be null to set the origin alone as
      *             selected.
      */
     @Override
@@ -171,10 +171,10 @@ public class ForcePieceIconChooser extends AbstractMHQIconChooser {
         getTreeCategories().setSelectionPath(new TreePath(
               ((DefaultMutableTreeNode) getTreeCategories().getModel().getRoot()).getPath()));
 
-        if (icon instanceof LayeredForceIcon) {
-            final List<ForcePieceIcon> forcePieceIcons = ((LayeredForceIcon) icon).getPieces().get(getLayer());
+        if (icon instanceof LayeredFormationIcon) {
+            final List<FormationPieceIcon> forcePieceIcons = ((LayeredFormationIcon) icon).getPieces().get(getLayer());
             if ((forcePieceIcons != null) && !forcePieceIcons.isEmpty()) {
-                getImageList().setSelectedValues(forcePieceIcons.toArray(new ForcePieceIcon[] {}));
+                getImageList().setSelectedValues(forcePieceIcons.toArray(new FormationPieceIcon[] {}));
             } else {
                 getImageList().clearSelection();
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -347,7 +347,7 @@ public class FactionAccoladeEvent {
 
         Faction faction = Factions.getInstance().getFaction(factionCode);
         boolean factionIsClan = faction.isClan();
-        int formationSize = CombatTeam.getStandardForceSize(faction, FormationLevel.COMPANY.getDepth());
+        int formationSize = CombatTeam.getStandardFormationSize(faction, FormationLevel.COMPANY.getDepth());
 
         int gameYear = campaign.getGameYear();
 

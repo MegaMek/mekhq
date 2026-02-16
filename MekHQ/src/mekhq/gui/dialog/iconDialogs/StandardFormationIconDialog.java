@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,26 +37,31 @@ import javax.swing.JFrame;
 import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.gui.dialog.AbstractMHQIconChooserDialog;
 import mekhq.gui.panels.AbstractMHQIconChooser;
-import mekhq.gui.panels.StandardForceIconChooser;
+import mekhq.gui.panels.StandardFormationIconChooser;
 
 /**
- * StandardForceIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to select a
- * StandardForceIcon from the Force Icon Directory.
+ * StandardFormationIconDialog is an implementation of AbstractMHQIconChooserDialog that is used to select a
+ * StandardFormationIcon from the Formation Icon Directory.
+ *
+ * <p>Known as {@code StandardForceIconDialog} prior to 0.50.12</p>
+ *
  *
  * @see AbstractMHQIconChooserDialog
  * @see AbstractIconChooserDialog
+ *
+ * @since 0.50.12
  */
-public class StandardForceIconDialog extends AbstractMHQIconChooserDialog {
+public class StandardFormationIconDialog extends AbstractMHQIconChooserDialog {
     //region Constructors
-    public StandardForceIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
-        this(frame, "StandardForceIconDialog", "StandardForceIconDialog.title",
-              new StandardForceIconChooser(frame, icon));
+    public StandardFormationIconDialog(final JFrame frame, final @Nullable AbstractIcon icon) {
+        this(frame, "StandardFormationIconDialog", "StandardFormationIconDialog.title",
+              new StandardFormationIconChooser(frame, icon));
     }
 
-    protected StandardForceIconDialog(final JFrame frame, final String name, final String title,
+    protected StandardFormationIconDialog(final JFrame frame, final String name, final String title,
           final AbstractMHQIconChooser chooser) {
         super(frame, name, title, chooser);
     }
@@ -64,12 +69,12 @@ public class StandardForceIconDialog extends AbstractMHQIconChooserDialog {
 
     //region Getters
     @Override
-    protected StandardForceIconChooser getChooser() {
-        return (StandardForceIconChooser) super.getChooser();
+    protected StandardFormationIconChooser getChooser() {
+        return (StandardFormationIconChooser) super.getChooser();
     }
 
     @Override
-    public @Nullable StandardForceIcon getSelectedItem() {
+    public @Nullable StandardFormationIcon getSelectedItem() {
         return getChooser().getSelectedItem();
     }
     //endregion Getters

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,21 +49,21 @@ import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 
-public record SalvageForceData(Force force, ForceType forceType, @Nullable Person tech, double maximumCargoCapacity,
-      double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageForceData";
+public record SalvageFormationData(Formation formation, FormationType formationType, @Nullable Person tech, double maximumCargoCapacity,
+                                   double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageFormationData";
 
-    public static SalvageForceData buildData(Campaign campaign, Force force, boolean isSpaceScenario) {
-        ForceType forceType = force.getForceType();
-        UUID techId = force.getTechID();
-        Person tech = techId == null || !forceType.isSalvage() ? null : campaign.getPerson(techId);
+    public static SalvageFormationData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
+        FormationType formationType = formation.getFormationType();
+        UUID techId = formation.getTechID();
+        Person tech = techId == null || !formationType.isSalvage() ? null : campaign.getPerson(techId);
         if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
             tech = null;
         }
@@ -74,7 +74,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         boolean hasTug = false;
 
         Hangar hangar = campaign.getHangar();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             if (!unit.isFullyCrewed()) {
                 continue;
             }
@@ -128,8 +128,8 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             }
         }
 
-        return new SalvageForceData(force,
-              forceType,
+        return new SalvageFormationData(formation,
+              formationType,
               tech,
               maximumCargoCapacity,
               maximumTowCapacity,
@@ -141,7 +141,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         StringBuilder tooltip = new StringBuilder();
 
         if (tech == null) {
-            String noTechLabel = getTextAt(RESOURCE_BUNDLE, "SalvageForceData.noTech");
+            String noTechLabel = getTextAt(RESOURCE_BUNDLE, "SalvageFormationData.noTech");
             tooltip.append(noTechLabel);
         } else {
             tooltip.append(tech.getFullTitle()).append("<br>");
@@ -152,10 +152,10 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
             String injuryLabelKey;
             int injuries;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-                injuryLabelKey = "SalvageForceData.injuries";
+                injuryLabelKey = "SalvageFormationData.injuries";
                 injuries = tech.getInjuries().size();
             } else {
-                injuryLabelKey = "SalvageForceData.hits";
+                injuryLabelKey = "SalvageFormationData.hits";
                 injuries = tech.getHits();
             }
             String injuriesLabel = getFormattedTextAt(RESOURCE_BUNDLE, injuryLabelKey, injuries);
@@ -165,11 +165,11 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         return tooltip.toString();
     }
 
-    public String getAllCrewTechTooltip(Campaign campaign, Force force) {
+    public String getAllCrewTechTooltip(Campaign campaign, Formation formation) {
         Hangar hangar = campaign.getHangar();
 
         StringBuilder tooltip = new StringBuilder();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             for (Person crew : unit.getCrew()) {
                 if (crew.isTechExpanded() && !crew.isEngineer()) {
                     tooltip.append(getTechTooltip(campaign, crew));
@@ -199,7 +199,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
     private Map<String, Double> getUnsortedMap(Hangar hangar, boolean isTow) {
         Map<String, Double> capacityMap = new HashMap<>();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             Entity entity = unit.getEntity();
             if (entity == null) {
                 continue;
@@ -237,7 +237,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
 
     public String getTugTooltip(Hangar hangar) {
         Map<String, Boolean> capacityMap = new HashMap<>();
-        for (Unit unit : force.getAllUnitsAsUnits(hangar, false)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             Entity entity = unit.getEntity();
             if (entity == null) {
                 continue;
@@ -266,7 +266,7 @@ public record SalvageForceData(Force force, ForceType forceType, @Nullable Perso
         }
 
         if (tooltip.isEmpty()) {
-            tooltip.append(getTextAt(RESOURCE_BUNDLE, "SalvageForceData.noTug"));
+            tooltip.append(getTextAt(RESOURCE_BUNDLE, "SalvageFormationData.noTug"));
         }
         return tooltip.toString();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -402,7 +402,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
             entity.setNMarines(unit.getMarineCount());
         }
         // Calculate deployment round
-        var force = campaign.getForceFor(unit);
+        var force = campaign.getFormationFor(unit);
         if (force != null) {
             entity.setForceString(force.getFullMMName());
         } else if (!unit.getEntity().getForceString().isBlank()) {
