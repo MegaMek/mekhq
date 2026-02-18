@@ -1721,7 +1721,7 @@ public class StratConRulesManager {
      */
     private static TargetRollModifier getScoutComplementarySPAModifier(Person scout) {
         PersonnelOptions options = scout.getOptions();
-        int complementaryModifier = options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ? 1 : 0;
+        int complementaryModifier = options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ? -1 : 0;
 
         return new TargetRollModifier(complementaryModifier, "Complementary SPA Modifier");
     }
@@ -1811,7 +1811,7 @@ public class StratConRulesManager {
                 PersonnelOptions options = crewMember.getOptions();
                 int complementaryModifier = !hasSensorEquipment && // Doesn't stack with Sensor Equipment
                                                   options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ?
-                                                  1 : 0;
+                                                  -1 : 0;
 
                 int scoutSkillLevel = (scoutSkill == null) ? -1 : scoutSkill.getTotalSkillLevel(skillModifierData);
                 scoutSkillLevel += complementaryModifier;
