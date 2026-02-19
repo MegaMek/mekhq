@@ -58,7 +58,7 @@ public class ExactMatchStep extends UnscrambleStep {
             proposal.proposeMapping(part, part.getEquipmentNum());
         }
 
-        if (part instanceof MissingAmmoBin missingAmmoBin &&
+        if (part instanceof MissingAmmoBin missingAmmoBin && mount.getType() instanceof AmmoType &&
                   ((AmmoBin) missingAmmoBin.getReplacementPart()).canChangeMunitions((AmmoType) mount.getType())) {
             proposal.proposeMapping(missingAmmoBin, part.getEquipmentNum());
         }
