@@ -1811,7 +1811,7 @@ public class StratConRulesManager {
                 PersonnelOptions options = crewMember.getOptions();
                 int complementaryModifier = !hasSensorEquipment && // Doesn't stack with Sensor Equipment
                                                   options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ?
-                                                  -1 : 0;
+                                                  1 : 0;
 
                 int scoutSkillLevel = (scoutSkill == null) ? -1 : scoutSkill.getTotalSkillLevel(skillModifierData);
                 scoutSkillLevel += complementaryModifier;
