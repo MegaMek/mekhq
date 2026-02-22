@@ -54,10 +54,13 @@ import megamek.common.TechConstants;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
+import mekhq.EventSpy;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -1345,6 +1348,72 @@ public class PersonTest {
         setField(person, "injuries", new ArrayList<>(List.of(injury)));
 
         assertEquals(3, person.getNonPermanentInjurySeverity());
+    }
+
+    @Test
+    void changeStatusCommanderKIAPromotesSecondInCommand() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
+        when(mockCampaign.getHangar()).thenReturn(new Hangar());
+        when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
+        when(mockCampaign.getForces()).thenReturn(new Force("Force"));
+
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person secondInCommand = new Person(mockCampaign);
+        secondInCommand.setSecondInCommand(true);
+        when(mockCampaign.getSecondInCommand()).thenReturn(secondInCommand);
+
+        Person person = new Person(mockCampaign);
+        person.setCommander(true);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            person.changeStatus(mockCampaign, LocalDate.of(3001,1,1), PersonnelStatus.KIA);
+
+            // Verify event was emitted
+            PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
+                  (PersonStatusChangedEvent e) -> e.getPerson() == person);
+            assertNotNull(personStatusChangedEvent);
+        }
+
+        assertEquals(PersonnelStatus.KIA, person.getStatus());
+        assertFalse(person.isCommander());
+        // Check that second in command is now the commander
+        assertFalse(secondInCommand.isSecondInCommand());
+        assertTrue(secondInCommand.isCommander());
+        verify(mockCampaign).personUpdated(secondInCommand);
+    }
+
+    @Test
+    void changeStatusSecondInCommandKIA() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
+        when(mockCampaign.getHangar()).thenReturn(new Hangar());
+        when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
+        when(mockCampaign.getForces()).thenReturn(new Force("Force"));
+
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.setSecondInCommand(true);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            person.changeStatus(mockCampaign, LocalDate.of(3001,1,1), PersonnelStatus.KIA);
+
+            // Verify event was emitted
+            PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
+                  (PersonStatusChangedEvent e) -> e.getPerson() == person);
+            assertNotNull(personStatusChangedEvent);
+        }
+
+        assertEquals(PersonnelStatus.KIA, person.getStatus());
+        assertFalse(person.isSecondInCommand());
     }
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {
