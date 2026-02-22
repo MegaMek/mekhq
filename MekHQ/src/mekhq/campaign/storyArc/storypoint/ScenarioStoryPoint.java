@@ -188,11 +188,13 @@ public class ScenarioStoryPoint extends StoryPoint {
                     int scenarioId = Integer.parseInt(wn2.getTextContent().trim());
                     if (null != c) {
                         Scenario s = c.getScenario(scenarioId);
+                        s.autoAssignBotStartingPos();
                         this.setScenario(s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
                     Scenario s = Scenario.generateInstanceFromXML(wn2, c, version);
                     if (null != s) {
+                        s.autoAssignBotStartingPos();
                         this.setScenario(s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionStoryPointId")) {

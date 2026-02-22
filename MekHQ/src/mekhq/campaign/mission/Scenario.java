@@ -1307,6 +1307,39 @@ public class Scenario implements IPlayerSettings {
         return retVal;
     }
 
+    /**
+     * Automatically assign bot players without explicit starting positions
+     * to the opposite starting position of the player (if such a position exists)
+     */
+     public void autoAssignBotStartingPos() {
+
+        // Default any unassigned bot starting zones to the opposite edge of the player.
+        int oppositePos = switch (startingPos) {
+            case Board.START_N -> Board.START_S;
+            case Board.START_NE -> Board.START_SW;
+            case Board.START_E -> Board.START_W;
+            case Board.START_SE -> Board.START_NW;
+            case Board.START_S -> Board.START_N;
+            case Board.START_SW -> Board.START_NE;
+            case Board.START_W -> Board.START_E;
+            case Board.START_NW -> Board.START_SE;
+
+            case Board.START_CENTER -> Board.START_EDGE;
+            case Board.START_EDGE -> Board.START_CENTER;
+
+            default -> Board.START_NONE;
+        };
+
+        if (oppositePos != Board.START_NONE) {
+            for (BotForce botForce: botForces) {
+                if (botForce.getStartingPos() == Board.START_NONE ||
+                          botForce.getStartingPos() == Board.START_ANY) {
+                    botForce.setStartingPos(botForce.getTeam() == 1 ? startingPos : oppositePos);
+                }
+            }
+        }
+    }
+
     protected static List<String> getEntityStub(Node wn) {
         List<String> stub = new ArrayList<>();
         NodeList nl = wn.getChildNodes();
