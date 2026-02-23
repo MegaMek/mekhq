@@ -38,9 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +64,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -1364,10 +1370,12 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person secondInCommand = new Person(mockCampaign);
+        secondInCommand.setFullNameDirect("Second Incommand");
         secondInCommand.setSecondInCommand(true);
         when(mockCampaign.getSecondInCommand()).thenReturn(secondInCommand);
 
         Person person = new Person(mockCampaign);
+        person.setFullNameDirect("First Incommand");
         person.setCommander(true);
 
         try (EventSpy eventSpy = new EventSpy()) {
@@ -1375,7 +1383,7 @@ public class PersonTest {
 
             // Verify event was emitted
             PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
-                  (PersonStatusChangedEvent e) -> e.getPerson() == person);
+                  e -> e.getPerson() == person);
             assertNotNull(personStatusChangedEvent);
         }
 
@@ -1385,6 +1393,13 @@ public class PersonTest {
         assertFalse(secondInCommand.isSecondInCommand());
         assertTrue(secondInCommand.isCommander());
         verify(mockCampaign).personUpdated(secondInCommand);
+        // Should have been at least one report for the person, announcing their death.
+        verify(mockCampaign, atLeastOnce()).addReport(eq(DailyReportType.PERSONNEL),
+              argThat(s -> s.contains(person.getHyperlinkedFullTitle())));
+        // Should have been at least two reports for the second in command, announcing their removal as second in
+        // command and promotion to commander.
+        verify(mockCampaign, atLeast(2)).addReport(eq(DailyReportType.PERSONNEL),
+              argThat(s -> s.contains(secondInCommand.getHyperlinkedFullTitle())));
     }
 
     @Test
@@ -1408,12 +1423,16 @@ public class PersonTest {
 
             // Verify event was emitted
             PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
-                  (PersonStatusChangedEvent e) -> e.getPerson() == person);
+                  e -> e.getPerson() == person);
             assertNotNull(personStatusChangedEvent);
         }
 
         assertEquals(PersonnelStatus.KIA, person.getStatus());
         assertFalse(person.isSecondInCommand());
+        // Should have been at least two reports for the person, one announcing their death and one announcing
+        // they're no longer second in command.
+        verify(mockCampaign, atLeast(2)).addReport(eq(DailyReportType.PERSONNEL),
+              argThat(s -> s.contains(person.getHyperlinkedFullTitle())));
     }
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {
