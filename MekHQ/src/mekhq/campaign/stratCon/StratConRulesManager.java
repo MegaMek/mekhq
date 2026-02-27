@@ -39,6 +39,7 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.board.Coords.ALL_DIRECTIONS;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static megamek.common.compute.Compute.rollD6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
 import static megamek.common.units.UnitType.JUMPSHIP;
@@ -1569,12 +1570,22 @@ public class StratConRulesManager {
                     continue;
                 }
 
+                int trackWidth = track.getWidth() - 1;
+                int trackHeight = track.getHeight() -1;
+
                 for (int direction = 0; direction < 6; direction++) {
+                    StratConCoords checkCoords = currentCoords.translate(direction);
+
+                    if ((checkCoords.getX()<0) ||
+                              (checkCoords.getX() > trackWidth) ||
+                              (checkCoords.getY() < 0) ||
+                              (checkCoords.getY() > trackWidth)
+                    )
+                        continue;
+
                     if (remainingScans == 0) {
                         break;
                     }
-
-                    StratConCoords checkCoords = currentCoords.translate(direction);
 
                     // Per-scout: don't re-visit the same hex for this scout
                     if (scoutVisited.contains(checkCoords)) {
