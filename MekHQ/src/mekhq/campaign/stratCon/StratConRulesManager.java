@@ -3416,7 +3416,8 @@ public class StratConRulesManager {
 
             if (victory) {
                 specificObjective.incrementCurrentObjectiveCount();
-            } else {
+            } else if (!specificObjective.isObjectiveCompleted(track)) {
+                // Only fail the objective if it hasn't already been completed
                 specificObjective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
             }
         }
