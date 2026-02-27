@@ -1569,12 +1569,22 @@ public class StratConRulesManager {
                     continue;
                 }
 
+                int trackWidth = track.getWidth() - 1;
+                int trackHeight = track.getHeight() -1;
+
                 for (int direction = 0; direction < 6; direction++) {
+                    StratConCoords checkCoords = currentCoords.translate(direction);
+
+                    if ((checkCoords.getX()<0) ||
+                              (checkCoords.getX() > trackWidth) ||
+                              (checkCoords.getY() < 0) ||
+                              (checkCoords.getY() > trackWidth)
+                    )
+                        continue;
+
                     if (remainingScans == 0) {
                         break;
                     }
-
-                    StratConCoords checkCoords = currentCoords.translate(direction);
 
                     // Per-scout: don't re-visit the same hex for this scout
                     if (scoutVisited.contains(checkCoords)) {
