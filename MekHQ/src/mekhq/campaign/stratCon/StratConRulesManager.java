@@ -1721,7 +1721,7 @@ public class StratConRulesManager {
      */
     private static TargetRollModifier getScoutComplementarySPAModifier(Person scout) {
         PersonnelOptions options = scout.getOptions();
-        int complementaryModifier = options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ? 1 : 0;
+        int complementaryModifier = options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ? -1 : 0;
 
         return new TargetRollModifier(complementaryModifier, "Complementary SPA Modifier");
     }
@@ -3406,7 +3406,8 @@ public class StratConRulesManager {
 
             if (victory) {
                 specificObjective.incrementCurrentObjectiveCount();
-            } else {
+            } else if (!specificObjective.isObjectiveCompleted(track)) {
+                // Only fail the objective if it hasn't already been completed
                 specificObjective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
             }
         }
