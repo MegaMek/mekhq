@@ -77,9 +77,9 @@ import mekhq.utilities.ReportingUtilities;
 public class MRMSService {
     private static final MMLogger LOGGER = MMLogger.create(MRMSService.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.MRMSService";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MRMS";
     @Deprecated(since = "0.50.10")
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
           MekHQ.getMHQOptions().getLocale());
 
     private MRMSService() {
