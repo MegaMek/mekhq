@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.unit.cleanup;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,9 +42,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import org.junit.jupiter.api.Test;
 
@@ -140,5 +144,48 @@ public class ExactMatchStepTest {
         step.visit(mockProposal, mockMissingPart);
 
         verify(mockProposal, times(1)).proposeMapping(eq(mockMissingPart), eq(1));
+    }
+
+    @Test
+    public void missingAmmoBinWithNonAmmoTypeMountDoesNotThrowTest() {
+        // mount.getType() is a plain EquipmentType (not AmmoType).
+        // Before the instanceof AmmoType guard was added, the cast to AmmoType would
+        // throw a ClassCastException.
+        EquipmentProposal mockProposal = mock(EquipmentProposal.class);
+        EquipmentType mockNonAmmoType = mock(EquipmentType.class);
+        Mounted mockMount = mock(Mounted.class);
+        when(mockMount.getType()).thenReturn(mockNonAmmoType);
+        doReturn(mockMount).when(mockProposal).getEquipment(eq(1));
+        MissingAmmoBin mockMissingAmmoBin = mock(MissingAmmoBin.class);
+        when(mockMissingAmmoBin.getEquipmentNum()).thenReturn(1);
+        when(mockMissingAmmoBin.getType()).thenReturn(mock(AmmoType.class));
+
+        ExactMatchStep step = new ExactMatchStep();
+
+        assertDoesNotThrow(() -> step.visit(mockProposal, mockMissingAmmoBin));
+        verify(mockProposal, times(0)).proposeMapping(any(), anyInt());
+    }
+
+    @Test
+    public void missingAmmoBinWithAmmoTypeMountProposesMapping() {
+        // When mount.getType() is an AmmoType and canChangeMunitions returns true,
+        // proposeMapping should be called for the MissingAmmoBin.
+        EquipmentProposal mockProposal = mock(EquipmentProposal.class);
+        AmmoType mockMountAmmoType = mock(AmmoType.class);
+        Mounted mockMount = mock(Mounted.class);
+        when(mockMount.getType()).thenReturn(mockMountAmmoType);
+        doReturn(mockMount).when(mockProposal).getEquipment(eq(1));
+        AmmoBin mockAmmoBin = mock(AmmoBin.class);
+        when(mockAmmoBin.canChangeMunitions(mockMountAmmoType)).thenReturn(true);
+        MissingAmmoBin mockMissingAmmoBin = mock(MissingAmmoBin.class);
+        when(mockMissingAmmoBin.getEquipmentNum()).thenReturn(1);
+        when(mockMissingAmmoBin.getType()).thenReturn(mock(AmmoType.class));
+        doReturn(mockAmmoBin).when(mockMissingAmmoBin).getReplacementPart();
+
+        ExactMatchStep step = new ExactMatchStep();
+
+        step.visit(mockProposal, mockMissingAmmoBin);
+
+        verify(mockProposal, times(1)).proposeMapping(eq(mockMissingAmmoBin), eq(1));
     }
 }
