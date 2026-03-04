@@ -1277,7 +1277,7 @@ public class StratConRulesManager {
             }
 
             // This is to ensure we're not trying to place a scenario off the map
-            if (trackState.isOnTrack(newCoords)){
+            if (trackState.isOffTrack(newCoords)) {
                 continue;
             }
 
@@ -1567,8 +1567,9 @@ public class StratConRulesManager {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
                     //ensure we are scouting on the StratCon track
-                    if (track.isOnTrack(checkCoords))
+                    if (track.isOffTrack(checkCoords)) {
                         continue;
+                    }
 
                     if (remainingScans == 0) {
                         break;

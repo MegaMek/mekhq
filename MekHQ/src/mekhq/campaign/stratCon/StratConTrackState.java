@@ -564,7 +564,7 @@ public class StratConTrackState {
     /**
      * Check to see if specified coordinates would be placed off the StratCon board
      */
-    public boolean isOnTrack(StratConCoords coords){
+    public boolean isOffTrack(StratConCoords coords) {
         int width = getWidth() - 1;
         int height = getHeight() - 1;
         return (coords.getX() < 0) ||
