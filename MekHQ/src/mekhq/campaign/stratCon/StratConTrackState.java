@@ -561,6 +561,17 @@ public class StratConTrackState {
     public void setTerrainTile(StratConCoords coords, String terrainTypeName) {
         terrainTypes.put(coords, terrainTypeName);
     }
+    /**
+     * Check to see if specified coordinates would be placed off the StratCon board
+     */
+    public boolean isOffTrack(StratConCoords coords) {
+        int width = getWidth() - 1;
+        int height = getHeight() - 1;
+        return (coords.getX() < 0) ||
+                     (coords.getX() > width) ||
+                     (coords.getY() < 0) ||
+                     (coords.getY() > height);
+    }
 
     public String getTerrainTile(StratConCoords coords) {
         return terrainTypes.getOrDefault(coords, "");
