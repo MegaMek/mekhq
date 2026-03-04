@@ -302,7 +302,7 @@ public class BotForceRandomizer {
         // distribution is centered on the focal weight class and has some chance of
         // going higher
         // or lower. The scale parameter of 0.4 produces a reasonable variance.
-        GammaDistribution gamma = new GammaDistribution(focalWeightClass / 0.4, 0.4);
+        GammaDistribution gamma = new GammaDistribution(targetWeightClass / 0.4, 0.4);
 
         // we use a double while loop here so that we start the whole thing over if we
         // overshoot force size

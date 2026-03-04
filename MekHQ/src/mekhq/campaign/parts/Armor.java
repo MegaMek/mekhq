@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -639,7 +639,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
         if (amountRemaining > 0) {
             LOGGER.warn("Still trying to add armor but that shouldn't have been a problem!");
-        } else if (amount < 0) {
+        } else if (amountRemaining < 0) {
             LOGGER.warn("Still trying to remove armor but no more armor is in the warehouse!");
         }
     }
