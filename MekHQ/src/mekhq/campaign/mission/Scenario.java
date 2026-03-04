@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.mission;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -64,8 +64,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -102,11 +102,11 @@ public class Scenario implements IPlayerSettings {
     private LocalDate date;
     private List<Integer> subForceIds;
     private List<UUID> unitIds;
-    private final List<Integer> salvageForces;
+    private final List<Integer> salvageFormations;
     private final List<UUID> salvageTechs;
     private int id = S_DEFAULT_ID;
     private int missionId;
-    private ForceStub stub;
+    private FormationStub stub;
     private boolean cloaked;
 
     // allow multiple loot objects for meeting different scenario objectives
@@ -178,7 +178,7 @@ public class Scenario implements IPlayerSettings {
         date = null;
         subForceIds = new ArrayList<>();
         unitIds = new ArrayList<>();
-        salvageForces = new ArrayList<>();
+        salvageFormations = new ArrayList<>();
         salvageTechs = new ArrayList<>();
         loots = new ArrayList<>();
         scenarioObjectives = new ArrayList<>();
@@ -631,36 +631,36 @@ public class Scenario implements IPlayerSettings {
         return subForceIds;
     }
 
-    public Force getForces(Campaign campaign) {
-        Force force = new Force("Assigned Forces");
+    public Formation getForces(Campaign campaign) {
+        Formation formation = new Formation("Assigned Forces");
         for (int subid : subForceIds) {
-            Force sub = campaign.getForce(subid);
+            Formation sub = campaign.getFormation(subid);
             if (null != sub) {
-                force.addSubForce(sub, false);
+                formation.addSubFormation(sub, false);
             }
         }
         for (UUID uid : unitIds) {
-            force.addUnit(uid);
+            formation.addUnit(uid);
         }
-        return force;
+        return formation;
     }
 
-    public List<Integer> getSalvageForces() {
-        return new ArrayList<>(salvageForces);
+    public List<Integer> getSalvageFormations() {
+        return new ArrayList<>(salvageFormations);
     }
 
-    public void removeSalvageForce(List<Integer> forceIds) {
-        salvageForces.removeAll(forceIds);
+    public void removeSalvageFormation(List<Integer> forceIds) {
+        salvageFormations.removeAll(forceIds);
     }
 
-    public void addSalvageForce(int forceId) {
-        if (!salvageForces.contains(forceId)) {
-            salvageForces.add(forceId);
+    public void addSalvageFormation(int forceId) {
+        if (!salvageFormations.contains(forceId)) {
+            salvageFormations.add(forceId);
         }
     }
 
-    public void clearSalvageForces() {
-        salvageForces.clear();
+    public void clearSalvageFormations() {
+        salvageFormations.clear();
     }
 
     public List<UUID> getSalvageTechs() {
@@ -713,7 +713,7 @@ public class Scenario implements IPlayerSettings {
         }
     }
 
-    public void removeForce(int fid) {
+    public void removeFormation(int fid) {
         List<Integer> toRemove = new ArrayList<>();
         for (Integer subForceId : subForceIds) {
             if (fid == subForceId) {
@@ -723,9 +723,9 @@ public class Scenario implements IPlayerSettings {
         subForceIds.removeAll(toRemove);
     }
 
-    public void clearAllForcesAndPersonnel(Campaign campaign) {
+    public void clearAllFormationsAndPersonnel(Campaign campaign) {
         for (int fid : subForceIds) {
-            Force f = campaign.getForce(fid);
+            Formation f = campaign.getFormation(fid);
             if (null != f) {
                 f.clearScenarioIds(campaign);
                 MekHQ.triggerEvent(new DeploymentChangedEvent(f, this));
@@ -747,19 +747,19 @@ public class Scenario implements IPlayerSettings {
      */
     public void convertToStub(final Campaign campaign, final ScenarioStatus status) {
         setStatus(status);
-        clearAllForcesAndPersonnel(campaign);
+        clearAllFormationsAndPersonnel(campaign);
         generateStub(campaign);
     }
 
     public void generateStub(Campaign c) {
-        stub = new ForceStub(getForces(c), c);
+        stub = new FormationStub(getForces(c), c);
         for (BotForce bf : botForces) {
             botForcesStubs.add(bf.generateStub(c));
         }
         botForces.clear();
     }
 
-    public ForceStub getForceStub() {
+    public FormationStub getForceStub() {
         return stub;
     }
 
@@ -923,22 +923,22 @@ public class Scenario implements IPlayerSettings {
     /**
      * Determines whether a list of forces is eligible to deploy to the scenario.
      *
-     * @param forces list of forces
+     * @param formations list of forces
      * @param c      the campaign that the forces are part of
      *
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
-    public boolean canDeployForces(Vector<Force> forces, Campaign c) {
+    public boolean canDeployForces(Vector<Formation> formations, Campaign c) {
         int additionalQuantity = 0;
-        for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits(false);
+        for (Formation formation : formations) {
+            Vector<UUID> units = formation.getAllUnits(false);
             for (UUID id : units) {
                 if (!canDeploy(c.getUnit(id), c)) {
                     return false;
                 }
             }
             if (null != deploymentLimit) {
-                additionalQuantity += deploymentLimit.getForceQuantity(force, c);
+                additionalQuantity += deploymentLimit.getForceQuantity(formation, c);
             }
         }
         if (null != deploymentLimit) {
@@ -1041,12 +1041,12 @@ public class Scenario implements IPlayerSettings {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loots");
         }
 
-        if (!salvageForces.isEmpty() && getStatus().isCurrent()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salvageForces");
-            for (Integer forceId : salvageForces) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageForce", forceId);
+        if (!salvageFormations.isEmpty() && getStatus().isCurrent()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salvageFormations");
+            for (Integer forceId : salvageFormations) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageFormation", forceId);
             }
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salvageForces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salvageFormations");
         }
 
         if (!salvageTechs.isEmpty() && getStatus().isCurrent()) {
@@ -1153,8 +1153,9 @@ public class Scenario implements IPlayerSettings {
                     retVal.setDesc(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("report")) {
                     retVal.setReport(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
-                    retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationStub") || wn2.getNodeName().equalsIgnoreCase(
+                      "forceStub")) {
+                    retVal.stub = FormationStub.generateInstanceFromXML(wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("linkedScenarioID")) {
                     retVal.linkedScenarioID = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
@@ -1178,7 +1179,8 @@ public class Scenario implements IPlayerSettings {
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
                         retVal.loots.add(loot);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvageForces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageFormations") || wn2.getNodeName().equalsIgnoreCase(
+                      "salvageForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -1187,13 +1189,14 @@ public class Scenario implements IPlayerSettings {
                             continue;
                         }
 
-                        if (!wn3.getNodeName().equalsIgnoreCase("salvageForce")) {
+                        if (!wn3.getNodeName().equalsIgnoreCase("salvageFormation") && !wn3.getNodeName().equalsIgnoreCase(
+                              "salvageForce")) {
                             // Error condition of sorts!
-                            LOGGER.error("Unknown node type loaded in salvageForces nodes: {}", wn3.getNodeName());
+                            LOGGER.error("Unknown node type loaded in salveFormations nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         // We need to use this method, as it includes additional safeties
-                        retVal.addSalvageForce(MathUtility.parseInt(wn3.getTextContent().trim(), FORCE_NONE));
+                        retVal.addSalvageFormation(MathUtility.parseInt(wn3.getTextContent().trim(), FORMATION_NONE));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvageTechs")) {
                     NodeList nl2 = wn2.getChildNodes();

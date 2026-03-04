@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.campaign.stratCon.StratConBiomeManifest.ImageType;
@@ -232,7 +232,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         if ((currentTrack != null) && currentTrack.getAssignedCoordForces().containsKey(coords)) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(coords)) {
-                String forceName = campaign.getForce(forceID).getName();
+                String forceName = campaign.getFormation(forceID).getName();
 
                 JCheckBoxMenuItem stickyForceItem = new JCheckBoxMenuItem();
                 stickyForceItem.setText(String.format("%s - remain deployed", forceName));
@@ -684,7 +684,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Worker function to render force icons to the given surface.
+     * Worker function to render formation icons to the given surface.
      */
     private void drawForces(Graphics2D g2D) {
         int xRadius = HEX_X_RADIUS / 3;
@@ -702,8 +702,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
                         String forceName;
                         try {
-                            Force force = campaign.getForce(forceID);
-                            forceName = force.getName();
+                            Formation formation = campaign.getFormation(forceID);
+                            forceName = formation.getName();
                         } catch (Exception e) {
                             // If we can't successfully fetch the Force, there is no point trying
                             // to draw it on the map.
@@ -931,8 +931,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
-                Force force = this.campaign.getForce(forceID);
-                infoBuilder.append(force.getName()).append(" assigned");
+                Formation formation = this.campaign.getFormation(forceID);
+                infoBuilder.append(formation.getName()).append(" assigned");
 
                 if (currentTrack.getStickyForces().contains(forceID)) {
                     infoBuilder.append("<i> - remain deployed</i>");

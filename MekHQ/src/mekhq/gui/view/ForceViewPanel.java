@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,8 +53,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -69,22 +69,22 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
-    private final Force force;
+    private final Formation formation;
     private final Campaign campaign;
 
     private JPanel pnlStats;
     private JPanel pnlSubUnits;
 
-    public ForceViewPanel(Force f, Campaign c) {
+    public ForceViewPanel(Formation f, Campaign c) {
         super();
-        this.force = f;
+        this.formation = f;
         this.campaign = c;
         this.setBorder(null);
         initComponents();
     }
 
     private void initComponents() {
-        getAccessibleContext().setAccessibleName("Selected Force: " + force.getFullName());
+        getAccessibleContext().setAccessibleName("Selected Force: " + formation.getFullName());
 
         JLabel lblIcon = new JLabel();
         pnlStats = new JPanel();
@@ -93,9 +93,9 @@ public class ForceViewPanel extends JScrollablePanel {
 
         setLayout(new GridBagLayout());
 
-        lblIcon.setIcon(force.getForceIcon().getImageIcon(150));
+        lblIcon.setIcon(formation.getFormationIcon().getImageIcon(150));
         lblIcon.setName("lblIcon");
-        lblIcon.getAccessibleContext().setAccessibleName("Force Icon");
+        lblIcon.getAccessibleContext().setAccessibleName("Formation Icon");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -105,7 +105,7 @@ public class ForceViewPanel extends JScrollablePanel {
         add(lblIcon, gridBagConstraints);
 
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(force.getName()));
+        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(formation.getName()));
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -130,11 +130,11 @@ public class ForceViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlSubUnits, gridBagConstraints);
 
-        if (null != force.getDescription() && !force.getDescription().isEmpty()) {
+        if (null != formation.getDescription() && !formation.getDescription().isEmpty()) {
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(force.getDescription()));
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(formation.getDescription()));
             txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder("Description"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -179,14 +179,14 @@ public class ForceViewPanel extends JScrollablePanel {
         String assigned = "";
         String type = null;
 
-        Person commanderPerson = campaign.getPerson(force.getForceCommanderID());
+        Person commanderPerson = campaign.getPerson(formation.getFormationCommanderID());
 
-        if (force.getId() == 0) {
+        if (formation.getId() == 0) {
             commanderPerson = campaign.getCommander();
         }
         String commanderName = commanderPerson != null ? commanderPerson.getFullTitle() : "";
 
-        for (UUID uid : force.getAllUnits(false)) {
+        for (UUID uid : formation.getAllUnits(false)) {
             Unit unit = campaign.getUnit(uid);
             if (null != unit) {
                 // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
@@ -202,15 +202,15 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        if (force.getTechID() != null) {
-            final Person person = campaign.getPerson(force.getTechID());
+        if (formation.getTechID() != null) {
+            final Person person = campaign.getPerson(formation.getTechID());
             if (person != null) {
                 lanceTech = person.getFullName();
             }
         }
 
-        if (null != force.getParentForce()) {
-            assigned = force.getParentForce().getName();
+        if (null != formation.getParentFormation()) {
+            assigned = formation.getParentFormation().getName();
         }
 
         int nextY = 0;
@@ -218,13 +218,13 @@ public class ForceViewPanel extends JScrollablePanel {
         if (null != type) {
             lblType.setName("lblType");
 
-            ForceType forceType = force.getForceType();
+            FormationType formationType = formation.getFormationType();
 
             String forceLabel;
-            if (forceType.isStandard()) {
-                forceLabel = force.getFormationLevel().toString();
+            if (formationType.isStandard()) {
+                forceLabel = formation.getFormationLevel().toString();
             } else {
-                forceLabel = forceType.getDisplayName() + ' ' + force.getFormationLevel().toString();
+                forceLabel = formationType.getDisplayName() + ' ' + formation.getFormationLevel().toString();
             }
 
             lblType.setText("<html><i>" + forceLabel + "</i></html>");
@@ -274,7 +274,7 @@ public class ForceViewPanel extends JScrollablePanel {
         pnlStats.add(lblFormationType1, gridBagConstraints);
 
         lblFormationType2.setName("lblFormationType2");
-        lblFormationType2.setText(force.getFormationLevel().toString());
+        lblFormationType2.setText(formation.getFormationLevel().toString());
         lblFormationType1.setLabelFor(lblFormationType2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -286,7 +286,7 @@ public class ForceViewPanel extends JScrollablePanel {
         pnlStats.add(lblFormationType2, gridBagConstraints);
         nextY++;
 
-        if (null != force.getTechID()) {
+        if (null != formation.getTechID()) {
             if (!lanceTech.isBlank()) {
                 lblTech1.setName("lblTech1");
                 lblTech1.setText(resourceMap.getString("lblTech1.text"));
@@ -423,10 +423,10 @@ public class ForceViewPanel extends JScrollablePanel {
         JLabel lblForce;
 
         int nextY = 0;
-        for (Force subForce : force.getSubForces()) {
+        for (Formation subFormation : formation.getSubFormations()) {
             lblForce = new JLabel();
-            lblForce.setText(getForceSummary(subForce));
-            lblForce.setIcon(subForce.getForceIcon().getImageIcon(72));
+            lblForce.setText(getForceSummary(subFormation));
+            lblForce.setIcon(subFormation.getFormationIcon().getImageIcon(72));
             nextY++;
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -444,7 +444,7 @@ public class ForceViewPanel extends JScrollablePanel {
         JLabel lblUnit;
         ArrayList<Unit> units = new ArrayList<>();
         ArrayList<Unit> unmannedUnits = new ArrayList<>();
-        for (UUID uid : force.getUnits()) {
+        for (UUID uid : formation.getUnits()) {
             Unit u = campaign.getUnit(uid);
             if (null == u) {
                 continue;
@@ -645,18 +645,18 @@ public class ForceViewPanel extends JScrollablePanel {
     /**
      * Returns a summary of the given Force in HTML format.
      *
-     * @param force the Force to generate the summary for
+     * @param formation the Force to generate the summary for
      *
      * @return a summary of the Force in HTML format
      */
-    public String getForceSummary(Force force) {
+    public String getForceSummary(Formation formation) {
         int battleValue = 0;
         Money cost = Money.zero();
         double tonnage = 0;
         int number = 0;
         String commander = "No personnel found";
 
-        for (UUID uid : force.getAllUnits(false)) {
+        for (UUID uid : formation.getAllUnits(false)) {
             Unit unit = campaign.getUnit(uid);
             if (null != unit) {
                 boolean crewExists = unit.getCommander() != null;
@@ -667,8 +667,8 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        if (force.getForceCommanderID() != null) {
-            Person forceCommander = campaign.getPerson(force.getForceCommanderID());
+        if (formation.getFormationCommanderID() != null) {
+            Person forceCommander = campaign.getPerson(formation.getFormationCommanderID());
 
             if (forceCommander != null) {
                 commander = forceCommander.getFullTitle();
@@ -679,7 +679,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
         StringBuilder summary = new StringBuilder();
         summary.append("<html><font size='4'><b>")
-              .append(force.getName())
+              .append(formation.getName())
               .append("</b> (")
               .append(commander)
               .append(")</font><br/>");

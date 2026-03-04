@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,35 +40,39 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 
 /**
- * This contains the individual layers of a LayeredForceIcon, which are also the potential header folders within the
- * Pieces category of the Force Icon Directory.
+ * This contains the individual layers of a LayeredFormationIcon, which are also the potential header folders within the
+ * Pieces category of the Formation Icon Directory.
+ *
+ * <p>Known as {@code LayeredForceIconLayer} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
-public enum LayeredForceIconLayer {
+public enum LayeredFormationIconLayer {
     //region Enum Declarations
-    TYPE("LayeredForceIconLayer.TYPE.text", "LayeredForceIconLayer.TYPE.toolTipText",
+    TYPE("LayeredFormationIconLayer.TYPE.text", "LayeredFormationIconLayer.TYPE.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_TYPE_PATH, "tableTypes", ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    FORMATION("LayeredForceIconLayer.FORMATION.text", "LayeredForceIconLayer.FORMATION.toolTipText",
+    FORMATION("LayeredFormationIconLayer.FORMATION.text", "LayeredFormationIconLayer.FORMATION.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_FORMATION_PATH, "tableFormations", ListSelectionModel.SINGLE_SELECTION),
-    ADJUSTMENT("LayeredForceIconLayer.ADJUSTMENT.text",
-          "LayeredForceIconLayer.ADJUSTMENT.toolTipText",
+    ADJUSTMENT("LayeredFormationIconLayer.ADJUSTMENT.text",
+          "LayeredFormationIconLayer.ADJUSTMENT.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_ADJUSTMENT_PATH,
           "tableAdjustments",
           ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    ALPHANUMERIC("LayeredForceIconLayer.ALPHANUMERIC.text",
-          "LayeredForceIconLayer.ALPHANUMERIC.toolTipText",
+    ALPHANUMERIC("LayeredFormationIconLayer.ALPHANUMERIC.text",
+          "LayeredFormationIconLayer.ALPHANUMERIC.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_ALPHANUMERIC_PATH,
           "tableAlphanumerics",
           ListSelectionModel.MULTIPLE_INTERVAL_SELECTION),
-    SPECIAL_MODIFIER("LayeredForceIconLayer.SPECIAL_MODIFIER.text",
-          "LayeredForceIconLayer.SPECIAL_MODIFIER.toolTipText",
+    SPECIAL_MODIFIER("LayeredFormationIconLayer.SPECIAL_MODIFIER.text",
+          "LayeredFormationIconLayer.SPECIAL_MODIFIER.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH,
           "tableSpecialModifiers",
           ListSelectionModel.SINGLE_SELECTION),
-    BACKGROUND("LayeredForceIconLayer.BACKGROUND.text", "LayeredForceIconLayer.BACKGROUND.toolTipText",
+    BACKGROUND("LayeredFormationIconLayer.BACKGROUND.text", "LayeredFormationIconLayer.BACKGROUND.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_BACKGROUND_PATH, "tableBackgrounds", ListSelectionModel.SINGLE_SELECTION),
-    FRAME("LayeredForceIconLayer.FRAME.text", "LayeredForceIconLayer.FRAME.toolTipText",
+    FRAME("LayeredFormationIconLayer.FRAME.text", "LayeredFormationIconLayer.FRAME.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_FRAME_PATH, "tableFrames", ListSelectionModel.SINGLE_SELECTION),
-    LOGO("LayeredForceIconLayer.LOGO.text", "LayeredForceIconLayer.LOGO.toolTipText",
+    LOGO("LayeredFormationIconLayer.LOGO.text", "LayeredFormationIconLayer.LOGO.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH, "tableLogos", ListSelectionModel.SINGLE_SELECTION);
     //endregion Enum Declarations
 
@@ -81,7 +85,7 @@ public enum LayeredForceIconLayer {
     //endregion Variable Declarations
 
     //region Constructors
-    LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
+    LayeredFormationIconLayer(final String name, final String toolTipText, final String layerPath,
           final String tableName, final int listSelectionMode) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
               MekHQ.getMHQOptions().getLocale());
@@ -146,9 +150,9 @@ public enum LayeredForceIconLayer {
     //endregion Boolean Comparison Methods
 
     /**
-     * @return the layered force icon enum values in the order they are drawn in
+     * @return the layered formation icon enum values in the order they are drawn in
      */
-    public static List<LayeredForceIconLayer> getInDrawOrder() {
+    public static List<LayeredFormationIconLayer> getInDrawOrder() {
         return List.of(BACKGROUND, FRAME, TYPE, FORMATION, ADJUSTMENT, ALPHANUMERIC, SPECIAL_MODIFIER, LOGO);
     }
 

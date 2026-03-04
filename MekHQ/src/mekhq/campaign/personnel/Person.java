@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -112,7 +112,7 @@ import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -6164,9 +6164,9 @@ public class Person {
             }
         }
 
-        for (final Force force : campaign.getAllForces()) {
-            if (getId().equals(force.getTechID())) {
-                force.setTechID(null);
+        for (final Formation formation : campaign.getAllFormations()) {
+            if (getId().equals(formation.getTechID())) {
+                formation.setTechID(null);
             }
         }
     }

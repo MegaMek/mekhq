@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@
  */
 package mekhq.gui.menus;
 
-import static mekhq.campaign.force.Force.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ import javax.swing.JMenuItem;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -55,8 +55,8 @@ import mekhq.utilities.MHQInternationalization;
  *
  * <p>This menu provides:</p>
  * <ul>
- *     <li>A "clear assignment" option that moves units to {@link Force#FORCE_NONE}</li>
- *     <li>A hierarchical tree of all forces descending from {@link Force#FORCE_ORIGIN}</li>
+ *     <li>A "clear assignment" option that moves units to {@link Formation#FORMATION_NONE}</li>
+ *     <li>A hierarchical tree of all forces descending from {@link Formation#FORMATION_ORIGIN}</li>
  *     <li>Per-force assignment actions for each force in the hierarchy</li>
  * </ul>
  *
@@ -117,7 +117,7 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
      *
      * <ul>
      *     <li>A "clear assignment" option that removes units from all forces</li>
-     *     <li>A recursive force hierarchy beginning with {@link Force#FORCE_ORIGIN}</li>
+     *     <li>A recursive force hierarchy beginning with {@link Formation#FORMATION_ORIGIN}</li>
      * </ul>
      *
      * @param campaign the campaign whose forces are available
@@ -132,23 +132,23 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
         JMenuItem clearAssignment = new JMenuItem(MHQInternationalization.getText("AssignUnitToForceMenu.clear"));
         clearAssignment.addActionListener(ev -> {
             for (Unit unit : units) {
-                Force parentForce = campaign.getForceFor(unit);
-                if (null != parentForce) {
-                    campaign.removeUnitFromForce(unit);
-                    if (null != parentForce.getTechID()) {
+                Formation parentFormation = campaign.getFormationFor(unit);
+                if (null != parentFormation) {
+                    campaign.removeUnitFromFormation(unit);
+                    if (null != parentFormation.getTechID()) {
                         unit.removeTech();
                     }
                 }
                 // Clear any transport assignments of units in the deleted force
                 TOEMouseAdapter.clearTransportAssignment(campaign, unit);
 
-                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentForce, unit));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentFormation, unit));
             }
         });
         add(clearAssignment);
 
-        Force originForce = campaign.getForce(FORCE_ORIGIN); // All other forces descend from this force
-        addForceMenu(this, campaign, units, originForce);
+        Formation originFormation = campaign.getFormation(FORMATION_ORIGIN); // All other forces descend from this force
+        addForceMenu(this, campaign, units, originFormation);
     }
 
     /**
@@ -165,24 +165,24 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
      * @param parent   the UI component (menu or submenu) to append to
      * @param campaign the campaign context
      * @param units    the units that will be assigned upon selection
-     * @param force    the force represented by this submenu
+     * @param formation    the force represented by this submenu
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void addForceMenu(JComponent parent, final Campaign campaign, final Unit[] units, final Force force) {
+    private void addForceMenu(JComponent parent, final Campaign campaign, final Unit[] units, final Formation formation) {
         // A submenu for this force
-        JMenu forceMenu = new JMenu(force.getName());
-        forceMenu.addActionListener(ev -> addToForce(campaign, units, force));
+        JMenu forceMenu = new JMenu(formation.getName());
+        forceMenu.addActionListener(ev -> addToForce(campaign, units, formation));
 
         // Option to assign directly to this force
         JMenuItem assignHere = new JMenuItem(MHQInternationalization.getFormattedText("AssignUnitToForceMenu.subMenu",
-              force.getName()));
-        assignHere.addActionListener(ev -> addToForce(campaign, units, force));
+              formation.getName()));
+        assignHere.addActionListener(ev -> addToForce(campaign, units, formation));
         forceMenu.add(assignHere);
 
         // Recurse for all children
-        for (Force child : force.getSubForces()) {
+        for (Formation child : formation.getSubFormations()) {
             addForceMenu(forceMenu, campaign, units, child);
         }
 
@@ -192,19 +192,19 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
     /**
      * Assigns all provided units to the specified force.
      *
-     * <p>This method wraps a call to {@link Campaign#addUnitToForce(Unit, int)}, ensuring that each unit is moved to
+     * <p>This method wraps a call to {@link Campaign#addUnitToFormation(Unit, int)}, ensuring that each unit is moved to
      * the provided force ID.</p>
      *
      * @param campaign    the campaign receiving the assignment update
      * @param units       the units to move
-     * @param originForce the force to assign units to
+     * @param originFormation the force to assign units to
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void addToForce(Campaign campaign, Unit[] units, Force originForce) {
+    private static void addToForce(Campaign campaign, Unit[] units, Formation originFormation) {
         for (Unit unit : units) {
-            campaign.addUnitToForce(unit, originForce.getId());
+            campaign.addUnitToFormation(unit, originFormation.getId());
         }
     }
 }

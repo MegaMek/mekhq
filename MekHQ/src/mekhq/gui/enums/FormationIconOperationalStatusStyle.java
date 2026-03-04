@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,16 +38,20 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 
 /**
- * This is the style of Operational Status indicator to use for a LayeredForceIcon when automatically assigning and
+ * This is the style of Operational Status indicator to use for a LayeredFormationIcon when automatically assigning and
  * updating the value based on the assigned units.
+ *
+ * <p>Known as {@code ForceIconOperationStatusStyle} prior to 0.50.12</p>
+ *
+ * @since 0.50.12
  */
-public enum ForceIconOperationalStatusStyle {
+public enum FormationIconOperationalStatusStyle {
     //region Enum Declarations
-    BORDER("ForceIconOperationalStatusStyle.BORDER.text",
-          "ForceIconOperationalStatusStyle.BORDER.toolTipText",
+    BORDER("FormationIconOperationalStatusStyle.BORDER.text",
+          "FormationIconOperationalStatusStyle.BORDER.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH),
-    TAB("ForceIconOperationalStatusStyle.TAB.text",
-          "ForceIconOperationalStatusStyle.TAB.toolTipText",
+    TAB("FormationIconOperationalStatusStyle.TAB.text",
+          "FormationIconOperationalStatusStyle.TAB.toolTipText",
           MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH);
     //endregion Enum Declarations
 
@@ -58,7 +62,7 @@ public enum ForceIconOperationalStatusStyle {
     //endregion Variable Declarations
 
     //region Constructors
-    ForceIconOperationalStatusStyle(final String name, final String toolTipText,
+    FormationIconOperationalStatusStyle(final String name, final String toolTipText,
           final String path) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
               MekHQ.getMHQOptions().getLocale());

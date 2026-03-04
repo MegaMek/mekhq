@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -123,7 +123,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_CREW_STATE -> "Crew State";
             case COL_QUALITY -> "Quality";
             case COL_PILOT -> "Assigned to";
-            case COL_FORCE -> "Force";
+            case COL_FORCE -> "Formation";
             case COL_CREW -> "Crew";
             case COL_TECH_CRW -> "Tech Crew";
             case COL_MAINTAIN -> "Maint. Cost";
@@ -347,8 +347,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_QUALITY -> unit.getQualityName();
             case COL_PILOT -> (unit.getCommander() != null) ? unit.getCommander().getHTMLTitle() : "-";
             case COL_FORCE -> {
-                Force force = unit.getCampaign().getForce(unit.getForceId());
-                yield (force != null) ? force.getFullName() : "-";
+                Formation formation = unit.getCampaign().getFormation(unit.getFormationId());
+                yield (formation != null) ? formation.getFullName() : "-";
             }
             case COL_CREW -> {
                 int totalTempCrew = unit.getTotalTempCrew();
@@ -493,20 +493,20 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     break;
                 }
                 case COL_FORCE: {
-                    Force force = getCampaign().getForceFor(u);
-                    if (force != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(force.getName()).append("</b>");
-                        Force parent = force.getParentForce();
+                    Formation formation = getCampaign().getFormationFor(u);
+                    if (formation != null) {
+                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
+                        Formation parent = formation.getParentFormation();
                         // cut off after three lines and don't include the top level
                         int lines = 1;
-                        while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
+                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
                             desc.append("<br>").append(parent.getName());
                             lines++;
-                            parent = parent.getParentForce();
+                            parent = parent.getParentFormation();
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
-                        final Image forceImage = force.getForceIcon().getImage(54);
+                        final Image forceImage = formation.getFormationIcon().getImage(54);
                         if (forceImage != null) {
                             setImage(forceImage);
                         } else {

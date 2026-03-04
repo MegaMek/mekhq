@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1614,12 +1614,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             if (box.isSelected()) {
                 UUID id = UUID.fromString(box.getActionCommand());
 
-                if (!linkedForces.containsKey(campaign.getUnit(id).getForceId())) {
+                if (!linkedForces.containsKey(campaign.getUnit(id).getFormationId())) {
                     List<UUID> unitList = new ArrayList<>();
-                    linkedForces.put(campaign.getUnit(id).getForceId(), unitList);
+                    linkedForces.put(campaign.getUnit(id).getFormationId(), unitList);
                     reinforcementsSent = true;
                 }
-                linkedForces.get(campaign.getUnit(id).getForceId()).add(id);
+                linkedForces.get(campaign.getUnit(id).getFormationId()).add(id);
             }
         }
 

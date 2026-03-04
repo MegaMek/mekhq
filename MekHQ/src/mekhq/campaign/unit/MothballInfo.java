@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratCon.StratConCampaignState;
@@ -69,7 +69,7 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
-        forceId = Force.FORCE_NONE;
+        forceId = Formation.FORMATION_NONE;
     }
 
     /**
@@ -92,7 +92,7 @@ public class MothballInfo {
             techId = tech.getId();
         }
 
-        forceId = unit.getForceId();
+        forceId = unit.getFormationId();
 
         List<Person> drivers = new ArrayList<>(unit.getDrivers());
         for (Person driver : drivers) {
@@ -175,12 +175,12 @@ public class MothballInfo {
         }
 
         // Attempt to return the unit to its last force assignment.
-        Force force = campaign.getForce(forceId);
-        if (force != null) {
+        Formation formation = campaign.getFormation(forceId);
+        if (formation != null) {
             // If the force is deployed to a scenario, back out. We don't want to restore the unit to the original
             // force as that would cause them to teleport into the scenario. This will likely cause issues, so it's
             // prohibited.
-            if (force.isDeployed()) {
+            if (formation.isDeployed()) {
                 return;
             }
 
@@ -200,7 +200,7 @@ public class MothballInfo {
             }
 
             // If all the checks have passed, restore the unit to its last force
-            campaign.addUnitToForce(unit, forceId);
+            campaign.addUnitToFormation(unit, forceId);
         }
 
         unit.resetEngineer();
