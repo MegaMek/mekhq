@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,8 +41,11 @@ import megamek.logging.MMLogger;
  * <p>
  * It is used to classify and manipulate forces within the game.
  * </p>
+ *
+ * <p>Known as {@code ForceType} prior to 0.50.12</p>
+ * @since 0.50.12
  */
-public enum ForceType {
+public enum FormationType {
     // region Enum Declarations
     /**
      * Standard force type, typically used for combat.
@@ -87,7 +90,7 @@ public enum ForceType {
      * @param childrenInherit    Whether changing to this ForceType changes the ForceType in all child forces to this
      *                           ForceType.
      */
-    ForceType(final int key, boolean standardizeParents, boolean childrenInherit) {
+    FormationType(final int key, boolean standardizeParents, boolean childrenInherit) {
         this.displayName = generateDisplayName();
         this.symbol = generateSymbol();
         this.key = key;
@@ -214,14 +217,14 @@ public enum ForceType {
      *
      * @return the corresponding {@code ForceType} if the key is valid; otherwise, defaults to {@code STANDARD}.
      */
-    public static ForceType fromKey(int ordinal) {
-        for (ForceType type : values()) {
+    public static FormationType fromKey(int ordinal) {
+        for (FormationType type : values()) {
             if (type.key == ordinal) {
                 return type;
             }
         }
 
-        MMLogger logger = MMLogger.create(ForceType.class);
+        MMLogger logger = MMLogger.create(FormationType.class);
         logger.error("Unknown ForceType ordinal: {} - returning STANDARD.", ordinal);
 
         return STANDARD;

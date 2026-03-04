@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,10 +32,10 @@
  */
 package mekhq.campaign.events.persons;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -47,7 +47,7 @@ import mekhq.campaign.unit.Unit;
  * {@link Unit} involved in the assignment or removal.</p>
  *
  * <p>If the {@link Unit} is associated with a force, the force's commander information will
- * be updated accordingly through the {@link Force#updateCommander(Campaign)} method.</p>
+ * be updated accordingly through the {@link Formation#updateCommander(Campaign)} method.</p>
  */
 public class PersonCrewAssignmentEvent extends PersonChangedEvent {
 
@@ -61,19 +61,19 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
      * @param unit     The {@link Unit} involved in the assignment or removal.
      *
      *                 <p>If the {@code unit} is associated with a force, the force's commander information is updated
-     *                 during the construction of this event by calling {@link Force#updateCommander(Campaign)}.</p>
+     *                 during the construction of this event by calling {@link Formation#updateCommander(Campaign)}.</p>
      */
     public PersonCrewAssignmentEvent(Campaign campaign, Person crew, Unit unit) {
         super(crew);
         this.unit = unit;
 
-        int forceId = unit.getForceId();
+        int forceId = unit.getFormationId();
 
-        if (forceId != FORCE_NONE) {
-            Force force = campaign.getForce(forceId);
+        if (forceId != FORMATION_NONE) {
+            Formation formation = campaign.getFormation(forceId);
 
-            if (force != null) {
-                force.updateCommander(campaign);
+            if (formation != null) {
+                formation.updateCommander(campaign);
             }
         }
     }
