@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,7 @@ import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
@@ -63,7 +63,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
@@ -211,12 +211,12 @@ public class EventEffectsManager {
     private List<Person> getAllPotentialTargets(final boolean isGuard) {
         List<Person> potentialTargets = new ArrayList<>();
         if (isGuard) {
-            for (Force force : campaign.getAllForces()) {
-                if (!force.isForceType(SECURITY)) {
+            for (Formation formation : campaign.getAllFormations()) {
+                if (!formation.isFormationType(SECURITY)) {
                     continue;
                 }
 
-                for (UUID unitId : force.getAllUnits(false)) {
+                for (UUID unitId : formation.getAllUnits(false)) {
                     Unit unit = campaign.getUnit(unitId);
 
                     if (unit != null) {

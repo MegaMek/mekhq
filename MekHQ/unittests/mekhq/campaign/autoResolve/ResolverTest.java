@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -73,7 +73,7 @@ import megamek.common.units.Entity;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.camOpsReputation.ReputationController;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -224,7 +224,7 @@ public class ResolverTest {
         when(scenario.getBotForce(anyInt())).thenReturn(botForce);
         when(scenario.getNumBots()).thenReturn(1);
 
-        for (var force : campaign.getAllForces()) {
+        for (var force : campaign.getAllFormations()) {
             force.setScenarioId(11, campaign);
         }
 
@@ -238,9 +238,9 @@ public class ResolverTest {
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
         campaign.setReputation(reputationController);
-        var force = new Force("Heroes");
+        var force = new Formation("Heroes");
 
-        campaign.addForce(force, campaign.getForce(0));
+        campaign.addFormation(force, campaign.getFormation(0));
         return campaign;
     }
 

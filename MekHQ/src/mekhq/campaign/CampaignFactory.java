@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +56,7 @@ import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.market.PartsStore;
@@ -181,7 +181,7 @@ public class CampaignFactory {
 
         FactionStandings factionStandings = new FactionStandings();
         RankSystem rankSystem = Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE);
-        Force force = new Force(name);
+        Formation formation = new Formation(name);
 
         Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
@@ -226,7 +226,7 @@ public class CampaignFactory {
         try {
             campaignConfig = new CampaignConfiguration(name, date, options,
                   faction, techFaction, currencyManager, reputationController,
-                  factionStandings, rankSystem, force, finances, randomEvents, ultimatums,
+                  factionStandings, rankSystem, formation, finances, randomEvents, ultimatums,
                   retirementDefectionTracker, autosave, behaviorSettings,
                   personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
                   disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);

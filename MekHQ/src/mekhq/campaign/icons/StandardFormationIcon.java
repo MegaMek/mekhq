@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,25 +42,29 @@ import mekhq.MHQStaticDirectoryManager;
 import org.w3c.dom.Node;
 
 /**
- * StandardForceIcon is an implementation of AbstractIcon that contains and displays a StandardForceIcon from the Force
+ * StandardFormationIcon is an implementation of AbstractIcon that contains and displays a StandardFormationIcon from the Force
  * Icon Directory.
  *
+ * <p>Known as {@code StandardForceIcon} prior to 0.50.12</p>
+ *
  * @see AbstractIcon
+ *
+ * @since 0.50.12
  */
-public class StandardForceIcon extends AbstractIcon {
-    private static final MMLogger LOGGER = MMLogger.create(StandardForceIcon.class);
+public class StandardFormationIcon extends AbstractIcon {
+    private static final MMLogger LOGGER = MMLogger.create(StandardFormationIcon.class);
 
     // region Variable Declarations
     public static final String DEFAULT_FORCE_ICON_FILENAME = "empty.png";
-    public static final String XML_TAG = "standardForceIcon";
+    public static final String XML_TAG = "standardFormationIcon";
     // endregion Variable Declarations
 
     // region Constructors
-    public StandardForceIcon() {
+    public StandardFormationIcon() {
         this(ROOT_CATEGORY, DEFAULT_FORCE_ICON_FILENAME);
     }
 
-    public StandardForceIcon(final @Nullable String category, final @Nullable String filename) {
+    public StandardFormationIcon(final @Nullable String category, final @Nullable String filename) {
         super(category, filename);
     }
     // endregion Constructors
@@ -74,27 +78,27 @@ public class StandardForceIcon extends AbstractIcon {
 
     @Override
     public @Nullable Image getBaseImage() {
-        // If we can't create the force icon directory, return null
-        if (MHQStaticDirectoryManager.getForceIcons() == null) {
+        // If we can't create the formation icon directory, return null
+        if (MHQStaticDirectoryManager.getFormationIcons() == null) {
             return null;
         }
 
         final String category = hasDefaultCategory() ? "" : getCategory();
         final String filename = hasDefaultFilename() ? DEFAULT_FORCE_ICON_FILENAME : getFilename();
 
-        // Try to get the player's force icon file.
-        Image forceIcon = null;
+        // Try to get the player's formation icon file.
+        Image formationIcon = null;
         try {
-            forceIcon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem(category, filename);
-            if (forceIcon == null) {
-                forceIcon = (Image) MHQStaticDirectoryManager.getForceIcons().getItem("",
+            formationIcon = (Image) MHQStaticDirectoryManager.getFormationIcons().getItem(category, filename);
+            if (formationIcon == null) {
+                formationIcon = (Image) MHQStaticDirectoryManager.getFormationIcons().getItem("",
                       DEFAULT_FORCE_ICON_FILENAME);
             }
         } catch (Exception ex) {
             LOGGER.error("", ex);
         }
 
-        return forceIcon;
+        return formationIcon;
     }
 
     // region File I/O
@@ -103,20 +107,20 @@ public class StandardForceIcon extends AbstractIcon {
         writeToXML(pw, indent, XML_TAG);
     }
 
-    public static StandardForceIcon parseFromXML(final Node wn) {
-        final StandardForceIcon icon = new StandardForceIcon();
+    public static StandardFormationIcon parseFromXML(final Node wn) {
+        final StandardFormationIcon icon = new StandardFormationIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
             LOGGER.error("", ex);
-            return new StandardForceIcon();
+            return new StandardFormationIcon();
         }
         return icon;
     }
     // endregion File I/O
 
     @Override
-    public StandardForceIcon clone() {
-        return new StandardForceIcon(getCategory(), getFilename());
+    public StandardFormationIcon clone() {
+        return new StandardFormationIcon(getCategory(), getFilename());
     }
 }
