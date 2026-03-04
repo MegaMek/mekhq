@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -126,10 +126,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
 
     // Unit
     private MMComboBox<ForceNamingMethod> comboForceNamingMethod;
-    private JCheckBox chkGenerateForceIcons;
-    private JCheckBox chkUseSpecifiedFactionToGenerateForceIcons;
-    private JCheckBox chkGenerateOriginNodeForceIcon;
-    private JCheckBox chkUseOriginNodeForceIconLogo;
+    private JCheckBox chkGenerateFormationIcons;
+    private JCheckBox chkUseSpecifiedFactionToGenerateFormationIcons;
+    private JCheckBox chkGenerateOriginNodeFormationIcon;
+    private JCheckBox chkUseOriginNodeFormationIconLogo;
     private Map<Integer, JSpinner> spnForceWeightLimits;
 
     // Spares
@@ -545,37 +545,37 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         this.comboForceNamingMethod = comboForceNamingMethod;
     }
 
-    public JCheckBox getChkGenerateForceIcons() {
-        return chkGenerateForceIcons;
+    public JCheckBox getChkGenerateFormationIcons() {
+        return chkGenerateFormationIcons;
     }
 
-    public void setChkGenerateForceIcons(final JCheckBox chkGenerateForceIcons) {
-        this.chkGenerateForceIcons = chkGenerateForceIcons;
+    public void setChkGenerateFormationIcons(final JCheckBox chkGenerateFormationIcons) {
+        this.chkGenerateFormationIcons = chkGenerateFormationIcons;
     }
 
-    public JCheckBox getChkUseSpecifiedFactionToGenerateForceIcons() {
-        return chkUseSpecifiedFactionToGenerateForceIcons;
+    public JCheckBox getChkUseSpecifiedFactionToGenerateFormationIcons() {
+        return chkUseSpecifiedFactionToGenerateFormationIcons;
     }
 
-    public void setChkUseSpecifiedFactionToGenerateForceIcons(
-          final JCheckBox chkUseSpecifiedFactionToGenerateForceIcons) {
-        this.chkUseSpecifiedFactionToGenerateForceIcons = chkUseSpecifiedFactionToGenerateForceIcons;
+    public void setChkUseSpecifiedFactionToGenerateFormationIcons(
+          final JCheckBox chkUseSpecifiedFactionToGenerateFormationIcons) {
+        this.chkUseSpecifiedFactionToGenerateFormationIcons = chkUseSpecifiedFactionToGenerateFormationIcons;
     }
 
-    public JCheckBox getChkGenerateOriginNodeForceIcon() {
-        return chkGenerateOriginNodeForceIcon;
+    public JCheckBox getChkGenerateOriginNodeFormationIcon() {
+        return chkGenerateOriginNodeFormationIcon;
     }
 
-    public void setChkGenerateOriginNodeForceIcon(final JCheckBox chkGenerateOriginNodeForceIcon) {
-        this.chkGenerateOriginNodeForceIcon = chkGenerateOriginNodeForceIcon;
+    public void setChkGenerateOriginNodeFormationIcon(final JCheckBox chkGenerateOriginNodeFormationIcon) {
+        this.chkGenerateOriginNodeFormationIcon = chkGenerateOriginNodeFormationIcon;
     }
 
-    public JCheckBox getChkUseOriginNodeForceIconLogo() {
-        return chkUseOriginNodeForceIconLogo;
+    public JCheckBox getChkUseOriginNodeFormationIconLogo() {
+        return chkUseOriginNodeFormationIconLogo;
     }
 
-    public void setChkUseOriginNodeForceIconLogo(final JCheckBox chkUseOriginNodeForceIconLogo) {
-        this.chkUseOriginNodeForceIconLogo = chkUseOriginNodeForceIconLogo;
+    public void setChkUseOriginNodeFormationIconLogo(final JCheckBox chkUseOriginNodeFormationIconLogo) {
+        this.chkUseOriginNodeFormationIconLogo = chkUseOriginNodeFormationIconLogo;
     }
 
     public Map<Integer, JSpinner> getSpnForceWeightLimits() {
@@ -1446,34 +1446,34 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
             }
         });
 
-        setChkGenerateForceIcons(new JCheckBox(resources.getString("chkGenerateForceIcons.text")));
-        getChkGenerateForceIcons().setToolTipText(resources.getString("chkGenerateForceIcons.toolTipText"));
-        getChkGenerateForceIcons().setName("chkGenerateForceIcons");
-        getChkGenerateForceIcons().addActionListener(evt -> {
-            final boolean selected = getChkGenerateForceIcons().isSelected();
-            getChkUseSpecifiedFactionToGenerateForceIcons().setEnabled(selected);
-            getChkGenerateOriginNodeForceIcon().setEnabled(selected);
-            getChkUseOriginNodeForceIconLogo().setEnabled(selected && getChkGenerateOriginNodeForceIcon().isSelected());
+        setChkGenerateFormationIcons(new JCheckBox(resources.getString("chkGenerateFormationIcons.text")));
+        getChkGenerateFormationIcons().setToolTipText(resources.getString("chkGenerateFormationIcons.toolTipText"));
+        getChkGenerateFormationIcons().setName("chkGenerateFormationIcons");
+        getChkGenerateFormationIcons().addActionListener(evt -> {
+            final boolean selected = getChkGenerateFormationIcons().isSelected();
+            getChkUseSpecifiedFactionToGenerateFormationIcons().setEnabled(selected);
+            getChkGenerateOriginNodeFormationIcon().setEnabled(selected);
+            getChkUseOriginNodeFormationIconLogo().setEnabled(selected && getChkGenerateOriginNodeFormationIcon().isSelected());
             forceWeightLimitsPanel.setEnabled(selected);
         });
 
-        setChkUseSpecifiedFactionToGenerateForceIcons(new JCheckBox(resources.getString(
-              "chkUseSpecifiedFactionToGenerateForceIcons.text")));
-        getChkUseSpecifiedFactionToGenerateForceIcons().setToolTipText(resources.getString(
-              "chkUseSpecifiedFactionToGenerateForceIcons.toolTipText"));
-        getChkUseSpecifiedFactionToGenerateForceIcons().setName("chkUseSpecifiedFactionToGenerateForceIcons");
+        setChkUseSpecifiedFactionToGenerateFormationIcons(new JCheckBox(resources.getString(
+              "chkUseSpecifiedFactionToGenerateFormationIcons.text")));
+        getChkUseSpecifiedFactionToGenerateFormationIcons().setToolTipText(resources.getString(
+              "chkUseSpecifiedFactionToGenerateFormationIcons.toolTipText"));
+        getChkUseSpecifiedFactionToGenerateFormationIcons().setName("chkUseSpecifiedFactionToGenerateFormationIcons");
 
-        setChkGenerateOriginNodeForceIcon(new JCheckBox(resources.getString("chkGenerateOriginNodeForceIcon.text")));
-        getChkGenerateOriginNodeForceIcon().setToolTipText(resources.getString(
-              "chkGenerateOriginNodeForceIcon.toolTipText"));
-        getChkGenerateOriginNodeForceIcon().setName("chkGenerateOriginNodeForceIcon");
-        getChkGenerateOriginNodeForceIcon().addActionListener(evt -> getChkUseOriginNodeForceIconLogo().setEnabled(
-              getChkGenerateOriginNodeForceIcon().isEnabled() && getChkGenerateOriginNodeForceIcon().isSelected()));
+        setChkGenerateOriginNodeFormationIcon(new JCheckBox(resources.getString("chkGenerateOriginNodeFormationIcon.text")));
+        getChkGenerateOriginNodeFormationIcon().setToolTipText(resources.getString(
+              "chkGenerateOriginNodeFormationIcon.toolTipText"));
+        getChkGenerateOriginNodeFormationIcon().setName("chkGenerateOriginNodeFormationIcon");
+        getChkGenerateOriginNodeFormationIcon().addActionListener(evt -> getChkUseOriginNodeFormationIconLogo().setEnabled(
+              getChkGenerateOriginNodeFormationIcon().isEnabled() && getChkGenerateOriginNodeFormationIcon().isSelected()));
 
-        setChkUseOriginNodeForceIconLogo(new JCheckBox(resources.getString("chkUseOriginNodeForceIconLogo.text")));
-        getChkUseOriginNodeForceIconLogo().setToolTipText(resources.getString(
-              "chkUseOriginNodeForceIconLogo.toolTipText"));
-        getChkUseOriginNodeForceIconLogo().setName("chkUseOriginNodeForceIconLogo");
+        setChkUseOriginNodeFormationIconLogo(new JCheckBox(resources.getString("chkUseOriginNodeFormationIconLogo.text")));
+        getChkUseOriginNodeFormationIconLogo().setToolTipText(resources.getString(
+              "chkUseOriginNodeFormationIconLogo.toolTipText"));
+        getChkUseOriginNodeFormationIconLogo().setName("chkUseOriginNodeFormationIconLogo");
 
         createForceWeightLimitsPanel(forceWeightLimitsPanel);
 
@@ -1494,20 +1494,20 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(lblForceNamingMethod)
                                                       .addComponent(getComboForceNamingMethod(), Alignment.LEADING))
-                                      .addComponent(getChkGenerateForceIcons())
-                                      .addComponent(getChkUseSpecifiedFactionToGenerateForceIcons())
-                                      .addComponent(getChkGenerateOriginNodeForceIcon())
-                                      .addComponent(getChkUseOriginNodeForceIconLogo())
+                                      .addComponent(getChkGenerateFormationIcons())
+                                      .addComponent(getChkUseSpecifiedFactionToGenerateFormationIcons())
+                                      .addComponent(getChkGenerateOriginNodeFormationIcon())
+                                      .addComponent(getChkUseOriginNodeFormationIconLogo())
                                       .addComponent(forceWeightLimitsPanel));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(lblForceNamingMethod)
                                                         .addComponent(getComboForceNamingMethod()))
-                                        .addComponent(getChkGenerateForceIcons())
-                                        .addComponent(getChkUseSpecifiedFactionToGenerateForceIcons())
-                                        .addComponent(getChkGenerateOriginNodeForceIcon())
-                                        .addComponent(getChkUseOriginNodeForceIconLogo())
+                                        .addComponent(getChkGenerateFormationIcons())
+                                        .addComponent(getChkUseSpecifiedFactionToGenerateFormationIcons())
+                                        .addComponent(getChkGenerateOriginNodeFormationIcon())
+                                        .addComponent(getChkUseOriginNodeFormationIconLogo())
                                         .addComponent(forceWeightLimitsPanel));
         return panel;
     }
@@ -2090,14 +2090,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
 
         // Unit
         getComboForceNamingMethod().setSelectedItem(options.getForceNamingMethod());
-        if (getChkGenerateForceIcons().isSelected() != options.isGenerateForceIcons()) {
-            getChkGenerateForceIcons().doClick();
+        if (getChkGenerateFormationIcons().isSelected() != options.isGenerateFormationIcons()) {
+            getChkGenerateFormationIcons().doClick();
         }
-        getChkUseSpecifiedFactionToGenerateForceIcons().setSelected(options.isUseSpecifiedFactionToGenerateForceIcons());
-        if (getChkGenerateOriginNodeForceIcon().isSelected() != options.isGenerateOriginNodeForceIcon()) {
-            getChkGenerateOriginNodeForceIcon().doClick();
+        getChkUseSpecifiedFactionToGenerateFormationIcons().setSelected(options.isUseSpecifiedFactionToGenerateFormationIcons());
+        if (getChkGenerateOriginNodeFormationIcon().isSelected() != options.isGenerateOriginNodeFormationIcon()) {
+            getChkGenerateOriginNodeFormationIcon().doClick();
         }
-        getChkUseOriginNodeForceIconLogo().setSelected(options.isUseOriginNodeForceIconLogo());
+        getChkUseOriginNodeFormationIconLogo().setSelected(options.isUseOriginNodeFormationIconLogo());
         for (final Entry<Integer, Integer> entry : options.getForceWeightLimits().entrySet()) {
             getSpnForceWeightLimits().get(entry.getValue()).setValue(entry.getKey());
         }
@@ -2220,10 +2220,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
 
         // Unit
         options.setForceNamingMethod(getComboForceNamingMethod().getSelectedItem());
-        options.setGenerateForceIcons(getChkGenerateForceIcons().isSelected());
-        options.setUseSpecifiedFactionToGenerateForceIcons(getChkUseSpecifiedFactionToGenerateForceIcons().isSelected());
-        options.setGenerateOriginNodeForceIcon(getChkGenerateOriginNodeForceIcon().isSelected());
-        options.setUseOriginNodeForceIconLogo(getChkUseOriginNodeForceIconLogo().isSelected());
+        options.setGenerateFormationIcons(getChkGenerateFormationIcons().isSelected());
+        options.setUseSpecifiedFactionToGenerateFormationIcons(getChkUseSpecifiedFactionToGenerateFormationIcons().isSelected());
+        options.setGenerateOriginNodeFormationIcon(getChkGenerateOriginNodeFormationIcon().isSelected());
+        options.setUseOriginNodeFormationIconLogo(getChkUseOriginNodeFormationIconLogo().isSelected());
         options.setForceWeightLimits(new TreeMap<>());
         for (final Entry<Integer, JSpinner> entry : getSpnForceWeightLimits().entrySet()) {
             options.getForceWeightLimits().put((int) entry.getValue().getValue(), entry.getKey());

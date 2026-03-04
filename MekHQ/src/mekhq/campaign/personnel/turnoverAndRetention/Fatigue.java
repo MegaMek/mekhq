@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,7 +50,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -245,18 +245,18 @@ public class Fatigue {
         List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
 
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
-            Force force = combatTeam.getForce(campaign);
-            if (force == null || force.isDeployed()) {
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation == null || formation.isDeployed()) {
                 // 'isDeployed' will only return true if the force is deployed to a scenario. In which cases we don't
                 // want to yank the unit back until the next Monday checkpoint.
                 continue;
             }
 
-            if (!isForceDeployedToStratCon(activeContracts, force.getId())) {
+            if (!isForceDeployedToStratCon(activeContracts, formation.getId())) {
                 continue;
             }
 
-            Vector<UUID> unitsInForce = force.getAllUnits(false);
+            Vector<UUID> unitsInForce = formation.getAllUnits(false);
             int fatiguedUnits = 0;
             for (UUID unitId : unitsInForce) {
                 Unit unit = campaign.getUnit(unitId);
@@ -282,13 +282,13 @@ public class Fatigue {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
                     if (contract.getStratconCampaignState() != null) {
                         for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
-                            track.unassignForce(force.getId());
+                            track.unassignFormation(formation.getId());
                         }
                     }
                 }
 
                 String fatigueMessage = getFormattedTextAt(RESOURCE_BUNDLE, "fatigueUndeployed.text",
-                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, force.getName());
+                      spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, formation.getName());
                 campaign.addReport(PERSONNEL, fatigueMessage);
             }
         }
