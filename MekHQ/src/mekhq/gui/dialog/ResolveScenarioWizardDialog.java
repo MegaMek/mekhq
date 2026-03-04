@@ -1363,6 +1363,24 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     /**
+     * Syncs the objective checkboxes with the current evaluation state of the objective processor.
+     * Called after unit or salvage statuses are updated to keep the objectives panel current.
+     */
+    private void recheckObjectives() {
+        Map<ScenarioObjective, Set<String>> qualifyingUnits = objectiveProcessor.getQualifyingObjectiveUnits();
+        for (Map.Entry<ScenarioObjective, List<JCheckBox>> entry : objectiveCheckboxes.entrySet()) {
+            ScenarioObjective objective = entry.getKey();
+            Set<String> qualifying = qualifyingUnits.get(objective);
+            if (qualifying == null) {
+                continue;
+            }
+            for (JCheckBox checkbox : entry.getValue()) {
+                checkbox.setSelected(qualifying.contains(checkbox.getActionCommand()));
+            }
+        }
+    }
+
+    /**
      * Updates the final panel with information taken from the other ones.
      */
     private void updatePreviewPanel() {
@@ -1513,8 +1531,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         // Let's just call these all on tab change for safety for now
         updateFromUnitsTab();
         updateFromSalvageTab();
-        // TODO: WeaverThree - This wipes out user selections on the objective panel, so we can't use it right now.
-        // recheckObjectives();
+        recheckObjectives();
         updatePreviewPanel();
     }
 
