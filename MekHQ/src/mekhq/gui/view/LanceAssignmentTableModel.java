@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.gui.model.DataTableModel;
@@ -78,7 +78,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
     @Override
     public Class<?> getColumnClass(int c) {
         return switch (c) {
-            case COL_FORCE -> Force.class;
+            case COL_FORCE -> Formation.class;
             case COL_CONTRACT -> AtBContract.class;
             case COL_ROLE -> CombatRole.class;
             default -> String.class;
@@ -102,7 +102,7 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
             return "";
         }
         return switch (column) {
-            case COL_FORCE -> campaign.getForce(data.get(row).getForceId());
+            case COL_FORCE -> campaign.getFormation(data.get(row).getFormationId());
             case COL_WEIGHT_CLASS -> WEIGHT_CODES[data.get(row).getWeightClass(campaign)];
             case COL_CONTRACT -> campaign.getMission(data.get(row).getMissionId());
             case COL_ROLE -> data.get(row).getRole();
@@ -117,10 +117,10 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
         } else if (col == COL_ROLE) {
             if (value instanceof CombatRole) {
                 data.get(row).setRole((CombatRole) value);
-                Force chosenForce = (Force) getValueAt(row, COL_FORCE);
-                chosenForce.setCombatRoleInMemory((CombatRole) value);
-                for (Force force : chosenForce.getSubForces()) {
-                    force.setCombatRoleInMemory((CombatRole) value);
+                Formation chosenFormation = (Formation) getValueAt(row, COL_FORCE);
+                chosenFormation.setCombatRoleInMemory((CombatRole) value);
+                for (Formation formation : chosenFormation.getSubFormations()) {
+                    formation.setCombatRoleInMemory((CombatRole) value);
                 }
             }
         }

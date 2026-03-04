@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.atb;
 
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.*;
 
 import java.util.UUID;
@@ -52,7 +52,8 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -156,7 +157,7 @@ public class AtBScenarioModifierApplicator {
             }
 
             Faction faction = Factions.getInstance().getFaction(factionCode);
-            actualUnitsToRemove = getStandardForceSize(faction);
+            actualUnitsToRemove = CombatTeam.getStandardFormationSize(faction);
         }
 
         for (int x = 0; x < actualUnitsToRemove; x++) {
@@ -294,16 +295,16 @@ public class AtBScenarioModifierApplicator {
                         continue;
                     }
 
-                    Force playerForce = campaign.getForce(forceID);
+                    Formation playerFormation = campaign.getFormation(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep
                     // at least one visible
                     // as the bot is unable to handle an invisible op for at the moment.
-                    int maxHiddenUnits = Math.min(playerForce.getAllUnits(false).size() - 1,
+                    int maxHiddenUnits = Math.min(playerFormation.getAllUnits(false).size() - 1,
                           scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
                     int numHiddenUnits = 0;
 
-                    for (UUID unitID : playerForce.getAllUnits(false)) {
+                    for (UUID unitID : playerFormation.getAllUnits(false)) {
                         if (numHiddenUnits >= maxHiddenUnits) {
                             break;
                         }

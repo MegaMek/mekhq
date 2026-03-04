@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,7 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
@@ -89,10 +89,10 @@ public class DialogInterception extends JDialog {
      *
      * @param resupply     the {@link Resupply} instance containing the current campaign and contract details. Used to
      *                     access mission context, player commander information, and employer details.
-     * @param targetConvoy the optional {@link Force} representing the convoy involved in the interception. If
+     * @param targetConvoy the optional {@link Formation} representing the convoy involved in the interception. If
      *                     {@code null}, the dialog will use default values for the speaker and faction visuals.
      */
-    public DialogInterception(Resupply resupply, @Nullable Force targetConvoy) {
+    public DialogInterception(Resupply resupply, @Nullable Formation targetConvoy) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
@@ -113,7 +113,7 @@ public class DialogInterception extends JDialog {
         // Get speaker details
         Person speaker = null;
         if (targetConvoy != null) {
-            UUID speakerId = targetConvoy.getForceCommanderID();
+            UUID speakerId = targetConvoy.getFormationCommanderID();
             speaker = campaign.getPerson(speakerId);
         }
 
@@ -165,8 +165,8 @@ public class DialogInterception extends JDialog {
         String message = "";
 
         if (targetConvoy != null) {
-            if (targetConvoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false) ||
-                      targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (targetConvoy.formationContainsOnlyVTOLForces(campaign.getHangar(), false) ||
+                      targetConvoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 message = getFormattedTextAt(RESOURCE_BUNDLE,
                       "statusUpdateIntercepted.boilerplate",
                       campaign.getCommanderAddress(),
