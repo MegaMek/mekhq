@@ -197,7 +197,7 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case Capture:
                         entityMeetsObjective = !forceEntityEscape &&
-                                                     entityIsCaptured(entity, !opponentHasBattlefieldControl);
+                                                     entityIsCaptured(entity, opponentHasBattlefieldControl);
                         break;
                     case PreventReachMapEdge:
                         entityMeetsObjective = forceEntityDestruction ||
@@ -206,7 +206,7 @@ public class ScenarioObjectiveProcessor {
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
                                                      (!forceEntityDestruction &&
-                                                           !entityIsDestroyed(entity, opponentHasBattlefieldControl)) || entityIsCaptured(entity, !opponentHasBattlefieldControl);
+                                                           !entityIsDestroyed(entity, opponentHasBattlefieldControl)) || entityIsCaptured(entity, opponentHasBattlefieldControl);
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
@@ -240,7 +240,7 @@ public class ScenarioObjectiveProcessor {
             return switch (objective.getObjectiveCriterion()) {
                 case Destroy -> entityIsDestroyed(entity, opponentHasBattlefieldControl);
                 case ForceWithdraw -> entityIsForcedWithdrawal(entity);
-                case Capture -> entityIsCaptured(entity, !opponentHasBattlefieldControl);
+                case Capture -> entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case PreventReachMapEdge -> !entityHasReachedDestinationEdge(entity, objective);
                 case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl);
                 case ReachMapEdge -> entityHasReachedDestinationEdge(entity, objective);
@@ -275,6 +275,9 @@ public class ScenarioObjectiveProcessor {
 
     /**
      * Check whether we should consider an entity as being captured for the purposes of a Capture objective.
+     *
+     * @param entity                        Entity to check
+     * @param opponentHasBattlefieldControl Whether the entity's opponent has battlefield control
      */
     private boolean entityIsCaptured(Entity entity, boolean opponentHasBattlefieldControl) {
         // we consider an entity captured if it's been immobilized but not destroyed and hasn't left the field
@@ -282,7 +285,7 @@ public class ScenarioObjectiveProcessor {
         // Non-collapsed buildings should count as captured
         return entity.isImmobile() &&
                      (!entity.isDestroyed() || entity instanceof AbstractBuildingEntity && entity.isSalvage()) &&
-                     entity.getRetreatedDirection() == OffBoardDirection.NONE && !opponentHasBattlefieldControl;
+                     entity.getRetreatedDirection() == OffBoardDirection.NONE && opponentHasBattlefieldControl;
     }
 
     /**
