@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -58,8 +58,8 @@ public class ExactMatchStep extends UnscrambleStep {
             proposal.proposeMapping(part, part.getEquipmentNum());
         }
 
-        if (part instanceof MissingAmmoBin missingAmmoBin &&
-                  ((AmmoBin) missingAmmoBin.getReplacementPart()).canChangeMunitions((AmmoType) mount.getType())) {
+        if (part instanceof MissingAmmoBin missingAmmoBin && mount.getType() instanceof AmmoType ammoType &&
+                  ((AmmoBin) missingAmmoBin.getReplacementPart()).canChangeMunitions(ammoType)) {
             proposal.proposeMapping(missingAmmoBin, part.getEquipmentNum());
         }
     }
