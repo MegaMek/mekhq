@@ -65,7 +65,6 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -1362,7 +1361,6 @@ public class PersonTest {
         // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
         when(mockCampaign.getHangar()).thenReturn(new Hangar());
         when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
-        when(mockCampaign.getForces()).thenReturn(new Force("Force"));
 
         Faction mockFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
@@ -1408,7 +1406,6 @@ public class PersonTest {
         // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
         when(mockCampaign.getHangar()).thenReturn(new Hangar());
         when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
-        when(mockCampaign.getForces()).thenReturn(new Force("Force"));
 
         Faction mockFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
