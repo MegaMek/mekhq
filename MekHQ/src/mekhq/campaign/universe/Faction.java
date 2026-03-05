@@ -561,7 +561,7 @@ public class Faction {
      * @return The size of a lance, point or analogous formation type
      */
     public int getFormationBaseSize() {
-        return faction2.getFormationBaseSize();
+        return faction2 != null ? faction2.getFormationBaseSize() : 4;
     }
 
     /**
@@ -576,7 +576,7 @@ public class Faction {
      * @return How many formations form a formation of a higher type (e.g., lances in a company)
      */
     public int getFormationGrouping() {
-        return faction2.getFormationGrouping();
+        return faction2 != null ? faction2.getFormationGrouping() : 3;
     }
 
     /**
@@ -598,7 +598,7 @@ public class Faction {
      * @since 0.50.07
      */
     public String getRankSystemCode() {
-        return faction2.getRankSystem();
+        return faction2 != null ? faction2.getRankSystem() : "SLDF";
     }
 
     /**
@@ -626,7 +626,7 @@ public class Faction {
      * @return {@code true} if the faction performs Batchalls; {@code false} otherwise
      */
     public boolean performsBatchalls() {
-        return faction2.performsBatchalls();
+        return faction2 != null && faction2.performsBatchalls();
     }
 
     /**
@@ -640,7 +640,7 @@ public class Faction {
      * @since 0.50.07
      */
     public boolean isAggregate() {
-        return faction2.isAggregate();
+        return faction2 != null && faction2.isAggregate();
     }
 
     /**
@@ -654,6 +654,6 @@ public class Faction {
      * @since 0.50.07
      */
     public @Nullable FactionLeaderData getLeaderForYear(final int year) {
-        return faction2.getFactionLeaderForYear(year);
+        return faction2 != null ? faction2.getFactionLeaderForYear(year) : null;
     }
 }
