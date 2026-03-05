@@ -1258,9 +1258,6 @@ public class StratConRulesManager {
      */
     private static StratConCoords getUnoccupiedAdjacentCoords(StratConCoords originCoords,
           StratConTrackState trackState) {
-        // We need to reduce width/height by one because coordinates index from 0, not 1
-        final int trackWidth = trackState.getWidth() - 1;
-        final int trackHeight = trackState.getHeight() - 1;
 
         Set<StratConCoords> revealedCoords = trackState.getRevealedCoords();
         List<StratConCoords> suitableCoords = new ArrayList<>();
@@ -1280,10 +1277,7 @@ public class StratConRulesManager {
             }
 
             // This is to ensure we're not trying to place a scenario off the map
-            if ((newCoords.getX() < 0) ||
-                      (newCoords.getX() > trackWidth) ||
-                      (newCoords.getY() < 0) ||
-                      (newCoords.getY() > trackHeight)) {
+            if (trackState.isOffTrack(newCoords)) {
                 continue;
             }
 
@@ -1570,11 +1564,16 @@ public class StratConRulesManager {
                 }
 
                 for (int direction = 0; direction < 6; direction++) {
+                    StratConCoords checkCoords = currentCoords.translate(direction);
+
+                    //ensure we are scouting on the StratCon track
+                    if (track.isOffTrack(checkCoords)) {
+                        continue;
+                    }
+
                     if (remainingScans == 0) {
                         break;
                     }
-
-                    StratConCoords checkCoords = currentCoords.translate(direction);
 
                     // Per-scout: don't re-visit the same hex for this scout
                     if (scoutVisited.contains(checkCoords)) {
