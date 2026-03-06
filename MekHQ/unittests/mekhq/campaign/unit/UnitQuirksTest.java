@@ -47,11 +47,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Misc. unit tests for other functions of Unit.
+ * Tests for the quirk-related functions of Unit
  */
-public class UnitTest {
+public class UnitQuirksTest {
     @Test
-    void testQuirksList() {
+    void testGetQuirks() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(true);
 
@@ -65,7 +65,7 @@ public class UnitTest {
     }
 
     @Test
-    void testQuirksListEmptyWhenQuirksOff() {
+    void testGetQuirksEmptyWhenQuirksOff() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(false);
 
@@ -79,7 +79,7 @@ public class UnitTest {
     }
 
     @Test
-    void TestQuirksListHTML() {
+    void TestGetQuirksListHTML() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(true);
 
@@ -96,7 +96,7 @@ public class UnitTest {
         );
     }
     @Test
-    void TestQuirksListHTMLEmptyWhenQuirksOff() {
+    void TestGetQuirksListHTMLEmptyWhenQuirksOff() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(false);
 
@@ -108,5 +108,4 @@ public class UnitTest {
 
         assertNull(quirksList);
     }
-
 }
