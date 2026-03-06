@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,6 +55,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.TestPartsStore;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.TestSystems;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -128,6 +129,7 @@ public final class MHQTestUtilities {
     }
 
     public static Campaign getTestCampaign() {
+        Ranks.initializeRankSystems();
         return new Campaign(buildTestConfigWithSystems(TestSystems.getInstance()));
     }
 

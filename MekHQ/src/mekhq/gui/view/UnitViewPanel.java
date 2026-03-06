@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,6 +49,7 @@ import megamek.client.ui.util.FluffImageHelper;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
 import megamek.common.TechConstants;
+import megamek.common.options.IOption;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.units.Entity;
 import megamek.utilities.ImageUtilities;
@@ -60,6 +61,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.gui.utilities.MultiLineTooltip;
 
 /**
  * A custom panel that gets filled in with goodies from a unit record
@@ -218,7 +220,6 @@ public class UnitViewPanel extends JScrollablePanel {
         JLabel lblCost = new JLabel();
         JLabel txtCost = new JLabel();
         JLabel lblQuirk = new JLabel();
-        JLabel txtQuirk = new JLabel();
 
         pnlStats.setLayout(new GridBagLayout());
 
@@ -295,11 +296,6 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtBV, gridBagConstraints);
 
-        double weight = 1.0;
-        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
-            weight = 0.0;
-        }
-
         lblCost.setName("lblCost1");
         lblCost.setText(resourceMap.getString("lblCost1.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -315,7 +311,6 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = weight;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -331,17 +326,20 @@ public class UnitViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblQuirk, gridBagConstraints);
 
-            txtQuirk.setName("lblQuirk2");
-            txtQuirk.setText(unit.getQuirksList());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 5;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtQuirk, gridBagConstraints);
+            int gridy = 5;
+            for (IOption quirk: unit.getQuirks()) {
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = gridy++;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                JLabel label = new JLabel(quirk.getDisplayableNameWithValue());
+                label.setToolTipText(MultiLineTooltip.splitToolTip(quirk.getDescription()));
+                label.setName("quirk"+quirk.getName());
+                pnlStats.add(label, gridBagConstraints);
+            }
         }
     }
 }
