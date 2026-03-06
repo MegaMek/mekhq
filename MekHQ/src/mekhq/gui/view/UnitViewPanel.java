@@ -210,19 +210,9 @@ public class UnitViewPanel extends JScrollablePanel {
     }
 
     private void fillStats(ResourceBundle resourceMap) {
-        JLabel lblType = new JLabel();
-        JLabel lblTech = new JLabel();
-        JLabel txtTech = new JLabel();
-        JLabel lblTonnage = new JLabel();
-        JLabel txtTonnage = new JLabel();
-        JLabel lblBV = new JLabel();
-        JLabel txtBV = new JLabel();
-        JLabel lblCost = new JLabel();
-        JLabel txtCost = new JLabel();
-        JLabel lblQuirk = new JLabel();
-
         pnlStats.setLayout(new GridBagLayout());
 
+        JLabel lblType = new JLabel();
         lblType.setName("lblType");
         lblType.setText("<html><i>" + unit.getTypeDisplayableNameWithOmni() + "</i></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -236,109 +226,83 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblType, gridBagConstraints);
 
+        // Constraints for the left column, containing labels
+        GridBagConstraints labelConstraints = new GridBagConstraints();
+        labelConstraints.gridx = 0;
+        labelConstraints.gridy = 1;
+        labelConstraints.fill = GridBagConstraints.NONE;
+        labelConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        // Constraints for the right column, containing values
+        GridBagConstraints valueConstraints = new GridBagConstraints();
+        valueConstraints.gridx = 1;
+        valueConstraints.gridy = 1;
+        valueConstraints.weightx = 0.5;
+        valueConstraints.insets = new Insets(0, 10, 0, 0);
+        valueConstraints.fill = GridBagConstraints.HORIZONTAL;
+        valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+        JLabel lblTech = new JLabel();
         lblTech.setName("lblTech1");
         lblTech.setText(resourceMap.getString("lblTech1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblTech, gridBagConstraints);
+        pnlStats.add(lblTech, labelConstraints);
 
+        JLabel txtTech = new JLabel();
         txtTech.setName("lblTech2");
         txtTech.setText(TechConstants.getLevelDisplayableName(entity.getTechLevel()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtTech, gridBagConstraints);
+        pnlStats.add(txtTech, valueConstraints);
 
+        labelConstraints.gridy++; valueConstraints.gridy++;
+
+        JLabel lblTonnage = new JLabel();
         lblTonnage.setName("lblTonnage1");
         lblTonnage.setText(resourceMap.getString("lblTonnage1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblTonnage, gridBagConstraints);
+        pnlStats.add(lblTonnage, labelConstraints);
 
+        JLabel txtTonnage = new JLabel();
         txtTonnage.setName("lblTonnage2");
         txtTonnage.setText(Double.toString(entity.getWeight()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtTonnage, gridBagConstraints);
+        pnlStats.add(txtTonnage, valueConstraints);
 
+        labelConstraints.gridy++; valueConstraints.gridy++;
+
+        JLabel lblBV = new JLabel();
         lblBV.setName("lblBV1");
         lblBV.setText(resourceMap.getString("lblBV1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblBV, gridBagConstraints);
+        pnlStats.add(lblBV, labelConstraints);
 
+        JLabel txtBV = new JLabel();
         txtBV.setName("lblBV2");
         txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtBV, gridBagConstraints);
+        pnlStats.add(txtBV, valueConstraints);
 
+        labelConstraints.gridy++; valueConstraints.gridy++;
+
+        JLabel lblCost = new JLabel();
         lblCost.setName("lblCost1");
         lblCost.setText(resourceMap.getString("lblCost1.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblCost, gridBagConstraints);
+        pnlStats.add(lblCost, labelConstraints);
 
+        JLabel txtCost = new JLabel();
         txtCost.setName("lblCost2");
         txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtCost, gridBagConstraints);
+        pnlStats.add(txtCost, valueConstraints);
+
+        labelConstraints.gridy++; valueConstraints.gridy++;
 
         if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
+            JLabel lblQuirk = new JLabel();
             lblQuirk.setName("lblQuirk1");
             lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 5;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblQuirk, gridBagConstraints);
+            pnlStats.add(lblQuirk, labelConstraints);
 
-            int gridy = 5;
             for (IOption quirk: unit.getQuirks()) {
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = gridy++;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 JLabel label = new JLabel(quirk.getDisplayableNameWithValue());
                 label.setToolTipText(MultiLineTooltip.splitToolTip(quirk.getDescription()));
                 label.setName("quirk"+quirk.getName());
-                pnlStats.add(label, gridBagConstraints);
+                pnlStats.add(label, valueConstraints);
+
+                labelConstraints.gridy++; valueConstraints.gridy++;
             }
         }
     }
