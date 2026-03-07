@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,44 +39,48 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 
 /**
- * ForcePieceIcon is an implementation of StandardForceIcon that contains and displays a Force Icon Piece from the Force
- * Icon Directory's Pieces Subdirectory. These are then combined to form a single LayeredForceIcon.
+ * ForcePieceIcon is an implementation of StandardFormationIcon that contains and displays a Formation Icon Piece from the Force
+ * Icon Directory's Pieces Subdirectory. These are then combined to form a single LayeredFormationIcon.
  *
- * @see LayeredForceIconLayer
- * @see LayeredForceIcon
- * @see StandardForceIcon
+ * <p>Known as {@code ForcePieceIcon} prior to 0.50.12</p>
+ *
+ * @see LayeredFormationIconLayer
+ * @see LayeredFormationIcon
+ * @see StandardFormationIcon
+ *
+ * @since 0.50.12
  */
-public class ForcePieceIcon extends StandardForceIcon {
-    private static final MMLogger logger = MMLogger.create(ForcePieceIcon.class);
+public class FormationPieceIcon extends StandardFormationIcon {
+    private static final MMLogger logger = MMLogger.create(FormationPieceIcon.class);
 
     // region Variable Declarations
     public static final String XML_TAG = "forcePieceIcon";
-    private LayeredForceIconLayer layer;
+    private LayeredFormationIconLayer layer;
     // endregion Variable Declarations
 
     // region Constructors
-    public ForcePieceIcon() {
-        this(LayeredForceIconLayer.FRAME, ROOT_CATEGORY, MHQConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME);
+    public FormationPieceIcon() {
+        this(LayeredFormationIconLayer.FRAME, ROOT_CATEGORY, MHQConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME);
     }
 
-    public ForcePieceIcon(final LayeredForceIconLayer layer, final @Nullable String category,
-          final @Nullable String filename) {
+    public FormationPieceIcon(final LayeredFormationIconLayer layer, final @Nullable String category,
+                              final @Nullable String filename) {
         super(category, filename);
         setLayer(layer);
     }
     // endregion Constructors
 
     // region Getters/Setters
-    public LayeredForceIconLayer getLayer() {
+    public LayeredFormationIconLayer getLayer() {
         return layer;
     }
 
-    public void setLayer(final LayeredForceIconLayer layer) {
+    public void setLayer(final LayeredFormationIconLayer layer) {
         this.layer = layer;
     }
 
@@ -87,13 +91,13 @@ public class ForcePieceIcon extends StandardForceIcon {
 
     @Override
     public @Nullable Image getBaseImage() {
-        // If we can't create the force icon directory, return null
-        if (MHQStaticDirectoryManager.getForceIcons() == null) {
+        // If we can't create the formation icon directory, return null
+        if (MHQStaticDirectoryManager.getFormationIcons() == null) {
             return null;
         }
 
         try {
-            return (Image) MHQStaticDirectoryManager.getForceIcons().getItem(getCategoryPath(), getFilename());
+            return (Image) MHQStaticDirectoryManager.getFormationIcons().getItem(getCategoryPath(), getFilename());
         } catch (Exception ex) {
             logger.error("", ex);
             return null;
@@ -112,13 +116,13 @@ public class ForcePieceIcon extends StandardForceIcon {
         super.writeBodyToXML(pw, indent);
     }
 
-    public static ForcePieceIcon parseFromXML(final Node wn) {
-        final ForcePieceIcon icon = new ForcePieceIcon();
+    public static FormationPieceIcon parseFromXML(final Node wn) {
+        final FormationPieceIcon icon = new FormationPieceIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
             logger.error("", ex);
-            return new ForcePieceIcon();
+            return new FormationPieceIcon();
         }
         return icon;
     }
@@ -128,7 +132,7 @@ public class ForcePieceIcon extends StandardForceIcon {
         super.parseNode(wn);
 
         if ("layer".equals(wn.getNodeName())) {
-            setLayer(LayeredForceIconLayer.valueOf(wn.getTextContent().trim()));
+            setLayer(LayeredFormationIconLayer.valueOf(wn.getTextContent().trim()));
         }
     }
     // endregion File I/O
@@ -145,7 +149,7 @@ public class ForcePieceIcon extends StandardForceIcon {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof ForcePieceIcon dOther) {
+        } else if (other instanceof FormationPieceIcon dOther) {
             return (dOther.getLayer() == getLayer()) && dOther.getCategory().equals(getCategory())
                          && dOther.getFilename().equals(getFilename());
         } else {
@@ -159,7 +163,7 @@ public class ForcePieceIcon extends StandardForceIcon {
     }
 
     @Override
-    public ForcePieceIcon clone() {
-        return new ForcePieceIcon(getLayer(), getCategory(), getFilename());
+    public FormationPieceIcon clone() {
+        return new FormationPieceIcon(getLayer(), getCategory(), getFilename());
     }
 }
