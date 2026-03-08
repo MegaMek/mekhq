@@ -3490,7 +3490,8 @@ public class StratConRulesManager {
             if ((track.getAssignedForceReturnDates().get(forceID).equals(date) ||
                        track.getAssignedForceReturnDates().get(forceID).isBefore(date))) {
                 forcesToUndeploy.add(forceID);
-                campaign.addReport(BATTLE, String.format(resources.getString("force.undeployed"), formation.getName()));
+                campaign.addReport(BATTLE, String.format(resources.getString("formation.undeployed"),
+                      formation.getName()));
             }
         }
 
