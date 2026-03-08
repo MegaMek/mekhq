@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,7 +43,7 @@ import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
@@ -79,7 +79,7 @@ public class CampaignConfiguration {
     private String name;
     private LocalDate currentDay;
 
-    private Force forces;
+    private Formation formations;
 
     private Faction faction;
     private megamek.common.enums.Faction techFaction;
@@ -135,7 +135,7 @@ public class CampaignConfiguration {
      * @param reputationController     Default
      * @param factionStandings         Default
      * @param rankSystem               Default Rank System
-     * @param force                    List of player's TOE forces
+     * @param formation                List of player's TOE formations
      * @param finances                 Default
      * @param randomEvents             Default RandomEventsLibraries
      * @param ultimatums               Default
@@ -159,7 +159,7 @@ public class CampaignConfiguration {
           ReputationController reputationController,
           FactionStandings factionStandings,
           RankSystem rankSystem,
-          Force force,
+          Formation formation,
           Finances finances,
           RandomEventLibraries randomEvents,
           FactionStandingUltimatumsLibrary ultimatums,
@@ -182,7 +182,7 @@ public class CampaignConfiguration {
         this.reputation = reputationController;
         this.factionStandings = factionStandings;
         this.rankSystem = rankSystem;
-        this.forces = force;
+        this.formations = formation;
         this.finances = finances;
         this.randomEventLibraries = randomEvents;
         this.factionStandingUltimatumsLibrary = ultimatums;
@@ -221,7 +221,7 @@ public class CampaignConfiguration {
      * @param reputationController     Default
      * @param factionStandings         Default
      * @param rankSystem               Default Rank System
-     * @param force                    List of player's TOE forces
+     * @param formation                List of player's TOE formations
      * @param finances                 Default
      * @param randomEvents             Default RandomEventsLibraries
      * @param ultimatums               Default
@@ -254,7 +254,7 @@ public class CampaignConfiguration {
           ReputationController reputationController,
           FactionStandings factionStandings,
           RankSystem rankSystem,
-          Force force,
+          Formation formation,
           Finances finances,
           RandomEventLibraries randomEvents,
           FactionStandingUltimatumsLibrary ultimatums,
@@ -286,7 +286,7 @@ public class CampaignConfiguration {
         this.reputation = reputationController;
         this.factionStandings = factionStandings;
         this.rankSystem = rankSystem;
-        this.forces = force;
+        this.formations = formation;
         this.finances = finances;
         this.randomEventLibraries = randomEvents;
         this.factionStandingUltimatumsLibrary = ultimatums;
@@ -373,8 +373,8 @@ public class CampaignConfiguration {
         return this.rankSystem;
     }
 
-    public Force getforce() {
-        return this.forces;
+    public Formation getFormations() {
+        return this.formations;
     }
 
     public Finances getfinances() {
@@ -445,8 +445,8 @@ public class CampaignConfiguration {
         this.currentDay = currentDay;
     }
 
-    public void setForces(Force forces) {
-        this.forces = forces;
+    public void setFormations(Formation formations) {
+        this.formations = formations;
     }
 
     public void setFaction(Faction faction) {

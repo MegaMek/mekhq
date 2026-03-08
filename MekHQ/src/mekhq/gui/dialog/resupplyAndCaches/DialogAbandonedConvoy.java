@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,7 +57,7 @@ import javax.swing.JPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 
@@ -71,7 +71,7 @@ public class DialogAbandonedConvoy extends JDialog {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
-    public DialogAbandonedConvoy(Campaign campaign, AtBContract contract, @Nullable Force targetConvoy) {
+    public DialogAbandonedConvoy(Campaign campaign, AtBContract contract, @Nullable Formation targetConvoy) {
         setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         final int INSERT_SIZE = UIUtil.scaleForGUI(10);
@@ -91,7 +91,7 @@ public class DialogAbandonedConvoy extends JDialog {
         // Get speaker details
         Person speaker = null;
         if (targetConvoy != null) {
-            UUID speakerId = targetConvoy.getForceCommanderID();
+            UUID speakerId = targetConvoy.getFormationCommanderID();
             speaker = campaign.getPerson(speakerId);
         }
 

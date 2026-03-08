@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -126,10 +126,10 @@ public class CompanyGenerationOptions {
 
     // Unit
     private ForceNamingMethod forceNamingMethod;
-    private boolean generateForceIcons;
-    private boolean useSpecifiedFactionToGenerateForceIcons;
-    private boolean generateOriginNodeForceIcon;
-    private boolean useOriginNodeForceIconLogo;
+    private boolean generateFormationIcons;
+    private boolean useSpecifiedFactionToGenerateFormationIcons;
+    private boolean generateOriginNodeFormationIcon;
+    private boolean useOriginNodeFormationIconLogo;
     private TreeMap<Integer, Integer> forceWeightLimits;
 
     // Spares
@@ -239,10 +239,10 @@ public class CompanyGenerationOptions {
 
         // Unit
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
-        setGenerateForceIcons(true);
-        setUseSpecifiedFactionToGenerateForceIcons(false);
-        setGenerateOriginNodeForceIcon(true);
-        setUseOriginNodeForceIconLogo(false);
+        setGenerateFormationIcons(true);
+        setUseSpecifiedFactionToGenerateFormationIcons(false);
+        setGenerateOriginNodeFormationIcon(true);
+        setUseOriginNodeFormationIconLogo(false);
         setForceWeightLimits(new TreeMap<>());
         getForceWeightLimits().put(390, EntityWeightClass.WEIGHT_ASSAULT);
         getForceWeightLimits().put(280, EntityWeightClass.WEIGHT_HEAVY);
@@ -629,36 +629,36 @@ public class CompanyGenerationOptions {
         this.forceNamingMethod = forceNamingMethod;
     }
 
-    public boolean isGenerateForceIcons() {
-        return generateForceIcons;
+    public boolean isGenerateFormationIcons() {
+        return generateFormationIcons;
     }
 
-    public void setGenerateForceIcons(final boolean generateForceIcons) {
-        this.generateForceIcons = generateForceIcons;
+    public void setGenerateFormationIcons(final boolean generateFormationIcons) {
+        this.generateFormationIcons = generateFormationIcons;
     }
 
-    public boolean isUseSpecifiedFactionToGenerateForceIcons() {
-        return useSpecifiedFactionToGenerateForceIcons;
+    public boolean isUseSpecifiedFactionToGenerateFormationIcons() {
+        return useSpecifiedFactionToGenerateFormationIcons;
     }
 
-    public void setUseSpecifiedFactionToGenerateForceIcons(final boolean useSpecifiedFactionToGenerateForceIcons) {
-        this.useSpecifiedFactionToGenerateForceIcons = useSpecifiedFactionToGenerateForceIcons;
+    public void setUseSpecifiedFactionToGenerateFormationIcons(final boolean useSpecifiedFactionToGenerateFormationIcons) {
+        this.useSpecifiedFactionToGenerateFormationIcons = useSpecifiedFactionToGenerateFormationIcons;
     }
 
-    public boolean isGenerateOriginNodeForceIcon() {
-        return generateOriginNodeForceIcon;
+    public boolean isGenerateOriginNodeFormationIcon() {
+        return generateOriginNodeFormationIcon;
     }
 
-    public void setGenerateOriginNodeForceIcon(final boolean generateOriginNodeForceIcon) {
-        this.generateOriginNodeForceIcon = generateOriginNodeForceIcon;
+    public void setGenerateOriginNodeFormationIcon(final boolean generateOriginNodeFormationIcon) {
+        this.generateOriginNodeFormationIcon = generateOriginNodeFormationIcon;
     }
 
-    public boolean isUseOriginNodeForceIconLogo() {
-        return useOriginNodeForceIconLogo;
+    public boolean isUseOriginNodeFormationIconLogo() {
+        return useOriginNodeFormationIconLogo;
     }
 
-    public void setUseOriginNodeForceIconLogo(final boolean useOriginNodeForceIconLogo) {
-        this.useOriginNodeForceIconLogo = useOriginNodeForceIconLogo;
+    public void setUseOriginNodeFormationIconLogo(final boolean useOriginNodeFormationIconLogo) {
+        this.useOriginNodeFormationIconLogo = useOriginNodeFormationIconLogo;
     }
 
     public TreeMap<Integer, Integer> getForceWeightLimits() {
@@ -987,11 +987,11 @@ public class CompanyGenerationOptions {
 
         // Unit
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToGenerateForceIcons",
-              isUseSpecifiedFactionToGenerateForceIcons());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateFormationIcons", isGenerateFormationIcons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToGenerateFormationIcons",
+              isUseSpecifiedFactionToGenerateFormationIcons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateOriginNodeFormationIcon", isGenerateOriginNodeFormationIcon());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeFormationIconLogo", isUseOriginNodeFormationIconLogo());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "WeightClass:" + entry.getValue(), entry.getKey().toString());
@@ -1257,18 +1257,18 @@ public class CompanyGenerationOptions {
                     case "forceNamingMethod":
                         options.setForceNamingMethod(ForceNamingMethod.valueOf(wn.getTextContent().trim()));
                         break;
-                    case "generateForceIcons":
-                        options.setGenerateForceIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "generateFormationIcons":
+                        options.setGenerateFormationIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "useSpecifiedFactionToGenerateForceIcons":
-                        options.setUseSpecifiedFactionToGenerateForceIcons(
+                    case "useSpecifiedFactionToGenerateFormationIcons":
+                        options.setUseSpecifiedFactionToGenerateFormationIcons(
                               Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "generateOriginNodeForceIcon":
-                        options.setGenerateOriginNodeForceIcon(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "generateOriginNodeFormationIcon":
+                        options.setGenerateOriginNodeFormationIcon(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "useOriginNodeForceIconLogo":
-                        options.setUseOriginNodeForceIconLogo(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "useOriginNodeFormationIconLogo":
+                        options.setUseOriginNodeFormationIconLogo(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "forceWeightLimits": {
                         options.setForceWeightLimits(new TreeMap<>());

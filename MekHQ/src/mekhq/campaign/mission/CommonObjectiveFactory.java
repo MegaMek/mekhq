@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission;
 
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -43,7 +43,8 @@ import megamek.common.OffBoardDirection;
 import megamek.common.units.Dropship;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
@@ -216,7 +217,7 @@ public class CommonObjectiveFactory {
      */
     private static void addAssignedPlayerUnitsToObjective(AtBScenario scenario, Campaign campaign,
           ScenarioObjective objective) {
-        int expectedNumUnits = getStandardForceSize(campaign.getFaction());
+        int expectedNumUnits = CombatTeam.getStandardFormationSize(campaign.getFaction());
         if (scenario.isBigBattle()) {
             expectedNumUnits *= 2;
         } else if (scenario.isSpecialScenario()) {
@@ -226,10 +227,10 @@ public class CommonObjectiveFactory {
         // some scenarios have a lance assigned
         // some scenarios have individual units assigned
         if (scenario.getCombatTeamId() != AtBScenario.NO_COMBAT_TEAM) {
-            Force force = campaign.getForce(scenario.getCombatTeamId());
+            Formation formation = campaign.getFormation(scenario.getCombatTeamId());
 
-            if (force != null) {
-                objective.addForce(campaign.getForce(scenario.getCombatTeamId()).getName());
+            if (formation != null) {
+                objective.addForce(campaign.getFormation(scenario.getCombatTeamId()).getName());
             }
         } else {
             int unitCount = 0;

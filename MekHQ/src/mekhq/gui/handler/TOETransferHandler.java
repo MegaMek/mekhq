@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import javax.swing.tree.TreePath;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 
@@ -72,8 +72,8 @@ public class TOETransferHandler extends TransferHandler {
             Object node = ((JTree) c).getLastSelectedPathComponent();
             if (node instanceof Unit) {
                 MekHQ.triggerEvent(new OrganizationChangedEvent((Unit) node));
-            } else if (node instanceof Force) {
-                MekHQ.triggerEvent(new OrganizationChangedEvent((Force) node));
+            } else if (node instanceof Formation) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent((Formation) node));
             }
         }
     }
@@ -84,8 +84,8 @@ public class TOETransferHandler extends TransferHandler {
         Object node = tree.getLastSelectedPathComponent();
         if (node instanceof Unit) {
             return new StringSelection("UNIT|" + ((Unit) node).getId().toString());
-        } else if (node instanceof Force) {
-            return new StringSelection("FORCE|" + ((Force) node).getId());
+        } else if (node instanceof Formation) {
+            return new StringSelection("FORCE|" + ((Formation) node).getId());
         } else {
             return null;
         }
@@ -119,18 +119,18 @@ public class TOETransferHandler extends TransferHandler {
         }
 
         Object parent = dl.getPath().getLastPathComponent();
-        Force superForce = null;
-        if (parent instanceof Force) {
-            superForce = (Force) parent;
+        Formation superFormation = null;
+        if (parent instanceof Formation) {
+            superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superForce = gui.getCampaign().getForce(((Unit) parent).getForceId());
+            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
         }
 
         // Extract transfer data.
         // FIXME : Unit does not work
         @SuppressWarnings(value = "unused")
         Unit unit = null;
-        Force force = null;
+        Formation formation = null;
         Transferable t = support.getTransferable();
         try {
             StringTokenizer st = new StringTokenizer(
@@ -142,7 +142,7 @@ public class TOETransferHandler extends TransferHandler {
                 unit = gui.getCampaign().getUnit(UUID.fromString(id));
             }
             if (type.equals("FORCE")) {
-                force = gui.getCampaign().getForce(Integer.parseInt(id));
+                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
             LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
@@ -150,12 +150,12 @@ public class TOETransferHandler extends TransferHandler {
             LOGGER.error("I/O error: {}", ioe.getMessage());
         }
 
-        if ((force != null) && (superForce != null) &&
-                  (force.isAncestorOf(superForce) || force.equals(superForce))) {
+        if ((formation != null) && (superFormation != null) &&
+                  (formation.isAncestorOf(superFormation) || formation.equals(superFormation))) {
             return false;
         }
 
-        return (parent instanceof Force) || (parent instanceof Unit);
+        return (parent instanceof Formation) || (parent instanceof Unit);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class TOETransferHandler extends TransferHandler {
         }
         // Extract transfer data.
         Unit unit = null;
-        Force force = null;
+        Formation formation = null;
         Transferable t = support.getTransferable();
         try {
             StringTokenizer st = new StringTokenizer((String) t.getTransferData(DataFlavor.stringFlavor), "|");
@@ -178,8 +178,8 @@ public class TOETransferHandler extends TransferHandler {
                 }
             }
             if (type.equals("FORCE")) {
-                force = gui.getCampaign().getForce(Integer.parseInt(id));
-                if (force == null || force.isDeployed()) {
+                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
+                if (formation == null || formation.isDeployed()) {
                     return false;
                 }
             }
@@ -192,22 +192,22 @@ public class TOETransferHandler extends TransferHandler {
         // Get drop location info.
         JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
         TreePath dest = dl.getPath();
-        Force superForce = null;
+        Formation superFormation = null;
         Object parent = dest.getLastPathComponent();
 
-        if (parent instanceof Force) {
-            superForce = (Force) parent;
+        if (parent instanceof Formation) {
+            superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superForce = gui.getCampaign().getForce(((Unit) parent).getForceId());
+            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
         }
 
-        if (superForce != null) {
+        if (superFormation != null) {
             if (unit != null) {
-                gui.getCampaign().addUnitToForce(unit, superForce.getId());
+                gui.getCampaign().addUnitToFormation(unit, superFormation.getId());
                 return true;
             }
-            if (force != null) {
-                gui.getCampaign().moveForce(force, superForce);
+            if (formation != null) {
+                gui.getCampaign().moveFormation(formation, superFormation);
                 return true;
             }
         }

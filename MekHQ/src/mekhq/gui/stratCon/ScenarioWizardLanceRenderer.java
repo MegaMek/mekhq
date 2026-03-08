@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import javax.swing.ListCellRenderer;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -58,7 +58,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author NickAragua
  */
-public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRenderer<Force> {
+public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRenderer<Formation> {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     private final Campaign campaign;
@@ -69,9 +69,9 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
     }
 
     @Override
-    public Component getListCellRendererComponent(final JList<? extends Force> list, final Force force,
-          final int index, final boolean isSelected,
-          final boolean cellHasFocus) {
+    public Component getListCellRendererComponent(final JList<? extends Formation> list, final Formation formation,
+                                                  final int index, final boolean isSelected,
+                                                  final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
         // default return on all themes, but by recreating the colour it works properly
         final Color foreground = new Color((isSelected
@@ -82,7 +82,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setBackground(background);
 
         // Determine name color
-        OperationalStatus operationalStatus = force.updateForceIconOperationalStatus(campaign).get(0);
+        OperationalStatus operationalStatus = formation.updateFormationIconOperationalStatus(campaign).get(0);
 
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";
@@ -97,21 +97,21 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;
 
         // Get combat role
-        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(force.getId());
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(formation.getId());
         String roleString = "";
         if (combatTeam != null) {
             roleString = combatTeam.getRole().toString() + ", ";
         }
 
         // Adjust force name to remove unnecessary information
-        String forceName = force.getFullName();
-        String originNodeName = ", " + campaign.getForce(0).getName();
+        String forceName = formation.getFullName();
+        String originNodeName = ", " + campaign.getFormation(0).getName();
         forceName = forceName.replaceAll(originNodeName, "");
 
         String fatigueReport = "";
         if (campaign.getCampaignOptions().isUseFatigue()) {
             int highestFatigue = 0;
-            for (UUID unitId : force.getAllUnits(false)) {
+            for (UUID unitId : formation.getAllUnits(false)) {
                 Unit unit = campaign.getUnit(unitId);
 
                 if (unit == null) {
@@ -133,8 +133,8 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         }
 
         // Format string
-        setText(getFormattedTextAt(RESOURCE_BUNDLE, "report.string", statusOpenFormat, force.getName(),
-              statusCloseFormat, roleString, force.getTotalBV(campaign, true),
+        setText(getFormattedTextAt(RESOURCE_BUNDLE, "report.string", statusOpenFormat, formation.getName(),
+              statusCloseFormat, roleString, formation.getTotalBV(campaign, true),
               fatigueReport, forceName));
 
         return this;

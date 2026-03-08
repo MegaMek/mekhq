@@ -178,7 +178,13 @@ public class Armor extends Part implements IAcquisitionWork {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            if (!isSalvaging()) {
+            if (isSalvaging()) {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                      .append(rear ? " (Rear)" : "")
+                      .append(", ")
+                      .append(amount)
+                      .append(amount == 1 ? " point" : " points");
+            } else {
                 toReturn.append(unit.getEntity().getLocationName(location))
                       .append(rear ? " (Rear)" : "")
                       .append(", ")

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -69,51 +69,51 @@ public class AssignmentLogger {
         person.addAssignmentLogEntry(new AssignmentLogEntry(date, MessageFormat.format(message, unitName)));
     }
 
-    public static void addedToTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
-        if (force != null) {
+    public static void addedToTOEFormation(Campaign campaign, Person person, LocalDate date, Formation formation) {
+        if (formation != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
-                              force.getFullName() :
-                              force.getName())));
+                              formation.getFullName() :
+                              formation.getName())));
         }
     }
 
-    public static void reassignedTOEForce(final Campaign campaign, final Person person, final LocalDate date,
-          final @Nullable Force oldForce, final @Nullable Force newForce) {
-        if ((oldForce == null) && (newForce == null)) {
-            LOGGER.error("Cannot reassign {} on {} because both specified forces are null",
+    public static void reassignedTOEFormation(final Campaign campaign, final Person person, final LocalDate date,
+                                          final @Nullable Formation oldFormation, final @Nullable Formation newFormation) {
+        if ((oldFormation == null) && (newFormation == null)) {
+            LOGGER.error("Cannot reassign {} on {} because both specified formations are null",
                   person.getFullTitle(),
                   date);
             return;
         }
 
-        if ((oldForce != null) && (newForce != null)) {
+        if ((oldFormation != null) && (newFormation != null)) {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
-                              oldForce.getFullName() :
-                              oldForce.getName(),
+                              oldFormation.getFullName() :
+                              oldFormation.getName(),
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
-                              newForce.getFullName() :
-                              newForce.getName())));
-        } else if (oldForce == null) {
-            addedToTOEForce(campaign, person, date, newForce);
+                              newFormation.getFullName() :
+                              newFormation.getName())));
+        } else if (oldFormation == null) {
+            addedToTOEFormation(campaign, person, date, newFormation);
         } else {
-            removedFromTOEForce(campaign, person, date, oldForce);
+            removedFromTOEFormation(campaign, person, date, oldFormation);
         }
     }
 
-    public static void removedFromTOEForce(Campaign campaign, Person person, LocalDate date, Force force) {
-        if (force != null) {
+    public static void removedFromTOEFormation(Campaign campaign, Person person, LocalDate date, Formation formation) {
+        if (formation != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
                         campaign.getCampaignOptions().isUseExtendedTOEForceName() ?
-                              force.getFullName() :
-                              force.getName())));
+                              formation.getFullName() :
+                              formation.getName())));
         }
     }
 }
