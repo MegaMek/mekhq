@@ -206,7 +206,7 @@ public class ScenarioObjectiveProcessor {
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
                                                      (!forceEntityDestruction &&
-                                                           !entityIsDestroyed(entity, opponentHasBattlefieldControl)) || entityIsCaptured(entity, opponentHasBattlefieldControl);
+                                                           (!entityIsDestroyed(entity, opponentHasBattlefieldControl) || entityIsCaptured(entity, opponentHasBattlefieldControl)));
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
@@ -242,7 +242,8 @@ public class ScenarioObjectiveProcessor {
                 case ForceWithdraw -> entityIsForcedWithdrawal(entity);
                 case Capture -> entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case PreventReachMapEdge -> !entityHasReachedDestinationEdge(entity, objective);
-                case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl)
+                        || entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case ReachMapEdge -> entityHasReachedDestinationEdge(entity, objective);
                 default -> false;
             };
@@ -284,7 +285,7 @@ public class ScenarioObjectiveProcessor {
         // obviously can't capture it if we don't control the battlefield
         // Non-collapsed buildings should count as captured
         return entity.isImmobile() &&
-                     (!entity.isDestroyed() || entity instanceof AbstractBuildingEntity && entity.isSalvage()) &&
+                     (!entity.isDestroyed() || (entity instanceof AbstractBuildingEntity && entity.isSalvage())) &&
                      entity.getRetreatedDirection() == OffBoardDirection.NONE && opponentHasBattlefieldControl;
     }
 
