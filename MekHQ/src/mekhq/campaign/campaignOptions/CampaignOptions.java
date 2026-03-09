@@ -533,7 +533,6 @@ public class CampaignOptions {
     private int rentedFacilitiesCostKitchens;
     private int rentedFacilitiesCostHoldingCells;
     private int rentedFacilitiesCostRepairBays;
-    private boolean rentedFacilitiesEnabled;
     // endregion Finance Tab
 
     // region Mercenary Tab
@@ -1198,7 +1197,6 @@ public class CampaignOptions {
         rentedFacilitiesCostKitchens = 0;
         rentedFacilitiesCostHoldingCells = 0;
         rentedFacilitiesCostRepairBays = 0;
-        rentedFacilitiesEnabled = true;
         // endregion Finances Tab
 
         // region Mercenary Tab
@@ -3673,10 +3671,6 @@ public class CampaignOptions {
     public void setRentedFacilitiesCostHospitalBeds(final int rentedFacilitiesCostHospitalBeds) {
         this.rentedFacilitiesCostHospitalBeds = rentedFacilitiesCostHospitalBeds;
     }
-    public void setRentedFacilitiesEnabled(final boolean rentedFacilitiesEnabled) {
-        this.rentedFacilitiesEnabled = rentedFacilitiesEnabled;
-    }
-    public boolean getRentedFacilitiesEnabled (){ return rentedFacilitiesEnabled; }
 
     public int getRentedFacilitiesCostKitchens() {
         return rentedFacilitiesCostKitchens;

@@ -463,11 +463,6 @@ public class CampaignNewDayManager {
             campaign.setShoppingList(campaign.goShopping(campaign.getShoppingList()));
         }
 
-        //Check if rentals are enabled every week
-        if (isMonday){
-            campaignOptions.setRentedFacilitiesEnabled(FacilityRentals.rentalsEnabled(campaign));
-        }
-
         // check for anything in finances
         finances.newDay(campaign, yesterday, today);
 

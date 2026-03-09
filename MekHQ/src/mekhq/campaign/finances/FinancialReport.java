@@ -66,7 +66,6 @@ public class FinancialReport {
     private Money salaries = Money.zero();
     private Money overhead = Money.zero();
     private Money contracts = Money.zero();
-    private Money rentals = Money.zero();
 
     public Money getNetWorth() {
         return getTotalAssets().minus(getTotalLiabilities());
@@ -86,7 +85,7 @@ public class FinancialReport {
     }
 
     public Money getMonthlyExpenses() {
-        return maintenance.plus(salaries).plus(overhead).plus(coSpareParts).plus(coAmmo).plus(coFuel).plus(rentals);
+        return maintenance.plus(salaries).plus(overhead).plus(coSpareParts).plus(coAmmo).plus(coFuel);
     }
 
     public Money getCash() {
@@ -157,15 +156,12 @@ public class FinancialReport {
         return mek;
     }
 
-    public Money getRentals() { return rentals; }
-
     public static FinancialReport calculate(Campaign campaign) {
         FinancialReport r = new FinancialReport();
 
         r.cash = campaign.getFinances().getBalance();
         r.loans = campaign.getFinances().getLoanBalance();
         r.assets = campaign.getFinances().getTotalAssetValue();
-        r.rentals = campaign.getTotalRentFeesExcludingBays();
 
         campaign.getHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
