@@ -38,6 +38,8 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.mission.rentals.FacilityRentals;
+import mekhq.campaign.Campaign;
 
 public class MASHCapacity {
     /**
@@ -85,6 +87,6 @@ public class MASHCapacity {
             }
         }
 
-        return mashTheatreCount * capacityPerTheatre;
+        return (mashTheatreCount * capacityPerTheatre) ;
     }
 }
