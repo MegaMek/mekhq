@@ -429,8 +429,8 @@ public class CampaignGUI extends JPanel {
      * <p>
      * Note 2: the A mnemonic is used for the Advance Day button
      * <p>
-     * Note 3: Menu item accelerators use Ctrl+key (not Alt+key) to avoid conflicts with {@link MHQTabType} tab
-     * mnemonics, which Swing maps to Alt+key via {@code JTabbedPane.setMnemonicAt()}.
+     * Note 3: Only essential actions (Save, Load, New) have global Ctrl+key accelerators. All other menu items use
+     * mnemonics only (accessible via keyboard menu navigation) to avoid duplicate accelerator conflicts.
      */
     private void initMenu() {
         // TODO : Implement "Export All" versions for Personnel and Parts
@@ -487,7 +487,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
         miImportPerson.setMnemonic(KeyEvent.VK_P);
-        miImportPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         miImportPerson.addActionListener(evt -> loadPersonFile());
         menuImport.add(miImportPerson);
 
@@ -495,20 +494,17 @@ public class CampaignGUI extends JPanel {
         miImportIndividualRankSystem.setToolTipText(resourceMap.getString("miImportIndividualRankSystem.toolTipText"));
         miImportIndividualRankSystem.setName("miImportIndividualRankSystem");
         miImportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
-        miImportIndividualRankSystem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK));
         miImportIndividualRankSystem.addActionListener(evt -> getCampaign().setRankSystem(RankSystem.generateIndividualInstanceFromXML(
               FileDialogs.openIndividualRankSystem(getFrame()).orElse(null))));
         menuImport.add(miImportIndividualRankSystem);
 
         JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text"));
         miImportParts.setMnemonic(KeyEvent.VK_A);
-        miImportParts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         miImportParts.addActionListener(evt -> loadPartsFile());
         menuImport.add(miImportParts);
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text"));
         miLoadForces.setMnemonic(KeyEvent.VK_F);
-        miLoadForces.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         miLoadForces.addActionListener(evt -> loadListFile(true));
         menuImport.add(miLoadForces);
 
@@ -529,7 +525,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text"));
         miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
-        miExportPersonCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         miExportPersonCSV.addActionListener(evt -> {
             try {
                 exportPersonnel(FileType.CSV,
@@ -545,7 +540,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text"));
         miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
-        miExportUnitCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
         miExportUnitCSV.addActionListener(evt -> {
             try {
                 exportUnits(FileType.CSV,
@@ -563,7 +557,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
         miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
-        miExportFinancesCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         miExportFinancesCSV.addActionListener(evt -> {
             try {
                 exportFinances(FileType.CSV,
@@ -591,7 +584,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportRankSystems = new JMenuItem(resourceMap.getString("miExportRankSystems.text"));
         miExportRankSystems.setName("miExportRankSystems");
         miExportRankSystems.setMnemonic(KeyEvent.VK_R);
-        miExportRankSystems.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miExportRankSystems.addActionListener(evt -> Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(getFrame())
                                                                                          .orElse(null),
               getCampaign().getRankSystem()));
@@ -600,7 +592,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportIndividualRankSystem = new JMenuItem(resourceMap.getString("miExportIndividualRankSystem.text"));
         miExportIndividualRankSystem.setName("miExportIndividualRankSystem");
         miExportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
-        miExportIndividualRankSystem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK));
         miExportIndividualRankSystem.addActionListener(evt -> getCampaign().getRankSystem()
                                                                     .writeToFile(FileDialogs.saveIndividualRankSystem(
                                                                           getFrame()).orElse(null)));
@@ -608,7 +599,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
-        miExportPlanetsXML.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         miExportPlanetsXML.addActionListener(evt -> {
             try {
                 exportPlanets(FileType.XML,
@@ -629,7 +619,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
         miExportCampaignSubset.setMnemonic(KeyEvent.VK_S);
-        miExportCampaignSubset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         miExportCampaignSubset.addActionListener(evt -> {
             CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
             cew.display(CampaignExportWizardState.ForceSelection);
@@ -648,14 +637,12 @@ public class CampaignGUI extends JPanel {
         JMenuItem miRefreshUnitCache = new JMenuItem(resourceMap.getString("miRefreshUnitCache.text"));
         miRefreshUnitCache.setName("miRefreshUnitCache");
         miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
-        miRefreshUnitCache.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
         miRefreshUnitCache.addActionListener(evt -> MekSummaryCache.refreshUnitData(false));
         menuRefresh.add(miRefreshUnitCache);
 
         JMenuItem miRefreshCamouflage = new JMenuItem(resourceMap.getString("miRefreshCamouflage.text"));
         miRefreshCamouflage.setName("miRefreshCamouflage");
         miRefreshCamouflage.setMnemonic(KeyEvent.VK_C);
-        miRefreshCamouflage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         miRefreshCamouflage.addActionListener(evt -> {
             MHQStaticDirectoryManager.refreshCamouflageDirectory();
             refreshAllTabs();
@@ -665,7 +652,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miRefreshPortraits = new JMenuItem(resourceMap.getString("miRefreshPortraits.text"));
         miRefreshPortraits.setName("miRefreshPortraits");
         miRefreshPortraits.setMnemonic(KeyEvent.VK_P);
-        miRefreshPortraits.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         miRefreshPortraits.addActionListener(evt -> {
             MHQStaticDirectoryManager.refreshPortraitDirectory();
             refreshAllTabs();
@@ -675,7 +661,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miRefreshFormationIcons = new JMenuItem(resourceMap.getString("miRefreshFormationIcons.text"));
         miRefreshFormationIcons.setName("miRefreshFormationIcons");
         miRefreshFormationIcons.setMnemonic(KeyEvent.VK_F);
-        miRefreshFormationIcons.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         miRefreshFormationIcons.addActionListener(evt -> {
             MHQStaticDirectoryManager.refreshFormationIcons();
             refreshAllTabs();
@@ -685,7 +670,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
         miRefreshAwards.setName("miRefreshAwards");
         miRefreshAwards.setMnemonic(KeyEvent.VK_A);
-        miRefreshAwards.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         miRefreshAwards.addActionListener(evt -> {
             MHQStaticDirectoryManager.refreshAwardIcons();
             refreshAllTabs();
@@ -704,7 +688,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
         miRefreshRanks.setName("miRefreshRanks");
         miRefreshRanks.setMnemonic(KeyEvent.VK_R);
-        miRefreshRanks.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
         menuRefresh.add(miRefreshRanks);
 
@@ -720,7 +703,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
         menuOptions.setMnemonic(KeyEvent.VK_C);
-        menuOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         menuOptions.addActionListener(this::menuOptionsActionPerformed);
         menuFile.add(menuOptions);
 
@@ -728,7 +710,6 @@ public class CampaignGUI extends JPanel {
         miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
         miMHQOptions.setName("miMHQOptions");
         miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
         menuFile.add(miMHQOptions);
 
@@ -736,7 +717,6 @@ public class CampaignGUI extends JPanel {
         miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
         miGameOptions.setName("miGameOptions");
         miGameOptions.setMnemonic(KeyEvent.VK_M);
-        miGameOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         miGameOptions.addActionListener(evt -> {
             final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
             god.setEditable(true);
@@ -751,7 +731,6 @@ public class CampaignGUI extends JPanel {
         miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
         miMMClientOptions.setName("miMMClientOptions");
         miMMClientOptions.setMnemonic(KeyEvent.VK_O);
-        miMMClientOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(frame, null).setVisible(true));
         menuFile.add(miMMClientOptions);
 
@@ -762,7 +741,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
         menuExitItem.setMnemonic(KeyEvent.VK_E);
-        menuExitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         menuExitItem.addActionListener(evt -> getApplication().exit(true));
         menuFile.add(menuExitItem);
 
@@ -777,28 +755,24 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
         miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
-        miPersonnelMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
         menuMarket.add(miPersonnelMarket);
 
         JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
         miContractMarket.setMnemonic(KeyEvent.VK_C);
-        miContractMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         miContractMarket.addActionListener(evt -> showContractMarket());
         miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB());
         menuMarket.add(miContractMarket);
 
         JMenuItem miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
-        miUnitMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
         miUnitMarket.addActionListener(evt -> showUnitMarket());
         miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
         miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
-        miPurchaseUnit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         miPurchaseUnit.addActionListener(evt -> {
             UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
             if (!MekSummaryCache.getInstance().isInitialized()) {
@@ -814,13 +788,11 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
         miBuyParts.setMnemonic(KeyEvent.VK_R);
-        miBuyParts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miBuyParts.addActionListener(evt -> new PartsStoreDialog(true, this).setVisible(true));
         menuMarket.add(miBuyParts);
 
         JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
         miHireBulk.setMnemonic(KeyEvent.VK_B);
-        miHireBulk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK));
         miHireBulk.addActionListener(evt -> hireBulkPersonnel());
         menuMarket.add(miHireBulk);
 
@@ -841,7 +813,6 @@ public class CampaignGUI extends JPanel {
             JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miHire.setMnemonic(role.getMnemonic());
-                miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.CTRL_DOWN_MASK));
             }
             miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
             miHire.setActionCommand(role.name());
@@ -859,8 +830,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
         if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
             miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
-            miHire.setAccelerator(KeyStroke.getKeyStroke(PersonnelRole.DEPENDENT.getMnemonic(),
-                  InputEvent.CTRL_DOWN_MASK));
         }
         miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
         miHire.addActionListener(this::hirePerson);
@@ -879,7 +848,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miHireAsTechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
         miHireAsTechs.setMnemonic(KeyEvent.VK_H);
-        miHireAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         miHireAsTechs.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
@@ -896,7 +864,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFireAsTechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
         miFireAsTechs.setMnemonic(KeyEvent.VK_E);
-        miFireAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         miFireAsTechs.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
@@ -913,13 +880,11 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
         miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK));
         miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
         menuAsTechPool.add(miFullStrengthAsTechs);
 
         JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
         miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
-        miFireAllAsTechs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
         menuAsTechPool.add(miFireAllAsTechs);
         menuMarket.add(menuAsTechPool);
@@ -933,7 +898,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miHireMedics = new JMenuItem(resourceMap.getString("miHireMedics.text"));
         miHireMedics.setMnemonic(KeyEvent.VK_H);
-        miHireMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         miHireMedics.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
@@ -950,7 +914,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFireMedics = new JMenuItem(resourceMap.getString("miFireMedics.text"));
         miFireMedics.setMnemonic(KeyEvent.VK_E);
-        miFireMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         miFireMedics.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
@@ -967,13 +930,11 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
         miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK));
         miFullStrengthMedics.addActionListener(evt -> getCampaign().resetMedicPool());
         menuMedicPool.add(miFullStrengthMedics);
 
         JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
-        miFireAllMedics.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
         menuMedicPool.add(miFireAllMedics);
         menuMarket.add(menuMedicPool);
@@ -1374,35 +1335,30 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
-        miDragoonsRating.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
         miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(
               true));
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));
         miPersonnelReport.setMnemonic(KeyEvent.VK_P);
-        miPersonnelReport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
         miPersonnelReport.addActionListener(evt -> new PersonnelReportDialog(getFrame(),
               new PersonnelReport(getCampaign())).setVisible(true));
         menuReports.add(miPersonnelReport);
 
         JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text"));
         miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
-        miHangarBreakdown.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         miHangarBreakdown.addActionListener(evt -> new HangarReportDialog(getFrame(),
               new HangarReport(getCampaign())).setVisible(true));
         menuReports.add(miHangarBreakdown);
 
         JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text"));
         miTransportReport.setMnemonic(KeyEvent.VK_T);
-        miTransportReport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         miTransportReport.addActionListener(evt -> new TransportReportDialog(getFrame(),
               new TransportReport(getCampaign())).setVisible(true));
         menuReports.add(miTransportReport);
 
         JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text"));
         miCargoReport.setMnemonic(KeyEvent.VK_C);
-        miCargoReport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         miCargoReport.addActionListener(evt -> new CargoReportDialog(getFrame(),
               new CargoReport(getCampaign())).setVisible(true));
         menuReports.add(miCargoReport);
@@ -1418,7 +1374,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text"));
         miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
-        miHistoricalDailyReportDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         miHistoricalDailyReportDialog.addActionListener(evt -> {
             HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
             histDailyReportDialog.setModal(true);
@@ -1429,14 +1384,12 @@ public class CampaignGUI extends JPanel {
 
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
-        miRetirementDefectionDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().isUseRandomRetirement());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
         miAwardEligibilityDialog = new JMenuItem(resourceMap.getString("miAwardEligibilityDialog.text"));
         miAwardEligibilityDialog.setMnemonic(KeyEvent.VK_R);
-        miAwardEligibilityDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         miAwardEligibilityDialog.setVisible(getCampaign().getCampaignOptions().isEnableAutoAwards());
         miAwardEligibilityDialog.addActionListener(evt -> showAwardEligibilityDialog());
         menuView.add(miAwardEligibilityDialog);
@@ -1454,13 +1407,11 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
         miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
-        miGMToolsDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));
         miGMToolsDialog.addActionListener(evt -> new GMToolsDialog(getFrame(), this, null).setVisible(true));
         menuManage.add(miGMToolsDialog);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
-        miBloodnames.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK));
         miBloodnames.addActionListener(evt -> {
             for (final Person person : getCampaign().getPersonnel()) {
                 getCampaign().checkBloodnameAdd(person, false);
@@ -1470,13 +1421,11 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
         miScenarioEditor.setMnemonic(KeyEvent.VK_S);
-        miScenarioEditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         miScenarioEditor.addActionListener(evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
         menuManage.add(miScenarioEditor);
 
         miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
         miCompanyGenerator.setMnemonic(KeyEvent.VK_C);
-        miCompanyGenerator.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
         miCompanyGenerator.addActionListener(evt -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(
               true));
@@ -1484,7 +1433,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miAutoResolveBehaviorEditor = new JMenuItem(resourceMap.getString("miAutoResolveBehaviorSettings.text"));
         miAutoResolveBehaviorEditor.setMnemonic(KeyEvent.VK_T);
-        miAutoResolveBehaviorEditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
         miAutoResolveBehaviorEditor.addActionListener(evt -> {
             var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
             autoResolveBehaviorSettingsDialog.setVisible(true);
@@ -1505,7 +1453,6 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
-        menuAboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         menuAboutItem.setName("aboutMenuItem");
         menuAboutItem.addActionListener(evt -> {
             MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
