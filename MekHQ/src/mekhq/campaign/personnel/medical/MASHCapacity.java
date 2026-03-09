@@ -85,6 +85,6 @@ public class MASHCapacity {
             }
         }
 
-        return (mashTheatreCount * capacityPerTheatre);
+        return mashTheatreCount * capacityPerTheatre;
     }
 }
