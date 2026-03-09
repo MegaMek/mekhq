@@ -84,6 +84,15 @@ public class FacilityRentals {
     private static final int CAPACITY_INCREASE_KITCHENS = 150; // One Field Kitchen
     private static final int CAPACITY_INCREASE_SECURITY = 35; // One squad of 7 soldiers
 
+    public static boolean rentalsEnabled (Campaign campaign){
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int hospitalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        int kitchenCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        int holdingCellCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+
+        return (hospitalCost + kitchenCost + holdingCellCost != 0);
+    }
+
     public static int getCapacityIncreaseFromRentals(List<Contract> activeContracts, ContractRentalType rentalType) {
         if (rentalType == ContractRentalType.MAINTENANCE_BAYS || rentalType == ContractRentalType.FACTORY_CONDITIONS) {
             return 0;
