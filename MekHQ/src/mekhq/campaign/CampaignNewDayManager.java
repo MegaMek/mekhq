@@ -588,7 +588,7 @@ public class CampaignNewDayManager {
      */
     private void updateFacilities() {
         updateFieldKitchenCapacity();
-        updateMASHTheatreCapacity();
+        campaign.calculateMASHTheaterCapacity();
     }
 
     /**
