@@ -33,11 +33,24 @@
 package mekhq.campaign.personnel.medical.advancedMedical;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.GameEffect;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.BodyLocation;
 
 /**
  * Test class for {@link InjuryTypes}
@@ -60,5 +73,41 @@ class InjuryTypesTest {
             InjuryTypes.registerAll();
             InjuryTypes.registerAll();
         }, "InjuryTypes.registerAll() should be safe to call multiple times");
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>.
+     * Permanent injuries must not produce stress effects that could worsen them or replace them
+     * with temporary injuries during post-combat stress resolution.
+     */
+    @ParameterizedTest(name = "{0} permanent injury produces no stress effects")
+    @MethodSource(value = "permanentInjuryStressEffectData")
+    void testGenStressEffect_permanentInjuryProducesNoEffects(String injuryName, InjuryType type,
+          BodyLocation location, int severity) {
+        // Setup
+        Campaign campaign = mock(Campaign.class);
+        Person person = mock(Person.class);
+        Injury permanentInjury = new Injury(30, injuryName, location, type, severity,
+              LocalDate.now(), true);
+
+        // Act
+        List<GameEffect> effects = type.genStressEffect(campaign, person, permanentInjury, 3);
+
+        // Assert
+        assertTrue(effects.isEmpty(),
+              injuryName + " is permanent and should produce no stress effects, but got: " + effects);
+    }
+
+    static Stream<Arguments> permanentInjuryStressEffectData() {
+        return Stream.of(
+              Arguments.of("Concussion", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 1),
+              Arguments.of("Concussion (severe)", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 2),
+              Arguments.of("Cerebral contusion", InjuryTypes.CEREBRAL_CONTUSION, BodyLocation.HEAD, 1),
+              Arguments.of("Internal bleeding", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 1),
+              Arguments.of("Internal bleeding (severe)", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 2),
+              Arguments.of("Broken limb", InjuryTypes.BROKEN_LIMB, BodyLocation.LEFT_ARM, 1),
+              Arguments.of("Broken collar bone", InjuryTypes.BROKEN_COLLAR_BONE, BodyLocation.CHEST, 1),
+              Arguments.of("Punctured lung", InjuryTypes.PUNCTURED_LUNG, BodyLocation.CHEST, 1)
+        );
     }
 }
