@@ -514,6 +514,11 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
+            // Permanent injuries have stabilized and should not have their recovery timer reset
+            if (i.isPermanent()) {
+                return Collections.emptyList();
+            }
+
             return Collections.singletonList(newResetRecoveryTimeAction(i));
         }
     }
@@ -529,6 +534,11 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
+            // Permanent injuries have stabilized and should not worsen or be replaced by temporary ones
+            if (injury.isPermanent()) {
+                return Collections.emptyList();
+            }
+
             String secondEffectFluff = "development of a chronic traumatic encephalopathy";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
@@ -688,6 +698,11 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
+            // Permanent injuries have stabilized and should not worsen or be replaced by temporary ones
+            if (i.isPermanent()) {
+                return Collections.emptyList();
+            }
+
             String secondEffectFluff = (i.getHits() < 3) ? "internal bleeding worsening" : "death";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
@@ -730,6 +745,11 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
+            // Permanent injuries have stabilized and should not have their recovery timer reset
+            if (i.isPermanent()) {
+                return Collections.emptyList();
+            }
+
             return Collections.singletonList(newResetRecoveryTimeAction(i));
         }
     }
@@ -758,6 +778,11 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
+            // Permanent injuries have stabilized and should not have their recovery timer reset
+            if (i.isPermanent()) {
+                return Collections.emptyList();
+            }
+
             return Collections.singletonList(newResetRecoveryTimeAction(i));
         }
 
@@ -883,6 +908,11 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
+            // Permanent injuries have stabilized and should not worsen or be replaced by temporary ones
+            if (injury.isPermanent()) {
+                return Collections.emptyList();
+            }
+
             String secondEffectFluff = (injury.getHits() == 1) ?
                                              "concussion worsening" :
                                              "development of a cerebral contusion";
