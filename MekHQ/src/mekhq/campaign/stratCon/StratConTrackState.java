@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -208,7 +208,7 @@ public class StratConTrackState {
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
-            unassignForce(forceID);
+            unassignFormation(forceID);
 
             // scenario bookkeeping
             scenario.getPrimaryForceIDs().clear();
@@ -289,7 +289,7 @@ public class StratConTrackState {
     /**
      * Handles the unassignment of a force from this track.
      */
-    public void unassignForce(int forceID) {
+    public void unassignFormation(int forceID) {
         if (assignedForceCoords.containsKey(forceID)) {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
             assignedForceCoords.remove(forceID);
@@ -459,10 +459,14 @@ public class StratConTrackState {
 
     /**
      * Convenience method to fail an objective at the given coordinates.
+     * Does nothing if the objective has already been completed.
      */
     public void failObjective(StratConCoords coords) {
         if (getObjectivesByCoords().containsKey(coords)) {
-            getObjectivesByCoords().get(coords).setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+            StratConStrategicObjective objective = getObjectivesByCoords().get(coords);
+            if (!objective.isObjectiveCompleted(this)) {
+                objective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+            }
         }
     }
 
@@ -556,6 +560,17 @@ public class StratConTrackState {
 
     public void setTerrainTile(StratConCoords coords, String terrainTypeName) {
         terrainTypes.put(coords, terrainTypeName);
+    }
+    /**
+     * Check to see if specified coordinates would be placed off the StratCon board
+     */
+    public boolean isOffTrack(StratConCoords coords) {
+        int width = getWidth() - 1;
+        int height = getHeight() - 1;
+        return (coords.getX() < 0) ||
+                     (coords.getX() > width) ||
+                     (coords.getY() < 0) ||
+                     (coords.getY() > height);
     }
 
     public String getTerrainTile(StratConCoords coords) {

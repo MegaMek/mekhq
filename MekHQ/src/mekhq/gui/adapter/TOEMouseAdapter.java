@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,14 +36,14 @@ import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
-import static mekhq.campaign.force.ForceType.CONVOY;
-import static mekhq.campaign.force.ForceType.SALVAGE;
-import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.force.ForceType.STANDARD;
-import static mekhq.campaign.force.ForceType.SUPPORT;
+import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_FALSE;
+import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_TRUE;
+import static mekhq.campaign.force.FormationType.CONVOY;
+import static mekhq.campaign.force.FormationType.SALVAGE;
+import static mekhq.campaign.force.FormationType.SECURITY;
+import static mekhq.campaign.force.FormationType.STANDARD;
+import static mekhq.campaign.force.FormationType.SUPPORT;
 
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -69,8 +69,8 @@ import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -86,7 +86,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
+import mekhq.gui.dialog.iconDialogs.LayeredFormationIconDialog;
 import mekhq.gui.menus.AssignForceToShipTransportMenu;
 import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
 import mekhq.gui.menus.AssignForceToTowTransportMenu;
@@ -233,13 +233,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         String target = st.nextToken();
         String forceId = st.nextToken();
 
-        Vector<Force> forces = new Vector<>();
+        Vector<Formation> formations = new Vector<>();
         Vector<Unit> units = new Vector<>();
 
         if (type.equals(TOEMouseAdapter.FORCE)) {
-            Force force = gui.getCampaign().getForce(Integer.parseInt(forceId));
-            if (null != force) {
-                forces.add(force);
+            Formation formation = gui.getCampaign().getFormation(Integer.parseInt(forceId));
+            if (null != formation) {
+                formations.add(formation);
             }
         }
 
@@ -251,33 +251,33 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (type.equals(TOEMouseAdapter.FORCE)) {
-            Vector<Force> newForces = new Vector<>();
-            for (Force force : forces) {
+            Vector<Formation> newFormations = new Vector<>();
+            for (Formation formation : formations) {
                 boolean duplicate = false;
-                for (Force otherForce : forces) {
-                    if (otherForce.getId() == force.getId()) {
+                for (Formation otherFormation : formations) {
+                    if (otherFormation.getId() == formation.getId()) {
                         continue;
                     }
 
-                    if (otherForce.isAncestorOf(force)) {
+                    if (otherFormation.isAncestorOf(formation)) {
                         duplicate = true;
                         break;
                     }
                 }
                 if (!duplicate) {
-                    newForces.add(force);
+                    newFormations.add(formation);
                 }
             }
-            forces = newForces;
+            formations = newFormations;
         }
 
         // TODO : eliminate any forces that are descendants of other forces in the
         // vector
-        final Force singleForce = forces.isEmpty() ? null : forces.get(0);
+        final Formation singleFormation = formations.isEmpty() ? null : formations.get(0);
         final Unit singleUnit = units.isEmpty() ? null : units.get(0);
 
         if (command.contains(TOEMouseAdapter.ADD_FORCE)) {
-            if (null != singleForce) {
+            if (null != singleFormation) {
                 String name = (String) JOptionPane.showInputDialog(null,
                       "Enter the force name",
                       "Force Name",
@@ -286,28 +286,28 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                       null,
                       "My Lance");
                 if (null != name) {
-                    Force f = new Force(name);
-                    gui.getCampaign().addForce(f, singleForce);
+                    Formation f = new Formation(name);
+                    gui.getCampaign().addFormation(f, singleFormation);
 
                     MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), f));
                 }
             }
         } else if (command.contains(TOEMouseAdapter.ADD_LANCE_TECH)) {
-            if (null != singleForce) {
+            if (null != singleFormation) {
                 Person tech = gui.getCampaign().getPerson(UUID.fromString(target));
                 if (null != tech) {
-                    if (singleForce.getTechID() != null) {
-                        Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
+                    if (singleFormation.getTechID() != null) {
+                        Person oldTech = gui.getCampaign().getPerson(singleFormation.getTechID());
                         oldTech.clearTechUnits();
-                        AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
+                        AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleFormation.getName());
                     }
-                    singleForce.setTechID(tech.getId());
+                    singleFormation.setTechID(tech.getId());
 
-                    AssignmentLogger.assignedTo(tech, gui.getCampaign().getLocalDate(), singleForce.getName());
+                    AssignmentLogger.assignedTo(tech, gui.getCampaign().getLocalDate(), singleFormation.getName());
 
-                    if (singleForce.getAllUnits(false) != null) {
+                    if (singleFormation.getAllUnits(false) != null) {
                         StringBuilder cantTech = new StringBuilder();
-                        for (UUID uuid : singleForce.getAllUnits(false)) {
+                        for (UUID uuid : singleFormation.getAllUnits(false)) {
                             Unit u = gui.getCampaign().getUnit(uuid);
                             if (u != null) {
                                 if (tech.canTech(u.getEntity())) {
@@ -335,12 +335,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
             }
         } else if (command.contains(TOEMouseAdapter.SET_LANCE_COMMANDER)) {
-            if (null != singleForce) {
-                singleForce.setOverrideForceCommanderID(UUID.fromString(target));
-                singleForce.updateCommander(gui.getCampaign());
+            if (null != singleFormation) {
+                singleFormation.setOverrideFormationCommanderID(UUID.fromString(target));
+                singleFormation.updateCommander(gui.getCampaign());
                 gui.getTOETab().refreshForceView();
             }
         } else if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
@@ -370,15 +370,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.contains(TOEMouseAdapter.ADD_UNIT)) {
-            if (null != singleForce) {
+            if (null != singleFormation) {
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
                 if (null != u) {
-                    gui.getCampaign().addUnitToForce(u, singleForce.getId());
+                    gui.getCampaign().addUnitToFormation(u, singleFormation.getId());
                 }
             }
         } else if (command.contains(TOEMouseAdapter.UNDEPLOY_FORCE)) {
-            for (Force force : forces) {
-                gui.undeployForce(force);
+            for (Formation formation : formations) {
+                gui.undeployForce(formation);
                 // Event triggered from undeployForce
             }
         } else if (command.contains(TOEMouseAdapter.DEPLOY_FORCE)) {
@@ -386,219 +386,219 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             Scenario scenario = gui.getCampaign().getScenario(sid);
 
             if (scenario instanceof AtBDynamicScenario) {
-                new ForceTemplateAssignmentDialog(gui, forces, null, (AtBDynamicScenario) scenario);
+                new ForceTemplateAssignmentDialog(gui, formations, null, (AtBDynamicScenario) scenario);
             } else {
-                for (Force force : forces) {
-                    gui.undeployForce(force);
-                    force.clearScenarioIds(gui.getCampaign(), true);
+                for (Formation formation : formations) {
+                    gui.undeployForce(formation);
+                    formation.clearScenarioIds(gui.getCampaign(), true);
                     if (null != scenario) {
-                        scenario.addForces(force.getId());
-                        force.setScenarioId(scenario.getId(), gui.getCampaign());
+                        scenario.addForces(formation.getId());
+                        formation.setScenarioId(scenario.getId(), gui.getCampaign());
                     }
-                    MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(formation, scenario));
                 }
             }
         } else if (command.contains(CHANGE_ICON)) {
-            if (singleForce != null) {
-                final LayeredForceIconDialog layeredForceIconDialog = new LayeredForceIconDialog(gui.getFrame(),
-                      singleForce.getForceIcon());
-                if (layeredForceIconDialog.showDialog().isConfirmed() &&
-                          (layeredForceIconDialog.getSelectedItem() != null)) {
-                    singleForce.setForceIcon(layeredForceIconDialog.getSelectedItem());
-                    MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
+            if (singleFormation != null) {
+                final LayeredFormationIconDialog layeredFormationIconDialog = new LayeredFormationIconDialog(gui.getFrame(),
+                      singleFormation.getFormationIcon());
+                if (layeredFormationIconDialog.showDialog().isConfirmed() &&
+                          (layeredFormationIconDialog.getSelectedItem() != null)) {
+                    singleFormation.setFormationIcon(layeredFormationIconDialog.getSelectedItem());
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
                 }
             }
         } else if (command.contains(COPY_ICON)) {
-            if (singleForce != null) {
-                gui.setCopyForceIcon(singleForce.getForceIcon().clone());
+            if (singleFormation != null) {
+                gui.setCopyFormationIcon(singleFormation.getFormationIcon().clone());
             }
         } else if (command.contains(PASTE_ICON)) {
-            if (gui.getCopyForceIcon() == null) {
+            if (gui.getCopyFormationIcon() == null) {
                 return;
             }
 
             final boolean subForces = command.contains(SUB_FORCES_PASTE_ICON);
-            for (final Force force : forces) {
-                force.setForceIcon(gui.getCopyForceIcon().clone(), subForces);
+            for (final Formation formation : formations) {
+                formation.setFormationIcon(gui.getCopyFormationIcon().clone(), subForces);
             }
             gui.getTOETab().refreshForceView();
         } else if (command.contains(CHANGE_CAMO)) {
-            if (singleForce != null) {
+            if (singleFormation != null) {
                 CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
-                      singleForce.getCamouflageOrElse(gui.getCampaign().getCamouflage()),
+                      singleFormation.getCamouflageOrElse(gui.getCampaign().getCamouflage()),
                       true);
                 if (ccd.showDialog().isCancelled()) {
                     return;
                 }
-                singleForce.setCamouflage(ccd.getSelectedItem());
-                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
+                singleFormation.setCamouflage(ccd.getSelectedItem());
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
             }
         } else if (command.contains(CHANGE_NAME)) {
-            if (null != singleForce) {
+            if (null != singleFormation) {
                 String name = (String) JOptionPane.showInputDialog(null,
                       "Enter the force name",
                       "Force Name",
                       JOptionPane.PLAIN_MESSAGE,
                       null,
                       null,
-                      singleForce.getName());
+                      singleFormation.getName());
                 if (name != null) {
-                    singleForce.setName(name);
+                    singleFormation.setName(name);
                 }
-                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
             }
         } else if (action.getActionCommand().startsWith(COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL)) {
-            if (singleForce == null) {
+            if (singleFormation == null) {
                 return;
             }
 
             FormationLevel formationLevel = FormationLevel.parseFromString(st.nextToken());
-            singleForce.setOverrideFormationLevel(formationLevel);
+            singleFormation.setOverrideFormationLevel(formationLevel);
 
-            Force.populateFormationLevelsFromOrigin(gui.getCampaign());
+            Formation.populateFormationLevelsFromOrigin(gui.getCampaign());
         } else if (action.getActionCommand().startsWith(COMMAND_CHANGE_ROLE_PREFERENCE)) {
-            if (singleForce == null) {
+            if (singleFormation == null) {
                 return;
             }
 
             CombatRole combatRole = CombatRole.parseFromString(st.nextToken());
-            singleForce.setCombatRoleInMemory(combatRole);
-            CombatTeam team = gui.getCampaign().getCombatTeamsAsMap().get(singleForce.getId());
+            singleFormation.setCombatRoleInMemory(combatRole);
+            CombatTeam team = gui.getCampaign().getCombatTeamsAsMap().get(singleFormation.getId());
             if (team != null) {
                 team.setRole(combatRole);
                 gui.refreshAllTabs();
             }
         } else if (command.contains(TOEMouseAdapter.CHANGE_DESC)) {
-            if (null != singleForce) {
+            if (null != singleFormation) {
                 MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(),
                       true,
                       "Edit Force Description",
-                      singleForce.getDescription());
+                      singleFormation.getDescription());
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
-                    singleForce.setDescription(tad.getText());
-                    MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
+                    singleFormation.setDescription(tad.getText());
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
                 }
             }
         } else if (command.contains("COMMAND_CHANGE_FORCE_TYPE")) {
-            if (singleForce == null) {
+            if (singleFormation == null) {
                 return;
             }
 
-            ForceType forceType = ForceType.STANDARD;
+            FormationType formationType = FormationType.STANDARD;
             if (command.contains(SUPPORT.name())) {
-                forceType = SUPPORT;
+                formationType = SUPPORT;
             }
 
             if (command.contains(CONVOY.name())) {
-                forceType = CONVOY;
+                formationType = CONVOY;
             }
 
             if (command.contains(SALVAGE.name())) {
-                forceType = SALVAGE;
+                formationType = SALVAGE;
             }
 
             if (command.contains(SECURITY.name())) {
-                forceType = SECURITY;
+                formationType = SECURITY;
             }
 
-            for (final Force force : forces) {
-                force.setForceType(forceType, forceType.shouldChildrenInherit());
+            for (final Formation formation : formations) {
+                formation.setFormationType(formationType, formationType.shouldChildrenInherit());
 
-                if (forceType.shouldStandardizeParents()) {
-                    for (Force parentForce : force.getAllParents()) {
-                        parentForce.setForceType(STANDARD, false);
+                if (formationType.shouldStandardizeParents()) {
+                    for (Formation parentFormation : formation.getAllParents()) {
+                        parentFormation.setFormationType(STANDARD, false);
                     }
                 }
 
-                MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
             }
 
             gui.getTOETab().refreshForceView();
         } else if (command.contains(CHANGE_STRATEGIC_FORCE_OVERRIDE)) {
-            if (singleForce == null) {
+            if (singleFormation == null) {
                 return;
             }
 
-            boolean formationState = singleForce.isCombatTeam();
-            singleForce.setCombatTeamStatus(!formationState);
-            singleForce.setOverrideCombatTeam(formationState ? COMBAT_TEAM_OVERRIDE_FALSE : COMBAT_TEAM_OVERRIDE_TRUE);
+            boolean formationState = singleFormation.isCombatTeam();
+            singleFormation.setCombatTeamStatus(!formationState);
+            singleFormation.setOverrideCombatTeam(formationState ? COMBAT_TEAM_OVERRIDE_FALSE : COMBAT_TEAM_OVERRIDE_TRUE);
 
-            for (Force childForce : singleForce.getAllSubForces()) {
-                childForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            for (Formation childFormation : singleFormation.getAllSubFormations()) {
+                childFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
             }
 
-            for (Force parentForce : singleForce.getAllParents()) {
-                parentForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            for (Formation parentFormation : singleFormation.getAllParents()) {
+                parentFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
             }
 
             recalculateCombatTeams(gui.getCampaign());
         } else if (command.contains(REMOVE_STRATEGIC_FORCE_OVERRIDE)) {
-            if (singleForce == null) {
+            if (singleFormation == null) {
                 return;
             }
 
-            singleForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            singleFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
             recalculateCombatTeams(gui.getCampaign());
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
-            for (Force force : forces) {
-                if (null != force && null != force.getParentForce()) {
+            for (Formation formation : formations) {
+                if (null != formation && null != formation.getParentFormation()) {
                     if (JOptionPane.YES_OPTION !=
                               JOptionPane.showConfirmDialog(null,
-                                    "Are you sure you want to delete " + force.getFullName() + '?',
+                                    "Are you sure you want to delete " + formation.getFullName() + '?',
                                     "Delete Force?",
                                     JOptionPane.YES_NO_OPTION)) {
                         return;
                     }
                     // Clear any transport assignments of units in the deleted force
-                    clearTransportAssignment(force.getAllUnits(false));
+                    clearTransportAssignment(formation.getAllUnits(false));
 
-                    for (Force childForce : force.getAllSubForces()) {
-                        gui.getCampaign().removeForce(childForce);
+                    for (Formation childFormation : formation.getAllSubFormations()) {
+                        gui.getCampaign().removeFormation(childFormation);
                     }
 
-                    gui.getCampaign().removeForce(force);
+                    gui.getCampaign().removeFormation(formation);
                 }
             }
 
             // We cycle through all forces because we need to assess how the removal affected them,
             // Even for truly huge campaigns this is still very cheap.
-            for (Force force : forces) {
-                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), force));
+            for (Formation formation : formations) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), formation));
             }
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
-            if (null != singleForce && singleForce.getTechID() != null) {
-                Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
+            if (null != singleFormation && singleFormation.getTechID() != null) {
+                Person oldTech = gui.getCampaign().getPerson(singleFormation.getTechID());
                 oldTech.clearTechUnits();
 
-                AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
+                AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleFormation.getName());
 
-                if (singleForce.getAllUnits(false) != null) {
-                    for (UUID uuid : singleForce.getAllUnits(false)) {
+                if (singleFormation.getAllUnits(false) != null) {
+                    for (UUID uuid : singleFormation.getAllUnits(false)) {
                         Unit u = gui.getCampaign().getUnit(uuid);
                         if (null != u.getTech()) {
                             u.removeTech();
                         }
                     }
                 }
-                singleForce.setTechID(null);
-                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
+                singleFormation.setTechID(null);
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleFormation));
             }
         } else if (command.contains(TOEMouseAdapter.REMOVE_UNIT)) {
             Campaign campaign = gui.getCampaign();
             for (Unit unit : units) {
                 if (null != unit) {
-                    Force parentForce = campaign.getForceFor(unit);
-                    if (null != parentForce) {
-                        campaign.removeUnitFromForce(unit);
-                        if (null != parentForce.getTechID()) {
+                    Formation parentFormation = campaign.getFormationFor(unit);
+                    if (null != parentFormation) {
+                        campaign.removeUnitFromFormation(unit);
+                        if (null != parentFormation.getTechID()) {
                             unit.removeTech();
                         }
                     }
                     // Clear any transport assignments of units in the deleted force
                     clearTransportAssignment(campaign, unit);
 
-                    MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentForce, unit));
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentFormation, unit));
                 }
             }
         } else if (command.contains(TOEMouseAdapter.UNDEPLOY_UNIT)) {
@@ -763,29 +763,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         // we will allow multiple selection of either units or forces
         // but not both - if both are selected then default to
         // unit and deselect all forces
-        Vector<Force> forces = new Vector<>();
+        Vector<Formation> formations = new Vector<>();
         Vector<Unit> unitsInForces = new Vector<>();
         Vector<Unit> units = new Vector<>();
         Vector<TreePath> uPath = new Vector<>();
         for (TreePath path : tree.getSelectionPaths()) {
             Object node = path.getLastPathComponent();
-            if (node instanceof Force) {
-                forces.add((Force) node);
+            if (node instanceof Formation) {
+                formations.add((Formation) node);
             }
             if (node instanceof Unit) {
                 units.add((Unit) node);
                 uPath.add(path);
             }
         }
-        for (Force force : forces) {
-            for (UUID id : force.getAllUnits(false)) {
+        for (Formation formation : formations) {
+            for (UUID id : formation.getAllUnits(false)) {
                 Unit u = gui.getCampaign().getUnit(id);
                 if (null != u) {
                     unitsInForces.add(u);
                 }
             }
         }
-        boolean forcesSelected = !forces.isEmpty();
+        boolean forcesSelected = !formations.isEmpty();
         boolean unitsSelected = !units.isEmpty();
         // if both are selected then we prefer units
         // and will deselect forces
@@ -799,16 +799,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
             tree.setSelectionPaths(paths);
         }
-        boolean multipleSelection = (forcesSelected && forces.size() > 1) || (unitsSelected && units.size() > 1);
+        boolean multipleSelection = (forcesSelected && formations.size() > 1) || (unitsSelected && units.size() > 1);
         if (forcesSelected) {
-            Force force = forces.get(0);
-            StringBuilder forceIds = new StringBuilder("" + force.getId());
-            for (int i = 1; i < forces.size(); i++) {
-                forceIds.append('|').append(forces.get(i).getId());
+            Formation formation = formations.get(0);
+            StringBuilder forceIds = new StringBuilder("" + formation.getId());
+            for (int i = 1; i < formations.size(); i++) {
+                forceIds.append('|').append(formations.get(i).getId());
             }
 
             if (!multipleSelection) {
-                if (force.getSubForces().isEmpty()) {
+                if (formation.getSubFormations().isEmpty()) {
                     menu = new JMenu("Override Formation Level");
                     menu.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_NAME + forceIds);
                     menu.addActionListener(this);
@@ -824,7 +824,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(formationLevel.toString());
                             menuItem.setToolTipText(formationLevel.getDescription());
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL +
-                                                            force.getId() +
+                                                            formation.getId() +
                                                             '|' +
                                                             formationLevel);
                             menuItem.addActionListener(this);
@@ -842,14 +842,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                 for (CombatRole combatRole : CombatRole.values()) {
                     String displayText = combatRole.toString();
-                    if (combatRole == force.getCombatRoleInMemory()) {
+                    if (combatRole == formation.getCombatRoleInMemory()) {
                         displayText = "✓ " + displayText;
                     }
 
                     menuItem = new JMenuItem(displayText);
                     menuItem.setToolTipText(combatRole.getToolTipText());
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_ROLE_PREFERENCE +
-                                                    force.getId() +
+                                                    formation.getId() +
                                                     '|' +
                                                     combatRole.name());
                     menuItem.addActionListener(this);
@@ -873,7 +873,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
 
-                if (force.getTechID() == null) {
+                if (formation.getTechID() == null) {
                     menu = new JMenu("Add Tech to Force");
 
                     JMenu mekTechs = new JMenu("Mek Techs");
@@ -991,7 +991,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 } else {
                     menuItem = new JMenuItem("Remove Tech from Force");
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH +
-                                                    force.getTechID() +
+                                                    formation.getTechID() +
                                                     '|' +
                                                     forceIds);
                     menuItem.addActionListener(this);
@@ -1056,7 +1056,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     String className = u.getEntity().getWeightClassName();
                     if (null != u.getCommander()) {
                         Person p = u.getCommander();
-                        if (p.getStatus().isActive() && (u.getForceId() < 1) && u.isPresent()) {
+                        if (p.getStatus().isActive() && (u.getFormationId() < 1) && u.isPresent()) {
                             JMenuItem menuItem0 = new JMenuItem(p.getFullTitle() + ", " + u.getName());
                             menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                             menuItem0.addActionListener(this);
@@ -1069,7 +1069,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             }
                             unitTypeMenus.get(type).setEnabled(true);
                         }
-                    } else if ((u.getForceId() < 1) &&
+                    } else if ((u.getFormationId() < 1) &&
                                      (u.isPresent()) &&
                                      (u.isNotCrewedEntityType())) {
                         JMenuItem menuItem0 = new JMenuItem(u.getName());
@@ -1086,7 +1086,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     if (u.getEntity() instanceof GunEmplacement) {
-                        if (u.getForceId() < 1 && u.isPresent()) {
+                        if (u.getFormationId() < 1 && u.isPresent()) {
                             JMenuItem menuItem0 = new JMenuItem("AutoTurret, " + u.getName());
                             menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                             menuItem0.addActionListener(this);
@@ -1150,7 +1150,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
                 // still in the multiple selection block
-                List<UUID> eligibleCommanders = force.getEligibleCommanders(gui.getCampaign());
+                List<UUID> eligibleCommanders = formation.getEligibleCommanders(gui.getCampaign());
                 if (!eligibleCommanders.isEmpty()) {
                     menuItem = new JScrollableMenu("setCommanderMenu", "Set Commander");
 
@@ -1170,29 +1170,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            menu = new JMenu("Force Icon");
+            menu = new JMenu("Formation Icon");
             if (!multipleSelection) {
-                menuItem = new JMenuItem("Change Force Icon...");
+                menuItem = new JMenuItem("Change Formation Icon...");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Copy Force Icon");
-                menuItem.setName("miCopyForceIcon");
+                menuItem = new JMenuItem("Copy Formation Icon");
+                menuItem.setName("miCopyFormationIcon");
                 menuItem.setActionCommand(COMMAND_COPY_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
 
-            if (gui.getCopyForceIcon() != null) {
-                menuItem = new JMenuItem("Paste Force Icon");
-                menuItem.setName("miPasteForceIcon");
+            if (gui.getCopyFormationIcon() != null) {
+                menuItem = new JMenuItem("Paste Formation Icon");
+                menuItem.setName("miPasteFormationIcon");
                 menuItem.setActionCommand(COMMAND_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Paste Force Icon to Force and Sub forces");
-                menuItem.setName("miSubForcesPasteForceIcon");
+                menuItem = new JMenuItem("Paste Formation Icon to Force and Sub forces");
+                menuItem.setName("miSubForcesPasteFormationIcon");
                 menuItem.setActionCommand(COMMAND_SUB_FORCES_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
@@ -1235,7 +1235,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             popup.add(menu);
 
             if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
-                JMenuItem optionStrategicForceOverride = new JMenuItem((force.isCombatTeam() ? "Never" : "Always") +
+                JMenuItem optionStrategicForceOverride = new JMenuItem((formation.isCombatTeam() ? "Never" : "Always") +
                                                                              " Consider Force a Combat Team");
                 optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionStrategicForceOverride.addActionListener(this);
@@ -1244,20 +1244,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Combat Team Override");
                 optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionRemoveStrategicForceOverride.addActionListener(this);
-                optionRemoveStrategicForceOverride.setVisible(force.getOverrideCombatTeam() !=
+                optionRemoveStrategicForceOverride.setVisible(formation.getOverrideCombatTeam() !=
                                                                     COMBAT_TEAM_OVERRIDE_NONE);
                 popup.add(optionRemoveStrategicForceOverride);
             }
 
-            if (StaticChecks.areAllForcesUnDeployed(gui.getCampaign(), forces) &&
-                      StaticChecks.areAllStandardForces(forces)) {
+            if (StaticChecks.areAllForcesUnDeployed(gui.getCampaign(), formations) &&
+                      StaticChecks.areAllStandardForces(formations)) {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;
                 for (final Mission mission : gui.getCampaign().getActiveMissions(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
-                        if (scenario.isCloaked() || !scenario.canDeployForces(forces, gui.getCampaign())) {
+                        if (scenario.isCloaked() || !scenario.canDeployForces(formations, gui.getCampaign())) {
                             continue;
                         }
 
@@ -1278,14 +1278,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
 
-            if (StaticChecks.areAllForcesDeployed(forces)) {
+            if (StaticChecks.areAllForcesDeployed(formations)) {
                 menuItem = new JMenuItem("Undeploy Force");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
 
                 boolean enable = true;
-                for (Force individualForce : forces) {
-                    int scenarioId = individualForce.getScenarioId();
+                for (Formation individualFormation : formations) {
+                    int scenarioId = individualFormation.getScenarioId();
                     Scenario scenario = gui.getCampaign().getScenario(scenarioId);
 
                     if (scenario != null && scenario.getHasTrack()) {
@@ -1300,7 +1300,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem("Remove Force");
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(forces) &&
+            menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(formations) &&
                                       !StaticChecks.areAnyUnitsDeployed(unitsInForces));
             popup.add(menuItem);
 

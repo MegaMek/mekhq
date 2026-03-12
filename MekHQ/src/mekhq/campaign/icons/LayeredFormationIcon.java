@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,48 +48,52 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * LayeredForceIcon is an implementation of StandardForceIcon that contains ForcePieceIcons for the
- * LayeredForceIconLayer layers. The icons stored are merged in a set order when the base image is drawn, thereby
- * allowing for the creation of a custom Force Icon from the various Pieces located in the Force Icon directory's Pieces
+ * LayeredFormationIcon is an implementation of StandardFormationIcon that contains ForcePieceIcons for the
+ * LayeredFormationIconLayer layers. The icons stored are merged in a set order when the base image is drawn, thereby
+ * allowing for the creation of a custom Formation Icon from the various Pieces located in the Formation Icon directory's Pieces
  * category.
  *
- * @see LayeredForceIconLayer
- * @see ForcePieceIcon
- * @see StandardForceIcon
+ * <p>Known as {@code LayeredForceIcon} prior to 0.50.12</p>
+ *
+ * @see LayeredFormationIconLayer
+ * @see FormationPieceIcon
+ * @see StandardFormationIcon
  * @see AbstractIcon
+ *
+ * @since 0.50.12
  */
-public class LayeredForceIcon extends StandardForceIcon {
-    private static final MMLogger logger = MMLogger.create(LayeredForceIcon.class);
+public class LayeredFormationIcon extends StandardFormationIcon {
+    private static final MMLogger logger = MMLogger.create(LayeredFormationIcon.class);
 
     // region Variable Declarations
     public static final String LAYERED_CATEGORY = "Layered";
     public static final String XML_TAG = "layeredForceIcon";
 
-    private Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces = new HashMap<>();
+    private Map<LayeredFormationIconLayer, List<FormationPieceIcon>> pieces = new HashMap<>();
     // endregion Variable Declarations
 
     // region Constructors
-    public LayeredForceIcon() {
+    public LayeredFormationIcon() {
         this(LAYERED_CATEGORY, DEFAULT_ICON_FILENAME);
     }
 
-    public LayeredForceIcon(final @Nullable String category, final @Nullable String filename) {
+    public LayeredFormationIcon(final @Nullable String category, final @Nullable String filename) {
         this(category, filename, null);
     }
 
-    public LayeredForceIcon(final String category, final String filename,
-          final @Nullable Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
+    public LayeredFormationIcon(final String category, final String filename,
+                                final @Nullable Map<LayeredFormationIconLayer, List<FormationPieceIcon>> pieces) {
         super(category, filename);
 
         if (pieces == null) {
-            getPieces().putIfAbsent(LayeredForceIconLayer.FRAME, new ArrayList<>());
-            getPieces().get(LayeredForceIconLayer.FRAME).add(new ForcePieceIcon());
+            getPieces().putIfAbsent(LayeredFormationIconLayer.FRAME, new ArrayList<>());
+            getPieces().get(LayeredFormationIconLayer.FRAME).add(new FormationPieceIcon());
         } else {
             setPieces(pieces);
         }
@@ -97,23 +101,23 @@ public class LayeredForceIcon extends StandardForceIcon {
     // endregion Constructors
 
     // region Getters/Setters
-    public Map<LayeredForceIconLayer, List<ForcePieceIcon>> getPieces() {
+    public Map<LayeredFormationIconLayer, List<FormationPieceIcon>> getPieces() {
         return pieces;
     }
 
-    public void setPieces(final Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
+    public void setPieces(final Map<LayeredFormationIconLayer, List<FormationPieceIcon>> pieces) {
         this.pieces = pieces;
     }
     // endregion Getters/Setters
 
     @Override
     public Image getBaseImage() {
-        // If we can't create the force icon directory, return null
-        if (MHQStaticDirectoryManager.getForceIcons() == null) {
+        // If we can't create the formation icon directory, return null
+        if (MHQStaticDirectoryManager.getFormationIcons() == null) {
             return null;
         }
 
-        // Try to get the player's force icon file.
+        // Try to get the player's formation icon file.
         BufferedImage base = null;
         final List<BufferedImage> images = new ArrayList<>();
         int width = 0;
@@ -121,14 +125,14 @@ public class LayeredForceIcon extends StandardForceIcon {
 
         try {
             // Gather height/width
-            for (final LayeredForceIconLayer layer : LayeredForceIconLayer.getInDrawOrder()) {
+            for (final LayeredFormationIconLayer layer : LayeredFormationIconLayer.getInDrawOrder()) {
                 if (!getPieces().containsKey(layer)) {
                     continue;
                 }
 
-                for (final ForcePieceIcon value : getPieces().get(layer)) {
+                for (final FormationPieceIcon value : getPieces().get(layer)) {
                     final BufferedImage image = (BufferedImage) MHQStaticDirectoryManager
-                                                                      .getForceIcons()
+                                                                      .getFormationIcons()
                                                                       .getItem(value.getCategoryPath(),
                                                                             value.getFilename());
                     if (image != null) {
@@ -154,10 +158,10 @@ public class LayeredForceIcon extends StandardForceIcon {
             logger.error("", ex);
         }
 
-        // Fallback to the default force icon
+        // Fallback to the default formation icon
         if (base == null) {
             try {
-                base = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem("",
+                base = (BufferedImage) MHQStaticDirectoryManager.getFormationIcons().getItem("",
                       DEFAULT_FORCE_ICON_FILENAME);
             } catch (Exception ex) {
                 logger.error("", ex);
@@ -178,10 +182,10 @@ public class LayeredForceIcon extends StandardForceIcon {
         super.writeBodyToXML(pw, indent);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "map");
-        for (final Map.Entry<LayeredForceIconLayer, List<ForcePieceIcon>> entry : getPieces().entrySet()) {
+        for (final Map.Entry<LayeredFormationIconLayer, List<FormationPieceIcon>> entry : getPieces().entrySet()) {
             if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, entry.getKey().name());
-                for (final ForcePieceIcon value : entry.getValue()) {
+                for (final FormationPieceIcon value : entry.getValue()) {
                     value.writeToXML(pw, indent);
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, entry.getKey().name());
@@ -190,13 +194,13 @@ public class LayeredForceIcon extends StandardForceIcon {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "map");
     }
 
-    public static LayeredForceIcon parseFromXML(final Node wn) {
-        final LayeredForceIcon icon = new LayeredForceIcon();
+    public static LayeredFormationIcon parseFromXML(final Node wn) {
+        final LayeredFormationIcon icon = new LayeredFormationIcon();
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
             logger.error("", ex);
-            return new LayeredForceIcon();
+            return new LayeredFormationIcon();
         }
         return icon;
     }
@@ -217,19 +221,19 @@ public class LayeredForceIcon extends StandardForceIcon {
             if ((wn.getNodeType() != Node.ELEMENT_NODE) || !wn.hasChildNodes()) {
                 continue;
             }
-            getPieces().put(LayeredForceIconLayer.valueOf(wn.getNodeName()),
+            getPieces().put(LayeredFormationIconLayer.valueOf(wn.getNodeName()),
                   processIconMapSubNodes(wn.getChildNodes()));
         }
     }
 
-    private List<ForcePieceIcon> processIconMapSubNodes(final NodeList nl) {
-        final List<ForcePieceIcon> pieces = new ArrayList<>();
+    private List<FormationPieceIcon> processIconMapSubNodes(final NodeList nl) {
+        final List<FormationPieceIcon> pieces = new ArrayList<>();
         for (int i = 0; i < nl.getLength(); i++) {
             final Node wn = nl.item(i);
             if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            final ForcePieceIcon piece = new ForcePieceIcon();
+            final FormationPieceIcon piece = new FormationPieceIcon();
             piece.parseNodes(wn.getChildNodes());
             pieces.add(piece);
         }
@@ -241,9 +245,9 @@ public class LayeredForceIcon extends StandardForceIcon {
     public String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getCategory()).append("/");
-        for (final Map.Entry<LayeredForceIconLayer, List<ForcePieceIcon>> entry : getPieces().entrySet()) {
+        for (final Map.Entry<LayeredFormationIconLayer, List<FormationPieceIcon>> entry : getPieces().entrySet()) {
             stringBuilder.append(entry.getKey()).append(":");
-            for (final ForcePieceIcon icon : entry.getValue()) {
+            for (final FormationPieceIcon icon : entry.getValue()) {
                 stringBuilder.append(icon).append("/");
             }
         }
@@ -254,8 +258,8 @@ public class LayeredForceIcon extends StandardForceIcon {
     public boolean equals(final @Nullable Object other) {
         if (this == other) {
             return true;
-        } else if (other instanceof LayeredForceIcon) {
-            return ((LayeredForceIcon) other).getPieces().equals(getPieces());
+        } else if (other instanceof LayeredFormationIcon) {
+            return ((LayeredFormationIcon) other).getPieces().equals(getPieces());
         } else {
             return false;
         }
@@ -267,16 +271,16 @@ public class LayeredForceIcon extends StandardForceIcon {
     }
 
     @Override
-    public LayeredForceIcon clone() {
-        final Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces = new LinkedHashMap<>();
-        for (final Map.Entry<LayeredForceIconLayer, List<ForcePieceIcon>> entry : getPieces().entrySet()) {
+    public LayeredFormationIcon clone() {
+        final Map<LayeredFormationIconLayer, List<FormationPieceIcon>> pieces = new LinkedHashMap<>();
+        for (final Map.Entry<LayeredFormationIconLayer, List<FormationPieceIcon>> entry : getPieces().entrySet()) {
             if ((entry.getValue() != null) && !entry.getValue().isEmpty()) {
                 pieces.put(entry.getKey(), new ArrayList<>());
-                for (final ForcePieceIcon value : entry.getValue()) {
+                for (final FormationPieceIcon value : entry.getValue()) {
                     pieces.get(entry.getKey()).add(value.clone());
                 }
             }
         }
-        return new LayeredForceIcon(getCategory(), getFilename(), pieces);
+        return new LayeredFormationIcon(getCategory(), getFilename(), pieces);
     }
 }

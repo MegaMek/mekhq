@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -201,7 +201,7 @@ public class AtBScenarioFactory {
                 for (CombatTeam combatTeam : combatTeamsTable.values()) {
                     // Don't generate scenarios for any combatTeamsTable already assigned, those assigned to a
                     // different contract, those not assigned to a contract, or for illegible combatTeamsTable
-                    if (assignedLances.contains(combatTeam.getForceId()) || (combatTeam.getContract(campaign) == null)
+                    if (assignedLances.contains(combatTeam.getFormationId()) || (combatTeam.getContract(campaign) == null)
                               || !combatTeam.isEligible(campaign) || (combatTeam.getMissionId() != contract.getId())
                               || !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                         continue;
@@ -219,7 +219,7 @@ public class AtBScenarioFactory {
                     // If one is generated, then add it to the scenario list
                     if (scenario != null) {
                         scenarios.add(scenario);
-                        assignedLances.add(combatTeam.getForceId());
+                        assignedLances.add(combatTeam.getFormationId());
 
                         // We care if the scenario is a Base Attack, as one must be generated if the
                         // current contract's morale is Unbreakable
@@ -281,7 +281,7 @@ public class AtBScenarioFactory {
                                       || (combatTeam.getMissionId() == CombatTeam.NO_MISSION)) {
                                 for (int i = 0; i < scenarios.size(); i++) {
                                     if ((scenarios.get(i).getCombatTeamId() != NO_COMBAT_TEAM)
-                                              && (scenarios.get(i).getCombatTeamId() == combatTeam.getForceId())) {
+                                              && (scenarios.get(i).getCombatTeamId() == combatTeam.getFormationId())) {
                                         if (dontGenerateForces.contains(atbScenario.getId())) {
                                             dontGenerateForces.remove(atbScenario.getId());
                                         }
@@ -299,13 +299,13 @@ public class AtBScenarioFactory {
                                                                          NO_COMBAT_TEAM)
                                                                   &&
                                                                   (((AtBScenario) scenario).getCombatTeamId() ==
-                                                                         combatTeam.getForceId()));
+                                                                         combatTeam.getFormationId()));
                             }
                             if (!scenarios.contains(atbScenario)) {
                                 scenarios.add(atbScenario);
                             }
-                            if (!assignedLances.contains(combatTeam.getForceId())) {
-                                assignedLances.add(combatTeam.getForceId());
+                            if (!assignedLances.contains(combatTeam.getFormationId())) {
+                                assignedLances.add(combatTeam.getFormationId());
                             }
                         } else {
                             logger.error("Unable to generate Base Attack scenario.");

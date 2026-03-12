@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,7 +46,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.persons.PersonNewEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -238,9 +238,9 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             if (null != u && u.isUnmanned()) {
                 u.addPilotOrSoldier(person, false);
                 // only assign to force if properly assigned to a unit
-                Force force = getCampaign().getForce(assignedForceId);
-                if (null != force && null != person.getUnit()) {
-                    getCampaign().addUnitToForce(u, force.getId());
+                Formation formation = getCampaign().getFormation(assignedForceId);
+                if (null != formation && null != person.getUnit()) {
+                    getCampaign().addUnitToFormation(u, formation.getId());
                 }
             }
         }

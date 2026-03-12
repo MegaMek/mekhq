@@ -639,7 +639,7 @@ public class MarketsTab {
 
         lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
         lblContractSearchRadius.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractSearchRadius"));
-        spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius", 300, 100, 2500, 100);
+        spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius", 300, 1, 2500, 100);
         spnContractSearchRadius.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractSearchRadius"));
 
         chkVariableContractLength = new CampaignOptionsCheckBox("VariableContractLength");

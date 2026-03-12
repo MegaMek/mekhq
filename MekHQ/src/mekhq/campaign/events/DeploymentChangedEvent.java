@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@
 package mekhq.campaign.events;
 
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 
@@ -44,17 +44,17 @@ import mekhq.campaign.unit.Unit;
 public class DeploymentChangedEvent extends ScenarioChangedEvent {
 
     private final Unit unit;
-    private final Force force;
+    private final Formation formation;
 
     public DeploymentChangedEvent(Unit unit, Scenario scenario) {
         super(scenario);
         this.unit = unit;
-        this.force = null;
+        this.formation = null;
     }
 
-    public DeploymentChangedEvent(Force force, Scenario scenario) {
+    public DeploymentChangedEvent(Formation formation, Scenario scenario) {
         super(scenario);
-        this.force = force;
+        this.formation = formation;
         this.unit = null;
     }
 
@@ -62,7 +62,7 @@ public class DeploymentChangedEvent extends ScenarioChangedEvent {
         return unit;
     }
 
-    public Force getForce() {
-        return force;
+    public Formation getForce() {
+        return formation;
     }
 }

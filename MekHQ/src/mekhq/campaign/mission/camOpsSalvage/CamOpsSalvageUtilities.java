@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -484,7 +484,7 @@ public class CamOpsSalvageUtilities {
      * {@link StratConCampaignState}.
      *
      * <p>This method identifies the {@link StratConTrackState} and {@link StratConCoords} that correspond to the
-     * given {@link Scenario}, and assigns each salvage-capable {@link Force} participating in the scenario to that
+     * given {@link Scenario}, and assigns each salvage-capable {@link Formation} participating in the scenario to that
      * location. If the scenario is not part of an {@link AtBContract}, or if the contract has no active strategic
      * campaign state, the method exits without making changes.</p>
      *
@@ -506,9 +506,9 @@ public class CamOpsSalvageUtilities {
         }
 
         findTrackAndCoords(scenario, state).ifPresent(loc -> {
-            for (int forceId : scenario.getSalvageForces()) {
-                Force force = campaign.getForce(forceId);
-                if (force != null) {
+            for (int forceId : scenario.getSalvageFormations()) {
+                Formation formation = campaign.getFormation(forceId);
+                if (formation != null) {
                     loc.track().assignForce(forceId, loc.coords(), campaign.getLocalDate(), false);
                 }
             }

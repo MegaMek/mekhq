@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import javax.swing.UIManager;
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.gui.enums.ForceIconOperationalStatusStyle;
+import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 public final class MHQOptions extends SuiteOptions {
@@ -963,23 +963,23 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, value);
     }
 
-    public boolean getNewDayForceIconOperationalStatus() {
+    public boolean getNewDayFormationIconOperationalStatus() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);
     }
 
-    public void setNewDayForceIconOperationalStatus(final boolean value) {
+    public void setNewDayFormationIconOperationalStatus(final boolean value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .putBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, value);
     }
 
-    public ForceIconOperationalStatusStyle getNewDayForceIconOperationalStatusStyle() {
-        return ForceIconOperationalStatusStyle.valueOf(userPreferences.node(MHQConstants.NEW_DAY_NODE)
+    public FormationIconOperationalStatusStyle getNewDayFormationIconOperationalStatusStyle() {
+        return FormationIconOperationalStatusStyle.valueOf(userPreferences.node(MHQConstants.NEW_DAY_NODE)
                                                              .get(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE,
-                                                                   ForceIconOperationalStatusStyle.BORDER.name()));
+                                                                   FormationIconOperationalStatusStyle.BORDER.name()));
     }
 
-    public void setNewDayForceIconOperationalStatusStyle(final ForceIconOperationalStatusStyle value) {
+    public void setNewDayFormationIconOperationalStatusStyle(final FormationIconOperationalStatusStyle value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .put(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
     }
@@ -1088,20 +1088,20 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     /**
-     * @return the path of the folder to load when exporting a layered force icon
+     * @return the path of the folder to load when exporting a layered formation icon
      */
-    public String getLayeredForceIconPath() {
+    public String getLayeredFormationIconPath() {
         return userPreferences.node(MHQConstants.FILE_PATH_NODE)
                      .get(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, "userdata/data/images/force/");
     }
 
     /**
-     * This sets the path where one saves their layered force icon during export, as this is not required for any data
+     * This sets the path where one saves their layered formation icon during export, as this is not required for any data
      * but improves UX.
      *
-     * @param value the path where the person saved their last layered force icon export
+     * @param value the path where the person saved their last layered formation icon export
      */
-    public void setLayeredForceIconPath(final String value) {
+    public void setLayeredFormationIconPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
 

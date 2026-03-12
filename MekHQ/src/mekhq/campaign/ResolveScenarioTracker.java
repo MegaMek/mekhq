@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -636,7 +636,7 @@ public class ResolveScenarioTracker {
                               campaign.getLocalDate(),
                               getMissionId(),
                               getScenarioId(),
-                              p.getUnit().getForceId(),
+                              p.getUnit().getFormationId(),
                               u.getEntity().getEntityType()));
                     }
                 }
@@ -1743,11 +1743,12 @@ public class ResolveScenarioTracker {
                 int statusHits = status.getHits();
                 int priorHits = person.getHits();
                 int newHits = statusHits - priorHits;
+                // Note: adjustedHits modifies the newHits. It can increase or decrease the value.
                 int adjustedHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
                       fatigueRate, newHits);
 
                 person.setHitsPrior(priorHits);
-                person.setHits(statusHits + adjustedHits);
+                person.setHits(priorHits + adjustedHits);
             }
 
             if (status.wasDeployed()) {
@@ -1951,7 +1952,7 @@ public class ResolveScenarioTracker {
 
         scenario.setStatus(resolution);
         scenario.setReport(report);
-        scenario.clearAllForcesAndPersonnel(campaign);
+        scenario.clearAllFormationsAndPersonnel(campaign);
         // let's reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();

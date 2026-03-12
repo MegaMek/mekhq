@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,7 +54,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
@@ -77,9 +77,9 @@ import mekhq.utilities.ReportingUtilities;
 public class MRMSService {
     private static final MMLogger LOGGER = MMLogger.create(MRMSService.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.MRMSService";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MRMS";
     @Deprecated(since = "0.50.10")
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
           MekHQ.getMHQOptions().getLocale());
 
     private MRMSService() {
@@ -881,10 +881,10 @@ public class MRMSService {
             boolean assigned = false;
 
             if ((unit != null) && configuredOptions.isUseAssignedTechsFirst()) {
-                Force force = campaign.getForce(unit.getForceId());
+                Formation formation = campaign.getFormation(unit.getFormationId());
 
-                if ((force != null) && (force.getTechID()) != null) {
-                    assigned = force.getTechID().toString().equals(tech.getId().toString());
+                if ((formation != null) && (formation.getTechID()) != null) {
+                    assigned = formation.getTechID().toString().equals(tech.getId().toString());
                 }
 
                 if (!assigned && !tech.getTechUnits().isEmpty()) {

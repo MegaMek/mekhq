@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,7 @@ package mekhq.gui.dialog.nagDialogs;
 import static mekhq.MHQConstants.NAG_PRISONERS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 
 import java.util.List;
@@ -45,7 +45,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -71,13 +71,13 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      */
     @Override
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Force> forces = campaign.getAllForces();
+        List<Formation> formations = campaign.getAllFormations();
 
 
         Person speaker = null;
-        for (Force force : forces) {
-            if (force.isForceType(SECURITY)) {
-                UUID commanderId = force.getForceCommanderID();
+        for (Formation formation : formations) {
+            if (formation.isFormationType(SECURITY)) {
+                UUID commanderId = formation.getFormationCommanderID();
                 Person commander = campaign.getPerson(commanderId);
                 if (commander == null) {
                     continue;

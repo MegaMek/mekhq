@@ -178,7 +178,13 @@ public class Armor extends Part implements IAcquisitionWork {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            if (!isSalvaging()) {
+            if (isSalvaging()) {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                      .append(rear ? " (Rear)" : "")
+                      .append(", ")
+                      .append(amount)
+                      .append(amount == 1 ? " point" : " points");
+            } else {
                 toReturn.append(unit.getEntity().getLocationName(location))
                       .append(rear ? " (Rear)" : "")
                       .append(", ")
@@ -639,7 +645,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
         if (amountRemaining > 0) {
             LOGGER.warn("Still trying to add armor but that shouldn't have been a problem!");
-        } else if (amount < 0) {
+        } else if (amountRemaining < 0) {
             LOGGER.warn("Still trying to remove armor but no more armor is in the warehouse!");
         }
     }
