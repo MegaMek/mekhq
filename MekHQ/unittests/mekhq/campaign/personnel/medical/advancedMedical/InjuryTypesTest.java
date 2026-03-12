@@ -33,8 +33,11 @@
 package mekhq.campaign.personnel.medical.advancedMedical;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -77,11 +80,11 @@ class InjuryTypesTest {
 
     /**
      * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>.
-     * Permanent injuries must not produce stress effects that could worsen them or replace them
-     * with temporary injuries during post-combat stress resolution.
+     * Permanent injuries that can only reset their recovery timer (or would be replaced by a
+     * different injury type) must not produce any stress effects.
      */
     @ParameterizedTest(name = "{0} permanent injury produces no stress effects")
-    @MethodSource(value = "permanentInjuryStressEffectData")
+    @MethodSource(value = "permanentInjuryNoStressEffectData")
     void testGenStressEffect_permanentInjuryProducesNoEffects(String injuryName, InjuryType type,
           BodyLocation location, int severity) {
         // Setup
@@ -98,16 +101,54 @@ class InjuryTypesTest {
               injuryName + " is permanent and should produce no stress effects, but got: " + effects);
     }
 
-    static Stream<Arguments> permanentInjuryStressEffectData() {
+    static Stream<Arguments> permanentInjuryNoStressEffectData() {
         return Stream.of(
-              Arguments.of("Concussion", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 1),
+              // Severe concussion can only become cerebral contusion (cross-type) — blocked
               Arguments.of("Concussion (severe)", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 2),
+              // Cerebral contusion can only become CTE (cross-type) — blocked
               Arguments.of("Cerebral contusion", InjuryTypes.CEREBRAL_CONTUSION, BodyLocation.HEAD, 1),
-              Arguments.of("Internal bleeding", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 1),
-              Arguments.of("Internal bleeding (severe)", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 2),
+              // These only reset recovery timer — blocked for permanent
               Arguments.of("Broken limb", InjuryTypes.BROKEN_LIMB, BodyLocation.LEFT_ARM, 1),
               Arguments.of("Broken collar bone", InjuryTypes.BROKEN_COLLAR_BONE, BodyLocation.CHEST, 1),
               Arguments.of("Punctured lung", InjuryTypes.PUNCTURED_LUNG, BodyLocation.CHEST, 1)
+        );
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>.
+     * Permanent injuries that can worsen within the same type (severity increase) should still
+     * produce worsening effects, but must not reset the recovery timer.
+     */
+    @ParameterizedTest(name = "{0} permanent injury can still worsen but skips timer reset")
+    @MethodSource(value = "permanentInjuryCanWorsenData")
+    void testGenStressEffect_permanentInjuryCanWorsenButSkipsTimerReset(String injuryName, InjuryType type,
+          BodyLocation location, int severity) {
+        // Setup
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        Person person = mock(Person.class);
+        Injury permanentInjury = new Injury(30, injuryName, location, type, severity,
+              LocalDate.of(3025, 1, 1), true);
+
+        // Act
+        List<GameEffect> effects = type.genStressEffect(campaign, person, permanentInjury, 3);
+
+        // Assert
+        assertFalse(effects.isEmpty(),
+              injuryName + " is permanent but should still produce worsening effects");
+        assertEquals(1, effects.size(),
+              injuryName + " should produce exactly 1 effect (worsening only, no timer reset)");
+        assertFalse(effects.get(0).desc().contains("recovery timer"),
+              injuryName + " permanent injury should not have a recovery timer reset effect");
+    }
+
+    static Stream<Arguments> permanentInjuryCanWorsenData() {
+        return Stream.of(
+              // Concussion sev 1 can worsen to sev 2 (same type)
+              Arguments.of("Concussion", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 1),
+              // Internal bleeding can worsen in severity (same type)
+              Arguments.of("Internal bleeding", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 1),
+              Arguments.of("Internal bleeding (severe)", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 2)
         );
     }
 }

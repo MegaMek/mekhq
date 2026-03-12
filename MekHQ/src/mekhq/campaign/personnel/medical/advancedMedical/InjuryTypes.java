@@ -698,11 +698,6 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
-            // Permanent injuries have stabilized and should not worsen or be replaced by temporary ones
-            if (i.isPermanent()) {
-                return Collections.emptyList();
-            }
-
             String secondEffectFluff = (i.getHits() < 3) ? "internal bleeding worsening" : "death";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
@@ -717,7 +712,7 @@ public final class InjuryTypes {
                 }));
             } else {
                 // We have a chance!
-                return Arrays.asList(newResetRecoveryTimeAction(i), new GameEffect(secondEffectFluff, rnd -> {
+                GameEffect worseningEffect = new GameEffect(secondEffectFluff, rnd -> {
                     if (rnd.applyAsInt(6) + hits >= 5) {
                         if (i.getHits() < 3) {
                             i.setHits(i.getHits() + 1);
@@ -729,7 +724,12 @@ public final class InjuryTypes {
                             LOGGER.info(entry.toString());
                         }
                     }
-                }));
+                });
+                // Permanent injuries have stabilized and should not have their recovery timer reset
+                if (i.isPermanent()) {
+                    return Collections.singletonList(worseningEffect);
+                }
+                return Arrays.asList(newResetRecoveryTimeAction(i), worseningEffect);
             }
         }
     }
@@ -908,8 +908,9 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
-            // Permanent injuries have stabilized and should not worsen or be replaced by temporary ones
-            if (injury.isPermanent()) {
+            // Permanent severe concussions cannot worsen further without being replaced
+            // by a different injury type, which is not allowed for permanent injuries
+            if (injury.isPermanent() && injury.getHits() >= 2) {
                 return Collections.emptyList();
             }
 
@@ -920,7 +921,7 @@ public final class InjuryTypes {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
                 secondEffectFluff = worseningChance + "% chance of " + secondEffectFluff;
             }
-            return Arrays.asList(newResetRecoveryTimeAction(injury), new GameEffect(secondEffectFluff, rnd -> {
+            GameEffect worseningEffect = new GameEffect(secondEffectFluff, rnd -> {
                 if (rnd.applyAsInt(6) + hits >= 5) {
                     if (injury.getHits() == 1) {
                         injury.setHits(2);
@@ -935,7 +936,12 @@ public final class InjuryTypes {
                         LOGGER.info(entry.toString());
                     }
                 }
-            }));
+            });
+            // Permanent injuries have stabilized and should not have their recovery timer reset
+            if (injury.isPermanent()) {
+                return Collections.singletonList(worseningEffect);
+            }
+            return Arrays.asList(newResetRecoveryTimeAction(injury), worseningEffect);
         }
 
         @Override
