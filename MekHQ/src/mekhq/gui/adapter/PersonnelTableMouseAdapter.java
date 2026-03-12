@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -3836,7 +3836,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
                     person.setSecondInCommand(false);
-                    getCampaign().addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                    getCampaign().addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                           person.getHyperlinkedFullTitle()));
                     getCampaign().personUpdated(person);
                 }
