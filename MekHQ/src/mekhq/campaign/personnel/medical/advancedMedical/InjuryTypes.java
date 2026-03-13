@@ -534,17 +534,12 @@ public final class InjuryTypes {
 
         @Override
         public List<GameEffect> genStressEffect(Campaign campaign, Person person, Injury injury, int hits) {
-            // Permanent injuries have stabilized and should not worsen or be replaced by temporary ones
-            if (injury.isPermanent()) {
-                return Collections.emptyList();
-            }
-
             String secondEffectFluff = "development of a chronic traumatic encephalopathy";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
                 secondEffectFluff = worseningChance + "% chance of " + secondEffectFluff;
             }
-            return Arrays.asList(newResetRecoveryTimeAction(injury), new GameEffect(secondEffectFluff, rnd -> {
+            GameEffect worseningEffect = new GameEffect(secondEffectFluff, rnd -> {
                 if (rnd.applyAsInt(6) + hits >= 5) {
                     Injury cte = CTE.newInjury(campaign, person, BodyLocation.HEAD, 1);
                     person.addInjury(cte);
@@ -552,7 +547,13 @@ public final class InjuryTypes {
                     MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(person, campaign.getLocalDate());
                     LOGGER.info(entry.toString());
                 }
-            }));
+            });
+            // Permanent injuries have stabilized and should not have their recovery timer reset,
+            // but can still worsen to CTE (which is an inherently permanent injury type)
+            if (injury.isPermanent()) {
+                return Collections.singletonList(worseningEffect);
+            }
+            return Arrays.asList(newResetRecoveryTimeAction(injury), worseningEffect);
         }
 
         @Override

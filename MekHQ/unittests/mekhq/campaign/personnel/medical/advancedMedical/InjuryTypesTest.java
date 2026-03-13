@@ -103,10 +103,8 @@ class InjuryTypesTest {
 
     static Stream<Arguments> permanentInjuryNoStressEffectData() {
         return Stream.of(
-              // Severe concussion can only become cerebral contusion (cross-type) — blocked
+              // Severe concussion can only become cerebral contusion (non-permanent type) — blocked
               Arguments.of("Concussion (severe)", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 2),
-              // Cerebral contusion can only become CTE (cross-type) — blocked
-              Arguments.of("Cerebral contusion", InjuryTypes.CEREBRAL_CONTUSION, BodyLocation.HEAD, 1),
               // These only reset recovery timer — blocked for permanent
               Arguments.of("Broken limb", InjuryTypes.BROKEN_LIMB, BodyLocation.LEFT_ARM, 1),
               Arguments.of("Broken collar bone", InjuryTypes.BROKEN_COLLAR_BONE, BodyLocation.CHEST, 1),
@@ -146,6 +144,8 @@ class InjuryTypesTest {
         return Stream.of(
               // Concussion sev 1 can worsen to sev 2 (same type)
               Arguments.of("Concussion", InjuryTypes.CONCUSSION, BodyLocation.HEAD, 1),
+              // Cerebral contusion can worsen to CTE (inherently permanent type)
+              Arguments.of("Cerebral contusion", InjuryTypes.CEREBRAL_CONTUSION, BodyLocation.HEAD, 1),
               // Internal bleeding can worsen in severity (same type)
               Arguments.of("Internal bleeding", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 1),
               Arguments.of("Internal bleeding (severe)", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 2)
