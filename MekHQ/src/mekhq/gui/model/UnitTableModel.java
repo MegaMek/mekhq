@@ -178,7 +178,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
             case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
             case COL_CREW -> getCrewTooltip(unit);
-            case COL_QUIRKS -> unit.getQuirksList();
+            case COL_QUIRKS -> unit.getQuirksListHTML();
             default -> null;
         };
     }
