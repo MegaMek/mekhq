@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,6 @@ package mekhq.gui.campaignOptions.components;
 
 import static java.awt.Color.BLACK;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
@@ -188,13 +187,15 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             @Override
             public Dimension getPreferredSize() {
                 Dimension standardSize = super.getPreferredSize();
-                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
+                // CAMPAIGN_OPTIONS_PANEL_WIDTH and standardSize are already in screen pixels — do not scale again
+                return new Dimension(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
             }
 
             @Override
             public Dimension getMinimumSize() {
                 Dimension standardSize = super.getPreferredSize();
-                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
+                // CAMPAIGN_OPTIONS_PANEL_WIDTH and standardSize are already in screen pixels — do not scale again
+                return new Dimension(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
             }
         };
 
