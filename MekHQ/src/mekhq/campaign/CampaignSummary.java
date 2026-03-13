@@ -462,8 +462,7 @@ public class CampaignSummary {
 
             int injuredPersonnel = campaign.getPatients().size();
             boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
-            int mashTheatreCapacity = useMASHTheatres ? MASHCapacity.checkMASHCapacity(unitsInToe,
-                  campaignOptions.getMASHTheatreCapacity()) : Integer.MAX_VALUE;
+            int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
 
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
