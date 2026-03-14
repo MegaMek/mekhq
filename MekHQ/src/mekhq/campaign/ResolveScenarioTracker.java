@@ -1743,11 +1743,12 @@ public class ResolveScenarioTracker {
                 int statusHits = status.getHits();
                 int priorHits = person.getHits();
                 int newHits = statusHits - priorHits;
+                // Note: adjustedHits modifies the newHits. It can increase or decrease the value.
                 int adjustedHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
                       fatigueRate, newHits);
 
                 person.setHitsPrior(priorHits);
-                person.setHits(statusHits + adjustedHits);
+                person.setHits(priorHits + adjustedHits);
             }
 
             if (status.wasDeployed()) {

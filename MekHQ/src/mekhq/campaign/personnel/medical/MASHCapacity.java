@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,6 +56,7 @@ public class MASHCapacity {
      * @author Illiani
      * @since 0.50.10
      */
+    //TODO: update methods for MASH Theaters to be consistent spelling (theatre vs theater)
     public static int checkMASHCapacity(List<Unit> units, int capacityPerTheatre) {
         int mashTheatreCount = 0;
 
