@@ -1639,7 +1639,7 @@ public class Person {
                 String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
                 campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
                       secondInCommandHyperlink));
-                campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                campaign.addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                       secondInCommandHyperlink));
 
                 campaign.personUpdated(secondInCommand);
