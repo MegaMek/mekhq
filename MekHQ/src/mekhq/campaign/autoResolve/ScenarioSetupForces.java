@@ -502,6 +502,28 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
             lastTouchesBeforeSendingEntity(game, entity);
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
 
+            // Ensure every entity has a force assignment so it gets added to the simulation
+            if (entity.getForceString().isBlank()) {
+                entity.setForceString(game.getPlayer(entity.getOwnerId()).getName() + "|1");
+            }
+
+            // Strip leading empty-named force segments from the forceString.
+            // The campaign root force may have no name, producing a forceString like
+            // "|1||Mech Force|29||...". Forces.verifyForceName rejects blank names,
+            // causing the entire force chain to fail. Remove those segments.
+            String fs = entity.getForceString();
+            while (fs.startsWith("|")) {
+                int sep = fs.indexOf("||");
+                if (sep >= 0) {
+                    fs = fs.substring(sep + 2);
+                } else {
+                    break;
+                }
+            }
+            if (!fs.equals(entity.getForceString())) {
+                entity.setForceString(fs.isBlank() ? game.getPlayer(entity.getOwnerId()).getName() + "|1" : fs);
+            }
+
             // Restore forces from MULs or other external sources from the forceString, if
             // any
             if (!entity.getForceString().isBlank()) {
