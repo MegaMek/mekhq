@@ -509,7 +509,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
 
             // Strip leading empty-named force segments from the forceString.
             // The campaign root force may have no name, producing a forceString like
-            // "|1||Mech Force|29||...". Forces.verifyForceName rejects blank names,
+            // "|1||Force Name|29||...". Forces.verifyForceName rejects blank names,
             // causing the entire force chain to fail. Remove those segments.
             String fs = entity.getForceString();
             while (fs.startsWith("|")) {
