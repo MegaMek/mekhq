@@ -666,7 +666,7 @@ public class StratConRulesManager {
         finalizeScenario(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
 
-        if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
+        if (!autoAssignLances && !scenario.overrideForceAutoAssignment()) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
                 backingScenario.removeFormation(forceID);
             }
@@ -1091,7 +1091,7 @@ public class StratConRulesManager {
         if (scenario != null) {
             // Don't auto-assign forces for Official Challenge scenarios - the player should choose their force
             boolean isOfficialChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
-            scenario.setIgnoreForceAutoAssignment(!isOfficialChallenge);
+            scenario.setOverrideForceAutoAssignment(!isOfficialChallenge);
         }
 
         return scenario;

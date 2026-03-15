@@ -32,7 +32,11 @@
  */
 package mekhq.campaign.stratCon;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -42,11 +46,15 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
@@ -70,7 +78,7 @@ class StratConRulesManagerTest {
      * processForceDeployment -> scanNeighboringCoords touches many objects.
      */
     private void setupProcessForceDeploymentMocks(Campaign campaign, CampaignOptions options,
-          StratConTrackState track, StratConCoords coords, int forceID) {
+          StratConTrackState track, int forceID) {
         // scanNeighboringCoords needs revealed coords set
         when(track.getRevealedCoords()).thenReturn(new HashSet<>());
         when(track.getScanRangeIncrease()).thenReturn(0);
@@ -135,7 +143,7 @@ class StratConRulesManagerTest {
         combatTeamsMap.put(forceID, combatTeam);
         when(campaign.getCombatTeamsAsMap()).thenReturn(combatTeamsMap);
 
-        setupProcessForceDeploymentMocks(campaign, options, track, coords, forceID);
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
 
         // Act
         StratConRulesManager.deployForceToCoords(coords, forceID, campaign, contract, track, false);
@@ -180,12 +188,103 @@ class StratConRulesManagerTest {
         combatTeamsMap.put(forceID, combatTeam);
         when(campaign.getCombatTeamsAsMap()).thenReturn(combatTeamsMap);
 
-        setupProcessForceDeploymentMocks(campaign, options, track, coords, forceID);
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
 
         // Act
         StratConRulesManager.deployForceToCoords(coords, forceID, campaign, contract, track, false);
 
         // Assert: force SHOULD be added to the regular scenario
         verify(regularScenario).addPrimaryForce(forceID);
+    }
+
+    /**
+     * Verifies that when an Official Challenge scenario spawns on a hex that already has a deployed
+     * force (the {@code generateScenarioForExistingForces} path), the scenario does NOT override
+     * force auto-assignment. This means {@code finalizeBackingScenario} (called with
+     * {@code autoAssignLances=false} in {@code generateDailyScenariosForTrack}) will remove the
+     * forces from the backing scenario and set the scenario to UNRESOLVED, preventing
+     * auto-assignment.
+     *
+     * <p>Regression test for
+     * <a href="https://github.com/MegaMek/mekhq/issues/8612">issue #8612</a>
+     * — spawn-on-existing-force path.
+     */
+    @Test
+    void generateScenarioForExistingForces_officialChallenge_doesNotOverrideAutoAssignment() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.isUseStratConMaplessMode()).thenReturn(false);
+
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+
+        // Create a mock scenario whose backing scenario is an Official Challenge
+        StratConScenario mockScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.OFFICIAL_CHALLENGE);
+        when(mockScenario.getBackingScenario()).thenReturn(backingScenario);
+
+        Set<Integer> forceIDs = new LinkedHashSet<>(List.of(42));
+
+        try (MockedStatic<StratConRulesManager> mockedManager =
+                   Mockito.mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
+            // Mock setupScenario to return our controlled Official Challenge scenario
+            mockedManager.when(() -> StratConRulesManager.setupScenario(
+                  any(), any(), any(), any(), any(), any(), anyBoolean(), any()
+            )).thenReturn(mockScenario);
+
+            // Act
+            StratConScenario result = StratConRulesManager.generateScenarioForExistingForces(
+                  coords, forceIDs, contract, campaign, track, null, null);
+
+            // Assert
+            assertNotNull(result);
+            // overrideForceAutoAssignment must be false for Official Challenge,
+            // so finalizeBackingScenario will remove formations instead of committing them
+            verify(mockScenario).setOverrideForceAutoAssignment(false);
+        }
+    }
+
+    /**
+     * Verifies that when a non-challenge scenario spawns on a hex with an existing force,
+     * the scenario DOES override force auto-assignment (so forces are committed as usual).
+     */
+    @Test
+    void generateScenarioForExistingForces_nonChallenge_overridesAutoAssignment() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(options.isUseStratConMaplessMode()).thenReturn(false);
+
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+
+        // Create a mock scenario whose backing scenario is NOT an Official Challenge
+        StratConScenario mockScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(mockScenario.getBackingScenario()).thenReturn(backingScenario);
+
+        Set<Integer> forceIDs = new LinkedHashSet<>(List.of(42));
+
+        try (MockedStatic<StratConRulesManager> mockedManager =
+                   Mockito.mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
+            mockedManager.when(() -> StratConRulesManager.setupScenario(
+                  any(), any(), any(), any(), any(), any(), anyBoolean(), any()
+            )).thenReturn(mockScenario);
+
+            // Act
+            StratConScenario result = StratConRulesManager.generateScenarioForExistingForces(
+                  coords, forceIDs, contract, campaign, track, null, null);
+
+            // Assert
+            assertNotNull(result);
+            // overrideForceAutoAssignment must be true for non-challenge scenarios,
+            // so finalizeBackingScenario will commit forces as normal
+            verify(mockScenario).setOverrideForceAutoAssignment(true);
+        }
     }
 }
