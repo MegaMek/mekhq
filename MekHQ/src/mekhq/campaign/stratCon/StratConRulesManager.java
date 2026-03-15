@@ -1089,7 +1089,9 @@ public class StratConRulesManager {
         // this is theoretically possible if forceIDs is empty - not likely in practice
         // but might as well, to future-proof.
         if (scenario != null) {
-            scenario.setIgnoreForceAutoAssignment(true);
+            // Don't auto-assign forces for Official Challenge scenarios - the player should choose their force
+            boolean isOfficialChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
+            scenario.setIgnoreForceAutoAssignment(!isOfficialChallenge);
         }
 
         return scenario;
@@ -1155,16 +1157,18 @@ public class StratConRulesManager {
 
         // we may stumble on a fixed objective scenario - in that case assign the force
         // to it and finalize we also will not be encountering any of the other stuff so bug out
-        // afterward
+        // afterward. Official Challenge scenarios should not auto-assign forces.
         StratConScenario revealedScenario = track.getScenario(coords);
         if (revealedScenario != null) {
-            revealedScenario.addPrimaryForce(forceID);
-            commitPrimaryForces(campaign, revealedScenario, track);
-            if (!revealedScenario.getBackingScenario().isFinalized()) {
-                setScenarioParametersFromBiome(track,
-                      revealedScenario,
-                      campaign.getCampaignOptions().isUseNoTornadoes());
-                finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+            if (!revealedScenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+                revealedScenario.addPrimaryForce(forceID);
+                commitPrimaryForces(campaign, revealedScenario, track);
+                if (!revealedScenario.getBackingScenario().isFinalized()) {
+                    setScenarioParametersFromBiome(track,
+                          revealedScenario,
+                          campaign.getCampaignOptions().isUseNoTornadoes());
+                    finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+                }
             }
             return;
         }
