@@ -57,10 +57,6 @@ public class TransportReport extends AbstractReport {
                                   stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
                                   stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math
-                         .max(stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) -
-                                    stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
         int noASF = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
                                    stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int nolv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
@@ -71,7 +67,6 @@ public class TransportReport extends AbstractReport {
                                    stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
                                   stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
         int noProto = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
                                      stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
               0);
@@ -83,7 +78,7 @@ public class TransportReport extends AbstractReport {
         int newNoASF = Math.max(noASF - freeSC, 0);
         int placedASF = Math.max(noASF - newNoASF, 0);
         if ((noASF > 0) && (freeSC > 0)) {
-            asfAppend = " [" + placedASF + " ASF will be placed in Small Craft bays]";
+            asfAppend = " [" + placedASF + " Fighters will be placed in Small Craft bays]";
             freeSC -= placedASF;
         }
 
@@ -101,12 +96,12 @@ public class TransportReport extends AbstractReport {
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mek Bays (Occupied):",
               stats.getTotalMekBays(), stats.getOccupiedBays(Entity.ETYPE_MEK), "Meks Not Transported:", noMek));
 
-        // Let's do ASF next.
+        // Let's do Fighters next (ASF, Conventional Fighters, Fixed-Wing Support all use Fighter bays).
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n",
-              "ASF Bays (Occupied):",
+              "Fighter Bays (Occupied):",
               stats.getTotalASFBays(),
               stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER),
-              "ASF Not Transported:",
+              "Fighters Not Transported:",
               noASF,
               asfAppend));
 
@@ -163,9 +158,9 @@ public class TransportReport extends AbstractReport {
 
         if ((noASF > 0) && (freeSC > 0)) {
             // Let's do ASF in Free Small Craft Bays next.
-            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   ASF in Small Craft Bays (Occupied):",
+            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   Fighters in Small Craft Bays (Occupied):",
                   stats.getTotalSmallCraftBays(), stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF,
-                  "ASF Not Transported:", newNoASF));
+                  "Fighters Not Transported:", newNoASF));
         }
 
         // Let's do ProtoMeks next.
@@ -174,7 +169,7 @@ public class TransportReport extends AbstractReport {
               stats.getTotalProtoMekBays(),
               stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
               "ProtoMeks Not Transported:",
-              noSC));
+              noProto));
 
         sb.append("\n\n");
 

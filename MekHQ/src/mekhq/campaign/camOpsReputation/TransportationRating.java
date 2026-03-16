@@ -387,7 +387,7 @@ public class TransportationRating {
                     smallCraftCount++;
                 } else if (entity.isMek()) {
                     mekCount++;
-                } else if (entity.isAerospaceFighter() || entity.isConventionalFighter()) {
+                } else if (entity.isFighter()) {
                     asfCount++;
                 } else if (entity.isProtoMek()) {
                     protoMekCount++;
