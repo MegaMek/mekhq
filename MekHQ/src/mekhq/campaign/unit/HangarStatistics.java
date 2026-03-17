@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,12 +38,15 @@ import java.util.HashMap;
 import megamek.common.bays.BayType;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.units.*;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 
 /**
  * Provides methods to gather statistics on units in a hangar.
  */
 public class HangarStatistics {
+    private static final MMLogger logger = MMLogger.create(HangarStatistics.class);
+
     private final Hangar hangar;
     private static final long LIGHT_VEHICLE_BIT = 1L << 62;
     private static final long SUPER_HEAVY_BIT = 1L << 63;
@@ -121,7 +124,9 @@ public class HangarStatistics {
                 BayType bayType = BayType.getTypeForEntity(en);
                 if (bayType != null) {
                     long key = bayTypeToKey(bayType);
-                    hashMap.merge(key, 1, Integer::sum);
+                    if (key >= 0) {
+                        hashMap.merge(key, 1, Integer::sum);
+                    }
                 }
             }
         }
@@ -130,11 +135,12 @@ public class HangarStatistics {
     }
 
     /**
-     * Maps a {@link BayType} to the ETYPE-based key used in the tally map.
+     * Maps a {@link BayType} to the ETYPE-based key used in the tally map. Returns {@code -1L} and logs a warning
+     * for any unhandled bay type so that new types added to MegaMek fail visibly rather than being silently counted.
      *
      * @param bayType the bay type to map
      *
-     * @return the corresponding ETYPE key for the tally map
+     * @return the corresponding ETYPE key for the tally map, or {@code -1L} if the bay type is not mapped
      */
     private static long bayTypeToKey(BayType bayType) {
         return switch (bayType) {
@@ -147,7 +153,10 @@ public class HangarStatistics {
             case VEHICLE_SH -> Entity.ETYPE_TANK | SUPER_HEAVY_BIT;
             case INFANTRY_FOOT, INFANTRY_JUMP, INFANTRY_MOTORIZED, INFANTRY_MECHANIZED -> Entity.ETYPE_INFANTRY;
             case BATTLEARMOR_IS, BATTLEARMOR_CLAN, BATTLEARMOR_CS -> Entity.ETYPE_BATTLEARMOR;
-            default -> -1L;
+            default -> {
+                logger.warn("Unmapped BayType in transport tally: {}", bayType);
+                yield -1L;
+            }
         };
     }
 
