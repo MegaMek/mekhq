@@ -62,6 +62,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -895,6 +896,101 @@ public class MRMSServiceTest {
                 .filter(p -> p instanceof Armor)
                 .map(p -> (Armor) p)
                 .forEach(MRMSServiceTest.this::breakArmor);
+        }
+    }
+
+    /**
+     * Regression test for GitHub #7414: MRMS generates thousands of futile repair actions
+     * when an AmmoBin needs reloading but the warehouse has insufficient ammo.
+     *
+     * <p>Before the fix, the while-loop in {@code performUnitMRMS} would keep retrying
+     * AmmoBin reloads because {@code fixPart} always returned "REPAIRED" even when
+     * {@code loadBin()} couldn't actually load any ammo. This consumed all tech time
+     * across all techs, generating thousands of actions.</p>
+     *
+     * <p>The fix: after {@code fixPart()}, if the AmmoBin still {@code needsFixing()},
+     * the action is not tagged as REPAIRED, so the loop terminates.</p>
+     */
+    @Nested
+    public class TestMRMSAmmoBinNoAmmoAvailable {
+        Unit unit;
+
+        static final int skillMin = SkillLevel.ULTRA_GREEN.getExperienceLevel();
+        static final int skillMax = SkillLevel.LEGENDARY.getExperienceLevel();
+        static final int targetNumberPreferred = 6;
+        static final int targetNumberMax = 6;
+        static final int dailyTimeMin = 0;
+
+        @BeforeEach
+        public void beforeEach() {
+            when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+            Entity entity = getUrbanMek();
+            assert entity != null;
+            unit = new Unit(entity, mockCampaign);
+            unit.initializeParts(true);
+        }
+
+        /**
+         * When an AmmoBin needs reloading but fixPart doesn't actually resolve the
+         * need (simulating no ammo in the warehouse), MRMS should NOT keep retrying
+         * the same ammo bin repair indefinitely.
+         *
+         * <p>We set up an AmmoBin that needs 10 shots. The mock fixPart does NOT
+         * change the AmmoBin's state (simulating that loadBin found no ammo in
+         * the quartermaster). The fix ensures the while-loop detects that the
+         * AmmoBin still needs fixing and stops retrying.</p>
+         */
+        @Test
+        public void testAmmoBinWithNoAmmoDoesNotLoopIndefinitely() {
+            // Arrange
+            addMRMSOption(PartRepairType.AMMUNITION, skillMin, skillMax,
+                  targetNumberPreferred, targetNumberMax, dailyTimeMin);
+            configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+            Person realTech = new Person("Test Tech", "Tech", mockCampaign);
+            realTech.addSkill(SkillType.S_TECH_MEK, SkillLevel.VETERAN.getExperienceLevel(), 0);
+            realTech.setPrimaryRoleDirect(PersonnelRole.MEK_TECH);
+            realTech.setMinutesLeft(480);
+            when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(realTech));
+
+            // Find the AmmoBin on the unit and make it need reloading
+            List<AmmoBin> ammoBins = unit.getParts().stream()
+                  .filter(p -> p instanceof AmmoBin)
+                  .map(p -> (AmmoBin) p)
+                  .toList();
+
+            // The UrbanMech UM-R69 should have at least one AmmoBin (for its Ultra AC/10)
+            assert !ammoBins.isEmpty() : "UrbanMech should have ammo bins";
+
+            for (AmmoBin ammoBin : ammoBins) {
+                ammoBin.setShotsNeeded(ammoBin.getFullShots());
+            }
+
+            // Mock fixPart for AmmoBin: do NOT change the AmmoBin state.
+            // This simulates the warehouse having no ammo — loadBin() would
+            // requisition 0 shots and shotsNeeded stays unchanged.
+            for (AmmoBin ammoBin : ammoBins) {
+                doAnswer(inv -> {
+                    Person tech = inv.getArgument(1);
+                    tech.setMinutesLeft(tech.getMinutesLeft() - ammoBin.getActualTime());
+                    // Intentionally NOT resetting shotsNeeded — simulating no ammo available
+                    return "Mock Ammo Reload (no ammo available)";
+                }).when(mockCampaign).fixPart(argThat(new IPartWorkMatch(ammoBin)), any(Person.class));
+            }
+
+            // Act
+            try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+                compute.when(() -> Compute.randomInt(anyInt())).thenReturn(6);
+                MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+            }
+
+            // Assert: fixPart should be called once per ammo bin, NOT thousands of times.
+            // Before the fix, this would loop until all tech time was consumed
+            // (480 min / 15 min per reload = 32 times per bin).
+            int maxExpectedCalls = ammoBins.size();
+            verify(mockCampaign, Mockito.atMost(maxExpectedCalls))
+                  .fixPart(argThat(p -> p instanceof AmmoBin), any(Person.class));
         }
     }
 

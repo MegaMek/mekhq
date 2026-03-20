@@ -977,6 +977,15 @@ public class MRMSService {
 
         debugLog("Ending after %s ns", "repairPart", System.nanoTime() - repairPartTime);
 
+        // AmmoBin repairs always complete instantly (AUTOMATIC_SUCCESS). If the bin
+        // still needs fixing after the repair attempt, it means the warehouse ran out
+        // of ammo. Don't count this as a successful repair — otherwise the outer
+        // while-loop in performUnitMRMS will keep retrying and generate thousands
+        // of futile actions (see GitHub #7414).
+        if ((partWork instanceof AmmoBin) && partWork.needsFixing() && !partWork.isBeingWorkedOn()) {
+            return MRMSPartAction.createNoTechs(partWork);
+        }
+
         return MRMSPartAction.createRepaired(partWork);
     }
 
