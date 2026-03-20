@@ -37,6 +37,7 @@ import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -61,6 +62,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
 import megamek.common.annotations.Nullable;
+import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
@@ -77,15 +79,26 @@ import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
@@ -95,10 +108,14 @@ import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
+import mekhq.gui.dialog.CampaignUpgradeDialog;
+import mekhq.service.ai.CampaignProposal;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger LOGGER = MMLogger.create(DataLoadingDialog.class);
@@ -354,7 +371,24 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Campaign Options
                 // This needs to be before we trigger the customize preset dialog
-                campaign.setLocalDate(DEFAULT_START_DATE);
+                // AI Proposal Pre-fill
+                CampaignProposal proposal = MekHQ.getPendingAiProposal();
+                if (proposal != null) {
+                    campaign.setName(proposal.mercenaryUnitName != null ? proposal.mercenaryUnitName : proposal.campaignName);
+                    campaign.setLocalDate(LocalDate.of(proposal.startYear, 1, 1));
+                    campaign.setBackstory(proposal.backgroundStory);
+                    
+                    // Try to find the faction
+                    String factionCode = proposal.startingFactionCode;
+                    if (factionCode != null) {
+                        mekhq.campaign.universe.Faction f = Factions.getInstance().getFaction(factionCode);
+                        if (f != null) {
+                            campaign.setFaction(f);
+                        }
+                    }
+                } else {
+                    campaign.setLocalDate(DEFAULT_START_DATE);
+                }
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
 
                 CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
@@ -369,16 +403,178 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Starting planet
                 Planet startingPlanet = (preset == null) ? null : preset.getPlanet();
+                
+                // AI Proposal Planet Pre-fill
+                if (startingPlanet == null && proposal != null && proposal.startingPlanetName != null) {
+                    mekhq.campaign.universe.PlanetarySystem sys = Systems.getInstance().getSystemByName(proposal.startingPlanetName, campaign.getLocalDate());
+                    if (sys != null) {
+                        startingPlanet = sys.getPrimaryPlanet();
+                    } else {
+                        LOGGER.error("AI proposed planet '" + proposal.startingPlanetName + "' was not found in the database. Using default.");
+                    }
+                }
+                
                 // If the player hasn't set a starting planet in the preset, use the default for their chosen faction
                 if (startingPlanet == null) {
                     startingPlanet = campaign.getNewCampaignStartingPlanet();
                 }
                 campaign.setStartingSystem(startingPlanet);
 
+                // region AI Initialization
+                if (proposal != null) {
+                    LOGGER.info("AIService: Starting AI initialization for campaign: " + proposal.campaignName);
+                    
+                    // 1. Finances
+                    if (proposal.startingFunds > 0) {
+                        try {
+                            campaign.getFinances().credit(
+                                TransactionType.STARTING_CAPITAL, 
+                                campaign.getLocalDate(), 
+                                Money.of((double)proposal.startingFunds), 
+                                "AI Campaign Starting Funds"
+                            );
+                            LOGGER.info("AIService: Credited " + proposal.startingFunds + " C-Bills");
+                        } catch (Exception e) {
+                            LOGGER.error("AIService: Failed to add starting funds", e);
+                        }
+                    }
+
+                    // 2. Personnel & Units
+                    boolean unitsAdded = false;
+                    if (proposal.startingUnits != null) {
+                        DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(
+                            new DefaultFactionSelector(campaign.getCampaignOptions().getRandomOriginOptions(), campaign.getFaction()), 
+                            new DefaultPlanetSelector(campaign.getCampaignOptions().getRandomOriginOptions(), campaign.getLocation().getPlanet()));
+                            
+                        for (CampaignProposal.UnitProposal up : proposal.startingUnits) {
+                            try {
+                                // Enhanced Mek lookup
+                                MekSummary summary = MekSummaryCache.getInstance().getMek(up.modelName);
+                                if (summary == null) {
+                                    // Try common variations if exact match fails
+                                     LOGGER.warn("AIService: Exact match failed for '" + up.modelName + "'. Trying robust search...");
+                                     for (MekSummary s : MekSummaryCache.getInstance().getAllMeks()) {
+                                         if (s.getName().equalsIgnoreCase(up.modelName) || 
+                                             s.getName().contains(up.modelName)) {
+                                             summary = s;
+                                             break;
+                                         }
+                                     }
+                                 }
+
+                                if (summary != null) {
+                                    Entity entity = summary.loadEntity();
+                                    if (entity != null) {
+                                        Unit unit = new Unit(entity, campaign);
+                                        Person pilot = campaign.newPerson(PersonnelRole.MEKWARRIOR, PersonnelRole.NONE, 
+                                            generator, megamek.common.enums.Gender.RANDOMIZE);
+                                        pilot.setGivenName(up.pilotName);
+                                        pilot.setSurname("");
+                                        pilot.setStatus(PersonnelStatus.ACTIVE);
+                                        
+                                        if (up.pilotSkills != null && up.pilotSkills.contains("/")) {
+                                            try {
+                                                String[] skills = up.pilotSkills.split("/");
+                                                int gunnery = Integer.parseInt(skills[0].trim());
+                                                int piloting = Integer.parseInt(skills[1].trim());
+                                                pilot.getSkills().addSkill(SkillType.S_GUN_MEK, new Skill(SkillType.getType(SkillType.S_GUN_MEK), gunnery, 0));
+                                                pilot.getSkills().addSkill(SkillType.S_PILOT_MEK, new Skill(SkillType.getType(SkillType.S_PILOT_MEK), piloting, 0));
+                                            } catch (Exception e) {
+                                                LOGGER.error("AIService: Failed to parse skills: " + up.pilotSkills);
+                                            }
+                                        }
+                                        
+                                        pilot.setCallsign("AI " + pilot.getCallsign());
+                                        pilot.setBiography(up.backstory);
+                                        
+                                        campaign.recruitPerson(pilot, true, true);
+                                        unit.addDriver(pilot);
+                                        campaign.getHangar().addUnit(unit);
+                                        unitsAdded = true;
+                                        LOGGER.info("AIService: Successfully added unit " + summary.getName() + " with pilot " + up.pilotName);
+                                    }
+                                } else {
+                                    LOGGER.error("AIService: Could not find any unit matching '" + up.modelName + "' in the database.");
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error("AIService: Error creating unit: " + up.modelName, e);
+                            }
+                        }
+                    }
+                    
+                    if (!unitsAdded) {
+                        LOGGER.warn("AIService: No units were successfully added. Adding a fallback Shadow Hawk SHD-2H.");
+                        try {
+                            MekSummary summary = MekSummaryCache.getInstance().getMek("Shadow Hawk SHD-2H");
+                            if (summary != null) {
+                                Entity entity = summary.loadEntity();
+                                Unit unit = new Unit(entity, campaign);
+                                Person pilot = campaign.newPerson(PersonnelRole.MEKWARRIOR, PersonnelRole.NONE, 
+                                    new DefaultPersonnelGenerator(new DefaultFactionSelector(campaign.getCampaignOptions().getRandomOriginOptions(), campaign.getFaction()), 
+                                    new DefaultPlanetSelector(campaign.getCampaignOptions().getRandomOriginOptions(), campaign.getLocation().getPlanet())), 
+                                    megamek.common.enums.Gender.RANDOMIZE);
+                                pilot.setStatus(PersonnelStatus.ACTIVE);
+                                campaign.recruitPerson(pilot, true, true);
+                                unit.addDriver(pilot);
+                                campaign.getHangar().addUnit(unit);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("AIService: Failed to add fallback unit", e);
+                        }
+                    }
+                    
+                    // 3. Update Unit State
+                    try {
+                        recalculateCombatTeams(campaign);
+                        campaign.getReputation().initializeReputation(campaign);
+                        LOGGER.info("AIService: Recalculated unit reputation and combat teams.");
+                    } catch (Exception e) {
+                        LOGGER.error("AIService: Failed to recalculate unit state", e);
+                    }
+
+                     // 4. Initial Mission
+                     if (proposal.initialContract != null) {
+                        try {
+                            AtBContract contract = new AtBContract("Initial AI Mission");
+                            contract.setEmployerCode(proposal.initialContract.employerCode, campaign.getGameYear());
+                            contract.setEnemyCode(proposal.initialContract.enemyCode);
+                            
+                            try {
+                                AtBContractType type = AtBContractType.valueOf(proposal.initialContract.missionType);
+                                contract.setContractType(type);
+                            } catch (IllegalArgumentException e) {
+                                contract.setContractType(AtBContractType.GARRISON_DUTY);
+                            }
+                            
+                            contract.setLength(proposal.initialContract.lengthMonths);
+                            contract.setStartAndEndDate(campaign.getLocalDate());
+                            contract.setDifficulty(proposal.initialContract.difficulty);
+                            contract.setStatus(MissionStatus.ACTIVE);
+                            contract.initContractDetails(campaign);
+                            
+                            Planet p = campaign.getLocation().getPlanet();
+                            contract.setSystemId(p != null ? p.getId() : "Unknown System");
+                            
+                            campaign.addMission(contract);
+                            LOGGER.info("AIService: Added initial mission: " + proposal.initialContract.missionType);
+                        } catch (Exception e) {
+                            LOGGER.error("AIService: Failed to setup initial contract", e);
+                        }
+                    }
+                    
+                    MekHQ.setPendingAiProposal(null);
+                    LOGGER.info("AIService: AI initialization complete.");
+                }
+                // endregion AI Initialization
+
                 // initialize reputation
-                ReputationController reputationController = new ReputationController();
-                reputationController.initializeReputation(campaign);
-                campaign.setReputation(reputationController);
+                if (campaign.getReputation() == null) {
+                    ReputationController reputationController = new ReputationController();
+                    reputationController.initializeReputation(campaign);
+                    campaign.setReputation(reputationController);
+                } else {
+                    campaign.getReputation().initializeReputation(campaign);
+                }
 
                 // initialize starting faction standings
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();

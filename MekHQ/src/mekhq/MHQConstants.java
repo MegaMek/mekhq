@@ -251,6 +251,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
     public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
+    public static final String CAMPAIGN_BACKSTORY = "campaignBackstory";
     // endregion Miscellaneous Options
     // endregion MHQOptions
 
@@ -396,4 +397,9 @@ public final class MHQConstants extends SuiteConstants {
     // Iconography
     public static final String ADDED_SINCE_LAST_DEVELOPMENT = "<span style='color:#C344C3;'>\u2605</span>";
     public static final String ADDED_SINCE_LAST_MILESTONE = "<span style='color:#7FCF43;'>\u2606</span>";
+
+    // region AI Service
+    public static final String AI_NODE = "ai";
+    public static final String AI_SERVICE_URL = "aiServiceUrl";
+    // endregion AI Service
 }

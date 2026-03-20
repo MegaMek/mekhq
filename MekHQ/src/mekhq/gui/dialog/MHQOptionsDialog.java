@@ -40,7 +40,13 @@ import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.ProxySelector;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Hashtable;
@@ -249,6 +255,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JSpinner spnStartGameBotClientDelay;
     private JSpinner spnStartGameBotClientRetryCount;
     private MMComboBox<CompanyGenerationMethod> comboDefaultCompanyGenerationMethod;
+    private JTextField txtAiServiceUrl;
+    private JButton btnTestAiConnection;
     // endregion Miscellaneous
     // endregion Variable Declarations
 
@@ -1439,6 +1447,70 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
             }
         });
 
+        final JLabel lblAiServiceUrl = new JLabel(resources.getString("lblAiServiceUrl.text"));
+        lblAiServiceUrl.setToolTipText(resources.getString("lblAiServiceUrl.toolTipText"));
+        lblAiServiceUrl.setName("lblAiServiceUrl");
+
+        txtAiServiceUrl = new JTextField(20);
+        txtAiServiceUrl.setToolTipText(resources.getString("lblAiServiceUrl.toolTipText"));
+        txtAiServiceUrl.setName("txtAiServiceUrl");
+
+        btnTestAiConnection = new JButton("Test Connection");
+        btnTestAiConnection.addActionListener(evt -> {
+            LOGGER.info("AIService: Test Connection button pressed.");
+            String url = txtAiServiceUrl.getText();
+            LOGGER.info("AIService: Testing URL: " + url);
+            
+            // Disable button during test
+            btnTestAiConnection.setEnabled(false);
+            btnTestAiConnection.setText("Testing...");
+            
+            try {
+                HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .version(HttpClient.Version.HTTP_1_1) // Use HTTP/1.1 for local servers
+                    .proxy(ProxySelector.of(null)) // Disable system proxy for local testing
+                    .build();
+                
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .header("User-Agent", "MekHQ/AI-Storyteller")
+                    .timeout(Duration.ofSeconds(30)) // Increased test timeout
+                    .POST(HttpRequest.BodyPublishers.ofString("{\"model\":\"test\", \"messages\":[{\"role\":\"user\",\"content\":\"hi\"}], \"max_tokens\":5}"))
+                    .build();
+                
+                LOGGER.info("AIService: Sending test request...");
+                client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(response -> {
+                        LOGGER.info("AIService: Test response received. Status: " + response.statusCode());
+                        SwingUtilities.invokeLater(() -> {
+                            btnTestAiConnection.setEnabled(true);
+                            btnTestAiConnection.setText("Test Connection");
+                            JOptionPane.showMessageDialog(null, 
+                                "Connection Successful!\nStatus: " + response.statusCode() + "\nResponse: " + response.body().substring(0, Math.min(200, response.body().length())),
+                                "AI Connection Test", JOptionPane.INFORMATION_MESSAGE);
+                        });
+                    })
+                    .exceptionally(ex -> {
+                        LOGGER.error("AIService: Test connection failed", ex);
+                        SwingUtilities.invokeLater(() -> {
+                            btnTestAiConnection.setEnabled(true);
+                            btnTestAiConnection.setText("Test Connection");
+                            JOptionPane.showMessageDialog(null, 
+                                "Connection Failed: " + ex.getMessage() + "\nCause: " + (ex.getCause() != null ? ex.getCause().getMessage() : "Unknown"),
+                                "AI Connection Error", JOptionPane.ERROR_MESSAGE);
+                        });
+                        return null;
+                    });
+            } catch (Exception e) {
+                LOGGER.error("AIService: Invalid URL or Client Error", e);
+                btnTestAiConnection.setEnabled(true);
+                btnTestAiConnection.setText("Test Connection");
+                JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         // Layout the UI
         JPanel body = new JPanel();
         GroupLayout layout = new GroupLayout(body);
@@ -1488,7 +1560,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             40))
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(lblDefaultCompanyGenerationMethod)
-                                                      .addComponent(comboDefaultCompanyGenerationMethod)));
+                                                      .addComponent(comboDefaultCompanyGenerationMethod))
+                                      .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                      .addComponent(lblAiServiceUrl)
+                                                      .addComponent(txtAiServiceUrl)
+                                                      .addComponent(btnTestAiConnection, 40, GroupLayout.DEFAULT_SIZE, 40)));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
@@ -1513,7 +1589,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(spnStartGameBotClientRetryCount))
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(lblDefaultCompanyGenerationMethod)
-                                                        .addComponent(comboDefaultCompanyGenerationMethod)));
+                                                        .addComponent(comboDefaultCompanyGenerationMethod))
+                                        .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(lblAiServiceUrl)
+                                                        .addComponent(txtAiServiceUrl)
+                                                        .addComponent(btnTestAiConnection, 120, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)));
 
         return body;
     }
@@ -1722,6 +1802,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options.setStartGameBotClientRetryCount((Integer) spnStartGameBotClientRetryCount.getValue());
         options
               .setDefaultCompanyGenerationMethod(Objects.requireNonNull(comboDefaultCompanyGenerationMethod.getSelectedItem()));
+        options.setAiServiceUrl(txtAiServiceUrl.getText());
 
         MekHQ.triggerEvent(new MHQOptionsChangedEvent());
     }
@@ -1732,6 +1813,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
         optionDisplayDateFormat.setText(options.getDisplayDateFormat());
         optionLongDisplayDateFormat.setText(options.getLongDisplayDateFormat());
+        txtAiServiceUrl.setText(options.getAiServiceUrl("http://127.0.0.1:1234/v1/chat/completions"));
         optionHideUnitFluff.setSelected(options.getHideUnitFluff());
         optionHistoricalDailyLog.setSelected(options.getHistoricalDailyLog());
         chkCompanyGeneratorStartup.setSelected(options.getCompanyGeneratorStartup());

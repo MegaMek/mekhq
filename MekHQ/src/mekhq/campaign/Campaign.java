@@ -347,6 +347,16 @@ public class Campaign implements ITechManager {
 
     private String name;
     private LocalDate currentDay;
+    private String backstory = "";
+
+    public String getBackstory() {
+        return backstory;
+    }
+
+    public void setBackstory(String backstory) {
+        this.backstory = backstory;
+    }
+
     private LocalDate campaignStartDate;
 
     // hierarchically structured Formation object to define TO&E
@@ -6527,6 +6537,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "id", id.toString());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "calendar", getLocalDate());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "backstory", backstory);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "retainerEmployerCode", retainerEmployerCode);

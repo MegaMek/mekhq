@@ -88,9 +88,11 @@ dependencies {
 
     implementation 'org.jfree:jfreechart:1.5.6'
 
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.20.1'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
 
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.6'
 
@@ -301,6 +303,10 @@ distributions {
                 into 'mmconf'
             }
 
+            from("${mmDir}/megamek/mmconf/milestoneReleases.yml") {
+                into 'mmconf'
+            }
+
             from("${mmDir}/megamek/build/launch4j/lib") {
                 into "lib"
             }
@@ -366,8 +372,11 @@ distributions {
             }
 
             from("${projectDir}/scripts") {
-                include 'shell.sh'
-                rename 'shell.sh', 'MekHQ.sh'
+                include 'MekHQ.sh'
+            }
+
+            from("${projectDir}/scripts") {
+                include 'MekHQ.bat'
             }
 
             from("${buildDir}/launch4j") {

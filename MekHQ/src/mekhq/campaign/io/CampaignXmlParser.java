@@ -1068,6 +1068,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     } else {
                         campaign.setName(val);
                     }
+                } else if (nodeName.equalsIgnoreCase("backstory")) {
+                    campaign.setBackstory(childNode.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("campaignStartDate")) {
                     String campaignStartDate = childNode.getTextContent().trim();
 

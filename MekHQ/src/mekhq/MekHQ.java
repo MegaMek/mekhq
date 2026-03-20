@@ -122,6 +122,9 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
+import megamek.common.event.MMEvent;
+import mekhq.service.ai.AIService;
+import mekhq.service.ai.CampaignProposal;
 import mekhq.utilities.ScenarioUtils;
 
 /**
@@ -160,6 +163,15 @@ public class MekHQ implements GameListener {
     private final IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
+    private static CampaignProposal pendingAiProposal;
+
+    public static void setPendingAiProposal(CampaignProposal proposal) {
+        pendingAiProposal = proposal;
+    }
+
+    public static CampaignProposal getPendingAiProposal() {
+        return pendingAiProposal;
+    }
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
     private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";

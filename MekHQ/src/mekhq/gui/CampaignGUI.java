@@ -743,6 +743,22 @@ public class CampaignGUI extends JPanel {
         });
         menuFile.add(miGameOptions);
 
+        final JMenuItem miAiLore = new JMenuItem("AI Campaign Lore");
+        miAiLore.setName("miAiLore");
+        miAiLore.setMnemonic(KeyEvent.VK_L);
+        miAiLore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.ALT_DOWN_MASK));
+        miAiLore.addActionListener(evt -> {
+            String lore = getCampaign().getBackstory();
+            if (lore == null || lore.isBlank()) {
+                lore = "No AI lore found for this campaign.";
+            }
+            JOptionPane.showMessageDialog(getFrame(), 
+                "<html><body style='width: 400px;'>" + lore.replace("\n", "<br>") + "</body></html>", 
+                "AI Campaign Lore", 
+                JOptionPane.INFORMATION_MESSAGE);
+        });
+        menuFile.add(miAiLore);
+
         final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
         miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
         miMMClientOptions.setName("miMMClientOptions");

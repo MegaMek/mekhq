@@ -49,6 +49,7 @@ import java.io.FilenameFilter;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -68,6 +69,8 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.storyArc.StoryArcStub;
+import mekhq.service.ai.AIService;
+import mekhq.service.ai.CampaignProposal;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
@@ -154,6 +157,58 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                     btnNewCampaign.setEnabled(true);
                 }
             });
+        });
+
+        MegaMekButton btnAiNewCampaign = new MegaMekButton("<html><center>AI CAMPAIGN<br>Storyteller</center></html>",
+              UIComponents.MainMenuButton.getComp(),
+              true);
+        btnAiNewCampaign.addActionListener(evt -> {
+            String prompt = JOptionPane.showInputDialog(getFrame(), 
+                "What kind of campaign do you want the AI to plan? (e.g. 'A ragtag mercenary group in the periphery during the Succession Wars')",
+                "AI Campaign Storyteller", 
+                JOptionPane.QUESTION_MESSAGE);
+            
+            if (prompt != null && !prompt.isBlank()) {
+                btnAiNewCampaign.setEnabled(false);
+                btnAiNewCampaign.setText("<html><center>AI WORKING...<br>Please wait</center></html>");
+                
+                AIService aiService = new AIService();
+                aiService.generateCampaign(prompt)
+                    .thenAccept(proposal -> SwingUtilities.invokeLater(() -> {
+                        LOGGER.info("Received AI campaign proposal: " + proposal.campaignName);
+                        String summary = String.format(
+                            "Campaign Name: %s\nUnit Name: %s\nStart Year: %d\nFaction: %s\nPlanet: %s\nStarting Funds: %,d C-Bills\n\nStory: %s\n\nStart this campaign?",
+                            proposal.campaignName, proposal.mercenaryUnitName != null ? proposal.mercenaryUnitName : "Unknown", 
+                            proposal.startYear, proposal.startingFactionCode, proposal.startingPlanetName, 
+                            proposal.startingFunds, proposal.backgroundStory
+                        );
+                        
+                        int choice = JOptionPane.showConfirmDialog(getFrame(), summary, "AI Campaign Proposal", JOptionPane.YES_NO_OPTION);
+                        if (choice == JOptionPane.YES_OPTION) {
+                            MekHQ.getMHQOptions().setCampaignBackstory(proposal.backgroundStory);
+                            MekHQ.setPendingAiProposal(proposal);
+                            startCampaign(null);
+                        }
+                        btnAiNewCampaign.setEnabled(true);
+                        btnAiNewCampaign.setText("<html><center>AI CAMPAIGN<br>Storyteller</center></html>");
+                    }))
+                    .exceptionally(ex -> {
+                          SwingUtilities.invokeLater(() -> {
+                              LOGGER.error("AI generation failed", ex);
+                              String errorMsg = ex.getMessage();
+                              if (ex.getCause() != null) {
+                                  errorMsg = ex.getCause().getMessage();
+                              }
+                              JOptionPane.showMessageDialog(getFrame(), 
+                                  "AI generation failed. Check if LM Studio is running.\n\nError: " + errorMsg,
+                                  "AI Error", 
+                                  JOptionPane.ERROR_MESSAGE);
+                              btnAiNewCampaign.setEnabled(true);
+                              btnAiNewCampaign.setText("<html><center>AI CAMPAIGN<br>Storyteller</center></html>");
+                          });
+                          return null;
+                      });
+            }
         });
 
         MegaMekButton btnLoadCampaign = new MegaMekButton(resources.getString("btnLoadCampaign.text"),
@@ -246,6 +301,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         btnNewCampaign.setMinimumSize(minButtonDim);
         btnNewCampaign.setPreferredSize(minButtonDim);
+        btnAiNewCampaign.setMinimumSize(minButtonDim);
+        btnAiNewCampaign.setPreferredSize(minButtonDim);
         btnLoadCampaign.setMinimumSize(minButtonDim);
         btnLoadCampaign.setPreferredSize(minButtonDim);
         btnLoadLastCampaign.setMinimumSize(minButtonDim);
@@ -288,6 +345,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         add(btnNewPlayerQuickstart, c);
         c.gridy++;
         add(btnNewCampaign, c);
+        c.gridy++;
+        add(btnAiNewCampaign, c);
         c.gridy++;
         add(btnLoadCampaign, c);
         c.gridy++;

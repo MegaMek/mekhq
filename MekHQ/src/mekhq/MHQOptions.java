@@ -504,6 +504,16 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.HEALED_INJURIES_FOREGROUND, value.getRGB());
     }
 
+    // region AI Service
+    public String getAiServiceUrl(String defaultValue) {
+        return userPreferences.node(MHQConstants.AI_NODE).get(MHQConstants.AI_SERVICE_URL, defaultValue);
+    }
+
+    public void setAiServiceUrl(String value) {
+        userPreferences.node(MHQConstants.AI_NODE).put(MHQConstants.AI_SERVICE_URL, value);
+    }
+    // endregion AI Service
+
     public Color getHealedInjuriesBackground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.HEALED_INJURIES_BACKGROUND, 0xEE9A00));
@@ -1182,6 +1192,16 @@ public final class MHQOptions extends SuiteOptions {
     public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
               .put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
+    }
+
+    public String getCampaignBackstory() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .get(MHQConstants.CAMPAIGN_BACKSTORY, "");
+    }
+
+    public void setCampaignBackstory(String backstory) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .put(MHQConstants.CAMPAIGN_BACKSTORY, backstory);
     }
     // endregion Miscellaneous Options
 }
