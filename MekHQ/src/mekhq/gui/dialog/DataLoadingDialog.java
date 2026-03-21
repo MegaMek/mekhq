@@ -526,14 +526,16 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     // 3. Update Unit State
                     try {
                         recalculateCombatTeams(campaign);
-                        campaign.getReputation().initializeReputation(campaign);
-                        LOGGER.info("AIService: Recalculated unit reputation and combat teams.");
+                        if (campaign.getReputation() != null) {
+                            campaign.getReputation().initializeReputation(campaign);
+                        }
+                        LOGGER.info("AIService: Recalculated unit state.");
                     } catch (Exception e) {
                         LOGGER.error("AIService: Failed to recalculate unit state", e);
                     }
 
-                     // 4. Initial Mission
-                     if (proposal.initialContract != null) {
+                    // 4. Initial Mission
+                    if (proposal.initialContract != null) {
                         try {
                             AtBContract contract = new AtBContract("Initial AI Mission");
                             contract.setEmployerCode(proposal.initialContract.employerCode, campaign.getGameYear());
