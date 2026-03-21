@@ -75,9 +75,11 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.FactionComboBox;
@@ -659,6 +661,20 @@ public class ContractMarketDialog extends JDialog {
             contract.setEnemyCode(proposal.enemyCode);
             contract.setDifficulty(proposal.difficulty);
             contract.setLength(proposal.lengthWeeks);
+            
+            // Set planet
+            Planet targetPlanet = null;
+            if (proposal.planetName != null && !proposal.planetName.isBlank()) {
+                mekhq.campaign.universe.PlanetarySystem sys = Systems.getInstance().getSystemByName(proposal.planetName, campaign.getLocalDate());
+                if (sys != null) {
+                    targetPlanet = sys.getPrimaryPlanet();
+                }
+            }
+            
+            if (targetPlanet == null) {
+                targetPlanet = campaign.getCurrentSystem().getPrimaryPlanet();
+            }
+            contract.setSystemId(targetPlanet.getId());
             
             // Basic initialization
             contract.initContractDetails(campaign);

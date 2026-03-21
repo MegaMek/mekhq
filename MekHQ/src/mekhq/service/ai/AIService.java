@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -51,9 +53,10 @@ public class AIService {
         "ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID, RETAINER, SABOTAGE, TERRORISM.\n\n" +
         "OUTPUT INSTRUCTIONS:\n" +
         "1. Respond ONLY with a single valid JSON object.\n" +
-        "2. DO NOT include any 'Thinking Process', reasoning, preamble, or post-script text.\n" +
-        "3. DO NOT use markdown code blocks (no ```json).\n" +
-        "4. If you fail to follow these instructions, the system will crash.";
+        "2. DO NOT include any comments (// or /*) inside the JSON.\n" +
+        "3. DO NOT include any 'Thinking Process', reasoning, preamble, or post-script text.\n" +
+        "4. DO NOT use markdown code blocks (no ```json).\n" +
+        "5. If you fail to follow these instructions, the system will crash.";
 
     public AIService() {
         this.httpClient = HttpClient.newBuilder()
@@ -61,14 +64,20 @@ public class AIService {
             .version(HttpClient.Version.HTTP_1_1) // Use HTTP/1.1 for local servers
             .proxy(ProxySelector.of(null)) // Disable system proxy for local AI service
             .build();
-        this.objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper = JsonMapper.builder()
+            .enable(JsonParser.Feature.ALLOW_COMMENTS)
+            .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+            .enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+            .enable(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER)
+            .enable(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .build();
     }
 
     public CompletableFuture<MissionProposal> generateMission(String userPrompt, String context) {
         String fullPrompt = "Context: " + context + "\n\nUser Request: " + userPrompt + 
             "\n\nGenerate a mission proposal in JSON format with the following fields: " +
-            "title, briefing (narrative), missionType (one of the enums), employerCode, enemyCode, difficulty (1-10), lengthWeeks.";
+            "title, briefing (narrative), missionType (one of the enums), employerCode, enemyCode, planetName (canon planet name), difficulty (1-10), lengthWeeks.";
 
         return callLLM(fullPrompt, MissionProposal.class);
     }
@@ -122,6 +131,7 @@ public class AIService {
                     }
                     try {
                         String body = response.body();
+                        LOGGER.debug("AIService: Received raw response: " + body);
                         ChatResponse chatResponse = objectMapper.readValue(body, ChatResponse.class);
                         if (chatResponse.choices == null || chatResponse.choices.isEmpty()) {
                             return CompletableFuture.failedFuture(new RuntimeException("No choices returned from LLM"));
@@ -136,10 +146,11 @@ public class AIService {
                         }
 
                         if (jsonContent == null) {
+                            LOGGER.error("AIService: No valid JSON found in response. Content: " + content);
                             throw new RuntimeException("No valid JSON structure found");
                         }
-                        
-                        return CompletableFuture.completedFuture(objectMapper.readValue(jsonContent, responseType));
+
+                        return CompletableFuture.completedFuture(objectMapper.readValue(jsonContent.trim(), responseType));
                     } catch (Exception e) {
                         return CompletableFuture.failedFuture(e);
                     }
@@ -160,7 +171,11 @@ public class AIService {
         }
     }
 
-    private String extractJson(String text) {
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    String extractJson(String text) {
         if (text == null || text.isBlank()) {
             return null;
         }
