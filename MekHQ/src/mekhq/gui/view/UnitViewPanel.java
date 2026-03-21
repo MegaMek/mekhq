@@ -38,6 +38,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Panel;
 import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -252,7 +253,8 @@ public class UnitViewPanel extends JScrollablePanel {
         txtTech.setText(TechConstants.getLevelDisplayableName(entity.getTechLevel()));
         pnlStats.add(txtTech, valueConstraints);
 
-        labelConstraints.gridy++; valueConstraints.gridy++;
+        labelConstraints.gridy++;
+        valueConstraints.gridy++;
 
         JLabel lblTonnage = new JLabel();
         lblTonnage.setName("lblTonnage1");
@@ -264,7 +266,8 @@ public class UnitViewPanel extends JScrollablePanel {
         txtTonnage.setText(Double.toString(entity.getWeight()));
         pnlStats.add(txtTonnage, valueConstraints);
 
-        labelConstraints.gridy++; valueConstraints.gridy++;
+        labelConstraints.gridy++;
+        valueConstraints.gridy++;
 
         JLabel lblBV = new JLabel();
         lblBV.setName("lblBV1");
@@ -276,7 +279,8 @@ public class UnitViewPanel extends JScrollablePanel {
         txtBV.setText(Integer.toString(entity.calculateBattleValue(true, true)));
         pnlStats.add(txtBV, valueConstraints);
 
-        labelConstraints.gridy++; valueConstraints.gridy++;
+        labelConstraints.gridy++;
+        valueConstraints.gridy++;
 
         JLabel lblCost = new JLabel();
         lblCost.setName("lblCost1");
@@ -288,7 +292,8 @@ public class UnitViewPanel extends JScrollablePanel {
         txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
         pnlStats.add(txtCost, valueConstraints);
 
-        labelConstraints.gridy++; valueConstraints.gridy++;
+        labelConstraints.gridy++;
+        valueConstraints.gridy++;
 
         if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
             JLabel lblQuirk = new JLabel();
@@ -296,14 +301,23 @@ public class UnitViewPanel extends JScrollablePanel {
             lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
             pnlStats.add(lblQuirk, labelConstraints);
 
-            for (IOption quirk: unit.getQuirks()) {
+            for (IOption quirk : unit.getQuirks()) {
                 JLabel label = new JLabel(quirk.getDisplayableNameWithValue());
                 label.setToolTipText(MultiLineTooltip.splitToolTip(quirk.getDescription()));
                 label.setName("quirk"+quirk.getName());
                 pnlStats.add(label, valueConstraints);
 
-                labelConstraints.gridy++; valueConstraints.gridy++;
+                labelConstraints.gridy++;
+                valueConstraints.gridy++;
             }
         }
+
+        // Add a dummy element at the end of the panel with a non-zero weighty
+        // to soak up any additional vertical space: Otherwise, the components
+        // will clump in the center of the panel.
+        GridBagConstraints dummyConstraints = new GridBagConstraints();
+        dummyConstraints.gridwidth = 2;
+        dummyConstraints.weighty = 1.0;
+        pnlStats.add(new Panel(), dummyConstraints);
     }
 }

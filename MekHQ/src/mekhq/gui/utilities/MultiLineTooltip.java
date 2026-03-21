@@ -32,7 +32,7 @@
  */
 package mekhq.gui.utilities;
 
-import megamek.utilities.StringUtils;
+import megamek.common.util.StringUtil;
 
 /**
  * This class splits a tooltip into multiple lines in order to wrap it.
@@ -70,6 +70,6 @@ public class MultiLineTooltip {
         if (tip.length() <= length + SPACE_BUFFER) {
             return tip;
         }
-        return StringUtils.wrapLines(tip, length);
+        return StringUtil.wrapLines(tip, length);
     }
 }

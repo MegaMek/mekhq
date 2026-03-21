@@ -3110,7 +3110,7 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * @return a html-coded list that says what quirks are enabled for this unit, or null if no quirks are enabled.
+     * @return an HTML-coded list that says what quirks are enabled for this unit, or null if no quirks are enabled.
      */
     public @Nullable String getQuirksListHTML() {
         List<IOption> quirks = getQuirks();
@@ -3120,7 +3120,7 @@ public class Unit implements ITechnology {
 
         StringBuilder quirkString = new StringBuilder("<html>");
         quirkString.append(quirks.get(0).getDisplayableNameWithValue());
-        for (int i=1; i<quirks.size(); i++) {
+        for (int i = 1; i < quirks.size(); i++) {
             quirkString.append("<br/>");
             quirkString.append(quirks.get(i).getDisplayableNameWithValue());
         }

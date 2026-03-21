@@ -32,19 +32,19 @@
  */
 package mekhq.campaign.unit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for the quirk-related functions of Unit
@@ -79,7 +79,7 @@ public class UnitQuirksTest {
     }
 
     @Test
-    void TestGetQuirksListHTML() {
+    void testGetQuirksListHTML() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(true);
 
@@ -91,12 +91,13 @@ public class UnitQuirksTest {
 
         assertEquals(
               "<html>Battle Fists (LA)<br/>Battle Fists (RA)<br/>Ubiquitous (Clans)<br/>Rugged (1 Point)<br/>" +
-                           "Ubiquitous (Inner Sphere)</html>",
+                    "Ubiquitous (Inner Sphere)</html>",
               quirksList
         );
     }
+
     @Test
-    void TestGetQuirksListHTMLEmptyWhenQuirksOff() {
+    void testGetQuirksListHTMLEmptyWhenQuirksOff() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).setValue(false);
 

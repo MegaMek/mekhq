@@ -66,7 +66,6 @@ import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLifeSupport;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
-import mekhq.campaign.personnel.ranks.Ranks;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -83,7 +82,6 @@ class PartsInUseManagerTest {
 
         @BeforeAll
         public static void beforeAll() {
-            Ranks.initializeRankSystems();
             campaign = MHQTestUtilities.getTestCampaign();
         }
 
@@ -286,8 +284,6 @@ class PartsInUseManagerTest {
 
             @BeforeAll
             static public void beforeAll() {
-                Ranks.initializeRankSystems();
-
                 campaign = MHQTestUtilities.getTestCampaign();
                 mockCampaignOptions = mock(CampaignOptions.class);
                 campaign.setCampaignOptions(mockCampaignOptions);
