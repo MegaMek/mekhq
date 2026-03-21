@@ -87,6 +87,7 @@ import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.*;
 import megamek.common.equipment.enums.FuelType;
+import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ILocationExposureStatus;
 import megamek.common.interfaces.ITechnology;
@@ -3109,28 +3110,32 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * @return a html-coded list that says what quirks are enabled for this unit
+     * @return a html-coded list that says what quirks are enabled for this unit, or null if no quirks are enabled.
      */
-    public @Nullable String getQuirksList() {
-        StringBuilder quirkString = new StringBuilder();
-        boolean first = true;
-        if (null != getEntity().getGame() && getEntity().getGame().getOptions().booleanOption("stratops_quirks")) {
-            for (Enumeration<IOptionGroup> i = getEntity().getQuirks().getGroups(); i.hasMoreElements(); ) {
-                IOptionGroup group = i.nextElement();
-                for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                    IOption quirk = j.nextElement();
-                    if (quirk.booleanValue()) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            quirkString.append("<br>");
-                        }
-                        quirkString.append(quirk.getDisplayableNameWithValue());
-                    }
-                }
-            }
+    public @Nullable String getQuirksListHTML() {
+        List<IOption> quirks = getQuirks();
+        if (quirks.isEmpty()) {
+            return null;
         }
-        return quirkString.toString().isBlank() ? null : "<html>" + quirkString + "</html>";
+
+        StringBuilder quirkString = new StringBuilder("<html>");
+        quirkString.append(quirks.get(0).getDisplayableNameWithValue());
+        for (int i=1; i<quirks.size(); i++) {
+            quirkString.append("<br/>");
+            quirkString.append(quirks.get(i).getDisplayableNameWithValue());
+        }
+        quirkString.append("</html>");
+        return quirkString.toString();
+    }
+
+    public List<IOption> getQuirks() {
+        Game game = entity.getGame();
+        if (game != null && game.getOptions().booleanOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS)) {
+            return entity.getQuirks().activeQuirks();
+        } else {
+            // Not using quirks at all.
+            return List.of();
+        }
     }
 
     /**
