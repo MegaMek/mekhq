@@ -84,9 +84,11 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -552,10 +554,34 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                             contract.setStartAndEndDate(campaign.getLocalDate());
                             contract.setDifficulty(proposal.initialContract.difficulty);
                             contract.setStatus(MissionStatus.ACTIVE);
+                            contract.setDesc(proposal.backgroundStory); // Mission description
+                            
+                            // Initialize contract parameters (salvage, overhead, etc.) to avoid 0-pay
+                            contract.setSalvagePct(50);
+                            contract.setBattleLossComp(50);
+                            contract.setTransportComp(50);
+                            contract.setStraightSupport(50);
+                            contract.setAdvancePct(25);
+                            contract.setMRBCFee(true);
+                            
                             contract.initContractDetails(campaign);
+                            contract.calculateContract(campaign);
                             
                             Planet p = campaign.getLocation().getPlanet();
-                            contract.setSystemId(p != null ? p.getId() : "Unknown System");
+                            if (p != null && p.getParentSystem() != null) {
+                                contract.setSystemId(p.getParentSystem().getId());
+                            } else {
+                                contract.setSystemId("Unknown System");
+                            }
+                            
+                            // Add a starting scenario
+                            AtBDynamicScenario scenario = new AtBDynamicScenario();
+                            scenario.setName("The Opening Engagement");
+                            scenario.setDesc("This is your first combat action in the " + proposal.campaignName + " campaign. " +
+                                            "Prepare your units and deploy to the mission zone.");
+                            scenario.setDate(campaign.getLocalDate());
+                            scenario.setStatus(ScenarioStatus.CURRENT);
+                            contract.addScenario(scenario);
                             
                             campaign.addMission(contract);
                             LOGGER.info("AIService: Added initial mission: " + proposal.initialContract.missionType);

@@ -122,7 +122,8 @@ public class Mission {
     }
 
     public String getSystemId() {
-        return getSystem().getId();
+        PlanetarySystem system = getSystem();
+        return system != null ? system.getId() : systemId;
     }
 
     public void setSystemId(String n) {

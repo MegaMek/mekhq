@@ -72,8 +72,10 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -674,10 +676,15 @@ public class ContractMarketDialog extends JDialog {
             if (targetPlanet == null) {
                 targetPlanet = campaign.getCurrentSystem().getPrimaryPlanet();
             }
-            contract.setSystemId(targetPlanet.getId());
+            if (targetPlanet != null && targetPlanet.getParentSystem() != null) {
+                contract.setSystemId(targetPlanet.getParentSystem().getId());
+            } else {
+                contract.setSystemId("Unknown System");
+            }
             
             // Basic initialization
             contract.initContractDetails(campaign);
+            contract.setDesc(proposal.briefing); // Mission description
             contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
             contract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
                                                (Integer) spnSharePct.getValue() :
@@ -688,6 +695,14 @@ public class ContractMarketDialog extends JDialog {
             contract.setSigningBonusPct(signingBonus);
             contract.calculateContract(campaign);
             
+            // Add a starting scenario
+            AtBDynamicScenario scenario = new AtBDynamicScenario();
+            scenario.setName("Opening Engagement: " + proposal.title);
+            scenario.setDesc(proposal.briefing);
+            scenario.setDate(campaign.getLocalDate());
+            scenario.setStatus(ScenarioStatus.CURRENT);
+            contract.addScenario(scenario);
+            
             contractMarket.getContracts().add(contract);
             
             // Update UI table
@@ -695,10 +710,15 @@ public class ContractMarketDialog extends JDialog {
             row.add(contract.getEmployerName(campaign.getGameYear()));
             row.add(contract.getEnemyName(campaign.getGameYear()));
             row.add(contract.getContractType().toString());
-            final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
-            final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getLocation().getTransitTime(), false)); // Assume no command circuit for simplicity
+            
+            int days = 0;
+            if (contract.getSystem() != null) {
+                final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
+                days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
+                      campaign.getLocation().getTransitTime(), false)); // Assume no command circuit for simplicity
+            }
             row.add(Integer.toString(days));
+            
             row.add(String.valueOf(contract.getLength()));
             row.add(contract.getTransportCompString());
             row.add(contract.getSalvagePctString());

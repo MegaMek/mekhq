@@ -131,49 +131,51 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
         } else if (col == COL_STATUS) {
             if (campaign.getCampaignOptions().isUseStratCon() && scenario instanceof AtBScenario) {
                 AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
-                      (AtBScenario) scenario);
+                if (contract != null) {
+                    StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                          (AtBScenario) scenario);
 
-                if (stratconScenario != null) {
-                    // Determine attributes of the scenario
-                    boolean isStrategic = stratconScenario.isStrategicObjective();
-                    boolean isTurningPoint = stratconScenario.isTurningPoint();
-                    boolean isCrisis = scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial();
-                    boolean isDual = scenario.getStratConScenarioType().isOfficialChallenge();
+                    if (stratconScenario != null) {
+                        // Determine attributes of the scenario
+                        boolean isStrategic = stratconScenario.isStrategicObjective();
+                        boolean isTurningPoint = stratconScenario.isTurningPoint();
+                        boolean isCrisis = scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial();
+                        boolean isDual = scenario.getStratConScenarioType().isOfficialChallenge();
 
-                    // Set the opening span color based on scenario type (Strategic, Crisis, or Turning Point)
-                    String openingSpan = "";
-                    if (isCrisis || isStrategic || isDual) {
-                        openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
-                    } else if (isTurningPoint) {
-                        openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+                        // Set the opening span color based on scenario type (Strategic, Crisis, or Turning Point)
+                        String openingSpan = "";
+                        if (isCrisis || isStrategic || isDual) {
+                            openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
+                        } else if (isTurningPoint) {
+                            openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+                        }
+
+                        // Generate an appropriate label
+                        String scenarioSeverityText;
+                        if (isStrategic) {
+                            scenarioSeverityText = resources.getString("col_status.strategic");
+                        } else if (isTurningPoint) {
+                            scenarioSeverityText = resources.getString("col_status.turningPoint");
+                        } else if (isCrisis) {
+                            scenarioSeverityText = resources.getString("col_status.crisis");
+                        } else if (isDual) {
+                            scenarioSeverityText = resources.getString("col_status.dual");
+                        } else {
+                            scenarioSeverityText = "";
+                        }
+
+                        // Add closing span tag if there is an opening span
+                        String closingSpan = openingSpan.isEmpty() ? "" : CLOSING_SPAN_TAG;
+
+                        // Wrap in HTML and include bold formatting for accessibility
+                        return String.format(
+                              "<html>%s%s<b> %s</b>%s</html>",
+                              scenario.getStatus().toString(),
+                              openingSpan,
+                              scenarioSeverityText,
+                              closingSpan
+                        );
                     }
-
-                    // Generate an appropriate label
-                    String scenarioSeverityText;
-                    if (isStrategic) {
-                        scenarioSeverityText = resources.getString("col_status.strategic");
-                    } else if (isTurningPoint) {
-                        scenarioSeverityText = resources.getString("col_status.turningPoint");
-                    } else if (isCrisis) {
-                        scenarioSeverityText = resources.getString("col_status.crisis");
-                    } else if (isDual) {
-                        scenarioSeverityText = resources.getString("col_status.dual");
-                    } else {
-                        scenarioSeverityText = "";
-                    }
-
-                    // Add closing span tag if there is an opening span
-                    String closingSpan = openingSpan.isEmpty() ? "" : CLOSING_SPAN_TAG;
-
-                    // Wrap in HTML and include bold formatting for accessibility
-                    return String.format(
-                          "<html>%s%s<b> %s</b>%s</html>",
-                          scenario.getStatus().toString(),
-                          openingSpan,
-                          scenarioSeverityText,
-                          closingSpan
-                    );
                 }
             }
 
@@ -190,18 +192,20 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario) {
                     AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                    StratConCampaignState campaignState = contract.getStratconCampaignState();
-                    StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
-                          ((AtBScenario) scenario));
+                    if (contract != null) {
+                        StratConCampaignState campaignState = contract.getStratconCampaignState();
+                        StratConScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                              ((AtBScenario) scenario));
 
-                    if (campaignState != null && stratconScenario != null) {
-                        StratConTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
-                        StratConCoords coords = stratconScenario.getCoords();
+                        if (campaignState != null && stratconScenario != null) {
+                            StratConTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
+                            StratConCoords coords = stratconScenario.getCoords();
 
-                        if (coords == null) {
-                            return track.getDisplayableName();
-                        } else {
-                            return track.getDisplayableName() + '-' + coords.toBTString();
+                            if (coords == null) {
+                                return track.getDisplayableName();
+                            } else {
+                                return track.getDisplayableName() + '-' + coords.toBTString();
+                            }
                         }
                     }
                 }
