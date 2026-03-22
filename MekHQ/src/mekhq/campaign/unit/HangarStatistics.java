@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,18 +35,21 @@ package mekhq.campaign.unit;
 
 import java.util.HashMap;
 
-import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.BayType;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.units.*;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 
 /**
  * Provides methods to gather statistics on units in a hangar.
  */
 public class HangarStatistics {
+    private static final MMLogger logger = MMLogger.create(HangarStatistics.class);
+
     private final Hangar hangar;
-    private final long LIGHT_VEHICLE_BIT = 1L << 62;
-    private final long SUPER_HEAVY_BIT = 1L << 63;
+    private static final long LIGHT_VEHICLE_BIT = 1L << 62;
+    private static final long SUPER_HEAVY_BIT = 1L << 63;
 
     public HangarStatistics(Hangar hangar) {
         this.hangar = hangar;
@@ -99,52 +102,62 @@ public class HangarStatistics {
                 continue;
             }
             if (unit.isMothballed()) {
-                hashMap.put((long) Unit.ETYPE_MOTHBALLED, hashMap.getOrDefault((long) Unit.ETYPE_MOTHBALLED, 0) + 1);
+                hashMap.merge((long) Unit.ETYPE_MOTHBALLED, 1, Integer::sum);
                 continue;
             }
 
             Entity en = unit.getEntity();
 
-            // Can be expanded to account for arbitrary types of transportable units.
+            // Non-transportable unit types that are tracked for other reporting purposes
             if (en instanceof GunEmplacement) {
-                hashMap.put(Entity.ETYPE_GUN_EMPLACEMENT, hashMap.getOrDefault(Entity.ETYPE_GUN_EMPLACEMENT, 0) + 1);
+                hashMap.merge(Entity.ETYPE_GUN_EMPLACEMENT, 1, Integer::sum);
             } else if (en instanceof FighterSquadron) {
-                hashMap.put(Entity.ETYPE_FIGHTER_SQUADRON, hashMap.getOrDefault(Entity.ETYPE_FIGHTER_SQUADRON, 0) + 1);
+                hashMap.merge(Entity.ETYPE_FIGHTER_SQUADRON, 1, Integer::sum);
             } else if (en instanceof Jumpship) {
-                hashMap.put(Entity.ETYPE_JUMPSHIP, hashMap.getOrDefault(Entity.ETYPE_JUMPSHIP, 0) + 1);
-            } else if (en instanceof Mek) {
-                hashMap.put(Entity.ETYPE_MEK, hashMap.getOrDefault(Entity.ETYPE_MEK, 0) + 1);
+                hashMap.merge(Entity.ETYPE_JUMPSHIP, 1, Integer::sum);
             } else if (en instanceof Dropship) {
-                hashMap.put(Entity.ETYPE_DROPSHIP, hashMap.getOrDefault(Entity.ETYPE_DROPSHIP, 0) + 1);
-            } else if (en instanceof SmallCraft) {
-                hashMap.put(Entity.ETYPE_SMALL_CRAFT, hashMap.getOrDefault(Entity.ETYPE_SMALL_CRAFT, 0) + 1);
-            } else if (en instanceof ConvFighter) {
-                hashMap.put(Entity.ETYPE_CONV_FIGHTER, hashMap.getOrDefault(Entity.ETYPE_CONV_FIGHTER, 0) + 1);
-            } else if (en instanceof AeroSpaceFighter) {
-                hashMap.put(Entity.ETYPE_AEROSPACE_FIGHTER,
-                      hashMap.getOrDefault(Entity.ETYPE_AEROSPACE_FIGHTER, 0) + 1);
-            } else if ((en instanceof Infantry) && !(en instanceof BattleArmor)) {
-                hashMap.put(Entity.ETYPE_INFANTRY, hashMap.getOrDefault(Entity.ETYPE_INFANTRY, 0) + 1);
-            } else if (en instanceof BattleArmor) {
-                hashMap.put(Entity.ETYPE_BATTLEARMOR, hashMap.getOrDefault(Entity.ETYPE_BATTLEARMOR, 0) + 1);
-            } else if (en instanceof Tank) {
-                // Split Tank into three indices, to match the two currently supported bay types and SH.
-                double weight = en.getWeight();
-                if (weight <= 50.0) {
-                    hashMap.put(Entity.ETYPE_TANK | LIGHT_VEHICLE_BIT,
-                          hashMap.getOrDefault(Entity.ETYPE_TANK | LIGHT_VEHICLE_BIT, 0) + 1);
-                } else if (weight > 50.0 && weight <= 100.0) {
-                    hashMap.put(Entity.ETYPE_TANK, hashMap.getOrDefault(Entity.ETYPE_TANK, 0) + 1);
-                } else {
-                    hashMap.put(Entity.ETYPE_TANK | SUPER_HEAVY_BIT,
-                          hashMap.getOrDefault(Entity.ETYPE_TANK | SUPER_HEAVY_BIT, 0) + 1);
+                hashMap.merge(Entity.ETYPE_DROPSHIP, 1, Integer::sum);
+            } else {
+                // For all other units, use BayType to determine the correct transport bay category.
+                // This delegates to MegaMek's canonical entity-to-bay mapping, ensuring fighters
+                // (ASF, Conventional, Fixed-Wing Support) are all correctly categorized together.
+                BayType bayType = BayType.getTypeForEntity(en);
+                if (bayType != null) {
+                    long key = bayTypeToKey(bayType);
+                    if (key >= 0) {
+                        hashMap.merge(key, 1, Integer::sum);
+                    }
                 }
-            } else if (en instanceof ProtoMek) {
-                hashMap.put(Entity.ETYPE_PROTOMEK, hashMap.getOrDefault(Entity.ETYPE_PROTOMEK, 0) + 1);
             }
         }
 
         return hashMap;
+    }
+
+    /**
+     * Maps a {@link BayType} to the ETYPE-based key used in the tally map. Returns {@code -1L} and logs a warning
+     * for any unhandled bay type so that new types added to MegaMek fail visibly rather than being silently counted.
+     *
+     * @param bayType the bay type to map
+     *
+     * @return the corresponding ETYPE key for the tally map, or {@code -1L} if the bay type is not mapped
+     */
+    private static long bayTypeToKey(BayType bayType) {
+        return switch (bayType) {
+            case MEK -> Entity.ETYPE_MEK;
+            case FIGHTER -> Entity.ETYPE_AEROSPACE_FIGHTER;
+            case PROTOMEK -> Entity.ETYPE_PROTOMEK;
+            case SMALL_CRAFT -> Entity.ETYPE_SMALL_CRAFT;
+            case VEHICLE_LIGHT -> Entity.ETYPE_TANK | LIGHT_VEHICLE_BIT;
+            case VEHICLE_HEAVY -> Entity.ETYPE_TANK;
+            case VEHICLE_SH -> Entity.ETYPE_TANK | SUPER_HEAVY_BIT;
+            case INFANTRY_FOOT, INFANTRY_JUMP, INFANTRY_MOTORIZED, INFANTRY_MECHANIZED -> Entity.ETYPE_INFANTRY;
+            case BATTLEARMOR_IS, BATTLEARMOR_CLAN, BATTLEARMOR_CS -> Entity.ETYPE_BATTLEARMOR;
+            default -> {
+                logger.warn("Unmapped BayType in transport tally: {}", bayType);
+                yield -1L;
+            }
+        };
     }
 
     public int getNumberOfUnitsByType(long type, boolean inTransit, boolean lv) {

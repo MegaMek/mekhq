@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -733,9 +733,7 @@ public class TransportCostCalculations {
                     smallCraftCount++;
                 } else if (entity.isMek()) {
                     mekCount++;
-                } else if (entity.isAerospaceFighter() ||
-                                 entity.isConventionalFighter() ||
-                                 entity.isFixedWingSupport()) {
+                } else if (entity.isFighter()) {
                     asfCount++;
                 } else if (entity.isProtoMek()) {
                     protoMekCount++;
