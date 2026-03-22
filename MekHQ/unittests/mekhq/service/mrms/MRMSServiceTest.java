@@ -33,6 +33,7 @@
 package mekhq.service.mrms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -918,7 +919,7 @@ public class MRMSServiceTest {
             when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
 
             Entity entity = getUrbanMek();
-            assert entity != null;
+            assertNotNull(entity);
             unit = new Unit(entity, mockCampaign);
             unit.initializeParts(true);
         }
@@ -940,7 +941,7 @@ public class MRMSServiceTest {
                   .filter(p -> p instanceof AmmoBin)
                   .map(p -> (AmmoBin) p)
                   .toList();
-            assert !ammoBins.isEmpty() : "UrbanMech should have ammo bins";
+            assertFalse(ammoBins.isEmpty(), "UrbanMech should have ammo bins");
 
             for (AmmoBin ammoBin : ammoBins) {
                 ammoBin.setShotsNeeded(ammoBin.getFullShots());
