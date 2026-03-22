@@ -180,7 +180,7 @@ public record Quartermaster(Campaign campaign) {
     public void addAmmo(AmmoType ammoType, int shots) {
         Objects.requireNonNull(ammoType);
 
-        if (shots >= 0) {
+        if (shots > 0) {
             addPart(new AmmoStorage(0, ammoType, shots, campaign()), 0);
         }
     }
@@ -196,7 +196,7 @@ public record Quartermaster(Campaign campaign) {
         Objects.requireNonNull(ammoType);
         Objects.requireNonNull(infantryWeapon);
 
-        if (shots >= 0) {
+        if (shots > 0) {
             addPart(new InfantryAmmoStorage(0, ammoType, shots, infantryWeapon, campaign()), 0);
         }
     }
@@ -241,7 +241,13 @@ public record Quartermaster(Campaign campaign) {
      * @return The number of shots removed.
      */
     private int removeAmmo(@Nullable AmmoStorage ammoStorage, int shotsNeeded) {
-        if ((ammoStorage == null) || (ammoStorage.getShots() == 0)) {
+        if (ammoStorage == null) {
+            return 0;
+        }
+
+        if (ammoStorage.getShots() == 0) {
+            // Clean up empty AmmoStorage that shouldn't exist in the warehouse
+            getWarehouse().removePart(ammoStorage);
             return 0;
         }
 

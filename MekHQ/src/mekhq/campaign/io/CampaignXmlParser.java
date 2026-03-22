@@ -699,6 +699,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
         for (Part part : campaign.getWarehouse().getParts()) {
+            // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
+            if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
+                LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
+                continue;
+            }
+
             // < 50.08 compatibility handler
             if (part instanceof SVArmor svArmor) {
                 final int PROHIBITED_BAR_RATING = 0;

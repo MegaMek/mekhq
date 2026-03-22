@@ -519,6 +519,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return (shotsNeeded > 0) || ammoTypeChanged();
     }
 
+    /**
+     * Checks whether ammo of the needed type is available in the warehouse.
+     *
+     * @return {@code true} if the warehouse has at least one shot of the required ammo type.
+     */
+    public boolean isAmmoAvailable() {
+        return getCampaign().getQuartermaster().getAmmoAvailable(getType()) > 0;
+    }
+
     @Override
     public String getDesc() {
         if (isSalvaging()) {

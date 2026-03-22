@@ -977,15 +977,6 @@ public class MRMSService {
 
         debugLog("Ending after %s ns", "repairPart", System.nanoTime() - repairPartTime);
 
-        // AmmoBin repairs always complete instantly (AUTOMATIC_SUCCESS). If the bin
-        // still needs fixing after the repair attempt, it means the warehouse ran out
-        // of ammo. Don't count this as a successful repair — otherwise the outer
-        // while-loop in performUnitMRMS will keep retrying and generate thousands
-        // of futile actions (see GitHub #7414).
-        if ((partWork instanceof AmmoBin) && partWork.needsFixing() && !partWork.isBeingWorkedOn()) {
-            return MRMSPartAction.createNoTechs(partWork);
-        }
-
         return MRMSPartAction.createRepaired(partWork);
     }
 
@@ -1050,6 +1041,10 @@ public class MRMSService {
             }
 
             if (!checkArmorSupply(partWork)) {
+                continue;
+            }
+
+            if (!checkAmmoSupply(partWork)) {
                 continue;
             }
 
@@ -1166,6 +1161,22 @@ public class MRMSService {
         }
 
         return (!(part instanceof Armor)) || ((Armor) part).isInSupply();
+    }
+
+    /**
+     * Checks whether an AmmoBin has ammo available in the warehouse.
+     * Non-AmmoBin parts always pass. Salvaging parts always pass.
+     *
+     * @param part The part to check.
+     *
+     * @return {@code true} if the part is not an AmmoBin, or if ammo is available.
+     */
+    private static boolean checkAmmoSupply(IPartWork part) {
+        if (part.isSalvaging()) {
+            return true;
+        }
+
+        return (!(part instanceof AmmoBin)) || ((AmmoBin) part).isAmmoAvailable();
     }
 
     private static WorkTimeCalculation calculateNewMRMSWorktime(IPartWork partWork, Person tech, MRMSOption mrmsOption,
