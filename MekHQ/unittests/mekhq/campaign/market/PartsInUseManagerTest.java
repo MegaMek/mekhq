@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +56,9 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -730,6 +732,150 @@ class PartsInUseManagerTest {
 
                 return stockPercents;
             }
+        }
+    }
+
+    /**
+     * Tests for {@link PartsInUseManager#updatePartInUse} to verify that refit-reserved parts
+     * are counted as in-use rather than stored.
+     */
+    @Nested
+    public class TestUpdatePartInUseData {
+        static Campaign campaign;
+        static PartsInUseManager partsInUseManager;
+        static Method method;
+
+        @BeforeAll
+        public static void beforeAll() {
+            Ranks.initializeRankSystems();
+            campaign = MHQTestUtilities.getTestCampaign();
+            partsInUseManager = new PartsInUseManager(campaign);
+
+            try {
+                method = PartsInUseManager.class.getDeclaredMethod(
+                      "updatePartInUseData", PartInUse.class, Part.class, boolean.class, PartQuality.class);
+                method.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private PartInUse createPartInUse() {
+            PartInUse piu = mock(PartInUse.class);
+            // Use real accessors backed by an int holder via delegation
+            // Simpler: just use a real wrapper approach
+            return piu;
+        }
+
+        @Test
+        public void testSparePartCountedAsStored() throws Exception {
+            // Arrange: a spare part with quantity 10, not reserved
+            Part spare = mock(Part.class);
+            when(spare.getUnit()).thenReturn(null);
+            when(spare.isPresent()).thenReturn(true);
+            when(spare.isReservedForRefit()).thenReturn(false);
+            when(spare.getQuantity()).thenReturn(10);
+            when(spare.getQuantityForPartsInUse()).thenReturn(10);
+            when(spare.getQuality()).thenReturn(PartQuality.QUALITY_D);
+
+            PartInUse partInUse = mock(PartInUse.class);
+            int[] useCount = {0};
+            int[] storeCount = {0};
+            when(partInUse.getUseCount()).thenAnswer(inv -> useCount[0]);
+            when(partInUse.getStoreCount()).thenAnswer(inv -> storeCount[0]);
+            // setUseCount / setStoreCount capture the values
+            org.mockito.Mockito.doAnswer(inv -> { useCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setUseCount(org.mockito.ArgumentMatchers.anyInt());
+            org.mockito.Mockito.doAnswer(inv -> { storeCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setStoreCount(org.mockito.ArgumentMatchers.anyInt());
+
+            // Act
+            method.invoke(partsInUseManager, partInUse, spare, false, PartQuality.QUALITY_A);
+
+            // Assert: spare should add to stored count, not in-use
+            assertEquals(0, useCount[0], "Spare part should not count as in-use");
+            assertEquals(10, storeCount[0], "Spare part with qty=10 should count as 10 stored");
+        }
+
+        @Test
+        public void testRefitReservedPartCountedAsInUse() throws Exception {
+            // Arrange: a part reserved for refit with quantity 1
+            Part reserved = mock(Part.class);
+            when(reserved.getUnit()).thenReturn(null);
+            when(reserved.isPresent()).thenReturn(true);
+            when(reserved.isReservedForRefit()).thenReturn(true);
+            when(reserved.getQuantity()).thenReturn(1);
+            when(reserved.getBaseQuantityForPartsInUse()).thenReturn(1);
+            when(reserved.getQuantityForPartsInUse()).thenReturn(0);
+            when(reserved.getQuality()).thenReturn(PartQuality.QUALITY_D);
+
+            PartInUse partInUse = mock(PartInUse.class);
+            int[] useCount = {0};
+            int[] storeCount = {0};
+            when(partInUse.getUseCount()).thenAnswer(inv -> useCount[0]);
+            when(partInUse.getStoreCount()).thenAnswer(inv -> storeCount[0]);
+            org.mockito.Mockito.doAnswer(inv -> { useCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setUseCount(org.mockito.ArgumentMatchers.anyInt());
+            org.mockito.Mockito.doAnswer(inv -> { storeCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setStoreCount(org.mockito.ArgumentMatchers.anyInt());
+
+            // Act
+            method.invoke(partsInUseManager, partInUse, reserved, false, PartQuality.QUALITY_A);
+
+            // Assert: refit-reserved part should count as in-use, NOT stored
+            assertEquals(1, useCount[0], "Refit-reserved part should count as in-use");
+            assertEquals(0, storeCount[0], "Refit-reserved part should NOT count as stored");
+        }
+
+        @Test
+        public void testMixOfSpareAndRefitReservedParts() throws Exception {
+            // Arrange: simulate the user's scenario with spare + reserved parts
+            Part spare = mock(Part.class);
+            when(spare.getUnit()).thenReturn(null);
+            when(spare.isPresent()).thenReturn(true);
+            when(spare.isReservedForRefit()).thenReturn(false);
+            when(spare.getQuantity()).thenReturn(11);
+            when(spare.getQuantityForPartsInUse()).thenReturn(11);
+            when(spare.getQuality()).thenReturn(PartQuality.QUALITY_D);
+
+            Part reserved1 = mock(Part.class);
+            when(reserved1.getUnit()).thenReturn(null);
+            when(reserved1.isPresent()).thenReturn(true);
+            when(reserved1.isReservedForRefit()).thenReturn(true);
+            when(reserved1.getQuantity()).thenReturn(1);
+            when(reserved1.getBaseQuantityForPartsInUse()).thenReturn(1);
+            when(reserved1.getQuantityForPartsInUse()).thenReturn(0);
+            when(reserved1.getQuality()).thenReturn(PartQuality.QUALITY_D);
+
+            Part reserved2 = mock(Part.class);
+            when(reserved2.getUnit()).thenReturn(null);
+            when(reserved2.isPresent()).thenReturn(true);
+            when(reserved2.isReservedForRefit()).thenReturn(true);
+            when(reserved2.getQuantity()).thenReturn(1);
+            when(reserved2.getBaseQuantityForPartsInUse()).thenReturn(1);
+            when(reserved2.getQuantityForPartsInUse()).thenReturn(0);
+            when(reserved2.getQuality()).thenReturn(PartQuality.QUALITY_D);
+
+            PartInUse partInUse = mock(PartInUse.class);
+            int[] useCount = {0};
+            int[] storeCount = {0};
+            when(partInUse.getUseCount()).thenAnswer(inv -> useCount[0]);
+            when(partInUse.getStoreCount()).thenAnswer(inv -> storeCount[0]);
+            org.mockito.Mockito.doAnswer(inv -> { useCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setUseCount(org.mockito.ArgumentMatchers.anyInt());
+            org.mockito.Mockito.doAnswer(inv -> { storeCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setStoreCount(org.mockito.ArgumentMatchers.anyInt());
+
+            // Act: process the spare and both reserved parts
+            method.invoke(partsInUseManager, partInUse, spare, false, PartQuality.QUALITY_A);
+            method.invoke(partsInUseManager, partInUse, reserved1, false, PartQuality.QUALITY_A);
+            method.invoke(partsInUseManager, partInUse, reserved2, false, PartQuality.QUALITY_A);
+
+            // Assert: stored=11 (only the spare), in-use=2 (the two reserved)
+            assertEquals(2, useCount[0],
+                  "Only refit-reserved parts should count as in-use");
+            assertEquals(11, storeCount[0],
+                  "Only unreserved spare parts should count as stored");
         }
     }
 }
