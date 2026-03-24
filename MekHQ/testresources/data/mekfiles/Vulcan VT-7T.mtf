@@ -181,7 +181,7 @@ primaryfactory:Tematagi, Coventry
 systemmanufacturer:CHASSIS:Crucis-II Delux Endo Steel
 systemmanufacturer:ENGINE:VOX 240 XL
 systemmanufacturer:ARMOR:StarSlab 1/d
-systemmanufacturer:JUMPJET:Model 9 Pitban
+systemmanufacturer:JUMP_JET:Model 9 Pitban
 systemmanufacturer:COMMUNICATIONS:Hartford 200S
 systemmanufacturer:TARGETING:Hartford TA10
 
