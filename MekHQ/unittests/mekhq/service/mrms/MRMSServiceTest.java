@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -725,8 +725,8 @@ public class MRMSServiceTest {
         }
 
         /**
-         * When allowCarryover is false, MRMS should not assign repairs to techs who don't have enough time remaining to
-         * complete the repair in the same day.
+         * When allowCarryover is false, MRMS should not assign repairs to techs who don't have enough time
+         * remaining to complete the repair in the same day.
          */
         @Test
         public void testMRMSUnitsCarryoverDisabled() {
@@ -798,16 +798,16 @@ public class MRMSServiceTest {
             realTechs.add(realTech2);
 
             addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
-                  targetNumberMax, dailyTimeMin);
+                targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
             when(mockCampaign.getTechs(anyBoolean())).thenReturn(realTechs);
 
             unit.getParts()
-                  .stream()
-                  .filter(p -> p instanceof Armor)
-                  .map(p -> (Armor) p)
-                  .forEach(MRMSServiceTest.this::breakArmor);
+                .stream()
+                .filter(p -> p instanceof Armor)
+                .map(p -> (Armor) p)
+                .forEach(MRMSServiceTest.this::breakArmor);
 
             // Act
             MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
@@ -836,11 +836,14 @@ public class MRMSServiceTest {
         }
 
         /**
-         * Scenario: - Tech has 40 minutes available - At NORMAL time, repair would take 15 minutes (fits within 40) -
-         * Tech has low skill (GREEN level), requiring target number adjustment - With extra time needed, repair would
-         * take 45+ minutes (exceeds 40) - With carryover disabled, this should not be attempted because the time check
-         * now accounts for work time modifiers, so extra time is factored into the carryover decision
-         * <p>
+         * Scenario:
+         * - Tech has 40 minutes available
+         * - At NORMAL time, repair would take 15 minutes (fits within 40)
+         * - Tech has low skill (GREEN level), requiring target number adjustment
+         * - With extra time needed, repair would take 45+ minutes (exceeds 40)
+         * - With carryover disabled, this should not be attempted because the time check
+         *   now accounts for work time modifiers, so extra time is factored into the carryover decision
+         *
          * Expected: No repairs should be performed
          */
         @Test
@@ -859,7 +862,7 @@ public class MRMSServiceTest {
 
             // Override the MRMS option to use the stricter target numbers
             addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
-                  targetNumberMax, dailyTimeMin);
+                targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
             when(mockCampaign.getTechs(anyBoolean())).thenReturn(realTechs);
 
@@ -878,7 +881,7 @@ public class MRMSServiceTest {
 
         private void arrangeTestMRMSUnitsCarryover(SkillLevel skillLevel, int techMinutesLeft) {
             addMRMSOption(PartRepairType.ARMOUR, skillMin, skillMax, targetNumberPreferred,
-                  targetNumberMax, dailyTimeMin);
+                targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
             Person realTech = createRealTech("Test Tech", skillLevel, techMinutesLeft);
@@ -886,10 +889,10 @@ public class MRMSServiceTest {
             when(mockCampaign.getTechs(anyBoolean())).thenReturn(realTechs);
 
             unit.getParts()
-                  .stream()
-                  .filter(p -> p instanceof Armor)
-                  .map(p -> (Armor) p)
-                  .forEach(MRMSServiceTest.this::breakArmor);
+                .stream()
+                .filter(p -> p instanceof Armor)
+                .map(p -> (Armor) p)
+                .forEach(MRMSServiceTest.this::breakArmor);
         }
     }
 

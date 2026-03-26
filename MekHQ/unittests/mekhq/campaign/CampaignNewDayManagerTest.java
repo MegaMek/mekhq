@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,8 +54,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Tests for CampaignNewDayManager temp crew pool processing. Tests various combinations of Campaign options and MekHQ
- * options to ensure daily temp crew pool filling/distribution works correctly.
+ * Tests for CampaignNewDayManager temp crew pool processing.
+ * Tests various combinations of Campaign options and MekHQ options
+ * to ensure daily temp crew pool filling/distribution works correctly.
  */
 public class CampaignNewDayManagerTest {
 
@@ -76,58 +77,58 @@ public class CampaignNewDayManagerTest {
     }
 
     /**
-     * Provides test cases for all combinations of campaign and MekHQ options Format: PersonnelRole,
-     * campaignOptionEnabled, mhqOptionEnabled, shouldDistribute
+     * Provides test cases for all combinations of campaign and MekHQ options
+     * Format: PersonnelRole, campaignOptionEnabled, mhqOptionEnabled, shouldDistribute
      */
     private static Stream<Arguments> getDailyReminderOptionCombinations() {
         return Stream.of(
-              // SOLDIER combinations
-              Arguments.of(PersonnelRole.SOLDIER, false, false, false),
-              Arguments.of(PersonnelRole.SOLDIER, false, true, false),
-              Arguments.of(PersonnelRole.SOLDIER, true, false, false),
-              Arguments.of(PersonnelRole.SOLDIER, true, true, true),
+            // SOLDIER combinations
+            Arguments.of(PersonnelRole.SOLDIER, false, false, false),
+            Arguments.of(PersonnelRole.SOLDIER, false, true, false),
+            Arguments.of(PersonnelRole.SOLDIER, true, false, false),
+            Arguments.of(PersonnelRole.SOLDIER, true, true, true),
 
-              // BATTLE_ARMOUR combinations
-              Arguments.of(PersonnelRole.BATTLE_ARMOUR, false, false, false),
-              Arguments.of(PersonnelRole.BATTLE_ARMOUR, false, true, false),
-              Arguments.of(PersonnelRole.BATTLE_ARMOUR, true, false, false),
-              Arguments.of(PersonnelRole.BATTLE_ARMOUR, true, true, true),
+            // BATTLE_ARMOUR combinations
+            Arguments.of(PersonnelRole.BATTLE_ARMOUR, false, false, false),
+            Arguments.of(PersonnelRole.BATTLE_ARMOUR, false, true, false),
+            Arguments.of(PersonnelRole.BATTLE_ARMOUR, true, false, false),
+            Arguments.of(PersonnelRole.BATTLE_ARMOUR, true, true, true),
 
-              // VEHICLE_CREW_GROUND combinations
-              Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, false, false, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, false, true, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, true, false, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, true, true, true),
+            // VEHICLE_CREW_GROUND combinations
+            Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, false, false, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, false, true, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, true, false, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_GROUND, true, true, true),
 
-              // VEHICLE_CREW_VTOL combinations
-              Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, false, false, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, false, true, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, true, false, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, true, true, true),
+            // VEHICLE_CREW_VTOL combinations
+            Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, false, false, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, false, true, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, true, false, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_VTOL, true, true, true),
 
-              // VEHICLE_CREW_NAVAL combinations
-              Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, false, false, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, false, true, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, true, false, false),
-              Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, true, true, true),
+            // VEHICLE_CREW_NAVAL combinations
+            Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, false, false, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, false, true, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, true, false, false),
+            Arguments.of(PersonnelRole.VEHICLE_CREW_NAVAL, true, true, true),
 
-              // VESSEL_PILOT combinations
-              Arguments.of(PersonnelRole.VESSEL_PILOT, false, false, false),
-              Arguments.of(PersonnelRole.VESSEL_PILOT, false, true, false),
-              Arguments.of(PersonnelRole.VESSEL_PILOT, true, false, false),
-              Arguments.of(PersonnelRole.VESSEL_PILOT, true, true, true),
+            // VESSEL_PILOT combinations
+            Arguments.of(PersonnelRole.VESSEL_PILOT, false, false, false),
+            Arguments.of(PersonnelRole.VESSEL_PILOT, false, true, false),
+            Arguments.of(PersonnelRole.VESSEL_PILOT, true, false, false),
+            Arguments.of(PersonnelRole.VESSEL_PILOT, true, true, true),
 
-              // VESSEL_GUNNER combinations
-              Arguments.of(PersonnelRole.VESSEL_GUNNER, false, false, false),
-              Arguments.of(PersonnelRole.VESSEL_GUNNER, false, true, false),
-              Arguments.of(PersonnelRole.VESSEL_GUNNER, true, false, false),
-              Arguments.of(PersonnelRole.VESSEL_GUNNER, true, true, true),
+            // VESSEL_GUNNER combinations
+            Arguments.of(PersonnelRole.VESSEL_GUNNER, false, false, false),
+            Arguments.of(PersonnelRole.VESSEL_GUNNER, false, true, false),
+            Arguments.of(PersonnelRole.VESSEL_GUNNER, true, false, false),
+            Arguments.of(PersonnelRole.VESSEL_GUNNER, true, true, true),
 
-              // VESSEL_CREW combinations
-              Arguments.of(PersonnelRole.VESSEL_CREW, false, false, false),
-              Arguments.of(PersonnelRole.VESSEL_CREW, false, true, false),
-              Arguments.of(PersonnelRole.VESSEL_CREW, true, false, false),
-              Arguments.of(PersonnelRole.VESSEL_CREW, true, true, true)
+            // VESSEL_CREW combinations
+            Arguments.of(PersonnelRole.VESSEL_CREW, false, false, false),
+            Arguments.of(PersonnelRole.VESSEL_CREW, false, true, false),
+            Arguments.of(PersonnelRole.VESSEL_CREW, true, false, false),
+            Arguments.of(PersonnelRole.VESSEL_CREW, true, true, true)
         );
     }
 
@@ -143,7 +144,7 @@ public class CampaignNewDayManagerTest {
         @ParameterizedTest
         @MethodSource("mekhq.campaign.CampaignNewDayManagerTest#getDailyReminderOptionCombinations")
         void testDailyTempCrewPoolProcessing(PersonnelRole role, boolean campaignOptionEnabled,
-              boolean mhqOptionEnabled, boolean shouldDistribute) {
+                                              boolean mhqOptionEnabled, boolean shouldDistribute) {
             // Arrange
             configureCampaignOption(role, campaignOptionEnabled);
             configureMHQOption(role, mhqOptionEnabled);
@@ -218,7 +219,8 @@ public class CampaignNewDayManagerTest {
         }
 
         /**
-         * Helper to simulate new day processing for a specific role Mimics the logic in CampaignNewDayManager
+         * Helper to simulate new day processing for a specific role
+         * Mimics the logic in CampaignNewDayManager
          */
         private void processNewDayForRole(PersonnelRole role) {
             boolean mhqOptionEnabled = getMHQOptionForRole(role);
