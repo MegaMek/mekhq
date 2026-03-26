@@ -5342,6 +5342,10 @@ public class Unit implements ITechnology {
                     }
                     bestSuits = Utilities.sortMapByValue(bestSuits, true);
                 }
+                // Get temp BA count up front so it can fill suits after real troopers are placed
+                int tempBACount = getCampaign().getCampaignOptions().isUseBlobBattleArmor()
+                        ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
+                int tempBAUsed = 0;
                 for (String key : bestSuits.keySet()) {
                     int i = Integer.parseInt(key);
                     if (!isBattleArmorSuitOperable(i)) {
@@ -5351,20 +5355,21 @@ public class Unit implements ITechnology {
                     if (numTroopers < nGunners) {
                         entity.setInternal(1, i);
                         numTroopers++;
+                    } else if (tempBACount > 0) {
+                        entity.setInternal(1, i);
+                        tempBACount--;
+                        tempBAUsed++;
                     } else {
                         entity.setInternal(0, i);
                     }
                 }
+                nGunners += tempBAUsed;
             }
 
-            // Do this after reordering BA so real people have better armor, when applicable
-            // Add temp crew to fill shortfall for infantry and BA
+            // Add temp crew to fill shortfall for conventional infantry
             if (entity instanceof Infantry && !isBattleArmor()
                       && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
                 nGunners += getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
-            } else if (isBattleArmor()
-                             && getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-                nGunners += getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR);
             }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
         }
