@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import mekhq.MHQConstants;
+import mekhq.utilities.SystemValidator.Category;
 import mekhq.utilities.SystemValidator.ValidationMessage;
 import mekhq.utilities.SystemValidator.ValidationResult;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,6 +49,9 @@ import org.junit.jupiter.api.Test;
 /**
  * Integration tests that validate all planetary system data files using the same deserialization path as production
  * code. These tests act as a CI safety net to catch data file issues before they reach users.
+ *
+ * <p>ERROR-level checks block the build. WARNING-level checks report counts but don't fail,
+ * since they flag pre-existing data quality issues that don't break runtime behavior.</p>
  */
 class SystemValidatorTest {
     private static ValidationResult result;
@@ -56,15 +60,12 @@ class SystemValidatorTest {
     static void validateAllSystems() {
         SystemValidator validator = new SystemValidator();
 
-        // Try staged data first (ZIP files from mm-data build), then fall back to
-        // mm-data source directory for local development
         String stagedPath = MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH;
         File stagedDir = new File(stagedPath);
 
         if (stagedDir.exists() && stagedDir.isDirectory()) {
             result = validator.validate(stagedPath);
         } else {
-            // Fall back to mm-data source when running without staged data
             String mmDataPath = "../../mm-data/" + MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH;
             File mmDataDir = new File(mmDataPath);
             assertTrue(mmDataDir.exists(),
@@ -74,58 +75,65 @@ class SystemValidatorTest {
         }
     }
 
+    // -------------------------------------------------------------------
+    // Critical ERROR checks (block the build)
+    // -------------------------------------------------------------------
+
     @Test
     void allYamlFilesParse() {
-        List<ValidationMessage> parseErrors = result.getErrors().stream()
-                                                    .filter(m -> m.getMessage().startsWith("Failed to parse YAML"))
-                                                    .toList();
-
-        assertTrue(parseErrors.isEmpty(),
-              "YAML parse failures found:\n" + formatMessages(parseErrors));
+        assertNoFindings(Category.YAML_PARSE_FAILURE, "YAML parse failures");
     }
 
     @Test
-    void allSystemsHaveRequiredFields() {
-        List<ValidationMessage> missingFields = result.getErrors().stream()
-                                                      .filter(m -> m.getMessage().startsWith("Missing"))
-                                                      .filter(m -> !m.getMessage().contains("planet type"))
-                                                      .filter(m -> !m.getMessage().contains("system position"))
-                                                      .toList();
+    void allSystemsHaveIds() {
+        assertNoFindings(Category.MISSING_SYSTEM_ID, "Missing system IDs");
+    }
 
-        assertTrue(missingFields.isEmpty(),
-              "Systems with missing required fields:\n" + formatMessages(missingFields));
+    @Test
+    void allSystemsHaveCoordinates() {
+        assertNoFindings(Category.MISSING_COORDINATES, "Missing coordinates");
+    }
+
+    @Test
+    void allSystemsHaveStars() {
+        assertNoFindings(Category.MISSING_STAR, "Missing stars");
     }
 
     @Test
     void allPrimaryPlanetSlotsValid() {
-        List<ValidationMessage> slotErrors = result.getErrors().stream()
-                                                   .filter(m -> m.getMessage().startsWith("Primary slot"))
-                                                   .toList();
-
-        assertTrue(slotErrors.isEmpty(),
-              "Invalid primary planet slots:\n" + formatMessages(slotErrors));
+        assertNoFindings(Category.INVALID_PRIMARY_SLOT, "Invalid primary planet slots");
     }
 
     @Test
     void noDuplicateSystemIds() {
-        List<ValidationMessage> dupeErrors = result.getErrors().stream()
-                                                   .filter(m -> m.getMessage().startsWith("Duplicate system ID"))
-                                                   .toList();
+        assertNoFindings(Category.DUPLICATE_SYSTEM_ID, "Duplicate system IDs");
+    }
 
-        assertTrue(dupeErrors.isEmpty(),
-              "Duplicate system IDs found:\n" + formatMessages(dupeErrors));
+    @Test
+    void noDuplicatePlanetPositions() {
+        assertNoFindings(Category.DUPLICATE_PLANET_POSITION, "Duplicate planet positions");
     }
 
     @Test
     void allPlanetsHaveRequiredFields() {
-        List<ValidationMessage> planetErrors = result.getErrors().stream()
-                                                     .filter(m -> m.getMessage().contains("system position")
-                                                                        || m.getMessage().contains("planet type"))
-                                                     .toList();
-
-        assertTrue(planetErrors.isEmpty(),
-              "Planets with missing required fields:\n" + formatMessages(planetErrors));
+        assertNoFindings(Category.MISSING_PLANET_FIELD, "Missing planet fields");
     }
+
+    @Test
+    void allPlanetPositionsValid() {
+        assertNoFindings(Category.INVALID_PLANET_POSITION, "Invalid planet positions");
+    }
+
+    @Test
+    void noValidationErrors() {
+        assertFalse(result.hasErrors(),
+              "Validation errors found (" + result.getErrorCount() + " total):\n"
+                    + formatMessages(result.getErrors()));
+    }
+
+    // -------------------------------------------------------------------
+    // Data quality WARNING checks (report but don't block build)
+    // -------------------------------------------------------------------
 
     @Test
     void validationProcessedFiles() {
@@ -136,10 +144,28 @@ class SystemValidatorTest {
     }
 
     @Test
-    void noValidationErrors() {
-        assertFalse(result.hasErrors(),
-              "Validation errors found (" + result.getErrorCount() + " total):\n"
-                    + formatMessages(result.getErrors()));
+    void reportWarnings() {
+        List<ValidationMessage> warnings = result.getWarnings();
+        System.out.println("--- Data Quality Warnings: " + warnings.size() + " ---");
+
+        for (Category category : Category.values()) {
+            long count = warnings.stream()
+                               .filter(m -> m.getCategory() == category)
+                               .count();
+            if (count > 0) {
+                System.out.println("  " + category + ": " + count);
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------
+
+    private void assertNoFindings(Category category, String label) {
+        List<ValidationMessage> findings = result.getByCategory(category);
+        assertTrue(findings.isEmpty(),
+              label + " found:\n" + formatMessages(findings));
     }
 
     private static String formatMessages(List<ValidationMessage> messages) {
