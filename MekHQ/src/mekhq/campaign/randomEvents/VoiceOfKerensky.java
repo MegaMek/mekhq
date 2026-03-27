@@ -125,9 +125,13 @@ public class VoiceOfKerensky {
 
         double wavefrontRadius = campaignYear - BROADCAST_YEAR;
 
-        double distanceFromWavefront = Math.abs(distanceFromPentagonWorlds - wavefrontRadius);
+        if (wavefrontRadius < distanceFromPentagonWorlds) {
+            return false;
+        }
 
-        return distanceFromWavefront <= DETECTION_BAND_LY;
+        double postArrivalOffset = wavefrontRadius - distanceFromPentagonWorlds;
+
+        return postArrivalOffset <= DETECTION_BAND_LY;
     }
 
     /**
@@ -140,16 +144,26 @@ public class VoiceOfKerensky {
      * @param campaign the current campaign
      */
     public static void trigger(Campaign campaign) {
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if (currentSystem == null) {
+            return;
+        }
+
+        Double systemX = currentSystem.getX();
+        Double systemY = currentSystem.getY();
+        if (systemX == null || systemY == null) {
+            return;
+        }
+
         Person speaker = getSpeaker(campaign);
 
         String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "voiceOfKerensky.message.ic", commanderAddress);
 
-        PlanetarySystem currentSystem = campaign.getCurrentSystem();
         double distanceFromPentagonWorlds = Math.sqrt(
-              Math.pow(currentSystem.getX() - PENTAGON_WORLDS_X, 2) +
-              Math.pow(currentSystem.getY() - PENTAGON_WORLDS_Y, 2));
+              Math.pow(systemX - PENTAGON_WORLDS_X, 2) +
+              Math.pow(systemY - PENTAGON_WORLDS_Y, 2));
         int yearsInTransit = campaign.getGameYear() - BROADCAST_YEAR;
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
