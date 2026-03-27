@@ -54,181 +54,32 @@ import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.SourceableValue;
 import mekhq.campaign.universe.StarType;
 import mekhq.campaign.universe.enums.PlanetaryType;
+import mekhq.utilities.ValidationMessage.Category;
+import mekhq.utilities.ValidationMessage.Severity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
- * Validates planetary system YAML data files for structural correctness and data integrity. Can be run as a standalone
- * Gradle task or called from unit tests.
+ * Validates planetary system YAML data files for structural correctness and data integrity.
+ *
+ * <p>This validator deserializes each YAML file using the same Jackson pipeline as production code, then checks for
+ * required fields, valid ranges, duplicate IDs, and data consistency. It can be run as a standalone Gradle task
+ * ({@code ./gradlew validateSystems}) or called programmatically from unit tests.</p>
  */
 public class SystemValidator {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int ABSOLUTE_ZERO_CELSIUS = -273;
     private static final int MIN_WATER_PERCENT = 0;
     private static final int MAX_WATER_PERCENT = 100;
 
-    public enum Severity {
-        ERROR,
-        WARNING
-    }
-
-    /**
-     * Categories for validation findings. Tests filter on these rather than message text.
-     */
-    public enum Category {
-        YAML_PARSE_FAILURE,
-        MISSING_SYSTEM_ID,
-        MISSING_COORDINATES,
-        MISSING_STAR,
-        INVALID_PRIMARY_SLOT,
-        NO_PLANETS,
-        DUPLICATE_SYSTEM_ID,
-        DUPLICATE_SUCS_ID,
-        DUPLICATE_PLANET_POSITION,
-        MISSING_PLANET_FIELD,
-        INVALID_PLANET_POSITION,
-        INVALID_GRAVITY,
-        INVALID_WATER,
-        INVALID_TEMPERATURE,
-        NEGATIVE_POPULATION,
-        UNKNOWN_FACTION,
-        MISSING_ATMOSPHERE_DATA,
-        DATA_DIRECTORY_ERROR
-    }
-
-    public static class ValidationMessage {
-        private final Severity severity;
-        private final Category category;
-        private final String fileName;
-        private final String systemId;
-        private final String planetInfo;
-        private final String message;
-
-        public ValidationMessage(Severity severity, Category category, String fileName,
-              String systemId, String planetInfo, String message) {
-            this.severity = severity;
-            this.category = category;
-            this.fileName = fileName;
-            this.systemId = systemId;
-            this.planetInfo = planetInfo;
-            this.message = message;
-        }
-
-        public Severity getSeverity() {
-            return severity;
-        }
-
-        public Category getCategory() {
-            return category;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public String getSystemId() {
-            return systemId;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(String.format("%-8s", severity));
-            sb.append("[").append(fileName).append("] ");
-            sb.append("System '").append(systemId).append("'");
-            if (planetInfo != null && !planetInfo.isEmpty()) {
-                sb.append(", ").append(planetInfo);
-            }
-            sb.append(" - ").append(message);
-            return sb.toString();
-        }
-    }
-
-    public static class ValidationResult {
-        private final List<ValidationMessage> messages = new ArrayList<>();
-        private int systemsValidated = 0;
-        private int planetsValidated = 0;
-        private int filesProcessed = 0;
-
-        public void addMessage(ValidationMessage msg) {
-            messages.add(msg);
-        }
-
-        public List<ValidationMessage> getMessages() {
-            return messages;
-        }
-
-        public List<ValidationMessage> getErrors() {
-            return messages.stream()
-                         .filter(m -> m.getSeverity() == Severity.ERROR)
-                         .toList();
-        }
-
-        public List<ValidationMessage> getWarnings() {
-            return messages.stream()
-                         .filter(m -> m.getSeverity() == Severity.WARNING)
-                         .toList();
-        }
-
-        public List<ValidationMessage> getByCategory(Category category) {
-            return messages.stream()
-                         .filter(m -> m.getCategory() == category)
-                         .toList();
-        }
-
-        public int getErrorCount() {
-            return (int) messages.stream()
-                               .filter(m -> m.getSeverity() == Severity.ERROR)
-                               .count();
-        }
-
-        public int getWarningCount() {
-            return (int) messages.stream()
-                               .filter(m -> m.getSeverity() == Severity.WARNING)
-                               .count();
-        }
-
-        public int getSystemsValidated() {
-            return systemsValidated;
-        }
-
-        public void incrementSystemsValidated() {
-            systemsValidated++;
-        }
-
-        public int getPlanetsValidated() {
-            return planetsValidated;
-        }
-
-        public void addPlanetsValidated(int count) {
-            planetsValidated += count;
-        }
-
-        public int getFilesProcessed() {
-            return filesProcessed;
-        }
-
-        public void incrementFilesProcessed() {
-            filesProcessed++;
-        }
-
-        public boolean hasErrors() {
-            return getErrorCount() > 0;
-        }
-
-        public String getSummary() {
-            return String.format("Validated %,d systems (%,d planets) from %,d files%n"
-                                       + "Errors: %d  |  Warnings: %d",
-                  systemsValidated, planetsValidated, filesProcessed,
-                  getErrorCount(), getWarningCount());
-        }
-    }
-
     private final ObjectMapper mapper;
     private final Set<String> knownFactionCodes;
 
+    /**
+     * Creates a new validator, initializing the YAML deserializer and loading known faction codes.
+     */
     public SystemValidator() {
         mapper = new ObjectMapper(new YAMLFactory());
         SimpleModule module = new SimpleModule();
@@ -242,16 +93,33 @@ public class SystemValidator {
         knownFactionCodes = loadFactionCodes();
     }
 
+    /**
+     * Loads all known faction codes from the factions data file for cross-referencing during validation.
+     *
+     * @return a set of known faction code strings, or an empty set if loading fails
+     */
     private Set<String> loadFactionCodes() {
         try {
             Factions factions = Factions.load(false);
             Collection<String> codes = factions.getFactionList();
             return new HashSet<>(codes);
         } catch (Exception ex) {
+            LOGGER.error("Failed to load faction codes for validation. "
+                               + "Faction code checks will be skipped.", ex);
             return Set.of();
         }
     }
 
+    /**
+     * Validates all planetary system data files found under the given directory path.
+     *
+     * <p>Recursively scans for {@code .yml} files and {@code .zip} archives containing YAML entries. Each file is
+     * deserialized and checked for structural correctness and data integrity.</p>
+     *
+     * @param dataPath the path to the directory containing planetary system data files
+     *
+     * @return a {@link ValidationResult} containing all findings and summary statistics
+     */
     public ValidationResult validate(String dataPath) {
         ValidationResult result = new ValidationResult();
         Map<String, String> seenIds = new HashMap<>();
@@ -268,6 +136,14 @@ public class SystemValidator {
         return result;
     }
 
+    /**
+     * Recursively validates all YAML files and ZIP archives in the given directory.
+     *
+     * @param dir         the directory to scan
+     * @param result      the result accumulator for findings
+     * @param seenIds     map tracking system IDs to their source files for duplicate detection
+     * @param seenSucsIds map tracking SUCS IDs to their source files for duplicate detection
+     */
     private void validateDirectory(File dir, ValidationResult result,
           Map<String, String> seenIds, Map<Integer, String> seenSucsIds) {
         File[] files = dir.listFiles((d, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
@@ -299,6 +175,14 @@ public class SystemValidator {
         }
     }
 
+    /**
+     * Validates all YAML entries within a ZIP archive.
+     *
+     * @param zipFile     the ZIP file to scan
+     * @param result      the result accumulator for findings
+     * @param seenIds     map tracking system IDs for duplicate detection
+     * @param seenSucsIds map tracking SUCS IDs for duplicate detection
+     */
     private void validateZipFile(File zipFile, ValidationResult result,
           Map<String, String> seenIds, Map<Integer, String> seenSucsIds) {
         try (ZipFile zip = new ZipFile(zipFile)) {
@@ -317,6 +201,8 @@ public class SystemValidator {
                     try (InputStream is = zip.getInputStream(entry)) {
                         validateFromStream(is, contextName, result, seenIds, seenSucsIds);
                     } catch (Exception ex) {
+                        LOGGER.error("Failed to parse YAML entry '{}' in ZIP '{}'",
+                              entryName, zipFile.getName(), ex);
                         result.addMessage(new ValidationMessage(Severity.ERROR,
                               Category.YAML_PARSE_FAILURE, contextName, "N/A", null,
                               "Failed to parse YAML: " + ex.getMessage()));
@@ -324,12 +210,21 @@ public class SystemValidator {
                 }
             }
         } catch (Exception ex) {
+            LOGGER.error("Failed to read ZIP archive '{}'", zipFile.getName(), ex);
             result.addMessage(new ValidationMessage(Severity.ERROR, Category.YAML_PARSE_FAILURE,
                   zipFile.getName(), "N/A", null,
                   "Failed to read ZIP archive: " + ex.getMessage()));
         }
     }
 
+    /**
+     * Validates a single YAML file.
+     *
+     * @param file        the YAML file to validate
+     * @param result      the result accumulator for findings
+     * @param seenIds     map tracking system IDs for duplicate detection
+     * @param seenSucsIds map tracking SUCS IDs for duplicate detection
+     */
     private void validateFile(File file, ValidationResult result,
           Map<String, String> seenIds, Map<Integer, String> seenSucsIds) {
         String fileName = file.getName();
@@ -338,11 +233,24 @@ public class SystemValidator {
         try (InputStream fis = new FileInputStream(file)) {
             validateFromStream(fis, fileName, result, seenIds, seenSucsIds);
         } catch (Exception ex) {
+            LOGGER.error("Failed to parse YAML file '{}'", fileName, ex);
             result.addMessage(new ValidationMessage(Severity.ERROR, Category.YAML_PARSE_FAILURE,
                   fileName, "N/A", null, "Failed to parse YAML: " + ex.getMessage()));
         }
     }
 
+    /**
+     * Validates a single system from an input stream by first checking the raw YAML tree structure, then deserializing
+     * into a typed {@link PlanetarySystem} object for further checks.
+     *
+     * @param is          the input stream containing YAML data
+     * @param fileName    the display name for this data source (used in messages)
+     * @param result      the result accumulator for findings
+     * @param seenIds     map tracking system IDs for duplicate detection
+     * @param seenSucsIds map tracking SUCS IDs for duplicate detection
+     *
+     * @throws Exception if the YAML cannot be parsed
+     */
     private void validateFromStream(InputStream is, String fileName, ValidationResult result,
           Map<String, String> seenIds, Map<Integer, String> seenSucsIds) throws Exception {
         JsonNode tree = mapper.readTree(is);
@@ -358,6 +266,14 @@ public class SystemValidator {
     // Raw YAML tree structural checks
     // -------------------------------------------------------------------
 
+    /**
+     * Extracts the system identifier from the raw JSON tree, falling back to the system name if no ID field is
+     * present.
+     *
+     * @param tree the parsed YAML tree
+     *
+     * @return the system ID, name, or {@code "<unknown>"} if neither is available
+     */
     private String getTreeSystemId(JsonNode tree) {
         JsonNode idNode = tree.get("id");
         if (idNode != null && idNode.isTextual()) {
@@ -370,6 +286,16 @@ public class SystemValidator {
         return "<unknown>";
     }
 
+    /**
+     * Validates the raw YAML tree structure for SUCS ID uniqueness and duplicate planet positions before
+     * deserialization.
+     *
+     * @param tree        the parsed YAML tree
+     * @param fileName    the source file name for messages
+     * @param systemId    the system identifier for messages
+     * @param result      the result accumulator for findings
+     * @param seenSucsIds map tracking SUCS IDs for duplicate detection
+     */
     private void validateTreeStructure(JsonNode tree, String fileName, String systemId,
           ValidationResult result, Map<Integer, String> seenSucsIds) {
         JsonNode sucsNode = tree.get("sucsId");
@@ -403,6 +329,14 @@ public class SystemValidator {
         }
     }
 
+    /**
+     * Extracts the system position integer from a planet JSON node, handling both plain integer and sourceable-value
+     * object forms.
+     *
+     * @param planetNode the JSON node representing a planet
+     *
+     * @return the system position, or {@code null} if not present or not parseable
+     */
     private Integer extractSysPos(JsonNode planetNode) {
         JsonNode sysPosNode = planetNode.get("sysPos");
         if (sysPosNode == null) {
@@ -425,6 +359,14 @@ public class SystemValidator {
     // Typed system and planet validation
     // -------------------------------------------------------------------
 
+    /**
+     * Validates a deserialized {@link PlanetarySystem} for required fields, valid primary slot, and duplicate IDs.
+     *
+     * @param system   the deserialized planetary system
+     * @param fileName the source file name for messages
+     * @param result   the result accumulator for findings
+     * @param seenIds  map tracking system IDs for duplicate detection
+     */
     private void validateSystem(PlanetarySystem system, String fileName,
           ValidationResult result, Map<String, String> seenIds) {
         result.incrementSystemsValidated();
@@ -484,6 +426,14 @@ public class SystemValidator {
         }
     }
 
+    /**
+     * Validates a single {@link Planet} for required fields and plausible data ranges.
+     *
+     * @param planet   the planet to validate
+     * @param fileName the source file name for messages
+     * @param systemId the parent system identifier for messages
+     * @param result   the result accumulator for findings
+     */
     private void validatePlanet(Planet planet, String fileName, String systemId,
           ValidationResult result) {
         String planetInfo = buildPlanetInfo(planet);
@@ -521,6 +471,15 @@ public class SystemValidator {
         validatePlanetEvents(planet, fileName, systemId, planetInfo, result);
     }
 
+    /**
+     * Checks that a terrestrial planet has atmosphere and pressure data defined.
+     *
+     * @param planet     the terrestrial planet to check
+     * @param fileName   the source file name for messages
+     * @param systemId   the parent system identifier for messages
+     * @param planetInfo the formatted planet description for messages
+     * @param result     the result accumulator for findings
+     */
     private void validateTerrestrialCompleteness(Planet planet, String fileName, String systemId,
           String planetInfo, ValidationResult result) {
         LocalDate baseDate = LocalDate.of(1, 1, 1);
@@ -537,6 +496,16 @@ public class SystemValidator {
         }
     }
 
+    /**
+     * Validates planetary event data for plausible ranges (water percentage, population, temperature) and known faction
+     * codes.
+     *
+     * @param planet     the planet whose events are being checked
+     * @param fileName   the source file name for messages
+     * @param systemId   the parent system identifier for messages
+     * @param planetInfo the formatted planet description for messages
+     * @param result     the result accumulator for findings
+     */
     private void validatePlanetEvents(Planet planet, String fileName, String systemId,
           String planetInfo, ValidationResult result) {
         List<PlanetaryEvent> events = planet.getEvents();
@@ -588,6 +557,13 @@ public class SystemValidator {
         }
     }
 
+    /**
+     * Builds a human-readable description of a planet for use in validation messages.
+     *
+     * @param planet the planet to describe
+     *
+     * @return a string like "Planet 'Terra' (pos 3)" or "Planet 'unnamed'"
+     */
     private String buildPlanetInfo(Planet planet) {
         String name = planet.getId() != null ? planet.getId() : "unnamed";
         Integer pos = planet.getSystemPosition();
@@ -598,9 +574,10 @@ public class SystemValidator {
     }
 
     /**
-     * Entry point for the Gradle validateSystems task.
+     * Entry point for the Gradle {@code validateSystems} task. Validates all system data files in the specified
+     * directory (or the default path) and exits with code 1 if any errors are found.
      *
-     * @param args optional: path to data directory (defaults to MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH)
+     * @param args optional: path to data directory (defaults to {@link MHQConstants#PLANETARY_SYSTEM_DIRECTORY_PATH})
      */
     public static void main(String[] args) {
         String dataPath;

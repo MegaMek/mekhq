@@ -40,9 +40,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import mekhq.MHQConstants;
-import mekhq.utilities.SystemValidator.Category;
-import mekhq.utilities.SystemValidator.ValidationMessage;
-import mekhq.utilities.SystemValidator.ValidationResult;
+import mekhq.utilities.ValidationMessage.Category;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
