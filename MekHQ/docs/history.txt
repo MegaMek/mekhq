@@ -1,7 +1,78 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.12
+0.50.12 (2026-03-28 2100 UTC)
+## What's Changed
+* Fix #8614: Prevent a force from being assigned as its own subforce by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8615
+* RFE #3838: Personnel Simplification / Optional temporary crew for certain personnel roles by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8558
+* Task: Updated Campaign Options Iconography for 50.12 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8633
+* PR: Initial `BuildingEntity` support for MHQ by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8544
+* Improvement: Added Elegant Failure to Academy Tooltip Fetching by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8647
+* Fix transport cost display and calculation semantics  by @HammerGS in https://github.com/MegaMek/mekhq/pull/8635
+* Task: Updated ranks.xml for 50.12 by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8632
+* Feature: Added Canon Disease & Bioweapon Support; Added Disease Glossary Entry; Added Herd Immunity Mechanics; Added Ageranium's Disease & Dobrowski Depression-A Syndrome Flaws by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8476
+* Improvement: Added Support for Partial XP Skill Progress by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8442
+* subtype flags merged with flags by @exeea in https://github.com/MegaMek/mekhq/pull/8469
+* Fix: Fix failing tests & saves being unable to load. by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8651
+* Fix #8648 - Fixes to C3i in the ToE and implements Nova CEWs support in the ToE by @HammerGS in https://github.com/MegaMek/mekhq/pull/8649
+* Add Color Explanation Tooltips to Tables by @HammerGS in https://github.com/MegaMek/mekhq/pull/8637
+* Fix #8650: Save & Load All Temp Crew Options by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8652
+* Replace invalid character with '"' by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8656
+* PR: Campaign Option Badge Handling by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8643
+* PR: Update `milestoneReleases.yml` to reflect 0.50.11 being a Milestone release by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8658
+* Fix #8670: Fixed Units with Temp Crew Disappearing when Loading by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8671
+* Fix #8665: Minor campaign option text/label errors by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8667
+* Fix #8668: Fixes tanks with temp crew being prevented from deploying & background color fix on table by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8666
+* Updated Gradle to 9.3.0 by @rjhancock in https://github.com/MegaMek/mekhq/pull/8687
+* Fixed maneuver/auxillary reinforcement roll reporting by @heckindoc in https://github.com/MegaMek/mekhq/pull/8709
+* Update learning ropes campaign 0.50.11 by @HammerGS in https://github.com/MegaMek/mekhq/pull/8716
+* Fix NPE when spending XP on new skills  by @HammerGS in https://github.com/MegaMek/mekhq/pull/8715
+* Fix GM Edit Person dialog crash due to missing Enhanced Imaging resource (Fixes #8708) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8713
+* Fix NPE when accepting contract on planet with missing temperature data  by @HammerGS in https://github.com/MegaMek/mekhq/pull/8717
+* Fix IndexOutOfBoundsException in Academy.getTooltip() for mismatched curriculum data (Sentry) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8719
+* Fix NullPointerException when user academy file replaces base academies (Fixes #8659) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8720
+* Display surgeon skill level instead of target number in prosthetic surgery dialog by @HammerGS in https://github.com/MegaMek/mekhq/pull/8721
+* Fix Mapless StratCon VP scoring for Fleet in Being and Refused Engagement (Fixes #8689) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8722
+* Fix daily report category tabs highlighting when empty (Fixes #8653) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8723
+* Fix contract generation for factions absorbed by super-states (Fixes #8711) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8718
+* Added Checkstyle GitHub Actions by @rjhancock in https://github.com/MegaMek/mekhq/pull/8703
+* Adjustments to check style to ensure compliance. by @rjhancock in https://github.com/MegaMek/mekhq/pull/8734
+* Fixed Eagle Eyes rolls for Advanced Scouting by @heckindoc in https://github.com/MegaMek/mekhq/pull/8751
+* Gitignore update by @SJuliez in https://github.com/MegaMek/mekhq/pull/8740
+* Fix StratCon completed objectives being invalidated by subsequent scenario losses (Fixes #8705) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8726
+* PR: Fix warning about no armor in warehouse by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8767
+* Bump actions/upload-artifact from 6 to 7 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/8770
+* Fixed BotForceRandomizer throwing/generating nothing when weight class not set by @capellancitizen in https://github.com/MegaMek/mekhq/pull/8762
+* Fix #8752: Check type before casting Ammo Type by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8757
+* Fix #8766: Corrected Resource Bundle from `MRMSService` to `MRMS` for `MRMSService.java` by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8765
+* PR: Change contract search radius minimum to 1 instead of 100 by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8748
+* PR: Rename `Force` to `Formation` by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8627
+* Stop Advanced Scouting from being able to scout off StraCon board by @heckindoc in https://github.com/MegaMek/mekhq/pull/8769
+* Fix NPE when loading campaign with custom/unknown factions (Fixes #8626) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8733
+* Fix missing "Swap ammo" menu for some units (Fixes #8714) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8727
+* Fix armor location not showing when stripping in salvage mode (Fixes #8724) by @HammerGS in https://github.com/MegaMek/mekhq/pull/8728
+* Fixing an issue with resolving a scenario, new pilot hits were doubled by @TenkawaBC in https://github.com/MegaMek/mekhq/pull/8784
+* Fix #8795: Forces not returning from AoO Map by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8796
+* Fixed Missing Resource exception when killing Commander by @capellancitizen in https://github.com/MegaMek/mekhq/pull/8763
+* Fix - MASH Rentals work now by @heckindoc in https://github.com/MegaMek/mekhq/pull/8800
+* Salvage Picker Confirmation Buttons Moved fixes #8806 by @heckindoc in https://github.com/MegaMek/mekhq/pull/8807
+* Permanent injuries can't be replaced with temporal ones by @VicenteCartas in https://github.com/MegaMek/mekhq/pull/8803
+* Fixing double scaling issue by @VicenteCartas in https://github.com/MegaMek/mekhq/pull/8798
+* PR: Fix crew killed buildings not counting as crew killed in after-action by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8774
+* Addressing hotkey issues by @VicenteCartas in https://github.com/MegaMek/mekhq/pull/8797
+* Fix transport report for ConvFighters, Fixed-Wing Support, and ProtoMeks by @VicenteCartas in https://github.com/MegaMek/mekhq/pull/8815
+* Fix: Prevent infinite MRMS loop when AmmoBin repair can't be fulfilled (#7414) by @VicenteCartas in https://github.com/MegaMek/mekhq/pull/8816
+* Fix #8832: Temp BA properly fill BA suits by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8833
+* Bump actions/deploy-pages from 4 to 5 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/8831
+* Bump codecov/codecov-action from 5 to 6 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/8835
+* Bump gradle/actions from 5 to 6 by @dependabot[bot] in https://github.com/MegaMek/mekhq/pull/8826
+* Fix connector system display and map rendering bugs by @HammerGS in https://github.com/MegaMek/mekhq/pull/8837
+* Add planetary system data validator and integration tests by @HammerGS in https://github.com/MegaMek/mekhq/pull/8839
 
+## New Contributors
+* @heckindoc made their first contribution in https://github.com/MegaMek/mekhq/pull/8709
+* @capellancitizen made their first contribution in https://github.com/MegaMek/mekhq/pull/8762
+
+**Full Changelog**: https://github.com/MegaMek/mekhq/compare/v0.50.11...v0.50.12
 0.50.11 (2025-12-30 1900 UTC)
 * Fix #8387: Fixed Incorrect Reference Key for Rout Messaging by @IllianiBird in https://github.com/MegaMek/mekhq/pull/8388
 * Adding Java 25 LTS to Testing by @rjhancock in https://github.com/MegaMek/mekhq/pull/8396
