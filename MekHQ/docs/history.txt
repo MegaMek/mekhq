@@ -1,5 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
+0.50.13
+
 0.50.12 (2026-03-28 2100 UTC)
 ## What's Changed
 * Fix #8614: Prevent a force from being assigned as its own subforce by @psikomonkie in https://github.com/MegaMek/mekhq/pull/8615
