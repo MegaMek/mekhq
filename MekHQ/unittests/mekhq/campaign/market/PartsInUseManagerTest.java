@@ -736,8 +736,8 @@ class PartsInUseManagerTest {
     }
 
     /**
-     * Tests for {@link PartsInUseManager#updatePartInUse} to verify that refit-reserved parts
-     * are counted as in-use rather than stored.
+     * Tests for the private {@code PartsInUseManager#updatePartInUseData} method to verify that
+     * refit-reserved parts are counted as in-use rather than stored.
      */
     @Nested
     public class TestUpdatePartInUseData {
@@ -758,13 +758,6 @@ class PartsInUseManagerTest {
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
-        }
-
-        private PartInUse createPartInUse() {
-            PartInUse piu = mock(PartInUse.class);
-            // Use real accessors backed by an int holder via delegation
-            // Simpler: just use a real wrapper approach
-            return piu;
         }
 
         @Test
@@ -876,6 +869,44 @@ class PartsInUseManagerTest {
                   "Only refit-reserved parts should count as in-use");
             assertEquals(11, storeCount[0],
                   "Only unreserved spare parts should count as stored");
+        }
+
+        @Test
+        public void testRefitReservedInTransitPartCountedAsTransfer() throws Exception {
+            // Arrange: a part reserved for refit that is still in transit
+            Part inTransitReserved = mock(Part.class);
+            when(inTransitReserved.getUnit()).thenReturn(null);
+            when(inTransitReserved.isPresent()).thenReturn(false);
+            when(inTransitReserved.isReservedForRefit()).thenReturn(true);
+            when(inTransitReserved.getQuantity()).thenReturn(1);
+            when(inTransitReserved.getBaseQuantityForPartsInUse()).thenReturn(1);
+            when(inTransitReserved.getQuantityForPartsInUse()).thenReturn(0);
+            when(inTransitReserved.getQuality()).thenReturn(PartQuality.QUALITY_D);
+
+            PartInUse partInUse = mock(PartInUse.class);
+            int[] useCount = {0};
+            int[] storeCount = {0};
+            int[] transferCount = {0};
+            when(partInUse.getUseCount()).thenAnswer(inv -> useCount[0]);
+            when(partInUse.getStoreCount()).thenAnswer(inv -> storeCount[0]);
+            when(partInUse.getTransferCount()).thenAnswer(inv -> transferCount[0]);
+            org.mockito.Mockito.doAnswer(inv -> { useCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setUseCount(org.mockito.ArgumentMatchers.anyInt());
+            org.mockito.Mockito.doAnswer(inv -> { storeCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setStoreCount(org.mockito.ArgumentMatchers.anyInt());
+            org.mockito.Mockito.doAnswer(inv -> { transferCount[0] = inv.getArgument(0); return null; })
+                  .when(partInUse).setTransferCount(org.mockito.ArgumentMatchers.anyInt());
+
+            // Act
+            method.invoke(partsInUseManager, partInUse, inTransitReserved, false, PartQuality.QUALITY_A);
+
+            // Assert: in-transit refit part should count as transfer, not in-use or stored
+            assertEquals(0, useCount[0],
+                  "In-transit refit-reserved part should NOT count as in-use");
+            assertEquals(0, storeCount[0],
+                  "In-transit refit-reserved part should NOT count as stored");
+            assertEquals(1, transferCount[0],
+                  "In-transit refit-reserved part should count as in-transfer");
         }
     }
 }

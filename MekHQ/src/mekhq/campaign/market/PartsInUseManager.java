@@ -237,10 +237,16 @@ public class PartsInUseManager {
             return;
         }
 
-        // Case 2: Part is reserved for a refit — count as in-use so the auto-resupply
-        // system sees the real available warehouse stock, not parts committed to refits.
+        // Case 2: Part is reserved for a refit — count as in-use if present, or as
+        // in-transfer if still being delivered, so the auto-resupply system sees the
+        // real available warehouse stock, not parts committed to refits.
         if (incomingPart.isReservedForRefit()) {
-            partInUse.setUseCount(partInUse.getUseCount() + incomingPart.getBaseQuantityForPartsInUse());
+            if (incomingPart.isPresent()) {
+                partInUse.setUseCount(partInUse.getUseCount() + incomingPart.getBaseQuantityForPartsInUse());
+            } else {
+                partInUse.setTransferCount(
+                      partInUse.getTransferCount() + incomingPart.getBaseQuantityForPartsInUse());
+            }
             return;
         }
 

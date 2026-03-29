@@ -1513,13 +1513,19 @@ public abstract class Part implements IPartWork, ITechnology {
     /**
      * Gets the quantity of this part if it is currently in use (not available as a spare).
      *
-     * <p>This method returns {@code 0} if the part is reserved or in use as a sub-component (determined by
-     * {@link #isPartUsedOrReserved()}).</p>
+     * <p>This method returns {@code 0} if {@link #isPartUsedOrReserved()} is {@code true}, which covers
+     * any of the following conditions:</p>
+     * <ul>
+     *     <li>The part is a sub-component of another part ({@code parentPart != null})</li>
+     *     <li>The part is reserved for a refit ({@code refitUnit != null})</li>
+     *     <li>The part is reserved by a technician for overnight work ({@code reservedBy != null})</li>
+     * </ul>
      *
      * <p>Otherwise, it delegates to {@link #getBaseQuantityForPartsInUse()}.</p>
      *
      * @return {@code 0} if the part is reserved or a sub-component, otherwise the base quantity
      *
+     * @see #isPartUsedOrReserved()
      * @see #getBaseQuantityForPartsInUse()
      */
     public int getQuantityForPartsInUse() {
