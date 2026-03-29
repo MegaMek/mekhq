@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1494,23 +1494,46 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
+     * Returns the base quantity of this part for Parts In Use reporting, without checking whether the part
+     * is reserved or in use.
+     *
+     * <p>Returns {@code 1} if the part is assigned to a unit, or the part's stored quantity otherwise.</p>
+     *
+     * <p>Subclasses that track quantity differently (e.g. {@code Armor} using armor points, or {@code AmmoStorage}
+     * using shots) should override this method.</p>
+     *
+     * @return the base quantity of this part for reporting purposes
+     *
+     * @see #getQuantityForPartsInUse()
+     */
+    public int getBaseQuantityForPartsInUse() {
+        return (this.getUnit() != null) ? 1 : this.getQuantity();
+    }
+
+    /**
      * Gets the quantity of this part if it is currently in use (not available as a spare).
      *
-     * <p>This method returns {@code 0} if the part is available as a spare (determined by
-     * {@link #isPartUsedOrReserved()}).</p>
+     * <p>This method returns {@code 0} if {@link #isPartUsedOrReserved()} is {@code true}, which covers
+     * any of the following conditions:</p>
+     * <ul>
+     *     <li>The part is a sub-component of another part ({@code parentPart != null})</li>
+     *     <li>The part is reserved for a refit ({@code refitUnit != null})</li>
+     *     <li>The part is reserved by a technician for overnight work ({@code reservedBy != null})</li>
+     * </ul>
      *
-     * <p>Otherwise, it returns {@code 1} if the part is assigned to a unit, or the part's stored quantity if it is
-     * not.</p>
+     * <p>Otherwise, it delegates to {@link #getBaseQuantityForPartsInUse()}.</p>
      *
-     * @return {@code 0} if the part is available as a spare, {@code 1} if assigned to a unit, otherwise the part's
-     *       quantity
+     * @return {@code 0} if the part is reserved or a sub-component, otherwise the base quantity
+     *
+     * @see #isPartUsedOrReserved()
+     * @see #getBaseQuantityForPartsInUse()
      */
     public int getQuantityForPartsInUse() {
         if (isPartUsedOrReserved()) {
             return 0;
         }
 
-        return (this.getUnit() != null) ? 1 : this.getQuantity();
+        return getBaseQuantityForPartsInUse();
     }
 
     @Override
