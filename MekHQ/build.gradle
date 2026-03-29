@@ -210,6 +210,16 @@ tasks.register('deleteAtlasedImages') {
     }
 }
 
+tasks.register('validateSystems', JavaExec) {
+    dependsOn jar
+    dependsOn stageDataFiles
+    description = 'Validates planetary system YAML data files for structural correctness and data integrity.'
+    group = 'verification'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'mekhq.utilities.SystemValidator'
+    args = ["${layout.projectDirectory.asFile}/data/universe/planetary_systems"]
+}
+
 tasks.register('officialUnitList', JavaExec) {
     dependsOn jar
     mustRunAfter(stageDataFiles)

@@ -790,7 +790,7 @@ public class InterstellarMapPanel extends JPanel {
                             if ((null != factions) && !isSystemEmpty(system)) {
                                 int i = 0;
                                 for (Faction faction : factions) {
-                                    if (capitals.get(faction).equals(system.getId())) {
+                                    if (system.getId().equals(capitals.get(faction))) {
                                         g2.setPaint(faction.getColor());
                                         arc.setArcByCenter(x, y, size + 5, 0,
                                               360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
