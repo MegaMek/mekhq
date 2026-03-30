@@ -593,12 +593,17 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
+    public int getBaseQuantityForPartsInUse() {
+        return this.getAmount();
+    }
+
+    @Override
     public int getQuantityForPartsInUse() {
         if (isPartUsedOrReserved()) {
             return 0;
         }
 
-        return this.getAmount();
+        return getBaseQuantityForPartsInUse();
     }
 
     public Part getNewPart() {
