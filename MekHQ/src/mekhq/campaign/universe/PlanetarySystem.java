@@ -220,8 +220,8 @@ public class PlanetarySystem {
     }
 
     public String getName(LocalDate when) {
-        // if no primary slot, then just return the id
-        if (getPrimaryPlanetPosition() < 1 && null != id) {
+        // if no primary slot was explicitly defined, then just return the id
+        if (getSourcedPrimarySlot() == null && id != null) {
             return id;
         }
 
@@ -473,7 +473,8 @@ public class PlanetarySystem {
     }
 
     public StarType getStar() {
-        return getSourcedStar().getValue();
+        SourceableValue<StarType> sourcedStar = getSourcedStar();
+        return sourcedStar == null ? null : sourcedStar.getValue();
     }
 
     public SourceableValue<StarType> getSourcedStar() {

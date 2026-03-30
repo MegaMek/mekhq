@@ -586,6 +586,7 @@ public class CampaignNewDayManager {
      * @author Illiani
      * @since 0.50.10
      */
+
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();

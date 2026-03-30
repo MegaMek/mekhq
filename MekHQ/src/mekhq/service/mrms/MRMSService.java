@@ -1044,6 +1044,10 @@ public class MRMSService {
                 continue;
             }
 
+            if (!checkAmmoSupply(partWork)) {
+                continue;
+            }
+
             // See if this part is blocked or can be dealt with
             // Find an appropriate tech and get their skill then create an
             // elite tech with the same skill
@@ -1157,6 +1161,22 @@ public class MRMSService {
         }
 
         return (!(part instanceof Armor)) || ((Armor) part).isInSupply();
+    }
+
+    /**
+     * Checks whether an AmmoBin has ammo available in the warehouse.
+     * Non-AmmoBin parts always pass. Salvaging parts always pass.
+     *
+     * @param part The part to check.
+     *
+     * @return {@code true} if the part is not an AmmoBin, or if ammo is available.
+     */
+    private static boolean checkAmmoSupply(IPartWork part) {
+        if (part.isSalvaging()) {
+            return true;
+        }
+
+        return (!(part instanceof AmmoBin)) || ((AmmoBin) part).isAmmoAvailable();
     }
 
     private static WorkTimeCalculation calculateNewMRMSWorktime(IPartWork partWork, Person tech, MRMSOption mrmsOption,

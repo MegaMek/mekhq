@@ -33,6 +33,7 @@
 package mekhq.service.mrms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -62,6 +63,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Attributes;
@@ -893,6 +895,67 @@ public class MRMSServiceTest {
                 .filter(p -> p instanceof Armor)
                 .map(p -> (Armor) p)
                 .forEach(MRMSServiceTest.this::breakArmor);
+        }
+    }
+
+    /**
+     * Regression test for GitHub #7414: AmmoBins with no ammo available in the warehouse
+     * should be filtered out of the repair list so MRMS does not futilely retry them.
+     */
+    @Nested
+    public class TestMRMSAmmoBinFiltering {
+        Unit unit;
+
+        static final int skillMin = SkillLevel.ULTRA_GREEN.getExperienceLevel();
+        static final int skillMax = SkillLevel.LEGENDARY.getExperienceLevel();
+        static final int targetNumberPreferred = 6;
+        static final int targetNumberMax = 6;
+        static final int dailyTimeMin = 0;
+
+        @BeforeEach
+        public void beforeEach() {
+            when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+            Entity entity = getUrbanMek();
+            assertNotNull(entity);
+            unit = new Unit(entity, mockCampaign);
+            unit.initializeParts(true);
+        }
+
+        /**
+         * When no ammo is available in the warehouse, MRMS should not attempt to
+         * reload AmmoBins at all — they should be filtered out as having no valid parts.
+         */
+        @Test
+        public void ammoBinsWithNoAmmoAreFilteredOut() {
+            addMRMSOption(PartRepairType.AMMUNITION, skillMin, skillMax,
+                  targetNumberPreferred, targetNumberMax, dailyTimeMin);
+            configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+
+            // Make all AmmoBins need reloading
+            List<AmmoBin> ammoBins = unit.getParts().stream()
+                  .filter(p -> p instanceof AmmoBin)
+                  .map(p -> (AmmoBin) p)
+                  .toList();
+            assertFalse(ammoBins.isEmpty(), "UrbanMech should have ammo bins");
+
+            for (AmmoBin ammoBin : ammoBins) {
+                ammoBin.setShotsNeeded(ammoBin.getFullShots());
+            }
+
+            // mockQuartermaster.getAmmoAvailable() returns 0 by default (no ammo in warehouse)
+
+            // Act
+            try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
+                compute.when(() -> Compute.randomInt(anyInt())).thenReturn(6);
+                MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+            }
+
+            // Assert: fixPart should never be called for AmmoBins since they were filtered out
+            verify(mockCampaign, Mockito.never())
+                  .fixPart(argThat(p -> p instanceof AmmoBin), any(Person.class));
         }
     }
 
