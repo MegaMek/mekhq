@@ -493,7 +493,7 @@ public class CampaignNewDayManager {
         }
 
         // Easter Egg: Voice of Kerensky
-        if (VoiceOfKerensky.shouldTrigger(today, campaign)) {
+        if (VoiceOfKerensky.shouldTrigger(today, campaign.getCurrentSystem())) {
             VoiceOfKerensky.trigger(campaign);
         }
 

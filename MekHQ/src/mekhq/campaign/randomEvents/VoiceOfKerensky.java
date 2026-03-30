@@ -94,11 +94,11 @@ public class VoiceOfKerensky {
      * </ul>
      *
      * @param today the current campaign date
-     * @param campaign the current campaign
+     * @param currentSystem the player's current planetary system, or {@code null} if unavailable
      *
      * @return {@code true} if the event should trigger
      */
-    public static boolean shouldTrigger(LocalDate today, Campaign campaign) {
+    public static boolean shouldTrigger(LocalDate today, @Nullable PlanetarySystem currentSystem) {
         if (today.getMonthValue() != BROADCAST_MONTH || today.getDayOfMonth() != BROADCAST_DAY) {
             return false;
         }
@@ -108,7 +108,6 @@ public class VoiceOfKerensky {
             return false;
         }
 
-        PlanetarySystem currentSystem = campaign.getCurrentSystem();
         if (currentSystem == null) {
             return false;
         }
