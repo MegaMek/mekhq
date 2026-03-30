@@ -185,6 +185,6 @@ primaryfactory:Various
 systemmanufacturer:CHASSIS:Republic-R
 systemmanufacturer:ENGINE:Leenex 60
 systemmanufacturer:ARMOR:Kallon FWL Special Ferro-Fibrous
-systemmanufacturer:JUMPJET:Pitban 6000
+systemmanufacturer:JUMP_JET:Pitban 6000
 systemmanufacturer:COMMUNICATIONS:Dalban Interact
 systemmanufacturer:TARGETING:Dalban Urban
