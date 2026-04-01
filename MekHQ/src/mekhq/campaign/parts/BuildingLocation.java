@@ -66,8 +66,8 @@ public class BuildingLocation extends Part {
     public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2300, 2350, 2400)
             .setApproximate(true, false, false)
-            .setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH)
+            .setPrototypeFactions(Faction.TH, Faction.CS)
+            .setProductionFactions(Faction.TH, Faction.CS)
             .setTechRating(TechRating.C)
             .setAvailability(AvailabilityValue.A,
                     AvailabilityValue.A,

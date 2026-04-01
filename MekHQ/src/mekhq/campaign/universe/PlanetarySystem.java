@@ -473,7 +473,8 @@ public class PlanetarySystem {
     }
 
     public StarType getStar() {
-        return getSourcedStar().getValue();
+        SourceableValue<StarType> sourcedStar = getSourcedStar();
+        return sourcedStar == null ? null : sourcedStar.getValue();
     }
 
     public SourceableValue<StarType> getSourcedStar() {

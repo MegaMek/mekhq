@@ -165,6 +165,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RiotScenario;
+import mekhq.campaign.randomEvents.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.stratCon.StratConCampaignState;
@@ -489,6 +490,11 @@ public class CampaignNewDayManager {
         // Random Events
         if (today.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && today.isBefore(GRAY_MONDAY_EVENTS_END)) {
             new GrayMonday(campaign, today);
+        }
+
+        // Easter Egg: Voice of Kerensky
+        if (VoiceOfKerensky.shouldTrigger(today, campaign.getCurrentSystem())) {
+            VoiceOfKerensky.trigger(campaign);
         }
 
         // Faction Standing
