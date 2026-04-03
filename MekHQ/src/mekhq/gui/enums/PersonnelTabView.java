@@ -40,10 +40,10 @@ public enum PersonnelTabView {
     //region Enum Declarations
     GRAPHIC("PersonnelTabView.GRAPHIC.text", "PersonnelTabView.GRAPHIC.toolTipText"),
     GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText"),
-    PILOT_GUNNERY_SKILLS("PersonnelTabView.PILOT_GUNNERY_SKILLS.text",
-          "PersonnelTabView.PILOT_GUNNERY_SKILLS.toolTipText"),
-    PILOT_GUNNERY_SKILLS_II("PersonnelTabView.PILOT_GUNNERY_SKILLS_II.text",
-          "PersonnelTabView.PILOT_GUNNERY_SKILLS_II.toolTipText"),
+    GUNNERY_PILOT_SKILLS("PersonnelTabView.GUNNERY_PILOT_SKILLS.text",
+          "PersonnelTabView.GUNNERY_PILOT_SKILLS.toolTipText"),
+    GUNNERY_PILOT_SKILLS_II("PersonnelTabView.GUNNERY_PILOT_SKILLS_II.text",
+          "PersonnelTabView.GUNNERY_PILOT_SKILLS_II.toolTipText"),
     INFANTRY_SKILLS("PersonnelTabView.INFANTRY_SKILLS.text", "PersonnelTabView.INFANTRY_SKILLS.toolTipText"),
     TACTICAL_SKILLS("PersonnelTabView.TACTICAL_SKILLS.text", "PersonnelTabView.TACTICAL_SKILLS.toolTipText"),
     TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS.text", "PersonnelTabView.TECHNICAL_SKILLS.toolTipText"),
@@ -91,12 +91,12 @@ public enum PersonnelTabView {
         return this == GENERAL;
     }
 
-    public boolean isPilotGunnerySkillsII() {
-        return this == PILOT_GUNNERY_SKILLS_II;
+    public boolean istGunneryPiloSkillsII() {
+        return this == GUNNERY_PILOT_SKILLS_II;
     }
 
-    public boolean isPilotGunnerySkills() {
-        return this == PILOT_GUNNERY_SKILLS;
+    public boolean isGunneryPilotSkills() {
+        return this == GUNNERY_PILOT_SKILLS;
     }
 
     public boolean isInfantrySkills() {
