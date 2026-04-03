@@ -52,6 +52,7 @@ import megamek.common.Player;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.event.PostGameResolution;
 import megamek.common.icons.Camouflage;
+import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
@@ -171,5 +172,33 @@ class ResolveScenarioTrackerTest {
         TestUnit capturedUnit = tracker.devastatedEnemyUnits.get(0);
         assertTrue(tracker.salvageStatus.containsKey(capturedUnit.getId()),
               "Devastated enemy unit should be tracked in salvageStatus for prisoner processing");
+    }
+
+    /**
+     * Verifies that an enemy EjectedCrew in the devastated list is routed to enemyEjections
+     * and NOT added to devastatedEnemyUnits, matching the graveyard handling pattern.
+     */
+    @Test
+    void processGameAddsDevastatedEnemyEjectedCrewToEnemyEjections() {
+        Entity originalRide = createEnemyEntity("Locust LCT-1V");
+        EjectedCrew ejectedCrew = new EjectedCrew(originalRide);
+        ejectedCrew.setOwner(enemyPlayer);
+        UUID ejectedId = UUID.randomUUID();
+        ejectedCrew.setExternalIdAsString(ejectedId.toString());
+        ejectedCrew.getCrew().setExternalIdAsString(ejectedId.toString(), 0);
+        ejectedCrew.setCamouflage(new Camouflage());
+
+        when(victoryEvent.getDevastatedEntities())
+              .thenReturn(Collections.enumeration(List.of(ejectedCrew)))
+              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
+              .thenReturn(Collections.enumeration(List.of(ejectedCrew)));
+
+        ResolveScenarioTracker tracker = createTracker();
+        tracker.processGame();
+
+        assertTrue(tracker.enemyEjections.containsKey(ejectedId),
+              "Ejected enemy crew from devastated unit should be in enemyEjections");
+        assertTrue(tracker.devastatedEnemyUnits.isEmpty(),
+              "EjectedCrew should not appear in devastatedEnemyUnits");
     }
 }
