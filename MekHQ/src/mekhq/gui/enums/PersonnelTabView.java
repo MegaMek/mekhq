@@ -91,7 +91,7 @@ public enum PersonnelTabView {
         return this == GENERAL;
     }
 
-    public boolean isGunneryPiloSkillsII() {
+    public boolean isGunneryPilotSkillsII() {
         return this == GUNNERY_PILOT_SKILLS_II;
     }
 
