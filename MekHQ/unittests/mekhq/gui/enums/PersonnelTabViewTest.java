@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,6 +78,20 @@ public class PersonnelTabViewTest {
                 assertTrue(personnelTabView.isGeneral());
             } else {
                 assertFalse(personnelTabView.isGeneral());
+            }
+        }
+    }
+
+    /**
+     * @deprecated use {@link #testIsGunneryPilotSkills()} instead.
+     */
+    @Deprecated(since = "0.50.13", forRemoval = true)
+    public void testIsPilotGunnerySkills() {
+        for (final PersonnelTabView personnelTabView : views) {
+            if (personnelTabView == PersonnelTabView.GUNNERY_PILOT_SKILLS) {
+                assertTrue(personnelTabView.isGunneryPilotSkills());
+            } else {
+                assertFalse(personnelTabView.isGunneryPilotSkills());
             }
         }
     }

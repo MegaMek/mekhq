@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,8 +91,24 @@ public enum PersonnelTabView {
         return this == GENERAL;
     }
 
+    /**
+     * @deprecated use {@link #isGunneryPilotSkillsII()} instead.
+     */
+    @Deprecated(since = "0.50.13", forRemoval = true)
+    public boolean isPilotGunnerySkillsII() {
+        return this == GUNNERY_PILOT_SKILLS_II;
+    }
+
     public boolean isGunneryPilotSkillsII() {
         return this == GUNNERY_PILOT_SKILLS_II;
+    }
+
+    /**
+     * @deprecated use {@link #isGunneryPilotSkills()} instead.
+     */
+    @Deprecated(since = "0.50.13", forRemoval = true)
+    public boolean isPilotGunnerySkills() {
+        return this == GUNNERY_PILOT_SKILLS;
     }
 
     public boolean isGunneryPilotSkills() {
