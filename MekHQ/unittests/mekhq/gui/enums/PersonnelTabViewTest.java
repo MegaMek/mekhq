@@ -83,7 +83,7 @@ public class PersonnelTabViewTest {
     }
 
     @Test
-    public void testIsPilotGunnerySkills() {
+    public void testIsGunneryPilotSkills() {
         for (final PersonnelTabView personnelTabView : views) {
             if (personnelTabView == PersonnelTabView.GUNNERY_PILOT_SKILLS) {
                 assertTrue(personnelTabView.isGunneryPilotSkills());
