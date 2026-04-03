@@ -68,8 +68,8 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Transaction transaction = financeModel.getTransaction(financeTable.getSelectedRow());
-        int row = financeTable.getSelectedRow();
+        int row = financeTable.convertRowIndexToModel(financeTable.getSelectedRow());
+        Transaction transaction = financeModel.getTransaction(row);
         if (null == transaction) {
             return;
         }
