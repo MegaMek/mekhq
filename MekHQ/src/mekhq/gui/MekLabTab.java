@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1225,6 +1225,7 @@ public class MekLabTab extends CampaignGuiTab {
         private BAStructureTab structureTab;
         private BAEquipmentTab equipmentTab;
         private BABuildTab buildTab;
+        private PreviewTab previewTab;
 
         public BattleArmorPanel(BattleArmor ba) {
             entity = ba;
@@ -1248,11 +1249,13 @@ public class MekLabTab extends CampaignGuiTab {
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
+            previewTab = new PreviewTab(this);
 
             addTab("Structure", new JScrollPaneWithSpeed(structureTab));
             addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
             addTab("Assign Criticals", new JScrollPaneWithSpeed(buildTab));
             addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
+            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
             this.repaint();
         }
 
@@ -1261,6 +1264,7 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.refresh();
             equipmentTab.refresh();
             buildTab.refresh();
+            previewTab.refresh();
             refreshSummary();
         }
 
