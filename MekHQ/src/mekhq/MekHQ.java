@@ -230,13 +230,13 @@ public class MekHQ implements GameListener {
         updateGuiScaling(); // also sets the look-and-feel
         setTooltipSettings();
 
-        // Show licensing/welcome dialog
-        LicensingDialog.showIfNeeded(null,
-              "Welcome to MekHQ " + MHQConstants.VERSION);
-
         initEventHandlers();
         // create a start-up frame and display it
         new StartupScreenPanel(this).getFrame().setVisible(true);
+
+        // Show licensing/welcome dialog after startup screen is visible
+        LicensingDialog.showIfNeeded(null,
+              "Welcome to " + MHQConstants.PROJECT_NAME + " " + MHQConstants.VERSION);
     }
 
     /**

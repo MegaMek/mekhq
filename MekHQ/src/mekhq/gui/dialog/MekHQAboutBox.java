@@ -34,7 +34,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -44,10 +43,11 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 
-import megamek.client.ui.Messages;
+import megamek.client.ui.dialogs.LicensingDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
@@ -112,44 +112,29 @@ public class MekHQAboutBox extends JDialog {
         aboutPane.setCaretPosition(0);
         aboutPane.addHyperlinkListener(this::handleHyperlink);
 
+        JScrollPane scrollPane = new JScrollPane(aboutPane);
+        scrollPane.setPreferredSize(UIUtil.scaleForGUI(550, 350));
+        scrollPane.setBorder(null);
+
         // Layout
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
         contentPanel.add(versionPanel, BorderLayout.NORTH);
-        contentPanel.add(aboutPane, BorderLayout.CENTER);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         getContentPane().add(contentPanel);
         pack();
     }
 
     private static String buildAboutHtml() {
-        int width = UIUtil.scaleForGUI(500);
-        String wikiUrl = Messages.getString("LicensingDialog.wikiUrl");
-        String gameContentRulesUrl = Messages.getString("LicensingDialog.gameContentRulesUrl");
-        String gameContentRulesText = Messages.getString("LicensingDialog.gameContentRulesText");
-        String discordUrl = Messages.getString("LicensingDialog.discordUrl");
-        String discordText = Messages.getString("LicensingDialog.discordText");
-
-        return "<html><body width='" + width + "'>"
-              + "<p>" + Messages.getString("LicensingDialog.disclaimer") + "</p>"
-              + "<p>" + Messages.getString("LicensingDialog.licensing")
-              + " <a href=\"" + gameContentRulesUrl + "\">" + gameContentRulesText + "</a>.</p>"
-              + "<p>" + Messages.getString("LicensingDialog.wiki")
-              + " <a href=\"" + wikiUrl + "\">" + wikiUrl + "</a></p>"
-              + "<p>" + Messages.getString("CommonAboutDialog.community")
-              + " <a href=\"" + discordUrl + "\">" + discordText + "</a>.</p>"
-              + "<p><small><i>" + Messages.getString("LicensingDialog.trademark")
-              + "</i></small></p>"
+        return "<html><body width='" + UIUtil.scaleForGUI(500) + "'>"
+              + LicensingDialog.buildLegalHtml()
               + "</body></html>";
     }
 
     private void handleHyperlink(HyperlinkEvent event) {
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            try {
-                Desktop.getDesktop().browse(event.getURL().toURI());
-            } catch (Exception ex) {
-                LOGGER.error(ex, "Failed to open URL: {}", event.getURL());
-            }
+            UIUtil.browse(event.getURL().toString(), this);
         }
     }
 
