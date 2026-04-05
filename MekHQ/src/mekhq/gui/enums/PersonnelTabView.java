@@ -94,7 +94,7 @@ public enum PersonnelTabView {
     /**
      * @deprecated use {@link #isGunneryPilotSkillsII()} instead.
      */
-    @Deprecated(since = "0.50.13", forRemoval = true)
+    @Deprecated(since = "{SEMVER}", forRemoval = true)
     public boolean isPilotGunnerySkillsII() {
         return this == GUNNERY_PILOT_SKILLS_II;
     }
@@ -106,7 +106,7 @@ public enum PersonnelTabView {
     /**
      * @deprecated use {@link #isGunneryPilotSkills()} instead.
      */
-    @Deprecated(since = "0.50.13", forRemoval = true)
+    @Deprecated(since = "{SEMVER}", forRemoval = true)
     public boolean isPilotGunnerySkills() {
         return this == GUNNERY_PILOT_SKILLS;
     }
