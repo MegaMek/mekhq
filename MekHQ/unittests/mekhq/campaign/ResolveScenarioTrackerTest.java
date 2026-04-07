@@ -1,0 +1,204 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
+
+import megamek.client.IClient;
+import megamek.common.Player;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.event.PostGameResolution;
+import megamek.common.icons.Camouflage;
+import megamek.common.units.EjectedCrew;
+import megamek.common.units.Entity;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.unit.TestUnit;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Tests for {@link ResolveScenarioTracker#processGame()}, verifying that enemy entities
+ * destroyed by ammo detonation (devastated) are properly tracked for prisoner capture.
+ *
+ * @see <a href="https://github.com/MegaMek/mekhq/issues/6497">GitHub issue #6497</a>
+ */
+class ResolveScenarioTrackerTest {
+
+    private Campaign campaign;
+    private Scenario scenario;
+    private IClient client;
+    private PostGameResolution victoryEvent;
+
+    // Players
+    private Player localPlayer;
+    private Player enemyPlayer;
+
+    @BeforeAll
+    static void beforeAll() {
+        EquipmentType.initializeTypes();
+    }
+
+    @BeforeEach
+    void setUp() {
+        // Create two players on different teams so isEnemyOf works correctly
+        localPlayer = new Player(0, "LocalPlayer");
+        localPlayer.setTeam(1);
+
+        enemyPlayer = new Player(1, "EnemyPlayer");
+        enemyPlayer.setTeam(2);
+
+        // Mock IClient
+        client = mock(IClient.class);
+        when(client.getLocalPlayer()).thenReturn(localPlayer);
+
+        // Mock Scenario - return empty forces and loot
+        scenario = mock(Scenario.class);
+        Formation emptyFormation = mock(Formation.class);
+        when(emptyFormation.getAllUnits(anyBoolean())).thenReturn(new Vector<>());
+        when(scenario.getForces(any())).thenReturn(emptyFormation);
+        when(scenario.getTraitorUnits(any())).thenReturn(Collections.emptyList());
+        when(scenario.getLoot()).thenReturn(List.of());
+        when(scenario.isTraitor(any(Entity.class), any(Campaign.class))).thenReturn(false);
+
+        // Mock Campaign
+        campaign = mock(Campaign.class);
+        when(campaign.getFaction()).thenReturn(null);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
+        CampaignOptions campaignOptions = new CampaignOptions();
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(campaign.getGameOptions()).thenReturn(new megamek.common.options.GameOptions());
+
+        // Mock PostGameResolution - default empty enumerations
+        victoryEvent = mock(PostGameResolution.class);
+        when(victoryEvent.getEntities()).thenReturn(Collections.emptyEnumeration());
+        when(victoryEvent.getGraveyardEntities()).thenReturn(Collections.emptyEnumeration());
+        when(victoryEvent.getRetreatedEntities()).thenReturn(Collections.emptyEnumeration());
+        when(victoryEvent.getDevastatedEntities()).thenReturn(Collections.emptyEnumeration());
+        when(victoryEvent.getWreckedEntities()).thenReturn(Collections.emptyEnumeration());
+    }
+
+    /**
+     * Creates a ResolveScenarioTracker with the test fixtures and sets the victory event and client.
+     */
+    private ResolveScenarioTracker createTracker() {
+        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, campaign, true);
+        tracker.setClient(client);
+        tracker.setEvent(victoryEvent);
+        return tracker;
+    }
+
+    /**
+     * Creates an enemy entity with a unique external ID, assigned to the enemy player.
+     */
+    private Entity createEnemyEntity(String unitName) {
+        Entity entity = getEntityForUnitTesting(unitName, false);
+        if (entity == null) {
+            throw new IllegalStateException("Failed to load test entity: " + unitName);
+        }
+        entity.setOwner(enemyPlayer);
+        entity.setExternalIdAsString(UUID.randomUUID().toString());
+        entity.setCamouflage(new Camouflage());
+        return entity;
+    }
+
+    /**
+     * Verifies that an enemy entity in the devastated list is added to devastatedEnemyUnits
+     * and tracked in salvageStatus. This is the fix for GitHub issue #6497: pilots of opfor
+     * units destroyed by ammo detonation were missing from the capturable personnel list.
+     */
+    @Test
+    void processGameAddsDevastatedEnemyUnitsToDevastatedList() {
+        Entity devastatedEnemy = createEnemyEntity("Locust LCT-1V");
+
+        when(victoryEvent.getDevastatedEntities())
+              .thenReturn(Collections.enumeration(List.of(devastatedEnemy)))
+              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
+              .thenReturn(Collections.enumeration(List.of(devastatedEnemy)));
+
+        ResolveScenarioTracker tracker = createTracker();
+        tracker.processGame();
+
+        assertFalse(tracker.devastatedEnemyUnits.isEmpty(),
+              "Devastated enemy units should contain the destroyed enemy entity");
+        assertEquals(1, tracker.devastatedEnemyUnits.size(),
+              "Should have exactly one devastated enemy unit");
+
+        TestUnit capturedUnit = tracker.devastatedEnemyUnits.get(0);
+        assertTrue(tracker.salvageStatus.containsKey(capturedUnit.getId()),
+              "Devastated enemy unit should be tracked in salvageStatus for prisoner processing");
+    }
+
+    /**
+     * Verifies that an enemy EjectedCrew in the devastated list is routed to enemyEjections
+     * and NOT added to devastatedEnemyUnits, matching the graveyard handling pattern.
+     */
+    @Test
+    void processGameAddsDevastatedEnemyEjectedCrewToEnemyEjections() {
+        Entity originalRide = createEnemyEntity("Locust LCT-1V");
+        EjectedCrew ejectedCrew = new EjectedCrew(originalRide);
+        ejectedCrew.setOwner(enemyPlayer);
+        UUID ejectedId = UUID.randomUUID();
+        ejectedCrew.setExternalIdAsString(ejectedId.toString());
+        ejectedCrew.getCrew().setExternalIdAsString(ejectedId.toString(), 0);
+        ejectedCrew.setCamouflage(new Camouflage());
+
+        when(victoryEvent.getDevastatedEntities())
+              .thenReturn(Collections.enumeration(List.of(ejectedCrew)))
+              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
+              .thenReturn(Collections.enumeration(List.of(ejectedCrew)));
+
+        ResolveScenarioTracker tracker = createTracker();
+        tracker.processGame();
+
+        assertTrue(tracker.enemyEjections.containsKey(ejectedId),
+              "Ejected enemy crew from devastated unit should be in enemyEjections");
+        assertTrue(tracker.devastatedEnemyUnits.isEmpty(),
+              "EjectedCrew should not appear in devastatedEnemyUnits");
+    }
+}

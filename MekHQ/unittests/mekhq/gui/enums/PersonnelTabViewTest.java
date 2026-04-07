@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,13 +82,38 @@ public class PersonnelTabViewTest {
         }
     }
 
-    @Test
+    /**
+     * @deprecated use {@link #testIsGunneryPilotSkills()} instead.
+     */
+    @Deprecated(since = "{SEMVER}", forRemoval = true)
     public void testIsPilotGunnerySkills() {
         for (final PersonnelTabView personnelTabView : views) {
-            if (personnelTabView == PersonnelTabView.PILOT_GUNNERY_SKILLS) {
-                assertTrue(personnelTabView.isPilotGunnerySkills());
+            if (personnelTabView == PersonnelTabView.GUNNERY_PILOT_SKILLS) {
+                assertTrue(personnelTabView.isGunneryPilotSkills());
             } else {
-                assertFalse(personnelTabView.isPilotGunnerySkills());
+                assertFalse(personnelTabView.isGunneryPilotSkills());
+            }
+        }
+    }
+
+    @Test
+    public void testIsGunneryPilotSkills() {
+        for (final PersonnelTabView personnelTabView : views) {
+            if (personnelTabView == PersonnelTabView.GUNNERY_PILOT_SKILLS) {
+                assertTrue(personnelTabView.isGunneryPilotSkills());
+            } else {
+                assertFalse(personnelTabView.isGunneryPilotSkills());
+            }
+        }
+    }
+
+    @Test
+    public void testIsGunneryPilotSkillsII() {
+        for (final PersonnelTabView personnelTabView : views) {
+            if (personnelTabView == PersonnelTabView.GUNNERY_PILOT_SKILLS_II) {
+                assertTrue(personnelTabView.isGunneryPilotSkillsII());
+            } else {
+                assertFalse(personnelTabView.isGunneryPilotSkillsII());
             }
         }
     }

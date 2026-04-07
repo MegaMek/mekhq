@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,6 +66,7 @@ import megamek.client.Client;
 import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.dialogs.LicensingDialog;
 import megamek.client.ui.dialogs.abstractDialogs.AutoResolveChanceDialog;
 import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
 import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
@@ -232,6 +233,10 @@ public class MekHQ implements GameListener {
         initEventHandlers();
         // create a start-up frame and display it
         new StartupScreenPanel(this).getFrame().setVisible(true);
+
+        // Show licensing/welcome dialog after startup screen is visible
+        LicensingDialog.showIfNeeded(null,
+              "Welcome to " + MHQConstants.PROJECT_NAME + " " + MHQConstants.VERSION);
     }
 
     /**

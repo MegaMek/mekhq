@@ -365,6 +365,18 @@ public class ResolveScenarioTracker {
                         status.assignFoundEntity(entity, true);
                     }
                 }
+            } else if (entity.getOwner().isEnemyOf(client.getLocalPlayer())) {
+                if (entity instanceof EjectedCrew) {
+                    enemyEjections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()),
+                          (EjectedCrew) entity);
+                } else {
+                    // Completely destroyed units (such as from an ammo explosion) need to be
+                    // kept track of, as their crew may still be capturable
+                    TestUnit nu = generateNewTestUnit(entity);
+                    UnitStatus us = new UnitStatus(nu);
+                    salvageStatus.put(nu.getId(), us);
+                    devastatedEnemyUnits.add(nu);
+                }
             }
 
             appendKillCredit(entity);
