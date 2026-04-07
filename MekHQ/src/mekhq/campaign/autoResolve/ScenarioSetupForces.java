@@ -25,7 +25,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  *
- * MechWarrior Copyright Microsoft Corporation. MegaMek was created under
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
  * Microsoft's "Game Content Usage Rules"
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
@@ -501,6 +501,32 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
         for (final Entity entity : entities) {
             lastTouchesBeforeSendingEntity(game, entity);
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
+
+            String playerName = game.getPlayer(entity.getOwnerId()).getName();
+            String defaultForceName = (playerName == null || playerName.isBlank() ? "Player" : playerName.trim())
+                  + "|1";
+
+            // Ensure every entity has a force assignment so it gets added to the simulation
+            if (entity.getForceString().isBlank()) {
+                entity.setForceString(defaultForceName);
+            }
+
+            // Strip leading empty-named force segments from the forceString.
+            // The campaign root force may have no name, producing a forceString like
+            // "|1||Force Name|29||...". Forces.verifyForceName rejects blank names,
+            // causing the entire force chain to fail. Remove those segments.
+            String fs = entity.getForceString().trim();
+            while (!fs.isEmpty() && fs.indexOf('|') >= 0 && fs.substring(0, fs.indexOf('|')).isBlank()) {
+                int sep = fs.indexOf("||");
+                if (sep >= 0) {
+                    fs = fs.substring(sep + 2).trim();
+                } else {
+                    break;
+                }
+            }
+            if (!fs.equals(entity.getForceString())) {
+                entity.setForceString(fs.isBlank() ? defaultForceName : fs);
+            }
 
             // Restore forces from MULs or other external sources from the forceString, if
             // any
