@@ -901,7 +901,8 @@ public class StratConRulesManager {
             for (Unit unit : potentialUnits) {
                 if (isValidUnitForScenario(unit,
                       scenarioForceTemplate,
-                      campaign.getCampaignOptions().isUseDropShips())) {
+                      campaign.getCampaignOptions().isUseDropShips(),
+                      scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
                     scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
                     AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
                           scenarioForceTemplate.getForceName(),
@@ -1006,20 +1007,40 @@ public class StratConRulesManager {
 
     /**
      * Validates if a given unit can be included in the scenario based on the template's rules and restrictions. It
-     * checks unit type, availability, functionality, and specific conditions such as DropShip usage.
+     * checks unit type, availability, functionality, and specific conditions such as DropShip usage and map
+     * compatibility.
      *
      * @param unit                  The unit to validate.
      * @param scenarioForceTemplate The force template containing the rules for unit validation.
      * @param isUsePlayerDropShips  Indicates if DropShips are allowed based on campaign options.
+     * @param mapLocation           The map location type of the scenario, used to check if the unit can operate there.
      *
      * @return {@code true} if the unit matches the template's requirements and can be included in the scenario,
      *       {@code false} otherwise.
      */
     private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
-          boolean isUsePlayerDropShips) {
+          boolean isUsePlayerDropShips, MapLocation mapLocation) {
         // Check if DropShips are allowed and the correct unit type matches
         if (scenarioForceTemplate.getAllowedUnitType() == 11 && !isUsePlayerDropShips) {
             return false;
+        }
+
+        // Check if the unit can operate on the scenario's map type
+        Entity entity = unit.getEntity();
+        if (entity != null) {
+            boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
+            boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
+
+            if ((isGround && entity.doomedOnGround())
+                  || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+                  || (mapLocation == Space && entity.doomedInSpace())) {
+                return false;
+            }
+
+            // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground
+            if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
+                return false;
+            }
         }
 
         // Validate the unit type, availability, and functionality
