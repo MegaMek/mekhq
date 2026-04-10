@@ -52,12 +52,14 @@ import megamek.common.Player;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.event.PostGameResolution;
 import megamek.common.icons.Camouflage;
+import megamek.common.interfaces.IEntityRemovalConditions;
 import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.TestUnit;
+import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -200,5 +202,102 @@ class ResolveScenarioTrackerTest {
               "Ejected enemy crew from devastated unit should be in enemyEjections");
         assertTrue(tracker.devastatedEnemyUnits.isEmpty(),
               "EjectedCrew should not appear in devastatedEnemyUnits");
+    }
+
+    /**
+     * Creates a player entity with a unique external ID and crew, assigned to the local player.
+     */
+    private Entity createPlayerEntity(String unitName) {
+        Entity entity = getEntityForUnitTesting(unitName, false);
+        if (entity == null) {
+            throw new IllegalStateException("Failed to load test entity: " + unitName);
+        }
+        entity.setOwner(localPlayer);
+        UUID entityId = UUID.randomUUID();
+        entity.setExternalIdAsString(entityId.toString());
+        entity.setCamouflage(new Camouflage());
+
+        // Ensure the crew has a valid external ID so crew recovery can be tested
+        if (entity.getCrew() != null) {
+            entity.getCrew().setExternalIdAsString(UUID.randomUUID().toString(), 0);
+        }
+        return entity;
+    }
+
+    /**
+     * Creates a mock {@link Unit} wrapping the given entity with a specific ID.
+     */
+    private Unit createMockUnit(Entity entity, UUID unitId) {
+        Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(unitId);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.getName()).thenReturn(entity.getDisplayName());
+        return unit;
+    }
+
+    /**
+     * Verifies that a player unit deployed by MekHQ but never present in game results
+     * (e.g., rejected by the server as an illegal design) is recovered rather than
+     * treated as a total loss. This is the fix for GitHub issue #6606.
+     *
+     * @see <a href="https://github.com/MegaMek/mekhq/issues/6606">GitHub issue #6606</a>
+     */
+    @Test
+    void processGameRecoversDeployedUnitNotInResults() {
+        Entity playerEntity = createPlayerEntity("Locust LCT-1V");
+        UUID unitId = UUID.fromString(playerEntity.getExternalIdAsString());
+        Unit unit = createMockUnit(playerEntity, unitId);
+
+        ResolveScenarioTracker tracker = createTracker();
+
+        // Simulate the state the constructor creates: unit is deployed but assumed lost
+        tracker.units.add(unit);
+        ResolveScenarioTracker.UnitStatus status = new ResolveScenarioTracker.UnitStatus(unit);
+        tracker.unitsStatus.put(unitId, status);
+
+        // Precondition: UnitStatus defaults to total loss
+        assertTrue(status.isTotalLoss(), "UnitStatus should default to total loss");
+
+        // The unit does NOT appear in any victory event enumeration (all are empty),
+        // so entities map will remain empty after processGame
+        tracker.processGame();
+
+        // The safety net should have recovered the unit
+        assertFalse(status.isTotalLoss(),
+              "Unit should not be a total loss when it never appeared in game results");
+
+        // Crew should be tracked as alive
+        UUID crewId = UUID.fromString(playerEntity.getCrew().getExternalIdAsString());
+        assertTrue(tracker.pilots.containsKey(crewId),
+              "Crew of recovered unit should be tracked in pilots map");
+    }
+
+    /**
+     * Verifies that a player unit which DID appear in results is NOT double-processed
+     * by the safety-net recovery logic.
+     */
+    @Test
+    void processGameDoesNotRecoverUnitFoundInResults() {
+        Entity playerEntity = createPlayerEntity("Locust LCT-1V");
+        UUID unitId = UUID.fromString(playerEntity.getExternalIdAsString());
+        Unit unit = createMockUnit(playerEntity, unitId);
+
+        // Make the entity appear in the devastated list — it IS in results, genuinely destroyed
+        playerEntity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
+
+        when(victoryEvent.getDevastatedEntities())
+              .thenReturn(Collections.enumeration(List.of(playerEntity)))
+              .thenReturn(Collections.enumeration(List.of(playerEntity)));
+
+        ResolveScenarioTracker tracker = createTracker();
+        tracker.units.add(unit);
+        ResolveScenarioTracker.UnitStatus status = new ResolveScenarioTracker.UnitStatus(unit);
+        tracker.unitsStatus.put(unitId, status);
+
+        tracker.processGame();
+
+        // The entity was found in devastated results, so it should be marked as a total loss
+        assertTrue(status.isTotalLoss(),
+              "Unit that appeared in devastated results should remain a total loss");
     }
 }

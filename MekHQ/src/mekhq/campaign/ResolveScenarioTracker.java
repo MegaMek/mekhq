@@ -233,16 +233,27 @@ public class ResolveScenarioTracker {
             initUnitsAndPilotsWithoutBattle();
         }
 
-        // Handle units that were deployed by MekHQ but never appeared in the MUL results.
-        // This mirrors the same safety check in processGame() - units that were never found
-        // in any result list should not be treated as total losses.
+        recoverUnfoundDeployedUnits();
+
+        checkStatusOfPersonnel();
+    }
+
+    /**
+     * Recovers units that were deployed by MekHQ but never appeared in the game/MUL results.
+     * This can happen when the MegaMek server rejects a unit (e.g., flagged as an illegal design).
+     * Such units should not be treated as total losses — they are returned to the campaign unharmed,
+     * and their crews are tracked as alive.
+     *
+     * @see <a href="https://github.com/MegaMek/mekhq/issues/6606">GitHub issue #6606</a>
+     */
+    void recoverUnfoundDeployedUnits() {
         for (Unit u : units) {
             UUID uid = u.getId();
             UnitStatus status = unitsStatus.get(uid);
             if (status != null && status.isTotalLoss() && !entities.containsKey(uid)) {
                 status.assignFoundEntity(u.getEntity(), false);
-                logger.warn("Unit {} ({}) was deployed but never appeared in MUL results. "
-                    + "Returning it to the campaign.",
+                logger.warn("Unit {} ({}) was deployed but never appeared in results. "
+                    + "It may have been rejected by the server. Returning it to the campaign.",
                     u.getName(), uid);
 
                 Crew crew = u.getEntity().getCrew();
@@ -251,8 +262,6 @@ public class ResolveScenarioTracker {
                 }
             }
         }
-
-        checkStatusOfPersonnel();
     }
 
     private TestUnit generateNewTestUnit(Entity e) {
@@ -528,26 +537,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        // Handle units that were deployed by MekHQ but never appeared in the game results.
-        // This can happen when the MegaMek server rejects a unit (e.g., flagged as an
-        // illegal design). These units should not be treated as total losses - they should
-        // be returned to the campaign unharmed.
-        for (Unit u : units) {
-            UUID uid = u.getId();
-            UnitStatus status = unitsStatus.get(uid);
-            if (status != null && status.isTotalLoss() && !entities.containsKey(uid)) {
-                status.assignFoundEntity(u.getEntity(), false);
-                logger.warn("Unit {} ({}) was deployed but never appeared in game results. "
-                    + "It may have been rejected by the server. Returning it to the campaign.",
-                    u.getName(), uid);
-
-                // Ensure crew is tracked as alive so they are not marked as dead
-                Crew crew = u.getEntity().getCrew();
-                if (crew != null && !"-1".equals(crew.getExternalIdAsString())) {
-                    pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
-                }
-            }
-        }
+        recoverUnfoundDeployedUnits();
 
         checkStatusOfPersonnel();
     }
