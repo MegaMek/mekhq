@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -232,6 +233,8 @@ class ResolveScenarioTrackerTest {
         when(unit.getId()).thenReturn(unitId);
         when(unit.getEntity()).thenReturn(entity);
         when(unit.getName()).thenReturn(entity.getDisplayName());
+        when(unit.getActiveCrew()).thenReturn(new ArrayList<>());
+        when(unit.getCrew()).thenReturn(new ArrayList<>());
         return unit;
     }
 

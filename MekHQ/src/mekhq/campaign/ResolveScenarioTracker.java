@@ -246,7 +246,7 @@ public class ResolveScenarioTracker {
      *
      * @see <a href="https://github.com/MegaMek/mekhq/issues/6606">GitHub issue #6606</a>
      */
-    void recoverUnfoundDeployedUnits() {
+    private void recoverUnfoundDeployedUnits() {
         for (Unit u : units) {
             UUID uid = u.getId();
             UnitStatus status = unitsStatus.get(uid);
