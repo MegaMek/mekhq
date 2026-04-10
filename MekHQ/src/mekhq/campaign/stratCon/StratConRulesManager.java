@@ -1029,16 +1029,10 @@ public class StratConRulesManager {
         Entity entity = unit.getEntity();
         if (entity != null) {
             boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
-            boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
 
             if ((isGround && entity.doomedOnGround())
                   || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
                   || (mapLocation == Space && entity.doomedInSpace())) {
-                return false;
-            }
-
-            // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground
-            if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
                 return false;
             }
         }
