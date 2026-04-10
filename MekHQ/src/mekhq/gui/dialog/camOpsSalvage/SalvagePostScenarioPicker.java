@@ -282,10 +282,10 @@ public class SalvagePostScenarioPicker {
      * to multiple salvage operations on the same day. This method ensures this doesn't happen by removing the force/s
      * (and tech/s) from any other scenarios they have been assigned to.
      *
-     * @param activeScenarios a list of scenarios marked as 'current' (i.e., unresolved)
-     * @param currentScenario the current scenario, techs and forces won't be sanitized from this scenario
-     * @param salvageTechs    a list of techs assigned to the salvage operation
-     * @param salvageFormations   a list of forces assigned to the salvage operation
+     * @param activeScenarios   a list of scenarios marked as 'current' (i.e., unresolved)
+     * @param currentScenario   the current scenario, techs and forces won't be sanitized from this scenario
+     * @param salvageTechs      a list of techs assigned to the salvage operation
+     * @param salvageFormations a list of forces assigned to the salvage operation
      *
      * @author Illiani
      * @since 0.50.10
@@ -583,7 +583,7 @@ public class SalvagePostScenarioPicker {
         // Build the mapping and populate salvage unit options ONCE, outside the loop
         unitNameMap.clear();
         for (Unit salvageUnit : salvageUnits) {
-            String base = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), false);
+            String base = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), isInSpace);
             String key = base;
             int duplicate = 2;
             while (unitNameMap.containsKey(key)) {
