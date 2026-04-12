@@ -121,6 +121,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
@@ -901,7 +902,7 @@ public class StratConRulesManager {
             for (Unit unit : potentialUnits) {
                 if (isValidUnitForScenario(unit,
                       scenarioForceTemplate,
-                      campaign.getCampaignOptions().isUseDropShips(),
+                      campaign,
                       scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
                     scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
                     AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
@@ -1012,16 +1013,16 @@ public class StratConRulesManager {
      *
      * @param unit                  The unit to validate.
      * @param scenarioForceTemplate The force template containing the rules for unit validation.
-     * @param isUsePlayerDropShips  Indicates if DropShips are allowed based on campaign options.
+     * @param campaign              The current campaign, used to check campaign options and planetary conditions.
      * @param mapLocation           The map location type of the scenario, used to check if the unit can operate there.
      *
      * @return {@code true} if the unit matches the template's requirements and can be included in the scenario,
      *       {@code false} otherwise.
      */
     private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
-          boolean isUsePlayerDropShips, MapLocation mapLocation) {
+          Campaign campaign, MapLocation mapLocation) {
         // Check if DropShips are allowed and the correct unit type matches
-        if (scenarioForceTemplate.getAllowedUnitType() == 11 && !isUsePlayerDropShips) {
+        if (scenarioForceTemplate.getAllowedUnitType() == 11 && !campaign.getCampaignOptions().isUseDropShips()) {
             return false;
         }
 
@@ -1029,11 +1030,21 @@ public class StratConRulesManager {
         Entity entity = unit.getEntity();
         if (entity != null) {
             boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
+            boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
 
             if ((isGround && entity.doomedOnGround())
                   || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
                   || (mapLocation == Space && entity.doomedInSpace())) {
                 return false;
+            }
+
+            // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
+            // but they can operate on airless worlds (vacuum)
+            if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
+                Planet planet = campaign.getLocation().getPlanet();
+                if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
+                    return false;
+                }
             }
         }
 
