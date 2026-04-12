@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.stratCon;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -56,6 +58,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -63,10 +66,18 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Atmosphere;
+import mekhq.campaign.universe.Planet;
+
+import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 
 /**
  * Tests for {@link StratConRulesManager}
@@ -286,5 +297,154 @@ class StratConRulesManagerTest {
             // so finalizeBackingScenario will commit forces as normal
             verify(mockScenario).setOverrideForceAutoAssignment(true);
         }
+    }
+
+    // -- isValidUnitForScenario tests --
+
+    /**
+     * Creates common mock infrastructure for isValidUnitForScenario tests.
+     *
+     * @param unitType the unit type to return from the entity
+     * @param hasUnstreamlinedQuirk whether the entity has the unstreamlined quirk
+     * @param atmosphere the planet's atmosphere (null to simulate missing planet data)
+     * @param isUseDropShips whether campaign options allow player dropships
+     * @param allowedUnitType the allowed unit type on the scenario force template (-2 for ATB_MIX)
+     *
+     * @return an Object array: [Unit, ScenarioForceTemplate, Campaign]
+     */
+    private Object[] setupIsValidUnitMocks(int unitType, boolean hasUnstreamlinedQuirk,
+          Atmosphere atmosphere, boolean isUseDropShips, int allowedUnitType) {
+        Entity entity = mock(Entity.class);
+        when(entity.getUnitType()).thenReturn(unitType);
+        when(entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)).thenReturn(hasUnstreamlinedQuirk);
+        when(entity.doomedOnGround()).thenReturn(false);
+        when(entity.doomedInAtmosphere()).thenReturn(false);
+        when(entity.doomedInSpace()).thenReturn(false);
+
+        Unit unit = mock(Unit.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.isAvailable()).thenReturn(true);
+        when(unit.isFunctional()).thenReturn(true);
+
+        ScenarioForceTemplate template = mock(ScenarioForceTemplate.class);
+        when(template.getAllowedUnitType()).thenReturn(allowedUnitType);
+
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.isUseDropShips()).thenReturn(isUseDropShips);
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+
+        CurrentLocation location = mock(CurrentLocation.class);
+        when(campaign.getLocation()).thenReturn(location);
+
+        if (atmosphere != null) {
+            Planet planet = mock(Planet.class);
+            when(planet.getAtmosphere(any())).thenReturn(atmosphere);
+            when(location.getPlanet()).thenReturn(planet);
+        } else {
+            when(location.getPlanet()).thenReturn(null);
+        }
+
+        return new Object[] { unit, template, campaign };
+    }
+
+    @Test
+    void isValidUnitForScenario_normalDropshipOnGround_allowed() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, false,
+              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipOnGroundWithAtmosphere_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipOnGroundWithVacuum_allowed() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.NONE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipInSpace_allowed() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.Space);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipOnLowAtmosphereWithAtmosphere_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.LowAtmosphere);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipNullPlanet_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              null, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_dropshipWhenDropShipsDisabled_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, false,
+              Atmosphere.BREATHABLE, false, UnitType.DROPSHIP);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_doomedOnGround_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.JUMPSHIP, false,
+              Atmosphere.BREATHABLE, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+        Entity entity = ((Unit) mocks[0]).getEntity();
+        when(entity.doomedOnGround()).thenReturn(true);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
     }
 }

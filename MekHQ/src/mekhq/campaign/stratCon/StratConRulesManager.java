@@ -1019,7 +1019,7 @@ public class StratConRulesManager {
      * @return {@code true} if the unit matches the template's requirements and can be included in the scenario,
      *       {@code false} otherwise.
      */
-    private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
+    static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
           Campaign campaign, MapLocation mapLocation) {
         // Check if DropShips are allowed and the correct unit type matches
         if (scenarioForceTemplate.getAllowedUnitType() == 11 && !campaign.getCampaignOptions().isUseDropShips()) {
