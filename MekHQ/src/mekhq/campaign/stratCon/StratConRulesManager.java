@@ -41,6 +41,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
+import static megamek.common.units.UnitType.DROPSHIP;
 import static megamek.common.units.UnitType.JUMPSHIP;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
@@ -1021,35 +1022,36 @@ public class StratConRulesManager {
      */
     static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
           Campaign campaign, MapLocation mapLocation) {
-        // Check if DropShips are allowed and the correct unit type matches
-        if (scenarioForceTemplate.getAllowedUnitType() == 11 && !campaign.getCampaignOptions().isUseDropShips()) {
+        // Check if the unit is a DropShip and player DropShips are disabled
+        Entity entity = unit.getEntity();
+        if (entity == null) {
             return false;
         }
 
-        // Check if the unit can operate on the scenario's map type
-        Entity entity = unit.getEntity();
-        if (entity != null) {
-            boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
-            boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
+        if (entity.getUnitType() == DROPSHIP && !campaign.getCampaignOptions().isUseDropShips()) {
+            return false;
+        }
 
-            if ((isGround && entity.doomedOnGround())
-                  || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
-                  || (mapLocation == Space && entity.doomedInSpace())) {
+        boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
+        boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
+
+        if ((isGround && entity.doomedOnGround())
+              || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+              || (mapLocation == Space && entity.doomedInSpace())) {
+            return false;
+        }
+
+        // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
+        // but they can operate on airless worlds (vacuum)
+        if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
+            Planet planet = campaign.getLocation().getPlanet();
+            if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
                 return false;
-            }
-
-            // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
-            // but they can operate on airless worlds (vacuum)
-            if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
-                Planet planet = campaign.getLocation().getPlanet();
-                if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
-                    return false;
-                }
             }
         }
 
         // Validate the unit type, availability, and functionality
-        return forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(),
               scenarioForceTemplate.getAllowedUnitType()) && unit.isAvailable() && unit.isFunctional();
     }
 
