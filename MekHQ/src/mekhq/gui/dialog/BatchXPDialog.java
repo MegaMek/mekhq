@@ -399,13 +399,7 @@ public final class BatchXPDialog extends JDialog {
                 person.improveSkill(skillName);
                 person.spendXPOnSkills(campaign, cost);
 
-                // Refresh skill reference after improvement
                 skill = person.getSkill(skillName);
-                if (skill == null) {
-                    LOGGER.error("Failed to improve skill {} for person {}: skill was null after improvement",
-                          skillName, person.getFullTitle());
-                    continue;
-                }
 
                 PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
                       person,
