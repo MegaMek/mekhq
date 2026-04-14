@@ -41,7 +41,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -86,14 +85,6 @@ class RetirementDefectionTrackerTest {
         List<Injury> injuryList = List.of(injuries);
 
         when(person.getInjuries()).thenReturn(injuryList);
-        when(person.getNonProstheticInjuries()).thenReturn(
-              injuryList.stream()
-                    .filter(i -> !i.getSubType().isPermanentModification())
-                    .collect(Collectors.toList()));
-        when(person.getProstheticInjuries()).thenReturn(
-              injuryList.stream()
-                    .filter(i -> i.getSubType().isPermanentModification())
-                    .collect(Collectors.toList()));
 
         return person;
     }

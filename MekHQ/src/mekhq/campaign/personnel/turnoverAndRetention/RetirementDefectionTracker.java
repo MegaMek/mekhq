@@ -1054,7 +1054,10 @@ public class RetirementDefectionTracker {
      * @return count of permanent injuries excluding prosthetics and implants
      */
     static int getInjuryTurnoverModifier(final Person person) {
-        return (int) person.getNonProstheticInjuries().stream().filter(Injury::isPermanent).count();
+        return (int) person.getInjuries().stream()
+              .filter(i -> !i.getSubType().isPermanentModification())
+              .filter(Injury::isPermanent)
+              .count();
     }
 
     /**
@@ -1065,7 +1068,9 @@ public class RetirementDefectionTracker {
      * @return {@code true} if the person has at least one permanent non-prosthetic injury
      */
     static boolean hasMedicalDischargeInjuries(final Person person) {
-        return person.getNonProstheticInjuries().stream().anyMatch(Injury::isPermanent);
+        return person.getInjuries().stream()
+              .filter(i -> !i.getSubType().isPermanentModification())
+              .anyMatch(Injury::isPermanent);
     }
 
     /**
