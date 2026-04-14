@@ -1052,8 +1052,6 @@ public class RetirementDefectionTracker {
      *
      * @param person the person to evaluate
      * @return count of permanent injuries excluding prosthetics and implants
-     *
-     * @see <a href="https://github.com/MegaMek/mekhq/issues/8631">#8631</a>
      */
     static int getInjuryTurnoverModifier(final Person person) {
         return (int) person.getNonProstheticInjuries().stream().filter(Injury::isPermanent).count();
@@ -1065,8 +1063,6 @@ public class RetirementDefectionTracker {
      *
      * @param person the person to evaluate
      * @return {@code true} if the person has at least one permanent non-prosthetic injury
-     *
-     * @see <a href="https://github.com/MegaMek/mekhq/issues/8631">#8631</a>
      */
     static boolean hasMedicalDischargeInjuries(final Person person) {
         return person.getNonProstheticInjuries().stream().anyMatch(Injury::isPermanent);
