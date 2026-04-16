@@ -36,6 +36,7 @@ package mekhq;
 import static megamek.MMConstants.LOCALHOST_IP;
 import static mekhq.utilities.MHQInternationalization.getText;
 
+import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -381,6 +382,9 @@ public class MekHQ implements GameListener {
             final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
             LOGGER.errorDialog(t, message, title);
         });
+
+        // Set an alternate table row color; it uses alpha and is valid for both dark and light UIs
+        UIManager.put("Table.alternateRowColor", new Color(125, 125, 125, 50));
 
         // Second, let's handle logging
         MegaMek.initializeLogging(MHQConstants.PROJECT_NAME);
