@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -354,6 +354,26 @@ public class ArmorTest {
         // Assert
         assertEquals(0, amountAvailable);
         assertEquals(1, partCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void changeTypeProducesConsistentName(Armor armor) {
+        if (armor instanceof SVArmor || armor instanceof ProtoMekArmor) {
+            // SVArmor doesn't have changeType, ProtoMekArmor has its own fixed name
+            return;
+        }
+
+        // Arrange - create armor via constructor with the target type
+        Armor constructedArmor = new Armor(1, DIFFERENT_ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, true,
+              mockCampaign);
+
+        // Act - create armor via changeType with the same type
+        Armor changedArmor = armor.clone();
+        changedArmor.changeType(DIFFERENT_ARMOR_TYPE, true);
+
+        // Assert - names must match regardless of how the armor was created
+        assertEquals(constructedArmor.getName(), changedArmor.getName());
     }
 
     private Armor getDifferentArmorType(Armor armor) {
