@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -359,21 +360,22 @@ public class ArmorTest {
     @ParameterizedTest
     @MethodSource(value = "armorParameter")
     public void changeTypeProducesConsistentName(Armor armor) {
-        if (armor instanceof SVArmor || armor instanceof ProtoMekArmor) {
-            // SVArmor doesn't have changeType, ProtoMekArmor has its own fixed name
-            return;
+        assumeFalse(armor instanceof SVArmor || armor instanceof ProtoMekArmor,
+              "SVArmor and ProtoMekArmor have their own name logic");
+
+        for (boolean clan : new boolean[] { false, true }) {
+            // Arrange - create armor via constructor with the target type
+            Armor constructedArmor = new Armor(1, DIFFERENT_ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, clan,
+                  mockCampaign);
+
+            // Act - create armor via changeType with the same type
+            Armor changedArmor = armor.clone();
+            changedArmor.changeType(DIFFERENT_ARMOR_TYPE, clan);
+
+            // Assert - names must match regardless of how the armor was created
+            assertEquals(constructedArmor.getName(), changedArmor.getName(),
+                  "Name mismatch for clan=" + clan);
         }
-
-        // Arrange - create armor via constructor with the target type
-        Armor constructedArmor = new Armor(1, DIFFERENT_ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, true,
-              mockCampaign);
-
-        // Act - create armor via changeType with the same type
-        Armor changedArmor = armor.clone();
-        changedArmor.changeType(DIFFERENT_ARMOR_TYPE, true);
-
-        // Assert - names must match regardless of how the armor was created
-        assertEquals(constructedArmor.getName(), changedArmor.getName());
     }
 
     private Armor getDifferentArmorType(Armor armor) {
