@@ -62,9 +62,11 @@ import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -1070,9 +1072,20 @@ public class SalvagePostScenarioPicker {
      *
      * <p>Checks the following requirements:</p>
      * <ul>
-     *   <li>For large vessels in space: at least one assigned unit must have a naval tug</li>
+     *   <li>Space salvage:</li>
+     *   <ul>
+     *   <li>For large vessels (Dropship or Jumpship): at least one assigned unit must have a naval tug</li>
+     *   <li>For small vessels (Small craft or Aerospace Fighters): at least one assigned unit must have a
+     *   SC or ASF bay</li>
+     *   <li>Weight limits do not apply</li>
+     *   </ul>
+     * </ul>
+     * <ul>
+     *   <li>Ground salvage (only):</li>
+     *   <ul>
      *   <li>Either: one assigned unit's cargo capacity must meet or exceed the salvage unit's weight</li>
      *   <li>Or: the combined weight of both assigned units must meet or exceed the salvage unit's weight</li>
+     *   </ul>
      * </ul>
      *
      * <p>Updates the validation label with the result and colors the unit label red if validation fails.</p>
@@ -1100,10 +1113,12 @@ public class SalvagePostScenarioPicker {
         Entity targetEntity = targetUnit.getEntity();
         double targetWeight = 0.0;
         boolean isLargeVessel = false;
+        boolean isSmallVessel = false;
         if (targetEntity != null) {
             targetWeight = targetEntity.getWeight();
             // Jumpship includes WarShips
             isLargeVessel = targetEntity instanceof Dropship || targetEntity instanceof Jumpship;
+            isSmallVessel = targetEntity instanceof SmallCraft || targetEntity instanceof AeroSpaceFighter;
         }
 
         // Check for naval tug requirement
@@ -1115,27 +1130,35 @@ public class SalvagePostScenarioPicker {
             }
         }
 
+        if (isInSpace && isSmallVessel && !isLargeVessel) {
+            if (!checkForDropshipWithBay(group, unitLeftEntity, unitRightEntity)) {
+                return;
+            }
+        }
+
         boolean isTwoUnitsSelected = salvageUnitLeft != null && salvageUnitRight != null;
 
-        // If two units selected, must use towing
-        if (isTwoUnitsSelected) {
-            double weightLeft = getTowCapacity(unitLeftEntity, salvageUnitLeft);
-            double weightRight = getTowCapacity(unitRightEntity, salvageUnitRight);
+        // Only check weight for ground salvage. If two units selected, must use towing
+        if (!isInSpace) {
+            if (isTwoUnitsSelected) {
+                double weightLeft = getTowCapacity(unitLeftEntity, salvageUnitLeft);
+                double weightRight = getTowCapacity(unitRightEntity, salvageUnitRight);
 
-            boolean hasTowageCapacity = (weightLeft + weightRight) >= targetWeight;
-            if (!hasTowageCapacity) {
-                invalidate(group,
-                      getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.tow"),
-                      MekHQ.getMHQOptions().getFontColorNegative());
-                return;
-            }
-        } else if (salvageUnitLeft != null) {
-            if (!useTowageOrCargo(group, unitLeftEntity, salvageUnitLeft, targetWeight)) {
-                return;
-            }
-        } else {
-            if (!useTowageOrCargo(group, unitRightEntity, salvageUnitRight, targetWeight)) {
-                return;
+                boolean hasTowageCapacity = (weightLeft + weightRight) >= targetWeight;
+                if (!hasTowageCapacity) {
+                    invalidate(group,
+                          getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.tow"),
+                          MekHQ.getMHQOptions().getFontColorNegative());
+                    return;
+                }
+            } else if (salvageUnitLeft != null) {
+                if (!useTowageOrCargo(group, unitLeftEntity, salvageUnitLeft, targetWeight)) {
+                    return;
+                }
+            } else {
+                if (!useTowageOrCargo(group, unitRightEntity, salvageUnitRight, targetWeight)) {
+                    return;
+                }
             }
         }
 
@@ -1180,12 +1203,27 @@ public class SalvagePostScenarioPicker {
     }
 
     private static boolean checkForNavalTug(SalvageComboBoxGroup group, Entity unitLeftEntity, Entity unitRightEntity) {
-        boolean hasNavalTugLeft = unitLeftEntity == null || CamOpsSalvageUtilities.hasNavalTug(unitLeftEntity);
-        boolean hasNavalTugRight = unitRightEntity == null || CamOpsSalvageUtilities.hasNavalTug(unitRightEntity);
-        boolean hasNavalTug = hasNavalTugLeft && hasNavalTugRight;
+        boolean hasNavalTugLeft = null != unitLeftEntity && CamOpsSalvageUtilities.hasNavalTug(unitLeftEntity);
+        boolean hasNavalTugRight = null != unitRightEntity && CamOpsSalvageUtilities.hasNavalTug(unitRightEntity);
+        boolean hasNavalTug = hasNavalTugLeft || hasNavalTugRight;
 
         if (!hasNavalTug) {
             invalidate(group, getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noTug"),
+                  MekHQ.getMHQOptions().getFontColorNegative());
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean checkForDropshipWithBay(SalvageComboBoxGroup group, Entity unitLeftEntity,
+          Entity unitRightEntity) {
+        boolean hasDropshipWithBayLeft = null != unitLeftEntity && CamOpsSalvageUtilities.hasBay(unitLeftEntity);
+        boolean hasDropshipWithBayRight = null != unitRightEntity && CamOpsSalvageUtilities.hasBay(unitRightEntity);
+        boolean hasDropshipWithBay = hasDropshipWithBayLeft || hasDropshipWithBayRight;
+
+        if (!hasDropshipWithBay) {
+            invalidate(group, getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noDropshipWithBay"),
                   MekHQ.getMHQOptions().getFontColorNegative());
             return false;
         }
