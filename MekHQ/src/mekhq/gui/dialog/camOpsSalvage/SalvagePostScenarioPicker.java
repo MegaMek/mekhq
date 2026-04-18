@@ -1072,20 +1072,20 @@ public class SalvagePostScenarioPicker {
      *
      * <p>Checks the following requirements:</p>
      * <ul>
-     *   <li>Space salvage:</li>
-     *   <ul>
-     *   <li>For large vessels (Dropship or Jumpship): at least one assigned unit must have a naval tug</li>
-     *   <li>For small vessels (Small craft or Aerospace Fighters): at least one assigned unit must have a
-     *   SC or ASF bay</li>
-     *   <li>Weight limits do not apply</li>
-     *   </ul>
-     * </ul>
-     * <ul>
-     *   <li>Ground salvage (only):</li>
-     *   <ul>
-     *   <li>Either: one assigned unit's cargo capacity must meet or exceed the salvage unit's weight</li>
-     *   <li>Or: the combined weight of both assigned units must meet or exceed the salvage unit's weight</li>
-     *   </ul>
+     *   <li>Space salvage:
+     *     <ul>
+     *       <li>For large vessels (Dropship or Jumpship): at least one assigned unit must have a naval tug</li>
+     *       <li>For small vessels (Small craft or Aerospace Fighters): at least one assigned unit must have a
+     *       SC or ASF bay</li>
+     *       <li>Weight limits do not apply</li>
+     *     </ul>
+     *   </li>
+     *   <li>Ground salvage (only):
+     *     <ul>
+     *       <li>Either: one assigned unit's cargo capacity must meet or exceed the salvage unit's weight</li>
+     *       <li>Or: the combined weight of both assigned units must meet or exceed the salvage unit's weight</li>
+     *     </ul>
+     *   </li>
      * </ul>
      *
      * <p>Updates the validation label with the result and colors the unit label red if validation fails.</p>
