@@ -1131,7 +1131,7 @@ public class SalvagePostScenarioPicker {
         }
 
         if (isInSpace && isSmallVessel && !isLargeVessel) {
-            if (!checkForDropshipWithBay(group, unitLeftEntity, unitRightEntity)) {
+            if (!checkForVesselWithSuitableBayEquipment(group, unitLeftEntity, unitRightEntity)) {
                 return;
             }
         }
@@ -1216,14 +1216,17 @@ public class SalvagePostScenarioPicker {
         return true;
     }
 
-    private static boolean checkForDropshipWithBay(SalvageComboBoxGroup group, Entity unitLeftEntity,
+    private static boolean checkForVesselWithSuitableBayEquipment(SalvageComboBoxGroup group, Entity unitLeftEntity,
           Entity unitRightEntity) {
-        boolean hasDropshipWithBayLeft = null != unitLeftEntity && CamOpsSalvageUtilities.hasBay(unitLeftEntity);
-        boolean hasDropshipWithBayRight = null != unitRightEntity && CamOpsSalvageUtilities.hasBay(unitRightEntity);
-        boolean hasDropshipWithBay = hasDropshipWithBayLeft || hasDropshipWithBayRight;
+        boolean isSuitableVesselLeft = null != unitLeftEntity &&
+                                             CamOpsSalvageUtilities.hasSuitableBayEquipment(unitLeftEntity);
+        boolean isSuitableVesselRight = null != unitRightEntity &&
+                                              CamOpsSalvageUtilities.hasSuitableBayEquipment(unitRightEntity);
+        boolean isSuitableVessel = isSuitableVesselLeft || isSuitableVesselRight;
 
-        if (!hasDropshipWithBay) {
-            invalidate(group, getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noDropshipWithBay"),
+        if (!isSuitableVessel) {
+            invalidate(group, getTextAt(RESOURCE_BUNDLE,
+                        "SalvagePostScenarioPicker.validation.noVesselWithSuitableBayEquipment"),
                   MekHQ.getMHQOptions().getFontColorNegative());
             return false;
         }

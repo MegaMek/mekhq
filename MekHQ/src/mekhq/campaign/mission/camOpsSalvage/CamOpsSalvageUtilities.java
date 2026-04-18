@@ -171,8 +171,9 @@ public class CamOpsSalvageUtilities {
         return false;
     }
 
-    public static boolean hasBay(Entity entity) {
+    public static boolean hasSuitableBayEquipment(Entity entity) {
         for (Bay b : entity.getTransportBays()) {
+            //ASF and SC bays are assumed to have the equipment needed to handle space derelicts
             if ((b instanceof ASFBay) || (b instanceof SmallCraftBay)) {
                 return true;
             }
