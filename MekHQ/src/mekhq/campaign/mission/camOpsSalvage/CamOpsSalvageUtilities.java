@@ -149,6 +149,10 @@ public class CamOpsSalvageUtilities {
                                 tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
                                       "CamOpsSalvageUtilities.tooltip.tug")).append(")");
                             }
+                            if (CamOpsSalvageUtilities.hasSuitableBayEquipment(entity)) {
+                                tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                                      "CamOpsSalvageUtilities.tooltip.bayEquipment")).append(")");
+                            }
                         }
                     }
                 }
