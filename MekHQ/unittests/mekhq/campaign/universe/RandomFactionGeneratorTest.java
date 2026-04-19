@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,9 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -97,6 +99,10 @@ public class RandomFactionGeneratorTest {
         when(f.getShortName()).thenReturn(id);
         when(f.isPeriphery()).thenReturn(periphery);
         when(f.isClan()).thenReturn(clan);
+        // By default a faction is considered valid in any year for the purposes of these tests;
+        // individual tests can override this for extinction-specific scenarios.
+        when(f.validIn(any(LocalDate.class))).thenReturn(true);
+        when(f.validIn(anyInt())).thenReturn(true);
         return f;
     }
 
@@ -226,5 +232,50 @@ public class RandomFactionGeneratorTest {
 
         assertFalse(enemyList.contains(isFaction.getShortName()));
         assertTrue(enemyList.contains(clanFaction.getShortName()));
+    }
+
+    /**
+     * Regression test for MekHQ issue #6451: an extinct faction (e.g. Aurigan Coalition
+     * past 3028) must not be returned as a current/employer faction even if stale planet
+     * ownership data still lists it as the controller of some systems.
+     */
+    @Test
+    public void testExtinctFactionExcludedFromCurrentFactions() {
+        when(isFaction.validIn(any(LocalDate.class))).thenReturn(false);
+        when(isFaction.validIn(anyInt())).thenReturn(false);
+        RandomFactionGenerator rfg = createTestRFG();
+
+        Set<String> factions = rfg.getCurrentFactions();
+
+        assertFalse(factions.contains(isFaction.getShortName()),
+              "Extinct faction should not appear in the current faction set");
+    }
+
+    @Test
+    public void testExtinctFactionExcludedFromEmployers() {
+        when(isFaction.validIn(any(LocalDate.class))).thenReturn(false);
+        when(isFaction.validIn(anyInt())).thenReturn(false);
+        RandomFactionGenerator rfg = createTestRFG();
+
+        Set<String> employers = rfg.getEmployerSet();
+
+        assertFalse(employers.contains(isFaction.getShortName()),
+              "Extinct faction should not appear in the employer set");
+    }
+
+    @Test
+    public void testExtinctContainedFactionExcluded() {
+        // innerISFaction is the contained (fallback) faction; mark it extinct.
+        when(innerISFaction.validIn(any(LocalDate.class))).thenReturn(false);
+        when(innerISFaction.validIn(anyInt())).thenReturn(false);
+        RandomFactionGenerator rfg = createTestRFG();
+
+        Set<String> factions = rfg.getCurrentFactions();
+        Set<String> employers = rfg.getEmployerSet();
+
+        assertFalse(factions.contains(innerISFaction.getShortName()),
+              "Extinct contained faction should not appear in the current faction set");
+        assertFalse(employers.contains(innerISFaction.getShortName()),
+              "Extinct contained faction should not appear in the employer set");
     }
 }

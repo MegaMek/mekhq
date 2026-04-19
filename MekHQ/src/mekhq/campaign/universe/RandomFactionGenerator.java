@@ -145,19 +145,29 @@ public class RandomFactionGenerator {
      */
     public Set<String> getCurrentFactions() {
         Set<String> retVal = new TreeSet<>();
+        LocalDate currentDate = getCurrentDate();
         for (Faction f : borderTracker.getFactionsInRegion()) {
 
             if (FactionHints.isEmptyFaction(f) ||
                       f.getShortName().equals("CLAN")) {
                 continue;
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
+            if (f.getShortName().equals("ROS") && currentDate.isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
+                continue;
+            }
+            // Skip factions whose stated active years don't include the current date.
+            // Stale planet ownership data can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
+            if (!f.validIn(currentDate)) {
                 continue;
             }
 
             retVal.add(f.getShortName());
             /* Add factions which do not control any planets to the employer list */
-            factionHints.getContainedFactions(f, getCurrentDate()).forEach(cf -> retVal.add(cf.getShortName()));
+            for (Faction containedFaction : factionHints.getContainedFactions(f, currentDate)) {
+                if (containedFaction != null && containedFaction.validIn(currentDate)) {
+                    retVal.add(containedFaction.getShortName());
+                }
+            }
         }
         // Add rebels and pirates
         retVal.add("REB");
@@ -172,14 +182,20 @@ public class RandomFactionGenerator {
      */
     protected WeightedIntMap<Faction> buildEmployerMap() {
         WeightedIntMap<Faction> employerMap = new WeightedIntMap<>();
+        LocalDate currentDate = getCurrentDate();
         for (Faction faction : borderTracker.getFactionsInRegion()) {
             if (faction.isClan() || FactionHints.isEmptyFaction(faction)) {
                 continue;
             }
-            if (faction.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+            if (faction.getShortName().equals("ROS") && currentDate.isAfter(FORTRESS_REPUBLIC)) {
                 continue;
             }
             if (faction.getShortName().equals(MERCENARY_FACTION_CODE)) {
+                continue;
+            }
+            // Skip factions whose stated active years don't include the current date.
+            // Stale planet ownership data can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
+            if (!faction.validIn(currentDate)) {
                 continue;
             }
 
@@ -187,13 +203,13 @@ public class RandomFactionGenerator {
             employerMap.add(weight, faction);
 
             /* Add factions which do not control any planets to the employer list */
-            for (Faction containedFaction : factionHints.getContainedFactions(faction, getCurrentDate())) {
+            for (Faction containedFaction : factionHints.getContainedFactions(faction, currentDate)) {
                 if (null != containedFaction) {
-                    if (!containedFaction.isClan()) {
+                    if (!containedFaction.isClan() && containedFaction.validIn(currentDate)) {
                         weight = (int) Math.floor((borderTracker.getBorders(faction).getSystems().size() *
                                                          factionHints.getAltLocationFraction(faction,
                                                                containedFaction,
-                                                               getCurrentDate())) + 0.5);
+                                                               currentDate)) + 0.5);
                         employerMap.add(weight, faction);
                     }
                 }
@@ -461,16 +477,22 @@ public class RandomFactionGenerator {
      */
     public Set<String> getEmployerSet() {
         Set<String> set = new HashSet<>();
+        LocalDate currentDate = getCurrentDate();
         for (Faction f : borderTracker.getFactionsInRegion()) {
+            // Skip factions whose stated active years don't include the current date.
+            // Stale planet ownership data can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
+            if (!f.validIn(currentDate)) {
+                continue;
+            }
+            if (f.getShortName().equals("ROS") && currentDate.isAfter(FORTRESS_REPUBLIC)) {
+                continue;
+            }
             if (!f.isClan() && !FactionHints.isEmptyFaction(f)) {
                 set.add(f.getShortName());
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
-                continue;
-            }
             /* Add factions which do not control any planets to the employer list */
-            for (Faction cfaction : factionHints.getContainedFactions(f, getCurrentDate())) {
-                if (!cfaction.isClan()) {
+            for (Faction cfaction : factionHints.getContainedFactions(f, currentDate)) {
+                if (!cfaction.isClan() && cfaction.validIn(currentDate)) {
                     set.add(cfaction.getShortName());
                 }
             }
