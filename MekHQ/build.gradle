@@ -1,5 +1,3 @@
-import org.codehaus.groovy.runtime.GStringImpl
-
 import java.time.LocalDateTime
 
 plugins {
@@ -52,12 +50,12 @@ ext {
             '-Dsun.awt.disablegrab=true'
     ]
 
-    fileStagingDir = "${layout.buildDirectory.get()}/files" as GStringImpl
-    atlasedImages = "${fileStagingDir}/atlasedImages.txt" as GStringImpl
-    scriptsDir = "${projectDir}/scripts" as GStringImpl
+    fileStagingDir = "${layout.buildDirectory.get()}/files"
+    atlasedImages = "${fileStagingDir}/atlasedImages.txt"
+    scriptsDir = "${projectDir}/scripts"
 
-    mmDir = "${rootDir}/../megamek" as GStringImpl
-    mmlDir = "${rootDir}/../megameklab" as GStringImpl
+    mmDir = "${rootDir}/../megamek"
+    mmlDir = "${rootDir}/../megameklab"
 }
 
 dependencies {
@@ -413,12 +411,13 @@ launch4j {
     internalName = 'MekHQ'
     downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
     supportUrl = 'https://megamek.org'
-    copyright = '2025 MegaMek Development Team.'
+    copyright = '2026 MegaMek Development Team.'
     trademarks = 'MechWarrior, BattleMech, `Mech and AeroTech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
-    jreMinVersion = '17'
+    jreMinVersion = '21'
     dontWrapJar = true
-    messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
+    messagesJreVersionError = 'We require a Java Runtime of version 21 or higher installed. https://github.' +
+            'com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
     messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
 }
 
