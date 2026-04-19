@@ -278,4 +278,72 @@ public class RandomFactionGeneratorTest {
         assertFalse(employers.contains(innerISFaction.getShortName()),
               "Extinct contained faction should not appear in the employer set");
     }
+
+    @Test
+    public void testExtinctFactionExcludedFromEnemyList() {
+        when(peripheryFaction.validIn(any(LocalDate.class))).thenReturn(false);
+        when(peripheryFaction.validIn(anyInt())).thenReturn(false);
+        RandomFactionGenerator rfg = createTestRFG();
+
+        List<String> enemyList = rfg.getEnemyList(isFaction);
+
+        assertFalse(enemyList.contains(peripheryFaction.getShortName()),
+              "Extinct faction should not appear in the enemy list");
+    }
+
+    @Test
+    public void testExtinctFactionExcludedAsPirateOpponent() {
+        // Pirates take the unfiltered border-region branch in buildEnemyMap; ensure the
+        // validity guard still excludes extinct factions there.
+        Faction pirates = createTestFaction("PIR", false, false);
+        when(peripheryFaction.validIn(any(LocalDate.class))).thenReturn(false);
+        when(peripheryFaction.validIn(anyInt())).thenReturn(false);
+        RandomFactionGenerator rfg = createTestRFG();
+
+        List<String> enemyList = rfg.getEnemyList(pirates);
+
+        assertFalse(enemyList.contains(peripheryFaction.getShortName()),
+              "Extinct faction should not appear in pirate/comstar enemy list");
+    }
+
+    /**
+     * Regression test for the actual contract-generation selection path used by AtB:
+     * an extinct faction must never be returned by {@link RandomFactionGenerator#getEmployerFaction()}.
+     */
+    @Test
+    public void testExtinctFactionNeverChosenAsEmployer() {
+        when(isFaction.validIn(any(LocalDate.class))).thenReturn(false);
+        when(isFaction.validIn(anyInt())).thenReturn(false);
+        RandomFactionGenerator rfg = createTestRFG();
+
+        for (int i = 0; i < 500; i++) {
+            Faction chosen = rfg.getEmployerFaction();
+            assertNotNull(chosen, "Employer faction should not be null");
+            assertNotEquals(isFaction.getShortName(), chosen.getShortName(),
+                  "Extinct faction must never be chosen as an employer");
+        }
+    }
+
+    /**
+     * Verifies that a contained/fallback faction is reachable via the weighted selection in
+     * {@link RandomFactionGenerator#getEmployerFaction()}. Prior to this PR the inner loop in
+     * buildEmployerMap incorrectly added the host faction (rather than the contained faction)
+     * to the weight map, so contained factions could never be selected as employers.
+     */
+    @Test
+    public void testContainedFactionCanBeChosenAsEmployer() {
+        RandomFactionGenerator rfg = createTestRFG();
+
+        boolean innerSeen = false;
+        for (int i = 0; i < 500; i++) {
+            Faction chosen = rfg.getEmployerFaction();
+            assertNotNull(chosen, "Employer faction should not be null");
+            if (innerISFaction.getShortName().equals(chosen.getShortName())) {
+                innerSeen = true;
+                break;
+            }
+        }
+        assertTrue(innerSeen,
+              "Contained faction should be selectable by getEmployerFaction()");
+    }
 }

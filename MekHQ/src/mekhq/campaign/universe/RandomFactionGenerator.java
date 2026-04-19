@@ -210,7 +210,7 @@ public class RandomFactionGenerator {
                                                          factionHints.getAltLocationFraction(faction,
                                                                containedFaction,
                                                                currentDate)) + 0.5);
-                        employerMap.add(weight, faction);
+                        employerMap.add(weight, containedFaction);
                     }
                 }
             }
@@ -416,6 +416,7 @@ public class RandomFactionGenerator {
      */
     protected WeightedIntMap<Faction> buildEnemyMap(Faction employer) {
         WeightedIntMap<Faction> enemyMap = new WeightedIntMap<>();
+        LocalDate currentDate = getCurrentDate();
 
         // If the employer is a pirate, or comstar return all border factions as "enemies"
         String employerShortName = employer.getShortName();
@@ -423,6 +424,9 @@ public class RandomFactionGenerator {
             for (Faction enemy : borderTracker.getFactionsInRegion()) {
                 if (FactionHints.isEmptyFaction(enemy) ||
                           enemy.getShortName().equals("CLAN")) {
+                    continue;
+                }
+                if (!enemy.validIn(currentDate)) {
                     continue;
                 }
                 enemyMap.add(1, enemy); // weight (1) can be adjusted as needed
@@ -436,36 +440,43 @@ public class RandomFactionGenerator {
                 continue;
             }
 
-            if (enemy.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+            if (enemy.getShortName().equals("ROS") && currentDate.isAfter(FORTRESS_REPUBLIC)) {
+                continue;
+            }
+            // Skip extinct factions; stale planet ownership data can otherwise leak them into the enemy pool.
+            if (!enemy.validIn(currentDate)) {
                 continue;
             }
 
             int totalCount = borderTracker.getBorderSystems(employer, enemy).size();
             double count = totalCount;
             // Split the border between main controlling faction and any contained factions.
-            for (Faction cFaction : factionHints.getContainedFactions(employer, getCurrentDate())) {
+            for (Faction cFaction : factionHints.getContainedFactions(employer, currentDate)) {
                 if ((null == cFaction) ||
-                          !factionHints.isContainedFactionOpponent(enemy, cFaction, employer, getCurrentDate())) {
+                          !factionHints.isContainedFactionOpponent(enemy, cFaction, employer, currentDate)) {
                     continue;
                 }
 
-                if (cFaction.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+                if (cFaction.getShortName().equals("ROS") && currentDate.isAfter(FORTRESS_REPUBLIC)) {
+                    continue;
+                }
+                if (!cFaction.validIn(currentDate)) {
                     continue;
                 }
 
-                if (factionHints.isNeutral(cFaction, enemy, getCurrentDate()) ||
-                          factionHints.isNeutral(enemy, cFaction, getCurrentDate())) {
+                if (factionHints.isNeutral(cFaction, enemy, currentDate) ||
+                          factionHints.isNeutral(enemy, cFaction, currentDate)) {
                     continue;
                 }
                 double cfCount = totalCount;
-                if (factionHints.getAltLocationFraction(employer, cFaction, getCurrentDate()) > 0.0) {
-                    cfCount = totalCount * factionHints.getAltLocationFraction(employer, cFaction, getCurrentDate());
+                if (factionHints.getAltLocationFraction(employer, cFaction, currentDate) > 0.0) {
+                    cfCount = totalCount * factionHints.getAltLocationFraction(employer, cFaction, currentDate);
                     count -= cfCount;
                 }
-                cfCount = adjustBorderWeight(cfCount, employer, enemy, getCurrentDate());
+                cfCount = adjustBorderWeight(cfCount, employer, enemy, currentDate);
                 enemyMap.add((int) Math.floor(cfCount + 0.5), cFaction);
             }
-            count = adjustBorderWeight(count, employer, enemy, getCurrentDate());
+            count = adjustBorderWeight(count, employer, enemy, currentDate);
             enemyMap.add((int) Math.floor(count + 0.5), enemy);
         }
 
@@ -525,24 +536,29 @@ public class RandomFactionGenerator {
      */
     public List<String> getEnemyList(Faction employer) {
         Set<Faction> list = new HashSet<>();
-        Faction outer = factionHints.getContainedFactionHost(employer, getCurrentDate());
+        LocalDate currentDate = getCurrentDate();
+        Faction outer = factionHints.getContainedFactionHost(employer, currentDate);
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
             if (FactionHints.isEmptyFaction(enemy)) {
                 continue;
             }
-            if (enemy.equals(employer) && !factionHints.isAtWarWith(enemy, enemy, getCurrentDate())) {
+            // Skip extinct factions; stale planet ownership data can otherwise leak them into the enemy list.
+            if (!enemy.validIn(currentDate)) {
                 continue;
             }
-            if (factionHints.isAlliedWith(employer, enemy, getCurrentDate()) && !employer.isClan() && !enemy.isClan()) {
+            if (enemy.equals(employer) && !factionHints.isAtWarWith(enemy, enemy, currentDate)) {
                 continue;
             }
-            if (factionHints.isNeutral(employer, enemy, getCurrentDate()) ||
-                      factionHints.isNeutral(enemy, employer, getCurrentDate())) {
+            if (factionHints.isAlliedWith(employer, enemy, currentDate) && !employer.isClan() && !enemy.isClan()) {
+                continue;
+            }
+            if (factionHints.isNeutral(employer, enemy, currentDate) ||
+                      factionHints.isNeutral(enemy, employer, currentDate)) {
                 continue;
             }
             Faction useBorder = employer;
             if (null != outer) {
-                if (!factionHints.isContainedFactionOpponent(outer, employer, enemy, getCurrentDate())) {
+                if (!factionHints.isContainedFactionOpponent(outer, employer, enemy, currentDate)) {
                     continue;
                 }
                 useBorder = outer;
@@ -550,9 +566,9 @@ public class RandomFactionGenerator {
 
             if (!borderTracker.getBorderSystems(useBorder, enemy).isEmpty()) {
                 list.add(enemy);
-                for (Faction cf : factionHints.getContainedFactions(enemy, getCurrentDate())) {
-                    if ((null != cf) &&
-                              factionHints.isContainedFactionOpponent(enemy, cf, employer, getCurrentDate())) {
+                for (Faction cf : factionHints.getContainedFactions(enemy, currentDate)) {
+                    if ((null != cf) && cf.validIn(currentDate) &&
+                              factionHints.isContainedFactionOpponent(enemy, cf, employer, currentDate)) {
                         list.add(cf);
                     }
                 }
