@@ -41,6 +41,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
+import static megamek.common.units.UnitType.DROPSHIP;
 import static megamek.common.units.UnitType.JUMPSHIP;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
@@ -121,6 +122,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
@@ -901,7 +903,8 @@ public class StratConRulesManager {
             for (Unit unit : potentialUnits) {
                 if (isValidUnitForScenario(unit,
                       scenarioForceTemplate,
-                      campaign.getCampaignOptions().isUseDropShips())) {
+                      campaign,
+                      scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
                     scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
                     AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
                           scenarioForceTemplate.getForceName(),
@@ -1006,24 +1009,49 @@ public class StratConRulesManager {
 
     /**
      * Validates if a given unit can be included in the scenario based on the template's rules and restrictions. It
-     * checks unit type, availability, functionality, and specific conditions such as DropShip usage.
+     * checks unit type, availability, functionality, and specific conditions such as DropShip usage and map
+     * compatibility.
      *
      * @param unit                  The unit to validate.
      * @param scenarioForceTemplate The force template containing the rules for unit validation.
-     * @param isUsePlayerDropShips  Indicates if DropShips are allowed based on campaign options.
+     * @param campaign              The current campaign, used to check campaign options and planetary conditions.
+     * @param mapLocation           The map location type of the scenario, used to check if the unit can operate there.
      *
      * @return {@code true} if the unit matches the template's requirements and can be included in the scenario,
      *       {@code false} otherwise.
      */
-    private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
-          boolean isUsePlayerDropShips) {
-        // Check if DropShips are allowed and the correct unit type matches
-        if (scenarioForceTemplate.getAllowedUnitType() == 11 && !isUsePlayerDropShips) {
+    static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
+          Campaign campaign, MapLocation mapLocation) {
+        // Check if the unit is a DropShip and player DropShips are disabled
+        Entity entity = unit.getEntity();
+        if (entity == null) {
             return false;
         }
 
+        if (entity.getUnitType() == DROPSHIP && !campaign.getCampaignOptions().isUseDropShips()) {
+            return false;
+        }
+
+        boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
+        boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
+
+        if ((isGround && entity.doomedOnGround())
+              || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+              || (mapLocation == Space && entity.doomedInSpace())) {
+            return false;
+        }
+
+        // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
+        // but they can operate on airless worlds (vacuum)
+        if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
+            Planet planet = campaign.getLocation().getPlanet();
+            if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
+                return false;
+            }
+        }
+
         // Validate the unit type, availability, and functionality
-        return forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(),
               scenarioForceTemplate.getAllowedUnitType()) && unit.isAvailable() && unit.isFunctional();
     }
 
