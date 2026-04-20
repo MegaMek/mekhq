@@ -395,9 +395,7 @@ public class MekHQ implements GameListener {
         // on Mac, override standard behavior of the added main menu, this is different for MML and MHQ
         Desktop desktop = Desktop.getDesktop();
         if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-            desktop.setAboutHandler(e -> {
-                new MekHQAboutDialog(null).show();
-            });
+            desktop.setAboutHandler(e -> new MekHQAboutDialog(null).show());
         }
 
         // Finally, let's handle startup
