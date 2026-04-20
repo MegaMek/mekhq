@@ -66,7 +66,6 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -106,7 +105,6 @@ public class MRMSServiceTest {
     @BeforeAll
     public static void beforeAll() {
         EquipmentType.initializeTypes();
-        Ranks.initializeRankSystems();
         SkillType.initializeTypes();
 
         mockFaction = Mockito.mock(Faction.class);

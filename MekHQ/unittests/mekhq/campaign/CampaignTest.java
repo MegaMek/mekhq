@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -76,7 +76,6 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.TestSystems;
@@ -100,7 +99,6 @@ public class CampaignTest {
     @BeforeAll
     public static void setup() {
         EquipmentType.initializeTypes();
-        Ranks.initializeRankSystems();
     }
 
     @BeforeEach

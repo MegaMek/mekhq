@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,13 +32,13 @@
  */
 package mekhq.gui.utilities;
 
-import java.util.ArrayList;
-import java.util.List;
+import megamek.common.util.StringUtil;
 
 /**
- * This class splits a tooltip into multiple lines in order to wrap it. It will enclose a string into HTML format
- * <p>
- * <a href="https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java">Stack Overflow</a>
+ * This class splits a tooltip into multiple lines in order to wrap it.
+ *
+ * Previously it enclosed the strings in HTML (<a href="https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java">Stack Overflow</a>),
+ * though it seems like that is not necessary if the tooltip does not otherwise need formatting.
  *
  * @author Paul Taylor (adapted by Miguel Azevedo)
  */
@@ -47,59 +47,29 @@ public class MultiLineTooltip {
     private static final int SPACE_BUFFER = 10;
 
     /**
-     * Wraps a string with html tags and places breaks where it can split it, defaulting the size of a line to 85
+     * Wraps a string to a given length in characters, defaulting the size of a line to 85
      * characters.
      *
      * @param tip String to split
      *
-     * @return Split string in html format
+     * @return Split string
      */
     public static String splitToolTip(String tip) {
         return splitToolTip(tip, DIALOG_TOOLTIP_MAX_SIZE);
     }
 
     /**
-     * Wraps a string with html tags and places breaks where it can split it.
+     * Wraps a string to a given line length in characters.
      *
      * @param tip    String to split
      * @param length Maximum characters that each line can have
      *
-     * @return Split string in html format
+     * @return Split string
      */
     public static String splitToolTip(String tip, int length) {
         if (tip.length() <= length + SPACE_BUFFER) {
             return tip;
         }
-
-        List<String> parts = new ArrayList<>();
-
-        int maxLength;
-        String overLong = tip.substring(0, length + SPACE_BUFFER);
-        int lastSpace = overLong.lastIndexOf(' ');
-        if (lastSpace >= length) {
-            parts.add(tip.substring(0, lastSpace));
-            maxLength = lastSpace;
-        } else {
-            parts.add(tip.substring(0, length));
-            maxLength = length;
-        }
-
-        while (maxLength < tip.length()) {
-            if (maxLength + length < tip.length()) {
-                parts.add(tip.substring(maxLength, maxLength + length));
-                maxLength += maxLength + length;
-            } else {
-                parts.add(tip.substring(maxLength));
-                break;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder("<html>");
-        for (int i = 0; i < parts.size() - 1; i++) {
-            sb.append(parts.get(i)).append("<br>");
-        }
-        sb.append(parts.get(parts.size() - 1));
-        sb.append(("</html>"));
-        return sb.toString();
+        return StringUtil.wrapLines(tip, length);
     }
 }
