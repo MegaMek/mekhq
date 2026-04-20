@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -79,7 +79,11 @@ public class SVArmor extends Armor {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
         this.bar = bar;
         this.techRating = techRating;
-        this.name = String.format("BAR %d armor (%s)", bar, techRating.getName());
+    }
+
+    @Override
+    public String getName() {
+        return String.format("BAR %d armor (%s)", bar, techRating.getName());
     }
 
     public int getBAR() {
