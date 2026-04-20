@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -308,6 +308,38 @@ public class Contract extends Mission {
 
     public void addSalvageByEmployer(Money l) {
         salvagedByEmployer = salvagedByEmployer.plus(l);
+    }
+
+    /**
+     * Computes the player's share of the total salvage value as an integer percentage, using
+     * {@link java.math.RoundingMode#HALF_UP} (i.e. 42.5% rounds to 43%, 42.49% rounds to 42%).
+     *
+     * <p>This avoids the truncation artifacts that previously could cause the displayed value to shift by a full
+     * percentage point after a small change to the salvage assignment (see issue #5683).</p>
+     *
+     * @param playerShare    the salvage value assigned to the player (mercs)
+     * @param employerShare  the salvage value assigned to the employer
+     *
+     * @return integer percentage in the range {@code [0, 100+]}, or {@code 0} if there is no salvage to split
+     */
+    public static int calculateSalvagePercentage(Money playerShare, Money employerShare) {
+        Money total = playerShare.plus(employerShare);
+        if (!total.isPositive()) {
+            return 0;
+        }
+        return playerShare.multipliedBy(100)
+                     .getAmount()
+                     .divide(total.getAmount(), 0, java.math.RoundingMode.HALF_UP)
+                     .intValue();
+    }
+
+    /**
+     * Convenience overload that computes the current salvage percentage from the values stored on this contract.
+     *
+     * @return integer percentage in the range {@code [0, 100+]}, or {@code 0} if there is no salvage to split
+     */
+    public int getCurrentSalvagePct() {
+        return calculateSalvagePercentage(getSalvagedByUnit(), getSalvagedByEmployer());
     }
 
     public int getSigningBonusPct() {
