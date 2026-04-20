@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -395,14 +395,16 @@ public final class BatchXPDialog extends JDialog {
                     cost = max(0, cost - progress);
                 }
 
-                // Improve the skill and deduce the cost
+                // Improve the skill and deduct the cost
                 person.improveSkill(skillName);
                 person.spendXPOnSkills(campaign, cost);
+
+                skill = person.getSkill(skillName);
 
                 PerformanceLogger.improvedSkill(campaignOptions.isPersonnelLogSkillGain(),
                       person,
                       campaign.getLocalDate(),
-                      skill.getType().getName(),
+                      skillName,
                       skill.getLevel());
                 campaign.personUpdated(person);
             }
