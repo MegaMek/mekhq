@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -563,6 +563,24 @@ public class AcquisitionsDialog extends JDialog {
                                       part.isOmniPoddable());
             btnDepod.addActionListener(ev -> {
                 MissingPart podded = part.getMissingPart();
+                if (podded == null) {
+                    // Should not happen: btnDepod is only shown when part.getMissingPart() != null
+                    // at panel construction. If we get here, campaign state changed between build
+                    // and click. Log diagnostic context (also sent to Sentry via MMLogger), then
+                    // rethrow so the global uncaught handler still surfaces the failure.
+                    NullPointerException npe = new NullPointerException(
+                          "AcquisitionsDialog btnDepod: part.getMissingPart() returned null for part " +
+                                part.getName() + " (id=" + part.getId() + ')');
+                    logger.error(npe,
+                          "btnDepod clicked but part.getMissingPart() returned null. " +
+                                "part={} (id={}), omniPodCount={}, missingCount={}, isOmniPoddable={}",
+                          part.getName(),
+                          part.getId(),
+                          partCountInfo.getOmniPodCount(),
+                          partCountInfo.getMissingCount(),
+                          part.isOmniPoddable());
+                    throw npe;
+                }
                 podded.setOmniPodded(true);
                 Part replacement = podded.findReplacement(false);
 
