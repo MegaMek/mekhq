@@ -744,7 +744,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = cl;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
+            this.name += " (" + (cl ? "Clan " : "IS ") + ArmorType.of(type, cl).getName() + ')';
         }
     }
 

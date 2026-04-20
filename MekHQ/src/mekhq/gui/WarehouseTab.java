@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -633,6 +633,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
+        // Update parts-in-use data to ensure "In Use" column is accurate
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, false, QUALITY_A);
+        partsModel.updatePartsInUse(partsInUse);
+
         partsModel.setData(getCampaign().getWarehouse().getSpareParts());
         getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
