@@ -232,7 +232,36 @@ public class ResolveScenarioTracker {
         } else {
             initUnitsAndPilotsWithoutBattle();
         }
+
+        recoverUnfoundDeployedUnits();
+
         checkStatusOfPersonnel();
+    }
+
+    /**
+     * Recovers units that were deployed by MekHQ but never appeared in the game/MUL results.
+     * This can happen when the MegaMek server rejects a unit (e.g., flagged as an illegal design).
+     * Such units should not be treated as total losses — they are returned to the campaign unharmed,
+     * and their crews are tracked as alive.
+     *
+     * @see <a href="https://github.com/MegaMek/mekhq/issues/6606">GitHub issue #6606</a>
+     */
+    private void recoverUnfoundDeployedUnits() {
+        for (Unit u : units) {
+            UUID uid = u.getId();
+            UnitStatus status = unitsStatus.get(uid);
+            if (status != null && status.isTotalLoss() && !entities.containsKey(uid)) {
+                status.assignFoundEntity(u.getEntity(), false);
+                logger.warn("Unit {} ({}) was deployed but never appeared in results. "
+                    + "It may have been rejected by the server. Returning it to the campaign.",
+                    u.getName(), uid);
+
+                Crew crew = u.getEntity().getCrew();
+                if (crew != null && !"-1".equals(crew.getExternalIdAsString())) {
+                    pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
+                }
+            }
+        }
     }
 
     private TestUnit generateNewTestUnit(Entity e) {
@@ -507,6 +536,9 @@ public class ResolveScenarioTracker {
                 bayLoadedEntities.put(trnId, cargo);
             }
         }
+
+        recoverUnfoundDeployedUnits();
+
         checkStatusOfPersonnel();
     }
 
@@ -862,14 +894,14 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Attempts to assign a casualty to temp crew members (blob crew) if any exist.
-     * Casualties are randomly distributed across all temp crew types proportional to their numbers.
-     * If no blob crew exists or the random roll indicates a Person should be hit, the casualty
-     * is assigned to the Person instead (setting dead or wounded status). This can be expanded in the
-     * future to include support for wounding temp crew.
+     * Attempts to assign a casualty to temp crew members (blob crew) if any exist. Casualties are randomly distributed
+     * across all temp crew types proportional to their numbers. If no blob crew exists or the random roll indicates a
+     * Person should be hit, the casualty is assigned to the Person instead (setting dead or wounded status). This can
+     * be expanded in the future to include support for wounding temp crew.
      *
-     * @param unit The unit with potential temp crew
+     * @param unit   The unit with potential temp crew
      * @param status The personnel status object to update if casualty assigned to a Person
+     *
      * @return The type of casualty assignment that occurred
      */
     private CasualtyAssignment assignTempCrewCasualty(Unit unit, PersonStatus status) {
@@ -1649,9 +1681,8 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Processes death payouts for killed temp crew (blob crew).
-     * Calculates appropriate compensation based on role base salaries and
-     * campaign payout settings.
+     * Processes death payouts for killed temp crew (blob crew). Calculates appropriate compensation based on role base
+     * salaries and campaign payout settings.
      */
     private void processTempCrewDeathPayouts() {
         CampaignOptions options = campaign.getCampaignOptions();
@@ -1674,28 +1705,29 @@ public class ResolveScenarioTracker {
         // Debit the total payout from campaign finances
         if (totalPayout.isPositive()) {
             campaign.getFinances().debit(
-                TransactionType.SALARIES,
-                campaign.getLocalDate(),
-                totalPayout,
-                getTextAt(RESOURCE_BUNDLE, "tempCrewDeathBenefitsTransaction")
+                  TransactionType.SALARIES,
+                  campaign.getLocalDate(),
+                  totalPayout,
+                  getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.tempCrewDeathBenefitsTransaction")
             );
 
             // Add a report entry
             campaign.addReport(
-                mekhq.campaign.enums.DailyReportType.PERSONNEL,
-                getFormattedTextAt(RESOURCE_BUNDLE, "tempCrewDeathBenefitsReport",
-                    totalPayout.toAmountAndSymbolString(),
-                    totalKilled)
+                  mekhq.campaign.enums.DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.tempCrewDeathBenefitsReport",
+                        totalPayout.toAmountAndSymbolString(),
+                        totalKilled)
             );
         }
     }
 
     /**
-     * Calculates the payout amount for a temp crew member based on base salary.
-     * Uses the same multipliers as regular personnel death benefits.
+     * Calculates the payout amount for a temp crew member based on base salary. Uses the same multipliers as regular
+     * personnel death benefits.
      *
      * @param baseSalary The base salary for the role
-     * @param isOfficer Whether the crew member is an officer (always false for temp crew)
+     * @param isOfficer  Whether the crew member is an officer (always false for temp crew)
+     *
      * @return The calculated payout amount
      */
     private Money calculateTempCrewPayout(Money baseSalary, boolean isOfficer) {

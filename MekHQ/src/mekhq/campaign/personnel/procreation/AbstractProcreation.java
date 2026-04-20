@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -220,7 +220,7 @@ public abstract class AbstractProcreation {
                      mother.getGenealogy().getSpouse() :
                      ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null) ?
                             campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))) :
-                            null);
+                      null);
     }
     //endregion Determination Methods
 
@@ -511,8 +511,8 @@ public abstract class AbstractProcreation {
                 baby.getOptions().getOption(UNOFFICIAL_DOBROWSKI_SYNDROME).setValue(true);
             }
 
-            // Alert the player
-            if (campaignOptions.isShowLifeEventDialogBirths()) {
+            // Alert the player, but only show this dialog for the first child with twins/triplets/etc
+            if (campaignOptions.isShowLifeEventDialogBirths() && (i == 0)) {
                 new BirthAnnouncement(campaign, mother, baby.getGender(), size);
             }
         }

@@ -617,7 +617,7 @@ public abstract class Part implements IPartWork, ITechnology {
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
         if (omniPodded) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "omniPodded", true);
         }

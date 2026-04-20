@@ -94,10 +94,14 @@ public class Armor extends Part implements IAcquisitionWork {
         this.location = loc;
         this.rear = r;
         this.clan = clan;
-        this.name = "Armor";
+    }
+
+    @Override
+    public String getName() {
         if (type > -1) {
-            this.name += " (" + (clan ? "Clan " : "IS ") + ArmorType.of(type, clan).getName() + ')';
+            return "Armor (" + (clan ? "Clan " : "IS ") + ArmorType.of(type, clan).getName() + ')';
         }
+        return "Armor";
     }
 
     @Override
@@ -742,10 +746,6 @@ public class Armor extends Part implements IAcquisitionWork {
     public void changeType(int ty, boolean cl) {
         this.type = ty;
         this.clan = cl;
-        this.name = "Armor";
-        if (type > -1) {
-            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
-        }
     }
 
     @Override
