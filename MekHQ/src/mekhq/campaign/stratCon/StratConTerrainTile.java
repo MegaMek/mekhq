@@ -34,6 +34,7 @@ package mekhq.campaign.stratCon;
 
 import java.util.List;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class StratConTerrainTile {
     public String terrainName;
     public List<String> battleTerrainTypes;
