@@ -35,7 +35,6 @@
 package mekhq.campaign.parts.equipment;
 
 import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.Campaign;
 
@@ -43,6 +42,7 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingJumpJet extends MissingEquipmentPart {
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingJumpJet() {
         this(0, null, -1, false, null);
     }
@@ -55,11 +55,6 @@ public class MissingJumpJet extends MissingEquipmentPart {
     @Override
     public int getBaseTime() {
         return isOmniPodded() ? 30 : 60;
-    }
-
-    @Override
-    public int getDifficulty() {
-        return 0;
     }
 
     @Override

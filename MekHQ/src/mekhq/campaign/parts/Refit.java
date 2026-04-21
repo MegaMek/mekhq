@@ -900,33 +900,37 @@ public class Refit extends Part implements IAcquisitionWork {
             if (oldPart.getLocation() >= 0) {
                 locationLostOldStuff[oldPart.getLocation()] = true;
             }
-            if (oldPart instanceof MissingPart) {
-                continue;
-            }
-            if (oldPart instanceof AmmoBin oldAmmoBin) {
-                int remainingShots = oldAmmoBin.getFullShots() - oldAmmoBin.getShotsNeeded();
-                AmmoType type = oldAmmoBin.getType();
-                if (remainingShots > 0) {
-                    if (oldPart instanceof LargeCraftAmmoBin) {
-                        if (type.hasFlag(AmmoType.F_CAP_MISSILE) ||
-                                  type.hasFlag(AmmoType.F_CRUISE_MISSILE) ||
-                                  type.hasFlag(AmmoType.F_SCREEN)) {
-                            time += WORK_HOUR * ((LargeCraftAmmoBin) oldPart).getFullShots();
-                        } else {
-                            time += 15 * Math.max(1, (int) oldPart.getTonnage());
-                        }
-                    } else {
-                        time += 2 * WORK_HOUR;
-                    }
-                    // ammoRemoved.merge(type, remainingShots, Integer::sum);
+            switch (oldPart) {
+                case MissingPart ignored -> {
+                    continue;
                 }
-                continue;
-            }
-            if (oldPart instanceof Armor oldArmor && sameArmorType) {
-                recycledArmorPoints += oldArmor.getAmount();
-                // Refund the time we added above for the "new" armor that actually wasn't.
-                time -= oldArmor.getAmount() * oldArmor.getBaseTimeFor(oldUnit.getEntity());
-                continue;
+                case AmmoBin oldAmmoBin -> {
+                    int remainingShots = oldAmmoBin.getFullShots() - oldAmmoBin.getShotsNeeded();
+                    AmmoType type = oldAmmoBin.getType();
+                    if (remainingShots > 0) {
+                        if (oldPart instanceof LargeCraftAmmoBin) {
+                            if (type.hasFlag(AmmoType.F_CAP_MISSILE) ||
+                                      type.hasFlag(AmmoType.F_CRUISE_MISSILE) ||
+                                      type.hasFlag(AmmoType.F_SCREEN)) {
+                                time += WORK_HOUR * ((LargeCraftAmmoBin) oldPart).getFullShots();
+                            } else {
+                                time += 15 * Math.max(1, (int) oldPart.getTonnage());
+                            }
+                        } else {
+                            time += 2 * WORK_HOUR;
+                        }
+                        // ammoRemoved.merge(type, remainingShots, Integer::sum);
+                    }
+                    continue;
+                }
+                case Armor oldArmor when sameArmorType -> {
+                    recycledArmorPoints += oldArmor.getAmount();
+                    // Refund the time we added above for the "new" armor that actually wasn't.
+                    time -= oldArmor.getAmount() * oldArmor.getBaseTimeFor(oldUnit.getEntity());
+                    continue;
+                }
+                default -> {
+                }
             }
             boolean isSalvaging = oldUnit.isSalvage();
             oldUnit.setSalvage(true);
@@ -2898,7 +2902,7 @@ public class Refit extends Part implements IAcquisitionWork {
             for (int i = 0; i < bay.getDoors(); i++) {
                 Part door;
                 if (!doors.isEmpty()) {
-                    door = doors.remove(0);
+                    door = doors.removeFirst();
                 } else {
                     // This shouldn't ever happen
                     door = new MissingBayDoor((int) entity.getWeight(), campaign);
@@ -2911,7 +2915,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 for (int i = 0; i < bay.getCapacity(); i++) {
                     Part cubicle;
                     if (cubicles.containsKey(bayType) && !cubicles.get(bayType).isEmpty()) {
-                        cubicle = cubicles.get(bayType).remove(0);
+                        cubicle = cubicles.get(bayType).removeFirst();
                     } else {
                         cubicle = new MissingCubicle((int) entity.getWeight(), bayType, campaign);
                         oldUnit.addPart(cubicle);

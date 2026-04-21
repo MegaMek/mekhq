@@ -55,6 +55,7 @@ public class MissingVeeStabilizer extends MissingPart {
 
     private int loc;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingVeeStabilizer() {
         this(0, 0, null);
     }
