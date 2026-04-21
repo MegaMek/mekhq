@@ -867,6 +867,7 @@ public class Scenario implements IPlayerSettings {
         return externalIDLookup;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setExternalIDLookup(HashMap<String, Entity> externalIDLookup) {
         this.externalIDLookup = externalIDLookup;
     }
@@ -924,7 +925,7 @@ public class Scenario implements IPlayerSettings {
      * Determines whether a list of forces is eligible to deploy to the scenario.
      *
      * @param formations list of forces
-     * @param c      the campaign that the forces are part of
+     * @param c          the campaign that the forces are part of
      *
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
@@ -1125,7 +1126,7 @@ public class Scenario implements IPlayerSettings {
                     return null;
                 }
 
-                retVal = (Scenario) scenarioClassList.get(0).getDeclaredConstructor().newInstance();
+                retVal = (Scenario) scenarioClassList.getFirst().getDeclaredConstructor().newInstance();
             } else {
                 retVal = (Scenario) Class.forName(className).getDeclaredConstructor().newInstance();
             }
@@ -1179,8 +1180,9 @@ public class Scenario implements IPlayerSettings {
                         Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
                         retVal.loots.add(loot);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvageFormations") || wn2.getNodeName().equalsIgnoreCase(
-                      "salvageForces")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageFormations") ||
+                                 wn2.getNodeName().equalsIgnoreCase(
+                                       "salvageForces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -1189,8 +1191,9 @@ public class Scenario implements IPlayerSettings {
                             continue;
                         }
 
-                        if (!wn3.getNodeName().equalsIgnoreCase("salvageFormation") && !wn3.getNodeName().equalsIgnoreCase(
-                              "salvageForce")) {
+                        if (!wn3.getNodeName().equalsIgnoreCase("salvageFormation") &&
+                                  !wn3.getNodeName().equalsIgnoreCase(
+                                        "salvageForce")) {
                             // Error condition of sorts!
                             LOGGER.error("Unknown node type loaded in salveFormations nodes: {}", wn3.getNodeName());
                             continue;
