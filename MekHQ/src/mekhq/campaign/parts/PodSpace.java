@@ -75,6 +75,7 @@ public class PodSpace implements IPartWork {
 
     protected boolean repairInPlace = false;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public PodSpace() {
         this(Entity.LOC_NONE, null);
     }
@@ -97,6 +98,7 @@ public class PodSpace implements IPartWork {
         return 30;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<Part> getPartList() {
         return childPartIds.stream()
                      .map(id -> campaign.getWarehouse().getPart(id))
@@ -491,6 +493,7 @@ public class PodSpace implements IPartWork {
         return false;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean shouldRepairInPlace() {
         return repairInPlace;
     }

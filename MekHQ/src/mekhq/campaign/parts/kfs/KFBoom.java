@@ -84,6 +84,7 @@ public class KFBoom extends Part {
 
     private int boomType;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public KFBoom() {
         this(0, null, Dropship.BOOM_STANDARD);
     }

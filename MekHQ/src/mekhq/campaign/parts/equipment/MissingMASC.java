@@ -36,7 +36,6 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 
 import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -52,6 +51,7 @@ import org.w3c.dom.NodeList;
 public class MissingMASC extends MissingEquipmentPart {
     protected int engineRating;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingMASC() {
         this(0, null, -1, null, 0, 0, false);
     }
@@ -79,6 +79,7 @@ public class MissingMASC extends MissingEquipmentPart {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getEngineRating() {
         return engineRating;
     }

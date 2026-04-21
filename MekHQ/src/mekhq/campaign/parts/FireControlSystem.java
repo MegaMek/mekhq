@@ -58,6 +58,7 @@ import org.w3c.dom.NodeList;
 public class FireControlSystem extends Part {
     private Money cost;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public FireControlSystem() {
         this(0, Money.zero(), null);
     }
