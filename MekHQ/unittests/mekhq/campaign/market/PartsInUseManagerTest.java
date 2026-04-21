@@ -743,7 +743,6 @@ class PartsInUseManagerTest {
 
         @BeforeAll
         public static void beforeAll() {
-            Ranks.initializeRankSystems();
             campaign = MHQTestUtilities.getTestCampaign();
             partsInUseManager = new PartsInUseManager(campaign);
 
