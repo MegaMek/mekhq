@@ -954,7 +954,7 @@ public class MRMSService {
             return MRMSPartAction.createNoTechs(partWork);
         }
 
-        Person tech = validTechs.get(0);
+        Person tech = validTechs.getFirst();
 
         Skill skill = tech.getSkillForWorkingOn(partWork);
         WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
@@ -1164,8 +1164,8 @@ public class MRMSService {
     }
 
     /**
-     * Checks whether an AmmoBin has ammo available in the warehouse.
-     * Non-AmmoBin parts always pass. Salvaging parts always pass.
+     * Checks whether an AmmoBin has ammo available in the warehouse. Non-AmmoBin parts always pass. Salvaging parts
+     * always pass.
      *
      * @param part The part to check.
      *

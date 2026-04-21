@@ -130,7 +130,7 @@ public class Utilities {
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         Collections.sort(rolls);
-        return (rolls.get(0) + rolls.get(1));
+        return (rolls.getFirst() + rolls.get(1));
     }
 
     /**

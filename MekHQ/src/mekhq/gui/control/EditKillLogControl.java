@@ -45,13 +45,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AddOrEditKillEntryDialog;
 import mekhq.gui.model.KillTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class EditKillLogControl extends JPanel {
     private final JFrame parent;
@@ -116,7 +116,7 @@ public class EditKillLogControl extends JPanel {
         killTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         killTable.getSelectionModel().addListSelectionListener(this::killTableValueChanged);
 
-        JScrollPane scrollKillTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollKillTable = new FastJScrollPane();
         scrollKillTable.setName("scrollPartsTable");
         scrollKillTable.setViewportView(killTable);
         this.add(scrollKillTable, BorderLayout.CENTER);

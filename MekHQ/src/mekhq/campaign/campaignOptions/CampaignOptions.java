@@ -3905,12 +3905,10 @@ public class CampaignOptions {
         this.personnelMarketStyle = personnelMarketStyle;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPersonnelMarketName() {
         return personnelMarketName;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setPersonnelMarketName(final String personnelMarketName) {
         this.personnelMarketName = personnelMarketName;
     }
@@ -3923,23 +3921,19 @@ public class CampaignOptions {
         this.personnelMarketReportRefresh = personnelMarketReportRefresh;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public Map<SkillLevel, Integer> getPersonnelMarketRandomRemovalTargets() {
         return personnelMarketRandomRemovalTargets;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setPersonnelMarketRandomRemovalTargets(
           final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
         this.personnelMarketRandomRemovalTargets = personnelMarketRandomRemovalTargets;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public double getPersonnelMarketDylansWeight() {
         return personnelMarketDylansWeight;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setPersonnelMarketDylansWeight(final double personnelMarketDylansWeight) {
         this.personnelMarketDylansWeight = personnelMarketDylansWeight;
     }

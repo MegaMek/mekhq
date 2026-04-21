@@ -233,10 +233,10 @@ public class StaticChecks {
     }
 
     public static boolean areAllUnitsOnSameC3iNetwork(Vector<Unit> units) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
-        final String network = units.get(0).getEntity().getC3NetId();
+        final String network = units.getFirst().getEntity().getC3NetId();
         if (network == null) {
             return false;
         }
@@ -289,10 +289,10 @@ public class StaticChecks {
      *       any of the units is on a different NC3 network from the others.
      */
     public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
-        final String network = units.get(0).getEntity().getC3NetId();
+        final String network = units.getFirst().getEntity().getC3NetId();
         if (network == null) {
             return false;
         }
@@ -371,10 +371,10 @@ public class StaticChecks {
      *       if any of the units is on a different Nova network from the others.
      */
     public static boolean areAllUnitsOnSameNovaCEWSNetwork(Vector<Unit> units) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
-        final String network = units.get(0).getEntity().getC3NetId();
+        final String network = units.getFirst().getEntity().getC3NetId();
         if (network == null) {
             return false;
         }
@@ -392,12 +392,12 @@ public class StaticChecks {
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
     public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
         final boolean isTank = (unitType == UnitType.TANK) || (unitType == UnitType.VTOL)
                                      || (unitType == UnitType.NAVAL);
-        final int weightClass = units.get(0).getEntity().getWeightClass();
+        final int weightClass = units.getFirst().getEntity().getWeightClass();
         return units.stream().allMatch(u -> (u.getEntity() == null)
                                                   ||
                                                   ((u.getEntity() != null) &&

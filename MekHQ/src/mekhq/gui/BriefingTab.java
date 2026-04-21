@@ -643,7 +643,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
-        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
     }
 
     /**
@@ -749,7 +749,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         getCampaign().removeMission(mission);
         final List<Mission> missions = getCampaign().getSortedMissions();
-        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -1051,7 +1051,7 @@ public final class BriefingTab extends CampaignGuiTab {
         for (UUID techID : assignedTechs) {
             Person tech = getCampaign().getPerson(techID);
             if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
-                availableTechs.add(0, tech);
+                availableTechs.addFirst(tech);
             }
         }
 
@@ -1725,7 +1725,7 @@ public final class BriefingTab extends CampaignGuiTab {
         ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
               cGame.getOptions(),
               alliedEntities,
-              allyFactionCodes.get(0),
+              allyFactionCodes.getFirst(),
               allEnemyEntities,
               opForFactionCodes,
               opForQuality,
@@ -1734,7 +1734,7 @@ public final class BriefingTab extends CampaignGuiTab {
         rp.groundMap = groundMap;
         rp.spaceEnvironment = spaceMap;
         MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, alliedEntities, "");
-        tlg.reconfigureEntities(alliedEntities, allyFactionCodes.get(0), mt, rp, null);
+        tlg.reconfigureEntities(alliedEntities, allyFactionCodes.getFirst(), mt, rp, null);
 
     }
 

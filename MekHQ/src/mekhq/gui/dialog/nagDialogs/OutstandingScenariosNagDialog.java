@@ -34,10 +34,8 @@ package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_OUTSTANDING_SCENARIOS;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.getOutstandingScenarios;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.hasOutStandingScenarios;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -73,26 +71,5 @@ public class OutstandingScenariosNagDialog extends ImmersiveDialogNag {
         String outstandingScenarios = getOutstandingScenarios(campaign);
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, outstandingScenarios);
-    }
-
-    /**
-     * Checks if a nag dialog should be displayed for outstanding scenarios in the given campaign.
-     *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
-     * <ul>
-     *     <li>If the campaign is set to use AtB (Against the Bot) rules.</li>
-     *     <li>If the nag dialog for outstanding scenarios has not been ignored in the user options.</li>
-     *     <li>If there are outstanding scenarios in the campaign.</li>
-     * </ul>
-     *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     *
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
-     */
-    public static boolean checkNag(Campaign campaign) {
-
-        return campaign.getCampaignOptions().isUseAtB() &&
-                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_OUTSTANDING_SCENARIOS) &&
-                     hasOutStandingScenarios(campaign);
     }
 }

@@ -311,7 +311,7 @@ public class PaperDoll extends Component {
         public Path2D genPath() {
             Path2D result = new Path2D.Float();
             if ((null != path) && !path.isEmpty()) {
-                result.moveTo(path.get(0).getX(), path.get(0).getY());
+                result.moveTo(path.getFirst().getX(), path.getFirst().getY());
                 IntStream.range(1, path.size()).mapToObj(i -> path.get(i))
                       .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));
                 result.closePath();

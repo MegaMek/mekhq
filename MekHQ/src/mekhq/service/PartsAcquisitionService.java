@@ -158,7 +158,7 @@ public class PartsAcquisitionService {
         Person admin = campaign.getLogisticsPerson();
 
         for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
-            IAcquisitionWork awFirst = awList.get(0);
+            IAcquisitionWork awFirst = awList.getFirst();
             Part part = awFirst.getAcquisitionPart();
             TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin, true, false);
             PartCountInfo pci = new PartCountInfo();
@@ -197,7 +197,7 @@ public class PartsAcquisitionService {
                 pci.setOmniPodCount(omniPod);
             }
 
-            partCountInfoMap.put(awList.get(0).getAcquisitionDisplayName(), pci);
+            partCountInfoMap.put(awList.getFirst().getAcquisitionDisplayName(), pci);
         }
 
         inTransitCount = 0;
