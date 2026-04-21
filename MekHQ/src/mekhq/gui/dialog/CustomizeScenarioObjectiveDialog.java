@@ -44,6 +44,7 @@ import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.OffBoardDirection;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.ObjectiveEffect;
@@ -54,7 +55,6 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveAmountType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 
@@ -196,7 +196,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         lstDetails.addListSelectionListener(
               e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrDetails = new JScrollPaneWithSpeed(lstDetails);
+        JScrollPane scrDetails = new FastJScrollPane(lstDetails);
         scrDetails.setMinimumSize(new Dimension(200, 100));
         scrDetails.setPreferredSize(new Dimension(200, 100));
         gbc.gridx = 1;
@@ -350,7 +350,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         localGbc.gridx++;
         panForce.add(btnAdd, localGbc);
         localGbc.gridx++;
-        JScrollPane scrForceNames = new JScrollPaneWithSpeed(forceNames);
+        JScrollPane scrForceNames = new FastJScrollPane(forceNames);
         scrForceNames.setMinimumSize(new Dimension(250, 100));
         scrForceNames.setPreferredSize(new Dimension(250, 100));
         panForce.add(scrForceNames, localGbc);
@@ -450,14 +450,14 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        JScrollPane scrSuccessEffects = new JScrollPaneWithSpeed(successEffects);
+        JScrollPane scrSuccessEffects = new FastJScrollPane(successEffects);
         scrSuccessEffects.setMinimumSize(new Dimension(300, 100));
         scrSuccessEffects.setPreferredSize(new Dimension(300, 100));
         panBottom.add(scrSuccessEffects, gbc);
         gbc.gridx++;
         panBottom.add(btnRemoveSuccess, gbc);
         gbc.gridx++;
-        JScrollPane scrFailureEffects = new JScrollPaneWithSpeed(failureEffects);
+        JScrollPane scrFailureEffects = new FastJScrollPane(failureEffects);
         scrFailureEffects.setMinimumSize(new Dimension(300, 100));
         scrFailureEffects.setPreferredSize(new Dimension(300, 100));
         panBottom.add(scrFailureEffects, gbc);

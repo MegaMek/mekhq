@@ -60,7 +60,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 
 /**
  * A dialog that displays an interactive family tree visualization.
@@ -218,8 +217,8 @@ public class FamilyTreeDialog extends JDialog {
                 int targetY = personCenterY - viewH / 2;
 
                 // Clamp to viewport and panel bounds for correct scrolling
-                targetX = Math.max(0, Math.min(targetX, panelW - viewW));
-                targetY = Math.max(0, Math.min(targetY, panelH - viewH));
+                targetX = Math.clamp(targetX, 0, panelW - viewW);
+                targetY = Math.clamp(targetY, 0, panelH - viewH);
 
                 scrollPane.getViewport().setViewPosition(new Point(targetX, targetY));
             }
@@ -369,8 +368,8 @@ class FamilyTreePanel extends JPanel {
                 Dimension viewSize = parentScrollPane.getViewport().getExtentSize();
                 Dimension contentSize = getPreferredSize();
 
-                newX = Math.max(0, Math.min(newX, contentSize.width - viewSize.width));
-                newY = Math.max(0, Math.min(newY, contentSize.height - viewSize.height));
+                newX = Math.clamp(newX, 0, contentSize.width - viewSize.width);
+                newY = Math.clamp(newY, 0, contentSize.height - viewSize.height);
 
                 parentScrollPane.getViewport().setViewPosition(new Point(newX, newY));
 
@@ -556,7 +555,7 @@ class FamilyTreePanel extends JPanel {
 
             // Add the first parent, if any
             if (parentCount > 0) {
-                Person parent0 = parents.get(0);
+                Person parent0 = parents.getFirst();
                 if (parent0 != null && !visited.contains(parent0)) {
                     TreeNodeBox parent0Box = nodeMap.computeIfAbsent(parent0, TreeNodeBox::new);
                     node.parents.add(parent0Box);

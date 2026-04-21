@@ -58,6 +58,7 @@ import javax.swing.WindowConstants;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
@@ -70,7 +71,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.RepairTab;
 import mekhq.gui.enums.MHQTabType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 import mekhq.utilities.ReportingUtilities;
@@ -134,7 +134,7 @@ public class AcquisitionsDialog extends JDialog {
 
         pnlSummary.firePropertyChange("counts", -1, 0);
 
-        JScrollPane scrollMain = new JScrollPaneWithSpeed(pnlMain);
+        JScrollPane scrollMain = new FastJScrollPane(pnlMain);
         scrollMain.setPreferredSize(new Dimension(700, 500));
 
         content.add(scrollMain, BorderLayout.CENTER);
@@ -408,7 +408,7 @@ public class AcquisitionsDialog extends JDialog {
         }
 
         private void initComponents() {
-            targetWork = awList.get(0);
+            targetWork = awList.getFirst();
             part = targetWork.getAcquisitionPart();
 
             partCountInfo = PartsAcquisitionService.getPartCountInfoMap().get(targetWork.getAcquisitionDisplayName());

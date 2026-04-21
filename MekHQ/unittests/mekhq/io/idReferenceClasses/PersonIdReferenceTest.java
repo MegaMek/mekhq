@@ -126,12 +126,12 @@ public class PersonIdReferenceTest {
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertEquals(1, origin.getGenealogy().getFormerSpouses().size());
-        assertEquals(formerSpouse, origin.getGenealogy().getFormerSpouses().get(0).getFormerSpouse());
+        assertEquals(formerSpouse, origin.getGenealogy().getFormerSpouses().getFirst().getFormerSpouse());
 
         // Testing Known But Migrated Former Spouse
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertEquals(1, origin.getGenealogy().getFormerSpouses().size());
-        assertEquals(formerSpouse, origin.getGenealogy().getFormerSpouses().get(0).getFormerSpouse());
+        assertEquals(formerSpouse, origin.getGenealogy().getFormerSpouses().getFirst().getFormerSpouse());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class PersonIdReferenceTest {
         assertTrue(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));
         assertEquals(1, origin.getGenealogy().getFamily().size());
         assertEquals(2, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).size());
-        assertEquals(parent1, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).get(0));
+        assertEquals(parent1, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).getFirst());
         assertEquals(parent2, origin.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).get(1));
     }
 

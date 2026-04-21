@@ -568,7 +568,7 @@ public class CapturePrisoners {
 
         Collections.sort(rolls);
 
-        prisoner.setLoyalty(rolls.get(0) + rolls.get(1) + rolls.get(2));
+        prisoner.setLoyalty(rolls.getFirst() + rolls.get(1) + rolls.get(2));
     }
 
     /**

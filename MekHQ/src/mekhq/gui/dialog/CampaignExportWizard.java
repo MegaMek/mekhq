@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 
 import megamek.common.equipment.AmmoType;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -74,7 +75,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard. May Knuth forgive me.
@@ -151,7 +151,7 @@ public class CampaignExportWizard extends JDialog {
 
         gbc.gridy++;
 
-        JScrollPane scrollPane = new JScrollPaneWithSpeed();
+        JScrollPane scrollPane = new FastJScrollPane();
         switch (state) {
             case ForceSelection:
                 lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));
@@ -719,7 +719,8 @@ public class CampaignExportWizard extends JDialog {
      * Helper function that returns a full force name with the source campaign root force name swapped out for the
      * destination campaign root force name
      */
-    private String getDestinationFullName(Formation sourceFormation, Campaign sourceCampaign, Campaign destinationCampaign) {
+    private String getDestinationFullName(Formation sourceFormation, Campaign sourceCampaign,
+          Campaign destinationCampaign) {
         return sourceFormation.getFullName()
                      .replace(sourceCampaign.getFormations().getName(), destinationCampaign.getFormations().getName());
     }

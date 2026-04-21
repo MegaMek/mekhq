@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.min;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
@@ -77,6 +76,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
@@ -101,7 +101,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -1066,9 +1065,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         rightPanel.add(topPanel, BorderLayout.PAGE_START);
 
-        JScrollPane scrOptions = new JScrollPaneWithSpeed();
+        JScrollPane scrOptions = new FastJScrollPane();
         panOptions = new JPanel();
-        JScrollPane scrSkills = new JScrollPaneWithSpeed();
+        JScrollPane scrSkills = new FastJScrollPane();
         panSkills = new JPanel();
 
         JTabbedPane tabStats = new JTabbedPane();
@@ -1283,8 +1282,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 Skill skill = person.getSkill(type);
                 // We had errors where player modified their skills beyond these values which then caused the
                 // JSpinners to break. This code here ensures that we self correct the values.
-                level = clamp(skill.getLevel(), 0, 10);
-                bonus = clamp(skill.getBonus(), -8, 8);
+                level = Math.clamp(skill.getLevel(), 0, 10);
+                bonus = Math.clamp(skill.getBonus(), -8, 8);
             }
             spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, skillType.getMaxLevel(), 1));
             spnLevel.addChangeListener(evt -> changeSkillValue(type));
@@ -1555,8 +1554,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
         LocalDate today = campaign.getLocalDate();
 
-        SkillType skillType = SkillType.getType(type);
-
         int level = (Integer) skillLvls.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
@@ -1718,22 +1715,22 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());
-        person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setConnections(Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
 
         newValue = MathUtility.parseInt(textWealth.getText(), person.getWealth());
-        person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
         newValue = MathUtility.parseInt(textReputation.getText(), person.getReputation());
-        person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setReputation(Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
 
         newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
-        person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        person.setUnlucky(Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
         newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
-        person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+        person.setBloodmark(Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
 
         newValue = MathUtility.parseInt(textExtraIncome.getText(), person.getExtraIncomeTraitLevel());
-        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 

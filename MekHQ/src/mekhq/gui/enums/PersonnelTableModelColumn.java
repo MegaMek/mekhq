@@ -735,7 +735,7 @@ public enum PersonnelTableModelColumn {
                                                .orElse(null);
                         String refitString = null != refitUnit ? "<b>Refitting</b> " + refitUnit.getName() : "";
                         if (person.getTechUnits().size() == 1) {
-                            unit = person.getTechUnits().get(0);
+                            unit = person.getTechUnits().getFirst();
                             if (unit != null) {
                                 return "<html>" +
                                              ReportingUtilities.separateIf(refitString,

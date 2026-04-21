@@ -40,8 +40,8 @@ import static megamek.common.units.Entity.ETYPE_TANK;
 import static megamek.common.units.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_TRUE;
-import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.LANCE;
+import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -75,9 +75,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Used by Against the Bot &amp; StratCon to track additional information about each formation on the TO&amp;E that has at
- * least one unit assigned. Extra info includes whether the formation counts as a Combat Team eligible for assignment to a
- * scenario role and what the assignment is on which contract.
+ * Used by Against the Bot &amp; StratCon to track additional information about each formation on the TO&amp;E that has
+ * at least one unit assigned. Extra info includes whether the formation counts as a Combat Team eligible for assignment
+ * to a scenario role and what the assignment is on which contract.
  *
  * @author Neoancient
  */
@@ -113,8 +113,8 @@ public class CombatTeam {
      * ComStar/WoB, or others (Inner Sphere, Clan, etc.).
      *
      * @param faction             The {@link Faction} object for which the standard formation size is to be calculated.
-     * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard formation size is to be
-     *                            calculated.
+     * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard formation size is to
+     *                            be calculated.
      *
      * @return The standard formation size, at the provided formation level, for the provided faction
      */
@@ -197,8 +197,8 @@ public class CombatTeam {
      * a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
      * <p>
      * This method iterates through all combat teams in the specified campaign, ignoring combat teams with the auxiliary
-     * role. For each valid combat team, it retrieves the associated formation and evaluates all units within that formation.
-     * The unit contribution to the total is determined based on its type: </p>
+     * role. For each valid combat team, it retrieves the associated formation and evaluates all units within that
+     * formation. The unit contribution to the total is determined based on its type: </p>
      * <ul>
      *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACE_FIGHTER:</b> Adds 1 for non-clan factions, and 0.5
      *     for clan factions.</li>
@@ -223,8 +223,8 @@ public class CombatTeam {
     /**
      * Effective size used when determining for many combat elements this combat team is.
      * <p>
-     * Retrieves the associated formation and evaluates all units within that formation. The unit contribution to the total is
-     * determined based on its type: </p>
+     * Retrieves the associated formation and evaluates all units within that formation. The unit contribution to the
+     * total is determined based on its type: </p>
      * <ul>
      *     <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACE_FIGHTER:</b> Adds 1 for non-clan factions, and 0.5
      *     for clan factions.</li>
@@ -750,8 +750,8 @@ public class CombatTeam {
     /**
      * Worker function that calculates the total weight of a formation with the given ID
      *
-     * @param campaign Campaign in which the formation resides
-     * @param formationId  Formation for which to calculate weight
+     * @param campaign    Campaign in which the formation resides
+     * @param formationId Formation for which to calculate weight
      *
      * @return Total formation weight
      */
@@ -793,9 +793,9 @@ public class CombatTeam {
     }
 
     /**
-     * This static method updates the combat teams across the campaign. It starts at the top level formation, and calculates
-     * the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into the campaign.
-     * After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
+     * This static method updates the combat teams across the campaign. It starts at the top level formation, and
+     * calculates the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into
+     * the campaign. After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
      *
      * @param campaign the current campaign.
      */
@@ -833,12 +833,13 @@ public class CombatTeam {
     /**
      * This method is used to update the combat teams for the campaign working downwards from a specified node, through
      * all of its sub-formations. It creates a new {@link CombatTeam} for each sub-formation and checks its eligibility.
-     * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set to
-     * {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function runs
-     * recursively on each sub-formation, effectively traversing the complete TO&E.
+     * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set
+     * to {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function
+     * runs recursively on each sub-formation, effectively traversing the complete TO&E.
      *
      * @param campaign    the current {@link Campaign}.
-     * @param workingNode the {@link Formation} node from which the method starts working down through all its sub-formations.
+     * @param workingNode the {@link Formation} node from which the method starts working down through all its
+     *                    sub-formations.
      */
     private static void recalculateSubFormationStrategicStatus(Campaign campaign,
           Hashtable<Integer, CombatTeam> combatTeamsTable, Formation workingNode) {
@@ -878,8 +879,8 @@ public class CombatTeam {
      * Retrieves the formation associated with the given campaign using the stored formation ID.
      *
      * <p>
-     * This method returns a {@link Formation} object corresponding to the stored {@code formationId}, if it exists within the
-     * specified campaign. If no matching formation is found, {@code null} is returned.
+     * This method returns a {@link Formation} object corresponding to the stored {@code formationId}, if it exists
+     * within the specified campaign. If no matching formation is found, {@code null} is returned.
      * </p>
      *
      * @param campaign the campaign containing the formations to search for the specified {@code formationId}

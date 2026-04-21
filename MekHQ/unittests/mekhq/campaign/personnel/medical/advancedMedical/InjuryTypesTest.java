@@ -64,7 +64,7 @@ class InjuryTypesTest {
     void testRegisterAllDoesNotCrash() {
         // Test that registerAll() completes without throwing an exception
         assertDoesNotThrow(() -> InjuryTypes.registerAll(),
-            "InjuryTypes.registerAll() should not throw an exception");
+              "InjuryTypes.registerAll() should not throw an exception");
     }
 
     @Test
@@ -79,9 +79,9 @@ class InjuryTypesTest {
     }
 
     /**
-     * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>.
-     * Permanent injuries that can only reset their recovery timer (or would be replaced by a
-     * different injury type) must not produce any stress effects.
+     * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>. Permanent injuries that can
+     * only reset their recovery timer (or would be replaced by a different injury type) must not produce any stress
+     * effects.
      */
     @ParameterizedTest(name = "{0} permanent injury produces no stress effects")
     @MethodSource(value = "permanentInjuryNoStressEffectData")
@@ -113,9 +113,9 @@ class InjuryTypesTest {
     }
 
     /**
-     * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>.
-     * Permanent injuries that can worsen within the same type (severity increase) should still
-     * produce worsening effects, but must not reset the recovery timer.
+     * Regression test for <a href="https://github.com/MegaMek/mekhq/issues/7565">#7565</a>. Permanent injuries that can
+     * worsen within the same type (severity increase) should still produce worsening effects, but must not reset the
+     * recovery timer.
      */
     @ParameterizedTest(name = "{0} permanent injury can still worsen but skips timer reset")
     @MethodSource(value = "permanentInjuryCanWorsenData")
@@ -136,7 +136,7 @@ class InjuryTypesTest {
               injuryName + " is permanent but should still produce worsening effects");
         assertEquals(1, effects.size(),
               injuryName + " should produce exactly 1 effect (worsening only, no timer reset)");
-        assertFalse(effects.get(0).desc().contains("recovery timer"),
+        assertFalse(effects.getFirst().desc().contains("recovery timer"),
               injuryName + " permanent injury should not have a recovery timer reset effect");
     }
 

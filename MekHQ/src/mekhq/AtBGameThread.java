@@ -252,7 +252,8 @@ public class AtBGameThread extends GameThread {
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
                         if (scenario.getCombatRole().isPatrol() &&
                                   (scenario.getCombatTeamById(campaign) != null) &&
-                                  (scenario.getCombatTeamById(campaign).getFormationId() == scenario.getCombatTeamId()) &&
+                                  (scenario.getCombatTeamById(campaign).getFormationId() ==
+                                         scenario.getCombatTeamId()) &&
                                   !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
@@ -310,7 +311,8 @@ public class AtBGameThread extends GameThread {
                         if (!useDropship &&
                                   scenario.getCombatRole().isPatrol() &&
                                   (scenario.getCombatTeamById(campaign) != null) &&
-                                  (scenario.getCombatTeamById(campaign).getFormationId() == scenario.getCombatTeamId())) {
+                                  (scenario.getCombatTeamById(campaign).getFormationId() ==
+                                         scenario.getCombatTeamId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
@@ -547,7 +549,7 @@ public class AtBGameThread extends GameThread {
                         if (towUnits) {
                             // Convert the list of Unit UUIDs to MM EntityIds
                             Unit towedUnit = campaign.getUnit(potentialTransports.getTransportedUnits(TOW_TRANSPORT,
-                                  transportId).get(0));
+                                  transportId).getFirst());
                             if (towedUnit != null && towedUnit.getEntity() != null) {
                                 // And now tow the units.
                                 Utilities.towPlayerTrailers(transport.getEntity().getId(),
@@ -627,7 +629,7 @@ public class AtBGameThread extends GameThread {
     }
 
     private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException,
-                                                                               InvalidPacketDataException{
+                                                                               InvalidPacketDataException {
         var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());

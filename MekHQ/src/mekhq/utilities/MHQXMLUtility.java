@@ -583,7 +583,7 @@ public class MHQXMLUtility extends MMXMLUtility {
             case 0:
                 return null;
             case 1:
-                final Entity entity = entities.get(0);
+                final Entity entity = entities.getFirst();
                 if (campaign != null) {
                     entity.setGame(campaign.getGame());
                 }
