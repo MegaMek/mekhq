@@ -51,12 +51,14 @@ public class XPHandler {
     private int adminXPPeriod;
 
     @Subscribe
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void campaignOptionsHandler(OptionsChangedEvent event) {
         this.adminXP = event.getOptions().getAdminXP();
         this.adminXPPeriod = event.getOptions().getAdminXPPeriod();
     }
 
     @Subscribe
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void processAdminXP(NewDayEvent event) {
         final Campaign campaign = event.getCampaign();
         if ((adminXP <= 0) || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.MONDAY)) {

@@ -46,10 +46,12 @@ public class TransactionChangedEvent extends TransactionEvent {
         this.newTransaction = newTransaction;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Transaction getOldTransaction() {
         return getTransaction();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Transaction getNewTransaction() {
         return newTransaction;
     }

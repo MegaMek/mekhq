@@ -492,8 +492,8 @@ public class ReputationController {
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s%s</td></tr>",
               indent,
               resources.getString("TechnicianModifier.text"),
-              technicianRequirements.get("rating").get(0) >= 0 ? "+" : "",
-              technicianRequirements.get("rating").get(0)));
+              technicianRequirements.get("rating").getFirst() >= 0 ? "+" : "",
+              technicianRequirements.get("rating").getFirst()));
         description.append("</table>");
 
         description.append("<table>");
@@ -707,7 +707,7 @@ public class ReputationController {
                     this.averageSkillLevel = SkillLevel.valueOf(workingNode2.getTextContent().toUpperCase());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
                     this.averageExperienceRating = MathUtility.parseInt(workingNode2.getTextContent()
-                                                                              .replaceAll("-", "_"));
+                                                                              .replace("-", "_"));
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("atbModifier")) {
                     this.atbModifier = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderMap")) {
