@@ -315,10 +315,12 @@ public class Clan {
         return retVal;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getAbjurationDate() {
         return abjurationDate;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAbjurationDate(int abjurationDate) {
         this.abjurationDate = abjurationDate;
     }

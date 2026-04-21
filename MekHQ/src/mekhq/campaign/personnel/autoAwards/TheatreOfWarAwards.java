@@ -121,7 +121,7 @@ public class TheatreOfWarAwards {
                 }
 
                 if (belligerents.size() == 1) {
-                    if (!processFaction(employer, belligerents.get(0))) {
+                    if (!processFaction(employer, belligerents.getFirst())) {
                         continue;
                     }
                 } else if (campaign.getCampaignOptions().isUseAtB()) {
@@ -157,7 +157,7 @@ public class TheatreOfWarAwards {
 
         try {
             return IntStream.rangeClosed(0, contractLength).map(year -> contractStartYear + year)
-                         .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.get(0)))
+                         .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.getFirst()))
                                                       && (checkYear <= Integer.parseInt(wartime.get(1))));
         } catch (Exception e) {
             LOGGER.error("Failed to parse isDuringWartime. Returning false.");

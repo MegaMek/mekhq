@@ -93,7 +93,7 @@ public class Appraisal {
      * <p>The multiplier increases or decreases based on the negative margin of success from an appraisal skill
      * check.</p>
      *
-     * @param marginOfSuccessValue The return value of {@link MarginOfSuccess#getMarginValue(MarginOfSuccess)}
+     * @param marginOfSuccessValue The return value of
      *
      * @return The appraisal cost multiplier as a {@code double}.
      *
