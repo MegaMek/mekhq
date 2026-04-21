@@ -121,6 +121,7 @@ public class PersonnelMarket {
     }
 
     @Subscribe
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
         setType(ev.getOptions().getPersonnelMarketName());
     }
@@ -209,7 +210,7 @@ public class PersonnelMarket {
             report.append(':');
 
             // Add details about the first personnel's experience, primary role, and name
-            Person person = personnel.get(0);
+            Person person = personnel.getFirst();
             int experienceLevel = person.getExperienceLevel(campaign, false);
             String expLevel = SkillType.getExperienceLevelName(experienceLevel);
 
@@ -268,6 +269,7 @@ public class PersonnelMarket {
         personnel.add(p);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void addPerson(Person p, Entity e) {
         addPerson(p);
         attachedEntities.put(p.getId(), e);

@@ -80,7 +80,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.stratCon.StratConCoords;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
@@ -89,6 +88,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.apache.commons.math3.util.Pair;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class StarLeagueCache {
     private final Campaign campaign;
     private final AtBContract contract;
@@ -116,6 +116,7 @@ public class StarLeagueCache {
 
     private final static MMLogger logger = MMLogger.create(StarLeagueCache.class);
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getCacheType() {
         return Compute.randomInt(CacheType.values().length);
     }
@@ -134,6 +135,7 @@ public class StarLeagueCache {
         determineOriginFaction();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     private void generateCombatCacheContents() {
         if (!didGenerationFail) {
             intactUnits = getCacheContents();
@@ -145,6 +147,7 @@ public class StarLeagueCache {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean didGenerationFail() {
         return didGenerationFail;
     }
@@ -223,7 +226,7 @@ public class StarLeagueCache {
                 didGenerationFail = true;
             } else {
                 Collections.shuffle(factions);
-                originFaction = Factions.getInstance().getFaction(factions.get(0));
+                originFaction = Factions.getInstance().getFaction(factions.getFirst());
             }
         } else {
             originFaction = Factions.getInstance().getFaction("SL");
@@ -414,8 +417,8 @@ public class StarLeagueCache {
         return unitWeights;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void createDudDialog(StratConTrackState track, StratConScenario scenario) {
-        StratConCoords stratconCoords = scenario.getCoords();
 
         // Dialog dimensions and representative
         final int DIALOG_WIDTH = 400;
@@ -467,6 +470,7 @@ public class StarLeagueCache {
         dialog.setVisible(true);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void createProposalDialog() {
         Money proposal = calculateProposal();
 

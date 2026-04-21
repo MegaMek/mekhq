@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -77,7 +77,6 @@ import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.Ranks;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -98,7 +97,6 @@ public class UnitIOTest {
         @BeforeAll
         public static void setupAll() {
             EquipmentType.initializeTypes();
-            Ranks.initializeRankSystems();
         }
 
         @BeforeEach
@@ -510,7 +508,6 @@ public class UnitIOTest {
         @BeforeAll
         public static void setupAll() {
             EquipmentType.initializeTypes();
-            Ranks.initializeRankSystems();
         }
 
         @BeforeEach
