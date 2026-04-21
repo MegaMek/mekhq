@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,12 +48,14 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
 
     /**
-     * Calculates the rating of a commander based on their skills and personality.
+     * Calculates the rating of a commander based on their skills, traits, and (optionally) personality.
+     * Follows the rules outlined in CamOps (revised 2021) pages 33-34.
      *
      * @param campaign  the campaign the commander belongs to
      * @param commander the commander to calculate the rating for
@@ -64,8 +66,9 @@ public class CommandRating {
      *           <li>"tactics": the commander's tactics skill value</li>
      *           <li>"strategy": the commander's strategy skill value</li>
      *           <li>"negotiation": the commander's negotiation skill value</li>
-     *           <li>"traits": the commander's trait score (see CamOps pg34)</li>
+     *           <li>"traits": the commander's trait score</li>
      *           <li>"personality": the value of the commander's personality characteristics (or 0, if disabled)</li>
+     *           <li>"total": sum of the above values or 1, whichever is greater</li>
      *       </ul>
      */
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
@@ -77,7 +80,7 @@ public class CommandRating {
         commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEGOTIATION));
 
         commandRating.put("traits",
-              getATOWTraitValues(commander,
+              getATOWTraitScore(commander,
                     campaign.getCampaignOptions().isUseAgeEffects(),
                     campaign.isClanCampaign(),
                     campaign.getLocalDate()));
@@ -107,26 +110,35 @@ public class CommandRating {
     }
 
     /**
-     * Calculates the ATOW (A Time of War) trait values for the provided commander.
+     * Calculates the ATOW (A Time of War) trait score for the provided commander.
      *
-     * <p>The trait score is determined by summing various attribute scores, including connection levels,
-     * combat-related traits, wealth, and reputation. The score has a minimum value of 1 regardless of calculated
-     * modifiers.</p>
+     * <p>The score one point for each positive trait and loses one point for each negative trait.</p>
      *
-     * <p>Trait scoring includes:
-     * <ul>
-     *   <li>Connections: Adds a score based on connection levels ranging from 1 to 10.</li>
-     *   <li>Combat Traits: Adds or subtracts points based on "Combat Sense" (+1) and "Combat Paralysis" (-1).</li>
-     *   <li>Wealth: Adds 1 point if the commander has sufficient wealth.</li>
-     *   <li>Reputation: Adds or subtracts scores based on positive and negative reputation levels.</li>
-     * </ul>
+     * <p>Positive traits:
+     *     <ul>
+     *         <li>"Combat Sense"</li>
+     *         <li>Connections > 0</li>
+     *         <li>Reputation > 0</li>
+     *         <li>Wealth >= 7</li>
+     *         <li>Charisma >= 7</li>
+     *     </ul>
+     * </p>
+     *
+     * <p>Negative traits:
+     *     <ul>
+     *         <li>"Combat Paralysis"</li>
+     *         <li>Reputation < 0</li>
+     *         <li>Unlucky > 0</li>
+     *         <li>Charisma <= 3</li>
+     *     </ul>
+     * </p>
      *
      * @param commander The {@link Person} representing the commander whose trait values need to be calculated. Can be
      *                  {@code null}, in which case the output is 0.
      *
-     * @return The calculated trait score for the commander, with a minimum value of 1.
+     * @return The calculated trait score for the commander.
      */
-    private static int getATOWTraitValues(Person commander, boolean isUseAgingEffects, boolean isClanCampaign,
+    private static int getATOWTraitScore(Person commander, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
         if (commander == null) {
             return 0;
@@ -136,7 +148,10 @@ public class CommandRating {
         PersonnelOptions options = commander.getOptions();
 
         // Connections
-        traitScore += commander.getAdjustedConnections(false);
+        int connections = commander.getAdjustedConnections(false);
+        if (connections > 0) {
+            traitScore += 1;
+        }
 
         // Wealth
         traitScore += commander.getWealth() >= 7 ? 1 : 0;
@@ -158,6 +173,19 @@ public class CommandRating {
         }
 
         if (options.booleanOption(ATOW_COMBAT_PARALYSIS)) {
+            traitScore -= 1;
+        }
+
+        // Charisma
+        int charisma = commander.getAttributeScore(SkillAttribute.CHARISMA);
+        if (charisma <= 3) {
+            traitScore -= 1;
+        } else if (charisma >= 7) {
+            traitScore += 1;
+        }
+
+        // Unlucky
+        if (commander.getUnlucky() > 0) {
             traitScore -= 1;
         }
 
