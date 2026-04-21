@@ -209,8 +209,8 @@ public class AtBDynamicScenario extends AtBScenario {
         // and there's a player force template associated with the first force
         // then return the generated deployment zone associated with the first force
         if (!getForceIDs().isEmpty() &&
-                  playerForceTemplates.containsKey(getForceIDs().get(0))) {
-            return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
+                  playerForceTemplates.containsKey(getForceIDs().getFirst())) {
+            return playerForceTemplates.get(getForceIDs().getFirst()).getActualDeploymentZone();
         }
 
         return super.getStartingPos();
@@ -423,7 +423,7 @@ public class AtBDynamicScenario extends AtBScenario {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }
 
-        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(getForceIDs().get(0));
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(getForceIDs().getFirst());
 
         if (combatTeam != null) {
             combatTeam.refreshCommander(campaign);
