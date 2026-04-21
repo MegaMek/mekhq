@@ -139,6 +139,7 @@ public class PaperDoll extends Component {
         setSize(base.getWidth(null), base.getHeight(null));
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setLocShape(BodyLocation loc, Path2D path) {
         Objects.requireNonNull(loc);
         if (null != path) {
@@ -180,6 +181,7 @@ public class PaperDoll extends Component {
         locTags.clear();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Color getHighlightColor() {
         return highlightColor;
     }

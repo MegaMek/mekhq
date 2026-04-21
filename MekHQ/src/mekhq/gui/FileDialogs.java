@@ -331,6 +331,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static Optional<File> openPlanetsTsv(JFrame frame) {
         Optional<File> value = GUI.fileDialogOpen(
               frame,

@@ -43,17 +43,16 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test class for {@link InjuryTypes}
@@ -63,7 +62,7 @@ class InjuryTypesTest {
     @Test
     void testRegisterAllDoesNotCrash() {
         // Test that registerAll() completes without throwing an exception
-        assertDoesNotThrow(() -> InjuryTypes.registerAll(),
+        assertDoesNotThrow(InjuryTypes::registerAll,
               "InjuryTypes.registerAll() should not throw an exception");
     }
 

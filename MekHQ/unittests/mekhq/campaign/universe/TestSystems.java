@@ -52,9 +52,4 @@ public class TestSystems extends Systems {
     public TestSystems() {
         super();
     }
-
-    public void addPlanetarySystem(PlanetarySystem system) {
-        systemList.put(system.getId(), system);
-    }
-
 }

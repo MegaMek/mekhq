@@ -90,6 +90,7 @@ public class ReportingUtilities {
      *
      * @return String start + main + end if main else ""
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static String surroundIf(String start, String main, String end) {
         if (null == main || main.isEmpty()) {
             return "";

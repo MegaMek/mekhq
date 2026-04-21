@@ -35,7 +35,6 @@ package mekhq;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
-import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -68,7 +67,6 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
-import megamek.common.net.packets.InvalidPacketDataException;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -89,6 +87,7 @@ import mekhq.utilities.ScenarioUtils;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class AtBGameThread extends GameThread {
     private static final MMLogger LOGGER = MMLogger.create(AtBGameThread.class);
 
@@ -628,8 +627,7 @@ public class AtBGameThread extends GameThread {
         return useDropship;
     }
 
-    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException,
-                                                                               InvalidPacketDataException {
+    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
         var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());

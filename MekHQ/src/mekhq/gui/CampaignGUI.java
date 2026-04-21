@@ -70,7 +70,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
-import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
@@ -758,12 +757,6 @@ public class CampaignGUI extends JPanel {
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
         miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
         menuMarket.add(miPersonnelMarket);
-
-        JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
-        miContractMarket.setMnemonic(KeyEvent.VK_C);
-        miContractMarket.addActionListener(evt -> showContractMarket());
-        miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseAtB());
-        menuMarket.add(miContractMarket);
 
         JMenuItem miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
         miUnitMarket.setMnemonic(KeyEvent.VK_U);
@@ -2155,9 +2148,7 @@ public class CampaignGUI extends JPanel {
         missionTypeDialog.setVisible(true);
 
         if (missionTypeDialog.isContract()) {
-            NewContractDialog newContractDialog = campaignOptions.isUseAtB() ?
-                                                        new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                                        new NewContractDialog(getFrame(), true, getCampaign());
+            NewContractDialog newContractDialog = new NewContractDialog(getFrame(), true, getCampaign());
             newContractDialog.setVisible(true);
         }
         return missionTypeDialog;
@@ -2270,7 +2261,6 @@ public class CampaignGUI extends JPanel {
     private void menuOptionsActionPerformed(final ActionEvent evt) {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
         // We need to handle it like this for now, as the options above get written to currently
-        boolean atb = oldOptions.isUseAtB();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
@@ -2341,29 +2331,6 @@ public class CampaignGUI extends JPanel {
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
         if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
             getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
-        }
-
-        if (atb != newOptions.isUseAtB()) {
-            if (newOptions.isUseAtB()) {
-                getCampaign().initAtB(false);
-                // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
-            }
-            if (newOptions.isUseAtB()) {
-                int loops = 0;
-                while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                    try {
-                        Thread.sleep(50);
-                        if (++loops > 20) {
-                            // Wait for up to a second
-                            break;
-                        }
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-            } else {
-                getCampaign().shutdownAtB();
-            }
         }
 
         getCampaign().initTurnover();
@@ -3313,8 +3280,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshPartsAvailability() {
-        if (!getCampaign().getCampaignOptions().isUseAtB() ||
-                  getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
+        if (getCampaign().getCampaignOptions().getAcquisitionType() == AcquisitionsType.ANY_TECH) {
             lblPartsAvailabilityRating.setText("");
         } else {
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();

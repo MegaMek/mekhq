@@ -88,6 +88,7 @@ public class StaticChecks {
      *
      * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean areAllUnitsTransported(Vector<Unit> units) {
         return units.stream().allMatch(Unit::hasTransportShipAssignment);
     }
@@ -391,6 +392,7 @@ public class StaticChecks {
      *
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
         if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
@@ -486,6 +488,7 @@ public class StaticChecks {
         return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isCurrentPrisoner());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean areAllPow(Person... people) {
         return Stream.of(people).allMatch(p -> p.getStatus().isPoW());
     }

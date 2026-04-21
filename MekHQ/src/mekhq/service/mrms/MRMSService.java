@@ -1407,22 +1407,27 @@ public class MRMSService {
             this.status = status;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusRepaired() {
             return status == STATUS.REPAIRED;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusMaxSkillReached() {
             return status == STATUS.MAX_SKILL_REACHED;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusOptionDisabled() {
             return status == STATUS.MRO_DISABLED;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoTechs() {
             return status == STATUS.NO_TECHS;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public int getMaxTechSkill() {
             return maxTechSkill;
         }
@@ -1431,28 +1436,13 @@ public class MRMSService {
             this.maxTechSkill = maxTechSkill;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public int getConfiguredTargetNumberPreferred() {
             return configuredTargetNumberPreferred;
         }
 
-        /**
-         * @deprecated consider {@link #getConfiguredTargetNumberPreferred()}
-         */
-        @Deprecated(since = "0.50.07", forRemoval = true)
-        public int getConfiguredBTHMin() {
-            return this.getConfiguredTargetNumberPreferred();
-        }
-
         public void setConfiguredTargetNumberPreferred(int configuredTargetNumberPreferred) {
             this.configuredTargetNumberPreferred = configuredTargetNumberPreferred;
-        }
-
-        /**
-         * @deprecated consider {@link #setConfiguredTargetNumberPreferred(int)}
-         */
-        @Deprecated(since = "0.50.07", forRemoval = true)
-        public void setConfiguredBTHMin(int configuredBTHMin) {
-            this.setConfiguredTargetNumberPreferred(configuredBTHMin);
         }
 
         public static MRMSPartAction createRepaired(IPartWork partWork) {
@@ -1543,6 +1533,7 @@ public class MRMSService {
             return partSet;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public void setPartSet(MRMSPartSet partSet) {
             this.partSet = partSet;
         }
@@ -1567,18 +1558,22 @@ public class MRMSService {
             return status == STATUS.NO_ACTIONS;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusActionsPerformed() {
             return status == STATUS.ACTIONS_PERFORMED;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoTechs() {
             return status == STATUS.NO_TECHS;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusUnfixableLimb() {
             return status == STATUS.UNFIXABLE_LIMB;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoParts() {
             return status == STATUS.NO_PARTS;
         }
