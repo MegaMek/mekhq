@@ -62,6 +62,7 @@ public class MekCockpit extends Part {
     private int type;
     private final boolean isClan;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MekCockpit() {
         this(0, Mek.COCKPIT_STANDARD, false, null);
     }

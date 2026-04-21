@@ -61,6 +61,7 @@ public class MissingInfantryArmorPart extends MissingPart {
     private boolean sneak_ir;
     private boolean sneak_ecm;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingInfantryArmorPart() {
         this(0, null, 1.0, false, false, false, false, false, false);
     }
@@ -179,6 +180,7 @@ public class MissingInfantryArmorPart extends MissingPart {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public double getDamageDivisor() {
         return damageDivisor;
     }
@@ -187,6 +189,7 @@ public class MissingInfantryArmorPart extends MissingPart {
         return dest;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isEncumbering() {
         return encumbering;
     }

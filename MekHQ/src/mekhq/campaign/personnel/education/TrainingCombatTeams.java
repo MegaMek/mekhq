@@ -100,7 +100,7 @@ public class TrainingCombatTeams {
     private static final MMLogger LOGGER = MMLogger.create(TrainingCombatTeams.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Education";
-    @Deprecated(since = "0.50.10", forRemoval = false)
+    @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
           MekHQ.getMHQOptions().getLocale());
 
@@ -163,8 +163,8 @@ public class TrainingCombatTeams {
      * <p>If educators or trainees lack eligible skills, appropriate reports are generated.
      * Training updates for skills and progression are logged within the campaign.</p>
      *
-     * @param campaign the {@link Campaign} managing the combat team and its associated personnel
-     * @param formation    the {@link Formation} undergoing training during this session
+     * @param campaign  the {@link Campaign} managing the combat team and its associated personnel
+     * @param formation the {@link Formation} undergoing training during this session
      */
     private static void processTraining(final Campaign campaign, final Formation formation) {
         // If the force is empty, we skip it
@@ -214,7 +214,7 @@ public class TrainingCombatTeams {
      * determine training time awarded and progress.</p>
      *
      * @param campaign        the current {@link Campaign} in which training is occurring
-     * @param formation           the {@link Formation} containing the units and trainees to train
+     * @param formation       the {@link Formation} containing the units and trainees to train
      * @param commander       the {@link Person} acting as the educator/commander providing the training
      * @param educatorSkills  a map containing all skills and their experience levels available for teaching by the
      *                        educator(s)
@@ -355,7 +355,7 @@ public class TrainingCombatTeams {
 
         // The lowest skill is improved first
         skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
-        Skill targetSkill = skillsBeingTrained.get(0);
+        Skill targetSkill = skillsBeingTrained.getFirst();
 
         // The +1 is to account for the next experience level to be gained
         int targetSkillLevel = targetSkill.getLevel() + 1;

@@ -231,7 +231,7 @@ public class TankLocation extends Part {
             } else {
                 int originalInternal = unit.getEntity().getOInternal(loc);
                 int internal = unit.getEntity().getInternal(loc);
-                damage = originalInternal - Math.min(originalInternal, Math.max(internal, 0));
+                damage = originalInternal - Math.clamp(internal, 0, originalInternal);
                 if (unit.isLocationBreached(loc)) {
                     breached = true;
                 }

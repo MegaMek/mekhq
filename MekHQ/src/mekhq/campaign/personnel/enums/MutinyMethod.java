@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public enum MutinyMethod {
     CAMPAIGN_OPERATIONS("MutinyMethod.CAMPAIGN_OPERATIONS.text", "MutinyMethod.CAMPAIGN_OPERATIONS.toolTipText"),
     ADVANCED_MUTINIES("MutinyMethod.ADVANCED_MUTINIES.text", "MutinyMethod.ADVANCED_MUTINIES.toolTipText");
@@ -54,10 +55,12 @@ public enum MutinyMethod {
         return toolTipText;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCampaignOperations() {
         return this == CAMPAIGN_OPERATIONS;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAdvancedMutinies() {
         return this == ADVANCED_MUTINIES;
     }

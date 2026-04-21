@@ -71,10 +71,12 @@ public enum AcademyType {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean IsNone() {
         return this == NONE;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isHighSchool() {
         return this == HIGH_SCHOOL;
     }
@@ -83,26 +85,32 @@ public enum AcademyType {
         return this == COLLEGE;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isUniversity() {
         return this == UNIVERSITY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMilitaryAcademy() {
         return this == MILITARY_ACADEMY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isBasicTraining() {
         return this == BASIC_TRAINING;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isNcoAcademy() {
         return this == NCO_ACADEMY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isWarrantOfficerAcademy() {
         return this == WARRANT_OFFICER_ACADEMY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isOfficerAcademy() {
         return this == OFFICER_ACADEMY;
     }
