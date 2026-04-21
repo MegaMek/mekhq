@@ -1118,7 +1118,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                     PersonnelRole role = PersonnelRole.valueOf(roleStr);
                                     campaign.setTempCrewPool(role, size);
                                 } catch (IllegalArgumentException e) {
-                                    LOGGER.warn("Unknown PersonnelRole: " + roleStr);
+                                    LOGGER.warn("Unknown PersonnelRole: {}", roleStr);
                                 }
                             }
                         }
