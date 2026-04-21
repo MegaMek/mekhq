@@ -337,6 +337,7 @@ public class StratConScenario implements IStratConDisplayable {
               getName());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getRequiredPlayerLances() {
         return requiredPlayerLances;
     }
@@ -465,6 +466,7 @@ public class StratConScenario implements IStratConDisplayable {
         this.numDefensivePoints = numDefensivePoints;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void useDefensivePoint() {
         numDefensivePoints--;
     }
@@ -481,6 +483,7 @@ public class StratConScenario implements IStratConDisplayable {
         failedReinforcements.add(forceID);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void removeFailedReinforcements(int forceID) {
         failedReinforcements.remove(forceID);
     }

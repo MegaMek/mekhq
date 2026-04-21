@@ -239,10 +239,9 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Recovers units that were deployed by MekHQ but never appeared in the game/MUL results.
-     * This can happen when the MegaMek server rejects a unit (e.g., flagged as an illegal design).
-     * Such units should not be treated as total losses — they are returned to the campaign unharmed,
-     * and their crews are tracked as alive.
+     * Recovers units that were deployed by MekHQ but never appeared in the game/MUL results. This can happen when the
+     * MegaMek server rejects a unit (e.g., flagged as an illegal design). Such units should not be treated as total
+     * losses — they are returned to the campaign unharmed, and their crews are tracked as alive.
      *
      * @see <a href="https://github.com/MegaMek/mekhq/issues/6606">GitHub issue #6606</a>
      */
@@ -253,8 +252,8 @@ public class ResolveScenarioTracker {
             if (status != null && status.isTotalLoss() && !entities.containsKey(uid)) {
                 status.assignFoundEntity(u.getEntity(), false);
                 logger.warn("Unit {} ({}) was deployed but never appeared in results. "
-                    + "It may have been rejected by the server. Returning it to the campaign.",
-                    u.getName(), uid);
+                                  + "It may have been rejected by the server. Returning it to the campaign.",
+                      u.getName(), uid);
 
                 Crew crew = u.getEntity().getCrew();
                 if (crew != null && !"-1".equals(crew.getExternalIdAsString())) {
@@ -1231,7 +1230,7 @@ public class ResolveScenarioTracker {
             }
 
             if ((commander == null) && !crew.isEmpty()) {
-                commander = crew.get(0);
+                commander = crew.getFirst();
             }
 
             int casualties = 0;
@@ -1612,6 +1611,7 @@ public class ResolveScenarioTracker {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<TestUnit> getAlliedUnits() {
         return alliedUnits;
     }
@@ -1656,10 +1656,12 @@ public class ResolveScenarioTracker {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setContractBreaches(int i) {
         contractBreaches = i;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBonusRolls(int i) {
         bonusRolls = i;
     }
@@ -1757,16 +1759,12 @@ public class ResolveScenarioTracker {
         // let's start by generating a stub file for our records
         scenario.generateStub(campaign);
 
-        // and create trackers for ransomed prisoners and units
-        Money unitRansoms = Money.zero();
-
         // ok lets do the whole enchilada and go ahead and update campaign
         // first figure out if we need any battle loss comp
         double blc = 0;
         final Mission mission = getMission();
 
         final boolean isContract = mission instanceof Contract;
-        final boolean isAtBContract = mission instanceof AtBContract;
         if (isContract) {
             blc = ((Contract) mission).getBattleLossComp() / 100.0;
         }
@@ -2004,6 +2002,7 @@ public class ResolveScenarioTracker {
         client = null;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ArrayList<Person> getMissingPersonnel() {
         ArrayList<Person> mia = new ArrayList<>();
         for (UUID pid : peopleStatus.keySet()) {
@@ -2018,6 +2017,7 @@ public class ResolveScenarioTracker {
         return mia;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ArrayList<Person> getDeadPersonnel() {
         ArrayList<Person> kia = new ArrayList<>();
         for (UUID pid : peopleStatus.keySet()) {
@@ -2032,6 +2032,7 @@ public class ResolveScenarioTracker {
         return kia;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ArrayList<Person> getRecoveredPersonnel() {
         ArrayList<Person> recovered = new ArrayList<>();
         for (UUID pid : peopleStatus.keySet()) {
@@ -2356,6 +2357,7 @@ public class ResolveScenarioTracker {
             return baseEntity;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public void setBaseEntity(Entity baseEntity) {
             this.baseEntity = baseEntity;
         }
