@@ -32,7 +32,6 @@
  */
 package mekhq.gui;
 
-import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
@@ -59,7 +58,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -69,15 +67,11 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
-import megamek.client.generator.ReconfigurationParameters;
-import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.event.Subscribe;
-import megamek.common.game.Game;
 import megamek.common.options.OptionsConstants;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
@@ -91,7 +85,6 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.GMModeEvent;
-import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
@@ -125,7 +118,6 @@ import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -133,11 +125,9 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.CompleteMissionDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewAtBContractDialog;
 import mekhq.gui.dialog.NewContractDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
@@ -148,8 +138,6 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.view.AtBScenarioViewPanel;
-import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
 
@@ -163,8 +151,6 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
           MekHQ.getMHQOptions().getLocale());
 
-    private LanceAssignmentView panLanceAssignment;
-    private JSplitPane splitScenario;
     private JTable scenarioTable;
     private MMComboBox<Mission> comboMission;
     private JScrollPane scrollMissionView;
@@ -377,26 +363,9 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         panScenario.add(scrollScenarioView, gridBagConstraints);
 
-        /* ATB */
-        panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new FastJScrollPane(panLanceAssignment);
-        paneLanceDeployment.setBorder(null);
-        paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
-        paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaignOptions().isUseAtB());
-        splitScenario = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panScenario, paneLanceDeployment);
-        splitScenario.setOneTouchExpandable(true);
-        splitScenario.setResizeWeight(1.0);
-
-        JSplitPane splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
-        splitBrief.setOneTouchExpandable(true);
-        splitBrief.setResizeWeight(0.5);
-        splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
-
         JPanel pnlTutorial = new TutorialHyperlinkPanel("missionTab");
 
         setLayout(new BorderLayout());
-        add(splitBrief, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
     }
 
@@ -404,9 +373,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true);
         mtd.setVisible(true);
         if (mtd.isContract()) {
-            NewContractDialog ncd = getCampaignOptions().isUseAtB() ?
-                                          new NewAtBContractDialog(getFrame(), true, getCampaign()) :
-                                          new NewContractDialog(getFrame(), true, getCampaign());
+            NewContractDialog ncd = new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
             comboMission.setSelectedItem(ncd.getContract());
         }
@@ -423,18 +390,10 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
-            CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(),
-                  true,
-                  (AtBContract) mission,
-                  getCampaign());
-            cmd.setVisible(true);
-            comboMission.setSelectedItem(cmd.getAtBContract());
-        } else {
-            CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, mission, getCampaign());
-            cmd.setVisible(true);
-            comboMission.setSelectedItem(cmd.getMission());
-        }
+        CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, mission, getCampaign());
+        cmd.setVisible(true);
+        comboMission.setSelectedItem(cmd.getMission());
+
         MekHQ.triggerEvent(new MissionChangedEvent(mission));
     }
 
@@ -464,12 +423,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if (!getCampaign().getPrisonerDefectors().isEmpty() &&
                   prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
             return;
-        }
-
-        if (campaignOptions.isUseAtB() && (mission instanceof AtBContract)) {
-            if (((AtBContract) mission).contractExtended(getCampaign())) {
-                return;
-            }
         }
 
         getCampaign().completeMission(mission, status);
@@ -540,10 +493,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     return;
                 }
             }
-        }
-
-        if (campaignOptions.isUseAtB() && (mission instanceof AtBContract)) {
-            getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
         }
 
         // prompt autoAwards ceremony
@@ -1573,17 +1522,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
-            atBScenario.refresh(getCampaign());
-
-            // Autoconfigure munitions for all non-player forces once more, using finalized
-            // forces
-            if (getCampaignOptions().isAutoConfigMunitions()) {
-                autoconfigureBotMunitions(atBScenario, chosen);
-            }
-            configureBotAi(atBScenario);
-        }
-
         if (scenario.getStratConScenarioType().isConvoy() && (autoResolveBehaviorSettings != null)) {
             try {
                 autoResolveBehaviorSettings = autoResolveBehaviorSettings.getCopy();
@@ -1596,146 +1534,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if (!chosen.isEmpty()) {
             getCampaignGui().getApplication().startHost(scenario, false, chosen, autoResolveBehaviorSettings);
         }
-    }
-
-    private void configureBotAi(AtBScenario scenario) {
-        Faction opFor = getEnemyFactionFromScenario(scenario);
-        boolean isPirate = opFor.isRebelOrPirate();
-        for (var bf : scenario.getBotForces()) {
-            bf.getBehaviorSettings().setIAmAPirate(isPirate);
-        }
-    }
-
-    /**
-     * Get the enemy faction from the Mission from the scenario
-     *
-     * @param scenario the scenario to get the enemy faction from
-     *
-     * @return the enemy faction
-     */
-    private Faction getEnemyFactionFromScenario(Scenario scenario) {
-        Mission mission = null;
-        if (scenario.getMissionId() != -1) {
-            mission = getCampaign().getMission(scenario.getMissionId());
-        }
-        if (mission == null) {
-            mission = comboMission.getSelectedItem();
-        }
-        String opForFactionCode = "IS";
-        Faction enemy;
-        if (mission instanceof AtBContract atBContract) {
-            enemy = atBContract.getEnemy();
-            if (enemy != null) {
-                return atBContract.getEnemy();
-            }
-            opForFactionCode = atBContract.getEnemyCode().isBlank() ? opForFactionCode : atBContract.getEnemyCode();
-        }
-        enemy = Factions.getInstance().getFaction(opForFactionCode);
-        return enemy;
-    }
-
-    /**
-     * Designed to fully kit out all non-player-controlled forces prior to battle. Does not do any checks for supplies,
-     * only for availability to each faction during the current timeframe.
-     *
-     */
-    private void autoconfigureBotMunitions(AtBScenario scenario, List<Unit> chosen) {
-        Game cGame = getCampaign().getGame();
-        boolean groundMap = scenario.getBoardType() == AtBScenario.T_GROUND;
-        boolean spaceMap = scenario.getBoardType() == AtBScenario.T_SPACE;
-        ArrayList<Entity> alliedEntities = new ArrayList<>();
-
-        ArrayList<String> allyFactionCodes = new ArrayList<>();
-        ArrayList<String> opForFactionCodes = new ArrayList<>();
-        String opForFactionCode = "IS";
-        String allyFaction = "IS";
-        int opForQuality = RATING_5;
-        HashMap<Integer, ArrayList<Entity>> botTeamMappings = new HashMap<>();
-        int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
-
-        // This had better be an AtB contract...
-        final Mission mission = comboMission.getSelectedItem();
-        if (mission instanceof AtBContract atbContract) {
-            opForFactionCode = (atbContract.getEnemyCode().isBlank()) ? opForFactionCode : atbContract.getEnemyCode();
-            opForQuality = atbContract.getEnemyQuality();
-            allyFactionCodes.add(atbContract.getEmployerCode());
-            allyFaction = atbContract.getEmployerName(allowedYear);
-        } else {
-            allyFactionCodes.add(allyFaction);
-        }
-        Faction opforFaction = Factions.getInstance().getFaction(opForFactionCode);
-        opForFactionCodes.add(opForFactionCode);
-        boolean isPirate = opforFaction.isRebelOrPirate();
-
-        // Collect player units to use as configuration fodder
-        ArrayList<Entity> playerEntities = new ArrayList<>();
-        for (final Unit unit : chosen) {
-            playerEntities.add(unit.getEntity());
-        }
-        allyFactionCodes.add(getCampaign().getFaction().getShortName());
-
-        // Split up bot forces into teams for separate handling
-        for (final BotForce botForce : scenario.getBotForces()) {
-            // Do not include Turrets
-            List<Entity> filteredEntityList =
-                  botForce.getFixedEntityList().stream().filter(
-                        e -> !(e.isBuildingEntityOrGunEmplacement())
-                  ).toList();
-            if (botForce.getName().contains(allyFaction)) {
-                // Stuff with our employer's name should be with us.
-                playerEntities.addAll(filteredEntityList);
-                alliedEntities.addAll(filteredEntityList);
-            } else {
-                int botTeam = botForce.getTeam();
-                if (!botTeamMappings.containsKey(botTeam)) {
-                    botTeamMappings.put(botTeam, new ArrayList<>());
-                }
-                botTeamMappings.get(botTeam).addAll(filteredEntityList);
-            }
-        }
-
-        // Configure generated units with appropriate munitions (for BV calculations)
-        TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
-
-        // Reconfigure each group separately so they only consider their own
-        // capabilities
-        for (ArrayList<Entity> entityList : botTeamMappings.values()) {
-            // bin fill ratio will be adjusted by the loadout generator based on piracy and
-            // quality
-            ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
-                  cGame.getOptions(),
-                  entityList,
-                  opForFactionCode,
-                  playerEntities,
-                  allyFactionCodes,
-                  opForQuality,
-                  ((isPirate) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f));
-            rp.isPirate = isPirate;
-            rp.groundMap = groundMap;
-            rp.spaceEnvironment = spaceMap;
-            MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, entityList, "");
-            // We now have the ability to pre-create a munition availability map for use with special scenarios,
-            // representing limited-availability ammo in the hands of a specific force.
-            tlg.reconfigureEntities(entityList, opForFactionCode, mt, rp, null);
-        }
-
-        // Finally, reconfigure all allies (but not player entities) as one organization
-        ArrayList<Entity> allEnemyEntities = new ArrayList<>();
-        botTeamMappings.values().forEach(allEnemyEntities::addAll);
-        ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
-              cGame.getOptions(),
-              alliedEntities,
-              allyFactionCodes.getFirst(),
-              allEnemyEntities,
-              opForFactionCodes,
-              opForQuality,
-              (getCampaign().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f);
-        rp.isPirate = getCampaign().getFaction().isPirate();
-        rp.groundMap = groundMap;
-        rp.spaceEnvironment = spaceMap;
-        MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, alliedEntities, "");
-        tlg.reconfigureEntities(alliedEntities, allyFactionCodes.getFirst(), mt, rp, null);
-
     }
 
     private void joinScenario() {
@@ -1933,9 +1731,6 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         changeMission();
-        if (getCampaignOptions().isUseAtB()) {
-            refreshLanceAssignments();
-        }
     }
 
     public void refreshScenarioView() {
@@ -1958,13 +1753,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         selectedScenario = scenario.getId();
-        if (getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            scrollScenarioView.setViewportView(new AtBScenarioViewPanel((AtBScenario) scenario,
-                  getCampaign(),
-                  getFrame()));
-        } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
-        }
+        scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
+
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
@@ -1990,8 +1780,8 @@ public final class BriefingTab extends CampaignGuiTab {
         btnPrintRS.setEnabled(canStartGame);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void refreshLanceAssignments() {
-        panLanceAssignment.refresh();
     }
 
     /*
@@ -2142,13 +1932,6 @@ public final class BriefingTab extends CampaignGuiTab {
     private final ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);
     private final ActionScheduler scenarioViewScheduler = new ActionScheduler(this::refreshScenarioView);
     private final ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);
-    private final ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
-
-    @Subscribe
-    public void handle(OptionsChangedEvent ev) {
-        splitScenario.getBottomComponent().setVisible(getCampaignOptions().isUseAtB());
-        splitScenario.resetToPreferredSizes();
-    }
 
     @Subscribe
     public void handle(ScenarioChangedEvent evt) {
@@ -2171,9 +1954,6 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
-        if (getCampaignOptions().isUseAtB()) {
-            lanceAssignmentScheduler.schedule();
-        }
     }
 
     @Subscribe

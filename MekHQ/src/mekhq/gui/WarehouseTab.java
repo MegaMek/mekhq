@@ -55,6 +55,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.AcquisitionEvent;
@@ -100,7 +101,6 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.WarehouseStatusSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
@@ -265,7 +265,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         });
         PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
-        JScrollPane scrollPartsTable = new JScrollPaneWithSpeed(partsTable);
+        JScrollPane scrollPartsTable = new FastJScrollPane(partsTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -310,7 +310,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setText("");
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
-        JScrollPane scrTargetWarehouse = new JScrollPaneWithSpeed(textTargetWarehouse);
+        JScrollPane scrTargetWarehouse = new FastJScrollPane(textTargetWarehouse);
         scrTargetWarehouse.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         gridBagConstraints = new GridBagConstraints();
@@ -349,7 +349,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         ArrayList<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
-        JScrollPane scrollTechTable = new JScrollPaneWithSpeed(techTable);
+        JScrollPane scrollTechTable = new FastJScrollPane(techTable);
         scrollTechTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));

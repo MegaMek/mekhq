@@ -380,13 +380,6 @@ public class ForceViewPanel extends JScrollablePanel {
         pnlStats.add(lblTonnage2, gridBagConstraints);
         nextY++;
 
-        // if AtB is enabled, set tooltip to show lance weight breakdowns
-        if (campaign.getCampaignOptions().isUseAtB()) {
-            // see Lance.java for lance weight breakdowns
-            lblTonnage1.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
-            lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
-        }
-
         lblCost1.setName("lblCost1");
         lblCost1.setText(resourceMap.getString("lblCost1.text"));
         gridBagConstraints = new GridBagConstraints();
