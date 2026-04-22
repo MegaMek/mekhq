@@ -145,6 +145,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param campaign the {@link Campaign} instance whose options will be displayed and edited
      * @param preset   an optional {@link CampaignPreset} to apply initial settings (maybe {@code null})
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public CampaignOptionsDialog(final Campaign campaign, @Nullable CampaignPreset preset) {
         super(null,
               false,

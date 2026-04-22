@@ -320,6 +320,7 @@ public class BattleArmorSuit extends Part {
         return clan;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isQuad() {
         return quad;
     }
@@ -328,6 +329,7 @@ public class BattleArmorSuit extends Part {
         return weightClass;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getGroundMP() {
         return groundMP;
     }
@@ -449,7 +451,7 @@ public class BattleArmorSuit extends Part {
             if (unit.getEntity().getInternal(trooper) > 0) {
                 // then there is a trooper here, so remove a crewmember
                 if (!unit.getCrew().isEmpty()) {
-                    trooperToRemove = unit.getCrew().get(unit.getCrew().size() - 1);
+                    trooperToRemove = unit.getCrew().getLast();
                     // don't remove yet - we need to first set the internal to
                     // destroyed so, this slot gets skipped over when we reset the pilot
                 }

@@ -214,7 +214,7 @@ public class PrisonerEventManagerTest {
 
         // We're deliberately not triggering this when initializing eventManager, as that allows us
         // to effectively skip the rest of the logic and create a more predictable test environment.
-        boolean eventTriggered = eventManager.checkForRansomEvents().get(0);
+        boolean eventTriggered = eventManager.checkForRansomEvents().getFirst();
 
         // Assert
         assertFalse(eventTriggered);
@@ -258,7 +258,7 @@ public class PrisonerEventManagerTest {
         // We're deliberately not triggering this when initializing eventManager, as that allows us
         // to effectively skip the rest of the logic and create a more predictable test environment.
         List<Boolean> results = eventManager.checkForRansomEvents();
-        boolean eventTriggered = results.get(0);
+        boolean eventTriggered = results.getFirst();
         boolean isAllied = results.get(1);
 
         // Assert
@@ -305,7 +305,7 @@ public class PrisonerEventManagerTest {
         // We're deliberately not triggering this when initializing eventManager, as that allows us
         // to effectively skip the rest of the logic and create a more predictable test environment.
         List<Boolean> results = eventManager.checkForRansomEvents();
-        boolean eventTriggered = results.get(0);
+        boolean eventTriggered = results.getFirst();
         boolean isAllied = results.get(1);
 
         // Assert
@@ -334,7 +334,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert
@@ -363,7 +363,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert
@@ -392,7 +392,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert
@@ -421,7 +421,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert
@@ -450,7 +450,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert
@@ -479,7 +479,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert
@@ -508,7 +508,7 @@ public class PrisonerEventManagerTest {
               totalPrisoners,
               totalPrisoners,
               prisonerCapacity);
-        boolean minorEvent = results.get(0);
+        boolean minorEvent = results.getFirst();
         boolean majorEvent = results.get(1);
 
         // Assert

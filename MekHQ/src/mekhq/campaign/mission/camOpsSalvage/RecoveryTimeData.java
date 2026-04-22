@@ -144,15 +144,34 @@ public record RecoveryTimeData(
                                        gravityMultiplier +
                                        atmosphereMultiplier +
                                        lightMultiplier;
-        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
-              "RecoveryTimeData.recoveryTimeBreakdown.totalMultiplier",
-              totalMultiplier));
 
-        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
-              "RecoveryTimeData.recoveryTimeBreakdown.totalRecoveryTime",
-              totalRecoveryTime));
-
-        breakdown.append(includeHTMLTags ? "</html>" : "");
-        return breakdown.toString();
+        return (includeHTMLTags ? "<html>" : "") + getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.baseRecoveryTime",
+              baseRecoveryTime) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.weatherMultiplier",
+                           weatherMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.windMultiplier",
+                           windMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.temperatureMultiplier",
+                           temperatureMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.gravityMultiplier",
+                           gravityMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.atmosphereMultiplier",
+                           atmosphereMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.lightMultiplier",
+                           lightMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.totalMultiplier",
+                           totalMultiplier) +
+                     getFormattedTextAt(RESOURCE_BUNDLE,
+                           "RecoveryTimeData.recoveryTimeBreakdown.totalRecoveryTime",
+                           totalRecoveryTime) +
+                     (includeHTMLTags ? "</html>" : "");
     }
 }

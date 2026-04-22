@@ -147,6 +147,7 @@ public enum FactionStandingLevel {
     /**
      * @return the lowest possible standing level as an integer
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getMinimumStandingLevel() {
         return MINIMUM_STANDING_LEVEL;
     }
@@ -154,6 +155,7 @@ public enum FactionStandingLevel {
     /**
      * @return the highest possible standing level as an integer.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getMaximumStandingLevel() {
         return MAXIMUM_STANDING_LEVEL;
     }

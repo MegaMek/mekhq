@@ -436,6 +436,7 @@ public class MekHQ implements GameListener {
     /**
      * @param campaignGUI the {@link CampaignGUI} to set
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setCampaignGUI(CampaignGUI campaignGUI) {
         this.campaignGUI = campaignGUI;
     }

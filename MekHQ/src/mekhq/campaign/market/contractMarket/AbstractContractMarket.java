@@ -372,19 +372,6 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int calculateMaxDeployableCombatTeams(Campaign campaign) {
-        CampaignOptions options = campaign.getCampaignOptions();
-        int baseStrategyDeployment = options.getBaseStrategyDeployment();
-        int additionalStrategyDeployment = options.getAdditionalStrategyDeployment();
-        int commanderStrategy = campaign.getCommanderStrategy();
-
-        return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
-    }
-
-    /**
      * Determines the {@link SkillLevel} corresponding to a given roll result (TW pg 273), optionally applying the
      * Bolster Contract skill adjustment.
      *

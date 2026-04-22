@@ -1654,7 +1654,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("changeSalary.text"),
-                      MathUtility.clamp(originalSalary, -1, 1000000000),
+                      Math.clamp(originalSalary, -1, 1000000000),
                       -1,
                       1000000000);
 
@@ -4872,7 +4872,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if ((academy.isLocal()) || (academy.isHomeSchool())) {
                 campus = campaign.getCurrentSystem().getId();
             } else {
-                campus = academy.getLocationSystems().get(0);
+                campus = academy.getLocationSystems().getFirst();
             }
 
             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -4895,7 +4895,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       List.of(person),
                       academyOption,
                       campus,
-                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).getFirst());
             }
             return;
         }
@@ -5064,7 +5064,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if ((academy.isLocal()) || (academy.isHomeSchool())) {
                 campus = campaign.getCurrentSystem().getId();
             } else {
-                campus = academy.getLocationSystems().get(0);
+                campus = academy.getLocationSystems().getFirst();
             }
 
             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -5084,7 +5084,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       personnel,
                       academyOption,
                       campus,
-                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).getFirst());
             }
             return;
         }

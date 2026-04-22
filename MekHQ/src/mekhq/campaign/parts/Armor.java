@@ -434,16 +434,12 @@ public class Armor extends Part implements IAcquisitionWork {
         // Options include: Waiting for Java to support that, or changing the entire
         // way the 'ETYPE' works on Entity to implement bitset or some similar.
         // For repair types, see CamOps, Master Repair Table, p207
-        String typeKey;
-        if (entity instanceof Tank) {
-            typeKey = "TANK";
-        } else if (entity instanceof Warship) {
-            typeKey = "CAPITAL";
-        } else if (entity instanceof Aero) {
-            typeKey = "AEROSPACE";
-        } else {
-            typeKey = "DEFAULT";
-        }
+        String typeKey = switch (entity) {
+            case Tank ignored -> "TANK";
+            case Warship ignored -> "CAPITAL";
+            case Aero ignored -> "AEROSPACE";
+            default -> "DEFAULT";
+        };
 
         return (switch (typeKey) {
             case "TANK" -> 3;

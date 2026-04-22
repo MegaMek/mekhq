@@ -70,8 +70,8 @@ import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
@@ -273,8 +273,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
         // TODO : eliminate any forces that are descendants of other forces in the
         // vector
-        final Formation singleFormation = formations.isEmpty() ? null : formations.get(0);
-        final Unit singleUnit = units.isEmpty() ? null : units.get(0);
+        final Formation singleFormation = formations.isEmpty() ? null : formations.getFirst();
+        final Unit singleUnit = units.isEmpty() ? null : units.getFirst();
 
         if (command.contains(TOEMouseAdapter.ADD_FORCE)) {
             if (null != singleFormation) {
@@ -299,7 +299,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (singleFormation.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleFormation.getTechID());
                         oldTech.clearTechUnits();
-                        AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleFormation.getName());
+                        AssignmentLogger.removedFrom(oldTech,
+                              gui.getCampaign().getLocalDate(),
+                              singleFormation.getName());
                     }
                     singleFormation.setTechID(tech.getId());
 
@@ -522,7 +524,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             boolean formationState = singleFormation.isCombatTeam();
             singleFormation.setCombatTeamStatus(!formationState);
-            singleFormation.setOverrideCombatTeam(formationState ? COMBAT_TEAM_OVERRIDE_FALSE : COMBAT_TEAM_OVERRIDE_TRUE);
+            singleFormation.setOverrideCombatTeam(formationState ?
+                                                        COMBAT_TEAM_OVERRIDE_FALSE :
+                                                        COMBAT_TEAM_OVERRIDE_TRUE);
 
             for (Formation childFormation : singleFormation.getAllSubFormations()) {
                 childFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
@@ -801,7 +805,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         }
         boolean multipleSelection = (forcesSelected && formations.size() > 1) || (unitsSelected && units.size() > 1);
         if (forcesSelected) {
-            Formation formation = formations.get(0);
+            Formation formation = formations.getFirst();
             StringBuilder forceIds = new StringBuilder("" + formation.getId());
             for (int i = 1; i < formations.size(); i++) {
                 forceIds.append('|').append(formations.get(i).getId());
@@ -1324,7 +1328,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 detachTrailerTransportMenuClass(unitsInForces, popup);
             }
         } else if (unitsSelected) {
-            Unit unit = units.get(0);
+            Unit unit = units.getFirst();
             StringBuilder unitIds = new StringBuilder(unit.getId().toString());
             for (int i = 1; i < units.size(); i++) {
                 unitIds.append('|').append(units.get(i).getId().toString());

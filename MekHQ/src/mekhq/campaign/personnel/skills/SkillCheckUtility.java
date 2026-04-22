@@ -466,6 +466,7 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isUsedEdge() {
         return usedEdge;
     }

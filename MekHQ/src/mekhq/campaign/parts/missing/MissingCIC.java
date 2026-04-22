@@ -52,6 +52,7 @@ import org.w3c.dom.NodeList;
 public class MissingCIC extends MissingPart {
     private Money cost;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingCIC() {
         this(0, Money.zero(), null);
     }

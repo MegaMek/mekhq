@@ -58,6 +58,7 @@ import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -76,7 +77,6 @@ import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.PersonTitleSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Shows injured and medical personnel
@@ -125,7 +125,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer());
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
-        JScrollPane scrollDocTable = new JScrollPaneWithSpeed(docTable);
+        JScrollPane scrollDocTable = new FastJScrollPane(docTable);
         scrollDocTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollDocTable.setMinimumSize(new Dimension(300, 300));
         scrollDocTable.setPreferredSize(new Dimension(300, 300));
@@ -222,7 +222,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
             }
         });
 
-        JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
+        JScrollPane scrollAssignedPatient = new FastJScrollPane(listAssignedPatient);
         scrollAssignedPatient.setBorder(null);
         scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
         scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
@@ -272,7 +272,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
             }
         });
 
-        JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
+        JScrollPane scrollUnassignedPatient = new FastJScrollPane(listUnassignedPatient);
         scrollUnassignedPatient.setBorder(null);
         scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
         scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));

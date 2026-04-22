@@ -749,7 +749,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         getCampaign().removeMission(mission);
         final List<Mission> missions = getCampaign().getSortedMissions();
-        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -1051,7 +1051,7 @@ public final class BriefingTab extends CampaignGuiTab {
         for (UUID techID : assignedTechs) {
             Person tech = getCampaign().getPerson(techID);
             if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
-                availableTechs.add(0, tech);
+                availableTechs.addFirst(tech);
             }
         }
 

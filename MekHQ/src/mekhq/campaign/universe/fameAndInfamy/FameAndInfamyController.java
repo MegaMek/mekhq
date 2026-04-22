@@ -106,7 +106,7 @@ public class FameAndInfamyController {
         } catch (Exception e) {
             logger.error("FameAndInfamyController failed to parse contents of 'shortname' in 'data/universe/factions" +
                                ".xml'. Last successfully parsed Faction shortname: {}",
-                  shortnames.get(shortnames.size() - 1));
+                  shortnames.getLast());
             return shortnames;
         }
 

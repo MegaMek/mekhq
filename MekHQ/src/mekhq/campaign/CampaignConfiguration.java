@@ -118,6 +118,7 @@ public class CampaignConfiguration {
     private CampaignSummary campaignSummary;
 
     // Bare constructor for test purposes.
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public CampaignConfiguration() {
 
     }
@@ -235,6 +236,7 @@ public class CampaignConfiguration {
      * @param marriage                 AbstractMarriage instance, defaults to Disabled
      * @param procreation              AbstractProcreation instance, defaults to Disabled
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public CampaignConfiguration(
           Game game,
           Player player,
@@ -461,6 +463,7 @@ public class CampaignConfiguration {
         this.rankSystem = rankSystem;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setCurrencyManager(CurrencyManager currencyManager) {
         this.currencyManager = currencyManager;
     }
@@ -505,10 +508,12 @@ public class CampaignConfiguration {
         this.procreation = procreation;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setRandomEventLibraries(RandomEventLibraries randomEventLibraries) {
         this.randomEventLibraries = randomEventLibraries;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setFactionStandingUltimatumsLibrary(FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary) {
         this.factionStandingUltimatumsLibrary = factionStandingUltimatumsLibrary;
     }
@@ -529,6 +534,7 @@ public class CampaignConfiguration {
         this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAutosaveService(IAutosaveService autosaveService) {
         this.autosaveService = autosaveService;
     }

@@ -2423,7 +2423,7 @@ public class CampaignGUI extends JPanel {
                                    JOptionPane.PLAIN_MESSAGE,
                                    null,
                                    techList.toArray(),
-                                   techList.get(0));
+                                   techList.getFirst());
 
             if (null == s) {
                 return;
@@ -3233,7 +3233,9 @@ public class CampaignGUI extends JPanel {
         }
         lblTempVehicleCrewGround.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (Ground)</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND) + "</html>";
+        String text = "<html><b>Temp Vehicle Crew (Ground)</b>: " +
+                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND) +
+                            "</html>";
         lblTempVehicleCrewGround.setText(text);
     }
 
@@ -3244,7 +3246,9 @@ public class CampaignGUI extends JPanel {
         }
         lblTempVehicleCrewVTOL.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (VTOL)</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL) + "</html>";
+        String text = "<html><b>Temp Vehicle Crew (VTOL)</b>: " +
+                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL) +
+                            "</html>";
         lblTempVehicleCrewVTOL.setText(text);
     }
 
@@ -3255,7 +3259,9 @@ public class CampaignGUI extends JPanel {
         }
         lblTempVehicleCrewNaval.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (Naval)</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL) + "</html>";
+        String text = "<html><b>Temp Vehicle Crew (Naval)</b>: " +
+                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL) +
+                            "</html>";
         lblTempVehicleCrewNaval.setText(text);
     }
 
@@ -3266,7 +3272,9 @@ public class CampaignGUI extends JPanel {
         }
         lblTempVesselPilot.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Vessel Pilots</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT) + "</html>";
+        String text = "<html><b>Temp Vessel Pilots</b>: " +
+                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT) +
+                            "</html>";
         lblTempVesselPilot.setText(text);
     }
 
@@ -3277,7 +3285,9 @@ public class CampaignGUI extends JPanel {
         }
         lblTempVesselGunner.setVisible(true);
         // FIXME : Localize
-        String text = "<html><b>Temp Vessel Gunners</b>: " + getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER) + "</html>";
+        String text = "<html><b>Temp Vessel Gunners</b>: " +
+                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER) +
+                            "</html>";
         lblTempVesselGunner.setText(text);
     }
 

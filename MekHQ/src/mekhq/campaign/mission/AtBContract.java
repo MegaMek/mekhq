@@ -40,7 +40,6 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -337,7 +336,7 @@ public class AtBContract extends Contract {
             String fileCategory = randomPath.getParent()
                                         .toString()
                                         .replaceAll("\\\\", "/"); // This is necessary for Windows machines
-            fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
+            fileCategory = fileCategory.replace(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
         } else {
@@ -1294,6 +1293,7 @@ public class AtBContract extends Contract {
         return employerLiaison;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setEmployerLiaison(Person employerLiaison) {
         this.employerLiaison = employerLiaison;
     }
@@ -1316,6 +1316,7 @@ public class AtBContract extends Contract {
         return clanOpponent;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setClanOpponent(Person clanOpponent) {
         this.clanOpponent = clanOpponent;
     }
@@ -1389,6 +1390,7 @@ public class AtBContract extends Contract {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public @Nullable String getEnemyMercenaryEmployerCode() {
         return enemyMercenaryEmployerCode;
     }
@@ -1563,7 +1565,7 @@ public class AtBContract extends Contract {
      */
     public AtBMoraleLevel changeMoraleLevel(final int delta) {
         int currentLevel = moraleLevel.getLevel();
-        int newLevel = clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
+        int newLevel = Math.clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
 
         AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
         if (newMoraleLevel != null) {
@@ -1577,6 +1579,7 @@ public class AtBContract extends Contract {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public LocalDate getRoutEnd() {
         return routEnd;
     }
@@ -2166,7 +2169,7 @@ public class AtBContract extends Contract {
             mappedValue = 5 + mappedValue;
         }
 
-        return min(max(mappedValue, 1), 10);
+        return Math.clamp(mappedValue, 1, 10);
     }
 
     /**
@@ -2401,10 +2404,7 @@ public class AtBContract extends Contract {
 
         double meanScenarioOdds = totalScenarioOdds / trackCount;
         double scenarioOdds = meanScenarioOdds / 100.0;
-        double turningPointChance = switch (getCommandRights()) {
-            case INTEGRATED -> 1.0;
-            default -> 0.33;
-        };
+        double turningPointChance = (getCommandRights() == ContractCommandRights.INTEGRATED ? 1.0 : 0.33);
 
         // This result gives us the average number of Turning Points expected for the contract
         return (int) ceil(baseRequirement * duration * scenarioOdds * turningPointChance);

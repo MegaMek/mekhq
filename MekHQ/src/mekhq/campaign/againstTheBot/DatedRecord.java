@@ -41,6 +41,7 @@ import java.time.LocalDate;
  * the value should apply to all dates from the beginning
  * or to the end of the epoch, respectively.
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 class DatedRecord<E> {
     private LocalDate start;
     private LocalDate end;
@@ -81,6 +82,7 @@ class DatedRecord<E> {
      *
      * @return true if d is between the start and end date, inclusive
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean fitsDate(LocalDate d) {
         return ((start == null) || !start.isAfter(d))
                      && ((end == null) || !end.isBefore(d));

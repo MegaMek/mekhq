@@ -69,6 +69,7 @@ public class MissingOmniPod extends MissingPart {
     // Pods are specific to the type of equipment they contain.
     private Part partType;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingOmniPod() {
         this(new EquipmentPart(), null);
     }

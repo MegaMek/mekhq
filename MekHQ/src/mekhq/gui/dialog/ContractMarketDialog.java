@@ -176,6 +176,7 @@ public class ContractMarketDialog extends JDialog {
      *
      * @return the total number of available contracts
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getAvailableContractsCount(Campaign campaign) {
         int contractCount = 0;
 

@@ -237,6 +237,7 @@ public class SpecialAbility {
         return originOnly;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setOriginOnly(boolean originOnly) {
         this.originOnly = originOnly;
     }
@@ -627,8 +628,8 @@ public class SpecialAbility {
         final int weight = (weaponTechLevel < CampaignOptions.TECH_STANDARD) ?
                                  50 :
                                  (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ?
-                                       25 :
-                                       (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5 : 1;
+                                 25 :
+                                 (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5 : 1;
         weapons.add(weight, equipmentType);
     }
 

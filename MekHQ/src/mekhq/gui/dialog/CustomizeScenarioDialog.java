@@ -58,6 +58,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Player;
 import megamek.common.planetaryConditions.PlanetaryConditions;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -71,7 +72,6 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.model.BotForceTableModel;
 import mekhq.gui.model.LootTableModel;
 import mekhq.gui.model.ObjectiveTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
 /**
@@ -937,7 +937,7 @@ public class CustomizeScenarioDialog extends JDialog {
         objectiveTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectiveTable.getSelectionModel().addListSelectionListener(this::objectiveTableValueChanged);
 
-        panObjectives.add(new JScrollPaneWithSpeed(objectiveTable), BorderLayout.CENTER);
+        panObjectives.add(new FastJScrollPane(objectiveTable), BorderLayout.CENTER);
 
     }
 
@@ -1030,7 +1030,7 @@ public class CustomizeScenarioDialog extends JDialog {
         lootTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lootTable.getSelectionModel().addListSelectionListener(this::lootTableValueChanged);
 
-        panLoot.add(new JScrollPaneWithSpeed(lootTable), BorderLayout.CENTER);
+        panLoot.add(new FastJScrollPane(lootTable), BorderLayout.CENTER);
     }
 
     private void lootTableValueChanged(ListSelectionEvent evt) {
@@ -1113,7 +1113,7 @@ public class CustomizeScenarioDialog extends JDialog {
         forcesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         forcesTable.getSelectionModel().addListSelectionListener(this::forcesTableValueChanged);
 
-        panOtherForces.add(new JScrollPaneWithSpeed(forcesTable), BorderLayout.CENTER);
+        panOtherForces.add(new FastJScrollPane(forcesTable), BorderLayout.CENTER);
     }
 
     private void forcesTableValueChanged(ListSelectionEvent evt) {

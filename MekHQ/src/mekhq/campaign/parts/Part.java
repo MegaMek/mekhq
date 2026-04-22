@@ -1139,6 +1139,7 @@ public abstract class Part implements IPartWork, ITechnology {
      *
      * @return the {@link Person} who reserved this part, or {@code null} if the part is not reserved
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Person getReservedBy() {
         return reservedBy;
     }

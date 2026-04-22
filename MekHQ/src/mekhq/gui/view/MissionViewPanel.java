@@ -57,6 +57,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -67,7 +68,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -163,7 +163,7 @@ public class MissionViewPanel extends JScrollablePanel {
             add(pnlTutorial, gridBagConstraints);
         }
 
-        JScrollPane scrollScenarioTable = new JScrollPaneWithSpeed(scenarioTable);
+        JScrollPane scrollScenarioTable = new FastJScrollPane(scenarioTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

@@ -139,6 +139,7 @@ public class PaperDoll extends Component {
         setSize(base.getWidth(null), base.getHeight(null));
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setLocShape(BodyLocation loc, Path2D path) {
         Objects.requireNonNull(loc);
         if (null != path) {
@@ -180,6 +181,7 @@ public class PaperDoll extends Component {
         locTags.clear();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Color getHighlightColor() {
         return highlightColor;
     }
@@ -311,7 +313,7 @@ public class PaperDoll extends Component {
         public Path2D genPath() {
             Path2D result = new Path2D.Float();
             if ((null != path) && !path.isEmpty()) {
-                result.moveTo(path.get(0).getX(), path.get(0).getY());
+                result.moveTo(path.getFirst().getX(), path.getFirst().getY());
                 IntStream.range(1, path.size()).mapToObj(i -> path.get(i))
                       .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));
                 result.closePath();

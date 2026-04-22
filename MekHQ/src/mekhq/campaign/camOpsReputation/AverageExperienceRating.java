@@ -73,7 +73,7 @@ public class AverageExperienceRating {
     protected static SkillLevel getSkillLevel(Campaign campaign, boolean log) {
         // values below 0 are treated as 'Legendary',
         // values above 7 are treated as 'wet behind the ears' which we call 'None'
-        int experienceScore = MathUtility.clamp(calculateAverageExperienceRating(campaign, log),
+        int experienceScore = Math.clamp(calculateAverageExperienceRating(campaign, log),
               0,
               NO_CAMPAIGN_EXPERIENCE);
 

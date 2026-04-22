@@ -82,20 +82,6 @@ public class PersonnelTabViewTest {
         }
     }
 
-    /**
-     * @deprecated use {@link #testIsGunneryPilotSkills()} instead.
-     */
-    @Deprecated(since = "{SEMVER}", forRemoval = true)
-    public void testIsPilotGunnerySkills() {
-        for (final PersonnelTabView personnelTabView : views) {
-            if (personnelTabView == PersonnelTabView.GUNNERY_PILOT_SKILLS) {
-                assertTrue(personnelTabView.isGunneryPilotSkills());
-            } else {
-                assertFalse(personnelTabView.isGunneryPilotSkills());
-            }
-        }
-    }
-
     @Test
     public void testIsGunneryPilotSkills() {
         for (final PersonnelTabView personnelTabView : views) {

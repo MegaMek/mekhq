@@ -96,6 +96,7 @@ public class StructuralIntegrity extends Part {
 
     private int pointsNeeded;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public StructuralIntegrity() {
         this(0, null);
     }
