@@ -643,7 +643,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
-        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
     }
 
     /**

@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
