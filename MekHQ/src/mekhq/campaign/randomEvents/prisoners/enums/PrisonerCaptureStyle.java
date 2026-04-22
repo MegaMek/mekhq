@@ -119,6 +119,7 @@ public enum PrisonerCaptureStyle {
      *
      * @return {@code true} if the current style is {@code CAMPAIGN_OPERATIONS}, otherwise {@code false}.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCampaignOperations() {
         return this == CAMPAIGN_OPERATIONS;
     }

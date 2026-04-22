@@ -349,7 +349,7 @@ public class PrisonerEventManager {
                 List<AtBContract> contracts = campaign.getActiveAtBContracts();
                 Collections.shuffle(contracts);
 
-                new PrisonEscapeScenario(campaign, contracts.get(0), escapees);
+                new PrisonEscapeScenario(campaign, contracts.getFirst(), escapees);
             }
         }
     }
@@ -783,7 +783,7 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_BATTLE_ARMOR :
                                                       PRISONER_CAPACITY_BATTLE_ARMOR *
-                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
@@ -796,7 +796,7 @@ public class PrisonerEventManager {
                             prisonerCapacity += isMekHQCaptureStyle ?
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
                                                       PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                                                      PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
                     continue;
@@ -861,7 +861,7 @@ public class PrisonerEventManager {
 
         if (!securityFormations.isEmpty()) {
             Collections.shuffle(securityFormations);
-            Formation designatedFormation = securityFormations.get(0);
+            Formation designatedFormation = securityFormations.getFirst();
             UUID speakerId = designatedFormation.getFormationCommanderID();
             if (speakerId != null) {
                 speaker = campaign.getPerson(speakerId);

@@ -51,6 +51,7 @@ import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -66,7 +67,6 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.CustomRankSystemCreationDialog;
 import mekhq.gui.model.RankTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class RankSystemsPane extends AbstractMHQScrollPane {
     private static final MMLogger LOGGER = MMLogger.create(RankSystemsPane.class);
@@ -332,7 +332,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         }
 
         // Create the Scroll Pane
-        final JScrollPane pane = new JScrollPaneWithSpeed(getRanksTable());
+        final JScrollPane pane = new FastJScrollPane(getRanksTable());
         pane.setName("ranksTableScrollPane");
         pane.setMinimumSize(new Dimension(1200, 400));
         pane.setPreferredSize(new Dimension(1200, 500));

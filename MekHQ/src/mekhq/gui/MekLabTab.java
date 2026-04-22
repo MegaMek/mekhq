@@ -60,6 +60,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
@@ -107,7 +108,6 @@ import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 public class MekLabTab extends CampaignGuiTab {
@@ -610,11 +610,11 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure/Armor", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Assign Criticals", new JScrollPaneWithSpeed(buildTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure/Armor", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Assign Criticals", new FastJScrollPane(buildTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -739,12 +739,12 @@ public class MekLabTab extends CampaignGuiTab {
             transportTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure/Armor", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Assign Criticals", new JScrollPaneWithSpeed(buildTab));
-            addTab("Transport Bays", new JScrollPaneWithSpeed(transportTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure/Armor", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Assign Criticals", new FastJScrollPane(buildTab));
+            addTab("Transport Bays", new FastJScrollPane(transportTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -867,11 +867,11 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure/Armor", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Assign Critical", new JScrollPaneWithSpeed(buildTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure/Armor", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Assign Critical", new FastJScrollPane(buildTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -991,11 +991,11 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Build", new JScrollPaneWithSpeed(buildTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Build", new FastJScrollPane(buildTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -1121,13 +1121,13 @@ public class MekLabTab extends CampaignGuiTab {
             transportTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure", new JScrollPaneWithSpeed(structureTab));
-            addTab("Armor", new JScrollPaneWithSpeed(armorTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Build", new JScrollPaneWithSpeed(buildTab));
-            addTab("Transport", new JScrollPaneWithSpeed(transportTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure", new FastJScrollPane(structureTab));
+            addTab("Armor", new FastJScrollPane(armorTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Build", new FastJScrollPane(buildTab));
+            addTab("Transport", new FastJScrollPane(transportTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -1251,11 +1251,11 @@ public class MekLabTab extends CampaignGuiTab {
             fluffTab.setRefreshedListener(this);
             previewTab = new PreviewTab(this);
 
-            addTab("Structure", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Assign Criticals", new JScrollPaneWithSpeed(buildTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Assign Criticals", new FastJScrollPane(buildTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -1369,9 +1369,9 @@ public class MekLabTab extends CampaignGuiTab {
             FluffTab fluffTab = new FluffTab(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Build", new JScrollPaneWithSpeed(structureTab));
-            addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Build", new FastJScrollPane(structureTab));
+            addTab("Fluff", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -1487,11 +1487,11 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure/Armor", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Assign Critical", new JScrollPaneWithSpeed(buildTab));
-            addTab("FluffTab", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure/Armor", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Assign Critical", new FastJScrollPane(buildTab));
+            addTab("FluffTab", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 
@@ -1617,12 +1617,12 @@ public class MekLabTab extends CampaignGuiTab {
             transportTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
-            addTab("Structure/Armor", new JScrollPaneWithSpeed(structureTab));
-            addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
-            addTab("Assign Criticals", new JScrollPaneWithSpeed(buildTab));
-            addTab("Transport Bays", new JScrollPaneWithSpeed(transportTab));
-            addTab("FluffTab", new JScrollPaneWithSpeed(fluffTab));
-            addTab("Preview", new JScrollPaneWithSpeed(previewTab));
+            addTab("Structure/Armor", new FastJScrollPane(structureTab));
+            addTab("Equipment", new FastJScrollPane(equipmentTab));
+            addTab("Assign Criticals", new FastJScrollPane(buildTab));
+            addTab("Transport Bays", new FastJScrollPane(transportTab));
+            addTab("FluffTab", new FastJScrollPane(fluffTab));
+            addTab("Preview", new FastJScrollPane(previewTab));
             this.repaint();
         }
 

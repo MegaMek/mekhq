@@ -1180,6 +1180,7 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCommitForces() {
         return commitForces;
     }

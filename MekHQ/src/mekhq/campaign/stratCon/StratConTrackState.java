@@ -302,6 +302,7 @@ public class StratConTrackState {
     /**
      * Handles the unassignment of a force from this track.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void unassignUnit(int forceID) {
         if (assignedForceCoords.containsKey(forceID)) {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
@@ -326,6 +327,7 @@ public class StratConTrackState {
         return assignedForceCoords;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAssignedForceCoords(Map<Integer, StratConCoords> assignedForceCoords) {
         this.assignedForceCoords = assignedForceCoords;
     }
@@ -335,6 +337,7 @@ public class StratConTrackState {
         return assignedCoordForces;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAssignedCoordForces(Map<StratConCoords, Set<Integer>> assignedCoordForces) {
         this.assignedCoordForces = assignedCoordForces;
     }
@@ -354,6 +357,7 @@ public class StratConTrackState {
         return assignedForceReturnDates;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAssignedForceReturnDates(Map<Integer, LocalDate> assignedForceReturnDates) {
         this.assignedForceReturnDates = assignedForceReturnDates;
     }
@@ -374,6 +378,7 @@ public class StratConTrackState {
         return revealedCoords;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setRevealedCoords(Set<StratConCoords> revealedCoords) {
         this.revealedCoords = revealedCoords;
     }
@@ -391,6 +396,7 @@ public class StratConTrackState {
      * board.
      */
     @Nullable
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public StratConCoords findClosestAlliedFacilityCoords(StratConCoords coords) {
         int minDistance = Integer.MAX_VALUE;
         StratConCoords closestFacilityCoords = null;
@@ -442,6 +448,7 @@ public class StratConTrackState {
      *
      * @return True if the operation succeeded, false if it failed
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean moveObjective(StratConCoords source, StratConCoords destination) {
         // safety: don't move it if it's not there; logic prevents two objectives in the same coords
         if (getObjectivesByCoords().containsKey(source) &&
@@ -458,8 +465,8 @@ public class StratConTrackState {
     }
 
     /**
-     * Convenience method to fail an objective at the given coordinates.
-     * Does nothing if the objective has already been completed.
+     * Convenience method to fail an objective at the given coordinates. Does nothing if the objective has already been
+     * completed.
      */
     public void failObjective(StratConCoords coords) {
         if (getObjectivesByCoords().containsKey(coords)) {
@@ -511,6 +518,7 @@ public class StratConTrackState {
     /**
      * Convenience method - returns true if the force with the given ID is currently deployed to this track
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isForceDeployed(int forceID) {
         return assignedForceCoords.containsKey(forceID);
     }
@@ -524,6 +532,7 @@ public class StratConTrackState {
         return stickyForces;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStickyForces(Set<Integer> stickyForces) {
         this.stickyForces = stickyForces;
     }
@@ -542,6 +551,7 @@ public class StratConTrackState {
         return strategicObjectives;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStrategicObjectives(List<StratConStrategicObjective> strategicObjectives) {
         this.strategicObjectives = strategicObjectives;
     }
@@ -561,6 +571,7 @@ public class StratConTrackState {
     public void setTerrainTile(StratConCoords coords, String terrainTypeName) {
         terrainTypes.put(coords, terrainTypeName);
     }
+
     /**
      * Check to see if specified coordinates would be placed off the StratCon board
      */
@@ -579,10 +590,12 @@ public class StratConTrackState {
 
     @XmlElementWrapper(name = "terrainTypes")
     @XmlElement(name = "terrainType")
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Map<StratConCoords, String> getTerrainTypes() {
         return terrainTypes;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStrategicObjectives(Map<StratConCoords, String> terrainTypes) {
         this.terrainTypes = terrainTypes;
     }

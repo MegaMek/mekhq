@@ -211,7 +211,7 @@ public class PartsReportDialog extends JDialog {
                 int sellQty = 1;
                 PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(),
                       true,
-                      "Sell how many " + spares.get(0).getName(),
+                      "Sell how many " + spares.getFirst().getName(),
                       sellQty,
                       1,
                       CampaignGUI.MAX_QUANTITY_SPINNER);
