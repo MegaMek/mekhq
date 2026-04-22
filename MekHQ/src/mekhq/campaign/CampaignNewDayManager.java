@@ -936,17 +936,7 @@ public class CampaignNewDayManager {
     private void processNewDayATB() {
         campaign.getContractMarket().generateContractOffers(campaign);
 
-        if ((campaign.getShipSearchExpiration() != null) && !campaign.getShipSearchExpiration().isAfter(today)) {
-            campaign.setShipSearchExpiration(null);
-            if (campaign.getShipSearchResult() != null) {
-                campaign.addReport(ACQUISITIONS, "Opportunity for purchase of " + campaign.getShipSearchResult() + " " +
-                                                       "has expired.");
-                campaign.setShipSearchResult(null);
-            }
-        }
-
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-            processShipSearch();
             processTrainingCombatTeams(campaign);
         }
 
@@ -1740,67 +1730,6 @@ public class CampaignNewDayManager {
               fatigueRate,
               true,
               failedWillpowerCheck);
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    void processShipSearch() {
-        if (campaign.getShipSearchStart() == null) {
-            return;
-        }
-
-        StringBuilder report = new StringBuilder();
-        if (finances.debit(TransactionType.UNIT_PURCHASE,
-              today,
-              campaign.getAtBConfig().shipSearchCostPerWeek(),
-              "Ship Search")) {
-            report.append(campaign.getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
-                  .append(" deducted for ship search.");
-        } else {
-            campaign.addReport(FINANCES, "<font color=" +
-                                               ReportingUtilities.getNegativeColor() +
-                                               ">Insufficient funds for ship search.</font>");
-            campaign.setShipSearchStart(null);
-            return;
-        }
-
-        long numDays = ChronoUnit.DAYS.between(campaign.getShipSearchStart(), today);
-        if (numDays > 21) {
-            int roll = d6(2);
-            TargetRoll target = campaign.getAtBConfig().shipSearchTargetRoll(campaign.getShipSearchType(), campaign);
-            campaign.setShipSearchStart(null);
-            report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ").append(roll);
-            // TODO : mos zero should make ship available on retainer
-            if (roll >= target.getValue()) {
-                report.append("<br/>Search successful. ");
-
-                MekSummary ms = campaign.getUnitGenerator().generate(faction.getShortName(),
-                      campaign.getShipSearchType(),
-                      -1,
-                      today.getYear(),
-                      campaign.getAtBUnitRatingMod());
-
-                if (ms == null) {
-                    ms = campaign.getAtBConfig().findShip(campaign.getShipSearchType());
-                }
-
-                if (ms != null) {
-                    campaign.setShipSearchResult(ms.getName());
-                    campaign.setShipSearchExpiration(today.plusDays(31));
-                    report.append(campaign.getShipSearchResult())
-                          .append(" is available for purchase for ")
-                          .append(Money.of(ms.getCost()).toAmountAndSymbolString())
-                          .append(" until ")
-                          .append(MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getShipSearchExpiration()));
-                } else {
-                    report.append(" <font color=")
-                          .append(ReportingUtilities.getNegativeColor())
-                          .append(">Could not determine ship type.</font>");
-                }
-            } else {
-                report.append("<br/>Ship search unsuccessful.");
-            }
-        }
-        campaign.addReport(ACQUISITIONS, report.toString());
     }
 
     /**
