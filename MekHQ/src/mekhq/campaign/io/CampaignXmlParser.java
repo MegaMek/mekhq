@@ -153,7 +153,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.campaignOptions.optionChangeDialogs.StratConMaplessCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.DOMException;
@@ -663,7 +662,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         if (campaign.getCampaignOptions().isUseAtB()) {
             campaign.setHasActiveContract();
             campaign.setAtBConfig(AtBConfiguration.loadFromXml());
-            campaign.setAtBEventProcessor(new AtBEventProcessor(campaign));
         }
 
         // Sanity Checks

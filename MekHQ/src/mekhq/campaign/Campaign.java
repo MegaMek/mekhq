@@ -267,7 +267,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
-import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -453,7 +452,6 @@ public class Campaign implements ITechManager {
     private final List<String> turnoverRetirementInformation;
 
     private AtBConfiguration atbConfig; // AtB
-    private AtBEventProcessor atbEventProcessor; // AtB
     private LocalDate shipSearchStart; // AtB
     private int shipSearchType;
     private String shipSearchResult; // AtB
@@ -1083,10 +1081,6 @@ public class Campaign implements ITechManager {
         campaignEventProcessor = processor;
     }
 
-    public void setAtBEventProcessor(AtBEventProcessor processor) {
-        atbEventProcessor = processor;
-    }
-
     public void setAtBConfig(AtBConfiguration config) {
         atbConfig = config;
     }
@@ -1097,127 +1091,6 @@ public class Campaign implements ITechManager {
         }
         return atbConfig;
     }
-
-    // region Ship Search
-
-    /**
-     * Sets the date a ship search was started, or null if no search is in progress.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchStart(@Nullable LocalDate shipSearchStart) {
-        this.shipSearchStart = shipSearchStart;
-    }
-
-    /**
-     * @return The date a ship search was started, or null if none is in progress.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public LocalDate getShipSearchStart() {
-        return shipSearchStart;
-    }
-
-    /**
-     * Sets the lookup name of the available ship, or null if none were found.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchResult(@Nullable String result) {
-        shipSearchResult = result;
-    }
-
-    /**
-     * @return The lookup name of the available ship, or null if none is available
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public String getShipSearchResult() {
-        return shipSearchResult;
-    }
-
-    /**
-     * @return The date the ship is no longer available, if there is one.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public LocalDate getShipSearchExpiration() {
-        return shipSearchExpiration;
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchExpiration(LocalDate shipSearchExpiration) {
-        this.shipSearchExpiration = shipSearchExpiration;
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public int getShipSearchType() {
-        return shipSearchType;
-    }
-
-    /**
-     * Sets the unit type to search for.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchType(int unitType) {
-        shipSearchType = unitType;
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void startShipSearch(int unitType) {
-        setShipSearchStart(getLocalDate());
-        setShipSearchType(unitType);
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void purchaseShipSearchResult() {
-        MekSummary ms = MekSummaryCache.getInstance().getMek(getShipSearchResult());
-        if (ms == null) {
-            LOGGER.error("Cannot find entry for {}", getShipSearchResult());
-            return;
-        }
-
-        Money cost = Money.of(ms.getCost());
-
-        if (getFunds().isLessThan(cost)) {
-            addReport(FINANCES, "<font color='" +
-                                      ReportingUtilities.getNegativeColor() +
-                                      "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
-            return;
-        }
-
-        MekFileParser mekFileParser;
-
-        try {
-            mekFileParser = new MekFileParser(ms.getSourceFile(), ms.getEntryName());
-        } catch (Exception ex) {
-            LOGGER.error("Unable to load unit: {}", ms.getEntryName(), ex);
-            return;
-        }
-
-        Entity en = mekFileParser.getEntity();
-
-        int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ?
-                                0 :
-                                calculatePartTransitTime(en.calcYearAvailability(getGameYear(),
-                                      useClanTechBase(),
-                                      getTechFaction()));
-
-        getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        PartQuality quality = PartQuality.QUALITY_D;
-
-        if (campaignOptions.isUseRandomUnitQualities()) {
-            quality = Unit.getRandomUnitQuality(0);
-        }
-
-        addNewUnit(en, true, transitDays, quality);
-
-        if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
-            addReport(ACQUISITIONS, "<font color='" +
-                                          ReportingUtilities.getPositiveColor() +
-                                          "'>Unit will be delivered in " +
-                                          transitDays +
-                                          " days.</font>");
-        }
-        setShipSearchResult(null);
-        setShipSearchExpiration(null);
-    }
-    // endregion Ship Search
 
     /**
      * Process retirements for retired personnel, if any.
@@ -9652,7 +9525,6 @@ public class Campaign implements ITechManager {
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
         getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
-        setAtBEventProcessor(new AtBEventProcessor(this));
     }
 
     /**
@@ -9660,7 +9532,6 @@ public class Campaign implements ITechManager {
      */
     public void shutdownAtB() {
         RandomFactionGenerator.getInstance().dispose();
-        atbEventProcessor.shutdown();
     }
 
     /**
