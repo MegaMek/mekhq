@@ -159,7 +159,8 @@ public class FactionAccoladeEvent {
                 String oocTextKey = isSameFaction
                                           ? "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.meks.ooc"
                                           : "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.adoption.ooc";
-                oocText = getTextAt(getFactionJudgmentDialogResourceBundle(), oocTextKey);
+                oocText = getFormattedTextAt(getFactionJudgmentDialogResourceBundle(), oocTextKey,
+                      getFactionName(accoladingFaction, campaign.getGameYear()));
             }
 
             ImmersiveDialogWidth dialogWidth;
