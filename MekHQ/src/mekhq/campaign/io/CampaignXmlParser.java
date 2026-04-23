@@ -143,14 +143,12 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyArc.StoryArc;
-import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.campaignOptions.optionChangeDialogs.StratConMaplessCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
@@ -251,14 +249,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
                           version));
-
-                    //  < 50.10 compatibility handler
-                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                    if (campaignOptions.isHadAtBEnabledMarker() && !campaignOptions.isUseStratCon()) {
-                        // Mapless StratCon replaced AtB in 50.10
-                        campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
-                        new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
-                    }
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
@@ -443,7 +433,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (options.isUseAtB()) {
+        if (options.isUseStratCon()) {
             Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
             for (Formation f : campaign.getAllFormations()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
@@ -659,7 +649,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             campaign.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
 
-        if (campaign.getCampaignOptions().isUseAtB()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             campaign.setHasActiveContract();
             campaign.setAtBConfig(AtBConfiguration.loadFromXml());
         }
@@ -2304,7 +2294,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     //region Migration Methods
     //region Ancestry Migration
-    private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
     // endregion Ancestry Migration
     // endregion Migration Methods
