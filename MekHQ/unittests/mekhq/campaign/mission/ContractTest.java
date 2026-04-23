@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -189,6 +189,45 @@ public class ContractTest {
         assertEquals(Money.of(5), contract.getEmployerTransportReimbursement(mockCampaign));
         // Player pays the other half
         assertEquals(Money.of(5), contract.getPlayerTransportCost(mockCampaign));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageZeroTotal() {
+        assertEquals(0, Contract.calculateSalvagePercentage(Money.zero(), Money.zero()));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageAllPlayer() {
+        assertEquals(100, Contract.calculateSalvagePercentage(Money.of(1000), Money.zero()));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageAllEmployer() {
+        assertEquals(0, Contract.calculateSalvagePercentage(Money.zero(), Money.of(1000)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageRoundsHalfUp() {
+        // 50/50 split = exactly 50%
+        assertEquals(50, Contract.calculateSalvagePercentage(Money.of(500), Money.of(500)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageRoundsUpFromHalf() {
+        // 425 / 1000 = 42.5% -> 43% with HALF_UP (regression test for issue #5683)
+        assertEquals(43, Contract.calculateSalvagePercentage(Money.of(425), Money.of(575)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageRoundsDownBelowHalf() {
+        // 424 / 1000 = 42.4% -> 42%
+        assertEquals(42, Contract.calculateSalvagePercentage(Money.of(424), Money.of(576)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageDoesNotTruncateNearWholeNumber() {
+        // 4299 / 10000 = 42.99% -> 43% (the original bug truncated to 42)
+        assertEquals(43, Contract.calculateSalvagePercentage(Money.of(4299), Money.of(5701)));
     }
 
     private void initializeTest() {
