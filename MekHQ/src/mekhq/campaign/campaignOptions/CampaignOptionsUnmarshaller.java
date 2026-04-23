@@ -399,6 +399,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "useFunctionalEscapeArtist" -> campaignOptions.setUseFunctionalEscapeArtist(parseBoolean(
                   nodeContents));
+            case "disableIntelBreachChance" -> campaignOptions.setDisableIntelBreachChance(parseBoolean(
+                  nodeContents));
             case "useRandomDependentAddition" -> campaignOptions.setUseRandomDependentAddition(parseBoolean(
                   nodeContents));
             case "useRandomDependentRemoval" -> campaignOptions.setUseRandomDependentRemoval(parseBoolean(
