@@ -33,9 +33,12 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
@@ -44,10 +47,14 @@ import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
+import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
 import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
@@ -70,17 +77,22 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
 import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
+import static mekhq.campaign.stratCon.StratConRulesManager.processIgnoredDynamicScenario;
+import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -95,6 +107,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
+import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -103,10 +116,18 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.Refit;
@@ -141,9 +162,11 @@ import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.GrayMonday;
+import mekhq.campaign.randomEvents.RiotScenario;
 import mekhq.campaign.randomEvents.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -155,6 +178,8 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -286,6 +311,12 @@ public class CampaignNewDayManager {
             fetchCelebrationDialogs();
         }
 
+        // Determine if we have an active contract or not, as campaign can get used
+        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
+        if (campaignOptions.isUseStratCon()) {
+            campaign.setHasActiveContract();
+        }
+
         // Clear Reports
         campaign.getCurrentReport().clear();
         campaign.setCurrentReportHTML("");
@@ -388,6 +419,11 @@ public class CampaignNewDayManager {
         if (updatedLocation.isOnPlanet() && isFirstOfMonth) {
             RandomDependents randomDependents = new RandomDependents(campaign);
             randomDependents.processMonthlyRemovalAndAddition();
+        }
+
+        // Process New Day for AtB
+        if (campaignOptions.isUseStratCon()) {
+            processNewDayATB();
         }
 
         processReputationChanges();
@@ -515,6 +551,33 @@ public class CampaignNewDayManager {
     }
 
     /**
+     * Gets all scenario IDs that have at least one standard force assigned to them.
+     *
+     * <p>This method iterates through all forces in the campaign and collects the scenario IDs of those forces that
+     * are classified as standard force types and are currently assigned to a scenario.</p>
+     *
+     * @return a set of scenario IDs that have standard forces assigned, or an empty set if no standard forces are
+     *       deployed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private Set<Integer> getAllScenariosWithAssignedStandardForces() {
+        Set<Integer> scenarios = new HashSet<>();
+
+        for (Formation formation : campaign.getAllFormations()) {
+            if (formation.getFormationType().isStandard()) {
+                int scenarioId = formation.getScenarioId();
+                if (scenarioId != NO_ASSIGNED_SCENARIO) {
+                    scenarios.add(scenarioId);
+                }
+            }
+        }
+
+        return scenarios;
+    }
+
+    /**
      * Updates the campaign's facility capacities and validates against operational limits.
      *
      * <p>This method performs the following facility updates:</p>
@@ -632,7 +695,16 @@ public class CampaignNewDayManager {
         // Prep some data for vocational xp
         int vocationalXpRate = campaignOptions.getVocationalXP();
         if (campaign.hasActiveContract()) {
-            vocationalXpRate *= 2;
+            if (campaignOptions.isUseStratCon()) {
+                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                    if (!contract.getContractType().isGarrisonType()) {
+                        vocationalXpRate *= 2;
+                        break;
+                    }
+                }
+            } else {
+                vocationalXpRate *= 2;
+            }
         }
 
         // Process personnel
@@ -852,7 +924,151 @@ public class CampaignNewDayManager {
     }
 
     /**
-     * Processes' reputation changes based on various conditions.
+     * Processes the new day actions for various AtB systems
+     * <p>
+     * It generates contract offers in the contract market, updates ship search expiration and results, processes ship
+     * search on Mondays, awards training experience to eligible training lances on active contracts on Mondays, adds or
+     * removes dependents at the start of the year if the options are enabled, rolls for morale at the start of the
+     * month, and processes ATB scenarios.
+     */
+    private void processNewDayATB() {
+        campaign.getContractMarket().generateContractOffers(campaign);
+
+        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+            processTrainingCombatTeams(campaign);
+        }
+
+        if (today.getDayOfMonth() == 1) {
+            /*
+             * First of the month; roll Morale.
+             */
+            for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                AtBMoraleLevel oldMorale = contract.getMoraleLevel();
+
+                contract.checkMorale(campaign, today);
+                AtBMoraleLevel newMorale = contract.getMoraleLevel();
+
+                String report = "";
+                if (contract.isPeaceful()) {
+                    report = resources.getString("garrisonDutyRouted.text");
+                } else if (oldMorale != newMorale) {
+                    report = String.format(resources.getString("contractMoraleReport.text"),
+                          newMorale,
+                          contract.getHyperlinkedName(),
+                          newMorale.getToolTipText());
+                }
+
+                if (!report.isBlank()) {
+                    campaign.addReport(GENERAL, report);
+                }
+            }
+        }
+
+        // Resupply
+        if (today.getDayOfMonth() == 2) {
+            // campaign occurs at the end of the 1st day, each month to avoid an awkward mechanics interaction where
+            // personnel might quit or get taken out of fatigue without the player having any opportunity to
+            // intervene before their resupply attempt becomes active.
+            List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+            AtBContract firstNonSubcontract = null;
+            for (AtBContract contract : activeContracts) {
+                if (!contract.isSubcontract()) {
+                    firstNonSubcontract = contract;
+                    break;
+                }
+            }
+
+            if (firstNonSubcontract != null) {
+                if (campaignOptions.isUseStratCon()) {
+                    boolean inLocation = updatedLocation.isOnPlanet() &&
+                                               updatedLocation.getCurrentSystem()
+                                                     .equals(firstNonSubcontract.getSystem());
+
+                    if (inLocation) {
+                        processResupply(firstNonSubcontract);
+                    }
+                }
+            }
+        }
+
+        int weekOfYear = today.get(Campaign.WEEK_FIELDS.weekOfYear());
+        boolean isOddWeek = (weekOfYear % 2 == 1);
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        if (campaignOptions.isUseStratCon() && isMonday && isOddWeek) {
+            negotiateAdditionalSupportPoints(campaign);
+        }
+
+        processNewDayATBScenarios();
+
+        // Daily events
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            if (campaignOptions.isUseGenericBattleValue() &&
+                      !contract.getContractType().isGarrisonType() &&
+                      contract.getStartDate().equals(today)) {
+                // Batchalls
+                Faction enemyFaction = contract.getEnemy();
+                String enemyFactionCode = contract.getEnemyCode();
+
+                boolean allowBatchalls = true;
+                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
+                    double regard = campaign.getFactionStandings().getRegardForFaction(enemyFactionCode, true);
+                    allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
+                }
+
+                if (enemyFaction.performsBatchalls() && allowBatchalls) {
+                    PerformBatchall batchallDialog = new PerformBatchall(campaign,
+                          contract.getClanOpponent(),
+                          contract.getEnemyCode());
+
+                    boolean batchallAccepted = batchallDialog.isBatchallAccepted();
+                    contract.setBatchallAccepted(batchallAccepted);
+
+                    if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
+                        List<String> reports = campaign.getFactionStandings()
+                                                     .processRefusedBatchall(faction.getShortName(),
+                                                           enemyFactionCode,
+                                                           today.getYear(),
+                                                           campaignOptions.getRegardMultiplier());
+
+                        for (String report : reports) {
+                            campaign.addReport(GENERAL, report);
+                        }
+                    }
+                }
+            }
+
+            if (isMonday && contract.getContractType().isRiotDuty() && contract.getStratconCampaignState() != null) {
+                int riotChance = 4;
+                if (randomInt(riotChance) == 0) {
+                    new RiotScenario(campaign, contract);
+                }
+            }
+
+            // Early Contract End (StratCon Only)
+            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null && !contract.getEndingDate().equals(today)) {
+                boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
+                int victoryPoints = contract.getContractScore(isUseMaplessMode);
+                int requiredVictoryPoints = contract.getRequiredVictoryPoints();
+
+                if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
+                    new ImmersiveDialogNotification(campaign,
+                          String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
+                                contract.getHyperlinkedName()), true);
+
+                    // This ensures any outstanding payout is paid out before the contract ends
+                    LocalDate adjustedDate = today.plusDays(1);
+                    int remainingMonths = contract.getMonthsLeft(adjustedDate);
+                    Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
+                    contract.setRoutedPayout(finalPayout);
+                    contract.setEndDate(adjustedDate);
+                }
+            }
+        }
+    }
+
+    /**
+     * Processes reputation changes based on various conditions.
      */
     private void processReputationChanges() {
         if (faction.isPirate()) {
@@ -1514,6 +1730,52 @@ public class CampaignNewDayManager {
               failedWillpowerCheck);
     }
 
+    @Deprecated(since = "0.50.10", forRemoval = true)
+    void processShipSearch() {
+        StringBuilder report = new StringBuilder();
+        if (finances.debit(TransactionType.UNIT_PURCHASE,
+              today,
+              campaign.getAtBConfig().shipSearchCostPerWeek(),
+              "Ship Search")) {
+            report.append(campaign.getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
+                  .append(" deducted for ship search.");
+        } else {
+            campaign.addReport(FINANCES, "<font color=" +
+                                               ReportingUtilities.getNegativeColor() +
+                                               ">Insufficient funds for ship search.</font>");
+            return;
+        }
+
+        campaign.addReport(ACQUISITIONS, report.toString());
+    }
+
+    /**
+     * Processes the resupply operation for a given contract.
+     *
+     * <p>For regular contracts, resupply always occurs. For guerrilla warfare contracts or contracts with pirate
+     * employers, resupply occurs only 25% of the time (1 in 4 chance).</p>
+     *
+     * <p>The resupply type is determined by the contract nature:</p>
+     * <ul>
+     *     <li><b>Smuggler resupply:</b> Used for guerrilla warfare or pirate contracts</li>
+     *     <li><b>Normal resupply:</b> Used for all other contract types</li>
+     * </ul>
+     *
+     * @param contract the {@link AtBContract} for which resupply is being processed
+     */
+    private void processResupply(AtBContract contract) {
+        boolean isGuerrilla = contract.getContractType().isGuerrillaType()
+                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
+
+        if (!isGuerrilla || randomInt(4) == 0) {
+            Resupply.ResupplyType resupplyType = isGuerrilla ?
+                                                       Resupply.ResupplyType.RESUPPLY_SMUGGLER :
+                                                       Resupply.ResupplyType.RESUPPLY_NORMAL;
+            Resupply resupply = new Resupply(campaign, contract, resupplyType);
+            performResupply(resupply, contract);
+        }
+    }
+
     /**
      * Process monthly auto awards for a given person based on their roles and experience level.
      *
@@ -1603,6 +1865,153 @@ public class CampaignNewDayManager {
         }
 
         return false;
+    }
+
+    private void processNewDayATBScenarios() {
+        // First, we get the list of all active AtBContracts
+        List<AtBContract> contracts = campaign.getActiveAtBContracts(true);
+        Set<Integer> allScenariosWithAssignedStandardForces = getAllScenariosWithAssignedStandardForces();
+
+        // Second, we process them and any already generated scenarios
+        for (AtBContract contract : contracts) {
+            /*
+             * Situations like a delayed start or running out of funds during transit can delay arrival until after
+             * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
+             */
+            if (!updatedLocation.getCurrentSystem().getId().equals(contract.getSystem().getId())) {
+                // transitTime is measured in days, so we round up to the next whole day
+                contract.setStartAndEndDate(today.plusDays((int) ceil(updatedLocation.getTransitTime())));
+                campaign.addReport(GENERAL, "The start and end dates of " +
+                                                  contract.getHyperlinkedName() +
+                                                  " have been shifted to reflect the current ETA.");
+
+                if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
+                    LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
+                    contract.setRoutEndDate(newRoutEndDate);
+                }
+
+                continue;
+            }
+
+            if (today.equals(contract.getStartDate())) {
+                hangar.getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation()));
+            }
+
+            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+                int deficit = campaign.getDeploymentDeficit(contract);
+                StratConCampaignState campaignState = contract.getStratconCampaignState();
+
+                if (campaignState != null && deficit > 0) {
+                    campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
+                          contract.getHyperlinkedName(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                          CLOSING_SPAN_TAG));
+
+                    campaignState.updateVictoryPoints(-1);
+                } else if (deficit > 0) {
+                    contract.addPlayerMinorBreaches(deficit);
+                    campaign.addReport(GENERAL, "Failure to meet " +
+                                                      contract.getHyperlinkedName() +
+                                                      " requirements resulted in " +
+                                                      deficit +
+                                                      ((deficit == 1) ?
+                                                             " minor contract breach" :
+                                                             " minor contract breaches"));
+                }
+            }
+
+            for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
+                if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
+                    boolean hasForceDeployed = allScenariosWithAssignedStandardForces.contains(scenario.getId());
+                    if (campaignOptions.isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
+                        StratConCampaignState campaignState = contract.getStratconCampaignState();
+
+                        if (campaignState == null) {
+                            return;
+                        }
+
+                        processIgnoredDynamicScenario(scenario.getId(), campaignState);
+
+                        ScenarioType scenarioType = scenario.getStratConScenarioType();
+                        if (scenarioType.isResupply()) {
+                            processAbandonedConvoy(campaign, contract, (AtBDynamicScenario) scenario);
+                        }
+
+                        scenario.clearAllFormationsAndPersonnel(campaign);
+                    } else {
+                        contract.addPlayerMinorBreach();
+
+                        campaign.addReport(BATTLE, "Failure to deploy for " +
+                                                         scenario.getHyperlinkedName() +
+                                                         " resulted in a minor contract breach.");
+                    }
+
+                    scenario.convertToStub(campaign,
+                          hasForceDeployed ? ScenarioStatus.FLEET_IN_BEING : ScenarioStatus.REFUSED_ENGAGEMENT);
+                }
+            }
+        }
+
+        // Third, on Mondays we generate new scenarios for the week
+        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+            AtBScenarioFactory.createScenariosForNewWeek(campaign);
+        }
+
+        // Fourth, we look at deployments for pre-existing and new scenarios
+        for (AtBContract contract : contracts) {
+            contract.checkEvents(campaign);
+
+            // If there is a standard battle set for today, deploy the lance.
+            for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
+                if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(today)) {
+                    int forceId = atBScenario.getCombatTeamId();
+                    if ((campaign.getCombatTeamsAsMap().get(forceId) != null) &&
+                              !campaign.getFormationIds().get(forceId).isDeployed()) {
+                        // If any unit in the force is under repair, don't deploy the force
+                        // Merely removing the unit from deployment would break with user expectation
+                        boolean forceUnderRepair = false;
+                        for (UUID uid : campaign.getFormationIds().get(forceId).getAllUnits(false)) {
+                            Unit u = hangar.getUnit(uid);
+                            if ((u != null) && u.isUnderRepair()) {
+                                forceUnderRepair = true;
+                                break;
+                            }
+                        }
+
+                        if (!forceUnderRepair) {
+                            campaign.getFormationIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
+                            atBScenario.addForces(forceId);
+
+                            campaign.addReport(BATTLE, MessageFormat.format(resources.getString(
+                                        "atbScenarioTodayWithForce.format"),
+                                  atBScenario.getHyperlinkedName(),
+                                  campaign.getFormationIds().get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getFormationIds().get(forceId),
+                                  atBScenario));
+                        } else {
+                            if (atBScenario.getHasTrack()) {
+                                campaign.addReport(BATTLE, MessageFormat.format(resources.getString("atbScenarioToday" +
+                                                                                                          ".stratCon"),
+                                      atBScenario.getHyperlinkedName()));
+                            } else {
+                                campaign.addReport(BATTLE, MessageFormat.format(resources.getString("atbScenarioToday" +
+                                                                                                          ".atb"),
+                                      atBScenario.getHyperlinkedName()));
+                            }
+                        }
+                    } else {
+                        if (atBScenario.getHasTrack()) {
+                            campaign.addReport(BATTLE,
+                                  MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                        atBScenario.getHyperlinkedName()));
+                        } else {
+                            campaign.addReport(BATTLE, MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                                  atBScenario.getHyperlinkedName()));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -91,6 +91,7 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredFormationIconCreationPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class GMToolsDialog extends AbstractMHQDialogBasic {
     private static final MMLogger LOGGER = MMLogger.create(GMToolsDialog.class);
