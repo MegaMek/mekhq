@@ -38,9 +38,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import megamek.MMConstants;
+import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.AbstractAboutDialog;
-import megameklab.MMLConstants;
 import mekhq.MHQConstants;
 
 public class MekHQAboutDialog extends AbstractAboutDialog {
@@ -51,17 +50,13 @@ public class MekHQAboutDialog extends AbstractAboutDialog {
 
     @Override
     protected JComponent version() {
-        JLabel program = new JLabel("MekHQ");
+        JLabel program = new JLabel(MHQConstants.PROJECT_NAME);
         program.putClientProperty("FlatLaf.styleClass", "h3");
-        JLabel version = new JLabel("MekHQ Version: " + MHQConstants.VERSION);
-        JLabel versionMML = new JLabel("MegaMekLab Version: " + MMLConstants.VERSION);
-        JLabel versionMM = new JLabel("MegaMek Version: " + MMConstants.VERSION);
+        JLabel version = new JLabel(Messages.getString("about.version", MHQConstants.VERSION));
         var panel = Box.createVerticalBox();
         panel.add(program);
         panel.add(Box.createVerticalStrut(8));
         panel.add(version);
-        panel.add(versionMML);
-        panel.add(versionMM);
         return panel;
     }
 }
