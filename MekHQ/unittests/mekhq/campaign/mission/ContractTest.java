@@ -226,7 +226,7 @@ public class ContractTest {
 
     @Test
     public void testCalculateSalvagePercentageDoesNotTruncateNearWholeNumber() {
-        // 4299 / 10000 = 42.99% -> 43% (the original bug truncated to 42)
+        // 4299 / 10000 = 42.99% -> 43% (the original bug for issue #5683)
         assertEquals(43, Contract.calculateSalvagePercentage(Money.of(4299), Money.of(5701)));
     }
 
