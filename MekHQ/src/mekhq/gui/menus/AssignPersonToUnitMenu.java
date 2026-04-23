@@ -273,20 +273,14 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                      entity.isSuperHeavy() ||
                                      entity.isTripodMek() ||
                                      entity.isQuadMek())) {
-                        final boolean valid;
-                        if (entity instanceof Mek) {
-                            valid = areAllBattleMekPilots;
-                        } else if (entity instanceof ProtoMek) {
-                            valid = areAllProtoMekPilots;
-                        } else if (entity instanceof ConvFighter) {
-                            valid = areAllConventionalAircraftPilots;
-                        } else if (entity instanceof Aero) {
-                            valid = areAllAerospacePilots;
-                        } else if (entity instanceof VTOL) {
-                            valid = areAllVTOLCrew;
-                        } else {
-                            valid = false;
-                        }
+                        final boolean valid = switch (entity) {
+                            case Mek ignored -> areAllBattleMekPilots;
+                            case ProtoMek ignored -> areAllProtoMekPilots;
+                            case ConvFighter ignored -> areAllConventionalAircraftPilots;
+                            case Aero ignored -> areAllAerospacePilots;
+                            case VTOL ignored -> areAllVTOLCrew;
+                            default -> false;
+                        };
 
                         if (valid) {
                             final JMenuItem miPilot = new JMenuItem(unit.getName());

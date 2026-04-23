@@ -64,6 +64,7 @@ import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.NewDayEvent;
@@ -79,7 +80,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -230,7 +230,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         mapView.setMinimumSize(new Dimension(600, 600));
         mapView.setView(panMapView);
 
-        scrollPlanetView = new JScrollPaneWithSpeed();
+        scrollPlanetView = new FastJScrollPane();
         scrollPlanetView.setBorder(null);
         scrollPlanetView.setMinimumSize(new Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new Dimension(400, 600));

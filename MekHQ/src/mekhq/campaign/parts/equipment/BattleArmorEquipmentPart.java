@@ -65,6 +65,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     private int trooper;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public BattleArmorEquipmentPart() {
         this(0, null, -1, 1.0, -1, null);
     }
@@ -137,7 +138,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             if (unit.getEntity().getInternal(trooper) > 0) {
                 unit.getEntity().setInternal(0, trooper);
                 if (!unit.getCrew().isEmpty()) {
-                    Person trooperToRemove = unit.getCrew().get(unit.getCrew().size() - 1);
+                    Person trooperToRemove = unit.getCrew().getLast();
                     if (null != trooperToRemove) {
                         unit.remove(trooperToRemove, true);
                     }

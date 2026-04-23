@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.Person.*;
@@ -302,15 +301,15 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             return;
         }
 
-        person.setConnections(clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        person.setReputation(clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
-        person.setWealth(clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
-        person.setExtraIncomeFromTraitLevel(clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setConnections(Math.clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setReputation(Math.clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setWealth(Math.clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         int baseUnluckyDiceSize = 5;
         int unluckyRoll = randomInt(baseUnluckyDiceSize);
         if (unluckyRoll == 0) { // 5% chance of positive value
-            person.setUnlucky(clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+            person.setUnlucky(Math.clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
         }
         // We want the chance of a Bloodmark to be low as it can be quite disruptive
         int baseBloodmarkDiceSize = person.getOriginFaction().isPirate() ? 5 : 50;
@@ -318,7 +317,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // non-pirates = approx 1.11% chance of a bloodmark
         int bloodmarkRoll = randomInt(baseBloodmarkDiceSize);
         if (bloodmarkRoll == 0) {
-            person.setBloodmark(clamp(performBloodmarkRoll(), MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+            person.setBloodmark(Math.clamp(performBloodmarkRoll(), MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
         }
     }
 

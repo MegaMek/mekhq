@@ -77,6 +77,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public record AtBEventProcessor(Campaign campaign) {
     private static final MMLogger LOGGER = MMLogger.create(AtBEventProcessor.class);
 
@@ -238,7 +239,7 @@ public record AtBEventProcessor(Campaign campaign) {
         Entity en;
         if (null != ms) {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
-                String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
+                String name = "Clan " + ms.getName().replace("Platoon", "Point");
                 ms = MekSummaryCache.getInstance().getMek(name);
                 LOGGER.info("looking for Clan infantry {}", name);
             }

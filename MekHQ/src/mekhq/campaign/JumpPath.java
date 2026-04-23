@@ -76,7 +76,7 @@ public class JumpPath {
         if (path.isEmpty()) {
             return null;
         } else {
-            return path.get(0);
+            return path.getFirst();
         }
     }
 
@@ -84,7 +84,7 @@ public class JumpPath {
         if (path.isEmpty()) {
             return null;
         } else {
-            return path.get(path.size() - 1);
+            return path.getLast();
         }
     }
 
@@ -107,6 +107,7 @@ public class JumpPath {
     /**
      * Use {@link #getTotalRechargeTime(LocalDate, boolean)} instead
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public double getTotalRechargeTime(LocalDate when) {
         return getTotalRechargeTime(when, false);
     }
@@ -183,7 +184,7 @@ public class JumpPath {
 
     public void removeFirstSystem() {
         if (!path.isEmpty()) {
-            path.remove(0);
+            path.removeFirst();
         }
     }
 

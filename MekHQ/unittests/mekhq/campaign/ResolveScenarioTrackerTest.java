@@ -66,8 +66,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link ResolveScenarioTracker#processGame()}, verifying that enemy entities
- * destroyed by ammo detonation (devastated) are properly tracked for prisoner capture.
+ * Tests for {@link ResolveScenarioTracker#processGame()}, verifying that enemy entities destroyed by ammo detonation
+ * (devastated) are properly tracked for prisoner capture.
  *
  * @see <a href="https://github.com/MegaMek/mekhq/issues/6497">GitHub issue #6497</a>
  */
@@ -151,9 +151,9 @@ class ResolveScenarioTrackerTest {
     }
 
     /**
-     * Verifies that an enemy entity in the devastated list is added to devastatedEnemyUnits
-     * and tracked in salvageStatus. This is the fix for GitHub issue #6497: pilots of opfor
-     * units destroyed by ammo detonation were missing from the capturable personnel list.
+     * Verifies that an enemy entity in the devastated list is added to devastatedEnemyUnits and tracked in
+     * salvageStatus. This is the fix for GitHub issue #6497: pilots of opfor units destroyed by ammo detonation were
+     * missing from the capturable personnel list.
      */
     @Test
     void processGameAddsDevastatedEnemyUnitsToDevastatedList() {
@@ -172,14 +172,14 @@ class ResolveScenarioTrackerTest {
         assertEquals(1, tracker.devastatedEnemyUnits.size(),
               "Should have exactly one devastated enemy unit");
 
-        TestUnit capturedUnit = tracker.devastatedEnemyUnits.get(0);
+        TestUnit capturedUnit = tracker.devastatedEnemyUnits.getFirst();
         assertTrue(tracker.salvageStatus.containsKey(capturedUnit.getId()),
               "Devastated enemy unit should be tracked in salvageStatus for prisoner processing");
     }
 
     /**
-     * Verifies that an enemy EjectedCrew in the devastated list is routed to enemyEjections
-     * and NOT added to devastatedEnemyUnits, matching the graveyard handling pattern.
+     * Verifies that an enemy EjectedCrew in the devastated list is routed to enemyEjections and NOT added to
+     * devastatedEnemyUnits, matching the graveyard handling pattern.
      */
     @Test
     void processGameAddsDevastatedEnemyEjectedCrewToEnemyEjections() {
@@ -239,9 +239,8 @@ class ResolveScenarioTrackerTest {
     }
 
     /**
-     * Verifies that a player unit deployed by MekHQ but never present in game results
-     * (e.g., rejected by the server as an illegal design) is recovered rather than
-     * treated as a total loss. This is the fix for GitHub issue #6606.
+     * Verifies that a player unit deployed by MekHQ but never present in game results (e.g., rejected by the server as
+     * an illegal design) is recovered rather than treated as a total loss. This is the fix for GitHub issue #6606.
      *
      * @see <a href="https://github.com/MegaMek/mekhq/issues/6606">GitHub issue #6606</a>
      */
@@ -276,8 +275,8 @@ class ResolveScenarioTrackerTest {
     }
 
     /**
-     * Verifies that a player unit which DID appear in results is NOT double-processed
-     * by the safety-net recovery logic.
+     * Verifies that a player unit which DID appear in results is NOT double-processed by the safety-net recovery
+     * logic.
      */
     @Test
     void processGameDoesNotRecoverUnitFoundInResults() {

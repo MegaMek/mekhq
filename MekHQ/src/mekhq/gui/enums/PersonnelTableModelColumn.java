@@ -349,6 +349,7 @@ public enum PersonnelTableModelColumn {
         return this == SCOUTING;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAsTech() {
         return this == ASTECH;
     }
@@ -373,10 +374,12 @@ public enum PersonnelTableModelColumn {
         return this == TECH_VESSEL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isZeroG() {
         return this == ZERO_G;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMedTech() {
         return this == MEDTECH;
     }
@@ -385,14 +388,17 @@ public enum PersonnelTableModelColumn {
         return this == MEDICAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isTechMinutes() {
         return this == TECH_MINUTES;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isWorkMinutes() {
         return this == WORK_MINUTES;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMedicalCapacity() {
         return this == MEDICAL_CAPACITY;
     }
@@ -593,6 +599,7 @@ public enum PersonnelTableModelColumn {
 
     public boolean isTacticalTransport() {return this == TACTICAL_TRANSPORT;}
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isATOWAttribute() {
         return isStrength() ||
                      isBody() ||
@@ -735,7 +742,7 @@ public enum PersonnelTableModelColumn {
                                                .orElse(null);
                         String refitString = null != refitUnit ? "<b>Refitting</b> " + refitUnit.getName() : "";
                         if (person.getTechUnits().size() == 1) {
-                            unit = person.getTechUnits().get(0);
+                            unit = person.getTechUnits().getFirst();
                             if (unit != null) {
                                 return "<html>" +
                                              ReportingUtilities.separateIf(refitString,
@@ -1179,7 +1186,7 @@ public enum PersonnelTableModelColumn {
         if (colorReasonKeys != null && !colorReasonKeys.isEmpty() && isNameRankOrStatusColumn()) {
             StringBuilder colorReasons = new StringBuilder();
             for (String key : colorReasonKeys) {
-                if (colorReasons.length() > 0) {
+                if (!colorReasons.isEmpty()) {
                     colorReasons.append("<br>");
                 }
                 colorReasons.append(resources.getString(key));

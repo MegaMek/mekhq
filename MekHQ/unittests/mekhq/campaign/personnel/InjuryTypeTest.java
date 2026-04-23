@@ -34,15 +34,15 @@ package mekhq.campaign.personnel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.EnumSet;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for {@link InjuryType} register method
@@ -101,9 +101,9 @@ class InjuryTypeTest {
     @Test
     void testRegisterThrowsOnNullInjuryType() {
         // Attempting to register null injury type should throw NullPointerException
-        assertThrows(NullPointerException.class, () -> {
-            InjuryType.register(888888, "test:null_injury", null);
-        }, "Register should throw NullPointerException when injury type is null");
+        assertThrows(NullPointerException.class,
+              () -> InjuryType.register(888888, "test:null_injury", null),
+              "Register should throw NullPointerException when injury type is null");
     }
 
     @Test
@@ -112,9 +112,9 @@ class InjuryTypeTest {
         InjuryType testInjury = new TestInjuryType("testNullKey");
 
         // Attempting to register with null key should throw NullPointerException
-        assertThrows(NullPointerException.class, () -> {
-            InjuryType.register(777777, null, testInjury);
-        }, "Register should throw NullPointerException when key is null");
+        assertThrows(NullPointerException.class,
+              () -> InjuryType.register(777777, null, testInjury),
+              "Register should throw NullPointerException when key is null");
     }
 
     @Test
@@ -123,9 +123,9 @@ class InjuryTypeTest {
         InjuryType testInjury = new TestInjuryType("testEmptyKey");
 
         // Attempting to register with empty key should throw IllegalArgumentException
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            InjuryType.register(666666, "", testInjury);
-        }, "Register should throw IllegalArgumentException when key is empty");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+              () -> InjuryType.register(666666, "", testInjury),
+              "Register should throw IllegalArgumentException when key is empty");
 
         assertEquals("Injury type key can't be an empty string.", exception.getMessage());
     }
@@ -143,9 +143,9 @@ class InjuryTypeTest {
         InjuryType.register(duplicateId, firstKey, firstInjury);
 
         // Attempting to register second injury type with same ID should throw IllegalArgumentException
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            InjuryType.register(duplicateId, secondKey, secondInjury);
-        }, "Register should throw IllegalArgumentException when ID is already registered");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+              () -> InjuryType.register(duplicateId, secondKey, secondInjury),
+              "Register should throw IllegalArgumentException when ID is already registered");
 
         assertEquals("Injury type ID " + duplicateId + " is already registered.", exception.getMessage());
     }
@@ -161,9 +161,9 @@ class InjuryTypeTest {
         InjuryType.register(444444, duplicateKey, firstInjury);
 
         // Attempting to register second injury type with same key should throw IllegalArgumentException
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            InjuryType.register(444443, duplicateKey, secondInjury);
-        }, "Register should throw IllegalArgumentException when key is already registered");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+              () -> InjuryType.register(444443, duplicateKey, secondInjury),
+              "Register should throw IllegalArgumentException when key is already registered");
 
         assertEquals("Injury type key \"" + duplicateKey + "\" is already registered.", exception.getMessage());
     }
@@ -179,9 +179,9 @@ class InjuryTypeTest {
         InjuryType.register(333333, firstKey, testInjury);
 
         // Attempting to register the same injury type instance again should throw IllegalArgumentException
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            InjuryType.register(333332, secondKey, testInjury);
-        }, "Register should throw IllegalArgumentException when injury type instance is already registered");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+              () -> InjuryType.register(333332, secondKey, testInjury),
+              "Register should throw IllegalArgumentException when injury type instance is already registered");
 
         assertEquals("Injury type " + testInjury.getSimpleName() + " is already registered", exception.getMessage());
     }
@@ -205,14 +205,14 @@ class InjuryTypeTest {
     void testByKeyReturnsNullForUnregisteredKey() {
         // Attempting to retrieve an injury type with a non-existent key should return null
         InjuryType result = InjuryType.byKey("test:nonexistent_key_" + System.nanoTime());
-        assertEquals(null, result, "byKey should return null for unregistered keys");
+        assertNull(result, "byKey should return null for unregistered keys");
     }
 
     @Test
     void testByIdReturnsNullForUnregisteredId() {
         // Attempting to retrieve an injury type with a non-existent ID should return null
         InjuryType result = InjuryType.byId(999998);
-        assertEquals(null, result, "byId should return null for unregistered IDs");
+        assertNull(result, "byId should return null for unregistered IDs");
     }
 
     @Test

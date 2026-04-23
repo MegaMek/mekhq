@@ -45,12 +45,14 @@ import mekhq.campaign.work.IAcquisitionWork;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BAArmor extends Armor {
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean canBeClan(int type) {
         return type == EquipmentType.T_ARMOR_BA_STANDARD || type == EquipmentType.T_ARMOR_BA_STEALTH_BASIC
                      || type == EquipmentType.T_ARMOR_BA_STEALTH_IMP || type == EquipmentType.T_ARMOR_BA_STEALTH
                      || type == EquipmentType.T_ARMOR_BA_FIRE_RESIST;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean canBeIs(int type) {
         return type != EquipmentType.T_ARMOR_BA_FIRE_RESIST;
     }

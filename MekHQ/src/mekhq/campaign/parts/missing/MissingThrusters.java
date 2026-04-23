@@ -52,6 +52,7 @@ import org.w3c.dom.NodeList;
 public class MissingThrusters extends MissingPart {
     private boolean isLeftThrusters;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingThrusters() {
         this(0, null);
     }

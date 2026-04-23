@@ -34,7 +34,6 @@
 package mekhq.campaign.market.contractMarket;
 
 import static java.lang.Math.max;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
@@ -771,7 +770,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         double reputationFactor = campaign.getReputation().getReputationFactor();
 
         if (campaignOptions.isClampReputationPayMultiplier()) {
-            reputationFactor = clamp(reputationFactor, 0.5, 2.0);
+            reputationFactor = Math.clamp(reputationFactor, 0.5, 2.0);
         }
 
         multiplier *= reputationFactor;

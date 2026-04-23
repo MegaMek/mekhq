@@ -133,6 +133,7 @@ public class ValidationResult {
     /**
      * @return the number of individual planets that were validated
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getPlanetsValidated() {
         return planetsValidated;
     }

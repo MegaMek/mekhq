@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.Version;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.GameOptions;
@@ -1304,7 +1303,6 @@ public class CampaignOptions {
         // endregion Markets Tab
 
         // region Against the Bot Tab
-        hadAtBEnabledMarker = false;
         stratConPlayType = StratConPlayType.DISABLED;
         useAdvancedScouting = false;
         noSeedForces = false;
@@ -2506,32 +2504,8 @@ public class CampaignOptions {
         return hrCapacity;
     }
 
-    /**
-     * Use {@link #setHRCapacity(Integer)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void setAdministrativeCapacity(final Integer hrCapacity) {
-        this.hrCapacity = hrCapacity;
-    }
-
     public void setHRCapacity(final Integer hrCapacity) {
         this.hrCapacity = hrCapacity;
-    }
-
-    /**
-     * @deprecated Unused
-     */
-    @Deprecated(since = "0.50.6", forRemoval = true)
-    public Integer getMultiCrewStrainDivider() {
-        return 1;
-    }
-
-    /**
-     * @deprecated Unused
-     */
-    @Deprecated(since = "0.50.6", forRemoval = true)
-    public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
-
     }
 
     public boolean isUseManagementSkill() {
@@ -4130,54 +4104,6 @@ public class CampaignOptions {
     // endregion Contract Market
     // endregion Markets Tab
 
-    // region RATs Tab
-
-    /**
-     * @deprecated no longer in use
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public boolean isUseStaticRATs() {
-        return false;
-    }
-
-    /**
-     * @deprecated no longer in use
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void setUseStaticRATs(final boolean useStaticRATs) {
-    }
-
-    /**
-     * @deprecated no longer in use
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public String[] getRATs() {
-        return new String[0];
-    }
-
-    /**
-     * @deprecated no longer in use
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void setRATs(final String... rats) {
-    }
-
-    /**
-     * @deprecated no longer in use
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public boolean isIgnoreRATEra() {
-        return false;
-    }
-
-    /**
-     * @deprecated no longer in use
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void setIgnoreRATEra(final boolean ignore) {
-    }
-    // endregion RATs Tab
-
     public boolean isUseEraMods() {
         return useEraMods;
     }
@@ -4569,6 +4495,7 @@ public class CampaignOptions {
      * @return {@code true} if the current acquisition personnel category matches the specified category, {@code false}
      *       otherwise.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAcquisitionPersonnelCategory(ProcurementPersonnelPick category) {
         return acquisitionPersonnelCategory == category;
     }
@@ -4932,7 +4859,7 @@ public class CampaignOptions {
         this.autoLogisticsOther = autoLogisticsOther;
     }
 
-    @Deprecated(since = "0.50.10", forRemoval = false)
+    @Deprecated(since = "0.50.10")
     public boolean isUseAtB() {
         return isUseStratCon();
     }
@@ -4949,10 +4876,12 @@ public class CampaignOptions {
         this.stratConPlayType = stratConPlayType;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isHadAtBEnabledMarker() {
         return hadAtBEnabledMarker;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHadAtBEnabledMarker(boolean hadAtBEnabledMarker) {
         this.hadAtBEnabledMarker = hadAtBEnabledMarker;
     }
@@ -5177,6 +5106,7 @@ public class CampaignOptions {
      *
      * @see #getAtBBattleChance(CombatRole, boolean)
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getAtBBattleChance(CombatRole role) {
         return getAtBBattleChance(role, false);
     }
@@ -5216,7 +5146,7 @@ public class CampaignOptions {
      * @param frequency the frequency to set the generation to (percent chance from 0 to 100)
      */
     public void setAtBBattleChance(final int role, final int frequency) {
-        this.atbBattleChance[role] = MathUtility.clamp(frequency, 0, 100);
+        this.atbBattleChance[role] = Math.clamp(frequency, 0, 100);
     }
 
     public boolean isGenerateChases() {
@@ -5259,51 +5189,6 @@ public class CampaignOptions {
         this.useNoTornadoes = useNoTornadoes;
     }
 
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public boolean isUseStrategy() {
-        return false;
-    }
-
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void setUseStrategy(final boolean useStrategy) {
-    }
-
-    /**
-     * @deprecated unused except in deprecated methods
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getBaseStrategyDeployment() {
-        return 0;
-    }
-
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void setBaseStrategyDeployment(final int baseStrategyDeployment) {
-    }
-
-    /**
-     * @deprecated unused except in deprecated methods
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int getAdditionalStrategyDeployment() {
-        return 0;
-    }
-
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
-    }
-
     public boolean isRestrictPartsByMission() {
         return restrictPartsByMission;
     }
@@ -5312,30 +5197,13 @@ public class CampaignOptions {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
-    /**
-     * @deprecated unused.
-     */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean isLimitLanceWeight() {
         return false;
     }
 
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void setLimitLanceWeight(final boolean limitLanceWeight) {
-    }
-
     public boolean isLimitLanceNumUnits() {
         return false;
-    }
-
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
     }
 
     public int getFixedMapChance() {

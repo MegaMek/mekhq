@@ -70,8 +70,8 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends Formation> list, final Formation formation,
-                                                  final int index, final boolean isSelected,
-                                                  final boolean cellHasFocus) {
+          final int index, final boolean isSelected,
+          final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
         // default return on all themes, but by recreating the colour it works properly
         final Color foreground = new Color((isSelected
@@ -82,7 +82,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setBackground(background);
 
         // Determine name color
-        OperationalStatus operationalStatus = formation.updateFormationIconOperationalStatus(campaign).get(0);
+        OperationalStatus operationalStatus = formation.updateFormationIconOperationalStatus(campaign).getFirst();
 
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";

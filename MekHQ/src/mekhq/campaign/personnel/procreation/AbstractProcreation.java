@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
@@ -192,7 +191,7 @@ public abstract class AbstractProcreation {
         final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random());
         // To not get unusual results, we limit the variance to +/- 4.0 (almost 6 weeks).
         // A base length of 268 creates a solid enough duration for now.
-        return 268 + (int) Math.round(MathUtility.clamp(gaussian, -4d, 4d) * 10.0);
+        return 268 + (int) Math.round(Math.clamp(gaussian, -4d, 4d) * 10.0);
     }
 
     /**

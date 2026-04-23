@@ -427,11 +427,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // GM Mode
                 campaign.setGMMode((preset == null) || preset.isGM());
 
-                // AtB
-                if (campaignOptions.isUseAtB()) {
-                    campaign.initAtB(true);
-                }
-
                 // Turnover
                 campaign.initTurnover();
                 // endregion Progress 7

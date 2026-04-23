@@ -227,7 +227,7 @@ public class Contract extends Mission {
     }
 
     public void setStraightSupport(int s) {
-        straightSupport = Math.max(0, Math.min(100, s));
+        straightSupport = Math.clamp(s, 0, 100);
     }
 
     public int getOverheadComp() {
@@ -255,7 +255,7 @@ public class Contract extends Mission {
     }
 
     public void setBattleLossComp(int s) {
-        battleLossComp = Math.max(0, Math.min(100, s));
+        battleLossComp = Math.clamp(s, 0, 100);
     }
 
     public int getSalvagePct() {
@@ -461,6 +461,7 @@ public class Contract extends Mission {
         return transitAmount;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setTransitAmount(Money amount) {
         transitAmount = amount;
     }

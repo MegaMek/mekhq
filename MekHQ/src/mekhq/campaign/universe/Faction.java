@@ -141,8 +141,8 @@ public class Faction {
         }
         List<FactionRecord.DateRange> active = faction2.getYearsActive();
         if (!active.isEmpty()) {
-            start = Objects.requireNonNullElse(active.get(0).start, 0);
-            end = Objects.requireNonNullElse(active.get(active.size() - 1).end, 9999);
+            start = Objects.requireNonNullElse(active.getFirst().start, 0);
+            end = Objects.requireNonNullElse(active.getLast().end, 9999);
         }
         HonorRating preInvasion = faction2.getPreInvasionHonorRating();
         HonorRating postInvasion = faction2.getPostInvasionHonorRating();
@@ -286,7 +286,8 @@ public class Faction {
         return layeredFormationIconBackgroundFilename;
     }
 
-    public void setLayeredFormationIconBackgroundFilename(final @Nullable String layeredFormationIconBackgroundFilename) {
+    public void setLayeredFormationIconBackgroundFilename(
+          final @Nullable String layeredFormationIconBackgroundFilename) {
         this.layeredFormationIconBackgroundFilename = layeredFormationIconBackgroundFilename;
     }
 

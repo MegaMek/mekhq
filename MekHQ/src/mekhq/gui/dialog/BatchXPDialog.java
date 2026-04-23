@@ -51,8 +51,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -65,7 +65,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public final class BatchXPDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(BatchXPDialog.class);
@@ -158,7 +157,7 @@ public final class BatchXPDialog extends JDialog {
         personnelSorter.setRowFilter(personnelFilter);
         personnelTable.setRowSorter(personnelSorter);
 
-        final JScrollPane pane = new JScrollPaneWithSpeed(personnelTable);
+        final JScrollPane pane = new FastJScrollPane(personnelTable);
         pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         return pane;
     }
@@ -287,7 +286,7 @@ public final class BatchXPDialog extends JDialog {
                     skillLevel.setEnabled(true);
                     ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
                     skillLevel.getModel()
-                          .setValue(MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 1, maxSkillLevel));
+                          .setValue(Math.clamp((Integer) skillLevel.getModel().getValue(), 1, maxSkillLevel));
                     buttonSpendXP.setEnabled(true);
                 }
             }

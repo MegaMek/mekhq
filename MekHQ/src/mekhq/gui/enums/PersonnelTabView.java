@@ -127,6 +127,7 @@ public enum PersonnelTabView {
         return this == TECHNICAL_SKILLS;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMedicalSkills() {
         return this == MEDICAL_SKILLS;
     }

@@ -100,7 +100,7 @@ public class CampaignOptionsUnmarshaller {
         return campaignOptions;
     }
 
-    private static boolean parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
+    private static void parseNodeName(Version version, String nodeName, CampaignOptions campaignOptions,
           String nodeContents, Node childNode) {
         switch (nodeName) {
             case "checkMaintenance" -> campaignOptions.setCheckMaintenance(parseBoolean(nodeContents));
@@ -420,7 +420,7 @@ public class CampaignOptionsUnmarshaller {
                         nodeContents));
             case "salaryXPMultipliers" -> {
                 if (!childNode.hasChildNodes()) {
-                    return false;
+                    return;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -479,12 +479,12 @@ public class CampaignOptionsUnmarshaller {
             case "nonBinaryDiceSize" -> campaignOptions.setNonBinaryDiceSize(parseInt(nodeContents));
             case "randomOriginOptions" -> {
                 if (!childNode.hasChildNodes()) {
-                    return false;
+                    return;
                 }
                 final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(childNode.getChildNodes(),
                       true);
                 if (randomOriginOptions == null) {
-                    return false;
+                    return;
                 }
                 campaignOptions.setRandomOriginOptions(randomOriginOptions);
             }
@@ -524,7 +524,7 @@ public class CampaignOptionsUnmarshaller {
             case "logMarriageNameChanges" -> campaignOptions.setLogMarriageNameChanges(parseBoolean(nodeContents));
             case "marriageSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
-                    return false;
+                    return;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -553,7 +553,7 @@ public class CampaignOptionsUnmarshaller {
             case "usePrisonerDivorce" -> campaignOptions.setUsePrisonerDivorce(parseBoolean(nodeContents));
             case "divorceSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
-                    return false;
+                    return;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -636,7 +636,7 @@ public class CampaignOptionsUnmarshaller {
             case "militaryAcademyAccidents" -> campaignOptions.setMilitaryAcademyAccidents(parseInt(nodeContents));
             case "enabledRandomDeathAgeGroups" -> {
                 if (!childNode.hasChildNodes()) {
-                    return false;
+                    return;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
@@ -793,7 +793,7 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "personnelMarketRandomRemovalTargets" -> {
                 if (!childNode.hasChildNodes()) {
-                    return false;
+                    return;
                 }
                 final NodeList nl2 = childNode.getChildNodes();
                 for (int j = 0; j < nl2.getLength(); j++) {
@@ -910,8 +910,9 @@ public class CampaignOptionsUnmarshaller {
             case "usePlanetaryConditions" -> campaignOptions.setUsePlanetaryConditions(parseBoolean(nodeContents));
             case "restrictPartsByMission" -> campaignOptions.setRestrictPartsByMission(parseBoolean(nodeContents));
             case "fixedMapChance" -> campaignOptions.setFixedMapChance(parseInt(nodeContents));
-            case "useAdvancedBuildingGunEmplacements" -> campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
-                  nodeContents));
+            case "useAdvancedBuildingGunEmplacements" ->
+                  campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
+                        nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));
@@ -950,7 +951,5 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents, 1.0));
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
-
-        return false;
     }
 }

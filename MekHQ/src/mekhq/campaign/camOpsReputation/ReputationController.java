@@ -158,7 +158,7 @@ public class ReputationController {
         // step four: calculate transportation rating
         List<Map<String, Integer>> rawTransportationData = calculateTransportationRating(campaign);
 
-        transportationCapacities = rawTransportationData.get(0);
+        transportationCapacities = rawTransportationData.getFirst();
         transportationRequirements = rawTransportationData.get(1);
         transportationValues = rawTransportationData.get(2);
 
@@ -492,8 +492,8 @@ public class ReputationController {
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s%s</td></tr>",
               indent,
               resources.getString("TechnicianModifier.text"),
-              technicianRequirements.get("rating").get(0) >= 0 ? "+" : "",
-              technicianRequirements.get("rating").get(0)));
+              technicianRequirements.get("rating").getFirst() >= 0 ? "+" : "",
+              technicianRequirements.get("rating").getFirst()));
         description.append("</table>");
 
         description.append("<table>");
@@ -512,28 +512,28 @@ public class ReputationController {
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
               indent,
               resources.getString("battleMeksAndProtoMeks.text"),
-              technicianRequirements.get("mek").get(0),
+              technicianRequirements.get("mek").getFirst(),
               technicianRequirements.get("mek").get(1)));
 
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
               indent,
               resources.getString("vehicles.text"),
-              technicianRequirements.get("vehicle").get(0),
+              technicianRequirements.get("vehicle").getFirst(),
               technicianRequirements.get("vehicle").get(1)));
 
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
               indent,
               resources.getString("fightersAndSmallCraft.text"),
-              technicianRequirements.get("aero").get(0),
+              technicianRequirements.get("aero").getFirst(),
               technicianRequirements.get("aero").get(1)));
 
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
                                                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
               indent,
               resources.getString("battleArmorTechs.text"),
-              technicianRequirements.get("battleArmor").get(0),
+              technicianRequirements.get("battleArmor").getFirst(),
               technicianRequirements.get("battleArmor").get(1)));
         description.append("</table><br>");
 
@@ -707,7 +707,7 @@ public class ReputationController {
                     this.averageSkillLevel = SkillLevel.valueOf(workingNode2.getTextContent().toUpperCase());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
                     this.averageExperienceRating = MathUtility.parseInt(workingNode2.getTextContent()
-                                                                              .replaceAll("-", "_"));
+                                                                              .replace("-", "_"));
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("atbModifier")) {
                     this.atbModifier = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderMap")) {

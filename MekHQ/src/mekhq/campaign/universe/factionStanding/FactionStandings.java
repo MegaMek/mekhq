@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.universe.Faction.DEFAULT_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -312,6 +311,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static double getMaximumOtherFactionRegard() {
         return MAXIMUM_OTHER_FACTION_REGARD;
     }
@@ -564,7 +564,7 @@ public class FactionStandings {
             regard += climateRegard.getOrDefault(factionCode, DEFAULT_REGARD);
         }
 
-        return clamp(regard, MINIMUM_REGARD, MAXIMUM_SAME_FACTION_REGARD);
+        return Math.clamp(regard, MINIMUM_REGARD, MAXIMUM_SAME_FACTION_REGARD);
     }
 
     /**
@@ -608,7 +608,7 @@ public class FactionStandings {
 
         factionCode = convertSpecialFaction(factionCode, gameYear);
 
-        double regardValue = clamp(newRegard, MINIMUM_REGARD, maximumRegard);
+        double regardValue = Math.clamp(newRegard, MINIMUM_REGARD, maximumRegard);
         double currentRegard = getRegardForFaction(factionCode, false);
 
         factionRegard.put(factionCode, regardValue);
@@ -699,7 +699,7 @@ public class FactionStandings {
         double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
                                      ? MAXIMUM_SAME_FACTION_REGARD
                                      : MAXIMUM_OTHER_FACTION_REGARD;
-        double newRegard = clamp(originalRegard + adjustedDelta, MINIMUM_REGARD, maximumRegard);
+        double newRegard = Math.clamp(originalRegard + adjustedDelta, MINIMUM_REGARD, maximumRegard);
 
         factionRegard.put(factionCode, newRegard);
 
@@ -1111,6 +1111,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void resetFactionStanding(final String factionCode) {
         factionRegard.remove(factionCode);
     }
