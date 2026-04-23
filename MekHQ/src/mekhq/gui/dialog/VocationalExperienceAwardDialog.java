@@ -126,8 +126,6 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
      * <p>This method integrates campaign options such as:</p>
      * <ul>
      *     <li>The default vocational XP advancement rate ({@code VocationalXP})</li>
-     *     <li>The status of whether the campaign is using the AtB (Against the Bot)
-     *         system ({@code isUseAtB})</li>
      *     <li>The type of active employment contracts (e.g., garrison or non-garrison)</li>
      * </ul>
      *

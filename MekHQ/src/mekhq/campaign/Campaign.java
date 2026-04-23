@@ -452,10 +452,6 @@ public class Campaign implements ITechManager {
     private final List<String> turnoverRetirementInformation;
 
     private AtBConfiguration atbConfig; // AtB
-    private LocalDate shipSearchStart; // AtB
-    private int shipSearchType;
-    private String shipSearchResult; // AtB
-    private LocalDate shipSearchExpiration; // AtB
     private IUnitGenerator unitGenerator; // deprecated
     @Deprecated(since = "0.50.10", forRemoval = true)
     private IUnitRating unitRating; // deprecated
@@ -1271,7 +1267,7 @@ public class Campaign implements ITechManager {
 
         formation.updateCommander(this);
 
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             recalculateCombatTeams(this);
         }
     }
@@ -1391,7 +1387,7 @@ public class Campaign implements ITechManager {
             MekHQ.triggerEvent(new OrganizationChangedEvent(this, formation, unit));
         }
 
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             recalculateCombatTeams(this);
         }
     }
@@ -5677,7 +5673,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             recalculateCombatTeams(this);
         }
     }
@@ -5717,7 +5713,7 @@ public class Campaign implements ITechManager {
                 u.getEntity().setC3Master(null, true);
             }
 
-            if (campaignOptions.isUseAtB() && formation.getUnits().isEmpty()) {
+            if (campaignOptions.isUseStratCon() && formation.getUnits().isEmpty()) {
                 combatTeams.remove(formation.getId());
             }
         }
@@ -5795,7 +5791,7 @@ public class Campaign implements ITechManager {
 
         shoppingList.restore();
 
-        if (getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseStratCon()) {
             RandomFactionGenerator.getInstance().startup(this);
 
             int loops = 0;
@@ -6609,7 +6605,7 @@ public class Campaign implements ITechManager {
         getUnitMarket().writeToXML(writer, indent);
 
         // Against the Bot
-        if (getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseStratCon()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXML(this, writer, indent);
@@ -7717,7 +7713,7 @@ public class Campaign implements ITechManager {
               skill.getSkillLevel(skillModifierData).toString());
         target.append(acquisition.getAllAcquisitionMods());
 
-        if (getCampaignOptions().isUseAtB() && getCampaignOptions().isRestrictPartsByMission()) {
+        if (getCampaignOptions().isUseStratCon() && getCampaignOptions().isRestrictPartsByMission()) {
             int contractAvailability = findAtBPartsAvailabilityLevel();
 
             if (contractAvailability != 0) {
@@ -9106,7 +9102,7 @@ public class Campaign implements ITechManager {
             }
 
             // This relies on the mission being a Contract, and AtB to be on
-            if (getCampaignOptions().isUseAtB()) {
+            if (getCampaignOptions().isUseStratCon()) {
                 setHasActiveContract();
             }
         }
@@ -9448,90 +9444,6 @@ public class Campaign implements ITechManager {
 
     public void initTurnover() {
         getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
-    }
-
-    public void initAtB(boolean newCampaign) {
-        if (!newCampaign) {
-            /*
-             * Switch all contracts to AtBContract's
-             */
-            for (Entry<Integer, Mission> me : missions.entrySet()) {
-                Mission m = me.getValue();
-                if (m instanceof Contract && !(m instanceof AtBContract)) {
-                    me.setValue(new AtBContract((Contract) m, this));
-                }
-            }
-
-            /*
-             * Go through all the personnel records and assume the earliest date is the date
-             * the unit was founded.
-             */
-            LocalDate founding = null;
-            for (Person person : getPersonnel()) {
-                for (LogEntry logEntry : person.getPersonalLog()) {
-                    if ((founding == null) || logEntry.getDate().isBefore(founding)) {
-                        founding = logEntry.getDate();
-                    }
-                }
-            }
-            /*
-             * Go through the personnel records again and assume that any person who joined the unit on the founding
-             * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
-             * they joined came with that `Mek (which is a less certain assumption)
-             */
-            for (Person person : getPersonnel()) {
-                LocalDate join = person.getPersonalLog()
-                                       .stream()
-                                       .filter(e -> e.getDesc().startsWith("Joined "))
-                                       .findFirst()
-                                       .map(LogEntry::getDate)
-                                       .orElse(null);
-                if ((join != null) && join.equals(founding)) {
-                    person.setFounder(true);
-                }
-                if (person.getPrimaryRole().isMekWarrior() ||
-                          (person.getPrimaryRole().isAerospacePilot() &&
-                                 getCampaignOptions().isAeroRecruitsHaveUnits()) ||
-                          person.getPrimaryRole().isProtoMekPilot()) {
-                    for (LogEntry logEntry : person.getPersonalLog()) {
-                        if (logEntry.getDate().equals(join) && logEntry.getDesc().startsWith("Assigned to ")) {
-                            String mek = logEntry.getDesc().substring(12);
-                            MekSummary ms = MekSummaryCache.getInstance().getMek(mek);
-                            if (null != ms &&
-                                      (person.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
-                                person.setOriginalUnitWeight(ms.getWeightClass());
-                                if (ms.isClan()) {
-                                    person.setOriginalUnitTech(Person.TECH_CLAN);
-                                } else if (ms.getYear() > 3050) {
-                                    // TODO : Fix this so we aren't using a hack that just assumes IS2
-                                    person.setOriginalUnitTech(Person.TECH_IS2);
-                                }
-                                if ((null != person.getUnit()) &&
-                                          ms.getName().equals(person.getUnit().getEntity().getShortNameRaw())) {
-                                    person.setOriginalUnitId(person.getUnit().getId());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            addAllCombatTeams(this.formations);
-
-            // Determine whether there is an active contract
-            setHasActiveContract();
-        }
-
-        setAtBConfig(AtBConfiguration.loadFromXml());
-        RandomFactionGenerator.getInstance().startup(this);
-        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
-    }
-
-    /**
-     * Stop processing AtB events and release memory.
-     */
-    public void shutdownAtB() {
-        RandomFactionGenerator.getInstance().dispose();
     }
 
     /**

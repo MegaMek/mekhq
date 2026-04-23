@@ -1572,30 +1572,7 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
-            int prostheticMedicalReliance = 1; // Minimum of 1
-            int myomerProsthetics = 0;
-            boolean hasPowerSupply = false;
-
-            for (Injury injury : person.getInjuries()) {
-                InjurySubType injurySubType = injury.getSubType();
-                if (injurySubType.isPermanentModification()) {
-                    prostheticMedicalReliance++;
-                }
-
-                if (injurySubType.isMyomerProsthetic()) {
-                    myomerProsthetics++;
-                }
-
-                if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
-                    hasPowerSupply = true;
-                }
-            }
-
-            if (!hasPowerSupply) {
-                myomerProsthetics *= 2;
-            }
-
-            int totalProstheticCount = prostheticMedicalReliance + myomerProsthetics;
+            int totalProstheticCount = getTotalProstheticCount(person);
 
             Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
@@ -1714,6 +1691,33 @@ public class CampaignNewDayManager {
         if (resetClinicalParanoia) {
             person.setSufferingFromClinicalParanoia(false);
         }
+    }
+
+    private static int getTotalProstheticCount(Person person) {
+        int prostheticMedicalReliance = 1; // Minimum of 1
+        int myomerProsthetics = 0;
+        boolean hasPowerSupply = false;
+
+        for (Injury injury : person.getInjuries()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (injurySubType.isPermanentModification()) {
+                prostheticMedicalReliance++;
+            }
+
+            if (injurySubType.isMyomerProsthetic()) {
+                myomerProsthetics++;
+            }
+
+            if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
+                hasPowerSupply = true;
+            }
+        }
+
+        if (!hasPowerSupply) {
+            myomerProsthetics *= 2;
+        }
+
+        return prostheticMedicalReliance + myomerProsthetics;
     }
 
     private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
@@ -1927,7 +1931,8 @@ public class CampaignNewDayManager {
                         StratConCampaignState campaignState = contract.getStratconCampaignState();
 
                         if (campaignState == null) {
-                            return;
+                            LOGGER.warn("Scenario {} has no StratConCampaignState", scenario.getId());
+                            continue;
                         }
 
                         processIgnoredDynamicScenario(scenario.getId(), campaignState);
