@@ -59,6 +59,7 @@ public enum AutoResolveMethod {
         return name;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static Optional<AutoResolveMethod> fromIntSafe(int index) {
         if (index < 0 || index >= values().length) {
             return Optional.empty();
@@ -66,6 +67,7 @@ public enum AutoResolveMethod {
         return Optional.of(values()[index]);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static Optional<AutoResolveMethod> fromStringSafe(String method) {
         return switch (method.toUpperCase()) {
             case "PRINCESS" -> Optional.of(PRINCESS);

@@ -127,7 +127,7 @@ public class PartQualityReportDialog extends AbstractReportDialog {
         Collections.sort(locations);
 
         // Add the unit's name to the start of the sorted locations list.
-        locations.add(0, unit.getName());
+        locations.addFirst(unit.getName());
 
         // Begin the HTML report.
         StringBuilder report = new StringBuilder("<html>");

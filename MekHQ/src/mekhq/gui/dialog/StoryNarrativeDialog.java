@@ -40,9 +40,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.storypoint.NarrativeStoryPoint;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -81,7 +81,7 @@ public class StoryNarrativeDialog extends StoryDialog {
               getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         txtDesc.setCaretPosition(0);
-        JScrollPane scrollPane = new JScrollPaneWithSpeed(txtDesc);
+        JScrollPane scrollPane = new FastJScrollPane(txtDesc);
         mainPanel.add(scrollPane, gbc);
 
         return mainPanel;

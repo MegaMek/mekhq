@@ -266,7 +266,7 @@ public class StratConRulesManager {
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
             List<StratConTrackState> tracks = campaignState.getTracks();
-            StratConTrackState track = campaignState.getTracks().get(0);
+            StratConTrackState track = campaignState.getTracks().getFirst();
 
             if (tracks.size() > 1) {
                 track = getRandomItem(tracks);
@@ -499,11 +499,11 @@ public class StratConRulesManager {
      * unoccupied coordinates on the track. If the scenario setup is successful, it is finalized and the deployment date
      * for the scenario is set as the current date.
      *
-     * @param campaign         the current campaign
-     * @param contract         the {@link AtBContract} for which the scenario is created
-     * @param track            the {@link StratConTrackState} where the scenario is located, or {@code null} if not
-     *                         located on a track
-     * @param template         the {@link ScenarioTemplate} used to create the scenario
+     * @param campaign             the current campaign
+     * @param contract             the {@link AtBContract} for which the scenario is created
+     * @param track                the {@link StratConTrackState} where the scenario is located, or {@code null} if not
+     *                             located on a track
+     * @param template             the {@link ScenarioTemplate} used to create the scenario
      * @param interceptedFormation the {@link Formation} that's being intercepted in the scenario
      */
     public static @Nullable void generateReinforcementInterceptionScenario(Campaign campaign,
@@ -560,6 +560,7 @@ public class StratConRulesManager {
      *           <li>All coordinates in the selected {@link StratConTrackState} are occupied and scenario placement is not possible.</li>
      *       </ul>
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static @Nullable StratConScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
           @Nullable StratConTrackState trackState, @Nullable ScenarioTemplate template, boolean allowPlayerFacilities,
           boolean allowPlayerForces, boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
@@ -1036,8 +1037,8 @@ public class StratConRulesManager {
         boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
 
         if ((isGround && entity.doomedOnGround())
-              || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
-              || (mapLocation == Space && entity.doomedInSpace())) {
+                  || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+                  || (mapLocation == Space && entity.doomedInSpace())) {
             return false;
         }
 
@@ -1771,7 +1772,7 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation                       the {@link Formation} containing units to evaluate
+     * @param formation                   the {@link Formation} containing units to evaluate
      * @param hangar                      the {@link Hangar} used to help retrieve units from the force
      * @param isCommandersOnlyVehicles    {@code true} to only use the skills possessed by the unit commander (if
      *                                    vehicle)
@@ -1921,7 +1922,7 @@ public class StratConRulesManager {
      *   <li>Generating follow-up scenarios for intercepted reinforcements or handling delays.</li>
      * </ul>
      *
-     * @param formation                     the {@link Formation} being deployed as a reinforcement
+     * @param formation                 the {@link Formation} being deployed as a reinforcement
      * @param reinforcementType         the type of reinforcement (e.g., auxiliary or chained scenario)
      * @param campaignState             the current state of the campaign
      * @param scenario                  the scenario to which the reinforcements are being deployed
@@ -2122,9 +2123,9 @@ public class StratConRulesManager {
      *     <li>A default ground template is selected if no specific cases are matched.</li>
      * </ul>
      *
-     * @param formation  The {@link Formation} instance that the scenario is based on. The force composition is used to
-     *               determine the appropriate scenario template.
-     * @param hangar The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param formation The {@link Formation} instance that the scenario is based on. The force composition is used to
+     *                  determine the appropriate scenario template.
+     * @param hangar    The {@link Hangar} instance from which to retrieve the {@link Unit}.
      *
      * @return A {@link ScenarioTemplate} instance representing the chosen scenario template file based on the logic
      *       described, or a default template if no special conditions are satisfied.
@@ -2325,9 +2326,9 @@ public class StratConRulesManager {
      * Categorizes a list of force IDs into groups based on the type of map they can primarily support.
      *
      * <p>This overloaded method analyzes each force associated with the given force IDs in the context of
-     * the provided {@link Hangar} and a pre-resolved list of {@link Formation} objects. It determines whether each force is
-     * suited for ground, atmospheric, or space maps, assigning them to the appropriate map types. Forces may belong to
-     * multiple map types based on their composition.</p>
+     * the provided {@link Hangar} and a pre-resolved list of {@link Formation} objects. It determines whether each
+     * force is suited for ground, atmospheric, or space maps, assigning them to the appropriate map types. Forces may
+     * belong to multiple map types based on their composition.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
@@ -2344,10 +2345,11 @@ public class StratConRulesManager {
      *       be found in the provided list of forces.</li>
      * </ul>
      *
-     * @param forceIDs  A list of force IDs to classify.
-     * @param hangar    The {@link Hangar} instance containing aerial or aerospace-related information about forces.
-     * @param allFormations A pre-resolved list of {@link Formation} objects. Forces are accessed using their IDs as indices,
-     *                  providing performance benefits when compared to fetching forces on demand.
+     * @param forceIDs      A list of force IDs to classify.
+     * @param hangar        The {@link Hangar} instance containing aerial or aerospace-related information about
+     *                      forces.
+     * @param allFormations A pre-resolved list of {@link Formation} objects. Forces are accessed using their IDs as
+     *                      indices, providing performance benefits when compared to fetching forces on demand.
      *
      * @return A {@link Map} where each {@link MapLocation} key corresponds to a map type, and the value is a list of
      *       force IDs that can operate in that map type.
@@ -2419,7 +2421,7 @@ public class StratConRulesManager {
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable Integer daysTilDeployment) {
         int unitType = MEK;
-        ;
+
         if (forceID != null) {
             unitType = campaign.getFormation(forceID).getPrimaryUnitType(campaign);
         }
@@ -2453,8 +2455,8 @@ public class StratConRulesManager {
      * @param campaign          the {@link Campaign} managing the gameplay state
      * @param contract          the {@link AtBContract} governing the StratCon campaign
      * @param track             the {@link StratConTrackState} to which the scenario belongs
-     * @param forceID           the ID of the force for which the scenario is generated, or {@link Formation#FORMATION_NONE} if
-     *                          none
+     * @param forceID           the ID of the force for which the scenario is generated, or
+     *                          {@link Formation#FORMATION_NONE} if none
      * @param coords            the {@link StratConCoords} specifying where the scenario will be placed
      * @param template          the {@link ScenarioTemplate} to use for scenario generation; if {@code null}, a random
      *                          one is selected
@@ -3404,7 +3406,8 @@ public class StratConRulesManager {
                     for (int forceId : linkedForces.keySet()) {
                         track.unassignFormation(forceId);
 
-                        if (linkedForces.get(forceId).size() == campaign.getFormation(forceId).getAllUnits(false).size()) {
+                        if (linkedForces.get(forceId).size() ==
+                                  campaign.getFormation(forceId).getAllUnits(false).size()) {
                             scenario.addForce(campaign.getFormation(forceId),
                                   ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID,
                                   campaign);
@@ -3706,6 +3709,7 @@ public class StratConRulesManager {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void shutdown() {
         MekHQ.unregisterHandler(this);
     }

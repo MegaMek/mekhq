@@ -85,6 +85,7 @@ public class JumpshipDockingCollar extends Part {
     private int collarType;
     private int collarNumber;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JumpshipDockingCollar() {
         this(0, 0, null, Jumpship.COLLAR_STANDARD);
     }

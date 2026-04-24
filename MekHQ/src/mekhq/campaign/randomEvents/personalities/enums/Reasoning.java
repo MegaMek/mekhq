@@ -33,7 +33,6 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import static java.lang.Math.round;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -168,7 +167,7 @@ public enum Reasoning {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public String getDescription(int reasoningDescriptionIndex, final Gender gender, final String givenName) {
-        reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+        reasoningDescriptionIndex = Math.clamp(reasoningDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = comparison + ".description." + reasoningDescriptionIndex;
         final PronounData pronounData = new PronounData(gender);
@@ -222,7 +221,7 @@ public enum Reasoning {
     public int getExamScore() {
         int results = (int) round(((double) this.level / GENIUS.level) * 100) - 5;
         results += randomInt(11);
-        results = clamp(results, 0, 100);
+        results = Math.clamp(results, 0, 100);
 
         return results;
     }
@@ -272,6 +271,7 @@ public enum Reasoning {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPersonalityTraitTypeLabel() {
         return getPersonalityTraitType().getLabel();
     }

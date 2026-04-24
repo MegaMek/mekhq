@@ -157,9 +157,9 @@ public class SalariesTab {
         civilianRoles = PersonnelRole.getCivilianRoles();
         civilianRoles.sort(Comparator.comparing(role -> role.getLabel(false)));
         civilianRoles.remove(PersonnelRole.NONE);
-        civilianRoles.add(0, PersonnelRole.NONE);
+        civilianRoles.addFirst(PersonnelRole.NONE);
         civilianRoles.remove(PersonnelRole.DEPENDENT);
-        civilianRoles.add(0, PersonnelRole.DEPENDENT);
+        civilianRoles.addFirst(PersonnelRole.DEPENDENT);
         lblBaseSalaryCivilian = new JLabel[civilianRoles.size()];
         spnBaseSalaryCivilian = new JSpinner[civilianRoles.size()];
     }
@@ -369,7 +369,7 @@ public class SalariesTab {
 
         // Contents
         for (final PersonnelRole personnelRole : roles) {
-            String componentName = personnelRole.toString().replaceAll(" ", "");
+            String componentName = personnelRole.toString().replace(" ", "");
 
             // JLabel
             JLabel jLabel = new JLabel(personnelRole.toString());

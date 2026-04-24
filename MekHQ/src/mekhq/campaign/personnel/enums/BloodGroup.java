@@ -114,6 +114,7 @@ public enum BloodGroup {
      *
      * @return {@code true} if the blood group is O_NEGATIVE, {@code false} otherwise.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isUniversalDonor() {
         return this == OO_NEGATIVE;
     }
@@ -123,6 +124,7 @@ public enum BloodGroup {
      *
      * @return {@code true} if the blood group is AB_POSITIVE, {@code false} otherwise.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isUniversalRecipient() {
         return this == AB_POSITIVE;
     }

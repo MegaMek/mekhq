@@ -329,8 +329,7 @@ public class Campaign implements ITechManager {
     /**
      * Map of PersonnelRole to temp crew pool size. Tracks TOTAL pool (not available). Use
      * {@link #getAvailableTempCrewPool(PersonnelRole)} for available count
-     *
-     *  */
+     **/
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
 
     private int lastFormationId;
@@ -866,9 +865,8 @@ public class Campaign implements ITechManager {
      * <p>This method provides a list of unique identifiers for all units currently included in the formation's TOE
      * structure.</p>
      *
-     * @param standardFormationsOnly if {@code true}, returns only units in {@link FormationType#STANDARD}
-     *                              formations; if
-     *                           {@code false}, returns all units.
+     * @param standardFormationsOnly if {@code true}, returns only units in {@link FormationType#STANDARD} formations;
+     *                               if {@code false}, returns all units.
      *
      * @return a List of UUID objects representing all units in the TOE according to the specified filter
      *
@@ -889,7 +887,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using {@code formationId} as the key.
+     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using {@code formationId} as the
+     * key.
      *
      * @param formationId the key of the {@link CombatTeam} to be removed from the {@link Hashtable}
      */
@@ -1372,6 +1371,7 @@ public class Campaign implements ITechManager {
         return campaignSummary;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setCampaignSummary(CampaignSummary campaignSummary) {
         this.campaignSummary = campaignSummary;
         this.campaignSummary.setCampaign(this);
@@ -1382,8 +1382,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add formation to an existing superformation. This method will also assign the formation an id and place it in the formationId
-     * hash
+     * Add formation to an existing superformation. This method will also assign the formation an id and place it in the
+     * formationId hash
      *
      * @param formation      - the Formation to add
      * @param superFormation - the superformation to add the new formation to
@@ -2344,6 +2344,7 @@ public class Campaign implements ITechManager {
         return baseCapacity + rentedCapacity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getCachedMashTheaterCapacity() {
         return mashTheatreCapacity;
     }
@@ -2352,6 +2353,7 @@ public class Campaign implements ITechManager {
         this.mashTheatreCapacity = mashTheatreCapacity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getRepairBaysRented() {
         return repairBaysRented;
     }
@@ -2360,6 +2362,7 @@ public class Campaign implements ITechManager {
         this.repairBaysRented = repairBaysRented;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void changeRepairBaysRented(int delta) {
         repairBaysRented = max(0, repairBaysRented + delta);
     }
@@ -2547,12 +2550,12 @@ public class Campaign implements ITechManager {
                                   "" :
                                   ' ' +
                                         String.format(resources.getString("personnelRecruitmentFormerSurname.text") +
-                                                            ' ', formerSurname);
+                                                      ' ', formerSurname);
             String add = !prisonerStatus.isFree() ?
                                (' ' +
                                       resources.getString(prisonerStatus.isBondsman() ?
-                                                                "personnelRecruitmentBondsman.text" :
-                                                                "personnelRecruitmentPrisoner.text")) :
+                                                          "personnelRecruitmentBondsman.text" :
+                                                          "personnelRecruitmentPrisoner.text")) :
                                "";
             addReport(PERSONNEL, String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
                   person.getHyperlinkedFullTitle(),
@@ -2868,58 +2871,58 @@ public class Campaign implements ITechManager {
                 case MEKWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MEK) ?
                                              person.getSkill(SkillType.S_GUN_MEK)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MEK) ?
                                              person.getSkill(SkillType.S_PILOT_MEK)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case AEROSPACE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO) ?
                                              person.getSkill(SkillType.S_GUN_AERO)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO) ?
                                              person.getSkill(SkillType.S_PILOT_AERO)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case ELEMENTAL: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA) ?
                                              person.getSkill(SkillType.S_GUN_BA)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MEK) ?
                                              person.getSkill(SkillType.S_ANTI_MEK)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case VEHICLE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE) ?
                                              person.getSkill(SkillType.S_GUN_VEE)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     switch (person.getPrimaryRole()) {
                         case VEHICLE_CREW_GROUND:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_GVEE)
-                                                           .getFinalSkillValue(skillModifierData) :
+                                                     .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VEHICLE_CREW_NAVAL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_NVEE)
-                                                           .getFinalSkillValue(skillModifierData) :
+                                                     .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VEHICLE_CREW_VTOL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                                      person.getSkill(SkillType.S_PILOT_VTOL)
-                                                           .getFinalSkillValue(skillModifierData) :
+                                                     .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         default:
@@ -2931,7 +2934,7 @@ public class Campaign implements ITechManager {
                     bloodnameTarget += 2 *
                                              (person.hasSkill(SkillType.S_GUN_PROTO) ?
                                                     person.getSkill(SkillType.S_GUN_PROTO)
-                                                          .getFinalSkillValue(skillModifierData) :
+                                                    .getFinalSkillValue(skillModifierData) :
                                                     TargetRoll.AUTOMATIC_FAIL);
                     break;
                 }
@@ -2941,28 +2944,28 @@ public class Campaign implements ITechManager {
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_PILOT_SPACE) ?
                                                             person.getSkill(SkillType.S_PILOT_SPACE)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_GUNNER:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_GUN_SPACE) ?
                                                             person.getSkill(SkillType.S_GUN_SPACE)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_CREW:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_TECH_VESSEL) ?
                                                             person.getSkill(SkillType.S_TECH_VESSEL)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_NAVIGATION) ?
                                                             person.getSkill(SkillType.S_NAVIGATION)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         default:
@@ -3168,6 +3171,7 @@ public class Campaign implements ITechManager {
      *
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<Person> getActiveCombatPersonnel() {
         return getActivePersonnel(false, false).stream()
                      .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
@@ -3365,11 +3369,6 @@ public class Campaign implements ITechManager {
      */
     public Collection<Part> getParts() {
         return parts.getParts();
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private int getQuantity(Part part) {
-        return getWarehouse().getPartQuantity(part, true);
     }
 
     public Part getPart(int id) {
@@ -3865,9 +3864,7 @@ public class Campaign implements ITechManager {
 
         switch (acquisitionsType) {
             case ADMINISTRATION -> fixedSkillName = S_ADMIN;
-            case ANY_TECH -> {
-                isAnyTech = true;
-            }
+            case ANY_TECH -> isAnyTech = true;
             case AUTOMATIC -> {
                 return null;
             }
@@ -4178,9 +4175,7 @@ public class Campaign implements ITechManager {
 
         switch (acquisitionsType) {
             case ADMINISTRATION -> fixedSkillName = S_ADMIN;
-            case ANY_TECH -> {
-                isAnyTech = true;
-            }
+            case ANY_TECH -> isAnyTech = true;
             case AUTOMATIC -> {
                 return Collections.emptyList();
             }
@@ -5598,7 +5593,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns {@code null}.
+     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns
+     * {@code null}.
      *
      * <p><b>Usage:</b> consider using {@link #getSecondInCommand()} instead.</p>
      *
@@ -6362,6 +6358,7 @@ public class Campaign implements ITechManager {
      * @param description       String displayed in the ledger and report
      * @param individualPayouts Map of Person to the Money they're owed
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void payPersonnel(TransactionType type, Money quantity, String description,
           Map<Person, Money> individualPayouts) {
         getFinances().debit(type,
@@ -7934,7 +7931,9 @@ public class Campaign implements ITechManager {
 
     /**
      * Gets the total temp crew pool size for a specific personnel role
+     *
      * @param role the personnel role
+     *
      * @return the total number of temp crew in the pool for this role
      */
     public int getTempCrewPool(PersonnelRole role) {
@@ -7947,6 +7946,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Sets the total temp crew pool size for a specific personnel role
+     *
      * @param role the personnel role
      * @param size the total number of temp crew in the pool
      */
@@ -7967,7 +7967,9 @@ public class Campaign implements ITechManager {
 
     /**
      * Checks if a specific blob crew type is enabled in campaign options
+     *
      * @param role the personnel role to check
+     *
      * @return true if this blob crew type is enabled
      */
     public boolean isBlobCrewEnabled(PersonnelRole role) {
@@ -7986,18 +7988,22 @@ public class Campaign implements ITechManager {
 
     /**
      * Gets the number of temp crew currently in use by units for a specific role
+     *
      * @param role the personnel role
+     *
      * @return the number of temp crew in use
      */
     public int getTempCrewInUse(PersonnelRole role) {
         return getUnits().stream()
-            .mapToInt(unit -> unit.getTempCrewByPersonnelRole(role))
-            .sum();
+                     .mapToInt(unit -> unit.getTempCrewByPersonnelRole(role))
+                     .sum();
     }
 
     /**
      * Gets the number of temp crew available for assignment for a specific role
+     *
      * @param role the personnel role
+     *
      * @return total pool minus crew currently in use
      */
     public int getAvailableTempCrewPool(PersonnelRole role) {
@@ -8292,7 +8298,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Increases the temp crew pool for a specific personnel role and fires the appropriate event
-     * @param role the personnel role
+     *
+     * @param role   the personnel role
      * @param amount the amount to increase by
      */
     public void increaseTempCrewPool(PersonnelRole role, int amount) {
@@ -8302,7 +8309,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Decreases the temp crew pool for a specific personnel role and fires the appropriate event
-     * @param role the personnel role
+     *
+     * @param role   the personnel role
      * @param amount the amount to decrease by
      */
     public void decreaseTempCrewPool(PersonnelRole role, int amount) {
@@ -8312,7 +8320,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Fires the appropriate pool changed event for a specific personnel role
-     * @param role the personnel role
+     *
+     * @param role   the personnel role
      * @param change the change amount (positive for increase, negative for decrease)
      */
     private void fireTempCrewPoolChangedEvent(PersonnelRole role, int change) {
@@ -8331,6 +8340,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Empties the temp crew pool for a specific role by setting it to the number of active temp crew for that role.
+     *
      * @param role the personnel role to reduce to the minimum
      */
     public void emptyTempCrewPoolForRole(PersonnelRole role) {
@@ -8338,8 +8348,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Fills the temp crew pool for a specific role by calculating crew needs across all units.
-     * Only runs if the corresponding blob crew option is enabled.
+     * Fills the temp crew pool for a specific role by calculating crew needs across all units. Only runs if the
+     * corresponding blob crew option is enabled.
+     *
      * @param role the personnel role to fill
      */
     public void fillTempCrewPoolForRole(PersonnelRole role) {
@@ -8367,6 +8378,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Resets the temp crew pool for a specific role by emptying and then filling it.
+     *
      * @param role the personnel role to reset
      */
     public void resetTempCrewPoolForRole(PersonnelRole role) {
@@ -8376,8 +8388,9 @@ public class Campaign implements ITechManager {
 
 
     /**
-     * Clears blob crew for a specific personnel role from units and empties the campaign pool.
-     * Should be called when a specific blob crew option is disabled.
+     * Clears blob crew for a specific personnel role from units and empties the campaign pool. Should be called when a
+     * specific blob crew option is disabled.
+     *
      * @param role the personnel role to clear
      */
     public void clearBlobCrewForRole(PersonnelRole role) {
@@ -8395,8 +8408,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Clears all blob crew from units and empties all campaign pools.
-     * Should be called when all blob crew options are disabled.
+     * Clears all blob crew from units and empties all campaign pools. Should be called when all blob crew options are
+     * disabled.
+     *
      * @deprecated Use {@link #clearBlobCrewForRole(PersonnelRole)} to clear specific roles instead
      */
     @Deprecated
@@ -8419,10 +8433,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use
-     * temp crew - checks if the commander is null
+     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use temp
+     * crew - checks if the commander is null
+     *
      * @param unit the unit to check
      * @param role the personnel role
+     *
      * @return true if the unit can use this type of temp crew
      */
     private boolean unitCanUseTempCrewRole(Unit unit, PersonnelRole role) {
@@ -8444,8 +8460,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Distributes temp crew from the pool to units that need crew for a specific personnel role.
-     * Each unit can be filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     * Distributes temp crew from the pool to units that need crew for a specific personnel role. Each unit can be
+     * filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     *
      * @param role the personnel role to distribute
      */
     public void distributeTempCrewPoolToUnits(PersonnelRole role) {
@@ -8558,6 +8575,7 @@ public class Campaign implements ITechManager {
         return partsStore;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setPartsStore(PartsStore partsStore) {
         this.partsStore = partsStore;
         this.partsStore.stock(this);
@@ -8614,6 +8632,7 @@ public class Campaign implements ITechManager {
      *
      * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getCommanderStrategy() {
         int commanderStrategy = 0;
         Person commander = getCommander();
@@ -8881,7 +8900,7 @@ public class Campaign implements ITechManager {
         // collect all the other units on this network to rebuild the uuids
         Vector<String> uuids = new Vector<>();
         Vector<Unit> networkedUnits = new Vector<>();
-        String network = removedUnits.get(0).getEntity().getC3NetId();
+        String network = removedUnits.getFirst().getEntity().getC3NetId();
         for (Unit unit : getUnits()) {
             if (removedUnits.contains(unit)) {
                 continue;
@@ -10150,6 +10169,7 @@ public class Campaign implements ITechManager {
      *
      * @return systemsInstance Systems instance used when instantiating this Campaign instance.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Systems getSystemsInstance() {
         return systemsInstance;
     }
@@ -10160,6 +10180,7 @@ public class Campaign implements ITechManager {
      *
      * @param systemsInstance new Systems instance that this campaign should use.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSystemsInstance(Systems systemsInstance) {
         this.systemsInstance = systemsInstance;
     }

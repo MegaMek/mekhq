@@ -38,6 +38,7 @@ import mekhq.campaign.Campaign;
  * Raised when a {@link Campaign} cannot be parsed from XML.
  */
 public class CampaignXmlParseException extends Exception {
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public CampaignXmlParseException() {
 
     }
@@ -50,6 +51,7 @@ public class CampaignXmlParseException extends Exception {
         super(e);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public CampaignXmlParseException(String message, Throwable e) {
         super(message, e);
     }

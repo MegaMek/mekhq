@@ -37,7 +37,10 @@ import java.util.HashMap;
 
 import megamek.common.bays.BayType;
 import megamek.common.equipment.GunEmplacement;
-import megamek.common.units.*;
+import megamek.common.units.Dropship;
+import megamek.common.units.Entity;
+import megamek.common.units.FighterSquadron;
+import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
 
@@ -109,23 +112,21 @@ public class HangarStatistics {
             Entity en = unit.getEntity();
 
             // Non-transportable unit types that are tracked for other reporting purposes
-            if (en instanceof GunEmplacement) {
-                hashMap.merge(Entity.ETYPE_GUN_EMPLACEMENT, 1, Integer::sum);
-            } else if (en instanceof FighterSquadron) {
-                hashMap.merge(Entity.ETYPE_FIGHTER_SQUADRON, 1, Integer::sum);
-            } else if (en instanceof Jumpship) {
-                hashMap.merge(Entity.ETYPE_JUMPSHIP, 1, Integer::sum);
-            } else if (en instanceof Dropship) {
-                hashMap.merge(Entity.ETYPE_DROPSHIP, 1, Integer::sum);
-            } else {
-                // For all other units, use BayType to determine the correct transport bay category.
-                // This delegates to MegaMek's canonical entity-to-bay mapping, ensuring fighters
-                // (ASF, Conventional, Fixed-Wing Support) are all correctly categorized together.
-                BayType bayType = BayType.getTypeForEntity(en);
-                if (bayType != null) {
-                    long key = bayTypeToKey(bayType);
-                    if (key >= 0) {
-                        hashMap.merge(key, 1, Integer::sum);
+            switch (en) {
+                case GunEmplacement ignored -> hashMap.merge(Entity.ETYPE_GUN_EMPLACEMENT, 1, Integer::sum);
+                case FighterSquadron ignored -> hashMap.merge(Entity.ETYPE_FIGHTER_SQUADRON, 1, Integer::sum);
+                case Jumpship ignored -> hashMap.merge(Entity.ETYPE_JUMPSHIP, 1, Integer::sum);
+                case Dropship ignored -> hashMap.merge(Entity.ETYPE_DROPSHIP, 1, Integer::sum);
+                case null, default -> {
+                    // For all other units, use BayType to determine the correct transport bay category.
+                    // This delegates to MegaMek's canonical entity-to-bay mapping, ensuring fighters
+                    // (ASF, Conventional, Fixed-Wing Support) are all correctly categorized together.
+                    BayType bayType = BayType.getTypeForEntity(en);
+                    if (bayType != null) {
+                        long key = bayTypeToKey(bayType);
+                        if (key >= 0) {
+                            hashMap.merge(key, 1, Integer::sum);
+                        }
                     }
                 }
             }
@@ -135,8 +136,8 @@ public class HangarStatistics {
     }
 
     /**
-     * Maps a {@link BayType} to the ETYPE-based key used in the tally map. Returns {@code -1L} and logs a warning
-     * for any unhandled bay type so that new types added to MegaMek fail visibly rather than being silently counted.
+     * Maps a {@link BayType} to the ETYPE-based key used in the tally map. Returns {@code -1L} and logs a warning for
+     * any unhandled bay type so that new types added to MegaMek fail visibly rather than being silently counted.
      *
      * @param bayType the bay type to map
      *
@@ -252,6 +253,7 @@ public class HangarStatistics {
                                       .sum());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getTotalSuperHeavyVehicleBays() {
         return (int) Math.round(getHangar().getUnitsStream()
                                       .mapToDouble(Unit::getSuperHeavyVehicleCapacity)
@@ -277,6 +279,7 @@ public class HangarStatistics {
                      .sum();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getTotalLargeCraftPassengerCapacity() {
         return getHangar().getUnitsStream()
                      .filter(u -> u.getEntity().isLargeCraft() || u.getEntity().isSmallCraft())

@@ -53,6 +53,7 @@ import javax.swing.event.ListSelectionListener;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -60,7 +61,6 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -128,7 +128,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.gridy++;
         addExecuteButton(activating, gbc);
 
-        JScrollPane scrollPane = new JScrollPaneWithSpeed();
+        JScrollPane scrollPane = new FastJScrollPane();
         scrollPane.setViewportView(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setMaximumSize(new Dimension(600, 600));
@@ -199,7 +199,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
         for (Person tech : campaign.getTechs()) {
-            if (tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
+            if (tech.canTech(unitsByType.get(unitType).getFirst().getEntity())) {
                 listModel.addElement(tech);
             }
         }
@@ -209,7 +209,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         techList.setBorder(new LineBorder(Color.GRAY, 1));
         techList.setCellRenderer(new TechListCellRenderer());
 
-        JScrollPane techListPane = new JScrollPaneWithSpeed();
+        JScrollPane techListPane = new FastJScrollPane();
         techListPane.setViewportView(techList);
         techListPane.setMaximumSize(new Dimension(200, 400));
         techListPane.setMinimumSize(new Dimension(200, 150));

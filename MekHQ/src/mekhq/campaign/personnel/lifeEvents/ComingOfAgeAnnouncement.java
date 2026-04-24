@@ -210,9 +210,9 @@ public class ComingOfAgeAnnouncement {
             return getFallbackSpeaker();
         } else {
             if (commander != null) {
-                if (commander.equals(presentParents.get(0))) {
+                if (commander.equals(presentParents.getFirst())) {
                     speakerType = SpeakerType.OTHER_PARENT;
-                    return presentParents.get(0);
+                    return presentParents.getFirst();
                 } else if ((presentParents.size() > 1) && commander.equals(presentParents.get(1))) {
                     speakerType = SpeakerType.OTHER_PARENT;
                     return presentParents.get(1);

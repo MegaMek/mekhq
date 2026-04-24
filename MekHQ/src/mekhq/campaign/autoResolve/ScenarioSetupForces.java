@@ -85,6 +85,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
     private final OrderFactory orderFactory;
     private final Game dummyGame;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ScenarioSetupForces(Campaign campaign, List<Unit> units, SCENARIO scenario,
           ForceConsolidation forceConsolidationMethod) {
         this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
@@ -504,7 +505,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
 
             String playerName = game.getPlayer(entity.getOwnerId()).getName();
             String defaultForceName = (playerName == null || playerName.isBlank() ? "Player" : playerName.trim())
-                  + "|1";
+                                            + "|1";
 
             // Ensure every entity has a force assignment so it gets added to the simulation
             if (entity.getForceString().isBlank()) {

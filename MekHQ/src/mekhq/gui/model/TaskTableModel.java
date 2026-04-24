@@ -90,6 +90,7 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
         return data.get(row);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public IPartWork[] getTasksAt(int[] rows) {
         IPartWork[] tasks = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {

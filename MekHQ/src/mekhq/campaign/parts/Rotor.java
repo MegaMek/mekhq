@@ -63,6 +63,7 @@ public class Rotor extends TankLocation {
                                                                        AvailabilityValue.C)
                                                                  .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Rotor() {
         this(0, null);
     }

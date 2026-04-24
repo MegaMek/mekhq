@@ -37,7 +37,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.MathUtility.getGaussianAverage;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -48,7 +47,6 @@ import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
@@ -3052,7 +3050,7 @@ public class AtBDynamicScenarioFactory {
             int adjustedValue = min(skill.getAdjustedValue(), EXP_LEGENDARY);
             int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
-            int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
+            int skillRoll = Math.clamp(d6(2) + commandSkillsModifier, 2, 12);
             skillLevel = switch (skillRoll) {
                 case 3, 4, 5 -> 1;
                 case 6, 7, 8, 9 -> 2;
@@ -3074,7 +3072,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        return clamp(skillLevel, 0, 10);
+        return Math.clamp(skillLevel, 0, 10);
     }
 
     /**
@@ -3088,11 +3086,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static String adjustForMaxWeight(String weights, int maxWeight) {
         if (maxWeight == EntityWeightClass.WEIGHT_HEAVY) {
-            return weights.replaceAll("A", "LM");
+            return weights.replace("A", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_MEDIUM) {
-            return weights.replaceAll("A", "MM").replaceAll("H", "LM");
+            return weights.replace("A", "MM").replace("H", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_LIGHT) {
-            return weights.replaceAll(".", "L");
+            return weights.replaceAll("\\.", "L");
         } else {
             return weights;
         }
@@ -3107,7 +3105,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static String adjustForMinWeight(String weights, int minWeight) {
         if (minWeight == EntityWeightClass.WEIGHT_MEDIUM) {
-            return weights.replaceAll("L", "M");
+            return weights.replace("L", "M");
         } else if (minWeight == EntityWeightClass.WEIGHT_HEAVY) {
             return weights.replaceAll("[LM]", "H");
         } else if (minWeight == EntityWeightClass.WEIGHT_ASSAULT) {
@@ -3554,8 +3552,8 @@ public class AtBDynamicScenarioFactory {
      * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
      * {@link CombatRole#PATROL}.</p>
      *
-     * <p>Only Combat Teams with a non-null {@link Formation} and a positive BV are counted. If at least one valid force
-     * is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
+     * <p>Only Combat Teams with a non-null {@link Formation} and a positive BV are counted. If at least one valid
+     * force is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
      *
      * <p>If the player has no qualifying forces, a default budget of {@code 10,000} BV is returned. This helps
      * ensure StratCon Singles generation can still proceed even when the player lacks suitable forces.</p>
@@ -3608,8 +3606,8 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method scans all player-controlled {@link CombatTeam}s that belong to a set of valid combat roles
      * (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the team's associated
-     * {@link Formation} and collects its total BV. These values are then combined to compute a Gaussian-weighted average,
-     * which serves as a representative BV budget for force generation.</p>
+     * {@link Formation} and collects its total BV. These values are then combined to compute a Gaussian-weighted
+     * average, which serves as a representative BV budget for force generation.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
      * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
@@ -4196,7 +4194,7 @@ public class AtBDynamicScenarioFactory {
 
         if (rolesByType != null) {
             if (unitTypes.size() == 1) {
-                roles = rolesByType.getOrDefault(unitTypes.get(0), new ArrayList<>());
+                roles = rolesByType.getOrDefault(unitTypes.getFirst(), new ArrayList<>());
             } else {
                 roles = rolesByType.getOrDefault(unitTypes.get(unitIndex), new ArrayList<>());
             }
@@ -4213,7 +4211,7 @@ public class AtBDynamicScenarioFactory {
 
         int unitType;
         if (unitTypes.size() == 1) {
-            unitType = unitTypes.get(0);
+            unitType = unitTypes.getFirst();
         } else {
             unitType = unitTypes.get(unitIndex);
         }
@@ -5093,7 +5091,7 @@ public class AtBDynamicScenarioFactory {
         // if there's no such thing, then mercenaries.
         List<String> planetFactions = contract.getSystem().getFactions(currentDate);
         if (planetFactions != null && !planetFactions.isEmpty()) {
-            factionCode = planetFactions.get(0);
+            factionCode = planetFactions.getFirst();
             Faction ownerFaction = Factions.getInstance().getFaction(factionCode);
 
             if (ownerFaction.is(FactionTag.ABANDONED)) {
@@ -5230,7 +5228,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             if ((botForce != null) && !botForce.getFixedEntityList().isEmpty()) {
-                Entity swapTarget = botForce.getFixedEntityList().get(0);
+                Entity swapTarget = botForce.getFixedEntityList().getFirst();
                 BenchedEntityData benchedEntity = new BenchedEntityData();
                 benchedEntity.entity = swapTarget;
                 benchedEntity.templateName = destinationTemplate.getForceName();

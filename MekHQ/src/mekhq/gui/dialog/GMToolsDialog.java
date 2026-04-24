@@ -69,6 +69,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
@@ -90,7 +91,6 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredFormationIconCreationPanel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class GMToolsDialog extends AbstractMHQDialogBasic {
     private static final MMLogger LOGGER = MMLogger.create(GMToolsDialog.class);
@@ -230,10 +230,12 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         this.spnDiceSides = spnDiceSides;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JSpinner getSpnMorale() {
         return spnMorale;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSpnMorale(final JSpinner spnMorale) {
         this.spnMorale = spnMorale;
     }
@@ -408,26 +410,32 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         this.lastGeneratedCallsign = lastGeneratedCallsign;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JLabel getLblCurrentCompanyName() {
         return lblCurrentCompany;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setLblCurrentCompanyName(JLabel lblCurrentCompany) {
         this.lblCurrentCompany = lblCurrentCompany;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JTextArea getTxtCompanyNamesGenerated() {
         return txtCompanyNamesGenerated;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setTxtCompanyNamesGenerated(final JTextArea txtCompanyNamesGenerated) {
         this.txtCompanyNamesGenerated = txtCompanyNamesGenerated;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public @Nullable String getLastGeneratedCompanyName() {
         return lastGeneratedCompanyName;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setLastGeneratedCompanyName(final @Nullable String lastGeneratedCompanyName) {
         this.lastGeneratedCompanyName = lastGeneratedCompanyName;
     }
@@ -538,10 +546,12 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         this.chkProcreationEligibilityType = chkProcreationEligibilityType;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JSpinner getSpnPregnancySize() {
         return spnPregnancySize;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSpnPregnancySize(final JSpinner spnPregnancySize) {
         this.spnPregnancySize = spnPregnancySize;
     }
@@ -581,7 +591,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
                                         .addComponent(dicePanel)
                                         .addComponent(ratPanel));
 
-        return new JScrollPaneWithSpeed(panel);
+        return new FastJScrollPane(panel);
     }
 
     private JPanel createDicePanel() {
@@ -819,7 +829,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
                                         .addComponent(companyNamePanel)
                                         .addComponent(bloodnamePanel));
 
-        return new JScrollPaneWithSpeed(namesPanel);
+        return new FastJScrollPane(namesPanel);
     }
 
     private JPanel createNamePanel() {
@@ -1298,82 +1308,6 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
     }
     // endregion Names Tab
 
-    // region Personnel Module Tab
-    private JScrollPane createPersonnelModuleTab() {
-        // Create Panel Components
-        final JPanel procreationPanel = createProcreationPanel();
-
-        // Layout the Panel
-        final AbstractMHQScrollablePanel personnelModulePanel = new DefaultMHQScrollablePanel(getFrame(),
-              "personnelModulePanel");
-        final GroupLayout layout = new GroupLayout(personnelModulePanel);
-        personnelModulePanel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(layout.createSequentialGroup().addComponent(procreationPanel));
-
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING).addComponent(procreationPanel));
-
-        return new JScrollPaneWithSpeed(personnelModulePanel);
-    }
-
-    private JPanel createProcreationPanel() {
-        // Create the Panel
-        final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("procreationPanel.title")));
-        panel.setName("procreationPanel");
-
-        // Create the Constraints
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 3, 0, 3);
-
-        // Create the Components and Layout
-        if (getPerson() != null) {
-            final JLabel lblEligible = new JLabel(resources.getString("Eligible.text"));
-            lblEligible.setName("lblEligible");
-            panel.add(lblEligible, gbc);
-
-            final JLabel lblEligibility = new JLabel(resources.getString("True.text"));
-            lblEligibility.setName("lblEligibility");
-            gbc.gridx++;
-            panel.add(lblEligibility, gbc);
-
-            setChkProcreationEligibilityType(new JCheckBox(resources.getString("chkProcreationEligibilityType.text")));
-            getChkProcreationEligibilityType().setToolTipText(resources.getString(
-                  "chkProcreationEligibilityType.toolTipText"));
-            getChkProcreationEligibilityType().setName("chkProcreationEligibilityType");
-            getChkProcreationEligibilityType().addActionListener(evt -> {
-                final String reason = getGUI().getCampaign()
-                                            .getProcreation()
-                                            .canProcreate(getGUI().getCampaign().getLocalDate(),
-                                                  getPerson(),
-                                                  getChkProcreationEligibilityType().isSelected());
-                lblEligibility.setText(resources.getString((reason == null) ? "True.text" : "False.text"));
-                lblEligibility.setToolTipText(reason);
-            });
-            gbc.gridx++;
-            panel.add(getChkProcreationEligibilityType(), gbc);
-
-            // Male Personnel are invalid after this point
-            if (getPerson().getGender().isMale()) {
-                return panel;
-            }
-        }
-
-        final JPanel procreationSimulationPanel = new JPanel();
-        procreationSimulationPanel.setBorder(BorderFactory.createTitledBorder(resources.getString(
-              "procreationSimulationPanel.title")));
-        procreationSimulationPanel.setToolTipText(resources.getString("procreationSimulationPanel.toolTipText"));
-        procreationSimulationPanel.setName("procreationSimulationPanel");
-
-        return panel;
-    }
     // endregion Personnel Module Tab
 
     // region Layered Formation Icon Tab
@@ -1489,13 +1423,13 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
               (Integer) getSpnDiceNumber().getValue(),
               (Integer) getSpnDiceSides().getValue());
         getLblTotalDiceResult().setText(String.format(resources.getString("lblTotalDiceResult.text"),
-              individualDice.get(0)));
+              individualDice.getFirst()));
 
         final StringBuilder sb = new StringBuilder();
         for (int i = 1; i < individualDice.size() - 1; i++) {
             sb.append(individualDice.get(i)).append(", ");
         }
-        sb.append(individualDice.get(individualDice.size() - 1));
+        sb.append(individualDice.getLast());
 
         getTxtIndividualDiceResults().setText((!sb.isEmpty()) ? sb.toString() : "-");
     }

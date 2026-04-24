@@ -129,6 +129,7 @@ public class CampaignOptionsPresetPicker extends JDialog {
      *
      * @return {@code true} if 'customize' was selected, {@code false} otherwise
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean wasCustomized() {
         return returnState == PresetSelection.CUSTOMIZE.getValue();
     }

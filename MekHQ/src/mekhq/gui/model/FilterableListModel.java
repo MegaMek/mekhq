@@ -46,6 +46,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     private final List<Integer> indices;
     private Predicate<E> filter;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public FilterableListModel() {
         this(null, null);
     }

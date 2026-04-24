@@ -59,6 +59,7 @@ public class MissingProtoMekLocation extends MissingPart {
     protected double percent;
     protected boolean forQuad;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingProtoMekLocation() {
         this(0, 0, 0, false, false, null);
     }
@@ -119,6 +120,7 @@ public class MissingProtoMekLocation extends MissingPart {
         return loc;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean hasBooster() {
         return booster;
     }
@@ -165,6 +167,7 @@ public class MissingProtoMekLocation extends MissingPart {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean forQuad() {
         return forQuad;
     }

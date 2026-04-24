@@ -63,7 +63,6 @@ import javax.swing.table.TableModel;
 
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.CriticalSlot;
@@ -130,7 +129,7 @@ public class Utilities {
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         Collections.sort(rolls);
-        return (rolls.get(0) + rolls.get(1));
+        return (rolls.getFirst() + rolls.get(1));
     }
 
     /**
@@ -261,6 +260,7 @@ public class Utilities {
         return choice;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static File[] getAllFiles(String dir, FilenameFilter filter) {
         File fl = new File(dir);
         return fl.listFiles(filter);
@@ -335,19 +335,25 @@ public class Utilities {
             return false;
         }
 
-        if (entity1 instanceof Mek) {
-            if (((Mek) entity1).getCockpitType() != ((Mek) entity2).getCockpitType()) {
-                return false;
-            } else if (entity1.getGyroType() != entity2.getGyroType()) {
-                return false;
+        switch (entity1) {
+            case Mek mek -> {
+                if (mek.getCockpitType() != ((Mek) entity2).getCockpitType()) {
+                    return false;
+                } else if (entity1.getGyroType() != entity2.getGyroType()) {
+                    return false;
+                }
             }
-        } else if (entity1 instanceof Aero) {
-            if (((Aero) entity1).getCockpitType() != ((Aero) entity2).getCockpitType()) {
-                return false;
+            case Aero aero -> {
+                if (aero.getCockpitType() != ((Aero) entity2).getCockpitType()) {
+                    return false;
+                }
             }
-        } else if (entity1 instanceof Tank) {
-            if (entity1.getMovementMode() != entity2.getMovementMode()) {
-                return false;
+            case Tank ignored -> {
+                if (entity1.getMovementMode() != entity2.getMovementMode()) {
+                    return false;
+                }
+            }
+            default -> {
             }
         }
         List<EquipmentType> fixedEquipment = new ArrayList<>();
@@ -404,7 +410,7 @@ public class Utilities {
      * @throws IllegalStateException if the roll is not within the expected range
      */
     public static int generateExpLevel(int bonus) {
-        int roll = MathUtility.clamp(Compute.d6(2) + bonus, 1, 12);
+        int roll = Math.clamp(Compute.d6(2) + bonus, 1, 12);
 
         return switch (roll) {
             case 1 -> EXP_ULTRA_GREEN;
@@ -1287,6 +1293,7 @@ public class Utilities {
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found. Don't recurse.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser) {
         parseXMLFiles(dirName, parser, false);
     }

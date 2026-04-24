@@ -70,6 +70,7 @@ public abstract class AbstractSkillGenerator {
      *
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
         randomSkillPreferences = Objects.requireNonNull(skillPreferences);
     }
