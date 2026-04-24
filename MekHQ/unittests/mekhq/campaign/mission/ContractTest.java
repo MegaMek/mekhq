@@ -236,7 +236,6 @@ public class ContractTest {
     public void testCalculateSalvagePercentageBugReportScenario() {
         // From issue #5683: 30142128 / (30142128 + 40498831) = 42.67% -> 43%
         // Adding more salvage to the player share must not decrease the displayed percentage
-        // (the original truncating code violated monotonicity).
         int before = Contract.calculateSalvagePercentage(Money.of(30142128), Money.of(40498831));
         int after = Contract.calculateSalvagePercentage(Money.of(30326639), Money.of(40498831));
         assertEquals(43, before);
