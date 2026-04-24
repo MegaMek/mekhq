@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
@@ -207,27 +208,39 @@ public class ContractTest {
     }
 
     @Test
-    public void testCalculateSalvagePercentageRoundsHalfUp() {
-        // 50/50 split = exactly 50%
+    public void testCalculateSalvagePercentageExactWholePercent() {
+        // 50/50 split = exactly 50%, no rounding needed
         assertEquals(50, Contract.calculateSalvagePercentage(Money.of(500), Money.of(500)));
     }
 
     @Test
-    public void testCalculateSalvagePercentageRoundsUpFromHalf() {
-        // 425 / 1000 = 42.5% -> 43% with HALF_UP (regression test for issue #5683)
+    public void testCalculateSalvagePercentageRoundsAnyFractionUp() {
+        // 425 / 1000 = 42.5% -> 43% (CEILING rounds any fraction up)
         assertEquals(43, Contract.calculateSalvagePercentage(Money.of(425), Money.of(575)));
     }
 
     @Test
-    public void testCalculateSalvagePercentageRoundsDownBelowHalf() {
-        // 424 / 1000 = 42.4% -> 42%
-        assertEquals(42, Contract.calculateSalvagePercentage(Money.of(424), Money.of(576)));
+    public void testCalculateSalvagePercentageRoundsSmallFractionUp() {
+        // 421 / 1000 = 42.1% -> 43% (CEILING rounds any fraction up; this models the gameplay
+        // requirement that 50.001% against a 50% cap is a breach)
+        assertEquals(43, Contract.calculateSalvagePercentage(Money.of(421), Money.of(579)));
     }
 
     @Test
     public void testCalculateSalvagePercentageDoesNotTruncateNearWholeNumber() {
         // 4299 / 10000 = 42.99% -> 43% (the original bug for issue #5683)
         assertEquals(43, Contract.calculateSalvagePercentage(Money.of(4299), Money.of(5701)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageBugReportScenario() {
+        // From issue #5683: 30142128 / (30142128 + 40498831) = 42.67% -> 43%
+        // Adding more salvage to the player share must not decrease the displayed percentage
+        // (the original truncating code violated monotonicity).
+        int before = Contract.calculateSalvagePercentage(Money.of(30142128), Money.of(40498831));
+        int after = Contract.calculateSalvagePercentage(Money.of(30326639), Money.of(40498831));
+        assertEquals(43, before);
+        assertTrue(after >= before, "salvage % must be monotonic in player share");
     }
 
     private void initializeTest() {

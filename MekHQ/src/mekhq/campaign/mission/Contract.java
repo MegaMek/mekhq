@@ -312,9 +312,11 @@ public class Contract extends Mission {
 
     /**
      * Computes the player's share of the total salvage value as an integer percentage, using
-     * {@link java.math.RoundingMode#HALF_UP} (i.e. 42.5% rounds to 43%, 42.49% rounds to 42%).
+     * {@link java.math.RoundingMode#CEILING} (i.e. any fractional percentage rounds up to the next whole percent).
      *
-     * <p>This avoids the truncation artifacts that previously could cause the displayed value to shift by a full
+     * <p>Rounding up is intentional from a gameplay standpoint: the percentage is compared against the contract's
+     * salvage cap, and a true value of e.g. 50.001% against a 50% cap is a breach and must be surfaced as such. It
+     * also fixes the truncation artifacts that previously could cause the displayed value to shift by a full
      * percentage point after a small change to the salvage assignment (see issue #5683).</p>
      *
      * @param playerShare    the salvage value assigned to the player (mercs)
@@ -329,7 +331,7 @@ public class Contract extends Mission {
         }
         return playerShare.multipliedBy(100)
                      .getAmount()
-                     .divide(total.getAmount(), 0, java.math.RoundingMode.HALF_UP)
+                     .divide(total.getAmount(), 0, java.math.RoundingMode.CEILING)
                      .intValue();
     }
 
