@@ -322,7 +322,7 @@ public class Contract extends Mission {
      * @param playerShare    the salvage value assigned to the player (mercs)
      * @param employerShare  the salvage value assigned to the employer
      *
-     * @return integer percentage in the range {@code [0, 100+]}, or {@code 0} if there is no salvage to split
+     * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
      */
     public static int calculateSalvagePercentage(Money playerShare, Money employerShare) {
         Money total = playerShare.plus(employerShare);
@@ -338,7 +338,7 @@ public class Contract extends Mission {
     /**
      * Convenience overload that computes the current salvage percentage from the values stored on this contract.
      *
-     * @return integer percentage in the range {@code [0, 100+]}, or {@code 0} if there is no salvage to split
+     * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
      */
     public int getCurrentSalvagePct() {
         return calculateSalvagePercentage(getSalvagedByUnit(), getSalvagedByEmployer());
