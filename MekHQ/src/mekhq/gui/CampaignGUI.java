@@ -67,6 +67,8 @@ import javax.xml.parsers.DocumentBuilder;
 import megamek.MMConstants;
 import megamek.MegaMek;
 import megamek.Version;
+import megamek.client.ui.CopySystemDataAction;
+import megamek.client.ui.ShowBugReportDialogAction;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
@@ -87,6 +89,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
+import megameklab.MMLConstants;
 import mekhq.IconPackage;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
@@ -1458,21 +1461,16 @@ public class CampaignGUI extends JPanel {
         menuHelp.setMnemonic(KeyEvent.VK_SLASH);
         menuHelp.setName("helpMenu");
 
+        menuHelp.addSeparator();
+
         JMenuItem menuBugReportItem = new JMenuItem(resourceMap.getString("menuReportBug.text"));
         menuBugReportItem.setName("ReportBug");
         menuBugReportItem.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
         menuHelp.add(menuBugReportItem);
 
-        JMenuItem menuCopySystemDataItem = new JMenuItem(resourceMap.getString("menuCopySystemData.text"));
-        menuCopySystemDataItem.setName("CopySystemData");
-        menuCopySystemDataItem.setToolTipText(resourceMap.getString("menuCopySystemData.tip"));
-        menuCopySystemDataItem.addActionListener(evt -> {
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(new StringSelection(MekHQ.getUnderlyingInformation()), null);
-        });
-        menuHelp.add(menuCopySystemDataItem);
+        menuHelp.add(new CopySystemDataAction(MHQConstants.PROJECT_NAME));
 
-        menuHelp.add(new JSeparator());
+        menuHelp.addSeparator();
 
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);

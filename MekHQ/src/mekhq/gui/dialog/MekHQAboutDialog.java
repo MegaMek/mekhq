@@ -33,30 +33,24 @@
  */
 package mekhq.gui.dialog;
 
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
-import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.AbstractAboutDialog;
 import mekhq.MHQConstants;
 
+import java.awt.Window;
+
 public class MekHQAboutDialog extends AbstractAboutDialog {
 
-    public MekHQAboutDialog(JFrame parent) {
+    public MekHQAboutDialog(Window parent) {
         super(parent);
     }
 
     @Override
-    protected JComponent version() {
-        JLabel program = new JLabel(MHQConstants.PROJECT_NAME);
-        program.putClientProperty("FlatLaf.styleClass", "h3");
-        JLabel version = new JLabel(Messages.getString("about.version", MHQConstants.VERSION));
-        var panel = Box.createVerticalBox();
-        panel.add(program);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(version);
-        return panel;
+    protected String currentProjectName() {
+        return MHQConstants.PROJECT_NAME;
+    }
+
+    @Override
+    protected String currentVersion() {
+        return MHQConstants.VERSION.toString();
     }
 }
