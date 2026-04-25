@@ -36,9 +36,10 @@ import megamek.common.util.StringUtil;
 
 /**
  * This class splits a tooltip into multiple lines in order to wrap it.
- *
- * Previously it enclosed the strings in HTML (<a href="https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java">Stack Overflow</a>),
- * though it seems like that is not necessary if the tooltip does not otherwise need formatting.
+ * <p>
+ * Previously it enclosed the strings in HTML (<a
+ * href="https://stackoverflow.com/questions/868651/multi-line-tooltips-in-java">Stack Overflow</a>), though it seems
+ * like that is not necessary if the tooltip does not otherwise need formatting.
  *
  * @author Paul Taylor (adapted by Miguel Azevedo)
  */
@@ -47,8 +48,7 @@ public class MultiLineTooltip {
     private static final int SPACE_BUFFER = 10;
 
     /**
-     * Wraps a string to a given length in characters, defaulting the size of a line to 85
-     * characters.
+     * Wraps a string to a given length in characters, defaulting the size of a line to 85 characters.
      *
      * @param tip String to split
      *

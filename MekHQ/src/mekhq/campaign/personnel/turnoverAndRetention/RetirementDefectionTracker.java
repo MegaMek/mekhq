@@ -448,7 +448,7 @@ public class RetirementDefectionTracker {
         List<Contract> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
-            if (campaign.getCampaignOptions().isUseAtB()) {
+            if (campaign.getCampaignOptions().isUseStratCon()) {
                 Optional<Contract> defensiveContract = activeContracts.stream()
                                                              .filter(contract -> contract instanceof AtBContract)
                                                              .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))

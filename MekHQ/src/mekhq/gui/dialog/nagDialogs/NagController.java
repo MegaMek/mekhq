@@ -213,24 +213,6 @@ public class NagController {
             }
         }
 
-        // Outstanding Scenarios
-        if (OutstandingScenariosNagDialog.checkNag(campaign)) {
-            OutstandingScenariosNagDialog outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-            if (outstandingScenariosNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
-        // Deployment Shortfall
-        final boolean isUseAtB = campaignOptions.isUseAtB();
-
-        if (DeploymentShortfallNagDialog.checkNag(isUseAtB, campaign)) {
-            DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);
-            if (deploymentShortfallNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
         // Prisoners of War
         final boolean hasActiveContract = campaign.hasActiveContract();
         final boolean hasPrisoners = !campaign.getCurrentPrisoners().isEmpty();

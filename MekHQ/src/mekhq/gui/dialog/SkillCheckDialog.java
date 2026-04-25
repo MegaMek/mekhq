@@ -119,7 +119,7 @@ public class SkillCheckDialog {
               isUseAgingEffects, isClanCampaign, today);
 
         // Results Dialog
-        campaign.addReport(SKILL_CHECKS, results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
+        campaign.addReport(SKILL_CHECKS, results.replace("<p>", "<br><br>").replace("</p>", ""));
         showResultsDialog(results);
     }
 

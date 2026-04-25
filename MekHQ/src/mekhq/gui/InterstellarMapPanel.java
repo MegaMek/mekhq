@@ -67,7 +67,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.vecmath.Vector2d;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.FactionTag;
@@ -448,7 +447,7 @@ public class InterstellarMapPanel extends JPanel {
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 double size = 1 + 5 * Math.log(conf.scale);
-                size = Math.max(min(size, conf.maxDotSize), conf.minDotSize);
+                size = Math.clamp(size, conf.minDotSize, conf.maxDotSize);
 
                 final Stroke thick = new BasicStroke(2.0f);
                 final Stroke thin = new BasicStroke(1.2f);
@@ -1278,7 +1277,7 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optAcademies.isSelected()) {
-            int academyCount = MathUtility.clamp(system.getFilteredAcademies(campaign).size(), 0, 6);
+            int academyCount = Math.clamp(system.getFilteredAcademies(campaign).size(), 0, 6);
 
             return switch (academyCount) {
                 case 6 -> new Color(253, 231, 37);
@@ -1304,7 +1303,7 @@ public class InterstellarMapPanel extends JPanel {
         if (optDiseases.isSelected()) {
             Set<InjuryType> diseases = getAllActiveDiseases(system.getId(), campaign.getLocalDate(), true);
             diseases.addAll(getAllActiveBioweapons(system.getId(), campaign.getLocalDate(), true));
-            
+
             int diseaseCount = min(4, diseases.size());
             return switch (diseaseCount) {
                 case 1 -> new Color(253, 231, 37);
@@ -1342,6 +1341,7 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void removeActionListener(ActionListener l) {
         listeners.remove(l);
     }

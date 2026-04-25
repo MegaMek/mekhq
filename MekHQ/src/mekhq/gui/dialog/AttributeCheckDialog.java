@@ -157,7 +157,7 @@ public class AttributeCheckDialog {
         String results = performAttributeCheck(dialog.getComboBoxChoiceIndex(), dialog.getSpinnerValue(), choiceIndex);
 
         // Results Dialog
-        campaign.addReport(SKILL_CHECKS, results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
+        campaign.addReport(SKILL_CHECKS, results.replace("<p>", "<br><br>").replace("</p>", ""));
         showResultsDialog(results);
     }
 
@@ -200,7 +200,7 @@ public class AttributeCheckDialog {
      */
     private String performAttributeCheck(int selectedOption, int selectedModifier, int choiceIndex) {
         List<SkillAttribute> attributes = deriveAttributesFromOption(ATTRIBUTE_CHECK_OPTIONS.get(selectedOption));
-        SkillAttribute firstAttribute = attributes.get(0);
+        SkillAttribute firstAttribute = attributes.getFirst();
         SkillAttribute secondAttribute = attributes.size() > 1 ? attributes.get(1) : null;
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
         AttributeCheckUtility utility = new AttributeCheckUtility(null,
@@ -364,7 +364,7 @@ public class AttributeCheckDialog {
 
         for (String attributeOption : ATTRIBUTE_CHECK_OPTIONS) {
             List<SkillAttribute> attributes = deriveAttributesFromOption(attributeOption);
-            SkillAttribute firstAttribute = attributes.get(0);
+            SkillAttribute firstAttribute = attributes.getFirst();
             SkillAttribute secondAttribute = attributes.size() > 1 ? attributes.get(1) : null;
             int targetNumber = determineTargetNumber(character, firstAttribute, secondAttribute, 0).getValue();
 

@@ -1194,53 +1194,24 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SACK: {
-                boolean showDialog = false;
-                List<Person> toRemove = new ArrayList<>();
-                if (getCampaignOptions().isUseAtB()) {
-                    for (Person person : people) {
-                        if (!person.getPrimaryRole().isCivilian()) {
-                            if (getCampaign().getRetirementDefectionTracker()
-                                      .removeFromCampaign(person, false, true, getCampaign(), null)) {
-                                showDialog = true;
-                            } else {
-                                toRemove.add(person);
-                            }
-                        } else {
-                            toRemove.add(person);
-                        }
-                    }
-                }
+                String question;
 
-                if (showDialog) {
-                    RetirementDefectionDialog rdd = new RetirementDefectionDialog(gui, null, false);
-
-                    if (rdd.wasAborted() ||
-                              !getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
-                        for (Person person : people) {
-                            getCampaign().getRetirementDefectionTracker().removePayout(person);
-                        }
-                    } else {
-                        for (final Person person : toRemove) {
-                            getCampaign().removePerson(person);
-                        }
-                    }
+                if (people.length > 1) {
+                    question = resources.getString("confirmRemoveMultiple.text");
                 } else {
-                    String question;
-                    if (people.length > 1) {
-                        question = resources.getString("confirmRemoveMultiple.text");
-                    } else {
-                        question = String.format(resources.getString("confirmRemove.format"), people[0].getFullTitle());
-                    }
-                    if (JOptionPane.YES_OPTION ==
-                              JOptionPane.showConfirmDialog(null,
-                                    question,
-                                    resources.getString("removeQ.text"),
-                                    JOptionPane.YES_NO_OPTION)) {
-                        for (Person person : people) {
-                            getCampaign().removePerson(person);
-                        }
+                    question = String.format(resources.getString("confirmRemove.format"), people[0].getFullTitle());
+                }
+
+                if (JOptionPane.YES_OPTION ==
+                          JOptionPane.showConfirmDialog(null,
+                                question,
+                                resources.getString("removeQ.text"),
+                                JOptionPane.YES_NO_OPTION)) {
+                    for (Person person : people) {
+                        getCampaign().removePerson(person);
                     }
                 }
+
                 break;
             }
             case CMD_EMPLOY: {
@@ -1654,7 +1625,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("changeSalary.text"),
-                      MathUtility.clamp(originalSalary, -1, 1000000000),
+                      Math.clamp(originalSalary, -1, 1000000000),
                       -1,
                       1000000000);
 
@@ -4872,7 +4843,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if ((academy.isLocal()) || (academy.isHomeSchool())) {
                 campus = campaign.getCurrentSystem().getId();
             } else {
-                campus = academy.getLocationSystems().get(0);
+                campus = academy.getLocationSystems().getFirst();
             }
 
             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -4895,7 +4866,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       List.of(person),
                       academyOption,
                       campus,
-                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).getFirst());
             }
             return;
         }
@@ -5064,7 +5035,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if ((academy.isLocal()) || (academy.isHomeSchool())) {
                 campus = campaign.getCurrentSystem().getId();
             } else {
-                campus = academy.getLocationSystems().get(0);
+                campus = academy.getLocationSystems().getFirst();
             }
 
             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -5084,7 +5055,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       personnel,
                       academyOption,
                       campus,
-                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+                      campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).getFirst());
             }
             return;
         }

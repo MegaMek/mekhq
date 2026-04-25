@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFOR
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -66,8 +67,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.
@@ -319,7 +318,9 @@ public class RulesetsTab {
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity",
               0, -1, 3, 1);
         chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
 
         // Other
         pnlScenarioModifiers = createUniversalModifiersPanel();
@@ -432,7 +433,9 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoResolvePanel", true,
               "AutoResolvePanel",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 1;
@@ -931,6 +934,7 @@ public class RulesetsTab {
      *
      * @return a {@link JPanel} containing all Legacy AtB settings.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JPanel createLegacyTab() {
         // Header
         legacyHeader = new CampaignOptionsHeaderPanel("LegacyTab",
