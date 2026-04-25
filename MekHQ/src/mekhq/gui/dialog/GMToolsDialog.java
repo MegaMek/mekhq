@@ -538,10 +538,12 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
     // endregion Name Tab
 
     // region Personnel Module Tab
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JCheckBox getChkProcreationEligibilityType() {
         return chkProcreationEligibilityType;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setChkProcreationEligibilityType(final JCheckBox chkProcreationEligibilityType) {
         this.chkProcreationEligibilityType = chkProcreationEligibilityType;
     }

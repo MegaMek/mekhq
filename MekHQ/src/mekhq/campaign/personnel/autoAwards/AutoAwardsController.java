@@ -687,7 +687,7 @@ public class AutoAwardsController {
         }
 
         if ((!factionHunterAwards.isEmpty()) &&
-                  (campaign.getCampaignOptions().isUseAtB()) &&
+                  (campaign.getCampaignOptions().isUseStratCon()) &&
                   (mission instanceof AtBContract)) {
             processedData = FactionHunterAwardsManager(personnel);
 
