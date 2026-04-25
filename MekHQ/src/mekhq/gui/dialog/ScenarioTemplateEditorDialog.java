@@ -55,6 +55,7 @@ import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
@@ -71,7 +72,6 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.stratCon.StratConBiomeManifest;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -183,7 +183,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         globalPanel = new DefaultMHQScrollablePanel(frame, "globalPanel", new GridBagLayout());
 
-        JScrollPane globalScrollPane = new JScrollPaneWithSpeed(globalPanel);
+        JScrollPane globalScrollPane = new FastJScrollPane(globalPanel);
         globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         globalScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         getContentPane().add(globalScrollPane);
@@ -242,7 +242,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtScenarioBriefing.setEditable(true);
         txtScenarioBriefing.setLineWrap(true);
         txtScenarioBriefing.setText(scenarioTemplate.shortBriefing);
-        JScrollPane scrScenarioBriefing = new JScrollPaneWithSpeed(txtScenarioBriefing);
+        JScrollPane scrScenarioBriefing = new FastJScrollPane(txtScenarioBriefing);
         gridBagConstraints.gridy++;
         globalPanel.add(scrScenarioBriefing, gridBagConstraints);
 
@@ -254,7 +254,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtLongBriefing.setEditable(true);
         txtLongBriefing.setLineWrap(true);
         txtLongBriefing.setText(scenarioTemplate.detailedBriefing);
-        JScrollPane scrLongBriefing = new JScrollPaneWithSpeed(txtLongBriefing);
+        JScrollPane scrLongBriefing = new FastJScrollPane(txtLongBriefing);
         gridBagConstraints.gridy++;
         globalPanel.add(scrLongBriefing, gridBagConstraints);
     }
@@ -277,7 +277,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         objectiveList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectiveList.setVisibleRowCount(5);
         objectiveList.setFixedCellWidth(400);
-        objectiveScrollPane = new JScrollPaneWithSpeed();
+        objectiveScrollPane = new FastJScrollPane();
         objectiveScrollPane.setViewportView(objectiveList);
 
         btnRemoveObjective = new JButton("Remove");
@@ -481,7 +481,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         listMULs = new JList<>();
         DefaultListModel<String> mulModel = new DefaultListModel<>();
-        JScrollPane scrMulList = new JScrollPaneWithSpeed(listMULs);
+        JScrollPane scrMulList = new FastJScrollPane(listMULs);
         File mulDir = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY);
 
         if (mulDir.exists() && mulDir.isDirectory()) {
@@ -710,7 +710,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         renderForceList();
 
-        forceScrollPane = new JScrollPaneWithSpeed(panForceList);
+        forceScrollPane = new FastJScrollPane(panForceList);
         forceScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         forceScrollPane.setVisible(false);
@@ -900,7 +900,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         selectedModifiersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         reloadSelectedModifiers();
 
-        JScrollPane modifierScrollPane = new JScrollPaneWithSpeed(selectedModifiersList);
+        JScrollPane modifierScrollPane = new FastJScrollPane(selectedModifiersList);
         modifierScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         pnlMapParameters.add(modifierScrollPane, localGbc);
 

@@ -47,7 +47,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
@@ -205,7 +204,7 @@ public class RetirementDefectionTracker {
             // Fatigue modifier
             if ((campaign.getCampaignOptions().isUseFatigue()) &&
                       (campaign.getCampaignOptions().isUseFatigueModifiers())) {
-                int fatigueModifier = MathUtility.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
+                int fatigueModifier = Math.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
 
                 if (fatigueModifier > 0) {
                     targetNumber.addModifier(fatigueModifier, resources.getString("fatigue.text"));
@@ -449,7 +448,7 @@ public class RetirementDefectionTracker {
         List<Contract> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
-            if (campaign.getCampaignOptions().isUseAtB()) {
+            if (campaign.getCampaignOptions().isUseStratCon()) {
                 Optional<Contract> defensiveContract = activeContracts.stream()
                                                              .filter(contract -> contract instanceof AtBContract)
                                                              .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
@@ -1051,26 +1050,28 @@ public class RetirementDefectionTracker {
      * not debilitating injuries that would cause a person to leave a unit.</p>
      *
      * @param person the person to evaluate
+     *
      * @return count of permanent injuries excluding prosthetics and implants
      */
     static int getInjuryTurnoverModifier(final Person person) {
         return (int) person.getInjuries().stream()
-              .filter(i -> !i.getSubType().isPermanentModification())
-              .filter(Injury::isPermanent)
-              .count();
+                           .filter(i -> !i.getSubType().isPermanentModification())
+                           .filter(Injury::isPermanent)
+                           .count();
     }
 
     /**
-     * Returns whether a person has permanent injuries (excluding prosthetics/implants)
-     * that qualify them for medical discharge.
+     * Returns whether a person has permanent injuries (excluding prosthetics/implants) that qualify them for medical
+     * discharge.
      *
      * @param person the person to evaluate
+     *
      * @return {@code true} if the person has at least one permanent non-prosthetic injury
      */
     static boolean hasMedicalDischargeInjuries(final Person person) {
         return person.getInjuries().stream()
-              .filter(i -> !i.getSubType().isPermanentModification())
-              .anyMatch(Injury::isPermanent);
+                     .filter(i -> !i.getSubType().isPermanentModification())
+                     .anyMatch(Injury::isPermanent);
     }
 
     /**

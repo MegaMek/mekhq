@@ -194,7 +194,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelFilterButtons.add(comboPersonType, gridBagConstraints);
 
-        boolean atbOutOfContract = campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract();
+        boolean atbOutOfContract = campaign.getCampaignOptions().isUseStratCon() && !campaign.hasActiveContract();
         boolean usingCamOpsMarkets = campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops");
         if (atbOutOfContract && !usingCamOpsMarkets) {
             // Paid recruitment is available

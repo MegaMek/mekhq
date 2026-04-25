@@ -45,13 +45,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AddOrEditScenarioEntryDialog;
 import mekhq.gui.model.LogTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class EditScenarioLogControl extends JPanel {
     private final JFrame parent;
@@ -116,7 +116,7 @@ public class EditScenarioLogControl extends JPanel {
         logsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         logsTable.getSelectionModel().addListSelectionListener(this::logTableValueChanged);
 
-        JScrollPane scrollLogsTable = new JScrollPaneWithSpeed();
+        JScrollPane scrollLogsTable = new FastJScrollPane();
         scrollLogsTable.setName(resourceMap.getString("scrollLogsTable.name"));
         scrollLogsTable.setViewportView(logsTable);
         this.add(scrollLogsTable, BorderLayout.CENTER);

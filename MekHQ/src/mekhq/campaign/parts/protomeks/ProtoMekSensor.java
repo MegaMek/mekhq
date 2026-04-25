@@ -55,6 +55,7 @@ import org.w3c.dom.Node;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtoMekSensor extends Part {
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ProtoMekSensor() {
         this(0, null);
     }

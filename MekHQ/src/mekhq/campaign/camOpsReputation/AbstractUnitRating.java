@@ -249,7 +249,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 }
                 return 0;
             });
-            commander = commanderList.get(0);
+            commander = commanderList.getFirst();
         }
 
         return commander;
@@ -529,6 +529,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     void updateDockingCollarCount(Jumpship jumpShip) {
         setDockingCollarCount(getDockingCollarCount() + jumpShip.getDockingCollars().size());
     }
@@ -598,6 +599,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         infantryUnitCount++;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getInfantryUnitCount() {
         return infantryUnitCount;
     }

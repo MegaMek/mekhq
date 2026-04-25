@@ -77,6 +77,7 @@ public class SpaUtilities {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean isSpaCategory(final SpecialAbility ability, final AbilityCategory category) {
         return getSpaCategory(ability) == category;
     }

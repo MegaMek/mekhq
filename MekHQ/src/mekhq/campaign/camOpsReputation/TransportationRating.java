@@ -400,7 +400,7 @@ public class TransportationRating {
         }
 
         // Count the number of passengers by filtering the personnel list
-        int passengerCount = (int) campaign.getPersonnelFilteringOutDepartedAndAbsent().size();
+        int passengerCount = campaign.getPersonnelFilteringOutDepartedAndAbsent().size();
 
         // Map each unit count to its type
         Map<String, Integer> transportRequirements = new HashMap<>(Map.of(

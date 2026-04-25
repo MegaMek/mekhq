@@ -36,7 +36,6 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 
 import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

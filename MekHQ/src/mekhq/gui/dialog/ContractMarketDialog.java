@@ -176,6 +176,7 @@ public class ContractMarketDialog extends JDialog {
      *
      * @return the total number of available contracts
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getAvailableContractsCount(Campaign campaign) {
         int contractCount = 0;
 
@@ -246,14 +247,6 @@ public class ContractMarketDialog extends JDialog {
         spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));
         spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
-            for (Contract c : contractMarket.getContracts()) {
-                if (campaign.getCampaignOptions().isUseAtB() &&
-                          campaign.getCampaignOptions().isUseShareSystem() &&
-                          c instanceof AtBContract) {
-                    ((AtBContract) c).setAtBSharesPercent(sharePct);
-                    c.calculateContract(campaign);
-                }
-            }
             if (contractView != null) {
                 contractView.refreshAmounts();
             }
@@ -745,12 +738,7 @@ public class ContractMarketDialog extends JDialog {
             scrollContractView.setViewportView(null);
             return;
         }
-        contractView = new ContractSummaryPanel(selectedContract,
-              campaign,
-              campaign.getCampaignOptions().isUseAtB() &&
-                    selectedContract instanceof AtBContract &&
-                    !((AtBContract) selectedContract).isSubcontract() &&
-                    !campaign.isPirateCampaign());
+        contractView = new ContractSummaryPanel(selectedContract, campaign, false);
         scrollContractView.setViewportView(contractView);
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere later

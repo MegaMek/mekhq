@@ -72,6 +72,7 @@ public class AeroLifeSupport extends Part {
                                                                        AvailabilityValue.C)
                                                                  .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public AeroLifeSupport() {
         this(0, Money.zero(), false, null);
     }

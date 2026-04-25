@@ -843,7 +843,7 @@ public class Academy implements Comparable<Academy> {
             tooltip.append("<i>").append(description).append("</i><br><br>");
             tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
-            Person person = personnel.get(0);
+            Person person = personnel.getFirst();
 
             int educationLevel = 0;
 

@@ -50,6 +50,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.SmallCraftBay;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
@@ -146,6 +149,10 @@ public class CamOpsSalvageUtilities {
                                 tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
                                       "CamOpsSalvageUtilities.tooltip.tug")).append(")");
                             }
+                            if (CamOpsSalvageUtilities.hasSuitableBayEquipment(entity)) {
+                                tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                                      "CamOpsSalvageUtilities.tooltip.bayEquipment")).append(")");
+                            }
                         }
                     }
                 }
@@ -165,6 +172,16 @@ public class CamOpsSalvageUtilities {
             }
         }
 
+        return false;
+    }
+
+    public static boolean hasSuitableBayEquipment(Entity entity) {
+        for (Bay b : entity.getTransportBays()) {
+            //ASF and SC bays are assumed to have the equipment needed to handle space derelicts
+            if ((b instanceof ASFBay) || (b instanceof SmallCraftBay)) {
+                return true;
+            }
+        }
         return false;
     }
 

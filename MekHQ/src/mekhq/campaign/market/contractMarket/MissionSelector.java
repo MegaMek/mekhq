@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.compute.Compute;
 import mekhq.campaign.mission.enums.AtBContractType;
 
@@ -58,7 +57,7 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
             case 4 -> AtBContractType.PIRATE_HUNTING;
@@ -89,7 +88,7 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
             case 4 -> AtBContractType.PLANETARY_ASSAULT;
@@ -120,7 +119,7 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2, 3 -> getCovertMission(Compute.d6(2), margin);
             case 4, 12 -> getSpecialMission(Compute.d6(2), margin);
             case 5, 8 -> AtBContractType.OBJECTIVE_RAID;
@@ -151,7 +150,7 @@ public class MissionSelector {
     }
 
     private static AtBContractType getSpecialMission(int roll, int margin) {
-        return switch (MathUtility.clamp(roll + margin, 2, 12)) {
+        return switch (Math.clamp(roll + margin, 2, 12)) {
             case 2 -> getCovertMission(Compute.d6(2), margin);
             // TODO: figure out how to offer planetary assault followup contracts
             case 3, 4 -> AtBContractType.GUERRILLA_WARFARE;

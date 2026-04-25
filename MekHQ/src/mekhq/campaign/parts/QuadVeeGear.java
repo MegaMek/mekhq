@@ -72,6 +72,7 @@ public class QuadVeeGear extends Part {
                                                                  .setProductionFactions(Faction.CHH)
                                                                  .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public QuadVeeGear() {
         this(0, null);
     }

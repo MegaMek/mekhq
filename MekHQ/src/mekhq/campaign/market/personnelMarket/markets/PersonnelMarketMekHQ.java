@@ -35,7 +35,6 @@ package mekhq.campaign.market.personnelMarket.markets;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
@@ -343,7 +342,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
         getLogger().debug("Rolls modified for location: {}", rolls);
 
-        rolls = clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
+        rolls = Math.clamp((int) round(rolls * getSystemPopulationRecruitmentMultiplier()), 1, rolls);
         getLogger().debug("Rolls modified for population: {}", rolls);
 
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();

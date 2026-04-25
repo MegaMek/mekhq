@@ -138,7 +138,6 @@ public class FormerSpouseTest {
         final FormerSpouse formerSpouse5 = new FormerSpouse(mockPerson1, today, FormerSpouseReason.DIVORCE);
 
         // Testing Equals
-        assertEquals(formerSpouse1, formerSpouse1);
         assertNotEquals(formerSpouse1, mockPerson1);
         assertNotEquals(formerSpouse1, formerSpouse2);
         assertNotEquals(formerSpouse1, formerSpouse3);

@@ -177,6 +177,7 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
         setData(new ArrayList<>(data));
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void updateRow(int row, PartInUse partInUse) {
         data.set(row, partInUse);
         fireTableRowsUpdated(row, row);
@@ -289,10 +290,12 @@ public class PartsInUseTableModel extends DataTableModel<PartInUse> {
             table.addMouseListener(this);
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public Border getFocusBorder() {
             return focusBorder;
         }
 
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public void setFocusBorder(Border focusBorder) {
             this.focusBorder = focusBorder;
             editButton.setBorder(focusBorder);

@@ -425,24 +425,23 @@ public class QuickTrain {
             return;
         }
 
-        switch (profession) {
-            case SOLDIER -> {
-                String highestSkillName = isUseSmallArmsOnly ?
-                                                S_SMALL_ARMS :
-                                                getHighestSkill(InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS,
-                                                      person, skillModifierData);
-                if (person.hasSkill(SkillType.S_ANTI_MEK)) {
-                    targetSkills.add(SkillType.S_ANTI_MEK);
-                }
-
-                if (highestSkillName == null) {
-                    targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isAdminsHaveNegotiation,
-                          isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
-                } else {
-                    targetSkills.add(highestSkillName);
-                }
+        if (profession == PersonnelRole.SOLDIER) {
+            String highestSkillName = isUseSmallArmsOnly ?
+                                            S_SMALL_ARMS :
+                                            getHighestSkill(InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS,
+                                                  person, skillModifierData);
+            if (person.hasSkill(SkillType.S_ANTI_MEK)) {
+                targetSkills.add(SkillType.S_ANTI_MEK);
             }
-            default -> targetSkills.addAll(profession.getSkillsForProfession(isAdminsHaveNegotiation,
+
+            if (highestSkillName == null) {
+                targetSkills.addAll(PersonnelRole.SOLDIER.getSkillsForProfession(isAdminsHaveNegotiation,
+                      isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
+            } else {
+                targetSkills.add(highestSkillName);
+            }
+        } else {
+            targetSkills.addAll(profession.getSkillsForProfession(isAdminsHaveNegotiation,
                   isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery, false));
         }
     }

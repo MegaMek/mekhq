@@ -90,6 +90,7 @@ public enum Phenotype {
     // endregion Variable Declarations
 
     // region Constructors
+    @Deprecated(since = "0.51.0", forRemoval = true)
     Phenotype() {
         this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9, 8, 0), new ArrayList<>());
     }
@@ -146,6 +147,7 @@ public enum Phenotype {
      * @author Illiani
      * @since 0.50.05
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isTrueborn() {
         return external;
     }

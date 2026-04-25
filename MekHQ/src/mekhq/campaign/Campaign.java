@@ -267,7 +267,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
-import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -329,8 +328,7 @@ public class Campaign implements ITechManager {
     /**
      * Map of PersonnelRole to temp crew pool size. Tracks TOTAL pool (not available). Use
      * {@link #getAvailableTempCrewPool(PersonnelRole)} for available count
-     *
-     *  */
+     **/
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
 
     private int lastFormationId;
@@ -454,11 +452,6 @@ public class Campaign implements ITechManager {
     private final List<String> turnoverRetirementInformation;
 
     private AtBConfiguration atbConfig; // AtB
-    private AtBEventProcessor atbEventProcessor; // AtB
-    private LocalDate shipSearchStart; // AtB
-    private int shipSearchType;
-    private String shipSearchResult; // AtB
-    private LocalDate shipSearchExpiration; // AtB
     private IUnitGenerator unitGenerator; // deprecated
     @Deprecated(since = "0.50.10", forRemoval = true)
     private IUnitRating unitRating; // deprecated
@@ -866,9 +859,8 @@ public class Campaign implements ITechManager {
      * <p>This method provides a list of unique identifiers for all units currently included in the formation's TOE
      * structure.</p>
      *
-     * @param standardFormationsOnly if {@code true}, returns only units in {@link FormationType#STANDARD}
-     *                              formations; if
-     *                           {@code false}, returns all units.
+     * @param standardFormationsOnly if {@code true}, returns only units in {@link FormationType#STANDARD} formations;
+     *                               if {@code false}, returns all units.
      *
      * @return a List of UUID objects representing all units in the TOE according to the specified filter
      *
@@ -889,7 +881,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using {@code formationId} as the key.
+     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using {@code formationId} as the
+     * key.
      *
      * @param formationId the key of the {@link CombatTeam} to be removed from the {@link Hashtable}
      */
@@ -1084,10 +1077,6 @@ public class Campaign implements ITechManager {
         campaignEventProcessor = processor;
     }
 
-    public void setAtBEventProcessor(AtBEventProcessor processor) {
-        atbEventProcessor = processor;
-    }
-
     public void setAtBConfig(AtBConfiguration config) {
         atbConfig = config;
     }
@@ -1098,127 +1087,6 @@ public class Campaign implements ITechManager {
         }
         return atbConfig;
     }
-
-    // region Ship Search
-
-    /**
-     * Sets the date a ship search was started, or null if no search is in progress.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchStart(@Nullable LocalDate shipSearchStart) {
-        this.shipSearchStart = shipSearchStart;
-    }
-
-    /**
-     * @return The date a ship search was started, or null if none is in progress.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public LocalDate getShipSearchStart() {
-        return shipSearchStart;
-    }
-
-    /**
-     * Sets the lookup name of the available ship, or null if none were found.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchResult(@Nullable String result) {
-        shipSearchResult = result;
-    }
-
-    /**
-     * @return The lookup name of the available ship, or null if none is available
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public String getShipSearchResult() {
-        return shipSearchResult;
-    }
-
-    /**
-     * @return The date the ship is no longer available, if there is one.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public LocalDate getShipSearchExpiration() {
-        return shipSearchExpiration;
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchExpiration(LocalDate shipSearchExpiration) {
-        this.shipSearchExpiration = shipSearchExpiration;
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public int getShipSearchType() {
-        return shipSearchType;
-    }
-
-    /**
-     * Sets the unit type to search for.
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void setShipSearchType(int unitType) {
-        shipSearchType = unitType;
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void startShipSearch(int unitType) {
-        setShipSearchStart(getLocalDate());
-        setShipSearchType(unitType);
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    public void purchaseShipSearchResult() {
-        MekSummary ms = MekSummaryCache.getInstance().getMek(getShipSearchResult());
-        if (ms == null) {
-            LOGGER.error("Cannot find entry for {}", getShipSearchResult());
-            return;
-        }
-
-        Money cost = Money.of(ms.getCost());
-
-        if (getFunds().isLessThan(cost)) {
-            addReport(FINANCES, "<font color='" +
-                                      ReportingUtilities.getNegativeColor() +
-                                      "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
-            return;
-        }
-
-        MekFileParser mekFileParser;
-
-        try {
-            mekFileParser = new MekFileParser(ms.getSourceFile(), ms.getEntryName());
-        } catch (Exception ex) {
-            LOGGER.error("Unable to load unit: {}", ms.getEntryName(), ex);
-            return;
-        }
-
-        Entity en = mekFileParser.getEntity();
-
-        int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ?
-                                0 :
-                                calculatePartTransitTime(en.calcYearAvailability(getGameYear(),
-                                      useClanTechBase(),
-                                      getTechFaction()));
-
-        getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        PartQuality quality = PartQuality.QUALITY_D;
-
-        if (campaignOptions.isUseRandomUnitQualities()) {
-            quality = Unit.getRandomUnitQuality(0);
-        }
-
-        addNewUnit(en, true, transitDays, quality);
-
-        if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
-            addReport(ACQUISITIONS, "<font color='" +
-                                          ReportingUtilities.getPositiveColor() +
-                                          "'>Unit will be delivered in " +
-                                          transitDays +
-                                          " days.</font>");
-        }
-        setShipSearchResult(null);
-        setShipSearchExpiration(null);
-    }
-    // endregion Ship Search
 
     /**
      * Process retirements for retired personnel, if any.
@@ -1372,6 +1240,7 @@ public class Campaign implements ITechManager {
         return campaignSummary;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setCampaignSummary(CampaignSummary campaignSummary) {
         this.campaignSummary = campaignSummary;
         this.campaignSummary.setCampaign(this);
@@ -1382,8 +1251,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add formation to an existing superformation. This method will also assign the formation an id and place it in the formationId
-     * hash
+     * Add formation to an existing superformation. This method will also assign the formation an id and place it in the
+     * formationId hash
      *
      * @param formation      - the Formation to add
      * @param superFormation - the superformation to add the new formation to
@@ -1398,7 +1267,7 @@ public class Campaign implements ITechManager {
 
         formation.updateCommander(this);
 
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             recalculateCombatTeams(this);
         }
     }
@@ -1518,7 +1387,7 @@ public class Campaign implements ITechManager {
             MekHQ.triggerEvent(new OrganizationChangedEvent(this, formation, unit));
         }
 
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             recalculateCombatTeams(this);
         }
     }
@@ -2344,6 +2213,7 @@ public class Campaign implements ITechManager {
         return baseCapacity + rentedCapacity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getCachedMashTheaterCapacity() {
         return mashTheatreCapacity;
     }
@@ -2352,6 +2222,7 @@ public class Campaign implements ITechManager {
         this.mashTheatreCapacity = mashTheatreCapacity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getRepairBaysRented() {
         return repairBaysRented;
     }
@@ -2360,6 +2231,7 @@ public class Campaign implements ITechManager {
         this.repairBaysRented = repairBaysRented;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void changeRepairBaysRented(int delta) {
         repairBaysRented = max(0, repairBaysRented + delta);
     }
@@ -2547,12 +2419,12 @@ public class Campaign implements ITechManager {
                                   "" :
                                   ' ' +
                                         String.format(resources.getString("personnelRecruitmentFormerSurname.text") +
-                                                            ' ', formerSurname);
+                                                      ' ', formerSurname);
             String add = !prisonerStatus.isFree() ?
                                (' ' +
                                       resources.getString(prisonerStatus.isBondsman() ?
-                                                                "personnelRecruitmentBondsman.text" :
-                                                                "personnelRecruitmentPrisoner.text")) :
+                                                          "personnelRecruitmentBondsman.text" :
+                                                          "personnelRecruitmentPrisoner.text")) :
                                "";
             addReport(PERSONNEL, String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
                   person.getHyperlinkedFullTitle(),
@@ -2868,58 +2740,58 @@ public class Campaign implements ITechManager {
                 case MEKWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MEK) ?
                                              person.getSkill(SkillType.S_GUN_MEK)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MEK) ?
                                              person.getSkill(SkillType.S_PILOT_MEK)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case AEROSPACE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO) ?
                                              person.getSkill(SkillType.S_GUN_AERO)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO) ?
                                              person.getSkill(SkillType.S_PILOT_AERO)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case ELEMENTAL: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA) ?
                                              person.getSkill(SkillType.S_GUN_BA)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MEK) ?
                                              person.getSkill(SkillType.S_ANTI_MEK)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case VEHICLE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE) ?
                                              person.getSkill(SkillType.S_GUN_VEE)
-                                                   .getFinalSkillValue(skillModifierData) :
+                                             .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     switch (person.getPrimaryRole()) {
                         case VEHICLE_CREW_GROUND:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_GVEE)
-                                                           .getFinalSkillValue(skillModifierData) :
+                                                     .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VEHICLE_CREW_NAVAL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_NVEE)
-                                                           .getFinalSkillValue(skillModifierData) :
+                                                     .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VEHICLE_CREW_VTOL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                                      person.getSkill(SkillType.S_PILOT_VTOL)
-                                                           .getFinalSkillValue(skillModifierData) :
+                                                     .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         default:
@@ -2931,7 +2803,7 @@ public class Campaign implements ITechManager {
                     bloodnameTarget += 2 *
                                              (person.hasSkill(SkillType.S_GUN_PROTO) ?
                                                     person.getSkill(SkillType.S_GUN_PROTO)
-                                                          .getFinalSkillValue(skillModifierData) :
+                                                    .getFinalSkillValue(skillModifierData) :
                                                     TargetRoll.AUTOMATIC_FAIL);
                     break;
                 }
@@ -2941,28 +2813,28 @@ public class Campaign implements ITechManager {
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_PILOT_SPACE) ?
                                                             person.getSkill(SkillType.S_PILOT_SPACE)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_GUNNER:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_GUN_SPACE) ?
                                                             person.getSkill(SkillType.S_GUN_SPACE)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_CREW:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_TECH_VESSEL) ?
                                                             person.getSkill(SkillType.S_TECH_VESSEL)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_NAVIGATION) ?
                                                             person.getSkill(SkillType.S_NAVIGATION)
-                                                                  .getFinalSkillValue(skillModifierData) :
+                                                            .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         default:
@@ -3168,6 +3040,7 @@ public class Campaign implements ITechManager {
      *
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<Person> getActiveCombatPersonnel() {
         return getActivePersonnel(false, false).stream()
                      .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
@@ -3365,11 +3238,6 @@ public class Campaign implements ITechManager {
      */
     public Collection<Part> getParts() {
         return parts.getParts();
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private int getQuantity(Part part) {
-        return getWarehouse().getPartQuantity(part, true);
     }
 
     public Part getPart(int id) {
@@ -3865,9 +3733,7 @@ public class Campaign implements ITechManager {
 
         switch (acquisitionsType) {
             case ADMINISTRATION -> fixedSkillName = S_ADMIN;
-            case ANY_TECH -> {
-                isAnyTech = true;
-            }
+            case ANY_TECH -> isAnyTech = true;
             case AUTOMATIC -> {
                 return null;
             }
@@ -4178,9 +4044,7 @@ public class Campaign implements ITechManager {
 
         switch (acquisitionsType) {
             case ADMINISTRATION -> fixedSkillName = S_ADMIN;
-            case ANY_TECH -> {
-                isAnyTech = true;
-            }
+            case ANY_TECH -> isAnyTech = true;
             case AUTOMATIC -> {
                 return Collections.emptyList();
             }
@@ -5598,7 +5462,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns {@code null}.
+     * Retrieves the flagged second-in-command from the personnel list. If no flagged second-in-command is found returns
+     * {@code null}.
      *
      * <p><b>Usage:</b> consider using {@link #getSecondInCommand()} instead.</p>
      *
@@ -5808,7 +5673,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             recalculateCombatTeams(this);
         }
     }
@@ -5848,7 +5713,7 @@ public class Campaign implements ITechManager {
                 u.getEntity().setC3Master(null, true);
             }
 
-            if (campaignOptions.isUseAtB() && formation.getUnits().isEmpty()) {
+            if (campaignOptions.isUseStratCon() && formation.getUnits().isEmpty()) {
                 combatTeams.remove(formation.getId());
             }
         }
@@ -5926,7 +5791,7 @@ public class Campaign implements ITechManager {
 
         shoppingList.restore();
 
-        if (getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseStratCon()) {
             RandomFactionGenerator.getInstance().startup(this);
 
             int loops = 0;
@@ -6362,6 +6227,7 @@ public class Campaign implements ITechManager {
      * @param description       String displayed in the ledger and report
      * @param individualPayouts Map of Person to the Money they're owed
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void payPersonnel(TransactionType type, Money quantity, String description,
           Map<Person, Money> individualPayouts) {
         getFinances().debit(type,
@@ -6739,7 +6605,7 @@ public class Campaign implements ITechManager {
         getUnitMarket().writeToXML(writer, indent);
 
         // Against the Bot
-        if (getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseStratCon()) {
             // TODO : AbstractContractMarket : Remove next two lines
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXML(this, writer, indent);
@@ -7847,7 +7713,7 @@ public class Campaign implements ITechManager {
               skill.getSkillLevel(skillModifierData).toString());
         target.append(acquisition.getAllAcquisitionMods());
 
-        if (getCampaignOptions().isUseAtB() && getCampaignOptions().isRestrictPartsByMission()) {
+        if (getCampaignOptions().isUseStratCon() && getCampaignOptions().isRestrictPartsByMission()) {
             int contractAvailability = findAtBPartsAvailabilityLevel();
 
             if (contractAvailability != 0) {
@@ -7934,7 +7800,9 @@ public class Campaign implements ITechManager {
 
     /**
      * Gets the total temp crew pool size for a specific personnel role
+     *
      * @param role the personnel role
+     *
      * @return the total number of temp crew in the pool for this role
      */
     public int getTempCrewPool(PersonnelRole role) {
@@ -7947,6 +7815,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Sets the total temp crew pool size for a specific personnel role
+     *
      * @param role the personnel role
      * @param size the total number of temp crew in the pool
      */
@@ -7967,7 +7836,9 @@ public class Campaign implements ITechManager {
 
     /**
      * Checks if a specific blob crew type is enabled in campaign options
+     *
      * @param role the personnel role to check
+     *
      * @return true if this blob crew type is enabled
      */
     public boolean isBlobCrewEnabled(PersonnelRole role) {
@@ -7986,18 +7857,22 @@ public class Campaign implements ITechManager {
 
     /**
      * Gets the number of temp crew currently in use by units for a specific role
+     *
      * @param role the personnel role
+     *
      * @return the number of temp crew in use
      */
     public int getTempCrewInUse(PersonnelRole role) {
         return getUnits().stream()
-            .mapToInt(unit -> unit.getTempCrewByPersonnelRole(role))
-            .sum();
+                     .mapToInt(unit -> unit.getTempCrewByPersonnelRole(role))
+                     .sum();
     }
 
     /**
      * Gets the number of temp crew available for assignment for a specific role
+     *
      * @param role the personnel role
+     *
      * @return total pool minus crew currently in use
      */
     public int getAvailableTempCrewPool(PersonnelRole role) {
@@ -8292,7 +8167,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Increases the temp crew pool for a specific personnel role and fires the appropriate event
-     * @param role the personnel role
+     *
+     * @param role   the personnel role
      * @param amount the amount to increase by
      */
     public void increaseTempCrewPool(PersonnelRole role, int amount) {
@@ -8302,7 +8178,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Decreases the temp crew pool for a specific personnel role and fires the appropriate event
-     * @param role the personnel role
+     *
+     * @param role   the personnel role
      * @param amount the amount to decrease by
      */
     public void decreaseTempCrewPool(PersonnelRole role, int amount) {
@@ -8312,7 +8189,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Fires the appropriate pool changed event for a specific personnel role
-     * @param role the personnel role
+     *
+     * @param role   the personnel role
      * @param change the change amount (positive for increase, negative for decrease)
      */
     private void fireTempCrewPoolChangedEvent(PersonnelRole role, int change) {
@@ -8331,6 +8209,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Empties the temp crew pool for a specific role by setting it to the number of active temp crew for that role.
+     *
      * @param role the personnel role to reduce to the minimum
      */
     public void emptyTempCrewPoolForRole(PersonnelRole role) {
@@ -8338,8 +8217,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Fills the temp crew pool for a specific role by calculating crew needs across all units.
-     * Only runs if the corresponding blob crew option is enabled.
+     * Fills the temp crew pool for a specific role by calculating crew needs across all units. Only runs if the
+     * corresponding blob crew option is enabled.
+     *
      * @param role the personnel role to fill
      */
     public void fillTempCrewPoolForRole(PersonnelRole role) {
@@ -8367,6 +8247,7 @@ public class Campaign implements ITechManager {
 
     /**
      * Resets the temp crew pool for a specific role by emptying and then filling it.
+     *
      * @param role the personnel role to reset
      */
     public void resetTempCrewPoolForRole(PersonnelRole role) {
@@ -8376,8 +8257,9 @@ public class Campaign implements ITechManager {
 
 
     /**
-     * Clears blob crew for a specific personnel role from units and empties the campaign pool.
-     * Should be called when a specific blob crew option is disabled.
+     * Clears blob crew for a specific personnel role from units and empties the campaign pool. Should be called when a
+     * specific blob crew option is disabled.
+     *
      * @param role the personnel role to clear
      */
     public void clearBlobCrewForRole(PersonnelRole role) {
@@ -8395,8 +8277,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Clears all blob crew from units and empties all campaign pools.
-     * Should be called when all blob crew options are disabled.
+     * Clears all blob crew from units and empties all campaign pools. Should be called when all blob crew options are
+     * disabled.
+     *
      * @deprecated Use {@link #clearBlobCrewForRole(PersonnelRole)} to clear specific roles instead
      */
     @Deprecated
@@ -8419,10 +8302,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use
-     * temp crew - checks if the commander is null
+     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use temp
+     * crew - checks if the commander is null
+     *
      * @param unit the unit to check
      * @param role the personnel role
+     *
      * @return true if the unit can use this type of temp crew
      */
     private boolean unitCanUseTempCrewRole(Unit unit, PersonnelRole role) {
@@ -8444,8 +8329,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Distributes temp crew from the pool to units that need crew for a specific personnel role.
-     * Each unit can be filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     * Distributes temp crew from the pool to units that need crew for a specific personnel role. Each unit can be
+     * filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     *
      * @param role the personnel role to distribute
      */
     public void distributeTempCrewPoolToUnits(PersonnelRole role) {
@@ -8558,6 +8444,7 @@ public class Campaign implements ITechManager {
         return partsStore;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setPartsStore(PartsStore partsStore) {
         this.partsStore = partsStore;
         this.partsStore.stock(this);
@@ -8614,6 +8501,7 @@ public class Campaign implements ITechManager {
      *
      * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getCommanderStrategy() {
         int commanderStrategy = 0;
         Person commander = getCommander();
@@ -8881,7 +8769,7 @@ public class Campaign implements ITechManager {
         // collect all the other units on this network to rebuild the uuids
         Vector<String> uuids = new Vector<>();
         Vector<Unit> networkedUnits = new Vector<>();
-        String network = removedUnits.get(0).getEntity().getC3NetId();
+        String network = removedUnits.getFirst().getEntity().getC3NetId();
         for (Unit unit : getUnits()) {
             if (removedUnits.contains(unit)) {
                 continue;
@@ -9214,7 +9102,7 @@ public class Campaign implements ITechManager {
             }
 
             // This relies on the mission being a Contract, and AtB to be on
-            if (getCampaignOptions().isUseAtB()) {
+            if (getCampaignOptions().isUseStratCon()) {
                 setHasActiveContract();
             }
         }
@@ -9556,92 +9444,6 @@ public class Campaign implements ITechManager {
 
     public void initTurnover() {
         getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
-    }
-
-    public void initAtB(boolean newCampaign) {
-        if (!newCampaign) {
-            /*
-             * Switch all contracts to AtBContract's
-             */
-            for (Entry<Integer, Mission> me : missions.entrySet()) {
-                Mission m = me.getValue();
-                if (m instanceof Contract && !(m instanceof AtBContract)) {
-                    me.setValue(new AtBContract((Contract) m, this));
-                }
-            }
-
-            /*
-             * Go through all the personnel records and assume the earliest date is the date
-             * the unit was founded.
-             */
-            LocalDate founding = null;
-            for (Person person : getPersonnel()) {
-                for (LogEntry logEntry : person.getPersonalLog()) {
-                    if ((founding == null) || logEntry.getDate().isBefore(founding)) {
-                        founding = logEntry.getDate();
-                    }
-                }
-            }
-            /*
-             * Go through the personnel records again and assume that any person who joined the unit on the founding
-             * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
-             * they joined came with that `Mek (which is a less certain assumption)
-             */
-            for (Person person : getPersonnel()) {
-                LocalDate join = person.getPersonalLog()
-                                       .stream()
-                                       .filter(e -> e.getDesc().startsWith("Joined "))
-                                       .findFirst()
-                                       .map(LogEntry::getDate)
-                                       .orElse(null);
-                if ((join != null) && join.equals(founding)) {
-                    person.setFounder(true);
-                }
-                if (person.getPrimaryRole().isMekWarrior() ||
-                          (person.getPrimaryRole().isAerospacePilot() &&
-                                 getCampaignOptions().isAeroRecruitsHaveUnits()) ||
-                          person.getPrimaryRole().isProtoMekPilot()) {
-                    for (LogEntry logEntry : person.getPersonalLog()) {
-                        if (logEntry.getDate().equals(join) && logEntry.getDesc().startsWith("Assigned to ")) {
-                            String mek = logEntry.getDesc().substring(12);
-                            MekSummary ms = MekSummaryCache.getInstance().getMek(mek);
-                            if (null != ms &&
-                                      (person.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
-                                person.setOriginalUnitWeight(ms.getWeightClass());
-                                if (ms.isClan()) {
-                                    person.setOriginalUnitTech(Person.TECH_CLAN);
-                                } else if (ms.getYear() > 3050) {
-                                    // TODO : Fix this so we aren't using a hack that just assumes IS2
-                                    person.setOriginalUnitTech(Person.TECH_IS2);
-                                }
-                                if ((null != person.getUnit()) &&
-                                          ms.getName().equals(person.getUnit().getEntity().getShortNameRaw())) {
-                                    person.setOriginalUnitId(person.getUnit().getId());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            addAllCombatTeams(this.formations);
-
-            // Determine whether there is an active contract
-            setHasActiveContract();
-        }
-
-        setAtBConfig(AtBConfiguration.loadFromXml());
-        RandomFactionGenerator.getInstance().startup(this);
-        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
-        setAtBEventProcessor(new AtBEventProcessor(this));
-    }
-
-    /**
-     * Stop processing AtB events and release memory.
-     */
-    public void shutdownAtB() {
-        RandomFactionGenerator.getInstance().dispose();
-        atbEventProcessor.shutdown();
     }
 
     /**
@@ -10150,6 +9952,7 @@ public class Campaign implements ITechManager {
      *
      * @return systemsInstance Systems instance used when instantiating this Campaign instance.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Systems getSystemsInstance() {
         return systemsInstance;
     }
@@ -10160,6 +9963,7 @@ public class Campaign implements ITechManager {
      *
      * @param systemsInstance new Systems instance that this campaign should use.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSystemsInstance(Systems systemsInstance) {
         this.systemsInstance = systemsInstance;
     }

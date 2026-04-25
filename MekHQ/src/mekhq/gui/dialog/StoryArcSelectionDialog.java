@@ -41,10 +41,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
@@ -106,7 +106,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
         descriptionPane.setMinimumSize(new Dimension(400, 400));
         descriptionPane.setPreferredSize(new Dimension(400, 400));
         descriptionPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        mainPanel.add(new JScrollPaneWithSpeed(descriptionPane));
+        mainPanel.add(new FastJScrollPane(descriptionPane));
 
         return mainPanel;
     }

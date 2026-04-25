@@ -117,7 +117,7 @@ public class PostScenarioDialogHandler {
     }
 
     private static void restartRats(Campaign campaign) {
-        if (campaign.getCampaignOptions().isUseAtB()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             RandomUnitGenerator.getInstance();
             RandomNameGenerator.getInstance();
         }
