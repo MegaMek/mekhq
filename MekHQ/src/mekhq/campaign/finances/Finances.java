@@ -555,7 +555,7 @@ public class Finances {
     }
 
     private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
-        if (campaign.getCampaignOptions().isUseAtB() &&
+        if (campaign.getCampaignOptions().isUseStratCon() &&
                   campaign.getCampaignOptions().isUseShareSystem() &&
                   (contract instanceof AtBContract)) {
             Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent()).dividedBy(100);
