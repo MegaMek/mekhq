@@ -91,18 +91,22 @@ public enum BattleMekWeightClassGenerationMethod {
         return this == WINDCHILD;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isWindchildLight() {
         return this == WINDCHILD_LIGHT;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isWindchildMedium() {
         return this == WINDCHILD_MEDIUM;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isWindchildHeavy() {
         return this == WINDCHILD_HEAVY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isWindchildAssault() {
         return this == WINDCHILD_ASSAULT;
     }

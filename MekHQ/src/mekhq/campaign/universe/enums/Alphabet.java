@@ -206,6 +206,7 @@ public enum Alphabet {
         return this == Y;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isZ() {
         return this == Z;
     }

@@ -39,7 +39,6 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -127,8 +126,6 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
      * <p>This method integrates campaign options such as:</p>
      * <ul>
      *     <li>The default vocational XP advancement rate ({@code VocationalXP})</li>
-     *     <li>The status of whether the campaign is using the AtB (Against the Bot)
-     *         system ({@code isUseAtB})</li>
      *     <li>The type of active employment contracts (e.g., garrison or non-garrison)</li>
      * </ul>
      *
@@ -145,16 +142,7 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
         int advancement = campaignOptions.getVocationalXP();
 
         if (campaign.hasActiveContract()) {
-            if (campaignOptions.isUseAtB()) {
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    if (!contract.getContractType().isGarrisonType()) {
-                        advancement *= 2;
-                        break;
-                    }
-                }
-            } else {
-                advancement *= 2;
-            }
+            advancement *= 2;
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "dialog.ooc", advancement);

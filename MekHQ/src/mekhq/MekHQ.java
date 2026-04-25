@@ -436,6 +436,7 @@ public class MekHQ implements GameListener {
     /**
      * @param campaignGUI the {@link CampaignGUI} to set
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setCampaignGUI(CampaignGUI campaignGUI) {
         this.campaignGUI = campaignGUI;
     }
@@ -545,20 +546,7 @@ public class MekHQ implements GameListener {
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        // Start the game thread - also refactor this into a factory
-        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
-            gameThread = new AtBGameThread(playerName,
-                  password,
-                  client,
-                  this,
-                  meks,
-                  atBScenario,
-                  autoResolveBehaviorSettings,
-                  useExperimentalPacarGui,
-                  true);
-        } else {
-            gameThread = new GameThread(playerName, password, client, this, meks, scenario);
-        }
+        gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         gameThread.start();
     }
 

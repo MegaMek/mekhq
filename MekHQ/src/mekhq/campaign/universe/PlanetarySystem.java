@@ -512,6 +512,7 @@ public class PlanetarySystem {
         return null;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Set<Integer> getPlanetPositions() {
         return planets.keySet();
     }
@@ -541,6 +542,7 @@ public class PlanetarySystem {
         return Objects.hash(id);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public PlanetarySystemEvent getEvent(LocalDate when) {
         if ((null == when) || (null == events)) {
             return null;

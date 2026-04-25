@@ -5246,7 +5246,7 @@ public class Person {
 
         int averageSkillLevel = (int) floor((double) totalSkillLevel / skillNames.size());
 
-        Skill skill = getSkill(skillNames.get(0));
+        Skill skill = getSkill(skillNames.getFirst());
         if (skill == null) {
             return EXP_NONE;
         }

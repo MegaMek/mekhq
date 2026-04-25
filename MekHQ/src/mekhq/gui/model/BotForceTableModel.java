@@ -120,6 +120,7 @@ public class BotForceTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<BotForce> getAllBotForces() {
         return data;
     }

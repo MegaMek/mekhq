@@ -138,7 +138,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
               MHQConstants.VERSION), JLabel.CENTER);
         lblVersion.setPreferredSize(new Dimension(250, 15));
         if (!skinSpec.fontColors.isEmpty()) {
-            lblVersion.setForeground(skinSpec.fontColors.get(0));
+            lblVersion.setForeground(skinSpec.fontColors.getFirst());
         }
 
         MegaMekButton btnNewCampaign = new MegaMekButton(resources.getString("btnNewCampaign.text"),

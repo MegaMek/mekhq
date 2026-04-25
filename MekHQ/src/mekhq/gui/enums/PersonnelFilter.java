@@ -312,6 +312,7 @@ public enum PersonnelFilter {
         return this == DEPENDENT;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCampFollower() {
         return this == CAMP_FOLLOWER;
     }

@@ -41,6 +41,7 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 import megamek.common.OffBoardDirection;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectConditionType;
@@ -50,7 +51,6 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * UI for creating or editing a single scenario objective
@@ -202,7 +202,7 @@ public class ObjectiveEditPanel extends JDialog {
     private void addDescriptionUI(GridBagConstraints gbc) {
         JLabel lblShortDescription = new JLabel("Short Description:");
 
-        JScrollPane txtScroll = new JScrollPaneWithSpeed();
+        JScrollPane txtScroll = new FastJScrollPane();
         txtShortDescription = new JTextArea();
         txtShortDescription.setColumns(40);
         txtShortDescription.setRows(5);

@@ -91,16 +91,19 @@ public class StarType {
         // empty constructor
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public StarType(int spectraClass, double subtype, String luminosity) {
         this.spectralClass = spectraClass;
         this.subtype = subtype;
         this.luminosity = luminosity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getSpectralClass() {
         return spectralClass;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSpectralClass(int c) {
         this.spectralClass = c;
     }
@@ -113,10 +116,12 @@ public class StarType {
         this.subtype = d;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getLuminosity() {
         return luminosity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setLuminosity(String s) {
         this.luminosity = s;
     }
@@ -128,7 +133,7 @@ public class StarType {
         }
 
         // Formatting subtype value up to two decimal points, if needed
-        int subtypeValue = MathUtility.clamp((int) Math.round(subtype * 100d), 0, 999);
+        int subtypeValue = Math.clamp((int) Math.round(subtype * 100d), 0, 999);
 
         String subtypeFormat = "%.2f";
         if (subtypeValue % 100 == 0) {

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -133,6 +132,7 @@ public enum Social {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPersonalityTraitTypeLabel() {
         return getPersonalityTraitType().getLabel();
     }
@@ -172,7 +172,7 @@ public enum Social {
      */
     public String getDescription(int socialDescriptionIndex, final Gender gender,
           final String givenName) {
-        socialDescriptionIndex = clamp(socialDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+        socialDescriptionIndex = Math.clamp(socialDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = name() + ".description." + socialDescriptionIndex;
         final PronounData pronounData = new PronounData(gender);

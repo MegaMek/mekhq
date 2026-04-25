@@ -72,7 +72,6 @@ import javax.swing.UIManager;
 
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.CriticalSlot;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
@@ -361,10 +360,10 @@ public class Unit implements ITechnology {
             if (uncrewed) {
                 return CrewAssignmentState.UNCREWED;
             } else if ((needsMoreDrivers() ||
-                             canTakeMoreVesselCrew() ||
-                             canTakeTechOfficer() ||
-                             needsMoreGunners() ||
-                             canTakeNavigator())) {
+                              canTakeMoreVesselCrew() ||
+                              canTakeTechOfficer() ||
+                              needsMoreGunners() ||
+                              canTakeNavigator())) {
                 return CrewAssignmentState.PARTIALLY_CREWED;
             } else {
                 return CrewAssignmentState.FULLY_CREWED;
@@ -1137,6 +1136,7 @@ public class Unit implements ITechnology {
         return null != entity.getCrew();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPilotDesc() {
         if (hasPilot()) {
             return entity.getCrew().getName() +
@@ -1801,7 +1801,7 @@ public class Unit implements ITechnology {
      * </ul>
      *
      * @param maximumMpPenalty the maximum movement penalty that can be applied to the entity.
-     * @param formationType        the type of force (e.g., convoy) which determines certain restrictions on transportation
+     * @param formationType    the type of force (e.g., convoy) which determines certain restrictions on transportation
      *                         capacity.
      *
      * @return the total cargo capacity of the entity. Returns 0.0 if the entity is not fully crewed.
@@ -1833,7 +1833,6 @@ public class Unit implements ITechnology {
 
             if (transporter instanceof CargoBay) {
                 cargoBayCapacity += actualCapacity;
-                continue;
             } else {
                 // No using your arms, roof rack, or lift hoists for convoys!
                 if (transporter instanceof ExternalCargo) {
@@ -1876,11 +1875,11 @@ public class Unit implements ITechnology {
                 double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
                 // Lift Hoist
                 if (maximumMpPenalty == 0) {
-                    capacity += Math.max(liftHoistCapacity, Math.min(getEntity().getTonnage() / 2,
-                          maxLiftHoistCapacity));
+                    capacity += Math.clamp(getEntity().getTonnage() / 2, liftHoistCapacity,
+                          maxLiftHoistCapacity);
                 } else if (maximumMpPenalty == 1) {
-                    capacity += Math.max(liftHoistCapacity, Math.min(getEntity().getTonnage(),
-                          maxLiftHoistCapacity));
+                    capacity += Math.clamp(getEntity().getTonnage(), liftHoistCapacity,
+                          maxLiftHoistCapacity);
                 } else if (maximumMpPenalty > 1) {
                     capacity += liftHoistCapacity;
                 }
@@ -2981,7 +2980,7 @@ public class Unit implements ITechnology {
                                     PersonnelRole role = PersonnelRole.valueOf(roleStr);
                                     retVal.setTempCrew(role, count);
                                 } catch (IllegalArgumentException e) {
-                                    LOGGER.warn("Unknown PersonnelRole: " + roleStr);
+                                    LOGGER.warn("Unknown PersonnelRole: {}", roleStr);
                                 }
                             }
                         }
@@ -3119,7 +3118,7 @@ public class Unit implements ITechnology {
         }
 
         StringBuilder quirkString = new StringBuilder("<html>");
-        quirkString.append(quirks.get(0).getDisplayableNameWithValue());
+        quirkString.append(quirks.getFirst().getDisplayableNameWithValue());
         for (int i = 1; i < quirks.size(); i++) {
             quirkString.append("<br/>");
             quirkString.append(quirks.get(i).getDisplayableNameWithValue());
@@ -4683,7 +4682,9 @@ public class Unit implements ITechnology {
     public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
             final Formation formation = campaign.getFormation(getFormationId());
-            return (formation != null) ? formation.getCamouflageOrElse(campaign.getCamouflage()) : campaign.getCamouflage();
+            return (formation != null) ?
+                         formation.getCamouflageOrElse(campaign.getCamouflage()) :
+                         campaign.getCamouflage();
         } else {
             return getCamouflage();
         }
@@ -5074,10 +5075,10 @@ public class Unit implements ITechnology {
                                                                                      .filter(e -> (cyberOptionNames.contains(
                                                                                            e.getKey()) ?
                                                                                                          e.getValue() >=
-                                                                                                               crewSize :
+                                                                                                         crewSize :
                                                                                                          e.getValue() >
-                                                                                                               crewSize /
-                                                                                                                     2))
+                                                                                                         crewSize /
+                                                                                                         2))
                                                                                      .max(Entry.comparingByValue())
                                                                                      .map(Entry::getKey))));
 
@@ -5349,7 +5350,7 @@ public class Unit implements ITechnology {
                 }
                 // Get temp BA count up front so it can fill suits after real troopers are placed
                 int tempBACount = getCampaign().getCampaignOptions().isUseBlobBattleArmor()
-                        ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
+                                        ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
                 int tempBAUsed = 0;
                 for (String key : bestSuits.keySet()) {
                     int i = Integer.parseInt(key);
@@ -5472,9 +5473,9 @@ public class Unit implements ITechnology {
         }
         // TODO: For the moment we need to max these out at 8 so people don't get errors when they customize in MM
         //  but we should put an option in MM to ignore those limits and set it to true when we start up through MHQ
-        entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
-        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), 0);
-        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
+        entity.getCrew().setPiloting(Math.clamp(piloting, 0, 8), 0);
+        entity.getCrew().setGunnery(Math.clamp(gunnery, 0, 8), 0);
+        entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), 0);
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             // Use tac ops crew hits calculations and current size versus maximum size
             entity.getCrew().setCurrentSize(nCrew + nGunners + nDrivers);
@@ -5570,11 +5571,11 @@ public class Unit implements ITechnology {
             artillery += pilot.getInjuryModifiers(false);
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
-        crew.setPiloting(Math.min(max(pilotingMek, 0), 8), crew.getCrewType().getPilotPos());
-        crew.setGunnery(Math.min(max(gunneryMek, 0), 8), crew.getCrewType().getGunnerPos());
-        crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
-        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 8));
-        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
+        crew.setPiloting(Math.clamp(pilotingMek, 0, 8), crew.getCrewType().getPilotPos());
+        crew.setGunnery(Math.clamp(gunneryMek, 0, 8), crew.getCrewType().getGunnerPos());
+        crew.setPilotingAero(Math.clamp(pilotingAero, 0, 8));
+        crew.setGunneryAero(Math.clamp(gunneryAero, 0, 8));
+        entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
@@ -5607,13 +5608,13 @@ public class Unit implements ITechnology {
                   person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
             artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
         }
-        entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
-        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setPiloting(Math.clamp(piloting, 0, 8), slot);
+        entity.getCrew().setGunnery(Math.clamp(gunnery, 0, 8), slot);
         // also set RPG gunnery skills in case present in game options
-        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 8), slot);
-        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 8), slot);
-        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 8), slot);
-        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), slot);
+        entity.getCrew().setGunneryL(Math.clamp(gunnery, 0, 8), slot);
+        entity.getCrew().setGunneryM(Math.clamp(gunnery, 0, 8), slot);
+        entity.getCrew().setGunneryB(Math.clamp(gunnery, 0, 8), slot);
+        entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), slot);
         entity.getCrew().setToughness(person.getAdjustedToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
@@ -5708,6 +5709,7 @@ public class Unit implements ITechnology {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getAeroCrewNeeds() {
         return Compute.getAeroCrewNeeds(entity);
     }
@@ -6087,6 +6089,7 @@ public class Unit implements ITechnology {
      *
      * @return true if this Unit is an unmanned trailer, false if it isn't a trailer or has a crew
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isUnmannedTrailer() {
         if (isNotCrewedEntityType() && getEntity() instanceof Tank tank) {
             return tank.isTrailer();
@@ -6095,6 +6098,7 @@ public class Unit implements ITechnology {
         return false;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isHandheldWeapon() {
         return entity instanceof HandheldWeapon;
     }
@@ -6504,8 +6508,9 @@ public class Unit implements ITechnology {
 
     /**
      * Sets the number of temporary crew for a specific personnel role
+     *
      * @param personnelRole the personnel role
-     * @param count the number of temp crew
+     * @param count         the number of temp crew
      */
     public void setTempCrew(PersonnelRole personnelRole, int count) {
         if (count <= 0) {
@@ -6530,6 +6535,7 @@ public class Unit implements ITechnology {
 
     /**
      * Returns true if this unit is using any type of blob crew
+     *
      * @return true if unit has any temp crew assigned
      */
     public boolean isUsingBlobCrew() {
@@ -7722,7 +7728,7 @@ public class Unit implements ITechnology {
      * @throws IllegalStateException if an unexpected value is encountered during the switch statement
      */
     public static PartQuality getRandomUnitQuality(int modifier) {
-        int roll = MathUtility.clamp((Compute.d6(2) + modifier), 2, 12);
+        int roll = Math.clamp((Compute.d6(2) + modifier), 2, 12);
 
         return switch (roll) {
             case 2, 3 -> QUALITY_A;
@@ -7756,7 +7762,7 @@ public class Unit implements ITechnology {
         // Drivers (this will also remove Gunners, if Driver == Gunner)
         int targetDriverCount = getTotalDriverNeeds();
         while (!drivers.isEmpty() && (drivers.size() > targetDriverCount)) {
-            Person removedPerson = drivers.get(0);
+            Person removedPerson = drivers.getFirst();
             remove(removedPerson, true);
 
             String keyAffix = entity instanceof Infantry ? "soldier" : "driver";
@@ -7781,7 +7787,7 @@ public class Unit implements ITechnology {
         // Vessel/Vehicle Crew
         int targetCrewCount = getTotalCrewNeeds();
         while (!vesselCrew.isEmpty() && (vesselCrew.size() > targetCrewCount)) {
-            Person removedPerson = vesselCrew.get(0);
+            Person removedPerson = vesselCrew.getFirst();
             remove(removedPerson, true);
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "Unit.excessCrew.crew", warningString,
                   CLOSING_SPAN_TAG, getHyperlinkedName(), removedPerson.getHyperlinkedName());

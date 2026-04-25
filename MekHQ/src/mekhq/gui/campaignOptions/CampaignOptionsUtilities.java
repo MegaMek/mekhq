@@ -44,21 +44,20 @@ import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
@@ -96,15 +95,14 @@ public class CampaignOptionsUtilities {
 
 
     /**
-     * Version marker for campaign options that existed before the metadata system was implemented
-     * and shouldn't have a version badge.
+     * Version marker for campaign options that existed before the metadata system was implemented and shouldn't have a
+     * version badge.
      */
     public static final Version LEGACY_RULE_BEFORE_METADATA = null;
 
     /**
-     * Version marker for campaign options that existed before the metadata system was implemented,
-     * but still since the most recent milestone. This variable should be deprecated once the next milestone is
-     * declared.
+     * Version marker for campaign options that existed before the metadata system was implemented, but still since the
+     * most recent milestone. This variable should be deprecated once the next milestone is declared.
      */
     public static final Version MILESTONE_BEFORE_METADATA = new Version(0, 50, 10);
 
@@ -114,8 +112,8 @@ public class CampaignOptionsUtilities {
     private static final Map<String, CampaignOptionsMetadata> METADATA_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * Factory method to get or create a CampaignOptionMetadata instance with caching.
-     * This ensures that identical metadata configurations reuse the same object instance.
+     * Factory method to get or create a CampaignOptionMetadata instance with caching. This ensures that identical
+     * metadata configurations reuse the same object instance.
      *
      * @param version the version when this option was added, or null for no version badge
      * @param flags   optional flags for this option (Custom, Important, Documented, Recommended)
@@ -138,10 +136,10 @@ public class CampaignOptionsUtilities {
     private static String buildMetadataKey(@Nullable Version version, CampaignOptionFlag... flags) {
         String versionKey = (version == null) ? "null" : version.toString();
         String flagsKey = (flags == null || flags.length == 0) ? "none"
-              : Arrays.stream(flags)
-                    .sorted()
-                    .map(Enum::name)
-                    .collect(Collectors.joining(","));
+                                : Arrays.stream(flags)
+                                  .sorted()
+                                  .map(Enum::name)
+                                  .collect(Collectors.joining(","));
         return versionKey + ":" + flagsKey;
     }
 
@@ -242,7 +240,7 @@ public class CampaignOptionsUtilities {
 
         if (indexToMoveToFront != -1) {
             String tabName = tabNames.remove(indexToMoveToFront);
-            tabNames.add(0, tabName);
+            tabNames.addFirst(tabName);
         }
 
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -436,7 +434,7 @@ public class CampaignOptionsUtilities {
 
     /**
      * Formats version and flag badges for campaign options based on metadata.
-     *
+     * <p>
      * The badges include:
      * <ul>
      *   <li>Special flag symbols (if any) - displayed first, uncolored</li>
