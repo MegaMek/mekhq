@@ -55,7 +55,7 @@ public class CommandRating {
 
     /**
      * Calculates the rating of a commander based on their skills, traits, and (optionally) personality.
-     * Follows the rules outlined in CamOps pp33-34.
+     * Follows the rules outlined in CamOps (revised 2021) pages 33-34.
      *
      * @param campaign  the campaign the commander belongs to
      * @param commander the commander to calculate the rating for
