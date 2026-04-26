@@ -99,6 +99,7 @@ import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalWarfare.TWGameManager;
+import megameklab.MMLConstants;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -360,6 +361,7 @@ public class MekHQ implements GameListener {
      */
     public static void main(String... args) {
         Config.setSerialFilter(sanityInputFilter);
+        MegaMek.setOriginProject(MHQConstants.PROJECT_NAME);
 
         // Configure Sentry with defaults. Although the client defaults to enabled, the properties file is used to
         // disable it and additional configuration can be done inside the sentry.properties file. The defaults for
@@ -393,9 +395,8 @@ public class MekHQ implements GameListener {
         MegaMek.initializeSuiteGraphicalSetups(MHQConstants.PROJECT_NAME);
 
         // on Mac, override standard behavior of the added main menu, this is different for MML and MHQ
-        Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-            desktop.setAboutHandler(e -> new MekHQAboutDialog(null).show());
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_ABOUT)) {
+            Desktop.getDesktop().setAboutHandler(e -> new MekHQAboutDialog(null).show());
         }
 
         // Finally, let's handle startup

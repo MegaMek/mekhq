@@ -400,9 +400,8 @@ public class CampaignGUI extends JPanel {
         });
 
         // on Mac, override auto-added "Quit MekHQ" behavior to work like other exit variants (ask for save etc)
-        Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
-            desktop.setQuitHandler((e, response) -> {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
+            Desktop.getDesktop().setQuitHandler((e, response) -> {
                 getApplication().exit(true);
                 response.cancelQuit(); // don't remove this
             });
