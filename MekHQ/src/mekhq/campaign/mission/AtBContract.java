@@ -743,7 +743,7 @@ public class AtBContract extends Contract {
                 yield false;
             }
             case 3 -> { // Resupply
-                if (campaignOptions.isUseStratCon() && !campaignOptions.isUseStratCon()) {
+                if (!campaignOptions.isUseStratCon()) {
                     campaign.addReport(GENERAL, "Bonus: Ronin");
                     new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                     yield false;

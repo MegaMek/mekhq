@@ -1734,25 +1734,6 @@ public class CampaignNewDayManager {
               failedWillpowerCheck);
     }
 
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    void processShipSearch() {
-        StringBuilder report = new StringBuilder();
-        if (finances.debit(TransactionType.UNIT_PURCHASE,
-              today,
-              campaign.getAtBConfig().shipSearchCostPerWeek(),
-              "Ship Search")) {
-            report.append(campaign.getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
-                  .append(" deducted for ship search.");
-        } else {
-            campaign.addReport(FINANCES, "<font color=" +
-                                               ReportingUtilities.getNegativeColor() +
-                                               ">Insufficient funds for ship search.</font>");
-            return;
-        }
-
-        campaign.addReport(ACQUISITIONS, report.toString());
-    }
-
     /**
      * Processes the resupply operation for a given contract.
      *
