@@ -58,6 +58,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -363,9 +364,15 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         panScenario.add(scrollScenarioView, gridBagConstraints);
 
+        JSplitPane splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, panScenario);
+        splitBrief.setOneTouchExpandable(true);
+        splitBrief.setResizeWeight(0.5);
+        splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
+
         JPanel pnlTutorial = new TutorialHyperlinkPanel("missionTab");
 
         setLayout(new BorderLayout());
+        add(splitBrief, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
     }
 
