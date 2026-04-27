@@ -190,7 +190,7 @@ public class MaplessStratCon {
         boolean restrictToSingleForce = backingScenario != null &&
                                               backingScenario.getStratConScenarioType().isOfficialChallenge();
         if (currentState.equals(UNRESOLVED)) {
-            assignmentUI.display(campaign, campaignState, scenarioCoords, restrictToSingleForce);
+            assignmentUI.display(campaign, campaignState, scenarioCoords, restrictToSingleForce, true);
             assignmentUI.setVisible(true);
             isPrimaryForce = true;
         }
