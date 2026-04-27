@@ -68,6 +68,7 @@ public class CommandRating {
      *           <li>"negotiation": the commander's negotiation skill value</li>
      *           <li>"traits": the commander's trait score</li>
      *           <li>"personality": the value of the commander's personality characteristics (or 0, if disabled)</li>
+     *           <li>"total": sum of the above values or 1, whichever is greater</li>
      *       </ul>
      */
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
@@ -135,7 +136,7 @@ public class CommandRating {
      * @param commander The {@link Person} representing the commander whose trait values need to be calculated. Can be
      *                  {@code null}, in which case the output is 0.
      *
-     * @return The calculated trait score for the commander, with a minimum value of 1.
+     * @return The calculated trait score for the commander.
      */
     private static int getATOWTraitScore(Person commander, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {

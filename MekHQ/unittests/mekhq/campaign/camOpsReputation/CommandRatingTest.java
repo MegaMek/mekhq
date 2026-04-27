@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -120,7 +119,7 @@ class CommandRatingTest {
     @ValueSource(ints = {1, 2, 5, 10})
     void testTactics(int tactics) {
         var commander = commanderWithLeadership(5);
-        commander.addSkill(SkillType.S_TACTICS, tactics, 0);;
+        commander.addSkill(SkillType.S_TACTICS, tactics, 0);
         assertRating(commander, Map.of("leadership", 5, "tactics", tactics, "total", 5 + tactics));
     }
 
@@ -128,7 +127,7 @@ class CommandRatingTest {
     @ValueSource(ints = {1, 3, 6, 10})
     void testNegotiation(int negotiation) {
         var commander = commanderWithLeadership(5);
-        commander.addSkill(SkillType.S_NEGOTIATION, negotiation, 0);;
+        commander.addSkill(SkillType.S_NEGOTIATION, negotiation, 0);
         assertRating(commander, Map.of("leadership", 5, "negotiation", negotiation, "total", 5 + negotiation));
     }
 
@@ -136,7 +135,7 @@ class CommandRatingTest {
     @ValueSource(ints = {1, 4, 7, 10})
     void testStrategy(int strategy) {
         var commander = commanderWithLeadership(5);
-        commander.addSkill(SkillType.S_STRATEGY, strategy, 0);;
+        commander.addSkill(SkillType.S_STRATEGY, strategy, 0);
         assertRating(commander, Map.of("leadership", 5, "strategy", strategy, "total", 5 + strategy));
     }
 
@@ -144,7 +143,7 @@ class CommandRatingTest {
     void testSkillBonuses() {
         var commander = new Person(campaign, "");
         commander.addSkill(SkillType.S_LEADER, 1, 2);
-        commander.addSkill(SkillType.S_TACTICS, 2, 3);;
+        commander.addSkill(SkillType.S_TACTICS, 2, 3);
         commander.addSkill(SkillType.S_NEGOTIATION, 3, 4);
         commander.addSkill(SkillType.S_STRATEGY, 4, 5);
         assertRating(commander, Map.of("leadership", 3, "tactics", 5, "negotiation", 7, "strategy", 9, "total", 24));
