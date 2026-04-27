@@ -77,7 +77,7 @@ class CampaignExportWizardTest {
 
     @Test
     void parseExportMoneyParsesPlainDigitsInSpanishLocale() {
-        assertEquals(1234567d, CampaignExportWizard.parseExportMoney("1234567", new Locale("es", "ES")), DELTA);
+        assertEquals(1234567d, CampaignExportWizard.parseExportMoney("1234567", Locale.of("es", "ES")), DELTA);
     }
 
     @Test
@@ -111,14 +111,14 @@ class CampaignExportWizardTest {
     void parseExportMoneyParsesSpanishGroupingSeparator() {
         // In es-ES the grouping separator is '.', so "1.000.000" is one million, not 1.0.
         assertEquals(1_000_000d,
-              CampaignExportWizard.parseExportMoney("1.000.000", new Locale("es", "ES")),
+              CampaignExportWizard.parseExportMoney("1.000.000", Locale.of("es", "ES")),
               DELTA);
     }
 
     @Test
     void parseExportMoneyParsesSpanishDecimalSeparator() {
         assertEquals(1234.56d,
-              CampaignExportWizard.parseExportMoney("1.234,56", new Locale("es", "ES")),
+              CampaignExportWizard.parseExportMoney("1.234,56", Locale.of("es", "ES")),
               DELTA);
     }
 

@@ -231,10 +231,13 @@ public class CampaignExportWizard extends JDialog {
                 btnNewCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if (destinationCampaignFile.isPresent()) {
-                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                        if (exportToCampaign(destinationCampaignFile.get())) {
+                            setVisible(false);
+                        } else {
+                            // Keep the wizard open so the user can correct the input (e.g. an
+                            // invalid C-bill amount) instead of having to restart the export flow.
                             LOGGER.error("Failed to export campaign to new campaign file");
                         }
-                        setVisible(false);
                     }
                 });
                 getContentPane().add(btnNewCampaign, gbc);
@@ -244,10 +247,13 @@ public class CampaignExportWizard extends JDialog {
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if (destinationCampaignFile.isPresent()) {
-                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                        if (exportToCampaign(destinationCampaignFile.get())) {
+                            setVisible(false);
+                        } else {
+                            // Keep the wizard open so the user can correct the input (e.g. an
+                            // invalid C-bill amount) instead of having to restart the export flow.
                             LOGGER.error("Failed to export campaign to existing campaign file");
                         }
-                        setVisible(false);
                     }
                 });
                 getContentPane().add(btnExistingCampaign, gbc);
@@ -557,6 +563,9 @@ public class CampaignExportWizard extends JDialog {
                   resourceMap.getString("lblStatus.MoneyParseError.text"),
                   resourceMap.getString("lblStatus.MoneyParseError.title"),
                   JOptionPane.ERROR_MESSAGE);
+            // Make it easy for the user to fix the bad value without hunting for the field.
+            txtExportMoney.requestFocusInWindow();
+            txtExportMoney.selectAll();
             return false;
         }
 
