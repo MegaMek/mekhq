@@ -1194,24 +1194,53 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SACK: {
-                String question;
-
-                if (people.length > 1) {
-                    question = resources.getString("confirmRemoveMultiple.text");
-                } else {
-                    question = String.format(resources.getString("confirmRemove.format"), people[0].getFullTitle());
-                }
-
-                if (JOptionPane.YES_OPTION ==
-                          JOptionPane.showConfirmDialog(null,
-                                question,
-                                resources.getString("removeQ.text"),
-                                JOptionPane.YES_NO_OPTION)) {
+                boolean showDialog = false;
+                List<Person> toRemove = new ArrayList<>();
+                if (getCampaignOptions().isUseStratCon()) {
                     for (Person person : people) {
-                        getCampaign().removePerson(person);
+                        if (!person.getPrimaryRole().isCivilian()) {
+                            if (getCampaign().getRetirementDefectionTracker()
+                                      .removeFromCampaign(person, false, true, getCampaign(), null)) {
+                                showDialog = true;
+                            } else {
+                                toRemove.add(person);
+                            }
+                        } else {
+                            toRemove.add(person);
+                        }
                     }
                 }
 
+                if (showDialog) {
+                    RetirementDefectionDialog rdd = new RetirementDefectionDialog(gui, null, false);
+
+                    if (rdd.wasAborted() ||
+                              !getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
+                        for (Person person : people) {
+                            getCampaign().getRetirementDefectionTracker().removePayout(person);
+                        }
+                    } else {
+                        for (final Person person : toRemove) {
+                            getCampaign().removePerson(person);
+                        }
+                    }
+                } else {
+                    String question;
+                    if (people.length > 1) {
+                        question = resources.getString("confirmRemoveMultiple.text");
+                    } else {
+                        question = String.format(resources.getString("confirmRemove.format"), people[0].getFullTitle());
+                    }
+                    if (JOptionPane.YES_OPTION ==
+                              JOptionPane.showConfirmDialog(null,
+                                    question,
+                                    resources.getString("removeQ.text"),
+                                    JOptionPane.YES_NO_OPTION)) {
+                        for (Person person : people) {
+                            getCampaign().removePerson(person);
+                        }
+                    }
+                }
                 break;
             }
             case CMD_EMPLOY: {

@@ -546,7 +546,20 @@ public class MekHQ implements GameListener {
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        gameThread = new GameThread(playerName, password, client, this, meks, scenario);
+        // Start the game thread - also refactor this into a factory
+        if (getCampaign().getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario atBScenario)) {
+            gameThread = new AtBGameThread(playerName,
+                  password,
+                  client,
+                  this,
+                  meks,
+                  atBScenario,
+                  autoResolveBehaviorSettings,
+                  useExperimentalPacarGui,
+                  true);
+        } else {
+            gameThread = new GameThread(playerName, password, client, this, meks, scenario);
+        }
         gameThread.start();
     }
 

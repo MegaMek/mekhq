@@ -47,4 +47,9 @@ public class TestPartsStore extends PartsStore {
     public void stock(Campaign campaign) {
         // Does nothing
     }
+
+    public void reallyStock(Campaign campaign) {
+        // runs the real stock(); high memory and CPU time use.
+        super.stock(campaign);
+    }
 }

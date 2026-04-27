@@ -107,6 +107,35 @@ public record RecoveryTimeData(
      * @since 0.50.10
      */
     public String getRecoveryTimeBreakdownString(boolean includeHTMLTags) {
+        StringBuilder breakdown = new StringBuilder(includeHTMLTags ? "<html>" : "");
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.baseRecoveryTime",
+              baseRecoveryTime));
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.weatherMultiplier",
+              weatherMultiplier));
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.windMultiplier",
+              windMultiplier));
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.temperatureMultiplier",
+              temperatureMultiplier));
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.gravityMultiplier",
+              gravityMultiplier));
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.atmosphereMultiplier",
+              atmosphereMultiplier));
+
+        breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "RecoveryTimeData.recoveryTimeBreakdown.lightMultiplier",
+              lightMultiplier));
 
         double totalMultiplier = BASE_MULTIPLIER +
                                        weatherMultiplier +
