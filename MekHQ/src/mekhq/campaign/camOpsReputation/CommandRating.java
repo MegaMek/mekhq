@@ -134,14 +134,14 @@ public class CommandRating {
      * </p>
      *
      * @param commander The {@link Person} representing the commander whose trait values need to be calculated. Can be
-     *                  {@code null}, in which case the output is 1.
+     *                  {@code null}, in which case the output is 0.
      *
-     * @return The calculated trait score for the commander, with a minimum value of 1.
+     * @return The calculated trait score for the commander.
      */
     private static int getATOWTraitScore(Person commander, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
         if (commander == null) {
-            return 1;
+            return 0;
         }
 
         int traitScore = 0;
