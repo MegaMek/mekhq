@@ -4859,11 +4859,6 @@ public class CampaignOptions {
         this.autoLogisticsOther = autoLogisticsOther;
     }
 
-    @Deprecated(since = "0.50.10")
-    public boolean isUseAtB() {
-        return isUseStratCon();
-    }
-
     public boolean isUseStratCon() {
         return getStratConPlayType() != StratConPlayType.DISABLED;
     }

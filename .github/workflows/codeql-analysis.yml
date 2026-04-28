@@ -1,13 +1,15 @@
 name: "CodeQL"
 
+permissions:
+  security-events: write
+  contents: read
+  actions: read
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - "**/*.pdf"
-      - "**/*.xml"
 
 jobs:
   analyze:
@@ -25,6 +27,12 @@ jobs:
       mmBranch: ${{ steps.find_mm.outputs.mmBranch }}
 
     steps:
+      - name: Checkout Data Repo
+        uses: actions/checkout@v6
+        with:
+          repository: megamek/mm-data
+          path: mm-data
+
       - name: Find the Right MegaMek Branch
         id: find_mm
         shell: bash {0}
@@ -80,6 +88,17 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
+      - name: "Show Ref and SHA"
+        run: |
+          echo "Ref: ${{ github.ref }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "Event Name: ${{ github.event_name }}"
+          echo "Event Action: ${{ github.event.action }}"
+          echo "Event Pull Request: ${{ github.event.pull_request }}"
+          echo "Event Pull Request Head: ${{ github.event.pull_request.head }}"
+          echo "Event Pull Request Head SHA: ${{ github.event.pull_request.head.sha }}"
+          echo "Event Pull Request Head Ref: ${{ github.event.pull_request.head.ref }}"
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
@@ -87,9 +106,11 @@ jobs:
           build-mode: none
           queries: security-and-quality
           source-root: mekhq
-          config: |
-            paths:
-              - mekhq
+          dependency-caching: true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
+        with:
+          checkout_path: mekhq
+          sha: ${{ github.event.pull_request.head.sha || github.sha}}
+          ref: ${{ github.ref }}

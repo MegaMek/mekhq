@@ -1238,6 +1238,21 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menu.add(menuItem);
             popup.add(menu);
 
+            if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
+                JMenuItem optionStrategicForceOverride = new JMenuItem((formation.isCombatTeam() ? "Never" : "Always") +
+                                                                             " Consider Force a Combat Team");
+                optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
+                optionStrategicForceOverride.addActionListener(this);
+                popup.add(optionStrategicForceOverride);
+
+                JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Combat Team Override");
+                optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
+                optionRemoveStrategicForceOverride.addActionListener(this);
+                optionRemoveStrategicForceOverride.setVisible(formation.getOverrideCombatTeam() !=
+                                                                    COMBAT_TEAM_OVERRIDE_NONE);
+                popup.add(optionRemoveStrategicForceOverride);
+            }
+
             if (StaticChecks.areAllForcesUnDeployed(gui.getCampaign(), formations) &&
                       StaticChecks.areAllStandardForces(formations)) {
                 menu = new JMenu("Deploy Force");

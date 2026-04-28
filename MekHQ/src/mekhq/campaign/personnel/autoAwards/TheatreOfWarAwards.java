@@ -124,7 +124,7 @@ public class TheatreOfWarAwards {
                     if (!processFaction(employer, belligerents.getFirst())) {
                         continue;
                     }
-                } else if (campaign.getCampaignOptions().isUseAtB()) {
+                } else if (campaign.getCampaignOptions().isUseStratCon()) {
                     String enemy = ((AtBContract) mission).getEnemyCode();
 
                     if (hasLoyalty(employer, attackers)) {

@@ -792,8 +792,8 @@ public class Inoculations {
 
     public static void triggerCanonDiseaseSpreadMessages(Campaign campaign, boolean isInTransit, boolean hasCure,
           Set<String> diseases) {
-        String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
-        alertColor = hasCure ? alertColor : getNegativeColor();
+        String alertColor = isInTransit ? getNegativeColor() : getWarningColor();
+        alertColor = spanOpeningWithCustomColor(hasCure ? alertColor : getNegativeColor());
 
         String reportKey = "Inoculations.spread.normal";
         if (!hasCure) {
