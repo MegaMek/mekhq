@@ -462,7 +462,8 @@ public class CustomizeScenarioDialog extends JDialog {
     private void btnOKActionPerformed(ActionEvent evt) {
         scenario.setName(txtName.getText());
         scenario.setDesc(txtDesc.getText());
-        if (!scenario.getStatus().isCurrent()) {
+        if (!scenario.getStatus().isCurrent() ||
+                  (campaign.getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario))) {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }

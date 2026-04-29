@@ -9446,6 +9446,90 @@ public class Campaign implements ITechManager {
         getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
     }
 
+    public void initAtB(boolean newCampaign) {
+        if (!newCampaign) {
+            /*
+             * Switch all contracts to AtBContract's
+             */
+            for (Entry<Integer, Mission> me : missions.entrySet()) {
+                Mission m = me.getValue();
+                if (m instanceof Contract && !(m instanceof AtBContract)) {
+                    me.setValue(new AtBContract((Contract) m, this));
+                }
+            }
+
+            /*
+             * Go through all the personnel records and assume the earliest date is the date
+             * the unit was founded.
+             */
+            LocalDate founding = null;
+            for (Person person : getPersonnel()) {
+                for (LogEntry logEntry : person.getPersonalLog()) {
+                    if ((founding == null) || logEntry.getDate().isBefore(founding)) {
+                        founding = logEntry.getDate();
+                    }
+                }
+            }
+            /*
+             * Go through the personnel records again and assume that any person who joined the unit on the founding
+             * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
+             * they joined came with that `Mek (which is a less certain assumption)
+             */
+            for (Person person : getPersonnel()) {
+                LocalDate join = person.getPersonalLog()
+                                       .stream()
+                                       .filter(e -> e.getDesc().startsWith("Joined "))
+                                       .findFirst()
+                                       .map(LogEntry::getDate)
+                                       .orElse(null);
+                if ((join != null) && join.equals(founding)) {
+                    person.setFounder(true);
+                }
+                if (person.getPrimaryRole().isMekWarrior() ||
+                          (person.getPrimaryRole().isAerospacePilot() &&
+                                 getCampaignOptions().isAeroRecruitsHaveUnits()) ||
+                          person.getPrimaryRole().isProtoMekPilot()) {
+                    for (LogEntry logEntry : person.getPersonalLog()) {
+                        if (logEntry.getDate().equals(join) && logEntry.getDesc().startsWith("Assigned to ")) {
+                            String mek = logEntry.getDesc().substring(12);
+                            MekSummary ms = MekSummaryCache.getInstance().getMek(mek);
+                            if (null != ms &&
+                                      (person.isFounder() || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
+                                person.setOriginalUnitWeight(ms.getWeightClass());
+                                if (ms.isClan()) {
+                                    person.setOriginalUnitTech(Person.TECH_CLAN);
+                                } else if (ms.getYear() > 3050) {
+                                    // TODO : Fix this so we aren't using a hack that just assumes IS2
+                                    person.setOriginalUnitTech(Person.TECH_IS2);
+                                }
+                                if ((null != person.getUnit()) &&
+                                          ms.getName().equals(person.getUnit().getEntity().getShortNameRaw())) {
+                                    person.setOriginalUnitId(person.getUnit().getId());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            addAllCombatTeams(this.formations);
+
+            // Determine whether there is an active contract
+            setHasActiveContract();
+        }
+
+        setAtBConfig(AtBConfiguration.loadFromXml());
+        RandomFactionGenerator.getInstance().startup(this);
+        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
+    }
+
+    /**
+     * Stop processing AtB events and release memory.
+     */
+    public void shutdownAtB() {
+        RandomFactionGenerator.getInstance().dispose();
+    }
+
     /**
      * Checks if an employee turnover prompt should be displayed based on campaign options, current date, and other
      * conditions (like transit status and campaign start date).
