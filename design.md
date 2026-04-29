@@ -48,8 +48,10 @@ This proposal is for an in-game editor inside MekHQ.
   computation, and validators (e.g. `cleanupSystems()`).
 - GM-mode gating is a well-established pattern (`campaign.isGM()`,
   used in `BriefingTab`, `PersonnelTableMouseAdapter`, etc.).
-- Edits are immediately observable in-game (interstellar map, contracts,
-  shopping radius, recruitment origin via `RandomOriginOptions`).
+- Edits are observable in-game after restart/reload. Same-session live updates
+  are deliberately out of scope for the MVP because they require invalidating
+  several object references and derived caches. We may add live updates later
+  if benchmarking shows the refresh path is fast enough for batch editing.
 
 Caveats / things to be careful about:
 
@@ -75,7 +77,7 @@ system has been customized" indicator everywhere a system is shown.
 ## 3. Data Model Recap (so the design is grounded)
 
 A planetary system YAML (see e.g.
-[`MaxiesPlanet.yml`](../../mm-data/data/universe/planetary_systems/canon_systems/MaxiesPlanet.yml))
+[`MaxiesPlanet.yml`](../mm-data/data/universe/planetary_systems/canon_systems/MaxiesPlanet.yml))
 contains:
 
 - **System-level fixed data:** `id`, `sucsId`, `xcood`, `ycood`,
@@ -103,6 +105,10 @@ Implications for the editor:
   attribution. Edits the user makes should be tagged with a new source
   (e.g. `source: "user:<campaign-name>"`) so they are visually
   distinguishable and round-trippable.
+- We must preserve the optional `version` metadata on sourced values. The
+  current `SourceableValue` model stores `source` and `value` but not
+  `version`; Phase 0 should add version support before any save path exists so
+  SUCS/canon metadata is not silently discarded.
 - We do **not** currently have a YAML *writer* — only a reader. The same
   Jackson `ObjectMapper` with `YAMLFactory` can write, but we will need
   matching `@JsonProperty` ordering and a serializer for `SourceableValue`
@@ -135,8 +141,8 @@ write the modified file out to user dir.
 - **Save.** Writes the *full* system YAML to
   `<userDir>/data/universe/planetary_systems/edits/<id>.yml`. The
   user-dir loader will pick it up on next load and override the canon
-  copy. Optionally also live-mutate the in-memory `PlanetarySystem`
-  so changes are visible without a restart (see §5.3).
+  copy. The MVP shows a clear "restart/reload required" message after save.
+  Same-session visibility is a later optional feature (see §5.3).
 - **Revert.** Delete the user-dir file and reload that system from canon.
 - **Diff badge.** On the interstellar map, edited systems get a small
   marker (e.g. an outline ring or a "*" suffix on hover) so the player
@@ -234,38 +240,144 @@ what the editor produced vs. what they hand-wrote.
 
 ### 5.2 In-memory model
 
-Two options, in increasing order of scope:
+Three options, in increasing order of scope:
 
-1. **Mutate the singleton (simple).** Replace the entry in
-   `Systems.getInstance().getSystems()` with the edited
-   `PlanetarySystem`. Any open campaign sees the change immediately.
-   *Downside:* cross-campaign leakage in the same JVM session.
-2. **Per-campaign overlay (clean).** Add an
+1. **Restart-required user-dir override (MVP).** Save the edited system YAML
+   to the user-dir override path and require the user to restart/reload before
+   MekHQ consumes it. This keeps the implementation small, avoids cache
+   invalidation risk, and makes batch edits cheap: a GM can edit several
+   systems and pay the reload cost once.
+2. **Mutate the global universe with a refresh service (future).** Apply the
+   edited `PlanetarySystem` to `Systems`, rebuild its indexes, and publish a
+   universe-data-changed event so open UI and campaign services can invalidate
+   caches. This is still process-global, so any open campaign sees the same
+   edited universe.
+3. **Per-campaign overlay (clean).** Add an
    `Optional<Map<String, PlanetarySystem>> overlay` to `Campaign`, and
    a `Campaign.getSystem(String id)` accessor that checks the overlay
    before falling back to `Systems.getInstance()`. All planet/system
    reads inside MekHQ would need to migrate to that accessor over time.
-   *Downside:* large diff, touches many files; do this only if Tier 3
+    *Downside:* large diff, touches many files; do this only if
    campaign-scoped overrides are committed to.
 
-Recommend **starting with option 1** for the MVP, plus a session-level
-"these systems were edited; you may want to restart to revert"
-notification. Move to option 2 only if/when campaign-scoped overrides
-ship.
+Recommend **starting with option 1** for the MVP. Move to option 2 only after
+we benchmark the refresh cost and confirm it will not make multi-planet editing
+feel clunky. Move to option 3 only if/when campaign-scoped overrides ship.
 
-### 5.3 YAML writer
+### 5.3 Ownership propagation and restart behavior
 
-- Reuse the same Jackson `ObjectMapper` configured in
-  [`Systems.load`](MekHQ/src/mekhq/campaign/universe/Systems.java#L272).
+Changing a planet's owner is not just display data. MekHQ reads current
+ownership in contract generation, map rendering, markets, finances,
+personnel origin/academy filtering, and some scenario force-generation logic.
+The behavior splits into three categories.
+
+**Honored after restart/reload:**
+
+- The interstellar map asks each visible `PlanetarySystem` for
+  `getFactionSet(date)`, so faction coloring follows edited ownership once the
+  map has an updated system list.
+- Future contract generation uses `RandomFactionGenerator`, which builds
+  employers, enemies, and mission targets from `FactionBorderTracker`. The
+  border tracker builds its regional faction set from
+  `PlanetarySystem.getFactionSet(date)`, so future contract offers honor
+  ownership edits after border data is rebuilt.
+- Contract quantity and local modifiers in `AtbMonthlyContractMarket`, unit
+  markets, personnel markets, currency fallback, academy/origin filters, and
+  HPG/jump-network display all consult current system data and should honor
+  edits after their local caches are refreshed.
+
+**Partially honored:**
+
+- Already-generated contracts store `employerCode`, `enemyCode`, and
+  `systemId`. A later ownership edit should not automatically rewrite those
+  terms. It may affect later scenario generation only where the scenario asks
+  for the current planet owner.
+- `AtBDynamicScenarioFactory` has explicit `PlanetOwner` force alignment.
+  Those forces resolve from `contract.getSystem().getFactions(currentDate)` at
+  generation time, so they follow edited ownership.
+- `AtBScenario` reinforcement logic checks whether the OpFor owns the planet
+  when deciding air support, turrets, conventional infantry, or battle armor.
+  Those checks follow edited ownership, but the OpFor faction itself still
+  comes from the contract's stored `enemyCode`.
+
+**Not automatically honored:**
+
+- Existing contract employer, enemy, ally, system, payout, and generated
+  scenario terms remain as saved. If we want ownership edits to rewrite active
+  contracts, that should be a separate GM action such as "Re-evaluate contract
+  factions from edited ownership" with a clear preview.
+- Random force tables and most RAT selection use the contract/scenario faction
+  code, not the local planet owner. They change only if the contract/scenario
+  faction changes or the template uses `PlanetOwner`.
+
+For the MVP, saving user-dir YAML does not update the running universe. The UI
+must make that explicit and should support editing several systems before the
+player restarts. Good MVP copy is something like: "Planetary data saved. MekHQ
+will use this change after restart/reload. Existing contracts are unchanged."
+
+If we add same-session editing later, it requires an explicit invalidation path.
+A proposed `UniverseEditService.applySystemEdit(PlanetarySystem editedSystem)`
+should:
+
+- Replace or mutate the system in `Systems.systemList` without leaving stale
+  references to old data.
+- Rebuild `Systems.systemGrid` when coordinates or system membership change,
+  because nearby-system queries use the grid, not just `systemList`.
+- Clear `Systems` HPG-network cache.
+- Clear all affected `Planet.CurrentEvents` caches, because each planet caches
+  its date-derived event state.
+- Rebuild or invalidate `RandomFactionGenerator` / `FactionBorderTracker`
+  border data.
+- Rebind `CurrentLocation` if the edited system is the campaign's current
+  system, since `CurrentLocation` stores a direct `PlanetarySystem` reference.
+- Refresh map panels and other UI snapshots such as `InterstellarMapPanel`'s
+  copied system list.
+- Reset secondary caches that depend on current ownership, including default
+  currency and HPG-network display.
+
+This future refresh service should be benchmarked before we expose it. If a GM
+edits several planets in one sitting, the implementation should either refresh
+once after an explicit "Apply Now" action or debounce/rebatch refresh work so
+we do not rebuild expensive derived data after every field change.
+
+### 5.4 YAML writer
+
+- Align with existing project style. MekHQ does not currently have a broad
+  repository/service abstraction for this kind of data; it mostly uses focused
+  managers and static utilities. Relevant existing patterns are
+  [`Systems.load`](MekHQ/src/mekhq/campaign/universe/Systems.java#L272),
+  [`SystemValidator`](MekHQ/src/mekhq/utilities/SystemValidator.java),
+  [`MHQXMLUtility`](MekHQ/src/mekhq/utilities/MHQXMLUtility.java), and
+  MegaMek's [`YamlEncDec`](../megamek/megamek/src/megamek/common/util/YamlEncDec.java).
+- Add a focused planetary YAML helper/factory rather than hand-building
+  mappers in multiple places. Candidate names:
+  `PlanetarySystemYamlMapper`, `PlanetarySystemYamlIO`, or
+  `PlanetarySystemFileService`. Prefer whichever best matches the final class
+  responsibilities, but keep it in or near `mekhq.campaign.universe` so
+  `Systems`, the editor, and validation tests can share it.
+- Reuse the same Jackson `ObjectMapper` configuration currently duplicated in
+  [`Systems.load`](MekHQ/src/mekhq/campaign/universe/Systems.java#L272) and
+  [`SystemValidator`](MekHQ/src/mekhq/utilities/SystemValidator.java#L84).
+  Update both to use the shared mapper so load, validation, and save behavior
+  cannot drift.
 - Add a `SourceableValueSerializer` symmetric to the existing
   deserializer: emit the bare value if `source == null`, else the
-  `{source, value}` (and optional `version`) object.
+  `{source, version, value}` object. Preserve `version` on load and save.
 - Add `@JsonInclude(NON_NULL)` so we don't litter unset fields.
+- Write editor output only under the configured user directory from
+  `PreferenceManager.getClientPreferences().getUserDir()`. Do not hardcode a
+  user path and do not write beside canon data. This follows existing user-dir
+  merge behavior used by `Systems.loadDefault()` and other user data such as
+  awards/icons.
+- If an edited file already exists, make a backup before overwriting it. MekHQ
+  campaign saves already use an adjacent `_backup` file pattern; the editor can
+  use that or a timestamped adjacent backup, but it should keep the backup in
+  the user's configured data area.
 - Round-trip test: load every canon system, write it back, reload,
   assert structural equivalence. This is the single most important
   test in the feature.
 
-### 5.4 UI placement
+### 5.5 UI placement
 
 - New entry in MekHQ's main menu **GM Tools -> Planetary System
   Editor...** (only enabled when `campaign.isGM()`), and a context-menu
@@ -277,7 +389,7 @@ ship.
   - Bottom: Validate / Save / Save As / Revert / Cancel.
 - Reuse `PlanetarySystemMapPanel` for the in-dialog preview tab.
 
-### 5.5 Validation pipeline
+### 5.6 Validation pipeline
 
 A single `PlanetarySystemValidator` class returns a list of
 `ValidationIssue { Severity, path, message }`. The dialog blocks Save on
@@ -294,8 +406,15 @@ listed in §4.2.
   backup of the previous user-dir version on every save; ship a "reset
   this system to canon" button.
 - **Performance.** Loading is already ~1–3s for canon. Per-edit re-save
-  is one file, fast. Live-mutating the singleton is O(1). Map repaint
-  on edit is the existing repaint cost.
+  is one file, fast. The restart-required MVP avoids live invalidation costs
+  entirely and is better for batch editing. Live application is not just O(1)
+  `systemList.put()`; it must also rebuild universe indexes and invalidate
+  ownership-dependent caches. That may still be acceptable for a single-system
+  edit, but it must be benchmarked before we promise it in the UI.
+- **Partial propagation.** Ownership edits affect many future calculations,
+  but they should not silently rewrite existing contracts or already-generated
+  scenarios. The UI should distinguish "future universe state changed" from
+  "active contract terms changed".
 - **Save game compatibility.** Campaigns reference systems by `id`
   (see [`CurrentLocation.generateInstanceFromXML`](MekHQ/src/mekhq/campaign/CurrentLocation.java#L588)).
   As long as we preserve `id`, existing saves keep working. **Renaming
@@ -327,21 +446,33 @@ listed in §4.2.
 A suggested order; each phase is independently shippable.
 
 1. **Phase 0 — Plumbing.**
+   - Extract a shared planetary YAML mapper/helper from the duplicated mapper
+     setup in `Systems.load` and `SystemValidator`.
+   - Add `version` to `SourceableValue` and preserve it during deserialization
+     and serialization.
    - `SourceableValueSerializer` + symmetric round-trip tests across
      all canon files.
    - Helper `Systems.saveUserSystem(PlanetarySystem)` writing to the
-     `edits/` directory with backup.
+     `edits/` directory under the configured user dir, with backup.
    - `PlanetarySystemValidator` skeleton wrapping today's rules.
-2. **Phase 1 — MVP editor (Tier 1).** Read-only viewer + per-planet event
-   table edit + save/revert + GM menu entry.
-3. **Phase 2 — Validation & helpers (Tier 2).** Faction-by-date picker,
-   enum dropdowns, socio-industrial widget, in-dialog preview,
-   diff view.
+   - Explicit restart-required save messaging and tests that prove the saved
+     user-dir file loads as an override on the next startup/load.
+2. **Phase 1 — Editor shell (Tier 1a).** GM-gated menu entry, read-only
+  system list/details, validation panel, and save/revert plumbing through the
+  user-dir override path.
+3. **Phase 2 — MVP editing (Tier 1b/Tier 2).** Per-planet event table edit,
+  faction-by-date picker, enum dropdowns, socio-industrial widget,
+  in-dialog preview, diff view.
 4. **Phase 3 — Wizards & bulk ops (Tier 3 minus campaign overlay).**
    Transfer-ownership, new-system, clone-from-template, export bundle.
-5. **Phase 4 — Campaign-scoped overrides (optional).** The `Campaign`
-   overlay refactor, behind a campaign option, only if there's clear
-   demand.
+5. **Phase 4 — Live refresh spike (optional).** Benchmark and, if acceptable,
+   add `UniverseEditService` or an equivalent refresh path that applies a
+   system edit and invalidates `Systems`, `FactionBorderTracker`, HPG, planet
+   event, current-location, map, and currency caches. Prefer an explicit
+   "Apply Now" or debounced batch refresh over refreshing after every field
+   change.
+6. **Phase 5 — Campaign-scoped overrides (optional).** The `Campaign`
+   overlay refactor, behind a campaign option, only if there's clear demand.
 
 ---
 
@@ -352,15 +483,18 @@ A suggested order; each phase is independently shippable.
 2. Do we want to allow **deleting** a canon system, or only
    "abandon"-ing it via the `ABN` faction code? Deletion would require
    handling references from saved games (`CurrentLocation`, contracts).
-3. Should edits be **per-campaign by default** (option 2 in §5.2) or
+3. Should edits be **per-campaign by default** (option 3 in §5.2) or
    **per-user by default** (option 1)? Per-campaign is cleaner but a
    bigger refactor.
 4. Where do edits live for **non-GM** players who load a campaign that
    was edited by a GM? Probably: the campaign save embeds the overlay,
    and on load we re-register those systems. This pushes us toward
-   option 2 in §5.2.
+    option 3 in §5.2.
 5. Is there appetite to also **expose this in MegaMekLab**, or keep it
    strictly MekHQ?
+6. Should the editor offer a GM-only **re-evaluate active contracts** action
+    after ownership changes, or should it only affect future generation and
+    scenario pieces that explicitly ask for current planet ownership?
 
 ---
 
@@ -369,11 +503,14 @@ A suggested order; each phase is independently shippable.
 - Build it inside MekHQ, GM-mode-gated.
 - Persist via the existing user-dir override mechanism — never touch
   canon files.
+- MVP behavior is restart/reload-required after save. This is simpler,
+  safer, and better for editing several planets in one sitting.
 - Start with a focused MVP that edits the per-planet event timeline
   (faction / population / socio-industrial / HPG), because that's 90%
   of the "I want to reflect my campaign in the universe" use case.
-- Make `SourceableValue` round-trip and `PlanetarySystem` YAML write
-  the very first thing you build, and golden-test it against every
-  canon file.
+- Treat same-session ownership propagation as optional future work, gated by
+  benchmark results and implemented as an explicit/batched refresh path.
+- Make `SourceableValue` round-trip and `PlanetarySystem` YAML write early,
+  and golden-test it against every canon file.
 - Layer validation, helpers, wizards, and (optionally) campaign-scoped
   overrides on top in later phases.

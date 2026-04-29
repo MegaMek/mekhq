@@ -169,6 +169,8 @@ public class PlanetarySystem {
     // Base data
     @JsonProperty("id")
     private String id;
+    @JsonProperty("sucsId")
+    private Integer sucsId;
     private String name;
 
     // Star data (to be factored out)
@@ -205,6 +207,18 @@ public class PlanetarySystem {
 
     public PlanetarySystem(String id) {
         this.id = id;
+    }
+
+    void prepareForSerialization() {
+        if (planets != null) {
+            planetList = new ArrayList<>(planets.values());
+            for (Planet planet : planetList) {
+                planet.prepareForSerialization();
+            }
+        }
+        if (events != null) {
+            eventList = new ArrayList<>(events.values());
+        }
     }
 
     public String getId() {

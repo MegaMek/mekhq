@@ -36,7 +36,9 @@ package mekhq.campaign.universe;
 import java.time.LocalDate;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
@@ -157,6 +159,12 @@ public class Planet {
 
     public Planet(String id) {
         this.id = id;
+    }
+
+    void prepareForSerialization() {
+        if (events != null) {
+            eventList = new ArrayList<>(events.values());
+        }
     }
 
     // Constant base data
@@ -308,6 +316,40 @@ public class Planet {
             return null;
         }
         return new ArrayList<>(events.values());
+    }
+
+    public void putEvent(PlanetaryEvent event) {
+        if ((event == null) || (event.date == null)) {
+            throw new IllegalArgumentException("Planetary events must have a date");
+        }
+        if (events == null) {
+            events = new TreeMap<>();
+        }
+        events.put(event.date, event);
+        currentEvents = null;
+    }
+
+    public boolean removeEvent(LocalDate when) {
+        if ((when == null) || (events == null)) {
+            return false;
+        }
+        boolean removed = events.remove(when) != null;
+        if (removed) {
+            currentEvents = null;
+        }
+        return removed;
+    }
+
+    public void replaceEvents(Collection<PlanetaryEvent> updatedEvents) {
+        events = new TreeMap<>();
+        if (updatedEvents != null) {
+            for (PlanetaryEvent event : updatedEvents) {
+                if ((event != null) && (event.date != null)) {
+                    events.put(event.date, event);
+                }
+            }
+        }
+        currentEvents = null;
     }
 
     protected <T> T getEventData(LocalDate when, T defaultValue, EventGetter<T> getter) {
@@ -768,6 +810,7 @@ public class Planet {
 
         @JsonProperty("faction")
         public SourceableValue<List<String>> faction;
+        @JsonIgnore
         public Set<Faction> factions;
         @JsonProperty("lifeForm")
         public SourceableValue<LifeForm> lifeForm;
@@ -791,6 +834,7 @@ public class Planet {
         @JsonProperty("dayLength")
         public SourceableValue<Double> dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
+        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
         @JsonProperty("custom")
         public boolean custom = false;
 

@@ -36,13 +36,16 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 
 /**
@@ -56,11 +59,30 @@ public class SourceableValue<T> {
     @JsonProperty("source")
     private String source;
 
+    @JsonProperty("version")
+    private String version;
+
     @JsonProperty("value")
     private T value;
 
+    public static <T> SourceableValue<T> of(T value) {
+        return of(null, null, value);
+    }
+
+    public static <T> SourceableValue<T> of(String source, String version, T value) {
+        SourceableValue<T> sourceableValue = new SourceableValue<>();
+        sourceableValue.source = source;
+        sourceableValue.version = version;
+        sourceableValue.value = value;
+        return sourceableValue;
+    }
+
     public String getSource() {
         return source;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public T getValue() {
@@ -95,6 +117,7 @@ public class SourceableValue<T> {
 
             // set up initial values we need
             String source = null;
+            String version = null;
             Object value = null; // Use Object since we don’t know T
 
             // If the type is known, use it; otherwise, use Object
@@ -105,6 +128,11 @@ public class SourceableValue<T> {
                 JsonNode sourceNode = root.get("source");
                 if (sourceNode != null) {
                     source = sourceNode.asText();
+                }
+
+                JsonNode versionNode = root.get("version");
+                if (versionNode != null) {
+                    version = versionNode.asText();
                 }
 
                 JsonNode valueNode = root.get("value");
@@ -120,6 +148,7 @@ public class SourceableValue<T> {
             // create final object for output
             SourceableValue<Object> sourceableValue = new SourceableValue<>();
             sourceableValue.source = source;
+            sourceableValue.version = version;
             sourceableValue.value = value;
 
             return sourceableValue;
@@ -132,6 +161,29 @@ public class SourceableValue<T> {
                                            type.containedType(0) :
                                            context.constructType(Object.class);
             return new SourceableValueDeserializer(containedType);
+        }
+    }
+
+    public static class SourceableValueSerializer extends JsonSerializer<SourceableValue> {
+
+        @Override
+        public void serialize(SourceableValue sourceableValue, JsonGenerator generator,
+              SerializerProvider serializers) throws IOException {
+            if ((sourceableValue.source == null) && (sourceableValue.version == null)) {
+                serializers.defaultSerializeValue(sourceableValue.value, generator);
+                return;
+            }
+
+            generator.writeStartObject();
+            if (sourceableValue.source != null) {
+                generator.writeStringField("source", sourceableValue.source);
+            }
+            if (sourceableValue.version != null) {
+                generator.writeStringField("version", sourceableValue.version);
+            }
+            generator.writeFieldName("value");
+            serializers.defaultSerializeValue(sourceableValue.value, generator);
+            generator.writeEndObject();
         }
     }
 

@@ -45,9 +45,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -271,19 +268,19 @@ public class Systems {
      *
      */
     public void load(String planetsPath) throws DOMException {
-        // set up mapper
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        // add custom deserializer for any complex objects that need to be read from Strings, etc.
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
-        module.addDeserializer(StarType.class, new StarType.StarTypeDeserializer());
-        module.addDeserializer(SourceableValue.class, new SourceableValue.SourceableValueDeserializer());
-        mapper.registerModule(module);
-        // this will allow the mapper to deserialize LocalDate objects
-        mapper.registerModule(new JavaTimeModule());
+        parsePlanetarySystemFiles(planetsPath, PlanetarySystemYamlIO.createMapper());
+    }
 
-        // Now we can Load all the yml files in the planetsPath and subdirectories
-        parsePlanetarySystemFiles(planetsPath, mapper);
+    public static java.nio.file.Path saveUserSystem(PlanetarySystem system) throws IOException {
+        return PlanetarySystemYamlIO.saveUserSystem(system);
+    }
+
+    public static boolean hasUserSystemOverride(String systemId) throws IOException {
+        return PlanetarySystemYamlIO.hasUserSystemOverride(systemId);
+    }
+
+    public static boolean deleteUserSystem(String systemId) throws IOException {
+        return PlanetarySystemYamlIO.deleteUserSystem(systemId);
     }
 
     /**
