@@ -120,12 +120,15 @@ class StratConRulesManagerTest {
     }
 
     /**
-     * Verifies that when a force deploys to coordinates containing an Official Challenge scenario,
-     * the force is NOT auto-assigned to that scenario. This is a regression test for
-     * <a href="https://github.com/MegaMek/mekhq/issues/8612">issue #8612</a>.
+     * Verifies that coordinate deployment does not auto-assign Official Challenge scenarios, while explicit player
+     * assignment still commits the selected force.
+     *
+     * <p>Regression coverage for
+     * <a href="https://github.com/MegaMek/mekhq/issues/8612">issue #8612</a> and
+     * <a href="https://github.com/MegaMek/mekhq/issues/8867">issue #8867</a>.
      */
     @Test
-    void deployForceToCoords_officialChallenge_doesNotAutoAssignForce() {
+    void officialChallenge_deployToCoordsDoesNotAutoAssign_assignForceToScenarioCommits() {
         Campaign campaign = mock(Campaign.class);
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
@@ -135,16 +138,17 @@ class StratConRulesManagerTest {
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 1;
 
-        // Create an Official Challenge scenario at the target coords
         StratConScenario challengeScenario = mock(StratConScenario.class);
         AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
         when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.OFFICIAL_CHALLENGE);
         when(backingScenario.isFinalized()).thenReturn(true);
         when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new java.util.ArrayList<>());
         when(challengeScenario.getBackingScenario()).thenReturn(backingScenario);
+        when(challengeScenario.getPrimaryForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(challengeScenario.getPlayerTemplateForceIDs()).thenReturn(new java.util.ArrayList<>());
         when(track.getScenario(coords)).thenReturn(challengeScenario);
 
-        // Setup combat team
         CombatTeam combatTeam = mock(CombatTeam.class);
         CombatRole combatRole = mock(CombatRole.class);
         when(combatRole.isPatrol()).thenReturn(false);
@@ -156,11 +160,14 @@ class StratConRulesManagerTest {
 
         setupProcessForceDeploymentMocks(campaign, options, track, forceID);
 
-        // Act
         StratConRulesManager.deployForceToCoords(coords, forceID, campaign, contract, track, false);
 
-        // Assert: force should NOT be added to Official Challenge scenario
         verify(challengeScenario, never()).addPrimaryForce(anyInt());
+
+        StratConRulesManager.assignForceToScenario(coords, forceID, campaign, contract, track, false);
+
+        verify(challengeScenario).addPrimaryForce(forceID);
+        verify(challengeScenario).commitPrimaryForces();
     }
 
     /**
@@ -206,6 +213,47 @@ class StratConRulesManagerTest {
 
         // Assert: force SHOULD be added to the regular scenario
         verify(regularScenario).addPrimaryForce(forceID);
+    }
+
+    /**
+     * Verifies that explicit player assignment to a non-challenge scenario commits the selected force.
+     */
+    @Test
+    void assignForceToScenario_nonChallengeScenario_commitsSelectedForce() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        StratConScenario regularScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(regularScenario.getBackingScenario()).thenReturn(backingScenario);
+        when(regularScenario.getPrimaryForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(regularScenario.getPlayerTemplateForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(regularScenario);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getCombatTeamsAsMap()).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        StratConRulesManager.assignForceToScenario(coords, forceID, campaign, contract, track, false);
+
+        verify(regularScenario).addPrimaryForce(forceID);
+        verify(regularScenario).commitPrimaryForces();
     }
 
     /**
