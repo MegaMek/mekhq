@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
@@ -189,6 +190,56 @@ public class ContractTest {
         assertEquals(Money.of(5), contract.getEmployerTransportReimbursement(mockCampaign));
         // Player pays the other half
         assertEquals(Money.of(5), contract.getPlayerTransportCost(mockCampaign));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageZeroTotal() {
+        assertEquals(0, Contract.calculateSalvagePercentage(Money.zero(), Money.zero()));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageAllPlayer() {
+        assertEquals(100, Contract.calculateSalvagePercentage(Money.of(1000), Money.zero()));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageAllEmployer() {
+        assertEquals(0, Contract.calculateSalvagePercentage(Money.zero(), Money.of(1000)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageExactWholePercent() {
+        // 50/50 split = exactly 50%, no rounding needed
+        assertEquals(50, Contract.calculateSalvagePercentage(Money.of(500), Money.of(500)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageRoundsAnyFractionUp() {
+        // 425 / 1000 = 42.5% -> 43% (CEILING rounds any fraction up)
+        assertEquals(43, Contract.calculateSalvagePercentage(Money.of(425), Money.of(575)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageRoundsSmallFractionUp() {
+        // 421 / 1000 = 42.1% -> 43% (CEILING rounds any fraction up; this models the gameplay
+        // requirement that 50.001% against a 50% cap is a breach)
+        assertEquals(43, Contract.calculateSalvagePercentage(Money.of(421), Money.of(579)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageDoesNotTruncateNearWholeNumber() {
+        // 4299 / 10000 = 42.99% -> 43% (the original bug for issue #5683)
+        assertEquals(43, Contract.calculateSalvagePercentage(Money.of(4299), Money.of(5701)));
+    }
+
+    @Test
+    public void testCalculateSalvagePercentageBugReportScenario() {
+        // From issue #5683: 30142128 / (30142128 + 40498831) = 42.67% -> 43%
+        // Adding more salvage to the player share must not decrease the displayed percentage
+        int before = Contract.calculateSalvagePercentage(Money.of(30142128), Money.of(40498831));
+        int after = Contract.calculateSalvagePercentage(Money.of(30326639), Money.of(40498831));
+        assertEquals(43, before);
+        assertTrue(after >= before, "salvage % must be monotonic in player share");
     }
 
     private void initializeTest() {
