@@ -284,6 +284,39 @@ public class Systems {
     }
 
     /**
+     * Cache of sanitized file base names (lower-cased, special chars replaced) found in the user edits directory.
+     * {@code null} means "not yet loaded"; callers should invalidate after writing or deleting overrides.
+     */
+    private volatile Set<String> overrideFileBaseNamesCache = null;
+
+    /**
+     * Cheap, cached lookup that answers whether the given system has a user override file on disk. Reads the edits
+     * directory once and caches the result; call {@link #invalidateUserOverrideCache()} after any save / delete /
+     * import so subsequent lookups pick up the change.
+     */
+    public boolean hasUserOverride(String systemId) {
+        if ((systemId == null) || systemId.isBlank()) {
+            return false;
+        }
+        Set<String> cache = overrideFileBaseNamesCache;
+        if (cache == null) {
+            try {
+                cache = PlanetarySystemYamlIO.listOverrideFileBaseNames();
+            } catch (IOException ex) {
+                logger.warn(ex, "Could not enumerate planetary override files");
+                cache = Set.of();
+            }
+            overrideFileBaseNamesCache = cache;
+        }
+        return cache.contains(PlanetarySystemYamlIO.sanitizeFileName(systemId));
+    }
+
+    /** Drops the cached set of override file names. Next {@link #hasUserOverride(String)} call re-reads the directory. */
+    public void invalidateUserOverrideCache() {
+        overrideFileBaseNamesCache = null;
+    }
+
+    /**
      * loop through all files in the directory and subdirectories and load any *.yml files found.
      *
      * @param dirName the name of the directory from which to load files

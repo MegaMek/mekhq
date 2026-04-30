@@ -52,7 +52,15 @@ public class LandMass {
         return name;
     }
 
+    public void setSourcedName(SourceableValue<String> name) {
+        this.name = name;
+    }
+
     public SourceableValue<String> getSourcedCapital() {
         return capital;
+    }
+
+    public void setSourcedCapital(SourceableValue<String> capital) {
+        this.capital = capital;
     }
 }

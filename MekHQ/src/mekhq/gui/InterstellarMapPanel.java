@@ -88,6 +88,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.gui.dialog.PlanetarySystemEditorDialog;
 
 /**
  * This is not functional yet. Just testing things out. A lot of this code is borrowed from InterstellarMap.java in
@@ -338,6 +339,14 @@ public class InterstellarMapPanel extends JPanel {
                      * }
                      * menuGM.add(item);
                      */
+
+                    item = new JMenuItem("Edit System (GM)...");
+                    item.setEnabled((selectedSystem != null) && InterstellarMapPanel.this.campaign.isGM());
+                    if (selectedSystem != null) {
+                        final PlanetarySystem editTarget = selectedSystem;
+                        item.addActionListener(evt -> openPlanetarySystemEditor(editTarget));
+                    }
+                    menuGM.add(item);
 
                     item = new JMenuItem("Recharge Jumpdrive");
                     item.setEnabled(InterstellarMapPanel.this.campaign.getLocation()
@@ -846,6 +855,16 @@ public class InterstellarMapPanel extends JPanel {
                                 g2.setStroke(oldStroke);
                             }
                         }
+
+                        // GM-edited system marker: thin cyan outline ring so the player can spot non-canon edits.
+                        if (Systems.getInstance().hasUserOverride(system.getId())) {
+                            Stroke oldStroke = g2.getStroke();
+                            g2.setPaint(Color.CYAN);
+                            g2.setStroke(new BasicStroke(2.0f));
+                            arc.setArcByCenter(x, y, size + 2.5, 0, 360, Arc2D.OPEN);
+                            g2.draw(arc);
+                            g2.setStroke(oldStroke);
+                        }
                     }
                 }
 
@@ -1332,6 +1351,25 @@ public class InterstellarMapPanel extends JPanel {
      * }
      * }
      */
+
+    /**
+     * Opens the GM-only planetary system editor pre-selected on the given system. Re-paints the map after the dialog
+     * closes so the override outline ring picks up any new edits the user just persisted.
+     */
+    private void openPlanetarySystemEditor(PlanetarySystem system) {
+        if ((system == null) || !campaign.isGM()) {
+            return;
+        }
+        PlanetarySystemEditorDialog dialog = new PlanetarySystemEditorDialog(hqView.getFrame(), campaign);
+        dialog.selectSystemById(system.getId());
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                repaint();
+            }
+        });
+        dialog.setVisible(true);
+    }
 
     private final transient List<ActionListener> listeners = new ArrayList<>();
 

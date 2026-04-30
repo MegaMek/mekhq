@@ -225,6 +225,10 @@ public class PlanetarySystem {
         return id;
     }
 
+    public Integer getSucsId() {
+        return sucsId;
+    }
+
     public Double getX() {
         return x;
     }
@@ -583,6 +587,57 @@ public class PlanetarySystem {
             return null;
         }
         return new ArrayList<>(events.values());
+    }
+
+    /**
+     * Insert or replace a system-level event keyed by date. GM-only planetary editor; gameplay code should not call
+     * this.
+     *
+     * @param event the event to insert; must have a non-null date
+     * @throws IllegalArgumentException if the event or its date is null
+     */
+    public void putEvent(PlanetarySystemEvent event) {
+        if ((event == null) || (event.date == null)) {
+            throw new IllegalArgumentException("Planetary system events must have a date");
+        }
+        if (events == null) {
+            events = new TreeMap<>();
+        }
+        events.put(event.date, event);
+    }
+
+    /**
+     * Remove the system-level event for the given date if present. GM-only planetary editor; gameplay code should not
+     * call this.
+     *
+     * @param when the date of the event to remove
+     * @return {@code true} if an event was removed
+     */
+    public boolean removeEvent(LocalDate when) {
+        if ((when == null) || (events == null)) {
+            return false;
+        }
+        return events.remove(when) != null;
+    }
+
+    /**
+     * Replace the system-level event timeline with the provided collection. GM-only planetary editor; gameplay code
+     * should not call this.
+     *
+     * @param updatedEvents events to install (may be null or empty to clear)
+     */
+    public void replaceEvents(Collection<PlanetarySystemEvent> updatedEvents) {
+        events = new TreeMap<>();
+        if (updatedEvents != null) {
+            for (PlanetarySystemEvent event : updatedEvents) {
+                if ((event != null) && (event.date != null)) {
+                    events.put(event.date, event);
+                }
+            }
+        }
+        if (events.isEmpty()) {
+            events = null;
+        }
     }
 
     protected interface EventGetter<T> {

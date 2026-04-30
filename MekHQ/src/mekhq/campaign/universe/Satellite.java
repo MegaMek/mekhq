@@ -53,6 +53,10 @@ public class Satellite {
         return name;
     }
 
+    public void setSourcedName(SourceableValue<String> name) {
+        this.name = name;
+    }
+
     public String getSize() {
         if (null == size) {
             return "medium";
@@ -60,7 +64,19 @@ public class Satellite {
         return size.getValue();
     }
 
+    public SourceableValue<String> getSourcedSize() {
+        return size;
+    }
+
+    public void setSourcedSize(SourceableValue<String> size) {
+        this.size = size;
+    }
+
     public String getIcon() {
         return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

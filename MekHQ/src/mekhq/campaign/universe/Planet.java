@@ -209,6 +209,14 @@ public class Planet {
         return null != satellites ? new ArrayList<>(satellites) : null;
     }
 
+    /**
+     * Replaces the satellite list. Pass {@code null} or an empty list to clear satellites entirely. Used by the
+     * GM-only planetary editor; gameplay code should not call this.
+     */
+    public void setSatellites(List<Satellite> satellites) {
+        this.satellites = (satellites == null || satellites.isEmpty()) ? null : new ArrayList<>(satellites);
+    }
+
     public Integer getSmallMoons() {
         return (null == getSourcedSmallMoons()) ? 0 : getSourcedSmallMoons().getValue();
     }
@@ -227,6 +235,14 @@ public class Planet {
 
     public List<LandMass> getLandMasses() {
         return null != landMasses ? new ArrayList<>(landMasses) : null;
+    }
+
+    /**
+     * Replaces the landmass list. Pass {@code null} or an empty list to clear landmasses entirely. Used by the
+     * GM-only planetary editor; gameplay code should not call this.
+     */
+    public void setLandMasses(List<LandMass> landMasses) {
+        this.landMasses = (landMasses == null || landMasses.isEmpty()) ? null : new ArrayList<>(landMasses);
     }
 
     public SourceableValue<Double> getSourcedDayLength(LocalDate when) {
@@ -286,6 +302,72 @@ public class Planet {
 
     public String getIcon() {
         return icon;
+    }
+
+    // --- Setters for the planetary editor (sourceable static fields) ---
+
+    public void setSourcedName(SourceableValue<String> name) {
+        this.name = name;
+    }
+
+    public void setSourcedGravity(SourceableValue<Double> gravity) {
+        this.gravity = gravity;
+    }
+
+    public void setSourcedDiameter(SourceableValue<Double> diameter) {
+        this.diameter = diameter;
+    }
+
+    public void setSourcedDensity(SourceableValue<Double> density) {
+        this.density = density;
+    }
+
+    public void setSourcedDayLength(SourceableValue<Double> dayLength) {
+        this.dayLength = dayLength;
+    }
+
+    public void setSourcedYearLength(SourceableValue<Double> yearLength) {
+        this.yearLength = yearLength;
+    }
+
+    public void setSourcedTemperature(SourceableValue<Integer> temperature) {
+        this.temperature = temperature;
+    }
+
+    public void setSourcedPressure(SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure) {
+        this.pressure = pressure;
+    }
+
+    public void setSourcedAtmosphere(SourceableValue<Atmosphere> atmosphere) {
+        this.atmosphere = atmosphere;
+    }
+
+    public void setSourcedComposition(SourceableValue<String> composition) {
+        this.composition = composition;
+    }
+
+    public void setSourcedPercentWater(SourceableValue<Integer> percentWater) {
+        this.percentWater = percentWater;
+    }
+
+    public void setSourcedLifeForm(SourceableValue<LifeForm> lifeForm) {
+        this.lifeForm = lifeForm;
+    }
+
+    public void setSourcedPlanetType(SourceableValue<PlanetaryType> planetType) {
+        this.planetType = planetType;
+    }
+
+    public void setSourcedSmallMoons(SourceableValue<Integer> smallMoons) {
+        this.smallMoons = smallMoons;
+    }
+
+    public void setSourcedRing(SourceableValue<Boolean> ring) {
+        this.ring = ring;
+    }
+
+    public void setDescription(String desc) {
+        this.desc = desc;
     }
 
     // Constant stellar data (to be moved out later)
