@@ -45,8 +45,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -64,11 +62,8 @@ import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
-import megamek.MMConstants;
-import megamek.MegaMek;
 import megamek.Version;
 import megamek.client.ui.CopySystemDataAction;
-import megamek.client.ui.ShowBugReportDialogAction;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
@@ -90,7 +85,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
-import megameklab.MMLConstants;
 import mekhq.IconPackage;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
