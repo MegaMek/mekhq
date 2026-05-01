@@ -220,13 +220,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             salvageUnit = contract.getSalvagedByUnit();
             maxSalvagePct = contract.getSalvagePct();
 
-            currentSalvagePct = 0;
-            if (salvageUnit.plus(salvageEmployer).isPositive()) {
-                currentSalvagePct = salvageUnit.multipliedBy(100)
-                                          .dividedBy(salvageUnit.plus(salvageEmployer))
-                                          .getAmount()
-                                          .intValue();
-            }
+            currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
         }
 
         initComponents();
@@ -1851,13 +1845,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        currentSalvagePct = 0;
-        if (salvageUnit.plus(salvageEmployer).isPositive()) {
-            currentSalvagePct = salvageUnit.multipliedBy(100)
-                                      .dividedBy(salvageUnit.plus(salvageEmployer))
-                                      .getAmount()
-                                      .intValue();
-        }
+        currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
 
         for (int i = 0; i < salvageBoxes.size(); i++) {
             // Skip the escaping units
