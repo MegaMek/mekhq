@@ -776,19 +776,21 @@ public class InterstellarMapPanel extends JPanel {
                             g2.fill(arc);
                         }
                         if ((null != selectedSystem) && selectedSystem.equals(system)) {
-                            // let's try rings
+                            // Draw the selection marker as TWO concentric stroked outlines (a white outer
+                            // ring and a thinner white inner ring with a black gap between them) instead of
+                            // filled discs. Filled discs on a full 360-degree arc with Arc2D.OPEN fill the
+                            // entire interior, which would obliterate the orange "current location" rings
+                            // (radii 1.2-1.8) and the cyan "GM override" outline (radius size + 2.5) drawn
+                            // underneath when a system is both your current location, an override, and
+                            // selected.
+                            Stroke oldStroke = g2.getStroke();
                             g2.setPaint(Color.WHITE);
-                            arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
-                            g2.fill(arc);
-                            g2.setPaint(Color.BLACK);
-                            arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
-                            g2.fill(arc);
-                            g2.setPaint(Color.WHITE);
-                            arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
-                            g2.fill(arc);
-                            g2.setPaint(Color.BLACK);
-                            arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
-                            g2.fill(arc);
+                            g2.setStroke(new BasicStroke(2.5f));
+                            arc.setArcByCenter(x, y, size * 2.2, 0, 360, Arc2D.OPEN);
+                            g2.draw(arc);
+                            arc.setArcByCenter(x, y, size * 1.95, 0, 360, Arc2D.OPEN);
+                            g2.draw(arc);
+                            g2.setStroke(oldStroke);
                         }
 
                         // if factions are selected, then we need to do it differently, because
