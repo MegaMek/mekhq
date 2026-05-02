@@ -19,7 +19,7 @@
  * NOTICE: The MegaMek organization is a non-profit group of volunteers
  * creating free software for the BattleTech community.
  *
- * MechWarrior, BattleMek, `Mek and AeroTek are registered trademarks
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
  * of The Topps Company, Inc. All Rights Reserved.
  *
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
