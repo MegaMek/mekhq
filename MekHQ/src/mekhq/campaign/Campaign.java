@@ -129,6 +129,7 @@ import megamek.common.units.*;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
@@ -758,15 +759,25 @@ public class Campaign implements ITechManager {
     }
 
     public String getTitle() {
+        MHQOptions options = MekHQ.getMHQOptions();
+        String formattedDate = options.getLongDisplayFormattedDate(getLocalDate());
+
+        // Only prepend the short weekday when the configured long date pattern does not already
+        // contain a weekday field (any 'E' token). Otherwise we duplicate the day on default
+        // settings, e.g. "Sun, Sunday, 4 May 3025". Locale is sourced from the same getter the
+        // date formatter uses, so the weekday and date are localized consistently.
+        if (!options.getLongDisplayDateFormat().contains("E")) {
+            String shortWeekday = getLocalDate().getDayOfWeek()
+                                        .getDisplayName(TextStyle.SHORT, options.getDateLocale());
+            formattedDate = shortWeekday + ", " + formattedDate;
+        }
+
         return getName() +
                      " (" +
                      getFaction().getFullName(getGameYear()) +
                      ')' +
                      " - " +
-                     getLocalDate().getDayOfWeek().getDisplayName(TextStyle.SHORT,
-                           MekHQ.getMHQOptions().getLocale()) +
-                     ", " +
-                     MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) +
+                     formattedDate +
                      " (" +
                      getEra() +
                      ')';
