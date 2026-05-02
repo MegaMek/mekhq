@@ -695,7 +695,7 @@ public class Inoculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static DiseaseScanResult getActiveDiseases(List<Person> allPersonnel) {
+    static DiseaseScanResult getActiveDiseases(List<Person> allPersonnel) {
         boolean hasSuperSpreader = false;
         Set<InjuryType> activeDiseases = new HashSet<>();
         Set<InjuryType> activeCanonDiseases = new HashSet<>();
@@ -711,6 +711,13 @@ public class Inoculations {
                 InjuryType type = injury.getType();
 
                 if (subType.isDisease()) {
+                    // Permanent infections do not act as contagion vectors. Without this guard, a permanent
+                    // canon disease (e.g. Knights-Grasse Syndrome) keeps its InjuryType in the active-spread
+                    // set forever — the carrier never recovers — and on the next jump the disease cascades
+                    // through the unit because vaccinations are suppressed in transit.
+                    if (injury.isPermanent()) {
+                        continue;
+                    }
                     if (subType.isCanonDisease()) {
                         activeCanonDiseases.add(type);
                         continue;
