@@ -129,6 +129,10 @@ public class FamilyTreeDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         setPreferredSize(scaleForGUI(900, 700));
+        // pack() is required: setPreferredSize is only a layout hint, so without it the JDialog opens at its
+        // minimum displayable size (a "bar") for any user who does not yet have a saved JWindowPreference.
+        // setPreferences() below still overrides this with a restored size if one was previously saved.
+        pack();
         setLocationRelativeTo(owner);
         setPreferences(this); // Must be before setVisible
         setVisible(true); // Should always be last
@@ -216,9 +220,14 @@ public class FamilyTreeDialog extends JDialog {
                 int targetX = personCenterX - viewW / 2;
                 int targetY = personCenterY - viewH / 2;
 
-                // Clamp to viewport and panel bounds for correct scrolling
-                targetX = Math.clamp(targetX, 0, panelW - viewW);
-                targetY = Math.clamp(targetY, 0, panelH - viewH);
+                // Clamp to viewport and panel bounds for correct scrolling. When the panel is smaller than the
+                // viewport (small tree, or pre-layout panel returning a default near-zero preferred size),
+                // panel - view goes negative, which violates Math.clamp's min <= max contract. Floor max at 0
+                // so the viewport simply stays at the origin in that case — there's nothing to scroll anyway.
+                int maxX = Math.max(0, panelW - viewW);
+                int maxY = Math.max(0, panelH - viewH);
+                targetX = Math.clamp(targetX, 0, maxX);
+                targetY = Math.clamp(targetY, 0, maxY);
 
                 scrollPane.getViewport().setViewPosition(new Point(targetX, targetY));
             }
@@ -364,12 +373,16 @@ class FamilyTreePanel extends JPanel {
                 int newX = (int) (contentX * zoomFactor - mousePos.x);
                 int newY = (int) (contentY * zoomFactor - mousePos.y);
 
-                // Clamp to valid bounds
+                // Clamp to valid bounds. When the user zooms out far enough that the panel fits inside the
+                // viewport, content - view goes negative and violates Math.clamp's min <= max contract.
+                // Floor max at 0 — there's nothing to scroll when content fits.
                 Dimension viewSize = parentScrollPane.getViewport().getExtentSize();
                 Dimension contentSize = getPreferredSize();
 
-                newX = Math.clamp(newX, 0, contentSize.width - viewSize.width);
-                newY = Math.clamp(newY, 0, contentSize.height - viewSize.height);
+                int maxX = Math.max(0, contentSize.width - viewSize.width);
+                int maxY = Math.max(0, contentSize.height - viewSize.height);
+                newX = Math.clamp(newX, 0, maxX);
+                newY = Math.clamp(newY, 0, maxY);
 
                 parentScrollPane.getViewport().setViewPosition(new Point(newX, newY));
 
