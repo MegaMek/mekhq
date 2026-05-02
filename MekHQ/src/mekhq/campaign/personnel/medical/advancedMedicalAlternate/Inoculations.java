@@ -681,15 +681,26 @@ public class Inoculations {
           Set<InjuryType> activeCanonDiseases) {}
 
     /**
-     * Scans all personnel for disease-related injuries and the presence of any Super Spreader flaw. Returns both the
-     * collected set of active diseases and whether at least one Super Spreader is present.
+     * Scans all personnel for transmissible disease-related injuries and the presence of any Super Spreader flaw.
+     * Returns the collected sets of active diseases (split by canon vs. generic) and whether at least one Super
+     * Spreader is present.
+     *
+     * <p>Permanent infections are deliberately excluded from both returned sets. The carrier still has the disease
+     * on their medical sheet and it still counts as a permanent Hit; it simply does not contribute to the unit-wide
+     * contagion pool the spread roll iterates over. Without this exclusion, a permanent canon disease such as
+     * Knights-Grasse Syndrome would stay in the active-spread set forever (the carrier never recovers) and cascade
+     * through the unit on the next jump, when vaccinations are suppressed for close-confines reasons.</p>
      *
      * @param allPersonnel the collection of personnel to evaluate
      *
      * @return a {@link DiseaseScanResult} containing:
      *       <ul>
      *         <li>{@code hasSuperSpreader} — {@code true} if any person has the Super Spreader flaw</li>
-     *         <li>{@code activeDiseases} — the set of all disease-type injuries present across the personnel</li>
+     *         <li>{@code activeDiseases} — non-permanent disease-typed injuries with the {@link InjurySubType#DISEASE_GENERIC}
+     *               subtype present across the personnel</li>
+     *         <li>{@code activeCanonDiseases} — non-permanent disease-typed injuries with the
+     *               {@link InjurySubType#DISEASE_CANON_GENERIC} or {@link InjurySubType#DISEASE_CANON_BIOWEAPON}
+     *               subtype present across the personnel</li>
      *       </ul>
      *
      * @author Illiani

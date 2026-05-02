@@ -78,6 +78,28 @@ public class InoculationsTest {
     }
 
     @Test
+    @DisplayName("Permanent canon-bioweapon carriers are excluded from the canon spread set")
+    void getActiveDiseases_excludesPermanentCanonBioweapons() {
+        InjuryType permanentBioweaponType = mock(InjuryType.class);
+        Injury permanentBioweaponInjury = injury(permanentBioweaponType, InjurySubType.DISEASE_CANON_BIOWEAPON, true);
+        Person permanentCarrier = personWith(permanentBioweaponInjury);
+
+        InjuryType activeBioweaponType = mock(InjuryType.class);
+        Injury activeBioweaponInjury = injury(activeBioweaponType, InjurySubType.DISEASE_CANON_BIOWEAPON, false);
+        Person activeCarrier = personWith(activeBioweaponInjury);
+
+        DiseaseScanResult result =
+              Inoculations.getActiveDiseases(List.of(permanentCarrier, activeCarrier));
+
+        assertFalse(result.activeCanonDiseases().contains(permanentBioweaponType),
+              "Permanent canon bioweapon must not appear in the canon spread set");
+        assertTrue(result.activeCanonDiseases().contains(activeBioweaponType),
+              "Non-permanent canon bioweapon should remain in the canon spread set");
+        assertTrue(result.activeDiseases().isEmpty(),
+              "Generic spread set must be empty when only canon-typed injuries are present");
+    }
+
+    @Test
     @DisplayName("A unit whose only carrier has a permanent disease reports an empty active-disease set")
     void getActiveDiseases_permanentOnlyUnitReportsEmpty() {
         InjuryType permanentType = mock(InjuryType.class);
