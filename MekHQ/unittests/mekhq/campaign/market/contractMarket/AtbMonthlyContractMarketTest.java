@@ -217,6 +217,8 @@ class AtbMonthlyContractMarketTest {
         }
 
         private void setupJumpPaths() {
+            // Campaign.calculateJumpPath can return a partial path for unreachable destinations.
+            // The first path is non-empty but ends at INTERMEDIATE, so it must be rejected.
             doReturn(partialJumpPath).when(campaign).calculateJumpPath(currentSystem, unreachableTargetSystem);
             doReturn(validJumpPath).when(campaign).calculateJumpPath(currentSystem, reachableTargetSystem);
         }
