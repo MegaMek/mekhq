@@ -160,6 +160,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
+import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
 import mekhq.gui.displayWrappers.RankDisplay;
@@ -4064,23 +4065,29 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (getCampaign().isGM()) {
             popup.addSeparator();
 
-            menu = new JMenu(resources.getString("GMMode.text"));
+            // The GM Mode menu and each of its themed sub-submenus are JScrollableMenu so that:
+            //   1. Empty sub-submenus are auto-suppressed (replaces deprecated JMenuHelpers.addMenuIfNonEmpty).
+            //   2. Large genealogy flyouts (Add/Remove Parent/Child on big rosters) get a MenuScroller automatically.
+            // The JScrollableMenu local type is required for the add() overrides to dispatch correctly; the WARNING
+            // in JScrollableMenu's javadoc covers this.
+            JScrollableMenu gmMenu = new JScrollableMenu("GMMode", resources.getString("GMMode.text"));
 
             // Top-level shortcuts: highest-traffic actions stay one click away.
             menuItem = new JMenuItem(resources.getString("editPerson.text"));
             menuItem.setActionCommand(CMD_EDIT);
             menuItem.addActionListener(this);
-            menu.add(menuItem);
+            gmMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("addXP.text"));
             menuItem.setActionCommand(CMD_ADD_XP);
             menuItem.addActionListener(this);
-            menu.add(menuItem);
+            gmMenu.add(menuItem);
 
-            menu.addSeparator();
+            gmMenu.addSeparator();
 
             // Status & Identity submenu
-            JMenu statusIdentityMenu = new JMenu(resources.getString("gmMenu.statusIdentity.text"));
+            JScrollableMenu statusIdentityMenu = new JScrollableMenu("gmMenu.statusIdentity",
+                  resources.getString("gmMenu.statusIdentity.text"));
 
             JMenu changePrisonerStatusMenu = new JMenu(resources.getString("changePrisonerStatus.text"));
             changePrisonerStatusMenu.add(newCheckboxMenu(PrisonerStatus.FREE.toString(),
@@ -4110,10 +4117,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             statusIdentityMenu.add(menuItem);
 
-            JMenuHelpers.addMenuIfNonEmpty(menu, statusIdentityMenu);
+            gmMenu.add(statusIdentityMenu);
 
             // Skills & XP submenu
-            JMenu skillsXpMenu = new JMenu(resources.getString("gmMenu.skillsXp.text"));
+            JScrollableMenu skillsXpMenu = new JScrollableMenu("gmMenu.skillsXp",
+                  resources.getString("gmMenu.skillsXp.text"));
 
             menuItem = new JMenuItem(resources.getString("setXP.text"));
             menuItem.setActionCommand(CMD_SET_XP);
@@ -4153,10 +4161,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             skillsXpMenu.add(attributesMenu);
 
-            JMenuHelpers.addMenuIfNonEmpty(menu, skillsXpMenu);
+            gmMenu.add(skillsXpMenu);
 
             // Medical submenu
-            JMenu medicalMenu = new JMenu(resources.getString("gmMenu.medical.text"));
+            JScrollableMenu medicalMenu = new JScrollableMenu("gmMenu.medical",
+                  resources.getString("gmMenu.medical.text"));
 
             if (!getCampaignOptions().isUseAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("editHits.text"));
@@ -4211,10 +4220,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 medicalMenu.add(menuItem);
             }
 
-            JMenuHelpers.addMenuIfNonEmpty(menu, medicalMenu);
+            gmMenu.add(medicalMenu);
 
-            // Family & Procreation submenu
-            JMenu familyMenu = new JMenu(resources.getString("gmMenu.familyProcreation.text"));
+            // Family & Procreation submenu. JScrollableMenu so the genealogy flyouts (Add/Remove Parent/Child)
+            // get auto-scrollers when the active roster pushes them past the threshold.
+            JScrollableMenu familyMenu = new JScrollableMenu("gmMenu.familyProcreation",
+                  resources.getString("gmMenu.familyProcreation.text"));
 
             if (getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected)
@@ -4321,10 +4332,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            JMenuHelpers.addMenuIfNonEmpty(menu, familyMenu);
+            gmMenu.add(familyMenu);
 
             // Personality & Roleplay submenu
-            JMenu personalityMenu = new JMenu(resources.getString("gmMenu.personalityRoleplay.text"));
+            JScrollableMenu personalityMenu = new JScrollableMenu("gmMenu.personalityRoleplay",
+                  resources.getString("gmMenu.personalityRoleplay.text"));
 
             if (getCampaignOptions().isUseLoyaltyModifiers()) {
                 menuItem = new JMenuItem(resources.getString("regenerateLoyalty.text"));
@@ -4374,10 +4386,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             personalityMenu.add(menuItem);
 
-            JMenuHelpers.addMenuIfNonEmpty(menu, personalityMenu);
+            gmMenu.add(personalityMenu);
 
             // Tools submenu
-            JMenu toolsMenu = new JMenu(resources.getString("gmMenu.tools.text"));
+            JScrollableMenu toolsMenu = new JScrollableMenu("gmMenu.tools",
+                  resources.getString("gmMenu.tools.text"));
 
             if (oneSelected) {
                 menuItem = new JMenuItem(resources.getString("loadGMTools.text"));
@@ -4385,9 +4398,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 toolsMenu.add(menuItem);
             }
 
-            JMenuHelpers.addMenuIfNonEmpty(menu, toolsMenu);
+            gmMenu.add(toolsMenu);
 
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+            // Pre-existing usage; popup is a JPopupMenu so we keep the helper here. Migrating to
+            // JScrollablePopupMenu requires changing the popup variable type, which is out of scope
+            // for this presentation refactor.
+            JMenuHelpers.addMenuIfNonEmpty(popup, gmMenu);
         }
         // endregion GM Menu
 
