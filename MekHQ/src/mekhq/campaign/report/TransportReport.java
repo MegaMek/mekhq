@@ -63,6 +63,7 @@ public class TransportReport extends AbstractReport {
                                   stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - stats.getOccupiedBays(Entity.ETYPE_TANK),
               0);
+        int nosh = Math.max(stats.getNumberOfSuperHeavyVehicles() - stats.getOccupiedSuperHeavyVehicleBays(), 0);
         int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
                                    stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
@@ -71,6 +72,7 @@ public class TransportReport extends AbstractReport {
                                      stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
               0);
         int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freesh = Math.max(stats.getTotalSuperHeavyVehicleBays() - stats.getOccupiedSuperHeavyVehicleBays(), 0);
         int freeSC = Math.max(stats.getTotalSmallCraftBays() - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int mothballedAsCargo = Math.max(stats.getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
 
@@ -88,6 +90,25 @@ public class TransportReport extends AbstractReport {
         if ((nolv > 0) && (freehv > 0)) {
             lvAppend = " [" + placedlv + " Light Vehicles will be placed in Heavy Vehicle bays]";
             freehv -= placedlv;
+        }
+
+        // Heavy Vehicles overflow into free Super Heavy Vehicle bays (SH bays accommodate any vehicle weight class).
+        String hvAppend = "";
+        int newNohv = Math.max(nohv - freesh, 0);
+        int placedhv = Math.max(nohv - newNohv, 0);
+        if ((nohv > 0) && (freesh > 0)) {
+            hvAppend = " [" + placedhv + " Heavy Vehicles will be placed in Super Heavy Vehicle bays]";
+            freesh -= placedhv;
+        }
+
+        // Light Vehicles still un-transported can also overflow into any remaining Super Heavy bays.
+        String lvShAppend = "";
+        int placedLvInSh = 0;
+        if ((newNolv > 0) && (freesh > 0)) {
+            placedLvInSh = Math.min(newNolv, freesh);
+            newNolv -= placedLvInSh;
+            freesh -= placedLvInSh;
+            lvShAppend = " [" + placedLvInSh + " Light Vehicles will be placed in Super Heavy Vehicle bays]";
         }
 
         final StringBuilder sb = new StringBuilder("Transports\n\n");
@@ -115,19 +136,49 @@ public class TransportReport extends AbstractReport {
               lvAppend));
 
         // Let's do Heavy Vehicles next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n",
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n",
               "Heavy Vehicle Bays (Occupied):",
               stats.getTotalHeavyVehicleBays(),
               stats.getOccupiedBays(Entity.ETYPE_TANK),
               "Heavy Vehicles Not Transported:",
-              nohv));
+              nohv,
+              hvAppend));
 
-        if (noASF > 0 && freeSC > 0) {
-            // Let's do ASF in Free Small Craft Bays next.
+        if ((nolv > 0) && (placedlv > 0)) {
+            // Light Vehicles placed in free Heavy Vehicle bays.
             sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n",
                   "   Light Vehicles in Heavy Vehicle Bays (Occupied):",
                   stats.getTotalHeavyVehicleBays(),
                   stats.getOccupiedBays(Entity.ETYPE_TANK) + placedlv,
+                  "Light Vehicles Not Transported:",
+                  newNolv));
+        }
+
+        // Let's do Super Heavy Vehicles next.
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n",
+              "Super Heavy Vehicle Bays (Occupied):",
+              stats.getTotalSuperHeavyVehicleBays(),
+              stats.getOccupiedSuperHeavyVehicleBays(),
+              "Super Heavy Vehicles Not Transported:",
+              nosh,
+              lvShAppend));
+
+        if ((nohv > 0) && (placedhv > 0)) {
+            // Heavy Vehicles placed in free Super Heavy Vehicle bays.
+            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n",
+                  "   Heavy Vehicles in Super Heavy Vehicle Bays (Occupied):",
+                  stats.getTotalSuperHeavyVehicleBays(),
+                  stats.getOccupiedSuperHeavyVehicleBays() + placedhv,
+                  "Heavy Vehicles Not Transported:",
+                  newNohv));
+        }
+
+        if (placedLvInSh > 0) {
+            // Light Vehicles placed in free Super Heavy Vehicle bays.
+            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n",
+                  "   Light Vehicles in Super Heavy Vehicle Bays (Occupied):",
+                  stats.getTotalSuperHeavyVehicleBays(),
+                  stats.getOccupiedSuperHeavyVehicleBays() + placedhv + placedLvInSh,
                   "Light Vehicles Not Transported:",
                   newNolv));
         }

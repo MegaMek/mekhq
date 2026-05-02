@@ -168,6 +168,27 @@ public class HangarStatistics {
         return bayMap.getOrDefault(key, 0);
     }
 
+    /**
+     * Returns the number of super-heavy vehicles (Tank-class units with weight > 100 tons) currently in the hangar.
+     * Mirrors {@link #getNumberOfUnitsByType(long, boolean, boolean)} for the super-heavy bay category, which has no
+     * dedicated public flag because super-heavy bays are tallied via an internal bit on the hash key.
+     *
+     * @return number of present (not in-transit) super-heavy vehicles in the hangar
+     */
+    public int getNumberOfSuperHeavyVehicles() {
+        return tallyBaysByType(false).getOrDefault(Entity.ETYPE_TANK | SUPER_HEAVY_BIT, 0);
+    }
+
+    /**
+     * Returns the number of occupied super-heavy vehicle bays, capped by the total super-heavy vehicle bay capacity.
+     *
+     * @return occupied super-heavy vehicle bays
+     */
+    public int getOccupiedSuperHeavyVehicleBays() {
+        int num = tallyBaysByType(false).getOrDefault(Entity.ETYPE_TANK | SUPER_HEAVY_BIT, 0);
+        return Math.min(getTotalSuperHeavyVehicleBays(), num);
+    }
+
     public int getOccupiedBays(long type) {
         return getOccupiedBays(type, false);
     }
@@ -253,7 +274,6 @@ public class HangarStatistics {
                                       .sum());
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getTotalSuperHeavyVehicleBays() {
         return (int) Math.round(getHangar().getUnitsStream()
                                       .mapToDouble(Unit::getSuperHeavyVehicleCapacity)
