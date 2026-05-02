@@ -135,6 +135,18 @@ public class FamilyTreeDialog extends JDialog {
         pack();
         setLocationRelativeTo(owner);
         setPreferences(this); // Must be before setVisible
+
+        // Defensive: an earlier version of this constructor lacked pack() and could persist a degenerate
+        // dialog size (e.g. ~150x40, just title bar plus tab strip) into JWindowPreference. setPreferences
+        // above unconditionally restores that bad size via element.setSize() and would re-trap affected
+        // users in the bar state on every subsequent open. If the restored size is clearly below usable
+        // thresholds, fall back to the preferred 900x700.
+        Dimension restored = getSize();
+        Dimension minimum = scaleForGUI(400, 300);
+        if (restored.width < minimum.width || restored.height < minimum.height) {
+            setSize(scaleForGUI(900, 700));
+        }
+
         setVisible(true); // Should always be last
     }
 
@@ -220,10 +232,10 @@ public class FamilyTreeDialog extends JDialog {
                 int targetX = personCenterX - viewW / 2;
                 int targetY = personCenterY - viewH / 2;
 
-                // Clamp to viewport and panel bounds for correct scrolling. When the panel is smaller than the
-                // viewport (small tree, or pre-layout panel returning a default near-zero preferred size),
-                // panel - view goes negative, which violates Math.clamp's min <= max contract. Floor max at 0
-                // so the viewport simply stays at the origin in that case — there's nothing to scroll anyway.
+                // Clamp to viewport and panel bounds for correct scrolling. When the rendered tree fits
+                // entirely inside the viewport (lone characters with no relatives, or any small tree on a
+                // sufficiently large dialog), panel - view goes negative, which violates Math.clamp's
+                // min <= max contract. Floor max at 0 — there's nothing to scroll when content fits.
                 int maxX = Math.max(0, panelW - viewW);
                 int maxY = Math.max(0, panelH - viewH);
                 targetX = Math.clamp(targetX, 0, maxX);
