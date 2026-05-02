@@ -160,6 +160,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
+import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
 import mekhq.gui.displayWrappers.RankDisplay;
@@ -4064,117 +4065,167 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (getCampaign().isGM()) {
             popup.addSeparator();
 
-            menu = new JMenu(resources.getString("GMMode.text"));
+            // The GM Mode menu and each of its themed sub-submenus are JScrollableMenu so that:
+            //   1. Empty sub-submenus are auto-suppressed (replaces deprecated JMenuHelpers.addMenuIfNonEmpty).
+            //   2. Large genealogy flyouts (Add/Remove Parent/Child on big rosters) get a MenuScroller automatically.
+            // The JScrollableMenu local type is required for the add() overrides to dispatch correctly; the WARNING
+            // in JScrollableMenu's javadoc covers this.
+            JScrollableMenu gmMenu = new JScrollableMenu("GMMode", resources.getString("GMMode.text"));
 
-            menuItem = new JMenu(resources.getString("changePrisonerStatus.text"));
-            menuItem.add(newCheckboxMenu(PrisonerStatus.FREE.toString(),
+            // Top-level shortcuts: highest-traffic actions stay one click away.
+            menuItem = new JMenuItem(resources.getString("editPerson.text"));
+            menuItem.setActionCommand(CMD_EDIT);
+            menuItem.addActionListener(this);
+            gmMenu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("addXP.text"));
+            menuItem.setActionCommand(CMD_ADD_XP);
+            menuItem.addActionListener(this);
+            gmMenu.add(menuItem);
+
+            gmMenu.addSeparator();
+
+            // Status & Identity submenu
+            JScrollableMenu statusIdentityMenu = new JScrollableMenu("gmMenu.statusIdentity",
+                  resources.getString("gmMenu.statusIdentity.text"));
+
+            JMenu changePrisonerStatusMenu = new JMenu(resources.getString("changePrisonerStatus.text"));
+            changePrisonerStatusMenu.add(newCheckboxMenu(PrisonerStatus.FREE.toString(),
                   makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.FREE.name()),
                   (person.getPrisonerStatus() == PrisonerStatus.FREE)));
-            menuItem.add(newCheckboxMenu(PrisonerStatus.PRISONER.toString(),
+            changePrisonerStatusMenu.add(newCheckboxMenu(PrisonerStatus.PRISONER.toString(),
                   makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER.name()),
                   (person.getPrisonerStatus() == PrisonerStatus.PRISONER)));
-            menuItem.add(newCheckboxMenu(PrisonerStatus.PRISONER_DEFECTOR.toString(),
+            changePrisonerStatusMenu.add(newCheckboxMenu(PrisonerStatus.PRISONER_DEFECTOR.toString(),
                   makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.PRISONER_DEFECTOR.name()),
                   (person.getPrisonerStatus() == PrisonerStatus.PRISONER_DEFECTOR)));
-            menuItem.add(newCheckboxMenu(PrisonerStatus.BONDSMAN.toString(),
+            changePrisonerStatusMenu.add(newCheckboxMenu(PrisonerStatus.BONDSMAN.toString(),
                   makeCommand(CMD_CHANGE_PRISONER_STATUS, PrisonerStatus.BONDSMAN.name()),
                   (person.getPrisonerStatus() == PrisonerStatus.BONDSMAN)));
-            menu.add(menuItem);
+            statusIdentityMenu.add(changePrisonerStatusMenu);
 
             if (StaticChecks.areAllPrisoners(selected)) {
-                menu.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+                statusIdentityMenu.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
             }
 
             if (Stream.of(selected).allMatch(p -> p.getStatus().isPoW())) {
-                menu.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
+                statusIdentityMenu.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
             }
 
             menuItem = new JMenuItem(resources.getString("removePerson.text"));
             menuItem.setActionCommand(CMD_REMOVE);
             menuItem.addActionListener(this);
-            menu.add(menuItem);
+            statusIdentityMenu.add(menuItem);
+
+            gmMenu.add(statusIdentityMenu);
+
+            // Skills & XP submenu
+            JScrollableMenu skillsXpMenu = new JScrollableMenu("gmMenu.skillsXp",
+                  resources.getString("gmMenu.skillsXp.text"));
+
+            menuItem = new JMenuItem(resources.getString("setXP.text"));
+            menuItem.setActionCommand(CMD_SET_XP);
+            menuItem.addActionListener(this);
+            skillsXpMenu.add(menuItem);
 
             if (oneSelected) {
-                JMenu subMenu = new JMenu(resources.getString("refundSkill.text"));
+                JMenu refundSkillMenu = new JMenu(resources.getString("refundSkill.text"));
                 for (Skill skill : person.getSkills().getSkills()) {
                     String label = skill.getType().getName();
                     JMenuItem menuSkill = new JMenuItem(label);
                     menuSkill.setActionCommand(makeCommand(CMD_REFUND_SKILL, label));
                     menuSkill.addActionListener(this);
-                    subMenu.add(menuSkill);
+                    refundSkillMenu.add(menuSkill);
                 }
-                menu.add(subMenu);
+                skillsXpMenu.add(refundSkillMenu);
             }
+
+            if (getCampaignOptions().isUseAbilities()) {
+                menuItem = new JMenuItem(resources.getString("addRandomSPA.text"));
+                menuItem.setActionCommand(CMD_ADD_RANDOM_ABILITY);
+                menuItem.addActionListener(this);
+                skillsXpMenu.add(menuItem);
+            }
+
+            JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
+            for (SkillAttribute attribute : SkillAttribute.values()) {
+                if (attribute.isNone()) {
+                    continue;
+                }
+                menuItem = new JMenuItem(attribute.getLabel());
+                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
+                menuItem.setActionCommand(makeCommand(CMD_SET_ATTRIBUTE, String.valueOf(attribute)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                attributesMenu.add(menuItem);
+            }
+            skillsXpMenu.add(attributesMenu);
+
+            gmMenu.add(skillsXpMenu);
+
+            // Medical submenu
+            JScrollableMenu medicalMenu = new JScrollableMenu("gmMenu.medical",
+                  resources.getString("gmMenu.medical.text"));
 
             if (!getCampaignOptions().isUseAdvancedMedical()) {
                 menuItem = new JMenuItem(resources.getString("editHits.text"));
                 menuItem.setActionCommand(CMD_EDIT_HITS);
                 menuItem.addActionListener(this);
-                menu.add(menuItem);
-            }
-
-            menuItem = new JMenuItem(resources.getString("addXP.text"));
-            menuItem.setActionCommand(CMD_ADD_XP);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            menuItem = new JMenuItem(resources.getString("setXP.text"));
-            menuItem.setActionCommand(CMD_SET_XP);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            menuItem = new JMenuItem(resources.getString("editPerson.text"));
-            menuItem.setActionCommand(CMD_EDIT);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            if (oneSelected) {
-                menuItem = new JMenuItem(resources.getString("loadGMTools.text"));
-                menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
-                menu.add(menuItem);
-            }
-
-            if (getCampaignOptions().isUseAdvancedMedical()) {
-                menuItem = new JMenuItem(resources.getString("removeAllInjuries.text"));
-                menuItem.setActionCommand(CMD_CLEAR_INJURIES);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-
-                menuItem = new JMenuItem(resources.getString("removeAllProsthetics.text"));
-                menuItem.setActionCommand(CMD_CLEAR_PROSTHETICS);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-
+                medicalMenu.add(menuItem);
+            } else {
                 if (oneSelected) {
+                    menuItem = new JMenuItem(resources.getString("editInjuries.text"));
+                    menuItem.setActionCommand(CMD_EDIT_INJURIES);
+                    menuItem.addActionListener(this);
+                    medicalMenu.add(menuItem);
+
                     for (Injury i : person.getInjuries()) {
                         menuItem = new JMenuItem(String.format(resources.getString("removeInjury.format"),
                               i.getName()));
                         menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUID().toString()));
                         menuItem.addActionListener(this);
-                        menu.add(menuItem);
+                        medicalMenu.add(menuItem);
                     }
+                }
 
-                    menuItem = new JMenuItem(resources.getString("editInjuries.text"));
-                    menuItem.setActionCommand(CMD_EDIT_INJURIES);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                if (medicalMenu.getItemCount() > 0) {
+                    medicalMenu.addSeparator();
                 }
 
                 menuItem = new JMenuItem(resources.getString("addRandomInjury.format"));
                 menuItem.setActionCommand(CMD_ADD_RANDOM_INJURY);
                 menuItem.addActionListener(this);
-                menu.add(menuItem);
+                medicalMenu.add(menuItem);
 
                 menuItem = new JMenuItem(resources.getString("addRandomInjuries.format"));
                 menuItem.setActionCommand(CMD_ADD_RANDOM_INJURIES);
                 menuItem.addActionListener(this);
-                menu.add(menuItem);
+                medicalMenu.add(menuItem);
 
                 menuItem = new JMenuItem(resources.getString("addRandomDisease.format"));
                 menuItem.setActionCommand(CMD_ADD_RANDOM_DISEASE);
                 menuItem.addActionListener(this);
-                menu.add(menuItem);
+                medicalMenu.add(menuItem);
+
+                medicalMenu.addSeparator();
+
+                menuItem = new JMenuItem(resources.getString("removeAllInjuries.text"));
+                menuItem.setActionCommand(CMD_CLEAR_INJURIES);
+                menuItem.addActionListener(this);
+                medicalMenu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("removeAllProsthetics.text"));
+                menuItem.setActionCommand(CMD_CLEAR_PROSTHETICS);
+                menuItem.addActionListener(this);
+                medicalMenu.add(menuItem);
             }
+
+            gmMenu.add(medicalMenu);
+
+            // Family & Procreation submenu. JScrollableMenu so the genealogy flyouts (Add/Remove Parent/Child)
+            // get auto-scrollers when the active roster pushes them past the threshold.
+            JScrollableMenu familyMenu = new JScrollableMenu("gmMenu.familyProcreation",
+                  resources.getString("gmMenu.familyProcreation.text"));
 
             if (getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected)
@@ -4185,7 +4236,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                                        "addPregnancies.text"));
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                    familyMenu.add(menuItem);
                 }
 
                 if (Stream.of(selected).anyMatch(Person::isPregnant)) {
@@ -4194,83 +4245,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                                        "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                    familyMenu.add(menuItem);
                 }
             }
-
-            if (getCampaignOptions().isUseLoyaltyModifiers()) {
-                menuItem = new JMenuItem(resources.getString("regenerateLoyalty.text"));
-                menuItem.setActionCommand(CMD_LOYALTY);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-            }
-
-            if (getCampaignOptions().isUseRandomPersonalities()) {
-                menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
-                menuItem.setActionCommand(CMD_PERSONALITY);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-            }
-
-            if (getCampaignOptions().isUseAbilities()) {
-                menuItem = new JMenuItem(resources.getString("addRandomSPA.text"));
-                menuItem.setActionCommand(CMD_ADD_RANDOM_ABILITY);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-            }
-
-            menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
-            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            menuItem = new JMenuItem(resources.getString("removeRoleplaySkills.text"));
-            menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            RandomSkillPreferences randomSkillPreferences = getCampaign().getRandomSkillPreferences();
-            boolean isRandomizeAttributes = randomSkillPreferences.isRandomizeAttributes();
-
-            menuItem = new JMenuItem(resources.getString("generateRoleplayAttributes." + (isRandomizeAttributes ?
-                                                                                                "random" : "reset")));
-            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_ATTRIBUTES);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            boolean isRandomizeTraits = randomSkillPreferences.isRandomizeTraits();
-            menuItem = new JMenuItem(resources.getString("generateRoleplayTraits." + (isRandomizeTraits ?
-                                                                                            "random" : "reset")));
-            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_TRAITS);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
-
-            JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
-
-            for (SkillAttribute attribute : SkillAttribute.values()) {
-                if (attribute.isNone()) {
-                    continue;
-                }
-
-                // Set
-                menuItem = new JMenuItem(attribute.getLabel());
-                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
-                menuItem.setActionCommand(makeCommand(CMD_SET_ATTRIBUTE, String.valueOf(attribute)));
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                attributesMenu.add(menuItem);
-            }
-            menu.add(attributesMenu);
-
-            menuItem = new JMenuItem(resources.getString("generateRandomCivilianProfession.text"));
-            menuItem.setToolTipText(wordWrap(String.format(resources.getString(
-                  "generateRandomCivilianProfession.tooltip"))));
-            menuItem.setActionCommand(makeCommand(CMD_RANDOM_PROFESSION));
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(getCampaign().isGM());
-            menu.add(menuItem);
 
             if (oneSelected) {
+                int genealogyStartCount = familyMenu.getItemCount();
+
                 Genealogy personGenealogy = person.getGenealogy();
                 List<Person> personParents = personGenealogy.getParents();
 
@@ -4292,7 +4273,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         newParentMenu.add(newParentItem);
                     }
                     if (newParentMenu.getItemCount() > 0) {
-                        menu.add(newParentMenu);
+                        familyMenu.add(newParentMenu);
                     }
                 }
 
@@ -4307,7 +4288,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     removeParentMenu.add(removeParentItem);
                 }
                 if (removeParentMenu.getItemCount() > 0) {
-                    menu.add(removeParentMenu);
+                    familyMenu.add(removeParentMenu);
                 }
 
                 JMenu newChildMenu = new JMenu(resources.getString("child.add"));
@@ -4330,7 +4311,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     newChildMenu.add(newChildItem);
                 }
                 if (newChildMenu.getItemCount() > 0) {
-                    menu.add(newChildMenu);
+                    familyMenu.add(newChildMenu);
                 }
 
                 JMenu removeChildMenu = new JMenu(resources.getString("child.remove"));
@@ -4343,11 +4324,86 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     removeChildMenu.add(removeChildItem);
                 }
                 if (removeChildMenu.getItemCount() > 0) {
-                    menu.add(removeChildMenu);
+                    familyMenu.add(removeChildMenu);
+                }
+
+                if (genealogyStartCount > 0 && familyMenu.getItemCount() > genealogyStartCount) {
+                    familyMenu.insertSeparator(genealogyStartCount);
                 }
             }
 
-            JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+            gmMenu.add(familyMenu);
+
+            // Personality & Roleplay submenu
+            JScrollableMenu personalityMenu = new JScrollableMenu("gmMenu.personalityRoleplay",
+                  resources.getString("gmMenu.personalityRoleplay.text"));
+
+            if (getCampaignOptions().isUseLoyaltyModifiers()) {
+                menuItem = new JMenuItem(resources.getString("regenerateLoyalty.text"));
+                menuItem.setActionCommand(CMD_LOYALTY);
+                menuItem.addActionListener(this);
+                personalityMenu.add(menuItem);
+            }
+
+            if (getCampaignOptions().isUseRandomPersonalities()) {
+                menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
+                menuItem.setActionCommand(CMD_PERSONALITY);
+                menuItem.addActionListener(this);
+                personalityMenu.add(menuItem);
+            }
+
+            menuItem = new JMenuItem(resources.getString("generateRandomCivilianProfession.text"));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString(
+                  "generateRandomCivilianProfession.tooltip"))));
+            menuItem.setActionCommand(makeCommand(CMD_RANDOM_PROFESSION));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(getCampaign().isGM());
+            personalityMenu.add(menuItem);
+
+            RandomSkillPreferences randomSkillPreferences = getCampaign().getRandomSkillPreferences();
+            boolean isRandomizeAttributes = randomSkillPreferences.isRandomizeAttributes();
+
+            menuItem = new JMenuItem(resources.getString("generateRoleplayAttributes." + (isRandomizeAttributes ?
+                                                                                                "random" : "reset")));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_ATTRIBUTES);
+            menuItem.addActionListener(this);
+            personalityMenu.add(menuItem);
+
+            boolean isRandomizeTraits = randomSkillPreferences.isRandomizeTraits();
+            menuItem = new JMenuItem(resources.getString("generateRoleplayTraits." + (isRandomizeTraits ?
+                                                                                            "random" : "reset")));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_TRAITS);
+            menuItem.addActionListener(this);
+            personalityMenu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            personalityMenu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("removeRoleplaySkills.text"));
+            menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            personalityMenu.add(menuItem);
+
+            gmMenu.add(personalityMenu);
+
+            // Tools submenu
+            JScrollableMenu toolsMenu = new JScrollableMenu("gmMenu.tools",
+                  resources.getString("gmMenu.tools.text"));
+
+            if (oneSelected) {
+                menuItem = new JMenuItem(resources.getString("loadGMTools.text"));
+                menuItem.addActionListener(evt -> loadGMToolsForPerson(person));
+                toolsMenu.add(menuItem);
+            }
+
+            gmMenu.add(toolsMenu);
+
+            // Pre-existing usage; popup is a JPopupMenu so we keep the helper here. Migrating to
+            // JScrollablePopupMenu requires changing the popup variable type, which is out of scope
+            // for this presentation refactor.
+            JMenuHelpers.addMenuIfNonEmpty(popup, gmMenu);
         }
         // endregion GM Menu
 
