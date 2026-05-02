@@ -82,6 +82,7 @@ import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -762,6 +763,9 @@ public class Campaign implements ITechManager {
                      getFaction().getFullName(getGameYear()) +
                      ')' +
                      " - " +
+                     getLocalDate().getDayOfWeek().getDisplayName(TextStyle.SHORT,
+                           MekHQ.getMHQOptions().getLocale()) +
+                     ", " +
                      MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) +
                      " (" +
                      getEra() +
