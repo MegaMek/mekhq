@@ -297,6 +297,11 @@ public class Systems {
             throw new NullPointerException();
         }
 
+        // Detect whether the current directory is the connector_systems subtree. Connector systems
+        // (DPR/HWY/LTR/FDR/ER/HL prefixes) are synthetic jump-path routing helpers with no inhabitants
+        // and need to be flagged so UI code can filter them out — see issue #8934.
+        boolean isConnectorDir = dirName.replace('\\', '/').contains("/connector_systems");
+
         File dir = new File(dirName);
         if (dir.isDirectory()) {
             File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
@@ -307,7 +312,7 @@ public class Systems {
                 for (File file : files) {
                     if (file.isFile()) {
                         try (FileInputStream fis = new FileInputStream(file)) {
-                            loadPlanetarySystem(fis, mapper);
+                            loadPlanetarySystem(fis, mapper, isConnectorDir);
                         } catch (Exception ex) {
                             // Ignore this file then
                             logger.error(ex, "Exception trying to parse {} - ignoring.", file.getPath());
@@ -325,8 +330,12 @@ public class Systems {
                             ZipEntry entry = entries.nextElement();
                             // Check if entry is a directory
                             if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
+                                // Zip entries carry their internal path; use it to detect connector entries
+                                // even when the zip itself sits in the canon tree.
+                                boolean entryIsConnector = isConnectorDir
+                                      || entry.getName().replace('\\', '/').contains("connector_systems");
                                 try (InputStream inputStream = zip.getInputStream(entry)) {
-                                    loadPlanetarySystem(inputStream, mapper);
+                                    loadPlanetarySystem(inputStream, mapper, entryIsConnector);
                                 } catch (Exception ex) {
                                     // Ignore this file then
                                     logger.error(ex, "Exception trying to parse zip  entry {} - ignoring.",
@@ -353,7 +362,7 @@ public class Systems {
         } else {
             if (dir.isFile()) {
                 try (FileInputStream fis = new FileInputStream(dir)) {
-                    loadPlanetarySystem(fis, mapper);
+                    loadPlanetarySystem(fis, mapper, isConnectorDir);
                 } catch (Exception ex) {
                     // Ignore this dir then
                     logger.error(ex, "Exception trying to parse {} - ignoring.", dir.getPath());
@@ -363,9 +372,12 @@ public class Systems {
         }
     }
 
-    private void loadPlanetarySystem(InputStream source, ObjectMapper mapper) throws IOException {
+    private void loadPlanetarySystem(InputStream source, ObjectMapper mapper, boolean isConnector) throws IOException {
 
         PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
+        if (isConnector) {
+            system.setConnector(true);
+        }
         systemList.put(system.getId(), system);
 
     }

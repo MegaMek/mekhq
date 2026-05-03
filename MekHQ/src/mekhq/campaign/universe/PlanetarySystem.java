@@ -175,6 +175,18 @@ public class PlanetarySystem {
     @JsonProperty("spectralType")
     private SourceableValue<StarType> star;
 
+    /**
+     * {@code true} for synthetic systems loaded from {@code mm-data/data/universe/planetary_systems/connector_systems/}
+     * — these are jump-path routing helpers (DPR, HWY, LTR, FDR, ER, HL prefixes) with no inhabitants, no faction
+     * history, and no canonical lore. They share the loader and registry with real canon systems and need to be
+     * filtered out of any UI that asks the user to pick a real system (e.g. the origin-system picker in
+     * {@code CustomizePersonDialog} — see issue #8934).
+     *
+     * <p>Set by {@link Systems#parsePlanetarySystemFiles} based on the loading directory; not deserialized from
+     * YAML (the YAML schema has no equivalent field).</p>
+     */
+    private boolean connector = false;
+
     // tree map of planets sorted by system position
     private TreeMap<Integer, Planet> planets;
 
@@ -209,6 +221,20 @@ public class PlanetarySystem {
 
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return {@code true} if this system was loaded from the {@code connector_systems/} subdirectory — a
+     *       synthetic jump-path routing helper with no inhabitants. UI code that asks the user to pick a
+     *       real system should filter these out. See {@link #connector} for full context.
+     */
+    public boolean isConnector() {
+        return connector;
+    }
+
+    /** Marks this system as a synthetic connector (used by {@link Systems} during YAML loading). */
+    public void setConnector(boolean connector) {
+        this.connector = connector;
     }
 
     public Double getX() {
