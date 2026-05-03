@@ -429,7 +429,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         panDemographics.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
-        DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel();
+        // Decide the initial faction-picker model up front so we can construct the JComboBox with
+        // the right contents from the start. The earlier approach (build strict, attach listener,
+        // then maybe rebuild) fired the choiceFaction selection-change listener during init, while
+        // chkClan and chkOnlyOurFaction were still null — Copilot review on PR #8937. Build now,
+        // attach listener after, and the rebuild path is reserved for the post-construction toggle.
+        boolean originSurvivesStrictFilter = wouldStrictFilterAdmit(person.getOriginFaction());
+        boolean openExpanded = person.getOriginFaction() != null && !originSurvivesStrictFilter;
+        DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel(openExpanded);
         choiceFaction = new JComboBox<>(factionsModel);
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -471,21 +478,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         // "Show All Factions" sibling checkbox. Default unchecked = strict lifespan filter (the
         // canonically correct view); checked = unfiltered (escape hatch for long-lived or
-        // unusual-origin characters). If the person's existing origin faction would already be
-        // filtered out by the strict view we auto-check the box so the dropdown reflects what's
-        // actually selected — same fall-back-to-all pattern used for the system picker (#8935).
-        // See issue #8929.
+        // unusual-origin characters). State is set to mirror the model we just built, so the
+        // checkbox is consistent with what's displayed without needing to fire the toggle handler
+        // during construction. See issue #8929.
         chkShowAllFactions = new JCheckBox("Show All Factions");
-        // Strict-mode model still has the origin faction in it (we always include the person's
-        // origin defensively), but the checkbox should reflect whether the strict *filter* would
-        // have admitted it on its own. If not — auto-check so the user sees the broader pool the
-        // assignment came from instead of a model that looks complete-yet-isn't.
-        boolean originSurvivesStrictFilter = wouldStrictFilterAdmit(person.getOriginFaction());
-        chkShowAllFactions.setSelected(person.getOriginFaction() != null && !originSurvivesStrictFilter);
+        chkShowAllFactions.setSelected(openExpanded);
         chkShowAllFactions.addActionListener(e -> rebuildFactionsModelPreservingSelection());
-        if (chkShowAllFactions.isSelected()) {
-            rebuildFactionsModelPreservingSelection();
-        }
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -1417,21 +1415,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     /**
      * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
-     * current selection across the swap. The selection is restored by reference; if the previously
-     * selected faction has been filtered out by the new model (impossible today since the person's
-     * origin is always included, but defensive), the listener leaves the index at -1 — same shape
-     * as Swing's default behavior.
+     * current selection across the swap. If there was no current selection (or the previously
+     * selected faction has been filtered out by the new model), the index is explicitly set to
+     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
+     * would silently assign an unintended origin when OK is clicked. (Copilot review on PR #8937.)
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();
         DefaultComboBoxModel<Faction> rebuilt = getFactionsComboBoxModel(chkShowAllFactions.isSelected());
         choiceFaction.setModel(rebuilt);
-        if (current != null) {
-            int idx = rebuilt.getIndexOf(current);
-            if (idx >= 0) {
-                choiceFaction.setSelectedIndex(idx);
-            }
-        }
+        int idx = (current != null) ? rebuilt.getIndexOf(current) : -1;
+        choiceFaction.setSelectedIndex(idx);
     }
 
     /**
