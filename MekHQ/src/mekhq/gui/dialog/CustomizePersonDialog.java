@@ -160,6 +160,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JComboBox<Faction> choiceFaction;
     private JComboBox<PlanetarySystem> choiceSystem;
     private DefaultComboBoxModel<PlanetarySystem> allSystems;
+    // Per-(system,birthdate) owner-resolution cache. ownersAt(...) walks every event on every planet
+    // in a system, and the picker calls it twice per system per filter pass plus once per visible
+    // dropdown row in the renderer. With ~9k systems loaded that's measurable. Identity-keyed because
+    // PlanetarySystem instances are reused across calls. Cleared whenever birthdate changes.
+    // (Copilot review on PR #8935.)
+    private final java.util.IdentityHashMap<PlanetarySystem, Set<Faction>> ownersCache = new java.util.IdentityHashMap<>();
+    private LocalDate ownersCacheBirthdate;
     private JCheckBox chkShowAllWorlds;
     private JComboBox<Planet> choicePlanet;
     private JCheckBox chkClan;
@@ -487,6 +494,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         DefaultComboBoxModel<PlanetarySystem> initialSystems = (originFaction != null)
               ? getPlanetarySystemsComboBoxModel(originFaction)
               : allSystems;
+        // If the person already has an origin planet that the faction-filtered view excludes (e.g.,
+        // a Tharkad-origin character whose faction is now FedSuns), fall back to the all-worlds view
+        // so we don't silently drop their existing assignment when they click OK. Tracked back to the
+        // checkbox state below via showAllWorldsInitial. (Copilot review on PR #8935.)
+        PlanetarySystem existingOriginSystem = (person.getOriginPlanet() != null)
+              ? person.getOriginPlanet().getParentSystem()
+              : null;
+        boolean showAllWorldsInitial = false;
+        if (existingOriginSystem != null && initialSystems != allSystems
+              && initialSystems.getIndexOf(existingOriginSystem) < 0) {
+            initialSystems = allSystems;
+            showAllWorldsInitial = true;
+        }
         choiceSystem = new JComboBox<>(initialSystems);
         choiceSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -500,10 +520,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 return this;
             }
         });
-        if (person.getOriginPlanet() != null) {
-            PlanetarySystem planetarySystem = person.getOriginPlanet().getParentSystem();
-            choiceSystem.setSelectedIndex(initialSystems.getIndexOf(planetarySystem));
-            updatePlanetsComboBoxModel(planetsModel, planetarySystem);
+        if (existingOriginSystem != null) {
+            choiceSystem.setSelectedIndex(initialSystems.getIndexOf(existingOriginSystem));
+            updatePlanetsComboBoxModel(planetsModel, existingOriginSystem);
         }
         choiceSystem.addActionListener(evt -> {
             // Update the clan check box based on the new selected faction
@@ -523,6 +542,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         panDemographics.add(choiceSystem, gridBagConstraints);
 
         chkShowAllWorlds = new JCheckBox("Show All Worlds");
+        chkShowAllWorlds.setSelected(showAllWorldsInitial);
         chkShowAllWorlds.addActionListener(e -> filterPlanetarySystemsForOurFaction(!chkShowAllWorlds.isSelected()));
 
         gridBagConstraints = new GridBagConstraints();
@@ -1419,7 +1439,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
                                                      .filter(a -> !a.isConnector())
-                                                     .filter(a -> isInhabitedAt(a, birthDate))
+                                                     .filter(a -> isInhabitedAt(cachedOwnersAt(a)))
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
@@ -1443,8 +1463,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
                                                      .filter(a -> !a.isConnector())
-                                                     .filter(a -> isInhabitedAt(a, birthDate))
-                                                     .filter(a -> isFactionMatch(ownersAt(a, birthDate), faction))
+                                                     .filter(a -> {
+                                                         Set<Faction> owners = cachedOwnersAt(a);
+                                                         return isInhabitedAt(owners) && isFactionMatch(owners, faction);
+                                                     })
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
@@ -1455,12 +1477,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * @return the system's birthdate-era name with its owner-at-birth faction codes appended in
-     *       brackets, e.g. {@code "New Avalon [FC]"}. Lets the user verify ownership at a glance
-     *       while picking a birthworld — especially useful in faction-merger eras where a world
-     *       may legitimately appear under a successor or predecessor faction's filter.
-     */
-    /**
      * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name
      * with the resolved owner faction code(s) appended in brackets. Owner is computed by
      * {@link #ownersAt(PlanetarySystem, LocalDate)} which applies to-the-victor citizenship rules,
@@ -1469,9 +1485,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      * Visible in both filtered and "Show All Worlds" modes — useful both for player context and
      * for spotting data-side anomalies at a glance.
      */
+    private Set<Faction> cachedOwnersAt(PlanetarySystem system) {
+        if (!java.util.Objects.equals(birthdate, ownersCacheBirthdate)) {
+            ownersCache.clear();
+            ownersCacheBirthdate = birthdate;
+        }
+        return ownersCache.computeIfAbsent(system, s -> ownersAt(s, birthdate));
+    }
+
     private String formatSystemForBirthdate(PlanetarySystem system) {
         String name = system.getName(birthdate);
-        Set<Faction> owners = ownersAt(system, birthdate);
+        Set<Faction> owners = cachedOwnersAt(system);
         if (owners.isEmpty()) {
             return name;
         }
@@ -1556,9 +1580,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                     snapshot = codes;
                 }
             }
+            // No snapshot means the world wasn't owned at `when` — uncolonized. Don't substitute a
+            // future colonization event, or we'd incorrectly mark pre-colonial dates as inhabited
+            // and pollute the picker (Copilot review on PR #8935).
             java.util.List<String> displayed;
-            if (eventualOwner != null && !sameCodes(snapshot, eventualOwner)
-                  && (snapshot == null || isDisputedOnly(snapshot) || anyDissolvesNear(snapshot, when))) {
+            if (snapshot != null && eventualOwner != null && !sameCodes(snapshot, eventualOwner)
+                  && (isDisputedOnly(snapshot) || anyDissolvesNear(snapshot, when))) {
                 displayed = eventualOwner;
             } else {
                 displayed = snapshot;
@@ -1665,18 +1692,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * @return {@code true} if the system has at least one real (non-abandoned) faction in control at the
-     *       given date. {@code PlanetarySystem.getFactionSet} only auto-removes the {@code ABN}
-     *       (abandoned) marker when other factions are present alongside it; a system whose ONLY faction
-     *       is {@code ABN} would still report a non-empty set, so we also reject that case.
+     * @return {@code true} if the resolved owner set has at least one real (non-abandoned) faction.
+     *       {@code ownersAt(...)} already drops the {@code ABN} marker when other factions are present;
+     *       a system whose ONLY faction is {@code ABN} would still come back non-empty here, so we
+     *       reject that case explicitly.
      */
-    private static boolean isInhabitedAt(PlanetarySystem system, LocalDate when) {
-        Set<Faction> factions = ownersAt(system, when);
-        if (factions.isEmpty()) {
+    private static boolean isInhabitedAt(Set<Faction> owners) {
+        if (owners.isEmpty()) {
             return false;
         }
-        if (factions.size() == 1) {
-            Faction only = factions.iterator().next();
+        if (owners.size() == 1) {
+            Faction only = owners.iterator().next();
             return only != null && !"ABN".equals(only.getShortName());
         }
         return true;

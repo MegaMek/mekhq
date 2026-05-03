@@ -299,8 +299,10 @@ public class Systems {
 
         // Detect whether the current directory is the connector_systems subtree. Connector systems
         // (DPR/HWY/LTR/FDR/ER/HL prefixes) are synthetic jump-path routing helpers with no inhabitants
-        // and need to be flagged so UI code can filter them out — see issue #8934.
-        boolean isConnectorDir = dirName.replace('\\', '/').contains("/connector_systems");
+        // and need to be flagged so UI code can filter them out — see issue #8934. Path normalization
+        // requires directory boundaries on either side so a hypothetical filename containing the
+        // substring (e.g. "my_connector_systems_notes.yml") doesn't trip the check.
+        boolean isConnectorDir = isConnectorPath(dirName);
 
         File dir = new File(dirName);
         if (dir.isDirectory()) {
@@ -332,8 +334,7 @@ public class Systems {
                             if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
                                 // Zip entries carry their internal path; use it to detect connector entries
                                 // even when the zip itself sits in the canon tree.
-                                boolean entryIsConnector = isConnectorDir
-                                      || entry.getName().replace('\\', '/').contains("connector_systems");
+                                boolean entryIsConnector = isConnectorDir || isConnectorPath(entry.getName());
                                 try (InputStream inputStream = zip.getInputStream(entry)) {
                                     loadPlanetarySystem(inputStream, mapper, entryIsConnector);
                                 } catch (Exception ex) {
@@ -380,6 +381,20 @@ public class Systems {
         }
         systemList.put(system.getId(), system);
 
+    }
+
+    /**
+     * @return {@code true} if the path identifies a {@code connector_systems/} subtree entry.
+     *       Both {@code /} and {@code \} separators are normalized; the segment must be bounded by
+     *       directory separators on both sides (or sit at the path root) so a stray substring match
+     *       in a filename or unrelated directory doesn't get flagged. See issue #8934.
+     */
+    private static boolean isConnectorPath(String path) {
+        if (path == null) {
+            return false;
+        }
+        String normalized = path.replace('\\', '/');
+        return normalized.contains("/connector_systems/") || normalized.startsWith("connector_systems/");
     }
 
     private void cleanupSystems() {
