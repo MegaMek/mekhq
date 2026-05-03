@@ -183,11 +183,17 @@ public class Faction {
      * {@code fallBackFactions} can carry the relationship — because the YAMLs only declare the
      * successor's predecessors (e.g. {@code RD.fallBackFactions = [CGB, FRR]}), never the inverse.
      *
-     * <p>Meta-faction codes are excluded so that {@code LA} and {@code FS} are not considered
-     * compatible just because both list {@code IS} as a fallback. The exclusion list is the codes
-     * {@code IS}, {@code CLAN.IS}, and any code starting with {@code Periphery.} or {@code CLAN.} —
-     * these are general-category fallbacks for missing-data lookups in
-     * {@link mekhq.campaign.universe.RandomFactionGenerator}, not real institutional ancestry.
+     * <p>Meta-faction codes are excluded as compatibility <em>targets</em>: a real faction is never
+     * considered "compatible" with the abstract meta-faction {@code IS} (or {@code CLAN.IS}, or any
+     * {@code Periphery.*} / {@code CLAN.*} code) just because the real faction's
+     * {@code fallBackFactions} list includes that meta code as a generic data-lookup fallback. Most
+     * playable Inner Sphere factions list {@code IS} as a fallback for the
+     * {@link mekhq.campaign.universe.RandomFactionGenerator} machinery, so without this exclusion
+     * any of them would erroneously test compatible with the abstract IS umbrella.
+     *
+     * <p>The exclusion does <em>not</em> change comparisons between two real factions: LA and FS, for
+     * example, are correctly considered incompatible by this method because neither lists the other's
+     * short code in its fallbacks, regardless of any shared meta entries.
      *
      * <p>FedCom-specific era rules (LA seceding 3057, Yvonne reverting to Federated Suns 3067) are
      * handled separately at the call site; this method intentionally does not look at the date.
