@@ -280,7 +280,7 @@ public class Utilities {
             // Weight of the two units must match, or we continue, but BA weight gets checked
             // differently
             if (en instanceof BattleArmor battleArmor) {
-                if (battleArmor.getTroopers() != (int) summary.getTWWeight()) {
+                if (battleArmor.getSquadSize() != (int) summary.getTWWeight()) {
                     continue;
                 }
             } else {
