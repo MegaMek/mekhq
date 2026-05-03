@@ -4956,10 +4956,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             } else if (academy.isLocal()) {
                 // are any of the local academies accepting applicants from person's Faction or
-                // campaign's Faction?
-                String faction = academy.getFilteredFaction(campaign,
+                // campaign's Faction? Use the campus-aware variant so faction-restricted local academies
+                // resolve against the system's faction history (handles mergers/splits — see #8915).
+                String faction = academy.getFilteredFactionAtCampus(campaign,
                       person,
-                      campaign.getSystemById(campaign.getCurrentSystem().getId()).getFactions(campaign.getLocalDate()));
+                      campaign.getCurrentSystem().getId());
 
                 if (faction == null) {
                     if (showIneligibleAcademies) {
@@ -4995,10 +4996,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 List<String> campuses = new ArrayList<>();
 
                 for (String campusId : academy.getLocationSystems()) {
-                    PlanetarySystem system = campaign.getSystemById(campusId);
-
-                    if (academy.getFilteredFaction(campaign, person, system.getFactions(campaign.getLocalDate())) !=
-                              null) {
+                    if (academy.getFilteredFactionAtCampus(campaign, person, campusId) != null) {
                         campuses.add(campusId);
                     }
                 }
@@ -5023,9 +5021,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                         }
                     } else {
-                        String faction = academy.getFilteredFaction(campaign,
-                              person,
-                              campaign.getSystemById(nearestCampus).getFactions(campaign.getLocalDate()));
+                        String faction = academy.getFilteredFactionAtCampus(campaign, person, nearestCampus);
 
                         if (faction != null) {
                             JMenu academyOption = new JMenu(academy.getName());
@@ -5118,21 +5114,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (academy.isLocal()) {
                 // find the first faction that accepts applications from all persons in
-                // personnel
+                // personnel — campus-aware variant resolves faction-restricted academies via system history
+                String currentCampus = campaign.getCurrentSystem().getId();
                 Optional<String> suitableFaction = personnel.stream()
-                                                         .map(person -> academy.getFilteredFaction(campaign,
-                                                               person,
-                                                               campaign.getCurrentSystem()
-                                                                     .getFactions(campaign.getLocalDate())))
+                                                         .map(person -> academy.getFilteredFactionAtCampus(campaign,
+                                                               person, currentCampus))
                                                          .filter(faction -> personnel.stream()
                                                                                   .allMatch(person -> Objects.equals(
                                                                                         faction,
-                                                                                        academy.getFilteredFaction(
-                                                                                              campaign,
-                                                                                              person,
-                                                                                              campaign.getCurrentSystem()
-                                                                                                    .getFactions(
-                                                                                                          campaign.getLocalDate())))))
+                                                                                        academy.getFilteredFactionAtCampus(
+                                                                                              campaign, person,
+                                                                                              currentCampus))))
                                                          .distinct()
                                                          .filter(Objects::nonNull)
                                                          .findFirst();
@@ -5163,20 +5155,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 List<String> suitableCampuses = personnel.stream()
                                                       .flatMap(person -> academy.getLocationSystems()
                                                                                .stream()
-                                                                               .filter(campus -> academy.getFilteredFaction(
-                                                                                     campaign,
-                                                                                     person,
-                                                                                     campaign.getSystemById(campus)
-                                                                                           .getFactions(campaign.getLocalDate())) !=
-                                                                                                       null))
+                                                                               .filter(campus -> academy.getFilteredFactionAtCampus(
+                                                                                     campaign, person, campus) != null))
                                                       .distinct()
                                                       .filter(campus -> personnel.stream()
-                                                                              .allMatch(person -> academy.getFilteredFaction(
-                                                                                    campaign,
-                                                                                    person,
-                                                                                    campaign.getSystemById(campus)
-                                                                                          .getFactions(campaign.getLocalDate())) !=
-                                                                                                        null))
+                                                                              .allMatch(person -> academy.getFilteredFactionAtCampus(
+                                                                                    campaign, person, campus) != null))
                                                       .collect(Collectors.toList());
 
                 if (!suitableCampuses.isEmpty()) {
@@ -5184,20 +5168,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     // find what factions accept an application from all members of the group
                     Optional<String> suitableFaction = personnel.stream()
-                                                             .map(person -> academy.getFilteredFaction(campaign,
-                                                                   person,
-                                                                   campaign.getSystemById(nearestCampus)
-                                                                         .getFactions(campaign.getLocalDate())))
+                                                             .map(person -> academy.getFilteredFactionAtCampus(campaign,
+                                                                   person, nearestCampus))
                                                              .distinct()
                                                              .filter(faction -> personnel.stream()
                                                                                       .allMatch(person -> faction.equals(
-                                                                                            academy.getFilteredFaction(
-                                                                                                  campaign,
-                                                                                                  person,
-                                                                                                  campaign.getSystemById(
-                                                                                                              nearestCampus)
-                                                                                                        .getFactions(
-                                                                                                              campaign.getLocalDate())))))
+                                                                                            academy.getFilteredFactionAtCampus(
+                                                                                                  campaign, person,
+                                                                                                  nearestCampus))))
                                                              .findFirst();
 
                     if (suitableFaction.isPresent()) {

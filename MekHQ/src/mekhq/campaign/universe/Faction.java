@@ -173,6 +173,60 @@ public class Faction {
         return alternativeFactionCodes;
     }
 
+    /**
+     * Tests whether this faction is institutionally compatible with another faction via the
+     * {@code fallBackFactions} successor/predecessor data already populated in the YAML faction files.
+     *
+     * <p>Used by faction-restricted academy access (and any future eligibility check) for non-FedCom
+     * faction successions: Clan Ghost Bear / Free Rasalhague Republic into Rasalhague Dominion, ComStar
+     * into Word of Blake, and similar mergers/splits. The check is bidirectional — either side's
+     * {@code fallBackFactions} can carry the relationship — because the YAMLs only declare the
+     * successor's predecessors (e.g. {@code RD.fallBackFactions = [CGB, FRR]}), never the inverse.
+     *
+     * <p>Meta-faction codes are excluded so that {@code LA} and {@code FS} are not considered
+     * compatible just because both list {@code IS} as a fallback. The exclusion list is the codes
+     * {@code IS}, {@code CLAN.IS}, and any code starting with {@code Periphery.} or {@code CLAN.} —
+     * these are general-category fallbacks for missing-data lookups in
+     * {@link mekhq.campaign.universe.RandomFactionGenerator}, not real institutional ancestry.
+     *
+     * <p>FedCom-specific era rules (LA seceding 3057, Yvonne reverting to Federated Suns 3067) are
+     * handled separately at the call site; this method intentionally does not look at the date.
+     *
+     * @param other the other faction to test compatibility against
+     *
+     * @return {@code true} if this and {@code other} are the same faction, or if either lists the
+     *       other in its {@code fallBackFactions} (after meta-code exclusion); {@code false} otherwise
+     */
+    public boolean isLineageCompatible(final @Nullable Faction other) {
+        if (other == null) {
+            return false;
+        }
+        if (this.equals(other)) {
+            return true;
+        }
+        if (containsNonMetaCode(this.alternativeFactionCodes, other.shortName)) {
+            return true;
+        }
+        return containsNonMetaCode(other.alternativeFactionCodes, this.shortName);
+    }
+
+    private static boolean containsNonMetaCode(@Nullable String[] codes, String target) {
+        if (codes == null || isMetaFactionCode(target)) {
+            return false;
+        }
+        for (String code : codes) {
+            if (target.equals(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isMetaFactionCode(String code) {
+        return "IS".equals(code) || "CLAN.IS".equals(code)
+                     || code.startsWith("Periphery.") || code.startsWith("CLAN.");
+    }
+
     public Color getColor() {
         return color;
     }
