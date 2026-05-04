@@ -39,11 +39,13 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -123,6 +125,8 @@ public class CampaignExportWizard extends JDialog {
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
         chkExportCompletedContracts.setText(resourceMap.getString("chkExportCompletedContracts.text"));
         lblMoney.setText(resourceMap.getString("lblMoney.text"));
+        lblMoney.setToolTipText(resourceMap.getString("lblMoney.tooltip"));
+        txtExportMoney.setToolTipText(resourceMap.getString("lblMoney.tooltip"));
         chkDestructiveExport.setText(resourceMap.getString("chkDestructiveExport.text"));
 
         sourceCampaign = c;
@@ -227,10 +231,13 @@ public class CampaignExportWizard extends JDialog {
                 btnNewCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if (destinationCampaignFile.isPresent()) {
-                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                        if (exportToCampaign(destinationCampaignFile.get())) {
+                            setVisible(false);
+                        } else {
+                            // Keep the wizard open so the user can correct the input (e.g. an
+                            // invalid C-bill amount) instead of having to restart the export flow.
                             LOGGER.error("Failed to export campaign to new campaign file");
                         }
-                        setVisible(false);
                     }
                 });
                 getContentPane().add(btnNewCampaign, gbc);
@@ -240,10 +247,13 @@ public class CampaignExportWizard extends JDialog {
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if (destinationCampaignFile.isPresent()) {
-                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                        if (exportToCampaign(destinationCampaignFile.get())) {
+                            setVisible(false);
+                        } else {
+                            // Keep the wizard open so the user can correct the input (e.g. an
+                            // invalid C-bill amount) instead of having to restart the export flow.
                             LOGGER.error("Failed to export campaign to existing campaign file");
                         }
-                        setVisible(false);
                     }
                 });
                 getContentPane().add(btnExistingCampaign, gbc);
@@ -448,6 +458,35 @@ public class CampaignExportWizard extends JDialog {
     }
 
     /**
+     * Parses the C-bill amount entered by the user using the supplied locale, so it accepts that locale's
+     * grouping and decimal separators (e.g. "1,000,000.50" in en-US, "1.000.000,50" in es-ES,
+     * "1 000 000,50" in fr-FR). Returns 0 for empty or null input. Throws {@link NumberFormatException}
+     * when the input is non-empty but not a valid number, so callers can surface the error rather than
+     * silently dropping the transfer (see issue #5939).
+     *
+     * <p>Note: C-bills are a real currency stored as {@link java.math.BigDecimal} inside {@link Money},
+     * so fractional amounts are allowed.
+     */
+    static double parseExportMoney(String text, Locale locale) {
+        if (text == null) {
+            return 0d;
+        }
+        String trimmed = text.trim();
+        if (trimmed.isEmpty()) {
+            return 0d;
+        }
+
+        NumberFormat nf = NumberFormat.getNumberInstance(locale);
+        nf.setGroupingUsed(true);
+        ParsePosition pp = new ParsePosition(0);
+        Number parsed = nf.parse(trimmed, pp);
+        if ((parsed == null) || (pp.getIndex() != trimmed.length())) {
+            throw new NumberFormatException("Could not parse '" + text + "' as a number in locale " + locale + ".");
+        }
+        return parsed.doubleValue();
+    }
+
+    /**
      * Carry out the campaign export.
      *
      * @param file Destination file.
@@ -510,17 +549,24 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
-        int money = 0;
+        double money = 0;
 
         try {
-            money = Integer.parseInt(txtExportMoney.getText());
+            money = parseExportMoney(txtExportMoney.getText(), MekHQ.getMHQOptions().getLocale());
             if (money > 0) {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL,
                       Money.of(money),
                       String.format("Transfer from %s", sourceCampaign.getName()));
             }
-        } catch (Exception ignored) {
-
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                  resourceMap.getString("lblStatus.MoneyParseError.text"),
+                  resourceMap.getString("lblStatus.MoneyParseError.title"),
+                  JOptionPane.ERROR_MESSAGE);
+            // Make it easy for the user to fix the bad value without hunting for the field.
+            txtExportMoney.requestFocusInWindow();
+            txtExportMoney.selectAll();
+            return false;
         }
 
         // forces aren't moved/copied over, we just use the force selection to

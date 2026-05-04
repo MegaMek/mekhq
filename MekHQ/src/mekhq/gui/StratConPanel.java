@@ -1072,7 +1072,7 @@ public class StratConPanel extends JPanel implements ActionListener {
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
                 if (selectedScenario == null) {
-                    assignmentUI.display(campaign, campaignState, selectedCoords, false);
+                    assignmentUI.display(campaign, campaignState, selectedCoords, false, false);
                     assignmentUI.setVisible(true);
                     isPrimaryForce = true;
                 }
@@ -1085,7 +1085,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         boolean restrictToSingleForce = backingScenario != null &&
                                                               backingScenario.getStratConScenarioType()
                                                                     .isOfficialChallenge();
-                        assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce);
+                        assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce, true);
                         assignmentUI.setVisible(true);
                         isPrimaryForce = true;
                     }

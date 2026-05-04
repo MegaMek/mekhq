@@ -1266,6 +1266,43 @@ public class StratConRulesManager {
     }
 
     /**
+     * Explicitly assigns a player-selected force to an existing StratCon scenario.
+     *
+     * @param coords   the {@link StratConCoords} containing the scenario.
+     * @param forceID  the unique ID of the combat team being assigned.
+     * @param campaign the current {@link Campaign} context.
+     * @param contract the {@link AtBContract} associated with the scenario.
+     * @param track    the {@link StratConTrackState} containing the scenario.
+     * @param sticky   whether the force should remain persistently assigned to this track.
+     */
+    public static void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign,
+          AtBContract contract, StratConTrackState track, boolean sticky) {
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
+
+        if (combatTeam == null) {
+            return;
+        }
+
+        processForceDeployment(coords, forceID, campaign, track, sticky);
+
+        StratConScenario scenario = track.getScenario(coords);
+        if (scenario == null) {
+            return;
+        }
+
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        if (!backingScenario.getForceIDs().contains(forceID)) {
+            scenario.addPrimaryForce(forceID);
+        }
+
+        commitPrimaryForces(campaign, scenario, track);
+        if (!backingScenario.isFinalized()) {
+            setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
+            finalizeScenario(backingScenario, contract, campaign);
+        }
+    }
+
+    /**
      * Finds an unoccupied coordinate adjacent to the given origin coordinate.
      *
      * <p>This method examines all directions defined by {@code ALL_DIRECTIONS} around {@code originCoords} and

@@ -69,6 +69,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
     private boolean restrictToSingleForce;
+    private boolean assignToScenario;
     private final JList<Formation> availableForceList = new JList<>();
     private final JButton btnConfirm;
     private final StratConPanel ownerPanel;
@@ -134,10 +135,11 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
      * Display the track force assignment UI.
      */
     public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords,
-          boolean restrictToSingleForce) {
+          boolean restrictToSingleForce, boolean assignToScenario) {
         this.campaign = campaign;
         this.currentCampaignState = campaignState;
         this.restrictToSingleForce = restrictToSingleForce;
+        this.assignToScenario = assignToScenario;
 
         initializeUI();
     }
@@ -164,12 +166,21 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
             }
 
             for (Formation formation : availableForceList.getSelectedValuesList()) {
-                StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
-                      formation.getId(),
-                      campaign,
-                      currentCampaignState.getContract(),
-                      ownerPanel.getCurrentTrack(),
-                      false);
+                if (assignToScenario) {
+                    StratConRulesManager.assignForceToScenario(ownerPanel.getSelectedCoords(),
+                          formation.getId(),
+                          campaign,
+                          currentCampaignState.getContract(),
+                          ownerPanel.getCurrentTrack(),
+                          false);
+                } else {
+                    StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
+                          formation.getId(),
+                          campaign,
+                          currentCampaignState.getContract(),
+                          ownerPanel.getCurrentTrack(),
+                          false);
+                }
             }
             setVisible(false);
             ownerPanel.repaint();
