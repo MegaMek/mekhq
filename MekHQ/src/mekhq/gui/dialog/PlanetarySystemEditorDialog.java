@@ -118,6 +118,14 @@ import mekhq.utilities.PlanetarySystemValidator;
 import mekhq.utilities.ValidationMessage;
 import mekhq.utilities.ValidationResult;
 
+/**
+ * GM-facing editor for planetary system user overrides.
+ *
+ * <p>The dialog edits the in-memory copy of a loaded {@link PlanetarySystem}, validates the result, and writes the
+ * full system YAML to the configured user data directory. Saved files are intentionally picked up on the next universe
+ * load; this MVP does not refresh the process-global {@link Systems} singleton for the rest of MekHQ in the same
+ * session.
+ */
 public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private static final MMLogger LOGGER = MMLogger.create(PlanetarySystemEditorDialog.class);
 
@@ -147,8 +155,11 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private JTextArea txtValidation;
     private JLabel lblSelection;
     private JLabel lblEditStatus;
+    // Planet Events and Planet Properties each have their own visible list, but they share one model and selection.
     private DefaultListModel<Planet> planetListModel;
     private JList<Planet> planetList;
+    private JList<Planet> propertiesPlanetList;
+    private boolean updatingPlanetSelection;
     private PlanetEventTableModel eventTableModel;
     private JTable tblEvents;
     private JTextField txtEventDate;
@@ -167,6 +178,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private JButton btnClearEvent;
     private JButton btnTransferOwnership;
     private JButton btnRevertPlanet;
+    private JButton btnRevertPropertiesPlanet;
     private JButton btnReviewChanges;
     private JButton btnSave;
 
@@ -362,10 +374,10 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
               new FastJScrollPane(txtSystemDetails));
         propertiesPanel = new PlanetarySystemPropertiesPanel(resources, campaign::getLocalDate, this::defaultSourceName,
               this::onPropertiesChanged);
-        tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.properties"), propertiesPanel);
         tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.systemEvents"),
               createSystemEventsPane());
         tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.eventEditor"), createEventEditorPane());
+        tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.properties"), createPropertiesEditorPane());
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabbedPane,
               createTitledPane("PlanetarySystemEditorDialog.validation", txtValidation));
@@ -381,6 +393,14 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
               createPlanetEventPane());
         splitPane.setName("splitPlanetEvents");
         splitPane.setResizeWeight(0.30);
+        return splitPane;
+    }
+
+    private Component createPropertiesEditorPane() {
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createPropertiesPlanetListPane(),
+              propertiesPanel);
+        splitPane.setName("splitPlanetProperties");
+        splitPane.setResizeWeight(0.18);
         return splitPane;
     }
 
@@ -421,8 +441,20 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     }
 
     private Component createPlanetListPane() {
-        planetListModel = new DefaultListModel<>();
-        planetList = new JList<>(planetListModel) {
+        planetList = createPlanetSelectionList("lstPlanetarySystemPlanets");
+        btnRevertPlanet = createRevertPlanetButton("btnRevertPlanetaryPlanet");
+        return createPlanetListWrapper(planetList, btnRevertPlanet);
+    }
+
+    private Component createPropertiesPlanetListPane() {
+        propertiesPlanetList = createPlanetSelectionList("lstPlanetarySystemPropertiesPlanets");
+        btnRevertPropertiesPlanet = createRevertPlanetButton("btnRevertPlanetaryPropertyPlanet");
+        return createPlanetListWrapper(propertiesPlanetList, btnRevertPropertiesPlanet);
+    }
+
+    private JList<Planet> createPlanetSelectionList(String name) {
+        ensurePlanetListModel();
+        JList<Planet> list = new JList<>(planetListModel) {
             @Override
             public String getToolTipText(MouseEvent event) {
                 int index = locationToIndex(event.getPoint());
@@ -433,9 +465,9 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
                 return value instanceof Planet planet ? planetListTooltip(planet) : null;
             }
         };
-        planetList.setName("lstPlanetarySystemPlanets");
-        planetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        planetList.setCellRenderer(new DefaultListCellRenderer() {
+        list.setName(name);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                   boolean isSelected, boolean cellHasFocus) {
@@ -446,28 +478,41 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
                 return component;
             }
         });
-        planetList.addListSelectionListener(evt -> {
+        list.addListSelectionListener(evt -> {
             if (!evt.getValueIsAdjusting()) {
-                updateSelectedPlanet();
+                synchronizePlanetSelection((JList<?>) evt.getSource());
             }
         });
+        return list;
+    }
+
+    private void ensurePlanetListModel() {
+        if (planetListModel == null) {
+            planetListModel = new DefaultListModel<>();
+        }
+    }
+
+    private Component createPlanetListWrapper(JList<Planet> list, JButton revertButton) {
         Component planetPane = createTitledComponentPane("PlanetarySystemEditorDialog.planetsHeader",
-              new FastJScrollPane(planetList));
+              new FastJScrollPane(list));
         planetPane.setMinimumSize(UIUtil.scaleForGUI(140, 120));
         planetPane.setPreferredSize(UIUtil.scaleForGUI(155, 320));
 
         JPanel wrapper = new JPanel(new BorderLayout(0, PADDING / 2));
         wrapper.add(planetPane, BorderLayout.CENTER);
 
-        btnRevertPlanet = new MMButton("btnRevertPlanetaryPlanet",
-              resources.getString("PlanetarySystemEditorDialog.revertPlanet"),
-              resources.getString("PlanetarySystemEditorDialog.revertPlanet.toolTipText"),
-              evt -> revertSelectedPlanetChanges());
         JPanel planetButtonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, PADDING / 2, 0));
-        planetButtonRow.add(btnRevertPlanet);
+        planetButtonRow.add(revertButton);
         wrapper.add(planetButtonRow, BorderLayout.SOUTH);
 
         return wrapper;
+    }
+
+    private JButton createRevertPlanetButton(String name) {
+        return new MMButton(name,
+              resources.getString("PlanetarySystemEditorDialog.revertPlanet"),
+              resources.getString("PlanetarySystemEditorDialog.revertPlanet.toolTipText"),
+              evt -> revertSelectedPlanetChanges());
     }
 
     private Component createPlanetEventPane() {
@@ -816,6 +861,10 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             planetList.revalidate();
             planetList.repaint();
         }
+        if (propertiesPlanetList != null) {
+            propertiesPlanetList.revalidate();
+            propertiesPlanetList.repaint();
+        }
     }
 
     private void ensureBaselineSnapshot(PlanetarySystem system) {
@@ -881,6 +930,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         Planet selectedPlanet = getSelectedPlanet();
         planetListModel.clear();
         if (selectedSystem == null) {
+            clearPlanetSelection();
             updateSelectedPlanet();
             return;
         }
@@ -894,6 +944,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
 
     private void restorePlanetSelection(Planet selectedPlanet) {
         if (planetListModel.isEmpty()) {
+            clearPlanetSelection();
             updateSelectedPlanet();
             return;
         }
@@ -901,17 +952,73 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         if (selectedPlanet != null) {
             for (int index = 0; index < planetListModel.size(); index++) {
                 if (Objects.equals(planetListModel.get(index).getId(), selectedPlanet.getId())) {
-                    planetList.setSelectedIndex(index);
+                    selectPlanetIndex(index);
                     return;
                 }
             }
         }
 
-        planetList.setSelectedIndex(0);
+        selectPlanetIndex(0);
     }
 
     private Planet getSelectedPlanet() {
-        return planetList == null ? null : planetList.getSelectedValue();
+        if ((planetList != null) && (planetList.getSelectedValue() != null)) {
+            return planetList.getSelectedValue();
+        }
+        return propertiesPlanetList == null ? null : propertiesPlanetList.getSelectedValue();
+    }
+
+    private void synchronizePlanetSelection(JList<?> sourceList) {
+        if (updatingPlanetSelection) {
+            return;
+        }
+        updatingPlanetSelection = true;
+        try {
+            setPlanetSelectionIndex(planetList, sourceList.getSelectedIndex());
+            setPlanetSelectionIndex(propertiesPlanetList, sourceList.getSelectedIndex());
+        } finally {
+            updatingPlanetSelection = false;
+        }
+        updateSelectedPlanet();
+    }
+
+    private void selectPlanetIndex(int index) {
+        updatingPlanetSelection = true;
+        try {
+            setPlanetSelectionIndex(planetList, index);
+            setPlanetSelectionIndex(propertiesPlanetList, index);
+        } finally {
+            updatingPlanetSelection = false;
+        }
+        updateSelectedPlanet();
+    }
+
+    private void clearPlanetSelection() {
+        updatingPlanetSelection = true;
+        try {
+            clearPlanetSelection(planetList);
+            clearPlanetSelection(propertiesPlanetList);
+        } finally {
+            updatingPlanetSelection = false;
+        }
+    }
+
+    private void setPlanetSelectionIndex(JList<Planet> list, int index) {
+        if (list == null) {
+            return;
+        }
+        if (index >= 0) {
+            list.setSelectedIndex(index);
+            list.ensureIndexIsVisible(index);
+        } else {
+            list.clearSelection();
+        }
+    }
+
+    private void clearPlanetSelection(JList<Planet> list) {
+        if (list != null) {
+            list.clearSelection();
+        }
     }
 
     private void updateSelectedPlanet() {
@@ -977,6 +1084,9 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
         if (btnRevertPlanet != null) {
             btnRevertPlanet.setEnabled(canEdit && hasUnsavedPlanetChanges(getSelectedPlanet()));
+        }
+        if (btnRevertPropertiesPlanet != null) {
+            btnRevertPropertiesPlanet.setEnabled(canEdit && hasUnsavedPlanetChanges(getSelectedPlanet()));
         }
     }
 

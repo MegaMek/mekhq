@@ -65,6 +65,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 
+/**
+ * Shared YAML gateway for planetary system files.
+ *
+ * <p>Load, validation, tests, and editor saves should use this mapper so {@link SourceableValue}, {@link StarType},
+ * and {@link SocioIndustrialData} round-trip consistently. Editor persistence writes full-system override files under
+ * the configured user directory at {@code data/universe/planetary_systems/edits}.
+ */
 public final class PlanetarySystemYamlIO {
 
     private static final String EDITS_DIRECTORY = "edits";
@@ -102,12 +109,17 @@ public final class PlanetarySystemYamlIO {
         createMapper().writeValue(destination, system);
     }
 
+    /** Deep-copies a system through the same YAML path used for save/load round trips. */
     public static PlanetarySystem copy(PlanetarySystem system) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         write(system, outputStream);
         return read(new ByteArrayInputStream(outputStream.toByteArray()));
     }
 
+    /**
+     * Writes a complete user override for {@code system}. Existing overrides are copied to an adjacent
+     * {@code *_backup} file before the replacement is moved into place.
+     */
     public static Path saveUserSystem(PlanetarySystem system) throws IOException {
         if ((system.getId() == null) || system.getId().isBlank()) {
             throw new IOException("Cannot save planetary system edits without a system id.");
@@ -134,6 +146,7 @@ public final class PlanetarySystemYamlIO {
         return destination;
     }
 
+    /** Returns the sanitized .yml override path for {@code systemId} inside the configured user data directory. */
     public static Path getUserSystemPath(String systemId) throws IOException {
         String userDir = PreferenceManager.getClientPreferences().getUserDir();
         if ((userDir == null) || userDir.isBlank()) {

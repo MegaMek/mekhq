@@ -34,6 +34,12 @@ package mekhq.utilities;
 
 import mekhq.campaign.universe.PlanetarySystem;
 
+/**
+ * Editor-facing validation facade for planetary system data.
+ *
+ * <p>It currently delegates to {@link SystemValidator} so the editor, data loading checks, and standalone validation
+ * tests stay aligned. Add editor-only warnings here if future UI rules should not become loader errors.
+ */
 public class PlanetarySystemValidator {
 
     private final SystemValidator systemValidator;

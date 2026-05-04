@@ -55,6 +55,7 @@ import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Satellite;
 import mekhq.campaign.universe.SourceableValue;
 
+/** Builds human-readable change summaries between a baseline system and an edited system for review/revert UI. */
 public final class PlanetarySystemChangeSummary {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
