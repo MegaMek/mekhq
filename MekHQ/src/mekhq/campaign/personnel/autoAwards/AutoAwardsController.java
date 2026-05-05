@@ -96,7 +96,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, null, isManualPrompt, null);
+            ProcessAwards(personnel, false, null, isManualPrompt);
         } else {
             logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
 
@@ -132,7 +132,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, null, isManualPrompt, null);
+            ProcessAwards(personnel, false, null, isManualPrompt);
         } else {
             logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -212,7 +212,7 @@ public class AutoAwardsController {
 
         // beginning the processing & filtering of Misc Awards
         if (!miscAwards.isEmpty()) {
-            processedData = MiscAwardsManager(personnel, false, true, wasCivilianHelp, scenarioKills, null);
+            processedData = MiscAwardsManager(personnel, false, true, wasCivilianHelp, scenarioKills);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -257,7 +257,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, academyAttributes, false, null);
+            ProcessAwards(personnel, false, academyAttributes, false);
         } else {
             logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -671,6 +671,19 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the mission was successful, false otherwise
      * @param academyAttributes    a map of academy attributes, null if not processing graduation awards
      * @param isManualPrompt       whether autoAwards was triggered manually
+     */
+    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful,
+          @Nullable HashMap<UUID, List<Object>> academyAttributes, boolean isManualPrompt) {
+        ProcessAwards(personnel, missionWasSuccessful, academyAttributes, isManualPrompt, null);
+    }
+
+    /**
+     * Process the awards for the given personnel.
+     *
+     * @param personnel            the List of personnel to process awards for
+     * @param missionWasSuccessful true if the mission was successful, false otherwise
+     * @param academyAttributes    a map of academy attributes, null if not processing graduation awards
+     * @param isManualPrompt       whether autoAwards was triggered manually
      * @param POWPersonnel         a list of persons that have been a prisoner of war in the current mission
      */
     private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful,
@@ -997,6 +1010,22 @@ public class AutoAwardsController {
         } else {
             return null;
         }
+    }
+
+    /**
+     * This method is the manager for processing Miscellaneous Awards.
+     *
+     * @param personnel            the personnel to be processed
+     * @param missionWasSuccessful true if the mission was successful, false otherwise
+     * @param wasCivilianHelp      true if the scenario (if relevant) was AtB Scenario type CIVILIAN_HELP
+     * @param wasScenario          true if the award is for a scenario, false otherwise
+     * @param scenarioKills        a map of personnel and their corresponding list of Kills
+     *
+     * @return a map containing the award data, or null if no awards are applicable
+     */
+    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful,
+          boolean wasScenario, boolean wasCivilianHelp, HashMap<UUID, List<Kill>> scenarioKills) {
+        return MiscAwardsManager(personnel, missionWasSuccessful, wasScenario, wasCivilianHelp, scenarioKills, null);
     }
 
     /**
