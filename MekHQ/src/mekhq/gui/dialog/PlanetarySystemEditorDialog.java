@@ -1788,7 +1788,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
 
     private void closeEditor() {
         if (confirmCloseEditor()) {
-            setVisible(false);
+            dispose();
         }
     }
 

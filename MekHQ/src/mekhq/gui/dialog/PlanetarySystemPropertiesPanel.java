@@ -45,8 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -839,10 +837,5 @@ final class PlanetarySystemPropertiesPanel extends JPanel {
             fireTableRowsUpdated(rowIndex, rowIndex);
             notifyChange();
         }
-    }
-
-    // Suppress unused warnings
-    @SuppressWarnings("unused")
-    private void unused(Function<?, ?> fn, BiConsumer<?, ?> consumer) {
     }
 }

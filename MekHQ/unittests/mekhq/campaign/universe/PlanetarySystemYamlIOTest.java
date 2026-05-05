@@ -48,6 +48,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
@@ -235,6 +237,31 @@ class PlanetarySystemYamlIOTest {
             assertFalse(Systems.hasUserSystemOverride(system.getId()));
             assertFalse(Systems.deleteUserSystem(system.getId()));
         } finally {
+            PreferenceManager.getClientPreferences().setUserDir(originalUserDir);
+        }
+    }
+
+    @Test
+    void exportOverridesAcceptsRelativeZipPathWithoutParent(@TempDir Path tempDir) throws Exception {
+        String originalUserDir = PreferenceManager.getClientPreferences().getUserDir();
+        Path zipFile = Path.of("planetary-overrides-" + System.nanoTime() + ".zip");
+
+        try {
+            PreferenceManager.getClientPreferences().setUserDir(tempDir.toString());
+            Systems.saveUserSystem(readSystem(VERSIONED_SYSTEM));
+
+            int exported = PlanetarySystemYamlIO.exportOverrides(zipFile);
+
+            assertEquals(1, exported);
+            assertTrue(Files.exists(zipFile));
+            try (ZipInputStream zipInput = new ZipInputStream(Files.newInputStream(zipFile))) {
+                ZipEntry entry = zipInput.getNextEntry();
+                assertNotNull(entry);
+                assertEquals("version test.yml", entry.getName());
+                assertFalse(entry.isDirectory());
+            }
+        } finally {
+            Files.deleteIfExists(zipFile);
             PreferenceManager.getClientPreferences().setUserDir(originalUserDir);
         }
     }

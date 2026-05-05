@@ -75,16 +75,23 @@ import mekhq.MHQConstants;
 public final class PlanetarySystemYamlIO {
 
     private static final String EDITS_DIRECTORY = "edits";
+    private static final ObjectMapper MAPPER = buildMapper();
 
     private PlanetarySystemYamlIO() {
 
     }
 
+    /** Returns the shared planetary-system YAML mapper. Treat the mapper as read-only after configuration. */
     public static ObjectMapper createMapper() {
+        return MAPPER;
+    }
+
+    private static ObjectMapper buildMapper() {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
         mapper.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL,
+              JsonInclude.Include.NON_NULL));
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         SimpleModule module = new SimpleModule();
@@ -101,12 +108,12 @@ public final class PlanetarySystemYamlIO {
     }
 
     public static PlanetarySystem read(InputStream source) throws IOException {
-        return createMapper().readValue(source, PlanetarySystem.class);
+        return MAPPER.readValue(source, PlanetarySystem.class);
     }
 
     public static void write(PlanetarySystem system, OutputStream destination) throws IOException {
         system.prepareForSerialization();
-        createMapper().writeValue(destination, system);
+        MAPPER.writeValue(destination, system);
     }
 
     /** Deep-copies a system through the same YAML path used for save/load round trips. */
@@ -216,8 +223,12 @@ public final class PlanetarySystemYamlIO {
      */
     public static int exportOverrides(Path zipFile) throws IOException {
         List<Path> overrides = listOverrideFiles();
-        Files.createDirectories(zipFile.toAbsolutePath().getParent());
-        try (ZipOutputStream zipOutput = new ZipOutputStream(Files.newOutputStream(zipFile))) {
+        Path destination = zipFile.toAbsolutePath();
+        Path parent = destination.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+        try (ZipOutputStream zipOutput = new ZipOutputStream(Files.newOutputStream(destination))) {
             for (Path override : overrides) {
                 ZipEntry entry = new ZipEntry(override.getFileName().toString());
                 zipOutput.putNextEntry(entry);

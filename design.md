@@ -34,8 +34,8 @@ The editor is GM-only and lives inside MekHQ. It is reachable from:
 - **GM Tools -> Planetary System Editor...** in the main menu.
 - The **Interstellar Map** context menu, where the clicked system is pre-selected.
 
-Both entry points open the same `PlanetarySystemEditorDialog`. The dialog is re-entry safe: repeated opens reuse the
-existing dialog instead of creating several independent editors.
+Both entry points open `PlanetarySystemEditorDialog`. Each editor instance is disposed on close so native window resources
+are released and `windowClosed` listeners run.
 
 ### Data Model
 
@@ -128,7 +128,7 @@ developer to load the same altered universe.
 
 - GM-gated editor entry from the main menu.
 - Interstellar Map context-menu entry that opens the editor with the clicked system pre-selected.
-- Re-entry-safe editor dialog reuse.
+- Editor instances are disposed on close so map repaint listeners and native resource cleanup run.
 - Searchable/sortable system list with filters for unsaved systems and systems with override files.
 - `[U]` / `[O]` system badges and changed-field tooltips.
 - Read-only System Details tab at the campaign date.
