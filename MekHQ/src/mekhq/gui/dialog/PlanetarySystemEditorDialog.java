@@ -134,6 +134,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private static final Dimension SYSTEM_LIST_MINIMUM_SIZE = UIUtil.scaleForGUI(280, 400);
     private static final Dimension SYSTEM_LIST_PREFERRED_SIZE = UIUtil.scaleForGUI(400, 600);
     private static final Dimension DETAILS_MINIMUM_SIZE = UIUtil.scaleForGUI(760, 500);
+    private static final double PLANET_LIST_SPLIT_WEIGHT = 0.30;
     private static final DateTimeFormatter EVENT_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     private final Campaign campaign;
@@ -392,7 +393,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createPlanetListPane(),
               createPlanetEventPane());
         splitPane.setName("splitPlanetEvents");
-        splitPane.setResizeWeight(0.30);
+        splitPane.setResizeWeight(PLANET_LIST_SPLIT_WEIGHT);
         return splitPane;
     }
 
@@ -400,7 +401,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createPropertiesPlanetListPane(),
               propertiesPanel);
         splitPane.setName("splitPlanetProperties");
-        splitPane.setResizeWeight(0.18);
+        splitPane.setResizeWeight(PLANET_LIST_SPLIT_WEIGHT);
         return splitPane;
     }
 
