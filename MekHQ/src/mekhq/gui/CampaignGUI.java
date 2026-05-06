@@ -44,15 +44,7 @@ import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -63,6 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -70,6 +63,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
+import megamek.client.ui.CopySystemDataAction;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
@@ -399,6 +393,14 @@ public class CampaignGUI extends JPanel {
                 getApplication().exit(true);
             }
         });
+
+        // on Mac, override auto-added "Quit MekHQ" behavior to work like other exit variants (ask for save etc)
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
+            Desktop.getDesktop().setQuitHandler((e, response) -> {
+                getApplication().exit(true);
+                response.cancelQuit(); // don't remove this
+            });
+        }
 
         CommandCenterTab commandCenter = getCommandCenterTab();
         for (DailyReportType type : DailyReportType.values()) {
@@ -1459,16 +1461,21 @@ public class CampaignGUI extends JPanel {
         menuHelp.setMnemonic(KeyEvent.VK_SLASH);
         menuHelp.setName("helpMenu");
 
+        menuHelp.addSeparator();
+
+        JMenuItem menuBugReportItem = new JMenuItem(resourceMap.getString("menuReportBug.text"));
+        menuBugReportItem.setName("ReportBug");
+        menuBugReportItem.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
+        menuHelp.add(menuBugReportItem);
+
+        menuHelp.add(new CopySystemDataAction(MHQConstants.PROJECT_NAME));
+
+        menuHelp.addSeparator();
+
         JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
         menuAboutItem.setMnemonic(KeyEvent.VK_A);
         menuAboutItem.setName("aboutMenuItem");
-        menuAboutItem.addActionListener(evt -> {
-            MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
-            aboutBox.setLocationRelativeTo(getFrame());
-            aboutBox.setModal(true);
-            aboutBox.setVisible(true);
-            aboutBox.dispose();
-        });
+        menuAboutItem.addActionListener(evt -> new MekHQAboutDialog(getFrame()).show());
         menuHelp.add(menuAboutItem);
 
         menuBar.add(menuHelp);
