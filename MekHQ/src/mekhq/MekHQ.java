@@ -36,6 +36,7 @@ package mekhq;
 import static megamek.MMConstants.LOCALHOST_IP;
 import static mekhq.utilities.MHQInternationalization.getText;
 
+import java.awt.Desktop;
 import java.awt.FileDialog;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -98,6 +99,7 @@ import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalWarfare.TWGameManager;
+import megameklab.MMLConstants;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -117,6 +119,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
+import mekhq.gui.dialog.MekHQAboutDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
@@ -358,6 +361,7 @@ public class MekHQ implements GameListener {
      */
     public static void main(String... args) {
         Config.setSerialFilter(sanityInputFilter);
+        MegaMek.setOriginProject(MHQConstants.PROJECT_NAME);
 
         // Configure Sentry with defaults. Although the client defaults to enabled, the properties file is used to
         // disable it and additional configuration can be done inside the sentry.properties file. The defaults for
@@ -385,10 +389,15 @@ public class MekHQ implements GameListener {
         // Second, let's handle logging
         MegaMek.initializeLogging(MHQConstants.PROJECT_NAME);
         MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
-        MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
+        MekHQ.initializeLogging();
 
         // Third, let's handle suite graphical setup initialization
         MegaMek.initializeSuiteGraphicalSetups(MHQConstants.PROJECT_NAME);
+
+        // on Mac, override standard behavior of the added main menu, this is different for MML and MHQ
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_ABOUT)) {
+            Desktop.getDesktop().setAboutHandler(e -> new MekHQAboutDialog(null).show());
+        }
 
         // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
@@ -397,17 +406,15 @@ public class MekHQ implements GameListener {
         LOGGER.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
-    public static void initializeLogging(final String originProject) {
-        LOGGER.info(getUnderlyingInformation(originProject));
+    public static void initializeLogging() {
+        LOGGER.info(getUnderlyingInformation());
     }
 
     /**
-     * @param originProject the project that launched MekHQ
-     *
      * @return the underlying information for this launch of MekHQ
      */
-    public static String getUnderlyingInformation(final String originProject) {
-        return MegaMek.getUnderlyingInformation(originProject, MHQConstants.PROJECT_NAME);
+    public static String getUnderlyingInformation() {
+        return MegaMek.getUnderlyingInformation(MHQConstants.PROJECT_NAME, MHQConstants.PROJECT_NAME);
     }
 
     public Server getMyServer() {

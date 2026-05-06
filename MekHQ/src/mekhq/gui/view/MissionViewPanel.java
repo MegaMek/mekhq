@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,7 +60,6 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -543,7 +542,7 @@ public class MissionViewPanel extends JScrollablePanel {
             lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));
             int maxSalvagePct = contract.getSalvagePct();
 
-            int currentSalvagePct = getCurrentSalvagePct(contract, contract.getSalvagedByUnit());
+            int currentSalvagePct = contract.getCurrentSalvagePct();
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
@@ -586,18 +585,6 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtDesc, gridBagConstraints);
 
-    }
-
-    private static int getCurrentSalvagePct(Contract contract, Money contract1) {
-        int currentSalvagePct = 0;
-        if (contract.getSalvagedByUnit().plus(contract1).isPositive()) {
-            currentSalvagePct = contract.getSalvagedByUnit()
-                                      .multipliedBy(100)
-                                      .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
-                                      .getAmount()
-                                      .intValue();
-        }
-        return currentSalvagePct;
     }
 
     private void fillStatsAtBContract() {
@@ -955,7 +942,7 @@ public class MissionViewPanel extends JScrollablePanel {
             lblSalvagePct.setText(resourceMap.getString("lblSalvagePct.text"));
             int maxSalvagePct = contract.getSalvagePct();
 
-            int currentSalvagePct = getCurrentSalvagePct(contract, contract.getSalvagedByEmployer());
+            int currentSalvagePct = contract.getCurrentSalvagePct();
 
             txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");
         }
