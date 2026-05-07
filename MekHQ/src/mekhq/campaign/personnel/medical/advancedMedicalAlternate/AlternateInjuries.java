@@ -1903,7 +1903,7 @@ public class AlternateInjuries {
         WoodenFoot() {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.WOODEN_LIMB.simpleName");
-            this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
+            this.allowedLocations = Set.of(LEFT_FOOT, RIGHT_FOOT);
             this.injuryEffect = TYPE_1_LIMB_REPLACEMENT;
         }
 
