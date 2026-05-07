@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -68,12 +69,14 @@ public class MiscAwards {
      * @param killCount              the number of kills (null if not applicable)
      * @param injuryCount            the number of injuries (null if not applicable)
      * @param supportPersonOfTheYear a UUID identifying the candidate for Support Person of the Year awards
+     * @param POWPersonnel           a list of persons that have been a prisoner of war in the current mission
      *
      * @return a map of eligible awards grouped by their respective IDs
      */
     public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission,
           UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
-          @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear) {
+          @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear,
+          @Nullable List<Person> POWPersonnel) {
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
@@ -109,7 +112,7 @@ public class MiscAwards {
                     }
                 }
                 case "prisonerofwar" -> {
-                    if (mission != null && prisonerOfWar(campaign, award, person)) {
+                    if (mission != null && prisonerOfWar(campaign, award, person, POWPersonnel)) {
                         eligibleAwards.add(award);
                     }
                 }
@@ -265,15 +268,18 @@ public class MiscAwards {
     /**
      * Checks if a person is a prisoner of war in a given campaign and is eligible to receive an award.
      *
-     * @param campaign the campaign in which the person is participating
-     * @param award    the award to be given
-     * @param person   the unique identifier of the person to check
+     * @param campaign     the campaign in which the person is participating
+     * @param award        the award to be given
+     * @param person       the unique identifier of the person to check
+     * @param POWPersonnel a list of persons that have been a prisoner of war in the current mission
      *
-     * @return true if the person is a prisoner of war and is eligible to receive the award, false otherwise
+     * @return true if the person has been a prisoner of war in the current mission and is eligible to receive the
+     *       award, false otherwise
      */
-    private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person) {
+    private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person,
+          @Nullable List<Person> POWPersonnel) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
-            return campaign.getPerson(person).getStatus().isPoW();
+            return POWPersonnel.stream().anyMatch(p -> p.getId() == person);
         }
 
         return false;
