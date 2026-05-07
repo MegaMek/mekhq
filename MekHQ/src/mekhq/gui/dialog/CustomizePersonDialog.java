@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1426,13 +1426,70 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         return factionsModel;
     }
 
+    // =========================================================================================
+    // Origin-system picker — birthworld semantics (issue #8934)
+    //
+    // The picker decides what worlds to show in five steps. Running example: Koji,
+    // born 3047-09-25, FedSuns origin, in a 3071 campaign.
+    //
+    // 1. Drop worlds that don't belong. Three filters run first:
+    //    a. Drop connector systems. Some YAML files under connector_systems/ are not real
+    //       worlds. They are routing helpers for jump paths. PlanetarySystem.isConnector
+    //       is set at YAML load time and skipped here.
+    //    b. Drop worlds with no people at the birthdate. A character born in 3047 cannot
+    //       come from a world that was empty in 3047.
+    //    c. (Filtered view only) Match faction by family tree. The old check asked: does
+    //       the world's owner equal the chosen faction? That fails for Koji — New Avalon
+    //       reads as FC in 3047, not FS. The new check also accepts a parent or child of
+    //       the chosen faction. FedCom is FedSuns and Lyran joined, so a FedSuns pick
+    //       matches a world that reads as FedCom. See isFactionMatch.
+    //
+    // 2. Look up the owner at the right date. Two things were wrong before:
+    //    a. The dialog has its own date field. The date picker writes to a local
+    //       'birthdate' field. The person's saved date only updates when OK is clicked.
+    //       The old code read the saved date, so date-picker changes had no effect until
+    //       reopening the dialog. Now everything reads the local 'birthdate'. The date
+    //       picker also fires a refresh.
+    //    b. The standard owner-lookup uses a cache that lies. Planet.getFactionSet(date)
+    //       keeps a running cursor that walks events forward. If the campaign already
+    //       rendered 3071, the cursor stopped there. Then asking about 3047 gives you
+    //       3067 data. New Avalon at 3047-09-25 was returning the 3067 DIS marker for
+    //       this reason. The new helper ownersAt(system, date) reads the events list
+    //       directly. No cursor, no surprise.
+    //
+    // 3. Apply "to the victor" rules inside ownersAt. BattleTech treats world citizenship
+    //    as who holds the world long term, not who happens to hold it during a war.
+    //    ownersAt swaps the listed owner for the world's eventual owner when:
+    //      - The listed owner is DIS (disputed). Whoever wins gets the world.
+    //      - The listed owner is a faction that ends within 100 years of the birthdate.
+    //
+    //    The 100-year rule is the heart of it. FedCom ends in 3067. A character born in
+    //    3047 will outlive the FedCom merger. They are FedSuns or Lyran stock, depending
+    //    on who keeps the world. But a character born in 2470 under the Star League keeps
+    //    SL — the Star League ends in 2786, more than 300 years later, and the player
+    //    picked that era for a reason.
+    //
+    //    Examples:
+    //      New Avalon  3047  listed FC (ends 3067)        eventual FS  -> swap to FS
+    //      Tharkad     3047  listed FC (ends 3067)        eventual LA  -> swap to LA
+    //      Hesperus II 3047  listed LA (no end)           eventual LA  -> keep LA
+    //      Terra       2470  listed SL (ends 2786, 316y)  various      -> keep SL
+    //
+    // 4. Show the owner in each row. Each dropdown row reads "World [OWNER]". Koji's view
+    //    shows "New Avalon [FS]" even though the raw data says FC — the to-the-victor rule
+    //    did the swap. See formatSystemForBirthdate.
+    //
+    // 5. Default the checkbox to filtered. The list should show worlds that could be home
+    //    to this faction's people. Showing the whole universe by default broke that. The
+    //    checkbox is now "Show All Worlds": off = filtered (default), on = everything.
+    //
+    // Performance: ownersAt walks all planets and events. cachedOwnersAt caches the result
+    // per system, keyed by birthdate. During a single filter pass each system is resolved
+    // once. The cache clears when 'birthdate' changes.
+    // =========================================================================================
+
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
-        // The unfiltered "all systems" model used when "Show All Worlds" is on. Three filters and
-        // a date-aware sort, all keyed to the dialog's working birthdate (NOT person.getDateOfBirth()
-        // — that field is only written back on OK, so an in-dialog date change wouldn't take effect).
-        // A 3047-born character must not see 3071-era system names in a birthworld picker, nor
-        // systems uninhabited or abandoned at 3047. Synthetic connector systems are excluded outright.
-        // See issue #8934.
+        // Unfiltered "all systems" model used when "Show All Worlds" is on. See header above.
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
         LocalDate birthDate = birthdate;
 
@@ -1450,13 +1507,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
-        // The faction-filtered model used when "Show All Worlds" is off. Connector + inhabited filters
-        // from #8934 plus a lineage-aware faction match: a world is admissible if its owner at the
-        // dialog's working birthdate is the chosen faction OR shares a successor/predecessor
-        // relationship with it. Without the lineage match, an FS character born in 3047 sees no New
-        // Avalon because the world is FedCom-controlled at that date — yet a FedSuns citizen on a
-        // FedCom world during the merger is historically routine. Uses the local {@code birthdate}
-        // field, NOT {@code person.getDateOfBirth()}, so in-dialog date changes take effect before OK.
+        // Faction-filtered model used when "Show All Worlds" is off. See header above.
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
         LocalDate birthDate = birthdate;
 
@@ -1477,13 +1528,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name
-     * with the resolved owner faction code(s) appended in brackets. Owner is computed by
-     * {@link #ownersAt(PlanetarySystem, LocalDate)} which applies to-the-victor citizenship rules,
-     * so a 3047-born character sees New Avalon as {@code [FS]} rather than the transitional
-     * {@code [FC]}. Multiple owners come out comma-separated, e.g. {@code "World [FACTA, FACTB]"}.
-     * Visible in both filtered and "Show All Worlds" modes — useful both for player context and
-     * for spotting data-side anomalies at a glance.
+     * Returns {@link #ownersAt(PlanetarySystem, LocalDate)} cached per system for the dialog's
+     * current {@code birthdate}. The cache is invalidated when {@code birthdate} changes, so a
+     * single filter pass resolves each system at most once even when both the inhabited and
+     * faction filters apply.
      */
     private Set<Faction> cachedOwnersAt(PlanetarySystem system) {
         if (!java.util.Objects.equals(birthdate, ownersCacheBirthdate)) {
@@ -1493,6 +1541,15 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         return ownersCache.computeIfAbsent(system, s -> ownersAt(s, birthdate));
     }
 
+    /**
+     * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name
+     * with the resolved owner faction code(s) appended in brackets. Owner is computed by
+     * {@link #ownersAt(PlanetarySystem, LocalDate)} which applies to-the-victor citizenship rules,
+     * so a 3047-born character sees New Avalon as {@code [FS]} rather than the transitional
+     * {@code [FC]}. Multiple owners come out comma-separated, e.g. {@code "World [FACTA, FACTB]"}.
+     * Visible in both filtered and "Show All Worlds" modes — useful both for player context and
+     * for spotting data-side anomalies at a glance.
+     */
     private String formatSystemForBirthdate(PlanetarySystem system) {
         String name = system.getName(birthdate);
         Set<Faction> owners = cachedOwnersAt(system);
