@@ -37,21 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
-import java.util.stream.Stream;
+import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -62,19 +48,16 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import megamek.common.preference.PreferenceManager;
-import mekhq.MHQConstants;
 
 /**
  * Shared YAML gateway for planetary system files.
  *
  * <p>Load, validation, tests, and editor saves should use this mapper so {@link SourceableValue}, {@link StarType},
- * and {@link SocioIndustrialData} round-trip consistently. Editor persistence writes full-system override files under
- * the configured user directory at {@code data/universe/planetary_systems/edits}.
+ * and {@link SocioIndustrialData} round-trip consistently. Campaign saves embed complete override systems using this
+ * same YAML representation inside the campaign XML.
  */
 public final class PlanetarySystemYamlIO {
 
-    private static final String EDITS_DIRECTORY = "edits";
     private static final ObjectMapper MAPPER = buildMapper();
 
     private PlanetarySystemYamlIO() {
@@ -111,229 +94,25 @@ public final class PlanetarySystemYamlIO {
         return MAPPER.readValue(source, PlanetarySystem.class);
     }
 
+    public static PlanetarySystem read(String yaml) throws IOException {
+        return read(new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8)));
+    }
+
     public static void write(PlanetarySystem system, OutputStream destination) throws IOException {
         system.prepareForSerialization();
         MAPPER.writeValue(destination, system);
     }
 
-    /** Deep-copies a system through the same YAML path used for save/load round trips. */
-    public static PlanetarySystem copy(PlanetarySystem system) throws IOException {
+    public static String writeToString(PlanetarySystem system) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         write(system, outputStream);
-        return read(new ByteArrayInputStream(outputStream.toByteArray()));
+        return outputStream.toString(StandardCharsets.UTF_8);
     }
 
-    /**
-     * Writes a complete user override for {@code system}. Existing overrides are copied to an adjacent
-     * {@code *_backup} file before the replacement is moved into place.
-     */
-    public static Path saveUserSystem(PlanetarySystem system) throws IOException {
-        if ((system.getId() == null) || system.getId().isBlank()) {
-            throw new IOException("Cannot save planetary system edits without a system id.");
-        }
-
-        Path destination = getUserSystemPath(system.getId());
-        Files.createDirectories(destination.getParent());
-        if (Files.exists(destination)) {
-            Path backup = destination.resolveSibling(destination.getFileName() + "_backup");
-            Files.copy(destination, backup, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        Path tempFile = Files.createTempFile(destination.getParent(), sanitizeFileName(system.getId()), ".tmp");
-        try {
-            try (OutputStream outputStream = Files.newOutputStream(tempFile)) {
-                write(system, outputStream);
-            }
-            Files.move(tempFile, destination, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ex) {
-            Files.deleteIfExists(tempFile);
-            throw ex;
-        }
-
-        return destination;
+    /** Deep-copies a system through the same YAML path used for save/load round trips. */
+    public static PlanetarySystem copy(PlanetarySystem system) throws IOException {
+        return read(writeToString(system));
     }
 
-    /** Returns the sanitized .yml override path for {@code systemId} inside the configured user data directory. */
-    public static Path getUserSystemPath(String systemId) throws IOException {
-        String userDir = PreferenceManager.getClientPreferences().getUserDir();
-        if ((userDir == null) || userDir.isBlank()) {
-            throw new IOException("Cannot locate planetary system edits until a user data directory is configured.");
-        }
-        if ((systemId == null) || systemId.isBlank()) {
-            throw new IOException("Cannot locate planetary system edits without a system id.");
-        }
-
-        Path editsDirectory = Paths.get(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH, EDITS_DIRECTORY);
-        return editsDirectory.resolve(sanitizeFileName(systemId) + ".yml");
-    }
-
-    public static boolean hasUserSystemOverride(String systemId) throws IOException {
-        return Files.exists(getUserSystemPath(systemId));
-    }
-
-    public static boolean deleteUserSystem(String systemId) throws IOException {
-        return Files.deleteIfExists(getUserSystemPath(systemId));
-    }
-
-    /** Returns the directory containing all user planetary system override files. */
-    public static Path getEditsDirectory() throws IOException {
-        String userDir = PreferenceManager.getClientPreferences().getUserDir();
-        if ((userDir == null) || userDir.isBlank()) {
-            throw new IOException("Cannot locate planetary system edits until a user data directory is configured.");
-        }
-        return Paths.get(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH, EDITS_DIRECTORY);
-    }
-
-    /** Returns the .yml override files currently in the user edits directory. Returns an empty list if missing. */
-    public static List<Path> listOverrideFiles() throws IOException {
-        Path editsDirectory = getEditsDirectory();
-        if (!Files.isDirectory(editsDirectory)) {
-            return List.of();
-        }
-        try (Stream<Path> stream = Files.list(editsDirectory)) {
-            List<Path> files = new ArrayList<>();
-            stream.filter(Files::isRegularFile)
-                  .filter(path -> path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".yml"))
-                  .sorted(Comparator.comparing(path -> path.getFileName().toString().toLowerCase(Locale.ROOT)))
-                  .forEach(files::add);
-            return files;
-        }
-    }
-
-    /**
-     * Returns the (sanitized) base names of the .yml override files in the user edits directory, with the trailing
-     * ".yml" suffix stripped. Useful for cheap membership checks (callers should sanitize their candidate ids the
-     * same way via {@link #sanitizeFileName(String)} before lookup).
-     */
-    public static Set<String> listOverrideFileBaseNames() throws IOException {
-        Set<String> names = new HashSet<>();
-        for (Path file : listOverrideFiles()) {
-            String fileName = file.getFileName().toString();
-            if (fileName.toLowerCase(Locale.ROOT).endsWith(".yml")) {
-                names.add(fileName.substring(0, fileName.length() - 4));
-            }
-        }
-        return names;
-    }
-
-    /**
-     * Writes all override .yml files into the given zip file.
-     *
-     * @return the number of files exported.
-     */
-    public static int exportOverrides(Path zipFile) throws IOException {
-        List<Path> overrides = listOverrideFiles();
-        Path destination = zipFile.toAbsolutePath();
-        Path parent = destination.getParent();
-        if (parent != null) {
-            Files.createDirectories(parent);
-        }
-        try (ZipOutputStream zipOutput = new ZipOutputStream(Files.newOutputStream(destination))) {
-            for (Path override : overrides) {
-                ZipEntry entry = new ZipEntry(override.getFileName().toString());
-                zipOutput.putNextEntry(entry);
-                Files.copy(override, zipOutput);
-                zipOutput.closeEntry();
-            }
-        }
-        return overrides.size();
-    }
-
-    /** Resolution requested by the user when an imported file collides with an existing override. */
-    public enum OverrideImportResolution {
-        /** Skip importing this file. */
-        SKIP,
-        /** Overwrite the existing override file. */
-        OVERWRITE,
-        /** Cancel the entire import. */
-        CANCEL
-    }
-
-    /** Callback invoked when an imported file already exists in the edits directory. */
-    @FunctionalInterface
-    public interface ConflictResolver {
-        OverrideImportResolution resolve(String fileName);
-    }
-
-    /** Result of an override import operation. */
-    public static final class ImportSummary {
-        private final int imported;
-        private final int skipped;
-        private final boolean cancelled;
-
-        ImportSummary(int imported, int skipped, boolean cancelled) {
-            this.imported = imported;
-            this.skipped = skipped;
-            this.cancelled = cancelled;
-        }
-
-        public int getImported() {
-            return imported;
-        }
-
-        public int getSkipped() {
-            return skipped;
-        }
-
-        public boolean isCancelled() {
-            return cancelled;
-        }
-    }
-
-    /**
-     * Reads {@code zipFile} and copies each .yml entry into the user edits directory. Existing files trigger the given
-     * conflict resolver.
-     */
-    public static ImportSummary importOverrides(Path zipFile, ConflictResolver resolver) throws IOException {
-        Path editsDirectory = getEditsDirectory();
-        Files.createDirectories(editsDirectory);
-        int imported = 0;
-        int skipped = 0;
-        try (ZipInputStream zipInput = new ZipInputStream(Files.newInputStream(zipFile))) {
-            ZipEntry entry;
-            while ((entry = zipInput.getNextEntry()) != null) {
-                try {
-                    if (entry.isDirectory()) {
-                        continue;
-                    }
-                    String rawName = entry.getName();
-                    if (!rawName.toLowerCase(Locale.ROOT).endsWith(".yml")) {
-                        skipped++;
-                        continue;
-                    }
-                    // Strip any directory components in the zip entry to avoid path traversal.
-                    String safeName = Paths.get(rawName).getFileName().toString();
-                    Path target = editsDirectory.resolve(safeName).normalize();
-                    if (!target.startsWith(editsDirectory)) {
-                        skipped++;
-                        continue;
-                    }
-                    if (Files.exists(target) && (resolver != null)) {
-                        OverrideImportResolution choice = resolver.resolve(safeName);
-                        if (choice == OverrideImportResolution.CANCEL) {
-                            return new ImportSummary(imported, skipped, true);
-                        }
-                        if (choice == OverrideImportResolution.SKIP) {
-                            skipped++;
-                            continue;
-                        }
-                    }
-                    Files.copy(zipInput, target, StandardCopyOption.REPLACE_EXISTING);
-                    imported++;
-                } finally {
-                    zipInput.closeEntry();
-                }
-            }
-        }
-        return new ImportSummary(imported, skipped, false);
-    }
-
-    static String sanitizeFileName(String fileName) {
-        String sanitized = fileName.toLowerCase(Locale.ROOT)
-                                 .replaceAll("[<>:\"/\\\\|?*\\p{Cntrl}]", "_")
-                                 .replaceAll("[ .]+$", "")
-                                 .trim();
-        return sanitized.isBlank() ? "planetary_system" : sanitized;
-    }
 }
 

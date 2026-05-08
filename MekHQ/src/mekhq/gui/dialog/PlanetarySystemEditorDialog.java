@@ -47,7 +47,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -110,7 +109,6 @@ import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.PlanetarySystemYamlIO;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.SourceableValue;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.utilities.PlanetarySystemChangeSummary;
@@ -119,12 +117,10 @@ import mekhq.utilities.ValidationMessage;
 import mekhq.utilities.ValidationResult;
 
 /**
- * GM-facing editor for planetary system user overrides.
+ * GM-facing editor for campaign planetary system overrides.
  *
- * <p>The dialog edits the in-memory copy of a loaded {@link PlanetarySystem}, validates the result, and writes the
- * full system YAML to the configured user data directory. Saved files are intentionally picked up on the next universe
- * load; this MVP does not refresh the process-global {@link Systems} singleton for the rest of MekHQ in the same
- * session.
+ * <p>The dialog edits working copies of loaded {@link PlanetarySystem} records, validates the result, and saves full
+ * system overrides into the campaign save. Unsaved dialog edits stay local to the dialog until the GM saves them.
  */
 public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private static final MMLogger LOGGER = MMLogger.create(PlanetarySystemEditorDialog.class);
@@ -142,6 +138,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private final List<FactionChoice> factionChoices;
     private final Set<String> knownFactionCodes;
     private final Map<String, PlanetarySystem> baselineSystems = new HashMap<>();
+    private final Set<String> workingSystemIds = new HashSet<>();
     private final Set<String> unsavedSystemIds = new HashSet<>();
     private final Set<String> overrideSystemIds = new HashSet<>();
     private final PlanetarySystemValidator validator = new PlanetarySystemValidator();
@@ -195,12 +192,12 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     public PlanetarySystemEditorDialog(final JFrame frame, final Campaign campaign) {
         super(frame, false, "PlanetarySystemEditorDialog", "PlanetarySystemEditorDialog.title");
         this.campaign = campaign;
-        systems = new ArrayList<>(Systems.getInstance().getSystems().values());
+        systems = new ArrayList<>(campaign.getSystems());
         systems.removeIf(Objects::isNull);
         systems.sort(Comparator.comparing(system -> systemDisplayName(system).toLowerCase(Locale.ROOT)));
         factionChoices = loadFactionChoices();
         knownFactionCodes = factionChoices.stream().map(FactionChoice::code).collect(Collectors.toSet());
-        loadUserOverrideSystemIds();
+        loadCampaignOverrideSystemIds();
         initialize();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         selectCampaignSystem();
@@ -728,15 +725,6 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
               evt -> deleteSelectedSystemOverride());
         panel.add(btnDeleteOverride);
 
-        panel.add(new MMButton("btnExportPlanetaryOverrides",
-              resources.getString("PlanetarySystemEditorDialog.exportOverrides"),
-              resources.getString("PlanetarySystemEditorDialog.exportOverrides.toolTipText"),
-              evt -> exportOverridesToZip()));
-        panel.add(new MMButton("btnImportPlanetaryOverrides",
-              resources.getString("PlanetarySystemEditorDialog.importOverrides"),
-              resources.getString("PlanetarySystemEditorDialog.importOverrides.toolTipText"),
-              evt -> importOverridesFromZip()));
-
         panel.add(new MMButton("btnClosePlanetarySystemEditor", resources, "Close.text", evt -> closeEditor()));
 
         updateButtonState(null);
@@ -801,7 +789,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             if (onlyUnsaved && !hasUnsavedChanges(system)) {
                 continue;
             }
-            if (onlyOverrides && !hasUserOverride(system)) {
+            if (onlyOverrides && !hasCampaignOverride(system)) {
                 continue;
             }
             filtered.add(system);
@@ -833,19 +821,15 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         systemList.setSelectedIndex(0);
     }
 
-    private void loadUserOverrideSystemIds() {
+    private void loadCampaignOverrideSystemIds() {
         overrideSystemIds.clear();
         for (PlanetarySystem system : systems) {
             String systemId = planetarySystemId(system);
             if (systemId == null) {
                 continue;
             }
-            try {
-                if (Systems.hasUserSystemOverride(systemId)) {
-                    overrideSystemIds.add(systemId);
-                }
-            } catch (IOException ex) {
-                LOGGER.warn(ex, "Could not check planetary system override state for {}", systemId);
+            if (campaign.hasPlanetarySystemOverride(systemId)) {
+                overrideSystemIds.add(systemId);
             }
         }
     }
@@ -911,6 +895,10 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
 
         ensureBaselineSnapshot(selectedSystem);
+        selectedSystem = ensureWorkingCopy(selectedSystem);
+        if (selectedSystem == null) {
+            return;
+        }
         LocalDate currentDate = campaign.getLocalDate();
         lblSelection.setText(MessageFormat.format(resources.getString("PlanetarySystemEditorDialog.selection"),
               systemDisplayName(selectedSystem), currentDate));
@@ -921,6 +909,44 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         updateEditStatus(selectedSystem);
         updateButtonState(selectedSystem);
         refreshSystemEvents(null);
+    }
+
+    private PlanetarySystem ensureWorkingCopy(PlanetarySystem system) {
+        String systemId = planetarySystemId(system);
+        if ((systemId == null) || workingSystemIds.contains(systemId)) {
+            return system;
+        }
+
+        try {
+            PlanetarySystem workingCopy = PlanetarySystemYamlIO.copy(system);
+            replaceSystemInEditor(systemId, workingCopy);
+            workingSystemIds.add(systemId);
+            return workingCopy;
+        } catch (IOException ex) {
+            LOGGER.error(ex, "Could not create planetary system working copy for {}", systemId);
+            JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
+                        "PlanetarySystemEditorDialog.workingCopyFailed"), ex.getMessage()),
+                  resources.getString("PlanetarySystemEditorDialog.workingCopyFailed.title"),
+                  JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+
+    private void replaceSystemInEditor(String systemId, PlanetarySystem replacement) {
+        for (int index = 0; index < systems.size(); index++) {
+            if (Objects.equals(planetarySystemId(systems.get(index)), systemId)) {
+                systems.set(index, replacement);
+                break;
+            }
+        }
+        for (int index = 0; index < systemListModel.size(); index++) {
+            PlanetarySystem listed = systemListModel.get(index);
+            if (Objects.equals(planetarySystemId(listed), systemId)) {
+                systemListModel.set(index, replacement);
+                systemList.setSelectedIndex(index);
+                break;
+            }
+        }
     }
 
     private void populatePlanetList(PlanetarySystem selectedSystem) {
@@ -1058,7 +1084,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         btnReviewChanges.setEnabled(canEdit && hasUnsavedChanges);
         btnSave.setEnabled(canEdit && hasUnsavedChanges);
         btnRevertChanges.setEnabled(canEdit && (selectedSystem != null) && hasUnsavedChanges(selectedSystem));
-        btnDeleteOverride.setEnabled(canEdit && (selectedSystem != null) && hasUserOverride(selectedSystem));
+        btnDeleteOverride.setEnabled(canEdit && (selectedSystem != null) && hasCampaignOverride(selectedSystem));
         updateEventButtonState();
         updateSystemEventButtonState();
     }
@@ -1100,8 +1126,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         if (hasUnsavedChanges(selectedSystem)) {
             statuses.add(resources.getString("PlanetarySystemEditorDialog.status.unsaved"));
         }
-        if (hasUserOverride(selectedSystem)) {
-            statuses.add(resources.getString("PlanetarySystemEditorDialog.status.userOverride"));
+        if (hasCampaignOverride(selectedSystem)) {
+            statuses.add(resources.getString("PlanetarySystemEditorDialog.status.campaignOverride"));
         }
 
         lblEditStatus.setText(statuses.isEmpty() ? " " : String.join(" | ", statuses));
@@ -1814,7 +1840,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         closeEditor();
     }
 
-    private boolean hasUserOverride(PlanetarySystem selectedSystem) {
+    private boolean hasCampaignOverride(PlanetarySystem selectedSystem) {
         String systemId = planetarySystemId(selectedSystem);
         return (systemId != null) && overrideSystemIds.contains(systemId);
     }
@@ -1926,19 +1952,16 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             return;
         }
 
-        List<Path> savedPaths = new ArrayList<>();
         try {
             for (PlanetarySystem system : systemsToSave) {
-                Path savedPath = Systems.saveUserSystem(system);
-                savedPaths.add(savedPath);
+                campaign.putPlanetarySystemOverride(system);
                 markSystemSaved(system);
             }
-            Systems.getInstance().invalidateUserOverrideCache();
             updateSelectedSystem();
             repaintSystemList();
             repaintPlanetList();
             JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
-                        "PlanetarySystemEditorDialog.saveComplete"), savedPaths.size(), formatSavedPaths(savedPaths)),
+                        "PlanetarySystemEditorDialog.saveComplete"), systemsToSave.size()),
                   resources.getString("PlanetarySystemEditorDialog.saveComplete.title"),
                   JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException ex) {
@@ -2000,12 +2023,6 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
                      .count();
     }
 
-    private static String formatSavedPaths(List<Path> savedPaths) {
-        return savedPaths.stream()
-                     .map(Path::toString)
-                     .collect(Collectors.joining(System.lineSeparator()));
-    }
-
     private void revertSelectedSystemChanges() {
         PlanetarySystem selectedSystem = getSelectedSystem();
         if ((selectedSystem == null) || !campaign.isGM() || !hasUnsavedChanges(selectedSystem)) {
@@ -2055,20 +2072,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
 
         PlanetarySystem replacement = PlanetarySystemYamlIO.copy(baseline);
-        Systems.getInstance().getSystems().put(systemId, replacement);
-        for (int index = 0; index < systems.size(); index++) {
-            if (Objects.equals(planetarySystemId(systems.get(index)), systemId)) {
-                systems.set(index, replacement);
-                break;
-            }
-        }
-        for (int index = 0; index < systemListModel.size(); index++) {
-            PlanetarySystem listed = systemListModel.get(index);
-            if (Objects.equals(planetarySystemId(listed), systemId)) {
-                systemListModel.set(index, replacement);
-                break;
-            }
-        }
+        replaceSystemInEditor(systemId, replacement);
+        workingSystemIds.add(systemId);
         return replacement;
     }
 
@@ -2184,137 +2189,32 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             return;
         }
 
-        try {
-            boolean deleted = Systems.deleteUserSystem(selectedSystem.getId());
-            overrideSystemIds.remove(planetarySystemId(selectedSystem));
-            Systems.getInstance().invalidateUserOverrideCache();
-            updateButtonState(selectedSystem);
-            updateEditStatus(selectedSystem);
-            repaintSystemList();
-            String key = deleted ? "PlanetarySystemEditorDialog.deleteOverrideComplete"
-                               : "PlanetarySystemEditorDialog.deleteOverrideNothing";
-            JOptionPane.showMessageDialog(this, resources.getString(key),
-                  resources.getString("PlanetarySystemEditorDialog.deleteOverrideComplete.title"),
-                  JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException ex) {
-            LOGGER.error(ex, "Failed to remove planetary system override");
-            JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
-                        "PlanetarySystemEditorDialog.deleteOverrideFailed"), ex.getMessage()),
-                  resources.getString("PlanetarySystemEditorDialog.deleteOverrideFailed.title"),
-                  JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void exportOverridesToZip() {
-        try {
-            List<java.nio.file.Path> overrides = PlanetarySystemYamlIO.listOverrideFiles();
-            if (overrides.isEmpty()) {
-                JOptionPane.showMessageDialog(this, resources.getString(
-                            "PlanetarySystemEditorDialog.exportOverridesEmpty"),
-                      resources.getString("PlanetarySystemEditorDialog.exportOverrides"),
-                      JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
-            chooser.setDialogTitle(resources.getString("PlanetarySystemEditorDialog.exportOverrides"));
-            chooser.setSelectedFile(new java.io.File("planetary-overrides.zip"));
-            chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-                  resources.getString("PlanetarySystemEditorDialog.zipFileFilter"), "zip"));
-            if (chooser.showSaveDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
-                return;
-            }
-
-            java.io.File chosenFile = chooser.getSelectedFile();
-            if (!chosenFile.getName().toLowerCase(Locale.ROOT).endsWith(".zip")) {
-                chosenFile = new java.io.File(chosenFile.getParentFile(), chosenFile.getName() + ".zip");
-            }
-            if (chosenFile.exists()) {
-                int overwrite = JOptionPane.showConfirmDialog(this, MessageFormat.format(
-                            resources.getString("PlanetarySystemEditorDialog.exportOverridesOverwrite"),
-                            chosenFile.getAbsolutePath()),
-                      resources.getString("PlanetarySystemEditorDialog.exportOverrides"),
-                      JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (overwrite != JOptionPane.YES_OPTION) {
-                    return;
-                }
-            }
-
-            int exported = PlanetarySystemYamlIO.exportOverrides(chosenFile.toPath());
-            JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
-                        "PlanetarySystemEditorDialog.exportOverridesComplete"), exported,
-                        chosenFile.getAbsolutePath()),
-                  resources.getString("PlanetarySystemEditorDialog.exportOverrides"),
-                  JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException ex) {
-            LOGGER.error(ex, "Failed to export planetary overrides");
-            JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
-                        "PlanetarySystemEditorDialog.exportOverridesFailed"), ex.getMessage()),
-                  resources.getString("PlanetarySystemEditorDialog.exportOverrides"),
-                  JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void importOverridesFromZip() {
-        if (!campaign.isGM()) {
-            return;
-        }
-
-        javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
-        chooser.setDialogTitle(resources.getString("PlanetarySystemEditorDialog.importOverrides"));
-        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-              resources.getString("PlanetarySystemEditorDialog.zipFileFilter"), "zip"));
-        if (chooser.showOpenDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        java.io.File chosenFile = chooser.getSelectedFile();
-        if ((chosenFile == null) || !chosenFile.isFile()) {
-            return;
-        }
+        String systemId = planetarySystemId(selectedSystem);
+        boolean deleted = campaign.removePlanetarySystemOverride(systemId);
+        overrideSystemIds.remove(systemId);
+        unsavedSystemIds.remove(systemId);
 
         try {
-            PlanetarySystemYamlIO.ImportSummary summary = PlanetarySystemYamlIO.importOverrides(chosenFile.toPath(),
-                  fileName -> promptOverrideConflict(fileName));
-            if (summary.getImported() > 0) {
-                Systems.getInstance().invalidateUserOverrideCache();
-            }
-            String key = summary.isCancelled()
-                              ? "PlanetarySystemEditorDialog.importOverridesCancelled"
-                              : "PlanetarySystemEditorDialog.importOverridesComplete";
-            JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(key),
-                        summary.getImported(), summary.getSkipped()),
-                  resources.getString("PlanetarySystemEditorDialog.importOverrides"),
-                  JOptionPane.INFORMATION_MESSAGE);
-            if (summary.getImported() > 0) {
-                JOptionPane.showMessageDialog(this, resources.getString(
-                            "PlanetarySystemEditorDialog.importOverridesRestart"),
-                      resources.getString("PlanetarySystemEditorDialog.importOverrides"),
-                      JOptionPane.INFORMATION_MESSAGE);
+            PlanetarySystem canonicalSystem = campaign.getSystemById(systemId);
+            if (canonicalSystem != null) {
+                PlanetarySystem workingCopy = PlanetarySystemYamlIO.copy(canonicalSystem);
+                replaceSystemInEditor(systemId, workingCopy);
+                refreshBaselineSnapshot(workingCopy);
             }
         } catch (IOException ex) {
-            LOGGER.error(ex, "Failed to import planetary overrides");
-            JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
-                        "PlanetarySystemEditorDialog.importOverridesFailed"), ex.getMessage()),
-                  resources.getString("PlanetarySystemEditorDialog.importOverrides"),
-                  JOptionPane.ERROR_MESSAGE);
+            LOGGER.error(ex, "Failed to restore canonical planetary system after deleting override");
         }
-    }
 
-    private PlanetarySystemYamlIO.OverrideImportResolution promptOverrideConflict(String fileName) {
-        String[] options = {
-              resources.getString("PlanetarySystemEditorDialog.importOverridesConflict.overwrite"),
-              resources.getString("PlanetarySystemEditorDialog.importOverridesConflict.skip"),
-              resources.getString("PlanetarySystemEditorDialog.importOverridesConflict.cancel")
-        };
-        int choice = JOptionPane.showOptionDialog(this, MessageFormat.format(resources.getString(
-                    "PlanetarySystemEditorDialog.importOverridesConflict"), fileName),
-              resources.getString("PlanetarySystemEditorDialog.importOverridesConflict.title"),
-              JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-        return switch (choice) {
-            case 0 -> PlanetarySystemYamlIO.OverrideImportResolution.OVERWRITE;
-            case 1 -> PlanetarySystemYamlIO.OverrideImportResolution.SKIP;
-            default -> PlanetarySystemYamlIO.OverrideImportResolution.CANCEL;
-        };
+        PlanetarySystem updatedSystem = getSelectedSystem();
+        updateButtonState(updatedSystem);
+        updateEditStatus(updatedSystem);
+        updateSelectedSystem();
+        repaintSystemList();
+        String key = deleted ? "PlanetarySystemEditorDialog.deleteOverrideComplete"
+                           : "PlanetarySystemEditorDialog.deleteOverrideNothing";
+        JOptionPane.showMessageDialog(this, resources.getString(key),
+              resources.getString("PlanetarySystemEditorDialog.deleteOverrideComplete.title"),
+              JOptionPane.INFORMATION_MESSAGE);
     }
 
     private String buildSystemDetails(PlanetarySystem system, LocalDate currentDate) {
@@ -2483,8 +2383,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         if (hasUnsavedChanges(system)) {
             badges.add(resources.getString("PlanetarySystemEditorDialog.badge.unsaved"));
         }
-        if (hasUserOverride(system)) {
-            badges.add(resources.getString("PlanetarySystemEditorDialog.badge.userOverride"));
+        if (hasCampaignOverride(system)) {
+            badges.add(resources.getString("PlanetarySystemEditorDialog.badge.campaignOverride"));
         }
         if (badges.isEmpty()) {
             return systemDisplayName(system);
@@ -2645,7 +2545,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
 
         List<String> lines = new ArrayList<>();
         lines.add(systemDisplayName(system));
-        if (hasUserOverride(system)) {
+        if (hasCampaignOverride(system)) {
             lines.add(resources.getString("PlanetarySystemEditorDialog.tooltip.override"));
         }
         if (hasUnsavedChanges(system)) {

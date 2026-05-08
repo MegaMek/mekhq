@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,16 +50,13 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import megamek.common.preference.PreferenceManager;
-import mekhq.MHQConstants;
 import mekhq.campaign.universe.enums.HPGRating;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.w3c.dom.Document;
 
 class PlanetarySystemYamlIOTest {
 
@@ -192,78 +191,29 @@ class PlanetarySystemYamlIOTest {
     }
 
     @Test
-    void saveUserSystemWritesUserOverrideAndBackup(@TempDir Path tempDir) throws Exception {
-        String originalUserDir = PreferenceManager.getClientPreferences().getUserDir();
+    void campaignXmlOverridesRoundTripEmbeddedYaml() throws Exception {
+        PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
 
-        try {
-            PreferenceManager.getClientPreferences().setUserDir(tempDir.toString());
-            PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
+        String xml = writeCampaignXmlOverrides(List.of(system));
 
-            Path savedPath = Systems.saveUserSystem(system);
+        assertTrue(xml.contains("<planetarySystemOverrides>"));
+        assertTrue(xml.contains("<planetarySystemOverride id=\"Version Test\"><![CDATA["));
+        assertTrue(xml.contains("sucsId: 42"));
 
-            Path expectedPath = tempDir.resolve(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH)
-                                      .resolve("edits")
-                                      .resolve("version test.yml");
-            assertEquals(expectedPath, savedPath);
-            assertTrue(Files.exists(savedPath));
+        Document document = MHQXMLUtility.newSafeDocumentBuilder()
+                                .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+        List<PlanetarySystem> overrides = PlanetarySystemCampaignXmlIO.parse(document.getDocumentElement());
 
-            Files.writeString(savedPath, "sentinel", StandardCharsets.UTF_8);
-            Systems.saveUserSystem(system);
-
-            Path backupPath = savedPath.resolveSibling(savedPath.getFileName() + "_backup");
-            assertEquals("sentinel", Files.readString(backupPath, StandardCharsets.UTF_8));
-
-            TestSystems loadedSystems = new TestSystems();
-            loadedSystems.load(tempDir.resolve(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
-            assertNotNull(loadedSystems.getSystemById("Version Test"));
-        } finally {
-            PreferenceManager.getClientPreferences().setUserDir(originalUserDir);
-        }
+        assertEquals(1, overrides.size());
+        PlanetarySystem reloaded = overrides.getFirst();
+        assertEquals("Version Test", reloaded.getId());
+        assertEquals("2026.03.02", reloaded.getSourcedStar().getVersion());
+        assertEquals(List.of("FS"), reloaded.getPrimaryPlanet().getFactions(EVENT_DATE));
     }
 
     @Test
-    void deleteUserSystemRemovesUserOverride(@TempDir Path tempDir) throws Exception {
-        String originalUserDir = PreferenceManager.getClientPreferences().getUserDir();
-
-        try {
-            PreferenceManager.getClientPreferences().setUserDir(tempDir.toString());
-            PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
-
-            Path savedPath = Systems.saveUserSystem(system);
-
-            assertTrue(Systems.hasUserSystemOverride(system.getId()));
-            assertTrue(Systems.deleteUserSystem(system.getId()));
-            assertFalse(Files.exists(savedPath));
-            assertFalse(Systems.hasUserSystemOverride(system.getId()));
-            assertFalse(Systems.deleteUserSystem(system.getId()));
-        } finally {
-            PreferenceManager.getClientPreferences().setUserDir(originalUserDir);
-        }
-    }
-
-    @Test
-    void exportOverridesAcceptsRelativeZipPathWithoutParent(@TempDir Path tempDir) throws Exception {
-        String originalUserDir = PreferenceManager.getClientPreferences().getUserDir();
-        Path zipFile = Path.of("planetary-overrides-" + System.nanoTime() + ".zip");
-
-        try {
-            PreferenceManager.getClientPreferences().setUserDir(tempDir.toString());
-            Systems.saveUserSystem(readSystem(VERSIONED_SYSTEM));
-
-            int exported = PlanetarySystemYamlIO.exportOverrides(zipFile);
-
-            assertEquals(1, exported);
-            assertTrue(Files.exists(zipFile));
-            try (ZipInputStream zipInput = new ZipInputStream(Files.newInputStream(zipFile))) {
-                ZipEntry entry = zipInput.getNextEntry();
-                assertNotNull(entry);
-                assertEquals("version test.yml", entry.getName());
-                assertFalse(entry.isDirectory());
-            }
-        } finally {
-            Files.deleteIfExists(zipFile);
-            PreferenceManager.getClientPreferences().setUserDir(originalUserDir);
-        }
+    void campaignXmlOverridesSkipEmptyCollections() {
+        assertEquals("", writeCampaignXmlOverrides(List.of()));
     }
 
     @ParameterizedTest
@@ -321,6 +271,14 @@ class PlanetarySystemYamlIOTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PlanetarySystemYamlIO.write(system, outputStream);
         return outputStream.toString(StandardCharsets.UTF_8);
+    }
+
+    private static String writeCampaignXmlOverrides(Collection<PlanetarySystem> systems) {
+        StringWriter output = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(output)) {
+            PlanetarySystemCampaignXmlIO.writeToXML(writer, 0, systems);
+        }
+        return output.toString();
     }
 }
 

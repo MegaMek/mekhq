@@ -45,7 +45,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.enums.HPGRating;
@@ -61,21 +60,53 @@ import org.w3c.dom.DOMException;
 public class Systems {
     private static final MMLogger logger = MMLogger.create(Systems.class);
 
-    private static Systems systems;
+    private static Systems activeSystems;
+    private static Systems canonicalSystems;
 
     private final int HPG_RADIUS_A_STATION = 50;
     private final int HPG_RADIUS_B_STATION = 30;
 
+    /**
+     * Returns the active runtime systems registry.
+     *
+     * <p>During normal campaign play this may be a campaign overlay containing campaign-save planetary overrides. New
+     * campaign-aware code should prefer {@link mekhq.campaign.Campaign} system accessors when a campaign is available.
+     */
     public static Systems getInstance() {
-        if (systems == null) {
-            systems = new Systems();
+        if (activeSystems == null) {
+            activeSystems = new Systems();
+            if (canonicalSystems == null) {
+                canonicalSystems = activeSystems;
+            }
         }
 
-        return systems;
+        return activeSystems;
     }
 
+    /**
+     * Replaces the active runtime systems registry. This does not replace the canonical startup data once it exists.
+     */
     public static void setInstance(Systems instance) {
-        systems = instance;
+        activeSystems = instance;
+        if (canonicalSystems == null) {
+            canonicalSystems = instance;
+        }
+    }
+
+    /**
+     * Stores the unmodified startup systems data and makes it active until a campaign overlay is installed.
+     */
+    public static void setCanonicalSystems(Systems systems) {
+        canonicalSystems = systems;
+        activeSystems = systems;
+    }
+
+    /** Returns the unmodified startup systems data used as the base for campaign overlays. */
+    public static Systems getCanonicalSystems() {
+        if (canonicalSystems == null) {
+            canonicalSystems = getInstance();
+        }
+        return canonicalSystems;
     }
 
     protected ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
@@ -136,6 +167,20 @@ public class Systems {
 
     public ConcurrentMap<String, PlanetarySystem> getSystems() {
         return systemList;
+    }
+
+    public Systems copyWithOverrides(Collection<PlanetarySystem> overrides) {
+        Systems copy = new Systems();
+        copy.systemList.putAll(systemList);
+        if (overrides != null) {
+            for (PlanetarySystem override : overrides) {
+                if ((override != null) && (override.getId() != null)) {
+                    copy.systemList.put(override.getId(), override);
+                }
+            }
+        }
+        copy.cleanupSystems();
+        return copy;
     }
 
     public PlanetarySystem getSystemById(String id) {
@@ -234,7 +279,7 @@ public class Systems {
 
     /**
      * Loads the default planetary system data. This includes all *.yml files in data/universe/planetary_systems and
-     * subfolders. It also loads a player's custom planets in their custom user directory, if it exists.
+     * subfolders.
      *
      */
     public static Systems loadDefault() throws DOMException, IOException {
@@ -245,10 +290,6 @@ public class Systems {
 
         // load default systems
         systems.load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
-
-        // load user directory systems
-        String userDir = PreferenceManager.getClientPreferences().getUserDir();
-        systems.load(new File(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
 
         // a bit of post loading clean up
         systems.cleanupSystems();
@@ -269,51 +310,6 @@ public class Systems {
      */
     public void load(String planetsPath) throws DOMException {
         parsePlanetarySystemFiles(planetsPath, PlanetarySystemYamlIO.createMapper());
-    }
-
-    public static java.nio.file.Path saveUserSystem(PlanetarySystem system) throws IOException {
-        return PlanetarySystemYamlIO.saveUserSystem(system);
-    }
-
-    public static boolean hasUserSystemOverride(String systemId) throws IOException {
-        return PlanetarySystemYamlIO.hasUserSystemOverride(systemId);
-    }
-
-    public static boolean deleteUserSystem(String systemId) throws IOException {
-        return PlanetarySystemYamlIO.deleteUserSystem(systemId);
-    }
-
-    /**
-     * Cache of sanitized file base names (lower-cased, special chars replaced) found in the user edits directory.
-     * {@code null} means "not yet loaded"; callers should invalidate after writing or deleting overrides.
-     */
-    private volatile Set<String> overrideFileBaseNamesCache = null;
-
-    /**
-     * Cheap, cached lookup that answers whether the given system has a user override file on disk. Reads the edits
-     * directory once and caches the result; call {@link #invalidateUserOverrideCache()} after any save / delete /
-     * import so subsequent lookups pick up the change.
-     */
-    public boolean hasUserOverride(String systemId) {
-        if ((systemId == null) || systemId.isBlank()) {
-            return false;
-        }
-        Set<String> cache = overrideFileBaseNamesCache;
-        if (cache == null) {
-            try {
-                cache = PlanetarySystemYamlIO.listOverrideFileBaseNames();
-            } catch (IOException ex) {
-                logger.warn(ex, "Could not enumerate planetary override files");
-                cache = Set.of();
-            }
-            overrideFileBaseNamesCache = cache;
-        }
-        return cache.contains(PlanetarySystemYamlIO.sanitizeFileName(systemId));
-    }
-
-    /** Drops the cached set of override file names. Next {@link #hasUserOverride(String)} call re-reads the directory. */
-    public void invalidateUserOverrideCache() {
-        overrideFileBaseNamesCache = null;
     }
 
     /**

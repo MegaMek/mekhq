@@ -859,7 +859,7 @@ public class InterstellarMapPanel extends JPanel {
                         }
 
                         // GM-edited system marker: thin cyan outline ring so the player can spot non-canon edits.
-                        if (Systems.getInstance().hasUserOverride(system.getId())) {
+                        if (campaign.hasPlanetarySystemOverride(system.getId())) {
                             Stroke oldStroke = g2.getStroke();
                             g2.setPaint(Color.CYAN);
                             g2.setStroke(new BasicStroke(2.0f));
