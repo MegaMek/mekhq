@@ -43,7 +43,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.personnel.enums.ModifierValue;
 
 /**
@@ -91,7 +90,7 @@ public class Modifier {
                         .mapToLong(mod -> mod)
                         .sum();
 
-        return (int) MathUtility.clamp(result, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        return Math.clamp(result, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public Modifier(ModifierValue value, int mod) {

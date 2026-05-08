@@ -131,7 +131,8 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().getFirst()),
+              campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         MekSummary ms = null;
@@ -140,7 +141,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
             RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits_PrimMek");
             ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
             if (!msl.isEmpty()) {
-                ms = msl.get(0);
+                ms = msl.getFirst();
             }
         } else {
             // TODO : AtB Star League RAT Roll Year Option

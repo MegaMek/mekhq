@@ -113,7 +113,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+        addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecialScenarioEnemies().getFirst()), campaign);
 
         ArrayList<Entity> otherForce = new ArrayList<>();
 

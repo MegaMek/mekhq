@@ -43,6 +43,7 @@ class Fraction {
     private int numerator;
     private int denominator;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Fraction() {
         numerator = 0;
         denominator = 1;
@@ -112,10 +113,12 @@ class Fraction {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getNumerator() {
         return numerator;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getDenominator() {
         return denominator;
     }

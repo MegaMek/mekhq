@@ -58,6 +58,7 @@ public class MissingTurret extends MissingPart {
 
     double weight;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingTurret() {
         this(0, 0, null);
     }

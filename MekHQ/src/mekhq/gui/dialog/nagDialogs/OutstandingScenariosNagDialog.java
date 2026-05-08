@@ -91,7 +91,7 @@ public class OutstandingScenariosNagDialog extends ImmersiveDialogNag {
      */
     public static boolean checkNag(Campaign campaign) {
 
-        return campaign.getCampaignOptions().isUseAtB() &&
+        return campaign.getCampaignOptions().isUseStratCon() &&
                      !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_OUTSTANDING_SCENARIOS) &&
                      hasOutStandingScenarios(campaign);
     }

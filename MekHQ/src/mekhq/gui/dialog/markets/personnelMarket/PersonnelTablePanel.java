@@ -97,7 +97,7 @@ public class PersonnelTablePanel extends JPanel {
         rowCount = people.size();
 
         if (rowCount > 0) {
-            selectedApplicants.add(people.get(0));
+            selectedApplicants.add(people.getFirst());
         }
 
         // Sorters

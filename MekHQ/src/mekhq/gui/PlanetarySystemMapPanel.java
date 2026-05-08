@@ -747,6 +747,7 @@ public class PlanetarySystemMapPanel extends JPanel {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void removeActionListener(ActionListener l) {
         listeners.remove(l);
     }

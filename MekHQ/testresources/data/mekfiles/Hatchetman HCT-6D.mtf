@@ -186,6 +186,6 @@ primaryfactory:New Syrtis
 systemmanufacturer:CHASSIS:Chariot Type II Endo
 systemmanufacturer:ENGINE:Vox 225 XL
 systemmanufacturer:ARMOR:Durallex Medium
-systemmanufacturer:JUMPJET:Rawlings 80
+systemmanufacturer:JUMP_JET:Rawlings 80
 systemmanufacturer:COMMUNICATIONS:TharHes Thalia HM-22
 systemmanufacturer:TARGETING:TharHes Ares-8A with Targeting Computer

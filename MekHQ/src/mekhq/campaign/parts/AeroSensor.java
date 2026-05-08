@@ -71,6 +71,7 @@ public class AeroSensor extends Part {
 
     private boolean largeCraft;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public AeroSensor() {
         this(0, false, null);
     }

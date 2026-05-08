@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,27 +31,26 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package asserts;
+package mekhq.gui.dialog;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import megamek.client.ui.dialogs.AbstractAboutDialog;
+import mekhq.MHQConstants;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.awt.Window;
 
-import org.junit.jupiter.api.Assertions;
+public class MekHQAboutDialog extends AbstractAboutDialog {
 
-/**
- * @author Deric Page (deric.page@nisc.coop) (ext 2335)
- */
-public class BigDecimalAssert {
-    public static void assertEquals(BigDecimal expected, Object actual, int scale) {
-        assertNotNull(actual);
+    public MekHQAboutDialog(Window parent) {
+        super(parent);
+    }
 
-        assertInstanceOf(BigDecimal.class, actual, "actual: " + actual.getClass().getName());
-        BigDecimal scaledExpected = expected.setScale(scale, RoundingMode.FLOOR);
-        BigDecimal scaledActual = ((BigDecimal) actual).setScale(scale, RoundingMode.FLOOR);
-        Assertions.assertEquals(0, scaledExpected.compareTo(scaledActual),
-              "\n\texpected: " + scaledExpected + "\n\tactual: " + scaledActual);
+    @Override
+    protected String currentProjectName() {
+        return MHQConstants.PROJECT_NAME;
+    }
+
+    @Override
+    protected String currentVersion() {
+        return MHQConstants.VERSION.toString();
     }
 }

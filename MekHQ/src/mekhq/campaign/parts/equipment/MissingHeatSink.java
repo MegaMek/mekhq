@@ -41,6 +41,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingHeatSink extends MissingEquipmentPart {
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingHeatSink() {
         this(0, null, -1, false, null);
     }

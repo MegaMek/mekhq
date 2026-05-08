@@ -65,8 +65,8 @@ public class RegionPerimeterTest {
 
         list.sort(RegionPerimeter.leastYSorter);
 
-        assertEquals(-1, list.get(0).y(), RegionPerimeter.EPSILON);
-        assertEquals(-1, list.get(0).x(), RegionPerimeter.EPSILON);
+        assertEquals(-1, list.getFirst().y(), RegionPerimeter.EPSILON);
+        assertEquals(-1, list.getFirst().x(), RegionPerimeter.EPSILON);
         assertEquals(2, list.get(1).x(), RegionPerimeter.EPSILON);
     }
 
@@ -172,7 +172,7 @@ public class RegionPerimeterTest {
 
         List<Point> intersection = RegionPerimeter.intersection(triangle, rectangle);
 
-        assertTrue(intersection.contains(triangle.get(0)));
+        assertTrue(intersection.contains(triangle.getFirst()));
         assertFalse(intersection.contains(triangle.get(1)));
         assertFalse(intersection.contains(triangle.get(2)));
         assertTrue(intersection.contains(new Point(-1, 0)));

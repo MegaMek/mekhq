@@ -50,6 +50,7 @@ import org.w3c.dom.NodeList;
 public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     private int trooper;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingBattleArmorEquipmentPart() {
         this(0, null, -1, 1.0, -1, null, 0.0);
     }

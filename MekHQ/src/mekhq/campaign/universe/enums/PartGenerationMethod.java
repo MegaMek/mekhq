@@ -83,6 +83,7 @@ public enum PartGenerationMethod {
         return this == WINDCHILD;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMishra() {
         return this == MISHRA;
     }

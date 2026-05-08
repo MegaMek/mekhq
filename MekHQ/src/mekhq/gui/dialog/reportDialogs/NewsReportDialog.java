@@ -37,6 +37,7 @@ import javax.swing.JTextPane;
 
 import mekhq.campaign.universe.NewsItem;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class NewsReportDialog extends AbstractReportDialog {
     //region Variable Declarations
     private final NewsItem news;

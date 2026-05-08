@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingProtoMekSensor extends MissingPart {
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingProtoMekSensor() {
         this(0, null);
     }

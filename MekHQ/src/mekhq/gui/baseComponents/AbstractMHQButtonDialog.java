@@ -60,6 +60,7 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
         this(frame, true, name, title);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     protected AbstractMHQButtonDialog(final JDialog dialog, final JFrame frame, final String name, final String title) {
         this(dialog, frame, true, name, title);
     }

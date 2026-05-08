@@ -211,6 +211,7 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
      *
      * @return True if using dropships under specific conditions, false otherwise
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     private boolean isUsingDropship() {
         if (getScenario().getCombatRole().isPatrol()) {
             for (Entity en : getScenario().getAlliesPlayer()) {

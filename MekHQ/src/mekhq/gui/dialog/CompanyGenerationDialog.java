@@ -49,6 +49,7 @@ import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -79,7 +80,6 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChang
 import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel. Wave 5 will be when this gets
@@ -134,7 +134,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     protected Container createCenterPane() {
         setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
               getCompanyGenerationOptions()));
-        return new JScrollPaneWithSpeed(getCompanyGenerationOptionsPanel());
+        return new FastJScrollPane(getCompanyGenerationOptionsPanel());
     }
 
     @Override

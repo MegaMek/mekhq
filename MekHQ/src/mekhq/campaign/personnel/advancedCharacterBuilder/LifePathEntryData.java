@@ -150,17 +150,18 @@ public record LifePathEntryData(
      */
     private int getTraitValue(LifePathEntryDataTraitLookup trait, boolean isMinimum) {
         return switch (trait) {
-            case BLOODMARK -> isMinimum ? MINIMUM_BLOODMARK : clamp(value, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+            case BLOODMARK -> isMinimum ? MINIMUM_BLOODMARK : Math.clamp(value, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
             case CONNECTIONS ->
-                  isMinimum ? MINIMUM_CONNECTIONS : clamp(value, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+                  isMinimum ? MINIMUM_CONNECTIONS : Math.clamp(value, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
             //            case ENEMY -> isMinimum ? MINIMUM_ENEMY : clamp(value, MINIMUM_ENEMY, MAXIMUM_ENEMY);
             //            case EXTRA_INCOME -> isMinimum ? MINIMUM_EXTRA_INCOME : clamp(value, MINIMUM_EXTRA_INCOME,
             //                  MAXIMUM_EXTRA_INCOME);
             //            case PROPERTY -> isMinimum ? MINIMUM_PROPERTY : max(value, MINIMUM_PROPERTY); // Has no maximum value
-            case REPUTATION -> isMinimum ? MINIMUM_REPUTATION : clamp(value, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+            case REPUTATION -> isMinimum ? MINIMUM_REPUTATION : Math.clamp(value, MINIMUM_REPUTATION,
+                  MAXIMUM_REPUTATION);
             // case TITLE -> isMinimum ? MINIMUM_TITLE : clamp(value, MINIMUM_TITLE, MAXIMUM_TITLE);
-            case UNLUCKY -> isMinimum ? MINIMUM_UNLUCKY : clamp(value, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
-            case WEALTH -> isMinimum ? MINIMUM_WEALTH : clamp(value, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+            case UNLUCKY -> isMinimum ? MINIMUM_UNLUCKY : Math.clamp(value, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+            case WEALTH -> isMinimum ? MINIMUM_WEALTH : Math.clamp(value, MINIMUM_WEALTH, MAXIMUM_WEALTH);
         };
     }
 
@@ -279,7 +280,7 @@ public record LifePathEntryData(
             return minimumScore;
         }
 
-        return clamp(value, minimumScore, MAXIMUM_ATTRIBUTE_SCORE);
+        return Math.clamp(value, minimumScore, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
@@ -292,6 +293,7 @@ public record LifePathEntryData(
      * @author Illiani
      * @since 0.50.07
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public @Nullable IOption getSPA(String lookupName) {
         if (!SPA.getLookupName().equalsIgnoreCase(classLookupName)) {
             return null;

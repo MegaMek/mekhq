@@ -64,6 +64,7 @@ public enum ScenarioType {
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLosTech() {
         return this == SPECIAL_LOS_TECH;
     }
@@ -86,6 +87,7 @@ public enum ScenarioType {
     /**
      * @return {@code true} if the scenario is considered a Jail Break scenario, {@code false} otherwise.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isJailBreak() {
         return this == SPECIAL_JAIL_BREAK;
     }

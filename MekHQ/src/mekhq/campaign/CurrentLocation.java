@@ -527,9 +527,9 @@ public class CurrentLocation {
           boolean useAltAdvancedMedical) {
         return useAltAdvancedMedical
                      ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME
-                             .newInjury(campaign, person, GENERIC, 1)
+                       .newInjury(campaign, person, GENERIC, 1)
                      : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME
-                             .newInjury(campaign, person, INTERNAL, 1);
+                       .newInjury(campaign, person, INTERNAL, 1);
     }
 
     /**
@@ -604,7 +604,7 @@ public class CurrentLocation {
                         p = c.getSystemByName("Terra");
                         if (null == p) {
                             // If that doesn't work then give the first planet we have
-                            p = c.getSystems().get(0);
+                            p = c.getSystems().getFirst();
                         }
                     }
                     retVal.currentSystem = p;

@@ -55,6 +55,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -63,7 +64,6 @@ import mekhq.campaign.events.assets.AssetNewEvent;
 import mekhq.campaign.events.assets.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.gui.model.DataTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -130,7 +130,7 @@ public class ManageAssetsDialog extends JDialog {
         assetTable.setShowGrid(false);
         assetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         assetTable.getSelectionModel().addListSelectionListener(this::assetTableValueChanged);
-        JScrollPane scrollAssetTable = new JScrollPaneWithSpeed(assetTable);
+        JScrollPane scrollAssetTable = new FastJScrollPane(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));

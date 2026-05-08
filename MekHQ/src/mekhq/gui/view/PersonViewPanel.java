@@ -92,7 +92,6 @@ import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
@@ -839,7 +838,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int divisionResult = numAwards / tierSize;
         int addition = (tierSize == 1) ? 0 : 1;
 
-        return MathUtility.clamp(divisionResult + addition, 1, maximumTiers);
+        return Math.clamp(divisionResult + addition, 1, maximumTiers);
     }
 
     /**
@@ -2425,7 +2424,7 @@ public class PersonViewPanel extends JScrollablePanel {
               person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
         if (campaignOptions.isUseFatigue() && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
-            int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
+            int fatigueTurnoverModifier = Math.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
             if (effectiveFatigue != baseFatigue) {
                 fatigueDisplay.append("<s><font color='gray'>")
                       .append(baseFatigue)

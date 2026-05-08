@@ -73,6 +73,7 @@ public class SVEnginePart extends Part {
      * Constructor used during campaign deserialization
      */
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public SVEnginePart() {
         this(0, 0.0, Engine.COMBUSTION_ENGINE, TechRating.D, FuelType.PETROCHEMICALS, null);
     }

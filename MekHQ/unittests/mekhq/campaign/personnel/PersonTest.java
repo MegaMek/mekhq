@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
@@ -54,10 +58,13 @@ import megamek.common.TechConstants;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
+import mekhq.EventSpy;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -1345,6 +1352,83 @@ public class PersonTest {
         setField(person, "injuries", new ArrayList<>(List.of(injury)));
 
         assertEquals(3, person.getNonPermanentInjurySeverity());
+    }
+
+    @Test
+    void changeStatusCommanderKIAPromotesSecondInCommand() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
+        when(mockCampaign.getHangar()).thenReturn(new Hangar());
+        when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
+
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person secondInCommand = new Person(mockCampaign);
+        secondInCommand.setFullNameDirect("Second Incommand");
+        secondInCommand.setSecondInCommand(true);
+        when(mockCampaign.getSecondInCommand()).thenReturn(secondInCommand);
+
+        Person person = new Person(mockCampaign);
+        person.setFullNameDirect("First Incommand");
+        person.setCommander(true);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            person.changeStatus(mockCampaign, LocalDate.of(3001,1,1), PersonnelStatus.KIA);
+
+            // Verify event was emitted
+            PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
+                  e -> e.getPerson() == person);
+            assertNotNull(personStatusChangedEvent);
+        }
+
+        assertEquals(PersonnelStatus.KIA, person.getStatus());
+        assertFalse(person.isCommander());
+        // Check that second in command is now the commander
+        assertFalse(secondInCommand.isSecondInCommand());
+        assertTrue(secondInCommand.isCommander());
+        verify(mockCampaign).personUpdated(secondInCommand);
+        // Should have been at least one report for the person, announcing their death.
+        verify(mockCampaign, atLeastOnce()).addReport(eq(DailyReportType.PERSONNEL),
+              argThat(s -> s.contains(person.getHyperlinkedFullTitle())));
+        // Should have been at least two reports for the second in command, announcing their removal as second in
+        // command and promotion to commander.
+        verify(mockCampaign, atLeast(2)).addReport(eq(DailyReportType.PERSONNEL),
+              argThat(s -> s.contains(secondInCommand.getHyperlinkedFullTitle())));
+    }
+
+    @Test
+    void changeStatusSecondInCommandKIA() {
+        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
+        when(mockCampaign.getHangar()).thenReturn(new Hangar());
+        when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
+
+        Faction mockFaction = mock(Faction.class);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.setSecondInCommand(true);
+
+        try (EventSpy eventSpy = new EventSpy()) {
+            person.changeStatus(mockCampaign, LocalDate.of(3001,1,1), PersonnelStatus.KIA);
+
+            // Verify event was emitted
+            PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
+                  e -> e.getPerson() == person);
+            assertNotNull(personStatusChangedEvent);
+        }
+
+        assertEquals(PersonnelStatus.KIA, person.getStatus());
+        assertFalse(person.isSecondInCommand());
+        // Should have been at least two reports for the person, one announcing their death and one announcing
+        // they're no longer second in command.
+        verify(mockCampaign, atLeast(2)).addReport(eq(DailyReportType.PERSONNEL),
+              argThat(s -> s.contains(person.getHyperlinkedFullTitle())));
     }
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {

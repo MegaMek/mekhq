@@ -56,6 +56,7 @@ public enum HPGRating {
         return name;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static HPGRating parseHPGRating(String val) {
         try {
             return HPGRating.valueOf(val.toUpperCase());

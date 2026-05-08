@@ -54,6 +54,7 @@ import org.w3c.dom.NodeList;
 public class InfantryMotiveType extends Part {
     private EntityMovementMode mode;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public InfantryMotiveType() {
         this(0, null, null);
     }

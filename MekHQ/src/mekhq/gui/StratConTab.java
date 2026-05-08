@@ -53,6 +53,7 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.NewDayEvent;
@@ -70,7 +71,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.stratCon.CampaignManagementDialog;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -162,7 +162,7 @@ public class StratConTab extends CampaignGuiTab {
         initializeInfoPanel();
         cmd = new CampaignManagementDialog(this);
 
-        JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
+        JScrollPane infoScrollPane = new FastJScrollPane(infoPanel);
         infoScrollPane.setBorder(null);
         infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600),
               infoScrollPane.getHeight())));
@@ -198,7 +198,7 @@ public class StratConTab extends CampaignGuiTab {
         infoPanel.add(btnManageCampaignState, constraints);
 
         // Add an expanded objective panel (scrollable)
-        expandedObjectivePanel = new JScrollPaneWithSpeed(objectiveStatusText);
+        expandedObjectivePanel = new FastJScrollPane(objectiveStatusText);
         expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         expandedObjectivePanel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(550, 300)));

@@ -86,7 +86,8 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().getFirst()),
+              campaign);
     }
 
     @Override

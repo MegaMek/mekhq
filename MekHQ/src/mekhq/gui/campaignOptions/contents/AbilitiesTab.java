@@ -501,7 +501,7 @@ public class AbilitiesTab {
      * @return A string containing the HTML-formatted description.
      */
     private static String buildAbilityDescription(String description) {
-        return ("<html>" + description + "</html>").replaceAll("\\{", "").replaceAll("}", "");
+        return ("<html>" + description + "</html>").replaceAll("\\{", "").replace("}", "");
     }
 
     /**

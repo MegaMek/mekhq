@@ -63,6 +63,7 @@ public class RandomDivorce extends AbstractDivorce {
      * @return The size of the divorce dice as an integer.
      */
     //region Getters/Setters
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getDivorceDiceSize() {
         return divorceDiceSize;
     }

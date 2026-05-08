@@ -428,7 +428,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaignOptions.isUseAtB()) {
+                if (campaignOptions.isUseStratCon()) {
                     campaign.initAtB(true);
                 }
 

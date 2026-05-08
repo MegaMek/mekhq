@@ -501,10 +501,12 @@ public class AtBScenarioModifier implements Cloneable {
         this.additionalBriefingText = additionalBriefingText;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Boolean getBenefitsPlayer() {
         return benefitsPlayer;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBenefitsPlayer(Boolean benefitsPlayer) {
         this.benefitsPlayer = benefitsPlayer;
     }
@@ -513,6 +515,7 @@ public class AtBScenarioModifier implements Cloneable {
         return blockFurtherEvents;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBlockFurtherEvents(Boolean blockFurtherEvents) {
         this.blockFurtherEvents = blockFurtherEvents;
     }
@@ -521,6 +524,7 @@ public class AtBScenarioModifier implements Cloneable {
         return eventTiming;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setEventTiming(EventTiming eventTiming) {
         this.eventTiming = eventTiming;
     }
@@ -529,6 +533,7 @@ public class AtBScenarioModifier implements Cloneable {
         return forceDefinition;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setForceDefinition(ScenarioForceTemplate forceDefinition) {
         this.forceDefinition = forceDefinition;
     }
@@ -537,6 +542,7 @@ public class AtBScenarioModifier implements Cloneable {
         return skillAdjustment;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSkillAdjustment(Integer skillAdjustment) {
         this.skillAdjustment = skillAdjustment;
     }
@@ -545,6 +551,7 @@ public class AtBScenarioModifier implements Cloneable {
         return qualityAdjustment;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setQualityAdjustment(Integer qualityAdjustment) {
         this.qualityAdjustment = qualityAdjustment;
     }
@@ -553,6 +560,7 @@ public class AtBScenarioModifier implements Cloneable {
         return eventRecipient;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setEventRecipient(ForceAlignment eventRecipient) {
         this.eventRecipient = eventRecipient;
     }
@@ -561,6 +569,7 @@ public class AtBScenarioModifier implements Cloneable {
         return battleDamageIntensity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBattleDamageIntensity(Integer battleDamageIntensity) {
         this.battleDamageIntensity = battleDamageIntensity;
     }
@@ -569,6 +578,7 @@ public class AtBScenarioModifier implements Cloneable {
         return ammoExpenditureIntensity;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAmmoExpenditureIntensity(Integer ammoExpenditureIntensity) {
         this.ammoExpenditureIntensity = ammoExpenditureIntensity;
     }
@@ -577,6 +587,7 @@ public class AtBScenarioModifier implements Cloneable {
         return unitRemovalCount;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setUnitRemovalCount(Integer unitRemovalCount) {
         this.unitRemovalCount = unitRemovalCount;
     }
@@ -587,6 +598,7 @@ public class AtBScenarioModifier implements Cloneable {
         return allowedMapLocations;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAllowedMapLocations(List<MapLocation> allowedMapLocations) {
         this.allowedMapLocations = allowedMapLocations;
     }
@@ -595,6 +607,7 @@ public class AtBScenarioModifier implements Cloneable {
         return useAmbushLogic;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setUseAmbushLogic(Boolean useAmbushLogic) {
         this.useAmbushLogic = useAmbushLogic;
     }
@@ -603,6 +616,7 @@ public class AtBScenarioModifier implements Cloneable {
         return switchSides;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSwitchSides(Boolean switchSides) {
         this.switchSides = switchSides;
     }
@@ -617,6 +631,7 @@ public class AtBScenarioModifier implements Cloneable {
         return numExtraEvents;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setNumExtraEvents(Integer numExtraEvents) {
         this.numExtraEvents = numExtraEvents;
     }
@@ -625,6 +640,7 @@ public class AtBScenarioModifier implements Cloneable {
         return bvBudgetAdditiveMultiplier;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setBVBudgetAdditiveMultiplier(Double bvBudgetAdditiveMultiplier) {
         this.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
     }
@@ -633,6 +649,7 @@ public class AtBScenarioModifier implements Cloneable {
         return reinforcementDelayReduction;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setReinforcementDelayReduction(Integer reinforcementDelayReduction) {
         this.reinforcementDelayReduction = reinforcementDelayReduction;
     }
@@ -645,6 +662,7 @@ public class AtBScenarioModifier implements Cloneable {
         return linkedModifiers;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setLinkedModifiers(Map<String, String> linkedModifiers) {
         this.linkedModifiers = linkedModifiers;
     }

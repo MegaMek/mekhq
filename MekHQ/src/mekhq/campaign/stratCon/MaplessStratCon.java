@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -190,7 +190,7 @@ public class MaplessStratCon {
         boolean restrictToSingleForce = backingScenario != null &&
                                               backingScenario.getStratConScenarioType().isOfficialChallenge();
         if (currentState.equals(UNRESOLVED)) {
-            assignmentUI.display(campaign, campaignState, scenarioCoords, restrictToSingleForce);
+            assignmentUI.display(campaign, campaignState, scenarioCoords, restrictToSingleForce, true);
             assignmentUI.setVisible(true);
             isPrimaryForce = true;
         }

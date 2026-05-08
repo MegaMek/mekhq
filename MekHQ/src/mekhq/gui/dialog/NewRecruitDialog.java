@@ -58,6 +58,7 @@ import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.Gender;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -65,7 +66,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -104,7 +104,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void initComponents() {
-        scrollView = new JScrollPaneWithSpeed();
+        scrollView = new FastJScrollPane();
         choiceRanks = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",

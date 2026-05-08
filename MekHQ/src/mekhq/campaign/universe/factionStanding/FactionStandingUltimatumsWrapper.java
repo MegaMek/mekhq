@@ -63,6 +63,7 @@ class FactionStandingUltimatumsWrapper {
      * @author Illiani
      * @since 0.50.07
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     void setUltimatums(List<FactionStandingUltimatumData> ultimatums) {
         this.ultimatums = ultimatums;
     }

@@ -59,7 +59,6 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -369,19 +368,6 @@ public abstract class AbstractContractMarket {
      */
     private int calculateBypassVarianceReduction(int availableForces) {
         return (int) Math.floor((double) availableForces / 3);
-    }
-
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int calculateMaxDeployableCombatTeams(Campaign campaign) {
-        CampaignOptions options = campaign.getCampaignOptions();
-        int baseStrategyDeployment = options.getBaseStrategyDeployment();
-        int additionalStrategyDeployment = options.getAdditionalStrategyDeployment();
-        int commanderStrategy = campaign.getCommanderStrategy();
-
-        return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
     }
 
     /**

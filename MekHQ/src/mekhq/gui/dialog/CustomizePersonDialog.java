@@ -33,10 +33,8 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.min;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.Person.*;
-import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -78,7 +76,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
-import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -91,7 +88,6 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -100,7 +96,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
@@ -110,6 +105,7 @@ import mekhq.gui.control.EditLogControl;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.gui.utilities.OriginFactionPickerHelper;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -159,6 +155,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textBloodname;
     private MarkdownEditorPanel txtBio;
     private JComboBox<Faction> choiceFaction;
+    private JCheckBox chkShowAllFactions;
     private JComboBox<PlanetarySystem> choiceSystem;
     private DefaultComboBoxModel<PlanetarySystem> allSystems;
     private JCheckBox chkOnlyOurFaction;
@@ -431,7 +428,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         panDemographics.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
-        DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel();
+        // Decide the initial faction-picker model up front so we can construct the JComboBox with
+        // the right contents from the start. The earlier approach (build strict, attach listener,
+        // then maybe rebuild) fired the choiceFaction selection-change listener during init, while
+        // chkClan and chkOnlyOurFaction were still null — Copilot review on PR #8937. Build now,
+        // attach listener after, and the rebuild path is reserved for the post-construction toggle.
+        boolean originSurvivesStrictFilter = OriginFactionPickerHelper.wouldStrictFilterAdmit(
+              person.getOriginFaction(), person, campaign.getGameYear(), person.getRecruitment());
+        boolean openExpanded = person.getOriginFaction() != null && !originSurvivesStrictFilter;
+        DefaultComboBoxModel<Faction> factionsModel = OriginFactionPickerHelper.buildModel(
+              person, campaign.getGameYear(), person.getRecruitment(), openExpanded);
         choiceFaction = new JComboBox<>(factionsModel);
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -470,6 +476,24 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panDemographics.add(choiceFaction, gridBagConstraints);
+
+        // "Show All Factions" sibling checkbox. Default unchecked = strict lifespan filter (the
+        // canonically correct view); checked = unfiltered (escape hatch for long-lived or
+        // unusual-origin characters). State is set to mirror the model we just built, so the
+        // checkbox is consistent with what's displayed without needing to fire the toggle handler
+        // during construction. See issue #8929.
+        chkShowAllFactions = new JCheckBox("Show All Factions");
+        chkShowAllFactions.setSelected(openExpanded);
+        chkShowAllFactions.addActionListener(e -> rebuildFactionsModelPreservingSelection());
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panDemographics.add(chkShowAllFactions, gridBagConstraints);
 
         y++;
 
@@ -1369,38 +1393,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
     }
 
-    private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
-        int year = campaign.getGameYear();
-        List<Faction> orderedFactions = Factions.getInstance()
-                                              .getFactions()
-                                              .stream()
-                                              .sorted((a, b) -> a.getFullName(year)
-                                                                      .compareToIgnoreCase(b.getFullName(year)))
-                                              .toList();
-
-        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
-        for (Faction faction : orderedFactions) {
-            // Always include the person's faction
-            if (faction.equals(person.getOriginFaction())) {
-                factionsModel.addElement(faction);
-            } else {
-                if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
-                    continue;
-                }
-
-                // Allow factions between the person's birthday
-                // and when they were recruited, or now if we're
-                // not tracking recruitment.
-                int endYear = person.getRecruitment() != null ?
-                                    Math.min(person.getRecruitment().getYear(), year) :
-                                    year;
-                if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
-                    factionsModel.addElement(faction);
-                }
-            }
-        }
-
-        return factionsModel;
+    /**
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
+     * current selection across the swap. If there was no current selection (or the previously
+     * selected faction has been filtered out by the new model), the index is explicitly set to
+     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
+     * would silently assign an unintended origin when OK is clicked. (Copilot review on PR #8937.)
+     */
+    private void rebuildFactionsModelPreservingSelection() {
+        Faction current = (Faction) choiceFaction.getSelectedItem();
+        DefaultComboBoxModel<Faction> rebuilt = OriginFactionPickerHelper.buildModel(
+              person, campaign.getGameYear(), person.getRecruitment(), chkShowAllFactions.isSelected());
+        choiceFaction.setModel(rebuilt);
+        int idx = (current != null) ? rebuilt.getIndexOf(current) : -1;
+        choiceFaction.setSelectedIndex(idx);
     }
 
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
@@ -1507,27 +1513,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         int currentValue = person.getConnections();
         int newValue = MathUtility.parseInt(textConnections.getText(), currentValue);
-        person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setConnections(Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
 
         currentValue = person.getWealth();
         newValue = MathUtility.parseInt(textWealth.getText(), currentValue);
-        person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
         currentValue = person.getReputation();
         newValue = MathUtility.parseInt(textReputation.getText(), currentValue);
-        person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setReputation(Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
 
         currentValue = person.getUnlucky();
         newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);
-        person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        person.setUnlucky(Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
         currentValue = person.getBloodmark();
         newValue = MathUtility.parseInt(textBloodmark.getText(), currentValue);
-        person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+        person.setBloodmark(Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
 
         currentValue = person.getExtraIncomeTraitLevel();
         newValue = MathUtility.parseInt(textExtraIncome.getText(), currentValue);
-        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
@@ -1627,7 +1633,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblValue;
         JLabel lblLevel;
         JLabel lblBonus;
-        JLabel lblAging;
         JSpinner spnLevel;
         JSpinner spnBonus;
 
@@ -1640,7 +1645,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         constraints.insets = new Insets(0, 10, 0, 0);
         constraints.gridx = 0;
 
-        AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
         SkillModifierData skillModifierData = person.getSkillModifierData(
               campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
               true);
@@ -1674,13 +1678,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 Skill skill = person.getSkill(type);
                 // We had errors where player modified their skills beyond these values which then caused the
                 // JSpinners to break. This code here ensures that we self correct the values.
-                level = clamp(skill.getLevel(), 0, 10);
-                bonus = clamp(skill.getBonus(), -8, 8);
+                level = Math.clamp(skill.getLevel(), 0, 10);
+                bonus = Math.clamp(skill.getBonus(), -8, 8);
             }
             spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, 10, 1));
             spnLevel.addChangeListener(evt -> changeSkillValue(type));
             spnLevel.setEnabled(chkSkill.isSelected());
-            spnBonus = new JSpinner(new SpinnerNumberModel(clamp(bonus, -8, 8), -8, 8, 1));
+            spnBonus = new JSpinner(new SpinnerNumberModel(Math.clamp(bonus, -8, 8), -8, 8, 1));
             spnBonus.addChangeListener(evt -> changeSkillValue(type));
             spnBonus.setEnabled(chkSkill.isSelected());
             skillLevels.put(type, spnLevel);
@@ -1750,7 +1754,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private void setSkills() {
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
             final String type = SkillType.getSkillList()[i];
-            AgingMilestone milestone = getMilestone(person.getAge(campaign.getLocalDate()));
             if (skillChecks.get(type).isSelected()) {
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
@@ -1903,8 +1906,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         boolean isClanCampaign = campaign.isClanCampaign();
         boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
         LocalDate today = campaign.getLocalDate();
-
-        SkillType skillType = SkillType.getType(type);
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();

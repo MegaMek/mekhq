@@ -112,6 +112,7 @@ public class PartsStore {
         return parts;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Part getByNameAndDetails(String nameAndDetails) {
         return nameAndDetailMap.get(nameAndDetails);
     }

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -115,7 +114,7 @@ public class ContractTypePicker {
             result = initialRoll;
         }
 
-        return clamp(result, 2, 12);
+        return Math.clamp(result, 2, 12);
     }
 
     /**

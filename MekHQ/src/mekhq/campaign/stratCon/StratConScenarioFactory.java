@@ -138,6 +138,7 @@ public class StratConScenarioFactory {
      *
      * @return Random scenario template.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static ScenarioTemplate getRandomScenario(MapLocation location) {
         return ObjectUtility.getRandomItem(dynamicScenarioLocationMap.get(location)).clone();
     }

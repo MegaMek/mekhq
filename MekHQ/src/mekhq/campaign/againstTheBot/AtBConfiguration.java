@@ -254,7 +254,7 @@ public class AtBConfiguration {
                   weightClass);
 
             // Limit the weightClassIndex within valid range
-            weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
+            weightClassIndex = Math.clamp(weightClassIndex, 0, botForceTable.size() - 1);
         }
 
         // Fetch table for the weight class

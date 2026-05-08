@@ -112,7 +112,7 @@ public enum FileType {
      * @return the recommended extension for files of this type
      */
     public String getRecommendedExtension() {
-        return extensions.get(0);
+        return extensions.getFirst();
     }
 
     /**

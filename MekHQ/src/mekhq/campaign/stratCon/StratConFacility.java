@@ -160,6 +160,7 @@ public class StratConFacility implements Cloneable {
         return displayableName;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDisplayableName(String displayableName) {
         this.displayableName = displayableName;
     }
@@ -168,6 +169,7 @@ public class StratConFacility implements Cloneable {
         return facilityType;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setFacilityType(FacilityType facilityType) {
         this.facilityType = facilityType;
     }
@@ -206,10 +208,12 @@ public class StratConFacility implements Cloneable {
         this.localModifiers = localModifiers;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getAggroRating() {
         return aggroRating;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAggroRating(int rating) {
         aggroRating = rating;
     }
@@ -238,6 +242,7 @@ public class StratConFacility implements Cloneable {
         ownershipChangeScore--;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void clearOwnershipChangeScore() {
         ownershipChangeScore = 0;
     }

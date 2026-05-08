@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public enum ForceReliabilityMethod {
     UNIT_RATING("ForceReliabilityMethod.UNIT_RATING.text", "ForceReliabilityMethod.UNIT_RATING.toolTipText"),
     LOYALTY("ForceReliabilityMethod.LOYALTY.text", "ForceReliabilityMethod.LOYALTY.toolTipText"),
@@ -67,22 +68,27 @@ public enum ForceReliabilityMethod {
         return this == LOYALTY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isOverrideA() {
         return this == OVERRIDE_A;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isOverrideB() {
         return this == OVERRIDE_B;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isOverrideC() {
         return this == OVERRIDE_C;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isOverrideD() {
         return this == OVERRIDE_D;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isOverrideF() {
         return this == OVERRIDE_F;
     }

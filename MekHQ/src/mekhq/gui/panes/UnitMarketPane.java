@@ -57,6 +57,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -70,7 +71,6 @@ import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
@@ -395,7 +395,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
               !getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
         getMarketTable().getSelectionModel().addListSelectionListener(evt -> updateDisplay());
 
-        final JScrollPane marketTableScrollPane = new JScrollPaneWithSpeed(getMarketTable(),
+        final JScrollPane marketTableScrollPane = new FastJScrollPane(getMarketTable(),
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         marketTableScrollPane.setName("marketTableScrollPane");
@@ -439,8 +439,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         return (getMarketTable().getSelectedRow() < 0) ?
                      null :
                      getMarketModel().getOffer(getMarketTable().convertRowIndexToModel(getMarketTable().getSelectedRow()))
-                           .map(UnitMarketOffer::getEntity)
-                           .orElse(null);
+                     .map(UnitMarketOffer::getEntity)
+                     .orElse(null);
     }
 
     /**

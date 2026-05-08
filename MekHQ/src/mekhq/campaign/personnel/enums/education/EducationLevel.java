@@ -75,10 +75,12 @@ public enum EducationLevel {
 
     // region Boolean Comparison Methods
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isEarlyChildhood() {
         return this == EARLY_CHILDHOOD;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isHighSchool() {
         return this == HIGH_SCHOOL;
     }

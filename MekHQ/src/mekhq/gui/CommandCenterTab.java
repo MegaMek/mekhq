@@ -66,6 +66,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.ui.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -116,7 +117,6 @@ import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -502,7 +502,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         listObjectives.setModel(new DefaultListModel<>());
         refreshObjectives();
 
-        panObjectives.add(new JScrollPaneWithSpeed(listObjectives), BorderLayout.CENTER);
+        panObjectives.add(new FastJScrollPane(listObjectives), BorderLayout.CENTER);
     }
 
     /**
@@ -722,7 +722,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
 
-        JScrollPane scrollProcurement = new JScrollPaneWithSpeed(procurementTable);
+        JScrollPane scrollProcurement = new FastJScrollPane(procurementTable);
         panProcurement = new JPanel(new GridBagLayout());
         panProcurement.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panProcurement.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -793,10 +793,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panReports.add(btnFactionStanding);
 
         RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
-        btnDiplomacy.addActionListener(evt -> {
-            new DiplomacyReport(getCampaignGui().getFrame(), getCampaign().isClanCampaign(),
-                  getCampaign().getLocalDate());
-        });
+        btnDiplomacy.addActionListener(evt -> new DiplomacyReport(getCampaignGui().getFrame(),
+              getCampaign().isClanCampaign(),
+              getCampaign().getLocalDate()));
         panReports.add(btnDiplomacy);
 
         RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));

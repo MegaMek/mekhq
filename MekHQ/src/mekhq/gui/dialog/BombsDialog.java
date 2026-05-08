@@ -55,13 +55,13 @@ import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.enums.BombType;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.IBomber;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -111,7 +111,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         );
 
         // Set up the display of this dialog.
-        JScrollPane scroller = new JScrollPaneWithSpeed(bombPanel);
+        JScrollPane scroller = new FastJScrollPane(bombPanel);
         scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);

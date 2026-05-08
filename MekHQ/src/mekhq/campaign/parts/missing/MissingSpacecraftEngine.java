@@ -57,6 +57,7 @@ public class MissingSpacecraftEngine extends MissingPart {
     double engineTonnage;
     boolean clan;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingSpacecraftEngine() {
         this(0, 0, null, false);
     }

@@ -86,6 +86,7 @@ public class KFDriveCoil extends Part {
         return docks;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public KFDriveCoil() {
         this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }

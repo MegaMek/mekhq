@@ -66,7 +66,7 @@ public class StructuralIntegrity extends Part {
                                                 .setAdvancement(2200, 2470, 2490)
                                                 .setApproximate(true, false, false)
                                                 .setPrototypeFactions(Faction.TA)
-                                                .setProductionFactions(Faction.TH)
+                                                .setProductionFactions(Faction.TH, Faction.CS)
                                                 .setTechRating(TechRating.C)
                                                 .setAvailability(AvailabilityValue.C,
                                                       AvailabilityValue.D,
@@ -75,7 +75,7 @@ public class StructuralIntegrity extends Part {
                                                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_CF = new TechAdvancement(TechBase.ALL)
                                                .setAdvancement(DATE_PS, 2470, 2490)
-                                               .setProductionFactions(Faction.TH)
+                                               .setProductionFactions(Faction.TH, Faction.CS)
                                                .setTechRating(TechRating.C)
                                                .setAvailability(AvailabilityValue.C,
                                                      AvailabilityValue.C,
@@ -86,7 +86,7 @@ public class StructuralIntegrity extends Part {
                                                .setAdvancement(2200, 2470, 2490)
                                                .setApproximate(true, false, false)
                                                .setPrototypeFactions(Faction.TA)
-                                               .setProductionFactions(Faction.TH)
+                                               .setProductionFactions(Faction.TH, Faction.CS)
                                                .setTechRating(TechRating.C)
                                                .setAvailability(AvailabilityValue.D,
                                                      AvailabilityValue.D,
@@ -96,6 +96,7 @@ public class StructuralIntegrity extends Part {
 
     private int pointsNeeded;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public StructuralIntegrity() {
         this(0, null);
     }

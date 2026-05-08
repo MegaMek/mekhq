@@ -62,6 +62,7 @@ public class MissingKFChargingSystem extends MissingPart {
         return docks;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingKFChargingSystem() {
         this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }

@@ -72,6 +72,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 /**
  * @author Neoancient
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class CustomizeAtBContractDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CustomizeAtBContractDialog.class);
 

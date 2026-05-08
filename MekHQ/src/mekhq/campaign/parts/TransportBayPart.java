@@ -56,6 +56,7 @@ public class TransportBayPart extends Part {
     private int bayNumber;
     private double size;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public TransportBayPart() {
         this(0, 0, 0, null);
     }

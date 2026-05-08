@@ -220,8 +220,8 @@ public class PlanetarySystem {
     }
 
     public String getName(LocalDate when) {
-        // if no primary slot, then just return the id
-        if (getPrimaryPlanetPosition() < 1 && null != id) {
+        // if no primary slot was explicitly defined, then just return the id
+        if (getSourcedPrimarySlot() == null && id != null) {
             return id;
         }
 
@@ -473,7 +473,8 @@ public class PlanetarySystem {
     }
 
     public StarType getStar() {
-        return getSourcedStar().getValue();
+        SourceableValue<StarType> sourcedStar = getSourcedStar();
+        return sourcedStar == null ? null : sourcedStar.getValue();
     }
 
     public SourceableValue<StarType> getSourcedStar() {
@@ -511,6 +512,7 @@ public class PlanetarySystem {
         return null;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Set<Integer> getPlanetPositions() {
         return planets.keySet();
     }
@@ -540,6 +542,7 @@ public class PlanetarySystem {
         return Objects.hash(id);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public PlanetarySystemEvent getEvent(LocalDate when) {
         if ((null == when) || (null == events)) {
             return null;

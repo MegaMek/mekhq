@@ -101,7 +101,7 @@ public class AtBScenarioFactory {
             Random randomGenerator = new Random();
             selectedClass = classList.get(randomGenerator.nextInt(classList.size()));
         } else {
-            selectedClass = classList.get(0);
+            selectedClass = classList.getFirst();
         }
 
         try {
@@ -201,9 +201,13 @@ public class AtBScenarioFactory {
                 for (CombatTeam combatTeam : combatTeamsTable.values()) {
                     // Don't generate scenarios for any combatTeamsTable already assigned, those assigned to a
                     // different contract, those not assigned to a contract, or for illegible combatTeamsTable
-                    if (assignedLances.contains(combatTeam.getFormationId()) || (combatTeam.getContract(campaign) == null)
-                              || !combatTeam.isEligible(campaign) || (combatTeam.getMissionId() != contract.getId())
-                              || !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
+                    if (assignedLances.contains(combatTeam.getFormationId()) ||
+                              (combatTeam.getContract(campaign) == null)
+                              ||
+                              !combatTeam.isEligible(campaign) ||
+                              (combatTeam.getMissionId() != contract.getId())
+                              ||
+                              !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                         continue;
                     }
 

@@ -111,6 +111,7 @@ public class InjuryType {
         register(-1, key, injType);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static List<String> getAllKeys() {
         List<String> result = new ArrayList<>(REGISTRY.keySet());
         Collections.sort(result);
@@ -186,6 +187,7 @@ public class InjuryType {
         return recoveryTime;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getRecoveryTime(Injury i) {
         return getRecoveryTime(i.getHits());
     }

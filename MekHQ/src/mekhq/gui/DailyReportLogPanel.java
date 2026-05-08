@@ -203,7 +203,7 @@ public class DailyReportLogPanel extends JPanel {
         if (reports.size() == 1) {
             // If parsing succeeds, it's a real report date
             try {
-                String line = reports.get(0);
+                String line = reports.getFirst();
                 String inner = line.substring(3, line.length() - 4); // strip <b> and </b>
 
                 // Use the user's configured date format and locale to match what's displayed

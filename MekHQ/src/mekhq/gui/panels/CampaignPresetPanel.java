@@ -56,6 +56,7 @@ import mekhq.gui.campaignOptions.CreateCampaignPreset;
  * null, and the preset is in the userdata folder. This prevents it from being shown on the renderer, where the button
  * cannot be used.
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class CampaignPresetPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private final Campaign campaign;

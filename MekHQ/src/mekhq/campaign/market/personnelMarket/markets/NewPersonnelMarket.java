@@ -1075,12 +1075,6 @@ public class NewPersonnelMarket {
         return entry;
     }
 
-    /** Use {@link #generatePersonnelReport(Campaign)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    private String generatePersonnelReport() {
-        return getTextAt(RESOURCE_BUNDLE, "hyperlink.personnelMarket.report");
-    }
-
     /**
      * Generates an HTML-formatted personnel recruitment report for the specified campaign, summarizing the number of
      * current applicants at each experience level.

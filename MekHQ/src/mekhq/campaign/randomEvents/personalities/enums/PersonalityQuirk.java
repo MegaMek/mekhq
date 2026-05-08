@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.PERSONALITY_QUIRK;
@@ -397,7 +396,7 @@ public enum PersonalityQuirk {
             return "";
         }
 
-        personalityQuirkIndex = clamp(personalityQuirkIndex, 0, MAXIMUM_VARIATIONS - 1);
+        personalityQuirkIndex = Math.clamp(personalityQuirkIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         String professionKey;
         if (primaryRole.isCombat()) {
@@ -461,7 +460,7 @@ public enum PersonalityQuirk {
             }
         }
         quirks.sort(Comparator.comparing(PersonalityQuirk::getLabel));
-        quirks.add(0, PersonalityQuirk.NONE);
+        quirks.addFirst(PersonalityQuirk.NONE);
         return quirks;
     }
     // endregion Getters

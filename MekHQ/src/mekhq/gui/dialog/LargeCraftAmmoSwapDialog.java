@@ -44,13 +44,13 @@ import megamek.client.ui.dialogs.customMek.BayMunitionsChoicePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.equipment.Mounted;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Neoancient
@@ -68,7 +68,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
 
         getContentPane().setLayout(new BorderLayout());
         mainPanel = new BayMunitionsChoicePanel(unit.getEntity(), unit.getCampaign().getGame());
-        getContentPane().add(new JScrollPaneWithSpeed(mainPanel), BorderLayout.CENTER);
+        getContentPane().add(new FastJScrollPane(mainPanel), BorderLayout.CENTER);
         JPanel panButtons = new JPanel();
         JButton button = new JButton("OK");
         button.addActionListener(ev -> apply());

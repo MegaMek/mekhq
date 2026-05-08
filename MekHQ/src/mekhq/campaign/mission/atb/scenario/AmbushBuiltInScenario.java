@@ -100,7 +100,8 @@ public class AmbushBuiltInScenario extends AtBScenario {
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().getFirst()),
+              campaign);
     }
 
     @Override

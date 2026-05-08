@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Systems;
@@ -49,7 +48,6 @@ public class StripUnitActionTest {
     @BeforeAll
     public static void beforeAll() {
         EquipmentType.initializeTypes();
-        Ranks.initializeRankSystems();
         try {
             Systems.setInstance(Systems.loadDefault());
         } catch (Exception ex) {

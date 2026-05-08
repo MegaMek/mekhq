@@ -64,6 +64,7 @@ import megamek.client.ui.util.ViewFormatting;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.AcquisitionEvent;
@@ -102,7 +103,6 @@ import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
@@ -262,7 +262,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.setShowGrid(false);
         servicedUnitTable.getSelectionModel().addListSelectionListener(this::servicedUnitTableValueChanged);
         ServicedUnitsTableMouseAdapter.connect(getCampaignGui(), servicedUnitTable, servicedUnitModel);
-        JScrollPane scrollServicedUnitTable = new JScrollPaneWithSpeed(servicedUnitTable);
+        JScrollPane scrollServicedUnitTable = new FastJScrollPane(servicedUnitTable);
         scrollServicedUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollServicedUnitTable.setMinimumSize(new Dimension(350, 200));
         scrollServicedUnitTable.setPreferredSize(new Dimension(350, 200));
@@ -270,7 +270,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         txtServicedUnitView = new JTextPane();
         txtServicedUnitView.setEditable(false);
         txtServicedUnitView.setContentType("text/html");
-        scrollServicedUnitView = new JScrollPaneWithSpeed(txtServicedUnitView);
+        scrollServicedUnitView = new FastJScrollPane(txtServicedUnitView);
         scrollServicedUnitView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollServicedUnitView.setMinimumSize(new Dimension(350, 400));
         scrollServicedUnitView.setPreferredSize(new Dimension(350, 400));
@@ -302,7 +302,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
-        JScrollPane scrollTechTable = new JScrollPaneWithSpeed(techTable);
+        JScrollPane scrollTechTable = new FastJScrollPane(techTable);
         scrollTechTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
@@ -368,7 +368,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         textTarget.setWrapStyleWord(true);
         textTarget.setBorder(null);
         textTarget.setName("textTarget");
-        JScrollPane scrTextTarget = new JScrollPaneWithSpeed(textTarget);
+        JScrollPane scrTextTarget = new FastJScrollPane(textTarget);
         scrTextTarget.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         gridBagConstraints = new GridBagConstraints();
@@ -422,7 +422,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
         TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel);
-        JScrollPane scrollTaskTable = new JScrollPaneWithSpeed(taskTable);
+        JScrollPane scrollTaskTable = new FastJScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new Dimension(300, 300));
 

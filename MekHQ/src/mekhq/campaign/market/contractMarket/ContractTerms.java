@@ -34,7 +34,6 @@ package mekhq.campaign.market.contractMarket;
 
 import java.time.LocalDate;
 
-import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.universe.Faction;
@@ -64,6 +63,7 @@ public class ContractTerms {
         return operationsTempoMultiplier;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getBaseLength() {
         return baseLength;
     }
@@ -115,7 +115,7 @@ public class ContractTerms {
      */
     public int getSalvagePercentage(int roll) {
         roll += salvageModifier;
-        return switch (MathUtility.clamp(roll, 3, 13)) {
+        return switch (Math.clamp(roll, 3, 13)) {
             case 3 -> 0;
             case 4 -> 10;
             case 5 -> 20;
@@ -140,7 +140,7 @@ public class ContractTerms {
      */
     public int getSupportPercentage(int roll) {
         roll += supportModifier;
-        return switch (MathUtility.clamp(roll, 2, 13)) {
+        return switch (Math.clamp(roll, 2, 13)) {
             case 2 -> 0;
             case 3, 9 -> 20;
             case 4, 10 -> 40;
@@ -187,7 +187,7 @@ public class ContractTerms {
      */
     public int getTransportTerms(int roll) {
         roll += transportModifier;
-        return switch (MathUtility.clamp(roll, 1, 10)) {
+        return switch (Math.clamp(roll, 1, 10)) {
             case 1 -> 0;
             case 2 -> 20;
             case 3 -> 25;
@@ -315,7 +315,7 @@ public class ContractTerms {
     private void addUnitReputationModifiers(double reputationFactor) {
         int flooredReputationFactor = (int) Math.floor(reputationFactor);
 
-        switch (MathUtility.clamp(flooredReputationFactor, 0, 10)) {
+        switch (Math.clamp(flooredReputationFactor, 0, 10)) {
             case 0:
                 commandModifier -= 2;
                 salvageModifier -= 1;

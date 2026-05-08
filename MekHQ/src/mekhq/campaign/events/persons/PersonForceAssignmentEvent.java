@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.Person;
 /**
  * Triggered when a tech is assigned to or removed from a force.
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class PersonForceAssignmentEvent extends PersonChangedEvent {
 
     private final Formation formation;

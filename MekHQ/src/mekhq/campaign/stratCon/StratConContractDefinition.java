@@ -193,6 +193,7 @@ public class StratConContractDefinition {
     /**
      * @return the contract type name
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getContractTypeName() {
         return contractTypeName;
     }
@@ -200,6 +201,7 @@ public class StratConContractDefinition {
     /**
      * @param contractTypeName the contract type name to set
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setContractTypeName(final String contractTypeName) {
         this.contractTypeName = contractTypeName;
     }
@@ -222,6 +224,7 @@ public class StratConContractDefinition {
         return allowEarlyVictory;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAllowEarlyVictory(boolean allowEarlyVictory) {
         this.allowEarlyVictory = allowEarlyVictory;
     }
@@ -236,6 +239,7 @@ public class StratConContractDefinition {
     /**
      * @param alliedFacilityCount the alliedFacilityCount to set
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAlliedFacilityCount(double alliedFacilityCount) {
         this.alliedFacilityCount = alliedFacilityCount;
     }
@@ -250,26 +254,31 @@ public class StratConContractDefinition {
     /**
      * @param hostileFacilityCount the hostileFacilityCount to set
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHostileFacilityCount(double hostileFacilityCount) {
         this.hostileFacilityCount = hostileFacilityCount;
     }
 
     @XmlElementWrapper(name = "allowedScenarios")
     @XmlElement(name = "allowedScenario")
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<String> getAllowedScenarios() {
         return allowedScenarios;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setAllowedScenarios(List<String> allowedScenarios) {
         this.allowedScenarios = allowedScenarios;
     }
 
     @XmlElementWrapper(name = "forbiddenScenarios")
     @XmlElement(name = "forbiddenScenario")
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<String> getForbiddenScenarios() {
         return forbiddenScenarios;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setForbiddenScenarios(List<String> forbiddenScenarios) {
         this.forbiddenScenarios = forbiddenScenarios;
     }
@@ -280,6 +289,7 @@ public class StratConContractDefinition {
         return objectiveParameters;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setObjectiveParameters(List<ObjectiveParameters> objectiveParameters) {
         this.objectiveParameters = objectiveParameters;
     }
@@ -290,6 +300,7 @@ public class StratConContractDefinition {
         return scenarioOdds;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setScenarioOdds(List<Integer> scenarioOdds) {
         this.scenarioOdds = scenarioOdds;
     }
@@ -300,6 +311,7 @@ public class StratConContractDefinition {
         return deploymentTimes;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDeploymentTimes(List<Integer> deploymentTimes) {
         this.deploymentTimes = deploymentTimes;
     }
@@ -308,6 +320,7 @@ public class StratConContractDefinition {
         return globalScenarioModifiers;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setGlobalScenarioModifiers(List<String> globalScenarioModifiers) {
         this.globalScenarioModifiers = globalScenarioModifiers;
     }

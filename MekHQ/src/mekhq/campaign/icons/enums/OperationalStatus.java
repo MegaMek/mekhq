@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.icons.enums;
 
-import static megamek.codeUtilities.MathUtility.clamp;
-
 import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.unit.Unit;
@@ -70,22 +68,27 @@ public enum OperationalStatus {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isFullyOperational() {
         return this == FULLY_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isSubstantiallyOperational() {
         return this == SUBSTANTIALLY_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMarginallyOperational() {
         return this == MARGINALLY_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isNotOperational() {
         return this == NOT_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isFactoryFresh() {
         return this == FACTORY_FRESH;
     }
@@ -119,14 +122,15 @@ public enum OperationalStatus {
      * If the specified ordinal is out of range, it will be clamped to ensure it lies within the valid range of the
      * available enumeration values.
      *
-     * @param ordinal the ordinal value to map to a {@code LayeredFormationIconOperationalStatus}. If the value is less than
-     *                0, it will be clamped to 0. If it exceeds the maximum ordinal value, it will be clamped to the
-     *                last index.
+     * @param ordinal the ordinal value to map to a {@code LayeredFormationIconOperationalStatus}. If the value is less
+     *                than 0, it will be clamped to 0. If it exceeds the maximum ordinal value, it will be clamped to
+     *                the last index.
      *
      * @return the corresponding {@code LayeredFormationIconOperationalStatus} enum value for the adjusted ordinal.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static OperationalStatus fromInt(int ordinal) {
-        ordinal = clamp(ordinal, 0, values().length);
+        ordinal = Math.clamp(ordinal, 0, values().length);
 
         return values()[ordinal];
     }

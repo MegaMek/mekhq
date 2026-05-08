@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,16 +36,17 @@ package mekhq.campaign;
 import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -62,11 +63,11 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Stream;
 
+import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Portrait;
-import megamek.common.enums.Gender;
 import megamek.common.units.Crew;
 import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
@@ -76,7 +77,6 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.TestSystems;
@@ -100,7 +100,6 @@ public class CampaignTest {
     @BeforeAll
     public static void setup() {
         EquipmentType.initializeTypes();
-        Ranks.initializeRankSystems();
     }
 
     @BeforeEach
@@ -413,9 +412,10 @@ public class CampaignTest {
     }
 
     // region Nested Test Classes for Temp Crew
+
     /**
-     * Parent nested test class for all temp crew tests.
-     * Contains shared setup and helper methods used across all temp crew role tests.
+     * Parent nested test class for all temp crew tests. Contains shared setup and helper methods used across all temp
+     * crew role tests.
      */
     @Nested
     class TempCrewTests {
@@ -433,22 +433,22 @@ public class CampaignTest {
          */
         private static Stream<PersonnelRole> getTempCrewRoles() {
             return Stream.of(
-                PersonnelRole.SOLDIER,
-                PersonnelRole.BATTLE_ARMOUR,
-                PersonnelRole.VEHICLE_CREW_GROUND,
-                PersonnelRole.VEHICLE_CREW_VTOL,
-                PersonnelRole.VEHICLE_CREW_NAVAL,
-                PersonnelRole.VESSEL_PILOT,
-                PersonnelRole.VESSEL_GUNNER,
-                PersonnelRole.VESSEL_CREW
+                  PersonnelRole.SOLDIER,
+                  PersonnelRole.BATTLE_ARMOUR,
+                  PersonnelRole.VEHICLE_CREW_GROUND,
+                  PersonnelRole.VEHICLE_CREW_VTOL,
+                  PersonnelRole.VEHICLE_CREW_NAVAL,
+                  PersonnelRole.VESSEL_PILOT,
+                  PersonnelRole.VESSEL_GUNNER,
+                  PersonnelRole.VESSEL_CREW
             );
         }
 
         /**
-         * Creates a mock Unit with a mock Entity configured for the specified personnel role.
-         * The unit will be properly configured to use the specified temp crew type.
+         * Creates a mock Unit with a mock Entity configured for the specified personnel role. The unit will be properly
+         * configured to use the specified temp crew type.
          *
-         * @param role The personnel role this unit should be configured for
+         * @param role     The personnel role this unit should be configured for
          * @param withCrew If true, unit will have 1 active crew member; if false, no crew
          */
         private Unit createMockUnitForRole(PersonnelRole role, boolean withCrew) {
@@ -598,16 +598,10 @@ public class CampaignTest {
             // Mock role methods so unitCanUseTempCrewRole returns true
             switch (role) {
                 case SOLDIER, BATTLE_ARMOUR, VEHICLE_CREW_GROUND,
-                     VEHICLE_CREW_VTOL, VEHICLE_CREW_NAVAL, VESSEL_PILOT -> {
-                    when(unit.getDriverRole()).thenReturn(role);
-                }
-                case VESSEL_GUNNER -> {
-                    when(unit.getGunnerRole()).thenReturn(role);
-                }
-                case VESSEL_CREW -> {
-                    // Can take more crew if not fully crewed (activeCrew.size() < fullCrewSize)
-                    when(unit.canTakeMoreVesselCrew()).thenReturn(activeCrew.size() < crewSize);
-                }
+                     VEHICLE_CREW_VTOL, VEHICLE_CREW_NAVAL, VESSEL_PILOT -> when(unit.getDriverRole()).thenReturn(role);
+                case VESSEL_GUNNER -> when(unit.getGunnerRole()).thenReturn(role);
+                case VESSEL_CREW -> // Can take more crew if not fully crewed (activeCrew.size() < fullCrewSize)
+                      when(unit.canTakeMoreVesselCrew()).thenReturn(activeCrew.size() < crewSize);
                 default -> throw new IllegalStateException("Unexpected value: " + role);
             }
 
@@ -622,8 +616,8 @@ public class CampaignTest {
         }
 
         /**
-         * Helper method to set up a mock commander for a unit.
-         * Call this in the Arrange phase when you need a unit with a commander.
+         * Helper method to set up a mock commander for a unit. Call this in the Arrange phase when you need a unit with
+         * a commander.
          */
         private void setupMockCommander(Unit unit) {
             Person mockCommander = mock(Person.class);
@@ -679,8 +673,8 @@ public class CampaignTest {
         }
 
         /**
-         * Tests that initial pool state is zero for each temp crew role.
-         * Tests {@link Campaign#getTempCrewPool(PersonnelRole)}.
+         * Tests that initial pool state is zero for each temp crew role. Tests
+         * {@link Campaign#getTempCrewPool(PersonnelRole)}.
          */
         @ParameterizedTest
         @MethodSource("getTempCrewRoles")
@@ -689,8 +683,7 @@ public class CampaignTest {
         }
 
         /**
-         * Tests setting pool to a positive value.
-         * Tests {@link Campaign#setTempCrewPool(PersonnelRole, int)}.
+         * Tests setting pool to a positive value. Tests {@link Campaign#setTempCrewPool(PersonnelRole, int)}.
          */
         @ParameterizedTest
         @MethodSource("getTempCrewRoles")
@@ -706,8 +699,8 @@ public class CampaignTest {
         }
 
         /**
-         * Tests that setting pool to negative value results in zero.
-         * Tests {@link Campaign#setTempCrewPool(PersonnelRole, int)}.
+         * Tests that setting pool to negative value results in zero. Tests
+         * {@link Campaign#setTempCrewPool(PersonnelRole, int)}.
          */
         @ParameterizedTest
         @MethodSource("getTempCrewRoles")
@@ -723,8 +716,8 @@ public class CampaignTest {
         }
 
         /**
-         * Tests that disabling blob crew option disables it for the role.
-         * Tests {@link Campaign#isBlobCrewEnabled(PersonnelRole)}.
+         * Tests that disabling blob crew option disables it for the role. Tests
+         * {@link Campaign#isBlobCrewEnabled(PersonnelRole)}.
          */
         @ParameterizedTest
         @MethodSource("getTempCrewRoles")
@@ -736,12 +729,12 @@ public class CampaignTest {
             disableBlobCrewForRole(role);
 
             // Assert
-            assertTrue(!testCampaign.isBlobCrewEnabled(role));
+            assertFalse(testCampaign.isBlobCrewEnabled(role));
         }
 
         /**
-         * Tests that enabling blob crew option enables it for the role.
-         * Tests {@link Campaign#isBlobCrewEnabled(PersonnelRole)}.
+         * Tests that enabling blob crew option enables it for the role. Tests
+         * {@link Campaign#isBlobCrewEnabled(PersonnelRole)}.
          */
         @ParameterizedTest
         @MethodSource("getTempCrewRoles")
@@ -757,8 +750,8 @@ public class CampaignTest {
         }
 
         /**
-         * Tests that clearing blob crew for a specific role only affects that role.
-         * Tests {@link Campaign#clearBlobCrewForRole(PersonnelRole)}.
+         * Tests that clearing blob crew for a specific role only affects that role. Tests
+         * {@link Campaign#clearBlobCrewForRole(PersonnelRole)}.
          */
         @Test
         void testClearBlobCrewForRoleIsolation() {
@@ -842,8 +835,8 @@ public class CampaignTest {
         }
 
         /**
-         * Tests {@link Campaign#fillTempCrewPoolForRole(PersonnelRole)} correctly calculates crew needs
-         * from units WITH at least 1 crew. Units need at least 1 real crew member to be able to use temp crew.
+         * Tests {@link Campaign#fillTempCrewPoolForRole(PersonnelRole)} correctly calculates crew needs from units WITH
+         * at least 1 crew. Units need at least 1 real crew member to be able to use temp crew.
          */
         @ParameterizedTest
         @MethodSource("getTempCrewRoles")
@@ -868,8 +861,8 @@ public class CampaignTest {
 
             assertTrue(expectedNeed > 0);
             assertEquals(expectedNeed, testCampaign.getTempCrewPool(role),
-                "Pool should be filled to match unit crew needs for " + role +
-                " (fullCrew=" + fullCrewSize + " - activeCrew=" + activeCrew + ")");
+                  "Pool should be filled to match unit crew needs for " + role +
+                        " (fullCrew=" + fullCrewSize + " - activeCrew=" + activeCrew + ")");
         }
 
         /**
@@ -894,7 +887,7 @@ public class CampaignTest {
 
             // Assert - Pool should remain 0 because unit has no crew
             assertEquals(0, testCampaign.getTempCrewPool(role),
-                "Pool should not be filled for units without any crew for " + role);
+                  "Pool should not be filled for units without any crew for " + role);
         }
 
         /**

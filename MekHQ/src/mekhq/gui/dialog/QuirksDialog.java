@@ -53,10 +53,10 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.equipment.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.WeaponQuirks;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -98,7 +98,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
         quirksPanel.refreshQuirks();
 
         // Set up the display of this dialog.
-        JScrollPane scroller = new JScrollPaneWithSpeed(quirksPanel);
+        JScrollPane scroller = new FastJScrollPane(quirksPanel);
         scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);

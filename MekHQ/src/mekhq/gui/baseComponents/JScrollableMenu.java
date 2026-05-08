@@ -65,11 +65,13 @@ public class JScrollableMenu extends JMenu {
         setName(name);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JScrollableMenu(final String name, final Action action) {
         super(action);
         setName(name);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JScrollableMenu(final String name, final String text, final boolean b) {
         super(text, b);
         setName(name);

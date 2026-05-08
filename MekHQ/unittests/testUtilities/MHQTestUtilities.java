@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,13 +39,13 @@ import java.time.LocalDate;
 import java.util.Base64;
 
 import megamek.common.Player;
+import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.game.Game;
+import megamek.common.loaders.MekSummary;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.loaders.MekSummary;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignConfiguration;
 import mekhq.campaign.CampaignFactory;
@@ -55,10 +55,11 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.TestPartsStore;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.universe.TestSystems;
 import mekhq.campaign.personnel.death.RandomDeath;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.TestSystems;
 
 public final class MHQTestUtilities {
     private static final String TEST_RESOURCES_DIR = "testresources/";
@@ -69,6 +70,7 @@ public final class MHQTestUtilities {
     public static final String TEST_BLK = ".blk";
     public static final String TEST_MTF = ".mtf";
 
+    private static boolean rankSystemsInitialized = false;
 
     /**
      * Create a Campaign Configuration partially configured from the campaign options
@@ -128,6 +130,10 @@ public final class MHQTestUtilities {
     }
 
     public static Campaign getTestCampaign() {
+        if (!rankSystemsInitialized) {
+            Ranks.initializeRankSystems();
+            rankSystemsInitialized = true;
+        }
         return new Campaign(buildTestConfigWithSystems(TestSystems.getInstance()));
     }
 

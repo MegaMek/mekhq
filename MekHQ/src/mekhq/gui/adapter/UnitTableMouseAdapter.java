@@ -322,7 +322,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             String message;
             if (sellableUnits.size() == 1) {
-                Unit unit = sellableUnits.get(0);
+                Unit unit = sellableUnits.getFirst();
                 message = getFormattedTextAt(
                       RESOURCE_BUNDLE,
                       "sellUnit.message.single",
@@ -425,7 +425,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (!toRemove.isEmpty()) {
                 String title = String.format(resources.getString("deleteUnitsCount.text"), toRemove.size());
                 if (toRemove.size() == 1) {
-                    title = toRemove.get(0).getName();
+                    title = toRemove.getFirst().getName();
                 }
 
                 if (0 ==
@@ -730,7 +730,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             final Campaign campaign = gui.getCampaign();
             final CampaignOptions campaignOptions = campaign.getCampaignOptions();
             final boolean isUseMaintenance = campaignOptions.isCheckMaintenance();
-            final boolean techsUseAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
 
             if (!isUseMaintenance) {
                 return;
@@ -1162,7 +1161,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (oneSelected) {
                 boolean canFillWithTempCrew = canUnitUseTempCrew(unit);
 
-                if (canFillWithTempCrew && unit.getActiveCrew().size() > 0) {
+                if (canFillWithTempCrew && !unit.getActiveCrew().isEmpty()) {
                     int currentCrew = unit.getActiveCrew().size();
                     int currentTempCrew = unit.getTotalTempCrew();
                     int fullCrew = unit.getFullCrewSize();
@@ -1422,10 +1421,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Determines if the specified unit can use temporary crew based on its type
-     * and campaign settings.
+     * Determines if the specified unit can use temporary crew based on its type and campaign settings.
      *
      * @param unit the unit to check
+     *
      * @return true if the unit can use temp crew, false otherwise
      */
     private boolean canUnitUseTempCrew(Unit unit) {
@@ -1443,15 +1442,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
         // Check if gunner role is enabled (and different from driver)
         if (gunnerRole != null && !gunnerRole.equals(driverRole) &&
-            gui.getCampaign().isBlobCrewEnabled(gunnerRole)) {
+                  gui.getCampaign().isBlobCrewEnabled(gunnerRole)) {
             return true;
         }
 
         // For vessels, also check vessel crew
         if (unit.getEntity().isSmallCraft() || unit.getEntity().isLargeCraft()) {
-            if (gui.getCampaign().isBlobCrewEnabled(PersonnelRole.VESSEL_CREW)) {
-                return true;
-            }
+            return gui.getCampaign().isBlobCrewEnabled(PersonnelRole.VESSEL_CREW);
         }
 
         return false;

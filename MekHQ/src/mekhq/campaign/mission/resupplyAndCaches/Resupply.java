@@ -770,23 +770,14 @@ public class Resupply {
      */
     private static boolean checkEquipmentSubType(Part part) {
         if (part instanceof EquipmentPart) {
-            if (part instanceof AmmoBin) {
-                return false;
-            }
+            return switch (part) {
+                case AmmoBin ignored -> false;
+                case AmmoStorage ignored -> false;
+                case BattleArmorEquipmentPart ignored -> false;
+                case HeatSink ignored -> false;
+                default -> !(part instanceof JumpJet);
+            };
 
-            if (part instanceof AmmoStorage) {
-                return false;
-            }
-
-            if (part instanceof BattleArmorEquipmentPart) {
-                return false;
-            }
-
-            if (part instanceof HeatSink) {
-                return false;
-            }
-
-            return !(part instanceof JumpJet);
         }
 
         return true;
@@ -922,6 +913,7 @@ public class Resupply {
          *
          * @param weight The new weight to assign.
          */
+        @Deprecated(since = "0.51.0", forRemoval = true)
         public void setWeight(double weight) {
             this.weight = weight;
         }

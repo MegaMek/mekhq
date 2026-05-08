@@ -427,8 +427,8 @@ public class SalvageFormationPicker extends JDialog {
             dispose();
         });
 
-        buttonPanel.add(btnCancel);
         buttonPanel.add(btnConfirm);
+        buttonPanel.add(btnCancel);
     }
 
     /**

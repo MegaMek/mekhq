@@ -51,6 +51,7 @@ import org.w3c.dom.NodeList;
 public class MissingKFBoom extends MissingPart {
     private int boomType;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingKFBoom() {
         this(0, null, Dropship.BOOM_STANDARD);
     }

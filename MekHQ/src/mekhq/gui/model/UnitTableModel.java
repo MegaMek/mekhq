@@ -178,7 +178,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
             case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
             case COL_CREW -> getCrewTooltip(unit);
-            case COL_QUIRKS -> unit.getQuirksList();
+            case COL_QUIRKS -> unit.getQuirksListHTML();
             default -> null;
         };
     }
@@ -357,8 +357,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     yield unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
                 } else {
                     yield (totalTempCrew + unit.getActiveCrew().size()) +
-                        "(" + unit.getActiveCrew().size() + ")" +
-                        "/" + unit.getFullCrewSize();
+                                "(" + unit.getActiveCrew().size() + ")" +
+                                "/" + unit.getFullCrewSize();
                 }
             }
             case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
@@ -420,7 +420,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 if (!colorReasonKeys.isEmpty()) {
                     StringBuilder colorReasons = new StringBuilder();
                     for (String key : colorReasonKeys) {
-                        if (colorReasons.length() > 0) {
+                        if (!colorReasons.isEmpty()) {
                             colorReasons.append("<br>");
                         }
                         colorReasons.append(getTextAt(GUI_RESOURCE_BUNDLE, key));

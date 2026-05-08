@@ -126,7 +126,7 @@ class BloodmarkTest {
             List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
             assertEquals(1, result.size(), "Expected one assassination attempt.");
-            assertEquals(CURRENT_DATE.plusDays(3), result.get(0), "Incorrect date for assassination attempt.");
+            assertEquals(CURRENT_DATE.plusDays(3), result.getFirst(), "Incorrect date for assassination attempt.");
         }
     }
 
@@ -141,7 +141,9 @@ class BloodmarkTest {
             List<LocalDate> result = Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false);
 
             assertEquals(2, result.size(), "Expected two assassination attempts.");
-            assertEquals(CURRENT_DATE.plusDays(2), result.get(0), "Incorrect date for first assassination attempt.");
+            assertEquals(CURRENT_DATE.plusDays(2),
+                  result.getFirst(),
+                  "Incorrect date for first assassination attempt.");
             assertEquals(CURRENT_DATE.plusDays(2 + 3),
                   result.get(1),
                   "Incorrect date for second assassination attempt.");

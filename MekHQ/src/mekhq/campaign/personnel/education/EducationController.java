@@ -33,7 +33,6 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.max;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
@@ -1679,11 +1678,7 @@ public class EducationController {
             return true;
         }
 
-        if (options.booleanOption(COMPULSION_PIRATE_HATE) && campaignFaction.isPirate()) {
-            return true;
-        }
-
-        return false;
+        return options.booleanOption(COMPULSION_PIRATE_HATE) && campaignFaction.isPirate();
     }
 
     /**
@@ -1698,7 +1693,7 @@ public class EducationController {
                                     .map(String::trim)
                                     .toArray(String[]::new);
 
-        int educationLevel = clamp(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(), 0, 5);
+        int educationLevel = Math.clamp(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(), 0, 5);
 
         if (!isGraduating) {
             educationLevel--;

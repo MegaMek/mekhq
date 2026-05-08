@@ -222,6 +222,7 @@ public class ScenarioObjective {
         additionalDetails.clear();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<String> getAdditionalDetails() {
         return additionalDetails;
     }

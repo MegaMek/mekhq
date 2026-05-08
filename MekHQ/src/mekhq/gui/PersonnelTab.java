@@ -60,6 +60,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.preference.IPreferenceChangeListener;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -85,7 +86,6 @@ import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -264,14 +264,14 @@ public final class PersonnelTab extends CampaignGuiTab {
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
-        scrollPersonnelView = new JScrollPaneWithSpeed();
+        scrollPersonnelView = new FastJScrollPane();
         scrollPersonnelView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollPersonnelView.setMinimumSize(new Dimension((int) round(PERSONNEL_VIEW_WIDTH * 0.9), 600));
         scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
-        JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
+        JScrollPane scrollPersonnelTable = new FastJScrollPane(personnelTable);
         scrollPersonnelTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         JPanel tableAndInfoPanel = new JPanel(new BorderLayout());

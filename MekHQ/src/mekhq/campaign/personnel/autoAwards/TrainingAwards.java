@@ -70,10 +70,10 @@ public class TrainingAwards {
         // We start by prepping the data we're going to be comparing against and
         // ensuring it's all valid
         try {
-            academyEducationLevel = (int) academyAttributes.get(0);
+            academyEducationLevel = (int) academyAttributes.getFirst();
         } catch (ClassCastException e) {
             LOGGER.warn("{} has invalid academyEducationLevel value '{}'. Aborting.",
-                  student.getFullName(), academyAttributes.get(0).toString());
+                  student.getFullName(), academyAttributes.getFirst().toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
         }

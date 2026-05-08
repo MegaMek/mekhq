@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
@@ -192,7 +191,7 @@ public class PersonUtility {
 
             int roll = d6(); // Roll once for the skill
             int adjustedLevel = skill.getLevel() + (roll == 6 ? 1 : roll == 1 ? -1 : 0);
-            skill.setLevel(clamp(adjustedLevel, 0, 10));
+            skill.setLevel(Math.clamp(adjustedLevel, 0, 10));
         }
     }
 

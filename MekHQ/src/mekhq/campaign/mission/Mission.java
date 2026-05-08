@@ -216,6 +216,7 @@ public class Mission {
         scenarios.clear();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean hasPendingScenarios() {
         // scenarios that are pending, but have not been revealed don't count
         return getScenarios().stream()

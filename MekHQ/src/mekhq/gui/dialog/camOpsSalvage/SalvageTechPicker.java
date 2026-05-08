@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -356,8 +356,8 @@ public class SalvageTechPicker extends JDialog {
             dispose();
         });
 
-        buttonPanel.add(btnCancel);
         buttonPanel.add(btnConfirm);
+        buttonPanel.add(btnCancel);
     }
 
     /**

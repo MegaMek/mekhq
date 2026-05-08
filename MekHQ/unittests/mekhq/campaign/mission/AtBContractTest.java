@@ -53,14 +53,13 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -83,7 +82,6 @@ public class AtBContractTest {
     @BeforeAll
     public static void initSingletons() {
         EquipmentType.initializeTypes();
-        Ranks.initializeRankSystems();
         // TODO: fix this in the production code
         RandomCallsignGenerator.getInstance(true); // Required in this code path to generate a random merc company name
         RandomCompanyNameGenerator.getInstance(); // Required in this code path to generate a random merc company name

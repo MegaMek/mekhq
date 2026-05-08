@@ -143,7 +143,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
 
         List<Object> rowData = data.get(rowIndex);
 
-        UUID personUUID = (UUID) rowData.get(0);
+        UUID personUUID = (UUID) rowData.getFirst();
         Person person = campaign.getPerson(personUUID);
         Award award = (Award) rowData.get(1);
 
@@ -193,7 +193,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     }
 
     public Person getPerson(int rowIndex) {
-        return campaign.getPerson((UUID) data.get(rowIndex).get(0));
+        return campaign.getPerson((UUID) data.get(rowIndex).getFirst());
     }
 
     public String getAwardName(int rowIndex) {

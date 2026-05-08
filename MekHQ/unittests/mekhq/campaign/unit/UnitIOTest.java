@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,34 +50,29 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Vector;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.Version;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.BipedMek;
-import megamek.common.units.Mek;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.equipment.EquipmentType;
-import megamek.common.units.Crew;
-import megamek.common.units.Entity;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.ranks.Ranks;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -86,8 +81,8 @@ import testUtilities.MHQTestUtilities;
 public class UnitIOTest {
 
     /**
-     * Nested test class for writeToXML method.
-     * Tests XML serialization of Unit objects, with focus on temp crew (blob crew) functionality.
+     * Nested test class for writeToXML method. Tests XML serialization of Unit objects, with focus on temp crew (blob
+     * crew) functionality.
      */
     @Nested
     public class WriteToXMLTests {
@@ -98,7 +93,6 @@ public class UnitIOTest {
         @BeforeAll
         public static void setupAll() {
             EquipmentType.initializeTypes();
-            Ranks.initializeRankSystems();
         }
 
         @BeforeEach
@@ -183,14 +177,14 @@ public class UnitIOTest {
          */
         private static Stream<PersonnelRole> getTempCrewRoles() {
             return Stream.of(
-                PersonnelRole.SOLDIER,
-                PersonnelRole.BATTLE_ARMOUR,
-                PersonnelRole.VEHICLE_CREW_GROUND,
-                PersonnelRole.VEHICLE_CREW_VTOL,
-                PersonnelRole.VEHICLE_CREW_NAVAL,
-                PersonnelRole.VESSEL_PILOT,
-                PersonnelRole.VESSEL_GUNNER,
-                PersonnelRole.VESSEL_CREW
+                  PersonnelRole.SOLDIER,
+                  PersonnelRole.BATTLE_ARMOUR,
+                  PersonnelRole.VEHICLE_CREW_GROUND,
+                  PersonnelRole.VEHICLE_CREW_VTOL,
+                  PersonnelRole.VEHICLE_CREW_NAVAL,
+                  PersonnelRole.VESSEL_PILOT,
+                  PersonnelRole.VESSEL_GUNNER,
+                  PersonnelRole.VESSEL_CREW
             );
         }
 
@@ -213,11 +207,11 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that basic unit XML structure is created correctly.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that basic unit XML structure is created correctly. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
-        void testBasicXMLStructure() throws Exception {
+        void testBasicXMLStructure() {
             // Arrange
             Unit testUnit = new Unit(mockEntity, mockCampaign);
 
@@ -235,8 +229,8 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that unit with no temp crew does not write tempCrewMap.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that unit with no temp crew does not write tempCrewMap. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testNoTempCrewMapWhenEmpty() throws Exception {
@@ -249,12 +243,12 @@ public class UnitIOTest {
             // Assert
             NodeList tempCrewMapNodes = doc.getElementsByTagName("tempCrewMap");
             assertEquals(0, tempCrewMapNodes.getLength(),
-                "tempCrewMap element should not exist when no temp crew assigned");
+                  "tempCrewMap element should not exist when no temp crew assigned");
         }
 
         /**
-         * Tests that tempCrewMap is written when temp crew is assigned.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that tempCrewMap is written when temp crew is assigned. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testTempCrewMapWrittenWhenPresent() throws Exception {
@@ -268,12 +262,12 @@ public class UnitIOTest {
             // Assert
             NodeList tempCrewMapNodes = doc.getElementsByTagName("tempCrewMap");
             assertEquals(1, tempCrewMapNodes.getLength(),
-                "tempCrewMap element should exist when temp crew is assigned");
+                  "tempCrewMap element should exist when temp crew is assigned");
         }
 
         /**
-         * Tests that a single temp crew role is serialized correctly to XML.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)} for individual PersonnelRole values.
+         * Tests that a single temp crew role is serialized correctly to XML. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)} for individual PersonnelRole values.
          *
          * @param role the personnel role to test
          */
@@ -295,21 +289,21 @@ public class UnitIOTest {
             Element tempCrewMap = (Element) tempCrewMapNodes.item(0);
             NodeList tempCrewNodes = tempCrewMap.getElementsByTagName("tempCrew");
             assertEquals(1, tempCrewNodes.getLength(),
-                String.format("Should have exactly one tempCrew entry for %s", role));
+                  String.format("Should have exactly one tempCrew entry for %s", role));
 
             Element tempCrew = (Element) tempCrewNodes.item(0);
             String actualRole = tempCrew.getElementsByTagName("role").item(0).getTextContent();
             String actualCount = tempCrew.getElementsByTagName("count").item(0).getTextContent();
 
             assertEquals(role.name(), actualRole,
-                String.format("Role should be %s", role.name()));
+                  String.format("Role should be %s", role.name()));
             assertEquals(String.valueOf(expectedCount), actualCount,
-                String.format("Count should be %d for role %s", expectedCount, role));
+                  String.format("Count should be %d for role %s", expectedCount, role));
         }
 
         /**
-         * Tests that multiple temp crew roles are serialized correctly to XML.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)} with multiple PersonnelRole entries.
+         * Tests that multiple temp crew roles are serialized correctly to XML. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)} with multiple PersonnelRole entries.
          */
         @Test
         void testMultipleTempCrewRolesSerialization() throws Exception {
@@ -329,7 +323,7 @@ public class UnitIOTest {
             Element tempCrewMap = (Element) tempCrewMapNodes.item(0);
             NodeList tempCrewNodes = tempCrewMap.getElementsByTagName("tempCrew");
             assertEquals(3, tempCrewNodes.getLength(),
-                "Should have exactly three tempCrew entries");
+                  "Should have exactly three tempCrew entries");
 
             // Verify each role is present with correct count
             boolean foundSoldier = false;
@@ -359,8 +353,8 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that temp crew with zero count is not written to XML.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that temp crew with zero count is not written to XML. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testZeroTempCrewNotWritten() throws Exception {
@@ -375,12 +369,12 @@ public class UnitIOTest {
             // Assert
             NodeList tempCrewMapNodes = doc.getElementsByTagName("tempCrewMap");
             assertEquals(0, tempCrewMapNodes.getLength(),
-                "tempCrewMap should not exist after removing all temp crew");
+                  "tempCrewMap should not exist after removing all temp crew");
         }
 
         /**
-         * Tests that updating temp crew count updates XML correctly.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that updating temp crew count updates XML correctly. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testUpdatedTempCrewCount() throws Exception {
@@ -406,8 +400,8 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that removing one role from multiple temp crews only affects that role.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that removing one role from multiple temp crews only affects that role. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testRemovingOneRoleFromMultiple() throws Exception {
@@ -427,17 +421,17 @@ public class UnitIOTest {
             Element tempCrewMap = (Element) tempCrewMapNodes.item(0);
             NodeList tempCrewNodes = tempCrewMap.getElementsByTagName("tempCrew");
             assertEquals(1, tempCrewNodes.getLength(),
-                "Should have exactly one tempCrew entry after removing SOLDIER");
+                  "Should have exactly one tempCrew entry after removing SOLDIER");
 
             Element tempCrew = (Element) tempCrewNodes.item(0);
             String role = tempCrew.getElementsByTagName("role").item(0).getTextContent();
             assertEquals(PersonnelRole.BATTLE_ARMOUR.name(), role,
-                "Remaining role should be BATTLE_ARMOUR");
+                  "Remaining role should be BATTLE_ARMOUR");
         }
 
         /**
-         * Tests that large temp crew counts are serialized correctly.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that large temp crew counts are serialized correctly. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testLargeTempCrewCount() throws Exception {
@@ -455,12 +449,12 @@ public class UnitIOTest {
             String actualCount = tempCrew.getElementsByTagName("count").item(0).getTextContent();
 
             assertEquals(String.valueOf(largeCount), actualCount,
-                "Large count should be serialized correctly");
+                  "Large count should be serialized correctly");
         }
 
         /**
-         * Tests that all supported temp crew roles can be serialized together.
-         * Verifies {@link Unit#writeToXML(PrintWriter, int)}.
+         * Tests that all supported temp crew roles can be serialized together. Verifies
+         * {@link Unit#writeToXML(PrintWriter, int)}.
          */
         @Test
         void testAllTempCrewRolesTogether() throws Exception {
@@ -482,7 +476,7 @@ public class UnitIOTest {
             Element tempCrewMap = (Element) doc.getElementsByTagName("tempCrewMap").item(0);
             NodeList tempCrewNodes = tempCrewMap.getElementsByTagName("tempCrew");
             assertEquals(8, tempCrewNodes.getLength(),
-                "Should have all 8 temp crew roles serialized");
+                  "Should have all 8 temp crew roles serialized");
 
             // Verify each role is present
             for (int i = 0; i < tempCrewNodes.getLength(); i++) {
@@ -491,14 +485,14 @@ public class UnitIOTest {
                 int count = Integer.parseInt(tempCrew.getElementsByTagName("count").item(0).getTextContent());
 
                 assertTrue(count >= 1 && count <= 8,
-                    String.format("Count for role %s should be between 1 and 8", role));
+                      String.format("Count for role %s should be between 1 and 8", role));
             }
         }
     }
 
     /**
-     * Nested test class for temp crew deserialization from XML.
-     * Tests {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
+     * Nested test class for temp crew deserialization from XML. Tests
+     * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
      */
     @Nested
     @Disabled // TODO: Fix test / Entity mocking
@@ -510,7 +504,6 @@ public class UnitIOTest {
         @BeforeAll
         public static void setupAll() {
             EquipmentType.initializeTypes();
-            Ranks.initializeRankSystems();
         }
 
         @BeforeEach
@@ -525,7 +518,7 @@ public class UnitIOTest {
 
             // Use a real Entity instead of mock for proper serialization/deserialization
             MekSummary mekSummary = MekSummaryCache.getInstance()
-                .getMek("Atlas AS7-D");
+                                          .getMek("Atlas AS7-D");
             if (mekSummary != null) {
                 mockEntity = mekSummary.loadEntity();
             } else {
@@ -540,14 +533,14 @@ public class UnitIOTest {
          */
         private static Stream<PersonnelRole> getTempCrewRoles() {
             return Stream.of(
-                PersonnelRole.SOLDIER,
-                PersonnelRole.BATTLE_ARMOUR,
-                PersonnelRole.VEHICLE_CREW_GROUND,
-                PersonnelRole.VEHICLE_CREW_VTOL,
-                PersonnelRole.VEHICLE_CREW_NAVAL,
-                PersonnelRole.VESSEL_PILOT,
-                PersonnelRole.VESSEL_GUNNER,
-                PersonnelRole.VESSEL_CREW
+                  PersonnelRole.SOLDIER,
+                  PersonnelRole.BATTLE_ARMOUR,
+                  PersonnelRole.VEHICLE_CREW_GROUND,
+                  PersonnelRole.VEHICLE_CREW_VTOL,
+                  PersonnelRole.VEHICLE_CREW_NAVAL,
+                  PersonnelRole.VESSEL_PILOT,
+                  PersonnelRole.VESSEL_GUNNER,
+                  PersonnelRole.VESSEL_CREW
             );
         }
 
@@ -571,7 +564,7 @@ public class UnitIOTest {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(new java.io.ByteArrayInputStream(
-                xmlString.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+                  xmlString.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
 
             // Get the unit element
             Element unitElement = doc.getDocumentElement();
@@ -582,8 +575,8 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that unit with no temp crew deserializes correctly without tempCrewMap.
-         * Verifies {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
+         * Tests that unit with no temp crew deserializes correctly without tempCrewMap. Verifies
+         * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
          */
         @Test
         void testNoTempCrewDeserialization() throws Exception {
@@ -602,8 +595,8 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that a single temp crew role deserializes correctly.
-         * Verifies {@link Unit#generateInstanceFromXML(Node, Version, Campaign)} for each PersonnelRole.
+         * Tests that a single temp crew role deserializes correctly. Verifies
+         * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)} for each PersonnelRole.
          *
          * @param role the personnel role to test
          */
@@ -621,12 +614,12 @@ public class UnitIOTest {
             // Assert
             assertNotNull(deserializedUnit, "Deserialized unit should not be null");
             assertEquals(expectedCount, deserializedUnit.getTempCrewByPersonnelRole(role),
-                String.format("Count for %s should be %d", role, expectedCount));
+                  String.format("Count for %s should be %d", role, expectedCount));
         }
 
         /**
-         * Tests that multiple temp crew roles deserialize correctly.
-         * Verifies {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
+         * Tests that multiple temp crew roles deserialize correctly. Verifies
+         * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
          */
         @Test
         void testMultipleTempCrewRolesDeserialization() throws Exception {
@@ -642,16 +635,16 @@ public class UnitIOTest {
             // Assert
             assertNotNull(deserializedUnit, "Deserialized unit should not be null");
             assertEquals(5, deserializedUnit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER),
-                "SOLDIER count should be 5");
+                  "SOLDIER count should be 5");
             assertEquals(3, deserializedUnit.getTempCrewByPersonnelRole(PersonnelRole.VEHICLE_CREW_GROUND),
-                "VEHICLE_CREW_GROUND count should be 3");
+                  "VEHICLE_CREW_GROUND count should be 3");
             assertEquals(10, deserializedUnit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW),
-                "VESSEL_CREW count should be 10");
+                  "VESSEL_CREW count should be 10");
         }
 
         /**
-         * Tests that large temp crew counts deserialize correctly.
-         * Verifies {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
+         * Tests that large temp crew counts deserialize correctly. Verifies
+         * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
          */
         @Test
         void testLargeTempCrewCountDeserialization() throws Exception {
@@ -666,12 +659,12 @@ public class UnitIOTest {
             // Assert
             assertNotNull(deserializedUnit, "Deserialized unit should not be null");
             assertEquals(largeCount, deserializedUnit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW),
-                "Large count should be deserialized correctly");
+                  "Large count should be deserialized correctly");
         }
 
         /**
-         * Tests that all supported temp crew roles deserialize correctly together.
-         * Verifies {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
+         * Tests that all supported temp crew roles deserialize correctly together. Verifies
+         * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
          */
         @Test
         void testAllTempCrewRolesDeserialization() throws Exception {
@@ -702,8 +695,8 @@ public class UnitIOTest {
         }
 
         /**
-         * Tests that zero count temp crew is not deserialized.
-         * Verifies {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
+         * Tests that zero count temp crew is not deserialized. Verifies
+         * {@link Unit#generateInstanceFromXML(Node, Version, Campaign)}.
          */
         @Test
         void testZeroTempCrewNotDeserialized() throws Exception {
@@ -718,7 +711,7 @@ public class UnitIOTest {
             // Assert
             assertNotNull(deserializedUnit, "Deserialized unit should not be null");
             assertEquals(0, deserializedUnit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER),
-                "SOLDIER count should be 0 after removal");
+                  "SOLDIER count should be 0 after removal");
         }
     }
 }

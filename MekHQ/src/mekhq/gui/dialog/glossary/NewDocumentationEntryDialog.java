@@ -55,11 +55,11 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MHQPDFReaderPanel;
 
 /**
@@ -103,7 +103,7 @@ public class NewDocumentationEntryDialog extends JDialog {
         tabbedPane.setMinimumSize(new Dimension(CENTER_PANEL_MINIMUM_WIDTH, Integer.MIN_VALUE));
         addDocumentationEntry(documentationEntry);
 
-        JScrollPaneWithSpeed scrollFullContents = buildDocumentationPane();
+        FastJScrollPane scrollFullContents = buildDocumentationPane();
         JPanel fullContentsWrapper = new JPanel(new BorderLayout());
         fullContentsWrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         fullContentsWrapper.add(scrollFullContents, BorderLayout.CENTER);
@@ -235,7 +235,7 @@ public class NewDocumentationEntryDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    private JScrollPaneWithSpeed buildDocumentationPane() {
+    private FastJScrollPane buildDocumentationPane() {
         StringBuilder formatedDocumentationText = new StringBuilder();
         formatedDocumentationText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
 
@@ -263,7 +263,7 @@ public class NewDocumentationEntryDialog extends JDialog {
             }
         });
 
-        JScrollPaneWithSpeed scrollDocumentation = new JScrollPaneWithSpeed(txtDocumentation);
+        FastJScrollPane scrollDocumentation = new FastJScrollPane(txtDocumentation);
         scrollDocumentation.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
         return scrollDocumentation;

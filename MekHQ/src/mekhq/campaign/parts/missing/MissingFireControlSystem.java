@@ -55,6 +55,7 @@ import org.w3c.dom.NodeList;
 public class MissingFireControlSystem extends MissingPart {
     private Money cost;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingFireControlSystem() {
         this(0, Money.zero(), null);
     }

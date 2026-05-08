@@ -92,6 +92,7 @@ public enum Atmosphere {
         return this == TOXIC_FLAME || this == TOXICFLAME;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isBreathable() {
         return this == BREATHABLE;
     }

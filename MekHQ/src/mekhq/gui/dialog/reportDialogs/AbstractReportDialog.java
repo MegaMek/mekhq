@@ -38,8 +38,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This displays a standard report for MekHQ.
@@ -56,7 +56,7 @@ public abstract class AbstractReportDialog extends AbstractMHQDialogBasic {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        final JScrollPane scrollPane = new JScrollPaneWithSpeed(createTxtReport());
+        final JScrollPane scrollPane = new FastJScrollPane(createTxtReport());
         scrollPane.setBorder(new EmptyBorder(2, 10, 2, 2));
         scrollPane.setName("reportPane");
 

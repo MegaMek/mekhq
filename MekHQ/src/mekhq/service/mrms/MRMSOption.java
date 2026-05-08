@@ -209,7 +209,7 @@ public class MRMSOption {
 
                 if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) ||
                           !partRepairTypes.contains(mrmsOption.getType())) {
-                    LOGGER.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
+                    LOGGER.error("Attempted to load MRMSOption with illegal type id of {}", mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);
                 }

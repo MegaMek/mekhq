@@ -215,7 +215,7 @@ public class SkillsTab {
                                                subType == ROLEPLAY_SECURITY;
                 // These next few cases shouldn't get hit, but we include them just in case
                 case SUPPORT_TECHNICIAN -> subType == SUPPORT_TECHNICIAN;
-                case UTILITY_COMMAND, SUPPORT_COMMAND -> subType == UTILITY_COMMAND;
+                case UTILITY_COMMAND -> subType == UTILITY_COMMAND;
                 case ROLEPLAY_ART -> subType == ROLEPLAY_ART;
                 case ROLEPLAY_INTEREST -> subType == ROLEPLAY_INTEREST;
                 case ROLEPLAY_SCIENCE -> subType == ROLEPLAY_SCIENCE;

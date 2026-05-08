@@ -111,6 +111,7 @@ public enum BattleMekQualityGenerationMethod {
         return this == A;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAStar() {
         return this == A_STAR;
     }

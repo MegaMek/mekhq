@@ -141,8 +141,8 @@ public class Faction {
         }
         List<FactionRecord.DateRange> active = faction2.getYearsActive();
         if (!active.isEmpty()) {
-            start = Objects.requireNonNullElse(active.get(0).start, 0);
-            end = Objects.requireNonNullElse(active.get(active.size() - 1).end, 9999);
+            start = Objects.requireNonNullElse(active.getFirst().start, 0);
+            end = Objects.requireNonNullElse(active.getLast().end, 9999);
         }
         HonorRating preInvasion = faction2.getPreInvasionHonorRating();
         HonorRating postInvasion = faction2.getPostInvasionHonorRating();
@@ -171,6 +171,66 @@ public class Faction {
 
     public @Nullable String[] getAlternativeFactionCodes() {
         return alternativeFactionCodes;
+    }
+
+    /**
+     * Tests whether this faction is institutionally compatible with another faction via the
+     * {@code fallBackFactions} successor/predecessor data already populated in the YAML faction files.
+     *
+     * <p>Used by faction-restricted academy access (and any future eligibility check) for non-FedCom
+     * faction successions: Clan Ghost Bear / Free Rasalhague Republic into Rasalhague Dominion, ComStar
+     * into Word of Blake, and similar mergers/splits. The check is bidirectional — either side's
+     * {@code fallBackFactions} can carry the relationship — because the YAMLs only declare the
+     * successor's predecessors (e.g. {@code RD.fallBackFactions = [CGB, FRR]}), never the inverse.
+     *
+     * <p>Meta-faction codes are excluded as compatibility <em>targets</em>: a real faction is never
+     * considered "compatible" with the abstract meta-faction {@code IS} (or {@code CLAN.IS}, or any
+     * {@code Periphery.*} / {@code CLAN.*} code) just because the real faction's
+     * {@code fallBackFactions} list includes that meta code as a generic data-lookup fallback. Most
+     * playable Inner Sphere factions list {@code IS} as a fallback for the
+     * {@link mekhq.campaign.universe.RandomFactionGenerator} machinery, so without this exclusion
+     * any of them would erroneously test compatible with the abstract IS umbrella.
+     *
+     * <p>The exclusion does <em>not</em> change comparisons between two real factions: LA and FS, for
+     * example, are correctly considered incompatible by this method because neither lists the other's
+     * short code in its fallbacks, regardless of any shared meta entries.
+     *
+     * <p>FedCom-specific era rules (LA seceding 3057, Yvonne reverting to Federated Suns 3067) are
+     * handled separately at the call site; this method intentionally does not look at the date.
+     *
+     * @param other the other faction to test compatibility against
+     *
+     * @return {@code true} if this and {@code other} are the same faction, or if either lists the
+     *       other in its {@code fallBackFactions} (after meta-code exclusion); {@code false} otherwise
+     */
+    public boolean isLineageCompatible(final @Nullable Faction other) {
+        if (other == null) {
+            return false;
+        }
+        if (this.equals(other)) {
+            return true;
+        }
+        if (containsNonMetaCode(this.alternativeFactionCodes, other.shortName)) {
+            return true;
+        }
+        return containsNonMetaCode(other.alternativeFactionCodes, this.shortName);
+    }
+
+    private static boolean containsNonMetaCode(@Nullable String[] codes, String target) {
+        if (codes == null || isMetaFactionCode(target)) {
+            return false;
+        }
+        for (String code : codes) {
+            if (target.equals(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isMetaFactionCode(String code) {
+        return "IS".equals(code) || "CLAN.IS".equals(code)
+                     || code.startsWith("Periphery.") || code.startsWith("CLAN.");
     }
 
     public Color getColor() {
@@ -286,7 +346,8 @@ public class Faction {
         return layeredFormationIconBackgroundFilename;
     }
 
-    public void setLayeredFormationIconBackgroundFilename(final @Nullable String layeredFormationIconBackgroundFilename) {
+    public void setLayeredFormationIconBackgroundFilename(
+          final @Nullable String layeredFormationIconBackgroundFilename) {
         this.layeredFormationIconBackgroundFilename = layeredFormationIconBackgroundFilename;
     }
 

@@ -54,8 +54,8 @@ public class Rotor extends TankLocation {
     public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
                                                                  .setAdvancement(2460, 2470, 2510)
                                                                  .setApproximate(true, false, false)
-                                                                 .setPrototypeFactions(Faction.TH)
-                                                                 .setProductionFactions(Faction.TH)
+                                                                 .setPrototypeFactions(Faction.TH, Faction.CS)
+                                                                 .setProductionFactions(Faction.TH, Faction.CS)
                                                                  .setTechRating(TechRating.D)
                                                                  .setAvailability(AvailabilityValue.C,
                                                                        AvailabilityValue.D,
@@ -63,6 +63,7 @@ public class Rotor extends TankLocation {
                                                                        AvailabilityValue.C)
                                                                  .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Rotor() {
         this(0, null);
     }

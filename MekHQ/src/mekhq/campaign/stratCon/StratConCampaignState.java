@@ -111,6 +111,7 @@ public class StratConCampaignState {
      *
      * @return The additive op for BV multiplier.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public double getGlobalOpForBVMultiplier() {
         return globalOpForBVMultiplier;
     }
@@ -142,6 +143,7 @@ public class StratConCampaignState {
         weeklyScenarios.add(weeklyScenario);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setWeeklyScenarios(final List<LocalDate> weeklyScenarios) {
         this.weeklyScenarios = weeklyScenarios;
     }
@@ -166,6 +168,7 @@ public class StratConCampaignState {
         supportPoints += change;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSupportPoints(int supportPoints) {
         this.supportPoints = supportPoints;
     }
@@ -174,6 +177,7 @@ public class StratConCampaignState {
         return victoryPoints;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setVictoryPoints(int victoryPoints) {
         this.victoryPoints = victoryPoints;
     }
@@ -202,10 +206,12 @@ public class StratConCampaignState {
         return globalScenarioModifiers;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setGlobalScenarioModifiers(List<String> globalScenarioModifiers) {
         this.globalScenarioModifiers = globalScenarioModifiers;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void useSupportPoint() {
         supportPoints--;
     }
@@ -215,6 +221,7 @@ public class StratConCampaignState {
      *
      * @param decrement The number of support points to use/decrease.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void useSupportPoints(int decrement) {
         supportPoints -= decrement;
     }

@@ -141,6 +141,7 @@ public class StratConFacilityFactory {
      * Gets a clone of a specific facility given the "ID" (file name), null if it doesn't exist.
      */
     @Nullable
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static StratConFacility getFacilityCloneByName(String name) {
         return stratconFacilityMap.containsKey(name) ? stratconFacilityMap.get(name).clone() : null;
     }
@@ -148,6 +149,7 @@ public class StratConFacilityFactory {
     /**
      * Retrieves a random facility
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static StratConFacility getRandomFacility() {
         return ObjectUtility.getRandomItem(stratConFacilityList).clone();
     }

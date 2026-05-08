@@ -81,9 +81,7 @@ class MovedAmmoBinTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.isDestroyed()).thenReturn(true);
-        doAnswer(ans -> {
-            return Collections.singletonMap(0, mockMount).entrySet();
-        }).when(mockProposal).getEquipment();
+        doAnswer(ans -> Collections.singletonMap(0, mockMount).entrySet()).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
 
         MovedAmmoBinStep step = new MovedAmmoBinStep();
@@ -98,9 +96,7 @@ class MovedAmmoBinTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(EquipmentType.class));
-        doAnswer(ans -> {
-            return Collections.singletonMap(0, mockMount).entrySet();
-        }).when(mockProposal).getEquipment();
+        doAnswer(ans -> Collections.singletonMap(0, mockMount).entrySet()).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
 
@@ -116,9 +112,7 @@ class MovedAmmoBinTest {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(AmmoType.class));
-        doAnswer(ans -> {
-            return Collections.singletonMap(0, mockMount).entrySet();
-        }).when(mockProposal).getEquipment();
+        doAnswer(ans -> Collections.singletonMap(0, mockMount).entrySet()).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
 
@@ -135,9 +129,7 @@ class MovedAmmoBinTest {
         AmmoType mockType = mock(AmmoType.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mockType);
-        doAnswer(ans -> {
-            return Collections.singletonMap(1, mockMount).entrySet();
-        }).when(mockProposal).getEquipment();
+        doAnswer(ans -> Collections.singletonMap(1, mockMount).entrySet()).when(mockProposal).getEquipment();
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
         doReturn(true).when(mockPart).canChangeMunitions(mockType);

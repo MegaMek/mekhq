@@ -86,6 +86,7 @@ public class ObjectiveTableModel extends AbstractTableModel {
         };
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void addObjective(ScenarioObjective objective) {
         data.add(objective);
         fireTableDataChanged();
