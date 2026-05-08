@@ -76,7 +76,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
-import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -97,7 +96,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
@@ -107,6 +105,7 @@ import mekhq.gui.control.EditLogControl;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+import mekhq.gui.utilities.OriginFactionPickerHelper;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -434,9 +433,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         // then maybe rebuild) fired the choiceFaction selection-change listener during init, while
         // chkClan and chkOnlyOurFaction were still null — Copilot review on PR #8937. Build now,
         // attach listener after, and the rebuild path is reserved for the post-construction toggle.
-        boolean originSurvivesStrictFilter = wouldStrictFilterAdmit(person.getOriginFaction());
+        boolean originSurvivesStrictFilter = OriginFactionPickerHelper.wouldStrictFilterAdmit(
+              person.getOriginFaction(), person, campaign.getGameYear(), person.getRecruitment());
         boolean openExpanded = person.getOriginFaction() != null && !originSurvivesStrictFilter;
-        DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel(openExpanded);
+        DefaultComboBoxModel<Faction> factionsModel = OriginFactionPickerHelper.buildModel(
+              person, campaign.getGameYear(), person.getRecruitment(), openExpanded);
         choiceFaction = new JComboBox<>(factionsModel);
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -1392,27 +1393,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
     }
 
-    private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
-        return getFactionsComboBoxModel(false);
-    }
-
-    /**
-     * @return {@code true} if {@code faction} would survive the strict lifespan filter on its own
-     *       (independent of the "always include person's origin" exception). Used at dialog open
-     *       to decide whether to auto-check "Show All Factions" so the dropdown actually reflects
-     *       what's selected.
-     */
-    private boolean wouldStrictFilterAdmit(Faction faction) {
-        if (faction == null || faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
-            return false;
-        }
-        int year = campaign.getGameYear();
-        int endYear = person.getRecruitment() != null
-              ? Math.min(person.getRecruitment().getYear(), year)
-              : year;
-        return faction.validBetween(person.getDateOfBirth().getYear(), endYear);
-    }
-
     /**
      * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
      * current selection across the swap. If there was no current selection (or the previously
@@ -1422,67 +1402,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();
-        DefaultComboBoxModel<Faction> rebuilt = getFactionsComboBoxModel(chkShowAllFactions.isSelected());
+        DefaultComboBoxModel<Faction> rebuilt = OriginFactionPickerHelper.buildModel(
+              person, campaign.getGameYear(), person.getRecruitment(), chkShowAllFactions.isSelected());
         choiceFaction.setModel(rebuilt);
         int idx = (current != null) ? rebuilt.getIndexOf(current) : -1;
         choiceFaction.setSelectedIndex(idx);
-    }
-
-    /**
-     * Builds the origin-faction picker model.
-     *
-     * <p>Default ({@code showAllFactions == false}): only factions whose {@code yearsActive} overlap
-     * the person's lifespan window {@code [birthYear .. min(recruitment, currentYear)]} appear, with
-     * {@code HIDDEN} and {@code SPECIAL}-tagged factions always excluded. This is the canonically
-     * correct behavior — a 3151-era character can't be born in the long-dissolved Federated
-     * Commonwealth.</p>
-     *
-     * <p>When {@code showAllFactions == true}: drops the lifespan filter entirely. Useful for
-     * legitimate but unusual cases (long-lived characters whose origin is now-defunct, deliberate
-     * "I want my Dark Age character to have a Word of Blake background" choices). {@code HIDDEN}
-     * and {@code SPECIAL} stay excluded — those are meta-factions and aggregates that aren't
-     * legitimate origins regardless of era.</p>
-     *
-     * <p>The person's existing origin faction is always included in both modes so editing a
-     * character whose origin is filtered out by the lifespan check doesn't silently lose the
-     * assignment. See issue #8929.</p>
-     */
-    private DefaultComboBoxModel<Faction> getFactionsComboBoxModel(boolean showAllFactions) {
-        int year = campaign.getGameYear();
-        List<Faction> orderedFactions = Factions.getInstance()
-                                              .getFactions()
-                                              .stream()
-                                              .sorted((a, b) -> a.getFullName(year)
-                                                                      .compareToIgnoreCase(b.getFullName(year)))
-                                              .toList();
-
-        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
-        for (Faction faction : orderedFactions) {
-            // Always include the person's faction
-            if (faction.equals(person.getOriginFaction())) {
-                factionsModel.addElement(faction);
-                continue;
-            }
-            if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
-                continue;
-            }
-            if (showAllFactions) {
-                factionsModel.addElement(faction);
-                continue;
-            }
-
-            // Allow factions between the person's birthday
-            // and when they were recruited, or now if we're
-            // not tracking recruitment.
-            int endYear = person.getRecruitment() != null ?
-                                Math.min(person.getRecruitment().getYear(), year) :
-                                year;
-            if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
-                factionsModel.addElement(faction);
-            }
-        }
-
-        return factionsModel;
     }
 
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
