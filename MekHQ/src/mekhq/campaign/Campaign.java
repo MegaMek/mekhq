@@ -6811,8 +6811,7 @@ public class Campaign implements ITechManager {
     }
 
     public void refreshPlanetarySystemOverlay() {
-        systemsInstance = Systems.getCanonicalSystems().copyWithOverrides(planetarySystemOverrides.values());
-        Systems.setInstance(systemsInstance);
+        systemsInstance = Systems.activateCampaignSystems(planetarySystemOverrides.values());
     }
 
     private void addPlanetarySystemOverride(PlanetarySystem system) {

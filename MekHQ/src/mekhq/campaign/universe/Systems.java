@@ -83,9 +83,7 @@ public class Systems {
         return activeSystems;
     }
 
-    /**
-     * Replaces the active runtime systems registry. This does not replace the canonical startup data once it exists.
-     */
+    /** Replaces the active runtime systems registry. Primarily retained for legacy callers and tests. */
     public static void setInstance(Systems instance) {
         activeSystems = instance;
         if (canonicalSystems == null) {
@@ -94,15 +92,37 @@ public class Systems {
     }
 
     /**
-     * Stores the unmodified startup systems data and makes it active until a campaign overlay is installed.
+     * Loads the unmodified startup systems data and makes it active until a campaign overlay is installed.
      */
-    public static void setCanonicalSystems(Systems systems) {
+    public static void initializeDefaultSystems() throws DOMException, IOException {
+        setCanonicalSystems(loadDefault());
+    }
+
+    /** Creates a systems registry for a campaign with no planetary overrides. */
+    public static Systems createCampaignSystems() {
+        return createCampaignSystems(List.of());
+    }
+
+    /** Creates a systems registry for a campaign by applying campaign-save overrides to the startup systems data. */
+    public static Systems createCampaignSystems(Collection<PlanetarySystem> overrides) {
+        return getCanonicalSystems().copyWithOverrides(overrides);
+    }
+
+    /**
+     * Creates and activates a campaign systems registry by applying campaign-save overrides to the startup systems data.
+     */
+    public static Systems activateCampaignSystems(Collection<PlanetarySystem> overrides) {
+        Systems campaignSystems = createCampaignSystems(overrides);
+        setInstance(campaignSystems);
+        return campaignSystems;
+    }
+
+    private static void setCanonicalSystems(Systems systems) {
         canonicalSystems = systems;
         activeSystems = systems;
     }
 
-    /** Returns the unmodified startup systems data used as the base for campaign overlays. */
-    public static Systems getCanonicalSystems() {
+    private static Systems getCanonicalSystems() {
         if (canonicalSystems == null) {
             canonicalSystems = getInstance();
         }
@@ -169,7 +189,7 @@ public class Systems {
         return systemList;
     }
 
-    public Systems copyWithOverrides(Collection<PlanetarySystem> overrides) {
+    private Systems copyWithOverrides(Collection<PlanetarySystem> overrides) {
         Systems copy = new Systems();
         copy.systemList.putAll(systemList);
         if (overrides != null) {

@@ -84,10 +84,11 @@ Overrides are scoped to the campaign save. If a GM sends another developer the `
 systems travel with that campaign. Other campaigns keep using canonical planetary data unless they contain their own
 override section.
 
-`Systems` now distinguishes the canonical universe loaded at startup from the active campaign overlay. Campaign load
-builds a shallow overlay from canonical systems plus any campaign overrides, then makes that overlay the active
-`Systems` instance for legacy call sites that still read from `Systems.getInstance()`. New or touched campaign-runtime
-code should prefer `campaign.getSystemById(...)`, `campaign.getSystemByName(...)`, and related campaign accessors.
+`Systems` keeps the canonical universe loaded at startup as an internal base and exposes purpose-specific helpers for
+campaign data. `Systems.createCampaignSystems(...)` builds a campaign registry, and
+`Systems.activateCampaignSystems(...)` makes that registry active for legacy call sites that still read from
+`Systems.getInstance()`. New or touched campaign-runtime code should prefer `campaign.getSystemById(...)`,
+`campaign.getSystemByName(...)`, and related campaign accessors.
 
 ### Runtime Behavior
 

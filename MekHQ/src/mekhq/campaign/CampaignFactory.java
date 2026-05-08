@@ -250,7 +250,7 @@ public class CampaignFactory {
         Game game = new Game();
         Player player = new Player(0, "self");
 
-        Systems systems = Systems.getCanonicalSystems();
+        Systems systems = Systems.createCampaignSystems();
 
         // For simplicity, createPartialCampaignConfiguration needs a CampaignOptions instance.
         CampaignOptions campaignOptions = new CampaignOptions();
