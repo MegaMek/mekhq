@@ -496,6 +496,8 @@ public final class BriefingTab extends CampaignGuiTab {
         // Prisoners
         boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
+        List<Person> POWPersonnel = getCampaign().getFriendlyPrisoners();
+
         // We only resolve prisoners if there are no active Missions
         if (getCampaign().getActiveMissions(false).isEmpty()) {
             if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
@@ -554,7 +556,8 @@ public final class BriefingTab extends CampaignGuiTab {
             // Successes as Success
             autoAwardsController.PostMissionController(getCampaign(),
                   mission,
-                  Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+                  Objects.equals(String.valueOf(cmd.getStatus()), "Success"),
+                  POWPersonnel);
         }
 
         // Update Faction Standings
