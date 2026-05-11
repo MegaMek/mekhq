@@ -853,8 +853,16 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         lblCompanyGenerationMethod.setToolTipText(resources.getString("lblCompanyGenerationMethod.toolTipText"));
         lblCompanyGenerationMethod.setName("lblCompanyGenerationMethod");
 
-        setComboCompanyGenerationMethod(new MMComboBox<>("comboCompanyGenerationMethod",
-              CompanyGenerationMethod.values()));
+        // RULESET_BASED is dev-gated behind the mekhq.companyGenerator.ruleset system property until
+        // Phase 2 lights up non-Mek units and multi-crew. Without the property set, only the legacy
+        // AtB / Windchild methods appear in the dropdown.
+        boolean rulesetGenAvailable = Boolean.getBoolean("mekhq.companyGenerator.ruleset");
+        CompanyGenerationMethod[] methods = rulesetGenAvailable
+              ? CompanyGenerationMethod.values()
+              : java.util.Arrays.stream(CompanyGenerationMethod.values())
+                    .filter(m -> !m.isRulesetBased())
+                    .toArray(CompanyGenerationMethod[]::new);
+        setComboCompanyGenerationMethod(new MMComboBox<>("comboCompanyGenerationMethod", methods));
         getComboCompanyGenerationMethod().setToolTipText(resources.getString("lblCompanyGenerationMethod.toolTipText"));
         getComboCompanyGenerationMethod().setRenderer(new DefaultListCellRenderer() {
             @Override

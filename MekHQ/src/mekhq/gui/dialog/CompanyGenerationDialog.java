@@ -188,6 +188,17 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     @Override
     protected void okAction() {
         final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
+
+        // Dev-gated branch: route through the ratgen pipeline instead of the legacy strategy.
+        // Phase 1 only generates units + Formations + crews; parts / finance / contract polish stay
+        // on the legacy path until those helpers are extracted into the polish package.
+        if (options.getMethod().isRulesetBased()) {
+            mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator.generate(getCampaign(), options);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
+                  getCompanyGenerationOptionsPanel().getCampaign().getFormations()));
+            return;
+        }
+
         final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
 
         final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());

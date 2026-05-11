@@ -48,7 +48,15 @@ public enum CompanyGenerationMethod {
     //region Enum Declarations
     AGAINST_THE_BOT("CompanyGenerationMethod.AGAINST_THE_BOT.text",
           "CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("CompanyGenerationMethod.WINDCHILD.text", "CompanyGenerationMethod.WINDCHILD.toolTipText");
+    WINDCHILD("CompanyGenerationMethod.WINDCHILD.text", "CompanyGenerationMethod.WINDCHILD.toolTipText"),
+    /**
+     * Phase 1 / dev-gated: routes generation through MegaMek's Force Generator
+     * ({@code Ruleset.processRoot}) instead of the legacy flat-list path. Hidden from the public dropdown
+     * until Phase 2 enables non-Mek units; surfaces only when the {@code mekhq.companyGenerator.ruleset}
+     * system property is set or the matching MHQ option is enabled.
+     */
+    RULESET_BASED("CompanyGenerationMethod.RULESET_BASED.text",
+          "CompanyGenerationMethod.RULESET_BASED.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -79,12 +87,23 @@ public enum CompanyGenerationMethod {
     public boolean isWindchild() {
         return this == WINDCHILD;
     }
+
+    /** @return true when this method routes through the MegaMek Force Generator pipeline. */
+    public boolean isRulesetBased() {
+        return this == RULESET_BASED;
+    }
     //endregion Boolean Comparison Methods
 
     public AbstractCompanyGenerator getGenerator(final Campaign campaign,
           final CompanyGenerationOptions options) {
         return switch (this) {
             case AGAINST_THE_BOT -> new AtBCompanyGenerator(campaign, options);
+            // RULESET_BASED does not extend AbstractCompanyGenerator — it has its own entry point in
+            // mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator. Callers that want the
+            // new pipeline must dispatch via CompanyGenerationDialog rather than this method. Falling
+            // through to Windchild here keeps the legacy callers (which never see RULESET_BASED while
+            // it is dev-gated) functional.
+            case RULESET_BASED -> new WindchildCompanyGenerator(campaign, options);
             default -> new WindchildCompanyGenerator(campaign, options);
         };
     }

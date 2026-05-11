@@ -84,6 +84,13 @@ public class CompanyGenerationOptions {
     private int lanceSize;
     private int starLeagueYear;
 
+    /**
+     * Inputs for the ratgen-driven pipeline (method = {@code RULESET_BASED}). Null-tolerant: legacy
+     * {@code AGAINST_THE_BOT} / {@code WINDCHILD} paths ignore this entirely. Lazy-initialized on first
+     * access so old presets parsing without the block still produce a valid instance.
+     */
+    private mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot forceDescriptorSnapshot;
+
     // Personnel
     private Map<PersonnelRole, Integer> supportPersonnel;
     private boolean poolAssistants;
@@ -350,6 +357,22 @@ public class CompanyGenerationOptions {
 
     public void setStarLeagueYear(final int starLeagueYear) {
         this.starLeagueYear = starLeagueYear;
+    }
+
+    /**
+     * Lazy accessor for the ratgen-pipeline inputs. Always non-null; created on first call so legacy
+     * presets that never touch the snapshot still hand out a well-formed default instance.
+     */
+    public mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot getForceDescriptorSnapshot() {
+        if (forceDescriptorSnapshot == null) {
+            forceDescriptorSnapshot = new mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot();
+        }
+        return forceDescriptorSnapshot;
+    }
+
+    public void setForceDescriptorSnapshot(
+          final mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot snapshot) {
+        this.forceDescriptorSnapshot = snapshot;
     }
     // endregion Base Information
 
@@ -932,6 +955,10 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lancesPerCompany", getLancesPerCompany());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceSize", getLanceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "starLeagueYear", getStarLeagueYear());
+        // Ratgen pipeline inputs (RULESET_BASED method). Skipped when never customized.
+        if (forceDescriptorSnapshot != null) {
+            forceDescriptorSnapshot.writeToXML(pw, indent);
+        }
 
         // Personnel
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
@@ -1119,6 +1146,11 @@ public class CompanyGenerationOptions {
                         break;
                     case "starLeagueYear":
                         options.setStarLeagueYear(Integer.parseInt(wn.getTextContent().trim()));
+                        break;
+                    case "forceDescriptorSnapshot":
+                        options.setForceDescriptorSnapshot(
+                              mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot
+                                    .parseFromXML(wn));
                         break;
                     // endregion Base Information
 
