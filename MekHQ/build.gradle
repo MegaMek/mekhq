@@ -118,6 +118,15 @@ application {
     ]
 }
 
+// Forward mekhq.* system properties set on the Gradle daemon (e.g. via IDEA Run Config "VM options",
+// or `gradlew -Dmekhq.foo=bar :MekHQ:run`) into the forked application JVM. Without this, daemon-level
+// -D flags never reach the running MekHQ process. Used for dev-gated feature flags such as
+// mekhq.companyGenerator.ruleset.
+tasks.named('run', JavaExec) {
+    System.getProperties().findAll { k, v -> k.toString().startsWith('mekhq.') && v != null }
+            .each { k, v -> systemProperty k.toString(), v.toString() }
+}
+
 
 jar {
     archiveFileName = "MekHQ.jar"
