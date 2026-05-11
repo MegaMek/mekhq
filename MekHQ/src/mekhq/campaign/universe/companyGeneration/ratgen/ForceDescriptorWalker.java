@@ -99,7 +99,10 @@ public final class ForceDescriptorWalker {
         }
 
         // Non-leaf — create a Formation for this echelon and recurse.
-        String name = descriptor.getName();
+        // getName() returns the raw template ("{ordinal} Lance"); parseName() resolves the
+        // {ordinal}/{greek}/{phonetic}/{parent} substitutions populated by Ruleset.assignPositions
+        // into the display string ("First Lance", "Alpha Company", etc.).
+        String name = descriptor.parseName();
         if (name == null || name.isBlank()) {
             name = "Unnamed Formation";
         }
