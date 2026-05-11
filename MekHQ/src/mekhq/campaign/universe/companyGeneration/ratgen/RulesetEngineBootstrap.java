@@ -65,20 +65,34 @@ public final class RulesetEngineBootstrap {
      * @param year the year to load RAT tables for; passed straight to {@link RATGenerator#loadYear(int)}
      */
     public static synchronized void ensureLoaded(int year) {
+        LOGGER.info("[CompanyGen] RulesetEngineBootstrap.ensureLoaded(year={}) START", year);
+
         // RATGenerator caches per-year availability internally; loadYear is idempotent.
+        long t0 = System.currentTimeMillis();
         RATGenerator ratGenerator = RATGenerator.getInstance();
         ratGenerator.loadYear(year);
+        LOGGER.info("[CompanyGen]   RATGenerator.loadYear({}) -> {}ms", year, System.currentTimeMillis() - t0);
 
         // MekSummaryCache scans .mtf/.blk files on first access and reuses the result.
-        MekSummaryCache.getInstance();
+        t0 = System.currentTimeMillis();
+        MekSummaryCache cache = MekSummaryCache.getInstance();
+        LOGGER.info("[CompanyGen]   MekSummaryCache.getInstance() -> {}ms (initialized={})",
+              System.currentTimeMillis() - t0, cache != null);
 
         // Ruleset.loadData is idempotent (guards on its initialized flag).
         if (!Ruleset.isInitialized()) {
-            LOGGER.info("Loading Force Generator rulesets from data/forcegenerator/faction_rules/");
+            LOGGER.info("[CompanyGen]   Loading Force Generator rulesets from data/forcegenerator/faction_rules/ ...");
+            t0 = System.currentTimeMillis();
             Ruleset.loadData();
+            LOGGER.info("[CompanyGen]   Ruleset.loadData() -> {}ms", System.currentTimeMillis() - t0);
+        } else {
+            LOGGER.info("[CompanyGen]   Ruleset already initialized; skipping loadData()");
         }
 
         // RandomNameGenerator is also lazily initialized; calling getInstance is enough.
         RandomNameGenerator.getInstance();
+        LOGGER.info("[CompanyGen]   RandomNameGenerator.getInstance() ready");
+
+        LOGGER.info("[CompanyGen] RulesetEngineBootstrap.ensureLoaded(year={}) DONE", year);
     }
 }

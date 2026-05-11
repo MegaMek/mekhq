@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
@@ -48,6 +49,8 @@ import mekhq.campaign.force.FormationLevel;
  * {@code Unit}, generating crew, and attaching the unit to the supplied parent Formation.</p>
  */
 public final class ForceDescriptorWalker {
+
+    private static final MMLogger LOGGER = MMLogger.create(ForceDescriptorWalker.class);
 
     /**
      * Callback for leaf descriptors. The walker has already created or located the parent {@link Formation}
@@ -82,18 +85,29 @@ public final class ForceDescriptorWalker {
     public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
           LeafHandler onLeaf) {
         if (root == null) {
+            LOGGER.warn("[CompanyGen] ForceDescriptorWalker.walk called with null root; returning 0");
             return 0;
         }
-        return walkInternal(root, campaign, parentInCampaign, onLeaf);
+        LOGGER.info("[CompanyGen] ForceDescriptorWalker.walk START rootEchelon={} rootFaction={} parentFormation={}",
+              root.getEchelon(), root.getFaction(),
+              parentInCampaign == null ? "null" : parentInCampaign.getName());
+        int leaves = walkInternal(root, campaign, parentInCampaign, onLeaf, 0);
+        LOGGER.info("[CompanyGen] ForceDescriptorWalker.walk DONE; {} leaves visited", leaves);
+        return leaves;
     }
 
     private static int walkInternal(ForceDescriptor descriptor, Campaign campaign, Formation parent,
-          LeafHandler onLeaf) {
+          LeafHandler onLeaf, int depth) {
+        String indent = "  ".repeat(depth);
         boolean hasChildren = (descriptor.getSubForces() != null && !descriptor.getSubForces().isEmpty())
               || (descriptor.getAttached() != null && !descriptor.getAttached().isEmpty());
 
         if (!hasChildren) {
             // Leaf — let the caller turn it into a Unit + crew.
+            LOGGER.info("[CompanyGen] {}LEAF parseName='{}' echelon={} unitType={} hasEntity={} hasCo={}",
+                  indent, descriptor.parseName(), descriptor.getEchelon(),
+                  descriptor.getUnitType(), descriptor.getEntity() != null,
+                  descriptor.getCo() != null);
             onLeaf.handle(descriptor, parent);
             return 1;
         }
@@ -106,22 +120,31 @@ public final class ForceDescriptorWalker {
         if (name == null || name.isBlank()) {
             name = "Unnamed Formation";
         }
+        int subCount = descriptor.getSubForces() == null ? 0 : descriptor.getSubForces().size();
+        int attCount = descriptor.getAttached() == null ? 0 : descriptor.getAttached().size();
+        LOGGER.info("[CompanyGen] {}NODE name='{}' echelon={} subForces={} attached={} -> creating Formation",
+              indent, name, descriptor.getEchelon(), subCount, attCount);
+
         Formation formation = new Formation(name);
         FormationLevel level = mapEchelonToFormationLevel(descriptor.getEchelon());
         if (level != null) {
             formation.setFormationLevel(level);
         }
         campaign.addFormation(formation, parent);
+        LOGGER.info("[CompanyGen] {}  Formation registered id={} formationLevel={} parentId={}",
+              indent, formation.getId(), level,
+              parent == null ? "null" : parent.getId());
 
         int leaves = 0;
         if (descriptor.getSubForces() != null) {
             for (ForceDescriptor child : descriptor.getSubForces()) {
-                leaves += walkInternal(child, campaign, formation, onLeaf);
+                leaves += walkInternal(child, campaign, formation, onLeaf, depth + 1);
             }
         }
         if (descriptor.getAttached() != null) {
             for (ForceDescriptor child : descriptor.getAttached()) {
-                leaves += walkInternal(child, campaign, formation, onLeaf);
+                LOGGER.info("[CompanyGen] {}  (attached child)", indent);
+                leaves += walkInternal(child, campaign, formation, onLeaf, depth + 1);
             }
         }
         return leaves;

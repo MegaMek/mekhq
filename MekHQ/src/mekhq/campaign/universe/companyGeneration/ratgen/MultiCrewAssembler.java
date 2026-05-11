@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.client.ratgenerator.CrewDescriptor;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -57,6 +58,8 @@ import mekhq.campaign.unit.Unit;
  */
 public final class MultiCrewAssembler {
 
+    private static final MMLogger LOGGER = MMLogger.create(MultiCrewAssembler.class);
+
     private MultiCrewAssembler() {
         // utility class
     }
@@ -75,12 +78,16 @@ public final class MultiCrewAssembler {
           boolean overrideName) {
         List<Person> crew = new ArrayList<>();
         // Phase 1: Mek-only single-pilot path. Phase 2 will branch on entity.defaultCrewType() etc.
-        PersonnelRole primary = PersonnelRoleResolver.primaryRole(
-              unit.getEntity() == null ? 0 : unit.getEntity().getUnitType());
+        int unitType = unit.getEntity() == null ? 0 : unit.getEntity().getUnitType();
+        PersonnelRole primary = PersonnelRoleResolver.primaryRole(unitType);
+        LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} primaryRole={} overrideName={} hasCommander={}",
+              unitType, primary, overrideName, commander != null);
         Person pilot = campaign.newPerson(primary);
         CrewDescriptorAdapter.apply(commander, pilot, overrideName);
         unit.addPilotOrSoldier(pilot);
         crew.add(pilot);
+        LOGGER.info("[CompanyGen]       crew[0]={} role={} attached to Unit",
+              pilot.getFullName(), pilot.getPrimaryRole());
         return crew;
     }
 }

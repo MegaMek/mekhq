@@ -34,6 +34,7 @@ package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -49,6 +50,8 @@ import mekhq.campaign.personnel.Person;
  * caller changes.</p>
  */
 public final class RankAssigner {
+
+    private static final MMLogger LOGGER = MMLogger.create(RankAssigner.class);
 
     private RankAssigner() {
         // utility class
@@ -69,6 +72,10 @@ public final class RankAssigner {
         if (rank > 0) {
             // Phase 1: direct pass-through. Phase 3 will translate via Faction.getRankSystemCode().
             person.setRank(rank);
+            LOGGER.info("[CompanyGen]         RankAssigner.apply set rank={} on person '{}'",
+                  rank, person.getFullName());
+        } else {
+            LOGGER.info("[CompanyGen]         RankAssigner.apply: descriptor rank<=0, leaving default");
         }
     }
 }

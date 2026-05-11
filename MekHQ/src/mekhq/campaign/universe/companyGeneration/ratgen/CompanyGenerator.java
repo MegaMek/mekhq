@@ -77,14 +77,25 @@ public final class CompanyGenerator {
      *         engine layer
      */
     public static ForceDescriptor generate(Campaign campaign, CompanyGenerationOptions options) {
+        long startedAt = System.currentTimeMillis();
+        LOGGER.info("[CompanyGen] ==================================================");
+        LOGGER.info("[CompanyGen] CompanyGenerator.generate() START");
         ForceDescriptorSnapshot snap = options.getForceDescriptorSnapshot();
+        LOGGER.info("[CompanyGen] snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargo={} flags={} roles={}",
+              snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType(),
+              snap.getRating(), snap.getExperience(), snap.getWeightClass(),
+              snap.isAugmented(), snap.getSizeMod(),
+              snap.getDropshipPct(), snap.getJumpshipPct(), snap.getCargo(),
+              snap.getFlags(), snap.getRoles());
 
         // 1. Bootstrap MegaMek-side state for the target year.
+        LOGGER.info("[CompanyGen] Stage 1: bootstrap engine state");
         RulesetEngineBootstrap.ensureLoaded(snap.getYear());
 
         // 2. Build a fresh ForceDescriptor from the snapshot. The Force Generator panel does this
         // server-side via buildForceDescriptor(); we mirror its inputs here so we never depend on the
         // panel being instantiated.
+        LOGGER.info("[CompanyGen] Stage 2: build root ForceDescriptor from snapshot");
         ForceDescriptor fd = new ForceDescriptor();
         fd.setTopLevel(true);
         fd.setFaction(snap.getFaction());
@@ -109,23 +120,42 @@ public final class CompanyGenerator {
             fd.setSizeMod(snap.getSizeMod());
         }
         fd.setDropshipPct(snap.getDropshipPct());
+        LOGGER.info("[CompanyGen]   built fd: faction={} year={} echelon={} unitType={} rating={} weightClass={}",
+              fd.getFaction(), fd.getYear(), fd.getEchelon(), fd.getUnitType(),
+              fd.getRating(), fd.getWeightClass());
 
         // 3. Run the engine. Null listener is safe per Ruleset.processRoot's internal guards.
-        Ruleset.findRuleset(fd).processRoot(fd, null);
+        LOGGER.info("[CompanyGen] Stage 3: Ruleset.processRoot()");
+        long t0 = System.currentTimeMillis();
+        Ruleset ruleset = Ruleset.findRuleset(fd);
+        LOGGER.info("[CompanyGen]   Ruleset.findRuleset({}) resolved to ruleset for faction={}",
+              fd.getFaction(), ruleset.getFaction());
+        ruleset.processRoot(fd, null);
+        LOGGER.info("[CompanyGen]   Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - t0);
 
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
+        LOGGER.info("[CompanyGen] Stage 4-7: walk tree, materialize Units + crews into Formations");
         Formation root = campaign.getFormations();
+        LOGGER.info("[CompanyGen]   campaign root Formation: id={} name={}",
+              root == null ? "null" : root.getId(),
+              root == null ? "null" : root.getName());
         int[] leafCount = { 0 };
+        int[] skippedNoEntity = { 0 };
+        int[] skippedAddFailed = { 0 };
         ForceDescriptorWalker.walk(fd, campaign, root, (leaf, parent) -> {
             Entity entity = leaf.getEntity();
             if (entity == null) {
-                LOGGER.warn("Leaf descriptor produced no entity: {}", leaf.getName());
+                LOGGER.warn("[CompanyGen]   LEAF SKIPPED (no entity): name={} unitType={} faction={}",
+                      leaf.parseName(), leaf.getUnitType(), leaf.getFaction());
+                skippedNoEntity[0]++;
                 return;
             }
             Unit unit = campaign.addNewUnit(entity, false, 0);
             if (unit == null) {
-                LOGGER.warn("Failed to add unit for entity {}", entity.getDisplayName());
+                LOGGER.warn("[CompanyGen]   LEAF SKIPPED (addNewUnit failed): entity={}",
+                      entity.getDisplayName());
+                skippedAddFailed[0]++;
                 return;
             }
             java.util.List<Person> crew = MultiCrewAssembler.assemble(unit, leaf.getCo(), campaign,
@@ -135,14 +165,22 @@ public final class CompanyGenerator {
             }
             parent.addUnit(unit.getId());
             leafCount[0]++;
+            LOGGER.info("[CompanyGen]   leaf #{}: entity={} -> Unit added, {} crew, parent Formation id={} ({})",
+                  leafCount[0], entity.getDisplayName(), crew.size(),
+                  parent.getId(), parent.getName());
         });
 
-        LOGGER.info("Ratgen company generation produced {} leaf units", leafCount[0]);
+        LOGGER.info("[CompanyGen] Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
+              leafCount[0], skippedNoEntity[0], skippedAddFailed[0]);
 
         // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
         // AbstractCompanyGenerator helpers in a follow-up commit. Phase 1 stops here so the
         // tree-walk integration can be verified end-to-end against a Mek-only scenario.
+        LOGGER.info("[CompanyGen] Stage 8: polish (parts/finance/contract) DEFERRED in Phase 1");
 
+        LOGGER.info("[CompanyGen] CompanyGenerator.generate() DONE in {}ms",
+              System.currentTimeMillis() - startedAt);
+        LOGGER.info("[CompanyGen] ==================================================");
         return fd;
     }
 }

@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import megamek.client.ratgenerator.CrewDescriptor;
+import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -47,6 +48,8 @@ import mekhq.campaign.personnel.Person;
  * are coarser. Phase 2 may revisit if alignment drifts noticeably.</p>
  */
 public final class CrewDescriptorAdapter {
+
+    private static final MMLogger LOGGER = MMLogger.create(CrewDescriptorAdapter.class);
 
     private CrewDescriptorAdapter() {
         // utility class
@@ -64,6 +67,7 @@ public final class CrewDescriptorAdapter {
      */
     public static void apply(CrewDescriptor descriptor, Person person, boolean overrideName) {
         if (descriptor == null || person == null) {
+            LOGGER.info("[CompanyGen]         CrewDescriptorAdapter.apply skipped (descriptor or person null)");
             return;
         }
         if (overrideName) {
@@ -78,6 +82,10 @@ public final class CrewDescriptorAdapter {
                     person.setSurname("");
                 }
                 person.setFullName();
+                LOGGER.info("[CompanyGen]         CrewDescriptorAdapter.apply renamed person to '{}' (gunnery={} piloting={} rank={})",
+                      fullName, descriptor.getGunnery(), descriptor.getPiloting(), descriptor.getRank());
+            } else {
+                LOGGER.info("[CompanyGen]         CrewDescriptorAdapter.apply: descriptor has blank name, keeping random");
             }
         }
     }
