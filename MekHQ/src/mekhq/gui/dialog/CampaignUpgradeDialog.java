@@ -162,9 +162,17 @@ public class CampaignUpgradeDialog {
                 // This needs to be before we start changing options
                 CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
 
-                campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
-                campaign.setGameOptions(chosenPreset.getGameOptions());
-                campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
+                // Preset getters are @Nullable; skip any section the preset does not provide so we
+                // do not overwrite the campaign's existing options with null (issue #8945).
+                if (chosenPreset.getCampaignOptions() != null) {
+                    campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
+                }
+                if (chosenPreset.getGameOptions() != null) {
+                    campaign.setGameOptions(chosenPreset.getGameOptions());
+                }
+                if (chosenPreset.getRandomSkillPreferences() != null) {
+                    campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
+                }
 
                 Map<String, SkillType> presetSkills = chosenPreset.getSkills();
                 for (final String skillName : SkillType.getSkillList()) {
