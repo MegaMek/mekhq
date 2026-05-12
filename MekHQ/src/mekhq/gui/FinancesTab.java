@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -77,6 +77,7 @@ import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.finances.WeeklyNetWorth;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
@@ -116,6 +117,10 @@ public final class FinancesTab extends CampaignGuiTab {
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
 
+    private ChartPanel financeAmountPanel;
+    private ChartPanel financeMonthlyPanel;
+    private ChartPanel financeNetWorthPanel;
+
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
           MekHQ.getMHQOptions().getLocale());
 
@@ -127,7 +132,7 @@ public final class FinancesTab extends CampaignGuiTab {
     //endregion Constructors
 
     private enum GraphType {
-        BALANCE_AMOUNT, MONTHLY_FINANCES
+        BALANCE_AMOUNT, MONTHLY_FINANCES, NETWORTH_OVER_TIME
     }
 
     /*
@@ -139,8 +144,9 @@ public final class FinancesTab extends CampaignGuiTab {
     public void initTab() {
 
         setLayout(new GridBagLayout());
-        ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
-        ChartPanel financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
+        financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
+        financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
+        financeNetWorthPanel = (ChartPanel) createGraphPanel(GraphType.NETWORTH_OVER_TIME);
 
         financeModel = new FinanceTableModel();
         JTable financeTable = new JTable(financeModel);
@@ -206,6 +212,7 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTab.addTab(resourceMap.getString("activeLoans.text"), panLoan);
         financeTab.addTab(resourceMap.getString("cbillsBalanceTime.text"), financeAmountPanel);
         financeTab.addTab(resourceMap.getString("monthlyRevenueExpenditures.text"), financeMonthlyPanel);
+        financeTab.addTab(resourceMap.getString("weeklyNetWorth.text"), financeNetWorthPanel);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -256,6 +263,12 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
+    }
+
+    public void updateCharts() {
+        financeAmountPanel.getChart().getXYPlot().setDataset(setupFinanceDataset());
+        financeMonthlyPanel.getChart().getCategoryPlot().setDataset(setupMonthlyDataset());
+        financeNetWorthPanel.getChart().getXYPlot().setDataset(setupNetWorthDataset());
     }
 
     private XYDataset setupFinanceDataset() {
@@ -331,12 +344,28 @@ public final class FinancesTab extends CampaignGuiTab {
         return dataset;
     }
 
+    private XYDataset setupNetWorthDataset() {
+        TimeSeries s1 = new TimeSeries("C-Bills");
+        List<WeeklyNetWorth> netWorthRecords = getCampaign().getFinances().getNetWorthOverTime();
+        for (WeeklyNetWorth weeklyNetWorth : netWorthRecords) {
+            LocalDate date = weeklyNetWorth.getDate();
+            s1.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
+                  weeklyNetWorth.getMoney().getAmount());
+        }
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(s1);
+
+        return dataset;
+    }
+
     private JPanel createGraphPanel(GraphType gt) {
         JFreeChart chart = null;
         if (gt.equals(GraphType.BALANCE_AMOUNT)) {
             chart = createAmountChart(setupFinanceDataset());
         } else if (gt.equals(GraphType.MONTHLY_FINANCES)) {
             chart = createMonthlyChart(setupMonthlyDataset());
+        } else if (gt.equals(GraphType.NETWORTH_OVER_TIME)) {
+            chart = createAmountChart(setupNetWorthDataset());
         }
         ChartPanel panel = new ChartPanel(chart, false);
         panel.setFillZoomRectangle(true);
@@ -432,6 +461,7 @@ public final class FinancesTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> {
             financeModel.setData(getCampaign().getFinances().getTransactions());
             loanModel.setData(getCampaign().getFinances().getLoans());
+            updateCharts();
             refreshFinancialReport();
         });
     }
