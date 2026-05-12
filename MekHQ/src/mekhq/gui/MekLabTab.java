@@ -62,6 +62,7 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Aero;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
@@ -349,8 +350,8 @@ public class MekLabTab extends CampaignGuiTab {
             testEntity = new TestTank((Tank) entity, entityVerifier.tankOption, null);
         } else if (entity instanceof BattleArmor) {
             testEntity = new TestBattleArmor((BattleArmor) entity, entityVerifier.baOption, null);
-        } else if (entity instanceof Infantry) {
-            testEntity = new TestInfantry((Infantry) entity, entityVerifier.tankOption, null);
+        } else if (entity instanceof ConvInfantry infantry) {
+            testEntity = new TestInfantry(infantry, entityVerifier.tankOption, null);
         } else if (entity instanceof ProtoMek) {
             testEntity = new TestProtoMek((ProtoMek) entity, entityVerifier.protomekOption, null);
         }
@@ -373,8 +374,8 @@ public class MekLabTab extends CampaignGuiTab {
         double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         double tonnage = entity.getWeight();
-        if (entity instanceof BattleArmor) {
-            tonnage = ((BattleArmor) entity).getTrooperWeight() * ((BattleArmor) entity).getTroopers();
+        if (entity instanceof BattleArmor battleArmor) {
+            tonnage = battleArmor.getTrooperWeight() * battleArmor.getSquadSize();
         }
 
         if (tonnage < testEntity.calculateWeight()) {
