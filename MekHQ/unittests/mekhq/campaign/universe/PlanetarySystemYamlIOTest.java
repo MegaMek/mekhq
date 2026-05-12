@@ -35,6 +35,7 @@ package mekhq.campaign.universe;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -146,6 +147,14 @@ class PlanetarySystemYamlIOTest {
     }
 
     @Test
+    void sucsIdNaSentinelLoadsAsNull() throws Exception {
+        PlanetarySystem system = readSystem(VERSIONED_SYSTEM.replace("sucsId: 42", "sucsId: .na"));
+
+        assertNull(system.getSucsId());
+        assertFalse(writeSystem(system).contains("sucsId:"));
+    }
+
+    @Test
     void editedPlanetaryEventRoundTripsThroughYaml() throws Exception {
         PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
         Planet planet = system.getPrimaryPlanet();
@@ -242,6 +251,7 @@ class PlanetarySystemYamlIOTest {
 
     private static void assertSystemsEquivalent(PlanetarySystem expected, PlanetarySystem actual) {
         assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getSucsId(), actual.getSucsId());
         assertEquals(expected.getX(), actual.getX());
         assertEquals(expected.getY(), actual.getY());
         assertEquals(expected.getPrimaryPlanetPosition(), actual.getPrimaryPlanetPosition());

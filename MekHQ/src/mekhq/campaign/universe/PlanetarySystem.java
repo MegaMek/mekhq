@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.universe;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +47,11 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
@@ -170,6 +176,7 @@ public class PlanetarySystem {
     @JsonProperty("id")
     private String id;
     @JsonProperty("sucsId")
+    @JsonDeserialize(using = SucsIdDeserializer.class)
     private Integer sucsId;
     private String name;
 
@@ -227,6 +234,32 @@ public class PlanetarySystem {
 
     public Integer getSucsId() {
         return sucsId;
+    }
+
+    public static class SucsIdDeserializer extends JsonDeserializer<Integer> {
+        @Override
+        public Integer deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+            JsonToken token = parser.currentToken();
+            if (token == JsonToken.VALUE_NULL) {
+                return null;
+            }
+            if (token == JsonToken.VALUE_NUMBER_INT) {
+                return parser.getIntValue();
+            }
+            if (token == JsonToken.VALUE_STRING) {
+                String text = parser.getText().trim();
+                if (text.isEmpty() || ".na".equalsIgnoreCase(text)) {
+                    return null;
+                }
+                try {
+                    return Integer.valueOf(text);
+                } catch (NumberFormatException ex) {
+                    throw JsonMappingException.from(parser, "Cannot deserialize sucsId from '" + text
+                          + "'; expected integer or .na", ex);
+                }
+            }
+            return (Integer) context.handleUnexpectedToken(Integer.class, parser);
+        }
     }
 
     public Double getX() {
