@@ -992,8 +992,16 @@ public class InterstellarMapPanel extends JPanel {
 
     public void setCampaign(Campaign c) {
         this.campaign = c;
-        this.systems = campaign.getSystems();
+        refreshSystemsFromCampaign();
         repaint();
+    }
+
+    private void refreshSystemsFromCampaign() {
+        String selectedSystemId = selectedSystem == null ? null : selectedSystem.getId();
+        this.systems = campaign.getSystems();
+        if (selectedSystemId != null) {
+            selectedSystem = campaign.getSystemById(selectedSystemId);
+        }
     }
 
     public void setJumpPath(JumpPath path) {
@@ -1355,8 +1363,8 @@ public class InterstellarMapPanel extends JPanel {
      */
 
     /**
-     * Opens the GM-only planetary system editor pre-selected on the given system. Re-paints the map after the dialog
-     * closes so the override outline ring picks up any new edits the user just persisted.
+    * Opens the GM-only planetary system editor pre-selected on the given system. Refreshes and repaints the map after
+    * the dialog closes so saved planetary overrides are drawn from the campaign overlay.
      */
     private void openPlanetarySystemEditor(PlanetarySystem system) {
         if ((system == null) || !campaign.isGM()) {
@@ -1367,6 +1375,7 @@ public class InterstellarMapPanel extends JPanel {
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosed(java.awt.event.WindowEvent e) {
+                refreshSystemsFromCampaign();
                 repaint();
             }
         });

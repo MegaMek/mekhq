@@ -370,7 +370,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         tabbedPane.setName("tabPlanetarySystemEditor");
         tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.details"),
               new FastJScrollPane(txtSystemDetails));
-        propertiesPanel = new PlanetarySystemPropertiesPanel(resources, campaign::getLocalDate, this::defaultSourceName,
+        propertiesPanel = new PlanetarySystemPropertiesPanel(resources, campaign::getLocalDate, this::defaultEditorSource,
               this::onPropertiesChanged);
         tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.systemEvents"),
               createSystemEventsPane());
@@ -548,7 +548,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         txtEventSocioIndustrial = new JTextField(12);
         attachSocioIndustrialFormatter(txtEventSocioIndustrial);
         txtEventSource = new JTextField(18);
-        txtEventSource.setText(defaultEventSource());
+        txtEventSource.setText(defaultEditorSource());
         txtEventVersion = new JTextField(10);
         txtEventMessage = new JTextField(24);
         chkEventCustom = new JCheckBox(resources.getString("PlanetarySystemEditorDialog.eventEditor.custom"));
@@ -1584,7 +1584,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         txtEventPopulation.setText("");
         cboEventHpg.setSelectedItem("");
         txtEventSocioIndustrial.setText("");
-        txtEventSource.setText(defaultEventSource());
+        txtEventSource.setText(defaultEditorSource());
         txtEventVersion.setText("");
         txtEventMessage.setText("");
         chkEventCustom.setSelected(false);
@@ -1680,7 +1680,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
 
         JTextField txtTransferDate = new JTextField(formatDate(getEventDateOrCampaignDate(txtEventDate.getText())), 12);
         JTextField txtTransferFactions = new JTextField(txtEventFactions.getText(), 18);
-        JTextField txtTransferSource = new JTextField(defaultEventSource(), 18);
+        JTextField txtTransferSource = new JTextField(defaultEditorSource(), 18);
         JTextField txtTransferVersion = new JTextField(txtEventVersion.getText(), 10);
         JTextField txtTransferMessage = new JTextField(resources.getString(
               "PlanetarySystemEditorDialog.eventEditor.transferOwnership.defaultMessage"), 24);
@@ -2344,7 +2344,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         return sourceableValue.getValue().name();
     }
 
-    private String defaultEventSource() {
+    private String defaultEditorSource() {
         String campaignName = blankToNull(campaign.getName());
         return campaignName == null ? "MekHQ GM" : "MekHQ GM: " + campaignName;
     }
