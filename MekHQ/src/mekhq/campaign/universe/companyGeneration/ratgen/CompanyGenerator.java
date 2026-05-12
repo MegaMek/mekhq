@@ -81,6 +81,26 @@ public final class CompanyGenerator {
         LOGGER.info("[CompanyGen] ==================================================");
         LOGGER.info("[CompanyGen] CompanyGenerator.generate() START");
         ForceDescriptorSnapshot snap = options.getForceDescriptorSnapshot();
+
+        // Stage 0: anchor inputs that the snapshot shouldn't be allowed to override.
+        //
+        // * Year is always the current campaign year. The user already chose the campaign date when
+        //   they set up the campaign; asking again on a sub-panel risks divergence. Whatever the
+        //   embedded ForceGeneratorOptionsView shows in its year field is informational only.
+        //
+        // * Faction falls back to the legacy CompanyGenerationOptions faction picker when the snapshot
+        //   is still at its constructor default ("IS"). The embedded panel writes a non-default value
+        //   on OK, in which case this is a no-op.
+        snap.setYear(campaign.getGameYear());
+        if ("IS".equals(snap.getFaction()) && options.getSpecifiedFaction() != null) {
+            String legacyFactionCode = options.getSpecifiedFaction().getShortName();
+            if (legacyFactionCode != null && !legacyFactionCode.isBlank()) {
+                snap.setFaction(legacyFactionCode);
+            }
+        }
+        LOGGER.info("[CompanyGen] Stage 0: anchored snapshot -> faction={} year={} (campaign year) echelon={} unitType={}",
+              snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType());
+
         LOGGER.info("[CompanyGen] snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargo={} flags={} roles={}",
               snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType(),
               snap.getRating(), snap.getExperience(), snap.getWeightClass(),

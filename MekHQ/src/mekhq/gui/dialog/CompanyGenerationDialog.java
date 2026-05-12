@@ -37,14 +37,23 @@ import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -66,6 +75,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
@@ -92,6 +102,13 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private Campaign campaign;
     private CompanyGenerationOptions companyGenerationOptions;
     private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
+    /**
+     * Embedded MegaMek Force Generator panel. Visible only when the user selects the
+     * {@code RULESET_BASED} generation method, and the source of every {@code ForceDescriptor} input
+     * fed into {@code CompanyGenerator.generate()} on that path. Constructed lazily inside
+     * {@link #createCenterPane()} so we don't pay the cost when the user never reaches this dialog.
+     */
+    private ForceGeneratorOptionsView ratgenOptionsView;
     //endregion Variable Declarations
 
     //region Constructors
@@ -134,7 +151,70 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     protected Container createCenterPane() {
         setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
               getCompanyGenerationOptions()));
-        return new FastJScrollPane(getCompanyGenerationOptionsPanel());
+
+        // Build the embedded MegaMek Force Generator panel. We hide all three of its own buttons
+        // (Generate / Export MUL / Clear) because the dialog's OK button drives generation. The
+        // user-supplied on-generate Consumer is a no-op for the same reason. The year field is locked
+        // to the campaign year — CompanyGenerator.Stage 0 anchors it regardless, but locking the field
+        // keeps the displayed value honest.
+        ratgenOptionsView = new ForceGeneratorOptionsView(fd -> {}, getCampaign().getGameOptions());
+        ratgenOptionsView.setGenerateButtonVisible(false);
+        ratgenOptionsView.setExportMULButtonVisible(false);
+        ratgenOptionsView.setClearButtonVisible(false);
+        ratgenOptionsView.setYearFieldEditable(false);
+        ratgenOptionsView.setCurrentYear(getCampaign().getGameYear());
+        ratgenOptionsView.setBorder(BorderFactory.createTitledBorder("Force Generator (Ruleset)"));
+
+        // Method-picker strip lives at the top of the dialog so the user can always switch methods,
+        // even when the legacy options panel is hidden. The picker mirrors its selection back into
+        // the legacy panel's internal combo so all of the panel's own listeners and createOptionsFromPanel()
+        // see the same method — this lets us hide the panel entirely on the ratgen path without losing
+        // the AtB/Windchild paths.
+        JPanel methodStrip = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        methodStrip.setBorder(BorderFactory.createTitledBorder("Generation Method"));
+        methodStrip.add(new JLabel("Company Generation Method:"));
+        boolean rulesetGenAvailable = Boolean.getBoolean("mekhq.companyGenerator.ruleset");
+        CompanyGenerationMethod[] availableMethods = rulesetGenAvailable
+              ? CompanyGenerationMethod.values()
+              : Arrays.stream(CompanyGenerationMethod.values())
+                    .filter(m -> !m.isRulesetBased())
+                    .toArray(CompanyGenerationMethod[]::new);
+        MMComboBox<CompanyGenerationMethod> dialogMethodCombo = new MMComboBox<>("dialogMethodCombo",
+              availableMethods);
+        Object initialPanelSelection = getCompanyGenerationOptionsPanel()
+              .getComboCompanyGenerationMethod().getSelectedItem();
+        if (initialPanelSelection != null) {
+            dialogMethodCombo.setSelectedItem(initialPanelSelection);
+        }
+        methodStrip.add(dialogMethodCombo);
+
+        // Vertical stack: method strip, then legacy panel, then ratgen panel. Only one of the two
+        // options panels is visible at a time.
+        JPanel host = new JPanel();
+        host.setLayout(new BoxLayout(host, BoxLayout.Y_AXIS));
+        host.add(methodStrip);
+        host.add(getCompanyGenerationOptionsPanel());
+        host.add(ratgenOptionsView);
+
+        Runnable applyVisibility = () -> {
+            Object sel = dialogMethodCombo.getSelectedItem();
+            boolean ruleset = (sel instanceof CompanyGenerationMethod m) && m.isRulesetBased();
+            getCompanyGenerationOptionsPanel().setVisible(!ruleset);
+            ratgenOptionsView.setVisible(ruleset);
+            host.revalidate();
+            host.repaint();
+        };
+
+        dialogMethodCombo.addActionListener(evt -> {
+            // Mirror selection into the legacy panel so its createOptionsFromPanel() reports the
+            // same method, then refresh which sub-panel is visible.
+            getCompanyGenerationOptionsPanel().getComboCompanyGenerationMethod()
+                  .setSelectedItem(dialogMethodCombo.getSelectedItem());
+            applyVisibility.run();
+        });
+
+        applyVisibility.run();
+        return new FastJScrollPane(host);
     }
 
     @Override
@@ -193,6 +273,14 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // Phase 1 only generates units + Formations + crews; parts / finance / contract polish stay
         // on the legacy path until those helpers are extracted into the polish package.
         if (options.getMethod().isRulesetBased()) {
+            // Pull the user's selections from the embedded Force Generator panel into the snapshot.
+            // The panel's year field is locked to the campaign year, and CompanyGenerator.generate's
+            // Stage 0 will re-anchor year from the campaign regardless, so the snapshot ends up with
+            // the canonical campaign year either way.
+            if (ratgenOptionsView != null) {
+                ForceDescriptor fd = ratgenOptionsView.buildForceDescriptor();
+                options.getForceDescriptorSnapshot().populateFromForceDescriptor(fd);
+            }
             mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator.generate(getCampaign(), options);
             MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
                   getCompanyGenerationOptionsPanel().getCampaign().getFormations()));

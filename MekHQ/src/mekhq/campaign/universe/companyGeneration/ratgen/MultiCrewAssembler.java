@@ -36,6 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.client.ratgenerator.CrewDescriptor;
+import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.SpaceStation;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -44,17 +49,17 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * Builds the {@link Person} crew for a {@link Unit}, sized to the unit's actual seat count, and attaches
- * each Person to the unit via {@link Unit#addDriver}, {@link Unit#addGunner}, or
- * {@link Unit#addPilotOrSoldier}.
+ * each Person to the unit through the appropriate {@code Unit.add*} method.
  *
- * <p>This is the sole owner of crew-size logic. Phase 1 covers the Mek path only (single pilot via
- * {@code addPilotOrSoldier}); Phase 2 fills in vehicles, VTOLs, infantry, BA, aero, and vessels with
- * full multi-person crew assembly.</p>
+ * <p>The seat count comes from MekHQ's {@code Unit.getTotalDriverNeeds()}, {@code getTotalGunnerNeeds()},
+ * {@code getTotalCrewNeeds()}, and {@code canTakeNavigator()} — these wrap {@code Compute} and already
+ * understand cockpit type, command consoles, tripod / superheavy variations, infantry squad size, BA
+ * trooper count, etc. We don't reimplement that logic here.</p>
  *
- * <p>Crew skills are decided by MekHQ's {@link AbstractPersonnelGenerator} based on the campaign's
- * configured skill setting; the {@link CrewDescriptor} commander's name is overridden onto the first
- * Person via {@link CrewDescriptorAdapter}. The descriptor's gunnery/piloting numbers are not directly
- * applied in Phase 1; revisit in Phase 2 if alignment drifts noticeably.</p>
+ * <p>Role assignment per seat is delegated to {@link PersonnelRoleResolver}. The commander (descriptor
+ * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the
+ * descriptor when {@code overrideName} is true. All other crew are randomly named by MekHQ's standard
+ * personnel generator.</p>
  */
 public final class MultiCrewAssembler {
 
@@ -65,29 +70,140 @@ public final class MultiCrewAssembler {
     }
 
     /**
-     * Generates and attaches the appropriate number of crew Persons to the given unit.
+     * Generates and attaches the appropriate Persons to the given unit. The commander is always first
+     * in the returned list.
      *
-     * @param unit       the MekHQ Unit to crew; must already wrap an Entity
-     * @param commander  the commander descriptor from the {@code ForceDescriptor.getCo()} for naming;
-     *                   may be null (then the commander gets a fully random name)
-     * @param campaign   the campaign that owns the unit and supplies the personnel generator
+     * @param unit         the MekHQ Unit to crew; must already wrap an Entity
+     * @param commander    the commander descriptor from {@code ForceDescriptor.getCo()}; may be null
+     *                     (then the commander is fully randomly named)
+     * @param campaign     the campaign that owns the unit and supplies the personnel generator
      * @param overrideName when true, the descriptor's name replaces MekHQ's random name on the commander
      * @return the list of Persons created and attached, with the commander first
      */
     public static List<Person> assemble(Unit unit, CrewDescriptor commander, Campaign campaign,
           boolean overrideName) {
         List<Person> crew = new ArrayList<>();
-        // Phase 1: Mek-only single-pilot path. Phase 2 will branch on entity.defaultCrewType() etc.
-        int unitType = unit.getEntity() == null ? 0 : unit.getEntity().getUnitType();
-        PersonnelRole primary = PersonnelRoleResolver.primaryRole(unitType);
-        LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} primaryRole={} overrideName={} hasCommander={}",
-              unitType, primary, overrideName, commander != null);
-        Person pilot = campaign.newPerson(primary);
-        CrewDescriptorAdapter.apply(commander, pilot, overrideName);
-        unit.addPilotOrSoldier(pilot);
-        crew.add(pilot);
-        LOGGER.info("[CompanyGen]       crew[0]={} role={} attached to Unit",
-              pilot.getFullName(), pilot.getPrimaryRole());
+        Entity entity = unit.getEntity();
+        if (entity == null) {
+            LOGGER.warn("[CompanyGen]     MultiCrewAssembler.assemble: unit has no entity, skipping");
+            return crew;
+        }
+        int unitType = entity.getUnitType();
+        PersonnelRole primary = PersonnelRoleResolver.primaryRole(unitType, entity);
+        PersonnelRole gunner = PersonnelRoleResolver.gunnerRole(unitType);
+
+        // Every crew member of a single leaf shares the leaf's CrewDescriptor — same gunnery /
+        // piloting target numbers, same experience class. Only the commander adopts the descriptor's
+        // name; the rest are randomly named but skill-equal. We always pass `commander` through to
+        // newPerson() and let CrewDescriptorAdapter decide whether to apply the name based on the
+        // overrideName flag.
+
+        // Single-pilot path: Meks, ProtoMeks, single-seat Aero / ConvFighter / LAM. usesSoloPilot()
+        // returns true exactly for these. Infantry / BA are NOT solo-pilot but share addPilotOrSoldier
+        // as the attach method, so we route them through their own branch below.
+        if (unit.usesSoloPilot()) {
+            Person pilot = newPerson(campaign, primary, commander, entity, overrideName);
+            unit.addPilotOrSoldier(pilot);
+            crew.add(pilot);
+            LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} solo-pilot role={} crew=[{}]",
+                  unitType, primary, pilot.getFullName());
+            return crew;
+        }
+
+        // Infantry / Battle Armor: addPilotOrSoldier per trooper, sized by the unit's full crew count.
+        // The commander is one of the squad; remaining troopers share the skill profile but get
+        // random names.
+        if (unit.usesSoldiers() || unit.isBattleArmor()) {
+            int squadSize = Math.max(1, unit.getFullCrewSize());
+            for (int i = 0; i < squadSize; i++) {
+                boolean isCommander = (i == 0);
+                Person trooper = newPerson(campaign, primary, commander, entity,
+                      isCommander && overrideName);
+                unit.addPilotOrSoldier(trooper);
+                crew.add(trooper);
+            }
+            LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} squad role={} size={}",
+                  unitType, primary, crew.size());
+            return crew;
+        }
+
+        // Multi-seat path: tanks, VTOLs, naval, multi-pilot aero, large craft. Drivers / gunners /
+        // vessel crew / navigator each have their own attach method on Unit.
+        int driverNeeds = unit.getTotalDriverNeeds();
+        int gunnerNeeds = unit.getTotalGunnerNeeds();
+        int vesselCrewNeeds = needsVesselCrew(entity) ? unit.getTotalCrewNeeds() : 0;
+        boolean needsNavigator = unit.canTakeNavigator();
+        int totalSeats = driverNeeds + gunnerNeeds + vesselCrewNeeds + (needsNavigator ? 1 : 0);
+        LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} multi-seat drivers={} gunners={} vesselCrew={} navigator={} total={}",
+              unitType, driverNeeds, gunnerNeeds, vesselCrewNeeds, needsNavigator, totalSeats);
+
+        // Drivers. Commander becomes the first driver when at least one driver seat exists.
+        for (int i = 0; i < driverNeeds; i++) {
+            boolean isCommander = crew.isEmpty();
+            Person driver = newPerson(campaign, primary, commander, entity,
+                  isCommander && overrideName);
+            unit.addDriver(driver);
+            crew.add(driver);
+        }
+        // Gunners.
+        for (int i = 0; i < gunnerNeeds; i++) {
+            boolean isCommander = crew.isEmpty();
+            Person g = newPerson(campaign, gunner, commander, entity,
+                  isCommander && overrideName);
+            unit.addGunner(g);
+            crew.add(g);
+        }
+        // Generic vessel crew.
+        if (vesselCrewNeeds > 0) {
+            PersonnelRole crewRole = PersonnelRoleResolver.vesselCrewRole();
+            for (int i = 0; i < vesselCrewNeeds; i++) {
+                Person c = newPerson(campaign, crewRole, commander, entity, false);
+                unit.addVesselCrew(c);
+                crew.add(c);
+            }
+        }
+        // Navigator (JumpShip / WarShip, not SpaceStation).
+        if (needsNavigator) {
+            Person nav = newPerson(campaign, PersonnelRoleResolver.navigatorRole(), commander, entity,
+                  false);
+            unit.setNavigator(nav);
+            crew.add(nav);
+        }
+
+        if (crew.isEmpty()) {
+            // Fallback: if the seat math collapsed to zero (e.g. an unusual entity), give the unit a
+            // single pilot so it isn't left uncrewed.
+            Person fallback = newPerson(campaign, primary, commander, entity, overrideName);
+            unit.addPilotOrSoldier(fallback);
+            crew.add(fallback);
+            LOGGER.warn("[CompanyGen]     MultiCrewAssembler.assemble unitType={} fell through to fallback single-pilot",
+                  unitType);
+        }
+
+        LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} attached {} persons; commander={}",
+              unitType, crew.size(), crew.get(0).getFullName());
         return crew;
+    }
+
+    private static Person newPerson(Campaign campaign, PersonnelRole role, CrewDescriptor descriptor,
+          Entity entity, boolean overrideName) {
+        Person person = campaign.newPerson(role);
+        if (descriptor != null) {
+            CrewDescriptorAdapter.apply(descriptor, person, entity, overrideName);
+        }
+        return person;
+    }
+
+    /**
+     * Vessel crew slots only apply to large craft. SmallCraft, DropShips, JumpShips, WarShips, and
+     * SpaceStations all need them; everything else is driver+gunner (or solo pilot).
+     */
+    private static boolean needsVesselCrew(Entity entity) {
+        if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof SpaceStation) {
+            return true;
+        }
+        int ut = entity.getUnitType();
+        return ut == UnitType.SMALL_CRAFT || ut == UnitType.DROPSHIP || ut == UnitType.JUMPSHIP
+              || ut == UnitType.WARSHIP || ut == UnitType.SPACE_STATION;
     }
 }

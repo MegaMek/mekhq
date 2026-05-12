@@ -39,6 +39,8 @@ import java.util.Set;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.MissionRole;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -185,6 +187,53 @@ public final class ForceDescriptorSnapshot {
 
     public void setCargo(double cargo) {
         this.cargo = cargo;
+    }
+
+    // ---- Population from a built ForceDescriptor ---------------------------
+
+    /**
+     * Copies every snapshot-relevant field out of a {@link ForceDescriptor} produced by
+     * {@link megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView#buildForceDescriptor()}. This is
+     * how the embedded options panel hands its user-selected values to the persistent snapshot when the
+     * dialog's OK button is clicked.
+     *
+     * <p>Values that the panel left {@code null} (i.e. "ruleset default") overwrite the snapshot field with
+     * {@code null}; the engine treats {@code null} on the {@code ForceDescriptor} as "let the ruleset
+     * decide" and we mirror that semantics rather than retaining stale snapshot state from a previous run.</p>
+     */
+    public void populateFromForceDescriptor(ForceDescriptor fd) {
+        if (fd == null) {
+            return;
+        }
+        if (fd.getFaction() != null && !fd.getFaction().isBlank()) {
+            this.faction = fd.getFaction();
+        }
+        if (fd.getYear() != null) {
+            this.year = fd.getYear();
+        }
+        this.echelon = fd.getEchelon();
+        this.unitType = fd.getUnitType();
+        this.rating = fd.getRating();
+        this.experience = fd.getExperience();
+        this.weightClass = fd.getWeightClass();
+        this.augmented = fd.isAugmented();
+        // getSizeMod() returns int; the snapshot stores Integer so the engine's "no preference" is null.
+        // Treat 0 as "not specified" here, matching how the panel leaves the value when the user doesn't touch it.
+        int rawSizeMod = fd.getSizeMod();
+        this.sizeMod = rawSizeMod == 0 ? null : rawSizeMod;
+        this.dropshipPct = fd.getDropshipPct();
+        // ForceDescriptor.getJumpshipPct() doesn't exist on the engine type; the panel writes the value
+        // back into its own text field but the engine has no setter. Leave snapshot's jumpshipPct alone.
+        this.flags.clear();
+        if (fd.getFlags() != null) {
+            this.flags.addAll(fd.getFlags());
+        }
+        this.roles.clear();
+        if (fd.getRoles() != null) {
+            for (MissionRole role : fd.getRoles()) {
+                this.roles.add(role.name());
+            }
+        }
     }
 
     // ---- XML round-trip ----------------------------------------------------

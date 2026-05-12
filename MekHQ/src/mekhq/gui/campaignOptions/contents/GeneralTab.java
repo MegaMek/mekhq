@@ -80,6 +80,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.dialog.CompanyGenerationDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
@@ -115,6 +116,7 @@ public class GeneralTab {
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
     private RoundedJButton btnRandomFaction;
+    private RoundedJButton btnCompanyGenerator;
     private JLabel lblDate;
     private RoundedJButton btnDate;
     private RoundedJButton btnRandomDate;
@@ -212,6 +214,17 @@ public class GeneralTab {
             }
         });
 
+        // Open the Company Generator. Only meaningful when this tab is being shown as part of new-campaign
+        // startup — outside of STARTUP / STARTUP_ABRIDGED the campaign's units are already on the books and
+        // the generator's purpose (seeding the starting force) doesn't apply. The button is disabled in
+        // those modes (matching how btnDate / btnRandomDate are gated) so it stays visually consistent in
+        // the layout but can't be clicked.
+        btnCompanyGenerator = new CampaignOptionsButton("CompanyGenerator");
+        btnCompanyGenerator.addActionListener(e -> new CompanyGenerationDialog(frame, campaign).setVisible(true));
+        if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
+            btnCompanyGenerator.setEnabled(false);
+        }
+
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
@@ -275,6 +288,7 @@ public class GeneralTab {
         panel.add(lblFaction, layout);
         panel.add(comboFaction, layout);
         panel.add(btnRandomFaction, layout);
+        panel.add(btnCompanyGenerator, layout);
 
         layout.gridy++;
         layout.gridwidth = 5;

@@ -32,15 +32,24 @@
  */
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
+import megamek.common.units.Entity;
+import megamek.common.units.LandAirMek;
 import megamek.common.units.UnitType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
- * Maps a MegaMek {@link UnitType} integer to the {@link PersonnelRole} a primary crew member should hold.
+ * Maps a MegaMek {@link UnitType} integer (and optionally the live {@link Entity}) to the
+ * {@link PersonnelRole} a primary crew member should hold, plus the role used for any extra gunner /
+ * vessel-crew / navigator seats on the same unit.
  *
- * <p>Phase 1 returns {@link PersonnelRole#MEKWARRIOR} for every unit type so the new pipeline produces the
- * same flat-list Mek output as the legacy strategies. Phase 2 fills in the full table covering vehicles,
- * VTOLs, infantry, BA, aero, vessels, and ProtoMeks.</p>
+ * <p>The table here is the single source of truth for "what role does the commander of a tank get?",
+ * "what role do the gunners of a DropShip get?", etc. Phase 2 fills in every {@code UnitType} value;
+ * the resolver falls back to {@link PersonnelRole#MEKWARRIOR} for unknown ints so a bad descriptor
+ * doesn't crash the pipeline.</p>
+ *
+ * <p>MekHQ uses a unified {@code VEHICLE_CREW_*} role for both drivers and gunners on ground / VTOL /
+ * naval vehicles, separate {@code VESSEL_*} roles for the seats on large craft, and {@code SOLDIER} /
+ * {@code BATTLE_ARMOUR} for infantry squads (every member added via {@code addPilotOrSoldier}).</p>
  */
 public final class PersonnelRoleResolver {
 
@@ -49,14 +58,69 @@ public final class PersonnelRoleResolver {
     }
 
     /**
-     * Returns the primary crew role for a unit of the given type. Phase 1 stub returns
-     * {@link PersonnelRole#MEKWARRIOR}; full table arrives in Phase 2.
+     * Returns the primary crew role for a unit of the given type. The commander descriptor (from
+     * {@code ForceDescriptor.getCo()}) is applied to this Person.
      *
      * @param unitType the {@link UnitType} integer of the unit
-     * @return the primary {@link PersonnelRole} for that unit's commander
+     * @return the primary {@link PersonnelRole}; never {@code null}
      */
     public static PersonnelRole primaryRole(int unitType) {
-        // Phase 1: Mek-only behavior to match the existing AbstractCompanyGenerator output.
-        return PersonnelRole.MEKWARRIOR;
+        return primaryRole(unitType, null);
+    }
+
+    /**
+     * Returns the primary crew role for a unit, with an optional {@link Entity} to refine the lookup
+     * (e.g. distinguishing LAMs from ordinary Meks).
+     *
+     * @param unitType the {@link UnitType} integer of the unit
+     * @param entity the live entity, or {@code null} if not yet available
+     * @return the primary {@link PersonnelRole}; never {@code null}
+     */
+    public static PersonnelRole primaryRole(int unitType, Entity entity) {
+        if (entity instanceof LandAirMek) {
+            return PersonnelRole.LAM_PILOT;
+        }
+        return switch (unitType) {
+            case UnitType.MEK -> PersonnelRole.MEKWARRIOR;
+            case UnitType.TANK, UnitType.GUN_EMPLACEMENT -> PersonnelRole.VEHICLE_CREW_GROUND;
+            case UnitType.BATTLE_ARMOR -> PersonnelRole.BATTLE_ARMOUR;
+            case UnitType.INFANTRY -> PersonnelRole.SOLDIER;
+            case UnitType.PROTOMEK -> PersonnelRole.PROTOMEK_PILOT;
+            case UnitType.VTOL -> PersonnelRole.VEHICLE_CREW_VTOL;
+            case UnitType.NAVAL -> PersonnelRole.VEHICLE_CREW_NAVAL;
+            case UnitType.CONV_FIGHTER -> PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+            case UnitType.AEROSPACE_FIGHTER, UnitType.AERO -> PersonnelRole.AEROSPACE_PILOT;
+            case UnitType.SMALL_CRAFT, UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP,
+                  UnitType.SPACE_STATION -> PersonnelRole.VESSEL_PILOT;
+            default -> PersonnelRole.MEKWARRIOR;
+        };
+    }
+
+    /**
+     * Returns the role assigned to additional gunner seats on a multi-crew unit (tanks with separate
+     * gunner stations, large craft turrets, etc.). For unified-crew vehicles this is the same role as
+     * the driver; for vessels it's {@link PersonnelRole#VESSEL_GUNNER}.
+     */
+    public static PersonnelRole gunnerRole(int unitType) {
+        return switch (unitType) {
+            case UnitType.SMALL_CRAFT, UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP,
+                  UnitType.SPACE_STATION -> PersonnelRole.VESSEL_GUNNER;
+            default -> primaryRole(unitType, null);
+        };
+    }
+
+    /**
+     * Returns the role assigned to the generic engineering / utility crew slots on large craft
+     * (the seats that aren't drivers, gunners, or the navigator).
+     */
+    public static PersonnelRole vesselCrewRole() {
+        return PersonnelRole.VESSEL_CREW;
+    }
+
+    /**
+     * Returns the role assigned to the navigator on a JumpShip / WarShip.
+     */
+    public static PersonnelRole navigatorRole() {
+        return PersonnelRole.VESSEL_NAVIGATOR;
     }
 }

@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
+import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -126,7 +128,7 @@ public final class ForceDescriptorWalker {
               indent, name, descriptor.getEchelon(), subCount, attCount);
 
         Formation formation = new Formation(name);
-        FormationLevel level = mapEchelonToFormationLevel(descriptor.getEchelon());
+        FormationLevel level = mapEchelonToFormationLevel(descriptor.getEchelon(), descriptor.getFaction());
         if (level != null) {
             formation.setFormationLevel(level);
         }
@@ -152,22 +154,70 @@ public final class ForceDescriptorWalker {
 
     /**
      * Maps a Force Generator echelon integer (from {@code data/forcegenerator/faction_rules/constants.txt})
-     * to MekHQ's {@link FormationLevel} enum. Only the IS values used in Phase 1 are mapped; Clan and
-     * ComStar mappings come in Phase 3.
+     * to MekHQ's {@link FormationLevel} enum, using the faction code to decide whether the int means IS
+     * (LANCE/COMPANY/BATTALION/…), Clan (STAR/BINARY/TRINARY/CLUSTER/…), or ComStar/WoB
+     * (LEVEL_II/CHOIR/LEVEL_III/…) since all three families reuse the same integers with different
+     * semantics.
      *
-     * @param echelon the {@code ForceDescriptor.echelon} value (boxed, may be null)
+     * @param echelon     the {@code ForceDescriptor.echelon} value (boxed, may be null)
+     * @param factionCode the faction code on the descriptor (e.g. "FS", "CW", "WOB"); may be null
      * @return the matching {@link FormationLevel}, or {@code null} if the echelon doesn't map
      */
-    private static FormationLevel mapEchelonToFormationLevel(Integer echelon) {
+    private static FormationLevel mapEchelonToFormationLevel(Integer echelon, String factionCode) {
         if (echelon == null) {
             return null;
         }
-        return switch (echelon) {
-            case 3 -> FormationLevel.LANCE;
-            case 4 -> FormationLevel.COMPANY;
-            case 5 -> FormationLevel.BATTALION;
-            case 6 -> FormationLevel.REGIMENT;
-            default -> null;
+        FactionFamily family = resolveFactionFamily(factionCode);
+        return switch (family) {
+            case CLAN -> switch (echelon) {
+                case 2 -> FormationLevel.TEAM;            // Point
+                case 3 -> FormationLevel.STAR_OR_NOVA;
+                case 4, 5 -> FormationLevel.BINARY_OR_TRINARY;
+                case 6 -> FormationLevel.CLUSTER;
+                case 7 -> FormationLevel.GALAXY;
+                case 8 -> FormationLevel.TOUMAN;
+                default -> null;
+            };
+            case COMSTAR -> switch (echelon) {
+                case 2 -> FormationLevel.TEAM;            // Level I
+                case 3, 4 -> FormationLevel.LEVEL_II_OR_CHOIR;
+                case 5 -> FormationLevel.LEVEL_III;
+                case 6 -> FormationLevel.LEVEL_IV;
+                case 9 -> FormationLevel.LEVEL_V;
+                case 10 -> FormationLevel.LEVEL_VI;
+                default -> null;
+            };
+            case INNER_SPHERE -> switch (echelon) {
+                case 2 -> FormationLevel.TEAM;            // Squad / Platoon
+                case 3 -> FormationLevel.LANCE;
+                case 4 -> FormationLevel.COMPANY;
+                case 5 -> FormationLevel.BATTALION;
+                case 6 -> FormationLevel.REGIMENT;
+                case 7 -> FormationLevel.BRIGADE;
+                case 8 -> FormationLevel.DIVISION;
+                case 9 -> FormationLevel.CORPS;
+                case 10 -> FormationLevel.ARMY;
+                default -> null;
+            };
         };
+    }
+
+    private enum FactionFamily { INNER_SPHERE, CLAN, COMSTAR }
+
+    private static FactionFamily resolveFactionFamily(String factionCode) {
+        if (factionCode == null || factionCode.isBlank()) {
+            return FactionFamily.INNER_SPHERE;
+        }
+        // Take the first comma-separated token; ratgen sometimes packs an "FS,FedSuns,3030" style code.
+        String primary = factionCode.split(",")[0].trim();
+        if ("CS".equalsIgnoreCase(primary) || "WOB".equalsIgnoreCase(primary)
+              || primary.toUpperCase().startsWith("CS.") || primary.toUpperCase().startsWith("WOB.")) {
+            return FactionFamily.COMSTAR;
+        }
+        FactionRecord faction = RATGenerator.getInstance().getFaction(primary);
+        if (faction != null && faction.isClan()) {
+            return FactionFamily.CLAN;
+        }
+        return FactionFamily.INNER_SPHERE;
     }
 }
