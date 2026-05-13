@@ -272,7 +272,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private XYDataset setupFinanceDataset() {
-        TimeSeries s1 = new TimeSeries("C-Bills");
+        TimeSeries timeSeries = new TimeSeries("C-Bills");
         List<Transaction> transactions = getCampaign().getFinances().getTransactions();
 
         Money balance = Money.zero();
@@ -282,12 +282,12 @@ public final class FinancesTab extends CampaignGuiTab {
             // since there may be more than one entry per day and the dataset for the graph can only have one entry per day
             // we use addOrUpdate() which assumes transactions are in sequential order by date so we always have the most
             // up-to-date entry for each day
-            s1.addOrUpdate(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
+            timeSeries.addOrUpdate(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
                   balance.getAmount().doubleValue());
         }
 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.addSeries(s1);
+        dataset.addSeries(timeSeries);
 
         return dataset;
     }
@@ -345,15 +345,15 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private XYDataset setupNetWorthDataset() {
-        TimeSeries s1 = new TimeSeries("C-Bills");
+        TimeSeries timeSeries = new TimeSeries("C-Bills");
         List<WeeklyNetWorth> netWorthRecords = getCampaign().getFinances().getNetWorthOverTime();
         for (WeeklyNetWorth weeklyNetWorth : netWorthRecords) {
             LocalDate date = weeklyNetWorth.getDate();
-            s1.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
+            timeSeries.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
                   weeklyNetWorth.getMoney().getAmount());
         }
         TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.addSeries(s1);
+        dataset.addSeries(timeSeries);
 
         return dataset;
     }

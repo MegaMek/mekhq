@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -103,8 +102,8 @@ public class WeeklyNetWorth {
                 } else if (wn2.getNodeName().equalsIgnoreCase("amount")) {
                     weeklyNetWorth.setAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
+            } catch (Exception exception) {
+                LOGGER.error(exception, "exception loading WeeklyNetWorth from save file");
             }
         }
         return weeklyNetWorth;
