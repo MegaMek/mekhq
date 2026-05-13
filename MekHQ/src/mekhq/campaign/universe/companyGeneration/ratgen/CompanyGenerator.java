@@ -32,6 +32,11 @@
  */
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.units.Entity;
@@ -60,8 +65,40 @@ public final class CompanyGenerator {
 
     private static final MMLogger LOGGER = MMLogger.create(CompanyGenerator.class);
 
+    // Single-thread daemon executor used by the addNewUnit watchdog. Scheduled tasks fire 5s after
+    // each addNewUnit call begins; if addNewUnit returns first, the task is cancelled. If it hangs,
+    // the task wins the race and dumps interesting thread stacks so the deadlock site is captured
+    // in the log without the user having to grab a manual thread dump.
+    private static final ScheduledExecutorService WATCHDOG = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "CompanyGen-Watchdog");
+        t.setDaemon(true);
+        return t;
+    });
+
     private CompanyGenerator() {
         // utility entry point
+    }
+
+    /**
+     * Dumps stack traces for threads relevant to the force-generation pipeline (worker pool, EDT,
+     * Swing Timer). Called by the {@link #WATCHDOG} when an {@code addNewUnit} call exceeds the
+     * watchdog threshold; logs the worker thread (parked inside the hanging call) and the EDT
+     * (which the worker may be waiting on) so a deadlock can be identified directly from the log.
+     */
+    private static void dumpInterestingThreads(String chassis, String model, long elapsedMs) {
+        LOGGER.warn("[CompanyGen][Watchdog] addNewUnit hung >{}ms on chassis='{}' model='{}'; dumping interesting thread stacks",
+              elapsedMs, chassis, model);
+        Thread.getAllStackTraces().forEach((thread, frames) -> {
+            String name = thread.getName();
+            if (name.startsWith("SwingWorker") || name.startsWith("AWT-EventQueue") || name.contains("Timer")) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n--- Thread '").append(name).append("' state=").append(thread.getState()).append(" ---");
+                for (StackTraceElement frame : frames) {
+                    sb.append("\n    at ").append(frame);
+                }
+                LOGGER.warn("[CompanyGen][Watchdog]{}", sb);
+            }
+        });
     }
 
     /**
@@ -92,8 +129,8 @@ public final class CompanyGenerator {
     public static ForceDescriptor generate(Campaign campaign, CompanyGenerationOptions options,
           Ruleset.ProgressListener listener) {
         long startedAt = System.currentTimeMillis();
-        LOGGER.info("[CompanyGen] ==================================================");
-        LOGGER.info("[CompanyGen] CompanyGenerator.generate() START");
+        LOGGER.info("[CompanyGen][Pipeline]==================================================");
+        LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() START");
         if (listener != null) {
             listener.updateProgress(0.0, "Preparing generation parameters...");
         }
@@ -115,10 +152,10 @@ public final class CompanyGenerator {
                 snap.setFaction(legacyFactionCode);
             }
         }
-        LOGGER.info("[CompanyGen] Stage 0: anchored snapshot -> faction={} year={} (campaign year) echelon={} unitType={}",
+        LOGGER.info("[CompanyGen][Pipeline]Stage 0: anchored snapshot -> faction={} year={} (campaign year) echelon={} unitType={}",
               snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType());
 
-        LOGGER.info("[CompanyGen] snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargo={} flags={} roles={}",
+        LOGGER.info("[CompanyGen][Pipeline]snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargo={} flags={} roles={}",
               snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType(),
               snap.getRating(), snap.getExperience(), snap.getWeightClass(),
               snap.isAugmented(), snap.getSizeMod(),
@@ -126,7 +163,7 @@ public final class CompanyGenerator {
               snap.getFlags(), snap.getRoles());
 
         // 1. Bootstrap MegaMek-side state for the target year.
-        LOGGER.info("[CompanyGen] Stage 1: bootstrap engine state");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 1: bootstrap engine state");
         if (listener != null) {
             listener.updateProgress(0.0, "Loading factions and rulesets...");
         }
@@ -135,7 +172,7 @@ public final class CompanyGenerator {
         // 2. Build a fresh ForceDescriptor from the snapshot. The Force Generator panel does this
         // server-side via buildForceDescriptor(); we mirror its inputs here so we never depend on the
         // panel being instantiated.
-        LOGGER.info("[CompanyGen] Stage 2: build root ForceDescriptor from snapshot");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 2: build root ForceDescriptor from snapshot");
         ForceDescriptor fd = new ForceDescriptor();
         fd.setTopLevel(true);
         fd.setFaction(snap.getFaction());
@@ -160,30 +197,30 @@ public final class CompanyGenerator {
             fd.setSizeMod(snap.getSizeMod());
         }
         fd.setDropshipPct(snap.getDropshipPct());
-        LOGGER.info("[CompanyGen]   built fd: faction={} year={} echelon={} unitType={} rating={} weightClass={}",
+        LOGGER.info("[CompanyGen][Pipeline]  built fd: faction={} year={} echelon={} unitType={} rating={} weightClass={}",
               fd.getFaction(), fd.getYear(), fd.getEchelon(), fd.getUnitType(),
               fd.getRating(), fd.getWeightClass());
 
         // 3. Run the engine. Null listener is safe per Ruleset.processRoot's internal guards.
-        LOGGER.info("[CompanyGen] Stage 3: Ruleset.processRoot()");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 3: Ruleset.processRoot()");
         if (listener != null) {
             listener.updateProgress(0.0, "Building force structure...");
         }
         long t0 = System.currentTimeMillis();
         Ruleset ruleset = Ruleset.findRuleset(fd);
-        LOGGER.info("[CompanyGen]   Ruleset.findRuleset({}) resolved to ruleset for faction={}",
+        LOGGER.info("[CompanyGen][Pipeline]  Ruleset.findRuleset({}) resolved to ruleset for faction={}",
               fd.getFaction(), ruleset.getFaction());
         ruleset.processRoot(fd, listener);
-        LOGGER.info("[CompanyGen]   Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - t0);
+        LOGGER.info("[CompanyGen][Pipeline]  Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - t0);
 
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
-        LOGGER.info("[CompanyGen] Stage 4-7: walk tree, materialize Units + crews into Formations");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 4-7: walk tree, materialize Units + crews into Formations");
         if (listener != null) {
             listener.updateProgress(0.0, "Materializing units and crews...");
         }
         Formation root = campaign.getFormations();
-        LOGGER.info("[CompanyGen]   campaign root Formation: id={} name={}",
+        LOGGER.info("[CompanyGen][Pipeline]  campaign root Formation: id={} name={}",
               root == null ? "null" : root.getId(),
               root == null ? "null" : root.getName());
         int[] leafCount = { 0 };
@@ -192,60 +229,106 @@ public final class CompanyGenerator {
         long[] stageStartNanos = { System.nanoTime() };
         ForceDescriptorWalker.walk(fd, campaign, root, (leaf, parent) -> {
             long leafStart = System.nanoTime();
+            String parentInfo = parent == null ? "null"
+                  : ("id=" + parent.getId() + " name='" + parent.getName() + "'");
             Entity entity = leaf.getEntity();
             if (entity == null) {
-                LOGGER.warn("[CompanyGen]   LEAF SKIPPED (no entity): name={} unitType={} faction={}",
-                      leaf.parseName(), leaf.getUnitType(), leaf.getFaction());
+                LOGGER.warn("[CompanyGen][Leaf] SKIPPED (no entity): name={} unitType={} faction={} parent={}",
+                      leaf.parseName(), leaf.getUnitType(), leaf.getFaction(), parentInfo);
                 skippedNoEntity[0]++;
                 return;
             }
-            String entityDisplay = entity.getDisplayName();
-            Unit unit = campaign.addNewUnit(entity, false, 0);
+            String entityChassis = entity.getChassis();
+            String entityModel = entity.getModel();
+            LOGGER.info("[CompanyGen][Leaf] ENTER chassis='{}' model='{}' unitType={} weight={} parent={} thread={}",
+                  entityChassis, entityModel, entity.getUnitType(), entity.getWeight(),
+                  parentInfo, Thread.currentThread().getName());
+
+            LOGGER.info("[CompanyGen][Leaf][AddUnit] BEFORE campaign.addNewUnit chassis='{}' model='{}'",
+                  entityChassis, entityModel);
+            long addUnitStart = System.nanoTime();
+            ScheduledFuture<?> watchdogTask = WATCHDOG.schedule(
+                  () -> dumpInterestingThreads(entityChassis, entityModel,
+                        (System.nanoTime() - addUnitStart) / 1_000_000),
+                  5, TimeUnit.SECONDS);
+            Unit unit;
+            try {
+                unit = campaign.addNewUnit(entity, false, 0);
+            } finally {
+                watchdogTask.cancel(false);
+            }
             long afterAddUnitNanos = System.nanoTime();
+            long addUnitMs = (afterAddUnitNanos - addUnitStart) / 1_000_000;
+            LOGGER.info("[CompanyGen][Leaf][AddUnit] AFTER campaign.addNewUnit unit={} elapsed={}ms",
+                  unit == null ? "null" : unit.getId(), addUnitMs);
             if (unit == null) {
-                LOGGER.warn("[CompanyGen]   LEAF SKIPPED (addNewUnit failed): entity={}", entityDisplay);
+                LOGGER.warn("[CompanyGen][Leaf] SKIPPED (addNewUnit failed): chassis='{}' model='{}'",
+                      entityChassis, entityModel);
                 skippedAddFailed[0]++;
                 return;
             }
+
+            LOGGER.info("[CompanyGen][Leaf][CrewAssemble] BEFORE MultiCrewAssembler.assemble unit={} crewDescriptor={}",
+                  unit.getId(), leaf.getCo() == null ? "null" : "present");
+            long assembleStart = System.nanoTime();
             java.util.List<Person> crew = MultiCrewAssembler.assemble(unit, leaf.getCo(), campaign,
                   /* overrideName */ true);
             long afterAssembleNanos = System.nanoTime();
+            long assembleMs = (afterAssembleNanos - assembleStart) / 1_000_000;
+            LOGGER.info("[CompanyGen][Leaf][CrewAssemble] AFTER MultiCrewAssembler.assemble crewSize={} elapsed={}ms",
+                  crew.size(), assembleMs);
+
             if (!crew.isEmpty()) {
+                LOGGER.info("[CompanyGen][Leaf][Rank] BEFORE RankAssigner.apply commander='{}'",
+                      crew.get(0).getFullName());
+                long rankStart = System.nanoTime();
                 RankAssigner.apply(leaf.getCo(), crew.get(0));
+                long rankMs = (System.nanoTime() - rankStart) / 1_000_000;
+                LOGGER.info("[CompanyGen][Leaf][Rank] AFTER RankAssigner.apply elapsed={}ms", rankMs);
             }
-            parent.addUnit(unit.getId());
+
+            // Use the canonical Campaign API instead of parent.addUnit(uuid). The bare addUnit(uuid)
+            // only updates the Formation's unit list; the Unit's formationId back-reference stays at
+            // FORMATION_NONE, so UnitTableModel's Formation column and any caller of
+            // Campaign.getFormation(unit.getFormationId()) sees nothing. addUnitToFormation sets
+            // unit.setFormationId(id), pushes the assignment through AssignmentLogger, and fires
+            // OrganizationChangedEvent — its subscribers (BriefingTab, TOETab) only do
+            // ActionScheduler.schedule() which wraps Timer.restart() and is thread-safe.
+            LOGGER.info("[CompanyGen][Leaf] BEFORE addUnitToFormation parent={} unit={}", parentInfo, unit.getId());
+            campaign.addUnitToFormation(unit, parent.getId());
+            LOGGER.info("[CompanyGen][Leaf] AFTER addUnitToFormation unit.formationId={}", unit.getFormationId());
             leafCount[0]++;
             long leafTotalMs = (System.nanoTime() - leafStart) / 1_000_000;
-            long addUnitMs = (afterAddUnitNanos - leafStart) / 1_000_000;
-            long assembleMs = (afterAssembleNanos - afterAddUnitNanos) / 1_000_000;
             // Warn on individual leaves that take more than 500ms — that's usually the sign of a
             // pathological RATGenerator selection or a slow Entity construction. Useful for spotting
             // hung-looking generation runs.
             if (leafTotalMs > 500) {
-                LOGGER.warn("[CompanyGen]   leaf #{} slow: {}ms total (addNewUnit={}ms assemble={}ms) entity={}",
-                      leafCount[0], leafTotalMs, addUnitMs, assembleMs, entityDisplay);
+                LOGGER.warn("[CompanyGen][Leaf] leaf #{} SLOW: {}ms total (addUnit={}ms assemble={}ms) chassis='{}' model='{}'",
+                      leafCount[0], leafTotalMs, addUnitMs, assembleMs, entityChassis, entityModel);
             }
             // Surface progress every 5 units to keep the dialog feeling alive AND to give the
             // log a heartbeat. Earlier batching at 25 was too coarse — a regiment with 36 leaves
             // would only get one mid-progress update, looking frozen to the user.
             if (listener != null && leafCount[0] % 5 == 0) {
                 long elapsedSec = (System.nanoTime() - stageStartNanos[0]) / 1_000_000_000;
+                LOGGER.info("[CompanyGen][Leaf][Progress] BEFORE listener.updateProgress count={} elapsedSec={}",
+                      leafCount[0], elapsedSec);
                 listener.updateProgress(0.0,
                       String.format("Materializing units and crews... (%d created, %ds elapsed)",
                             leafCount[0], elapsedSec));
+                LOGGER.info("[CompanyGen][Leaf][Progress] AFTER listener.updateProgress");
             }
-            LOGGER.info("[CompanyGen]   leaf #{}: entity={} -> Unit added, {} crew, parent Formation id={} ({})",
-                  leafCount[0], entity.getDisplayName(), crew.size(),
-                  parent.getId(), parent.getName());
+            LOGGER.info("[CompanyGen][Leaf] EXIT leaf #{} chassis='{}' model='{}' crew={} parent={} totalMs={}",
+                  leafCount[0], entityChassis, entityModel, crew.size(), parentInfo, leafTotalMs);
         });
 
-        LOGGER.info("[CompanyGen] Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
+        LOGGER.info("[CompanyGen][Pipeline]Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
               leafCount[0], skippedNoEntity[0], skippedAddFailed[0]);
 
         // 7b. Apply layered formation icons to every node in the campaign's Formation tree. Honors
         // the four formation-icon toggles on the options; bails cleanly if generation is disabled
         // or the formation-icon image directory is unavailable.
-        LOGGER.info("[CompanyGen] Stage 7b: apply layered formation icons");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7b: apply layered formation icons");
         if (listener != null) {
             listener.updateProgress(0.0, "Applying formation icons...");
         }
@@ -255,7 +338,7 @@ public final class CompanyGenerator {
         // node's commander the officer rank matching their FormationLevel (Lt → Lance, Capt →
         // Company, Major → Battalion, …). Non-officer combat crew get Sergeant-equivalent; support
         // crew get Corporal-equivalent. Gated on isAutomaticallyAssignRanks.
-        LOGGER.info("[CompanyGen] Stage 7c: tree-aware rank assignment");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7c: tree-aware rank assignment");
         if (listener != null) {
             listener.updateProgress(0.0, "Assigning ranks...");
         }
@@ -264,11 +347,11 @@ public final class CompanyGenerator {
         // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
         // AbstractCompanyGenerator helpers in a follow-up commit. Phase 1 stops here so the
         // tree-walk integration can be verified end-to-end against a Mek-only scenario.
-        LOGGER.info("[CompanyGen] Stage 8: polish (parts/finance/contract) DEFERRED in Phase 1");
+        LOGGER.info("[CompanyGen][Pipeline]Stage 8: polish (parts/finance/contract) DEFERRED in Phase 1");
 
-        LOGGER.info("[CompanyGen] CompanyGenerator.generate() DONE in {}ms",
+        LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() DONE in {}ms",
               System.currentTimeMillis() - startedAt);
-        LOGGER.info("[CompanyGen] ==================================================");
+        LOGGER.info("[CompanyGen][Pipeline]==================================================");
         return fd;
     }
 }

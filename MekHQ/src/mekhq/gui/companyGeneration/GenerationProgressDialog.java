@@ -74,7 +74,7 @@ public class GenerationProgressDialog extends JDialog {
 
     public GenerationProgressDialog(JFrame parent) {
         super(parent, "Generating Force", Dialog.ModalityType.APPLICATION_MODAL);
-        LOGGER.info("[ProgressDialog] constructed (thread={})", Thread.currentThread().getName());
+        LOGGER.info("[CompanyGen][Progress] constructed (thread={})", Thread.currentThread().getName());
 
         statusLabel = new JLabel("Initializing...");
         statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 8, 4));
@@ -108,11 +108,11 @@ public class GenerationProgressDialog extends JDialog {
     public void setStatus(String message) {
         long elapsedMs = (System.nanoTime() - createdAtNanos) / 1_000_000;
         String callerThread = Thread.currentThread().getName();
-        LOGGER.info("[ProgressDialog] setStatus '{}' (caller={} elapsed={}ms)",
+        LOGGER.info("[CompanyGen][Progress] setStatus '{}' (caller={} elapsed={}ms)",
               message, callerThread, elapsedMs);
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText(message);
-            LOGGER.info("[ProgressDialog]   statusLabel.setText '{}' applied (EDT)", message);
+            LOGGER.info("[CompanyGen][Progress]   statusLabel.setText '{}' applied (EDT)", message);
         });
     }
 
@@ -130,12 +130,12 @@ public class GenerationProgressDialog extends JDialog {
      */
     public void finish() {
         long elapsedMs = (System.nanoTime() - createdAtNanos) / 1_000_000;
-        LOGGER.info("[ProgressDialog] finish requested (caller={} elapsed={}ms)",
+        LOGGER.info("[CompanyGen][Progress] finish requested (caller={} elapsed={}ms)",
               Thread.currentThread().getName(), elapsedMs);
         SwingUtilities.invokeLater(() -> {
             setVisible(false);
             dispose();
-            LOGGER.info("[ProgressDialog] disposed (EDT)");
+            LOGGER.info("[CompanyGen][Progress] disposed (EDT)");
         });
     }
 

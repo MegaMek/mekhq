@@ -87,16 +87,18 @@ public final class RulesetRankAssigner {
     }
 
     public static void apply(Campaign campaign, CompanyGenerationOptions options) {
+        long startNanos = System.nanoTime();
         if (campaign == null || options == null) {
+            LOGGER.info("[CompanyGen][RankAssign] apply: campaign or options null, skipping");
             return;
         }
         if (!options.isAutomaticallyAssignRanks()) {
-            LOGGER.info("[CompanyGen] RulesetRankAssigner: disabled by isAutomaticallyAssignRanks");
+            LOGGER.info("[CompanyGen][RankAssign] apply: disabled by isAutomaticallyAssignRanks");
             return;
         }
         Formation root = campaign.getFormations();
         if (root == null) {
-            LOGGER.info("[CompanyGen] RulesetRankAssigner: campaign has no root Formation, skipping");
+            LOGGER.info("[CompanyGen][RankAssign] apply: campaign has no root Formation, skipping");
             return;
         }
 
@@ -110,18 +112,26 @@ public final class RulesetRankAssigner {
         int enlistedRank = enlistedRankForFaction(faction);
         int supportRank = supportRankForFaction(faction);
 
-        LOGGER.info("[CompanyGen] RulesetRankAssigner START faction={} enlistedRank={} supportRank={} root='{}'",
-              faction.getShortName(), enlistedRank, supportRank, root.getName());
+        LOGGER.info("[CompanyGen][RankAssign] START faction={} enlistedRank={} supportRank={} root='{}' thread={}",
+              faction.getShortName(), enlistedRank, supportRank, root.getName(),
+              Thread.currentThread().getName());
 
         // Pass 1: walk the tree post-order so lance / star commanders claim their officer rank
         // before their parent company / binary looks for ITS commander among remaining unranked
         // crew. Each Formation promotes the first not-yet-promoted combat Person in its subtree.
+        LOGGER.info("[CompanyGen][RankAssign][Pass1] BEFORE walkPostOrder");
+        long pass1Start = System.nanoTime();
         Set<Person> promoted = new LinkedHashSet<>();
         int officersAssigned = walkPostOrder(campaign, root, promoted);
+        long pass1Ms = (System.nanoTime() - pass1Start) / 1_000_000;
+        LOGGER.info("[CompanyGen][RankAssign][Pass1] AFTER walkPostOrder officers={} elapsed={}ms",
+              officersAssigned, pass1Ms);
 
         // Pass 2: every other combat Person gets the enlisted rank; every support Person gets the
         // Corporal-equivalent. Walk the tree's Units to limit the impact to crew we generated, not
         // pre-existing personnel.
+        LOGGER.info("[CompanyGen][RankAssign][Pass2] BEFORE enlisted/support assignment");
+        long pass2Start = System.nanoTime();
         int enlistedAssigned = 0;
         int supportAssigned = 0;
         Set<UUID> personIdsAlreadyDone = new HashSet<>();
@@ -149,9 +159,13 @@ public final class RulesetRankAssigner {
                 }
             }
         }
+        long pass2Ms = (System.nanoTime() - pass2Start) / 1_000_000;
+        LOGGER.info("[CompanyGen][RankAssign][Pass2] AFTER enlisted={} support={} elapsed={}ms",
+              enlistedAssigned, supportAssigned, pass2Ms);
 
-        LOGGER.info("[CompanyGen] RulesetRankAssigner DONE; officers={} enlisted={} support={}",
-              officersAssigned, enlistedAssigned, supportAssigned);
+        long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
+        LOGGER.info("[CompanyGen][RankAssign] DONE; officers={} enlisted={} support={} totalMs={}",
+              officersAssigned, enlistedAssigned, supportAssigned, totalMs);
     }
 
     /**
@@ -165,6 +179,8 @@ public final class RulesetRankAssigner {
         }
         int rankIndex = rankIndexForLevel(formation.getFormationLevel());
         if (rankIndex < 0) {
+            LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
+                  formation.getName(), formation.getFormationLevel());
             return count;
         }
         Person commander = pickCommander(campaign, formation, promoted);
@@ -172,11 +188,11 @@ public final class RulesetRankAssigner {
             commander.setRank(rankIndex);
             promoted.add(commander);
             count++;
-            LOGGER.info("[CompanyGen]   formation '{}' (level={}) -> '{}' promoted to rank index {}",
+            LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {}",
                   formation.getName(), formation.getFormationLevel(),
                   commander.getFullName(), rankIndex);
         } else {
-            LOGGER.info("[CompanyGen]   formation '{}' (level={}) -> no unpromoted combat Person available",
+            LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no unpromoted combat Person available",
                   formation.getName(), formation.getFormationLevel());
         }
         return count;

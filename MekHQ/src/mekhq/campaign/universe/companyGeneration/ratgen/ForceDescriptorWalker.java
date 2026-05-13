@@ -87,12 +87,13 @@ public final class ForceDescriptorWalker {
     public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
           LeafHandler onLeaf) {
         if (root == null) {
-            LOGGER.warn("[CompanyGen] ForceDescriptorWalker.walk called with null root; returning 0");
+            LOGGER.warn("[CompanyGen][Walker] walk called with null root; returning 0");
             return 0;
         }
-        LOGGER.info("[CompanyGen] ForceDescriptorWalker.walk START rootEchelon={} rootFaction={} parentFormation={}",
+        LOGGER.info("[CompanyGen][Walker] walk START rootEchelon={} rootFaction={} parentFormation={} thread={}",
               root.getEchelon(), root.getFaction(),
-              parentInCampaign == null ? "null" : parentInCampaign.getName());
+              parentInCampaign == null ? "null" : parentInCampaign.getName(),
+              Thread.currentThread().getName());
 
         // Merge the root descriptor into the campaign's existing top-level Formation instead of
         // nesting under it. Without this, the user gets a redundant level — their campaign's
@@ -110,7 +111,7 @@ public final class ForceDescriptorWalker {
             if (level != null) {
                 parentInCampaign.setFormationLevel(level);
             }
-            LOGGER.info("[CompanyGen] Merged root descriptor into existing campaign Formation '{}' (id={} formationLevel={}); recursing into {} subForces + {} attached",
+            LOGGER.info("[CompanyGen][Walker] merged root descriptor into existing campaign Formation '{}' (id={} formationLevel={}); recursing into {} subForces + {} attached",
                   parentInCampaign.getName(), parentInCampaign.getId(), level,
                   root.getSubForces() == null ? 0 : root.getSubForces().size(),
                   root.getAttached() == null ? 0 : root.getAttached().size());
@@ -123,7 +124,7 @@ public final class ForceDescriptorWalker {
             }
             if (root.getAttached() != null) {
                 for (ForceDescriptor child : root.getAttached()) {
-                    LOGGER.info("[CompanyGen]   (attached child of root)");
+                    LOGGER.info("[CompanyGen][Walker]   (attached child of root)");
                     leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
                 }
             }
@@ -134,7 +135,7 @@ public final class ForceDescriptorWalker {
             leaves = walkInternal(root, campaign, parentInCampaign, onLeaf, 0);
         }
 
-        LOGGER.info("[CompanyGen] ForceDescriptorWalker.walk DONE; {} leaves visited", leaves);
+        LOGGER.info("[CompanyGen][Walker] walk DONE; {} leaves visited", leaves);
         return leaves;
     }
 
@@ -146,11 +147,15 @@ public final class ForceDescriptorWalker {
 
         if (!hasChildren) {
             // Leaf — let the caller turn it into a Unit + crew.
-            LOGGER.info("[CompanyGen] {}LEAF parseName='{}' echelon={} unitType={} hasEntity={} hasCo={}",
+            String entityChassis = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getChassis();
+            String entityModel = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getModel();
+            LOGGER.info("[CompanyGen][Walker] {}LEAF parseName='{}' echelon={} unitType={} hasEntity={} hasCo={} chassis='{}' model='{}'",
                   indent, descriptor.parseName(), descriptor.getEchelon(),
                   descriptor.getUnitType(), descriptor.getEntity() != null,
-                  descriptor.getCo() != null);
+                  descriptor.getCo() != null, entityChassis, entityModel);
+            LOGGER.info("[CompanyGen][Walker] {}-> onLeaf.handle('{} {}')", indent, entityChassis, entityModel);
             onLeaf.handle(descriptor, parent);
+            LOGGER.info("[CompanyGen][Walker] {}<- onLeaf.handle returned for '{} {}'", indent, entityChassis, entityModel);
             return 1;
         }
 
@@ -164,7 +169,7 @@ public final class ForceDescriptorWalker {
         }
         int subCount = descriptor.getSubForces() == null ? 0 : descriptor.getSubForces().size();
         int attCount = descriptor.getAttached() == null ? 0 : descriptor.getAttached().size();
-        LOGGER.info("[CompanyGen] {}NODE name='{}' echelon={} subForces={} attached={} -> creating Formation",
+        LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' echelon={} subForces={} attached={} -> creating Formation",
               indent, name, descriptor.getEchelon(), subCount, attCount);
 
         Formation formation = new Formation(name);
@@ -173,7 +178,7 @@ public final class ForceDescriptorWalker {
             formation.setFormationLevel(level);
         }
         campaign.addFormation(formation, parent);
-        LOGGER.info("[CompanyGen] {}  Formation registered id={} formationLevel={} parentId={}",
+        LOGGER.info("[CompanyGen][Walker] {}  Formation registered id={} formationLevel={} parentId={}",
               indent, formation.getId(), level,
               parent == null ? "null" : parent.getId());
 
@@ -185,7 +190,7 @@ public final class ForceDescriptorWalker {
         }
         if (descriptor.getAttached() != null) {
             for (ForceDescriptor child : descriptor.getAttached()) {
-                LOGGER.info("[CompanyGen] {}  (attached child)", indent);
+                LOGGER.info("[CompanyGen][Walker] {}  (attached child)", indent);
                 leaves += walkInternal(child, campaign, formation, onLeaf, depth + 1);
             }
         }

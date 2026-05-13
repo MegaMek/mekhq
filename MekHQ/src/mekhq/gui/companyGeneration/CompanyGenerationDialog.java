@@ -224,7 +224,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                   JOptionPane.OK_CANCEL_OPTION,
                   JOptionPane.WARNING_MESSAGE);
             if (choice != JOptionPane.OK_OPTION) {
-                LOGGER.info("[CompanyGen] User cancelled at long-generation warning (echelon={})", chosenEchelon);
+                LOGGER.info("[CompanyGen][Worker] user cancelled at long-generation warning (echelon={})", chosenEchelon);
                 return;
             }
         }
@@ -235,28 +235,28 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // the EDT after generation completes and fires the post-gen extras.
         GenerationProgressDialog progressDialog = new GenerationProgressDialog(getFrame());
         long okStartedNanos = System.nanoTime();
-        LOGGER.info("[CompanyGen] okAction prepared SwingWorker (thread={})", Thread.currentThread().getName());
+        LOGGER.info("[CompanyGen][Worker] okAction prepared SwingWorker (thread={})", Thread.currentThread().getName());
 
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 long workerStartNanos = System.nanoTime();
-                LOGGER.info("[CompanyGen] SwingWorker.doInBackground START (thread={})",
+                LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground START (thread={})",
                       Thread.currentThread().getName());
                 try {
                     CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
                 } catch (Throwable t) {
-                    LOGGER.error(t, "[CompanyGen] SwingWorker.doInBackground threw");
+                    LOGGER.error(t, "[CompanyGen][Worker] SwingWorker.doInBackground threw");
                     throw t;
                 }
                 long elapsedMs = (System.nanoTime() - workerStartNanos) / 1_000_000;
-                LOGGER.info("[CompanyGen] SwingWorker.doInBackground DONE in {}ms", elapsedMs);
+                LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground DONE in {}ms", elapsedMs);
                 return null;
             }
 
             @Override
             protected void done() {
-                LOGGER.info("[CompanyGen] SwingWorker.done START (thread={})",
+                LOGGER.info("[CompanyGen][Worker] SwingWorker.done START (thread={})",
                       Thread.currentThread().getName());
                 progressDialog.finish();
                 try {
@@ -269,18 +269,20 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                           true);
                     return;
                 }
-                LOGGER.info("[CompanyGen] SwingWorker.done -> applyPostGenerationExtras");
+                LOGGER.info("[CompanyGen][Worker] SwingWorker.done -> applyPostGenerationExtras");
                 applyPostGenerationExtras(options);
-                LOGGER.info("[CompanyGen] SwingWorker.done complete");
+                LOGGER.info("[CompanyGen][Worker] SwingWorker.done complete");
             }
         };
 
         worker.execute();
-        LOGGER.info("[CompanyGen] SwingWorker.execute() returned; about to setVisible(true) on progressDialog");
+        LOGGER.info("[CompanyGen][Worker] worker.execute() returned (thread={}); about to setVisible(true) on progressDialog",
+              Thread.currentThread().getName());
         // Modal dialog blocks the EDT until SwingWorker.done() calls finish().
         progressDialog.setVisible(true);
         long modalElapsedMs = (System.nanoTime() - okStartedNanos) / 1_000_000;
-        LOGGER.info("[CompanyGen] progressDialog.setVisible(true) returned after {}ms (modal closed)", modalElapsedMs);
+        LOGGER.info("[CompanyGen][Worker] progressDialog.setVisible(true) returned after {}ms (modal closed, thread={})",
+              modalElapsedMs, Thread.currentThread().getName());
     }
 
     /**
@@ -307,13 +309,18 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
      * the EDT-side cleanup is the only thing the {@link SwingWorker#done()} callback has to do.
      */
     private void applyPostGenerationExtras(CompanyGenerationOptions options) {
+        long startNanos = System.nanoTime();
+        LOGGER.info("[CompanyGen][PostGen] START (thread={})", Thread.currentThread().getName());
+        LOGGER.info("[CompanyGen][PostGen] firing OrganizationChangedEvent");
         MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
 
         if (campaign.getCampaignOptions().isEnableAutoAwards()) {
+            LOGGER.info("[CompanyGen][PostGen] running AutoAwardsController");
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(campaign, false);
         }
 
+        LOGGER.info("[CompanyGen][PostGen] initializing ReputationController");
         ReputationController reputationController = new ReputationController();
         reputationController.initializeReputation(campaign);
         campaign.setReputation(reputationController);
@@ -324,7 +331,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // processBonusUnitsBasedOnCampaignOptions only consult the campaign, so they still work.
         // TODO: have CompanyGenerator.generate return the generated Persons so we can supply a
         // real tracker list and restore the alt-medical spare-pilot top-up.
+        LOGGER.info("[CompanyGen][PostGen] running processBonusUnitsBasedOnCampaignOptions");
         processBonusUnitsBasedOnCampaignOptions(Collections.emptyList(), options);
+        long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
+        LOGGER.info("[CompanyGen][PostGen] DONE in {}ms", totalMs);
     }
 
     private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
