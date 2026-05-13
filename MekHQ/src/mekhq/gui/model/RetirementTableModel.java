@@ -229,7 +229,8 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_FORCE:
                 Formation formation = campaign.getFormationFor(person);
                 if (null != formation) {
-                    return formation.getName();
+                    return formation.getDisplayPath(" / ",
+                          campaign.getCampaignOptions().isUseExtendedTOEForceName());
                 } else {
                     return "None";
                 }
@@ -437,14 +438,11 @@ public class RetirementTableModel extends AbstractTableModel {
             } else if (actualCol == COL_FORCE) {
                 Formation formation = campaign.getFormationFor(p);
                 if (null != formation) {
-                    StringBuilder desc = new StringBuilder("<html><b>" + formation.getName() + "</b>");
-                    Formation parent = formation.getParentFormation();
-                    // cut off after three lines and don't include the top level
-                    int lines = 1;
-                    while ((parent != null) && (null != parent.getParentFormation()) && (lines < 4)) {
-                        desc.append("<br>").append(parent.getName());
-                        lines++;
-                        parent = parent.getParentFormation();
+                    boolean includeTopLevel = campaign.getCampaignOptions().isUseExtendedTOEForceName();
+                    java.util.List<String> path = formation.getDisplayPath(includeTopLevel);
+                    StringBuilder desc = new StringBuilder("<html><b>").append(path.get(0)).append("</b>");
+                    for (int i = 1; i < path.size(); i++) {
+                        desc.append("<br>").append(path.get(i));
                     }
                     desc.append("</html>");
                     setHtmlText(desc.toString());

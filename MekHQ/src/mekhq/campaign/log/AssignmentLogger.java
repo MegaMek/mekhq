@@ -116,7 +116,7 @@ public class AssignmentLogger {
      */
     private static String formatFormationForLog(Campaign campaign, Formation formation) {
         return campaign.getCampaignOptions().isUseExtendedTOEForceName()
-              ? formation.getDisplayPath(" > ")
+              ? formation.getDisplayPath(" > ", true)
               : formation.getName();
     }
 }

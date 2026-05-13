@@ -835,7 +835,7 @@ public class CampaignOptions {
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
         setUseTransfers(true);
-        setUseExtendedTOEForceName(false);
+        setUseExtendedTOEForceName(true);
         setPersonnelLogSkillGain(false);
         setPersonnelLogAbilityGain(false);
         setPersonnelLogEdgeGain(false);

@@ -784,7 +784,14 @@ public enum PersonnelTableModelColumn {
 
             case FORCE:
                 final Formation formation = campaign.getFormationFor(person);
-                return (formation == null) ? "-" : formation.getName();
+                if (formation == null) {
+                    return "-";
+                }
+                // Honors the same isUseExtendedTOEForceName toggle the cell renderer reads, so the
+                // sort key / filter dropdown / grouped-view label shows the same breadcrumb users
+                // see in the Personnel and Hangar table's Formation column.
+                return formation.getDisplayPath(" / ",
+                      campaignOptions.isUseExtendedTOEForceName());
             case DEPLOYED:
                 final Unit unit = person.getUnit();
                 if (unit == null || !unit.isDeployed()) {

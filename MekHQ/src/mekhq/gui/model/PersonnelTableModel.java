@@ -307,7 +307,8 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 case FORCE:
                     Formation formation = getCampaign().getFormationFor(person);
                     if (formation != null) {
-                        List<String> path = formation.getDisplayPath();
+                        boolean includeTopLevel = getCampaign().getCampaignOptions().isUseExtendedTOEForceName();
+                        List<String> path = formation.getDisplayPath(includeTopLevel);
                         StringBuilder desc = new StringBuilder("<html><b>").append(path.get(0))
                                                    .append("</b>");
                         for (int i = 1; i < path.size(); i++) {

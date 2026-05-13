@@ -495,7 +495,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 case COL_FORCE: {
                     Formation formation = getCampaign().getFormationFor(u);
                     if (formation != null) {
-                        List<String> path = formation.getDisplayPath();
+                        boolean includeTopLevel = getCampaign().getCampaignOptions().isUseExtendedTOEForceName();
+                        List<String> path = formation.getDisplayPath(includeTopLevel);
                         StringBuilder desc = new StringBuilder("<html><b>").append(path.get(0)).append("</b>");
                         for (int i = 1; i < path.size(); i++) {
                             desc.append("<br>").append(path.get(i));

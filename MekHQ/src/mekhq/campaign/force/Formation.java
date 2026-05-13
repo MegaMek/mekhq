@@ -398,27 +398,60 @@ public class Formation {
     }
 
     /**
-     * Returns the display-path of this formation as a leaf-first list of names with the campaign-root
-     * formation excluded, mirroring what the Hangar and Personnel tabs' Formation column shows. Capped
-     * at four levels so deeply-nested structures don't produce unbounded output.
+     * Returns the display-path of this formation as a leaf-first list of names. Capped at four
+     * levels so deeply-nested structures don't produce unbounded output.
      *
      * <p>Example: a Lance under Company "A Company" under Battalion "First Battalion" under the
-     * campaign-root Regiment produces {@code ["Lance Name", "A Company", "First Battalion"]}; the
-     * top-level Regiment is omitted because it's the campaign root.</p>
+     * campaign-root "Tidal Wave's Pioneers" produces {@code ["Lance Name", "A Company",
+     * "First Battalion", "Tidal Wave's Pioneers"]} when {@code includeTopLevel=true}; with
+     * {@code includeTopLevel=false} the campaign-root is omitted.</p>
      *
-     * @return formation names in leaf-first order, top-level excluded, up to four entries
+     * @param includeTopLevel whether the campaign-root formation (the one whose
+     *                        {@code parentFormation == null}) should appear in the returned list.
+     *                        Honors {@link mekhq.campaign.campaignOptions.CampaignOptions#isUseExtendedTOEForceName()}
+     *                        at the caller; renderers should pass that option through.
+     * @return formation names in leaf-first order, up to four entries
      */
-    public List<String> getDisplayPath() {
+    public List<String> getDisplayPath(boolean includeTopLevel) {
         List<String> path = new ArrayList<>();
         path.add(getName());
         Formation parent = getParentFormation();
         int levels = 1;
-        while ((parent != null) && (parent.getParentFormation() != null) && (levels < 4)) {
+        while (parent != null && levels < 4) {
+            // parent.getParentFormation() == null means parent is the campaign-root: include only
+            // when the caller asked for it. Without this guard the older 3-level-plus-root display
+            // would silently grow to 4 levels for users who hadn't opted in.
+            if (parent.getParentFormation() == null && !includeTopLevel) {
+                break;
+            }
             path.add(parent.getName());
             levels++;
             parent = parent.getParentFormation();
         }
         return path;
+    }
+
+    /**
+     * Equivalent to {@code getDisplayPath(false)} — the abbreviated breadcrumb that omits the
+     * campaign-root formation. Kept for callers that don't have a {@link mekhq.campaign.Campaign}
+     * handle to read the campaign option from.
+     *
+     * @return formation names in leaf-first order, top-level excluded, up to four entries
+     */
+    public List<String> getDisplayPath() {
+        return getDisplayPath(false);
+    }
+
+    /**
+     * Joins {@link #getDisplayPath(boolean)} with the supplied separator. Used by plain-text consumers
+     * (e.g. AssignmentLogger) that can't render multi-line HTML.
+     *
+     * @param separator       the string inserted between adjacent names (e.g. {@code " > "})
+     * @param includeTopLevel whether the campaign-root formation should appear in the result
+     * @return joined leaf-first breadcrumb
+     */
+    public String getDisplayPath(String separator, boolean includeTopLevel) {
+        return String.join(separator, getDisplayPath(includeTopLevel));
     }
 
     /**
