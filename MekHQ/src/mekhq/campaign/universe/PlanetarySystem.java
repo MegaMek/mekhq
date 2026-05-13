@@ -223,9 +223,7 @@ public class PlanetarySystem {
                 planet.prepareForSerialization();
             }
         }
-        if (events != null) {
-            eventList = new ArrayList<>(events.values());
-        }
+        eventList = ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
     }
 
     public String getId() {

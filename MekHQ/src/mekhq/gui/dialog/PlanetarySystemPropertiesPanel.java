@@ -148,6 +148,13 @@ final class PlanetarySystemPropertiesPanel extends JPanel {
         this.satelliteModel = new SatelliteTableModel();
         this.tblSatellites = new JTable(satelliteModel);
 
+        txtPlanetName.setName("txtPlanetaryPropertyPlanetName");
+        txtGravity.setName("txtPlanetaryPropertyGravity");
+        tblLandMasses.setName("tblPlanetaryPropertyLandMasses");
+        tblSatellites.setName("tblPlanetaryPropertySatellites");
+        txtSource.setName("txtPlanetaryPropertySource");
+        txtVersion.setName("txtPlanetaryPropertyVersion");
+
         txtDescription.setLineWrap(true);
         txtDescription.setWrapStyleWord(true);
 

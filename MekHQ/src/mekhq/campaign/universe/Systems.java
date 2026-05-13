@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.enums.HPGRating;
@@ -91,9 +92,7 @@ public class Systems {
         }
     }
 
-    /**
-     * Loads the unmodified startup systems data and makes it active until a campaign overlay is installed.
-     */
+    /** Loads startup systems data and makes it active until a campaign overlay is installed. */
     public static void initializeDefaultSystems() throws DOMException, IOException {
         setCanonicalSystems(loadDefault());
     }
@@ -298,8 +297,9 @@ public class Systems {
     // Data loading methods
 
     /**
-     * Loads the default planetary system data. This includes all *.yml files in data/universe/planetary_systems and
-     * subfolders.
+     * Loads startup planetary system data. This includes all *.yml files in data/universe/planetary_systems,
+     * subfolders, and any matching files in the configured user directory. Campaign-save planetary overrides are
+     * applied separately.
      *
      */
     public static Systems loadDefault() throws DOMException, IOException {
@@ -310,6 +310,12 @@ public class Systems {
 
         // load default systems
         systems.load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
+
+        // load user-installed systems for backwards compatibility
+        String userDir = PreferenceManager.getClientPreferences().getUserDir();
+        if ((userDir != null) && !userDir.isBlank()) {
+            systems.load(new File(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
+        }
 
         // a bit of post loading clean up
         systems.cleanupSystems();

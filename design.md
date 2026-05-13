@@ -68,10 +68,11 @@ id: Galatea
 The effective load model is:
 
 ```text
-canonical data -> campaign planetary overrides -> editor working copies
+packaged data + user-dir custom systems -> campaign planetary overrides -> editor working copies
 ```
 
-where campaign overrides with the same system id replace canonical systems for that campaign only.
+where user-dir custom systems are existing startup data available to every campaign, and campaign overrides with the same
+system id replace startup systems for that campaign only.
 
 `PlanetarySystemYamlIO` is the shared YAML gateway for this feature. It owns the Jackson mapper configuration used for
 read/write/copy operations, including `SourceableValue`, `SocioIndustrialData`, and `StarType` serializers.
@@ -81,11 +82,12 @@ divergent serializer for the planetary model.
 ### Campaign Scope
 
 Overrides are scoped to the campaign save. If a GM sends another developer the `.cpnx` / `.cpnx.gz`, the edited planetary
-systems travel with that campaign. Other campaigns keep using canonical planetary data unless they contain their own
+systems travel with that campaign. Other campaigns keep using startup planetary data unless they contain their own
 override section.
 
-`Systems` keeps the canonical universe loaded at startup as an internal base and exposes purpose-specific helpers for
-campaign data. `Systems.createCampaignSystems(...)` builds a campaign registry, and
+`Systems` keeps the startup universe loaded as an internal base and exposes purpose-specific helpers for campaign data.
+The startup universe still includes existing user-dir custom planetary YAML for backwards compatibility, but the editor
+does not write or manage those files. `Systems.createCampaignSystems(...)` builds a campaign registry, and
 `Systems.activateCampaignSystems(...)` makes that registry active for legacy call sites that still read from
 `Systems.getInstance()`. New or touched campaign-runtime code should prefer `campaign.getSystemById(...)`,
 `campaign.getSystemByName(...)`, and related campaign accessors.
@@ -158,6 +160,7 @@ there is no separate user-data bundle to import or export.
 - Live validation panel powered by `PlanetarySystemValidator` / `SystemValidator`.
 - Save into the top-level campaign XML `<planetarySystemOverrides>` section.
 - Campaign load applies overrides before location and mission data resolves system references.
+- Existing user-dir custom planetary system YAML remains supported as startup data.
 - Active campaign overlay for legacy runtime callers that still use `Systems.getInstance()`.
 - Keyboard shortcuts: `Ctrl+S` save, `Ctrl+F` focus search, `Delete` / `Ctrl+D` delete selected event.
 - Shared YAML read/write/copy path in `PlanetarySystemYamlIO`.
@@ -189,7 +192,8 @@ there is no separate user-data bundle to import or export.
 ## 5. What We Discarded as Out of Scope
 
 - **Editing canonical `mm-data` files.** The editor writes only campaign overrides.
-- **Loose user-dir override files.** Editor output lives in the campaign save, not in the configured user data directory.
+- **Loose user-dir editor output files.** Existing user-dir custom planetary systems remain supported as startup data, but
+  editor output lives in the campaign save, not in the configured user data directory.
 - **System id editing.** Existing saves and references depend on stable system ids.
 - **System `name` editing.** The field is mostly vestigial and used as an id fallback during load.
 - **`sucsId` editing.** It is a Sarna catalog tag with no gameplay value in the editor and can trigger duplicate-id

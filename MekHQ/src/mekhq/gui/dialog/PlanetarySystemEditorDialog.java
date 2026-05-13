@@ -67,13 +67,14 @@ import java.util.stream.Collectors;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -417,6 +418,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         tblSystemEvents.setName("tblPlanetarySystemSystemEvents");
         tblSystemEvents.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSystemEvents.setRowHeight(UIUtil.scaleForGUI(22));
+        configureSystemEventChargeEditors();
         tblSystemEvents.getSelectionModel().addListSelectionListener(
               evt -> updateSystemEventButtonState());
         panel.add(createTitledComponentPane("PlanetarySystemEditorDialog.systemEvents.events",
@@ -436,6 +438,34 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         panel.add(buttons, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private void configureSystemEventChargeEditors() {
+        String[] chargeValues = systemEventChargeValues();
+        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_NADIR).setCellEditor(
+              new DefaultCellEditor(new JComboBox<>(chargeValues)));
+        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_ZENITH).setCellEditor(
+              new DefaultCellEditor(new JComboBox<>(chargeValues)));
+    }
+
+    private String[] systemEventChargeValues() {
+        return new String[] {
+              systemEventChargeInheritLabel(),
+              systemEventChargeYesLabel(),
+              systemEventChargeNoLabel()
+        };
+    }
+
+    private String systemEventChargeInheritLabel() {
+        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.inherit");
+    }
+
+    private String systemEventChargeYesLabel() {
+        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.yes");
+    }
+
+    private String systemEventChargeNoLabel() {
+        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.no");
     }
 
     private Component createPlanetListPane() {
@@ -2896,10 +2926,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
 
         @Override
         public Class<?> getColumnClass(int column) {
-            return switch (column) {
-                case COL_NADIR, COL_ZENITH -> Boolean.class;
-                default -> String.class;
-            };
+            return String.class;
         }
 
         @Override
@@ -2911,12 +2938,12 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         public Object getValueAt(int row, int column) {
             PlanetarySystemEvent event = getEventAt(row);
             if (event == null) {
-                return (column == COL_NADIR || column == COL_ZENITH) ? Boolean.FALSE : "";
+                return (column == COL_NADIR || column == COL_ZENITH) ? systemEventChargeInheritLabel() : "";
             }
             return switch (column) {
                 case COL_DATE -> formatDate(event.date);
-                case COL_NADIR -> sourceableBoolean(event.nadirCharge);
-                case COL_ZENITH -> sourceableBoolean(event.zenithCharge);
+                case COL_NADIR -> formatSystemEventCharge(event.nadirCharge);
+                case COL_ZENITH -> formatSystemEventCharge(event.zenithCharge);
                 default -> "";
             };
         }
@@ -2967,11 +2994,14 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
 
         private void updateBooleanField(PlanetarySystemEvent event, Object value, boolean nadir) {
-            boolean newValue = Boolean.TRUE.equals(value);
             SourceableValue<Boolean> existing = nadir ? event.nadirCharge : event.zenithCharge;
-            String source = (existing == null) ? null : existing.getSource();
-            String version = (existing == null) ? null : existing.getVersion();
-            SourceableValue<Boolean> wrapped = SourceableValue.of(source, version, newValue);
+            Boolean newValue = parseSystemEventCharge(value);
+            SourceableValue<Boolean> wrapped = null;
+            if (newValue != null) {
+                String source = (existing == null) ? null : existing.getSource();
+                String version = (existing == null) ? null : existing.getVersion();
+                wrapped = SourceableValue.of(source, version, newValue);
+            }
             if (nadir) {
                 event.nadirCharge = wrapped;
             } else {
@@ -2982,8 +3012,25 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             onPropertiesChanged();
         }
 
-        private Boolean sourceableBoolean(SourceableValue<Boolean> value) {
-            return ((value == null) || (value.getValue() == null)) ? Boolean.FALSE : value.getValue();
+        private String formatSystemEventCharge(SourceableValue<Boolean> value) {
+            if ((value == null) || (value.getValue() == null)) {
+                return systemEventChargeInheritLabel();
+            }
+            return value.getValue() ? systemEventChargeYesLabel() : systemEventChargeNoLabel();
+        }
+
+        private Boolean parseSystemEventCharge(Object value) {
+            if (value instanceof Boolean booleanValue) {
+                return booleanValue;
+            }
+            String text = value == null ? "" : value.toString();
+            if (systemEventChargeYesLabel().equals(text)) {
+                return true;
+            }
+            if (systemEventChargeNoLabel().equals(text)) {
+                return false;
+            }
+            return null;
         }
     }
 }

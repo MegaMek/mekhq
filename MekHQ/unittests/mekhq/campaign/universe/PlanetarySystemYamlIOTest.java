@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -52,9 +53,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import megamek.common.preference.PreferenceManager;
+import mekhq.MHQConstants;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Document;
@@ -144,6 +148,7 @@ class PlanetarySystemYamlIOTest {
         assertFalse(savedYaml.contains("\nstar:"));
         assertFalse(savedYaml.contains("\nrechargeStationsText:"));
         assertFalse(savedYaml.contains("\nparentSystem:"));
+        assertFalse(savedYaml.contains("event: []"));
     }
 
     @Test
@@ -221,8 +226,51 @@ class PlanetarySystemYamlIOTest {
     }
 
     @Test
+    void campaignXmlOverrideIdMustMatchEmbeddedYamlId() {
+        StringBuilder xml = new StringBuilder();
+        xml.append("<planetarySystemOverrides>\n");
+        xml.append("  <planetarySystemOverride id=\"XML Id\"><![CDATA[\n");
+        xml.append(VERSIONED_SYSTEM);
+        xml.append("  ]]></planetarySystemOverride>\n");
+        xml.append("</planetarySystemOverrides>\n");
+
+        IOException exception = assertThrows(IOException.class, () -> parseCampaignXmlOverrides(xml.toString()));
+
+        assertTrue(exception.getMessage().contains("does not match YAML id"));
+    }
+
+    @Test
     void campaignXmlOverridesSkipEmptyCollections() {
         assertEquals("", writeCampaignXmlOverrides(List.of()));
+    }
+
+    @Test
+    void loadDefaultIncludesUserDirectorySystems(final @TempDir Path userDirectory) throws Exception {
+        Path customSystemsDirectory = userDirectory.resolve(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
+        Files.createDirectories(customSystemsDirectory);
+        Files.writeString(customSystemsDirectory.resolve("User Custom.yml"), """
+              id: User Custom
+              xcood: 9999.0
+              ycood: 9999.0
+              spectralType: G2V
+              primarySlot: 1
+              planet:
+                - name: User Custom Prime
+                  type: TERRESTRIAL
+                  orbitalDist: 1.0
+                  sysPos: 1
+              """, StandardCharsets.UTF_8);
+
+        String originalUserDir = PreferenceManager.getClientPreferences().getUserDir();
+        try {
+            PreferenceManager.getClientPreferences().setUserDir(userDirectory.toString());
+
+            Systems systems = Systems.loadDefault();
+
+            assertNotNull(systems.getSystemById("User Custom"));
+        } finally {
+            PreferenceManager.getClientPreferences().setUserDir(originalUserDir == null ? "" : originalUserDir);
+        }
     }
 
     @ParameterizedTest
@@ -281,6 +329,12 @@ class PlanetarySystemYamlIOTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PlanetarySystemYamlIO.write(system, outputStream);
         return outputStream.toString(StandardCharsets.UTF_8);
+    }
+
+    private static List<PlanetarySystem> parseCampaignXmlOverrides(String xml) throws Exception {
+        Document document = MHQXMLUtility.newSafeDocumentBuilder()
+                                .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+        return PlanetarySystemCampaignXmlIO.parse(document.getDocumentElement());
     }
 
     private static String writeCampaignXmlOverrides(Collection<PlanetarySystem> systems) {

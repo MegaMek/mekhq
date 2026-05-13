@@ -162,9 +162,7 @@ public class Planet {
     }
 
     void prepareForSerialization() {
-        if (events != null) {
-            eventList = new ArrayList<>(events.values());
-        }
+        eventList = ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
     }
 
     // Constant base data

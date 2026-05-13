@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -88,9 +89,26 @@ public final class PlanetarySystemCampaignXmlIO {
             if ((yaml == null) || yaml.isBlank()) {
                 continue;
             }
-            overrides.add(PlanetarySystemYamlIO.read(yaml.strip()));
+            String xmlId = parseOverrideId(childNode);
+            PlanetarySystem system = PlanetarySystemYamlIO.read(yaml.strip());
+            if (!xmlId.equals(system.getId())) {
+                String message = String.format(Locale.ROOT,
+                      "Planetary system override id attribute \"%s\" does not match YAML id \"%s\".", xmlId,
+                      system.getId());
+                throw new IOException(message);
+            }
+            overrides.add(system);
         }
         return overrides;
+    }
+
+    private static String parseOverrideId(Node overrideNode) throws IOException {
+        Node idAttribute = overrideNode.getAttributes().getNamedItem(ID_ATTRIBUTE);
+        String xmlId = idAttribute == null ? null : idAttribute.getTextContent();
+        if ((xmlId == null) || xmlId.isBlank()) {
+            throw new IOException("Planetary system override is missing an id attribute.");
+        }
+        return xmlId;
     }
 
     private static void writeOverride(PrintWriter writer, int indent, PlanetarySystem system) {
