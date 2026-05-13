@@ -93,7 +93,47 @@ public final class ForceDescriptorWalker {
         LOGGER.info("[CompanyGen] ForceDescriptorWalker.walk START rootEchelon={} rootFaction={} parentFormation={}",
               root.getEchelon(), root.getFaction(),
               parentInCampaign == null ? "null" : parentInCampaign.getName());
-        int leaves = walkInternal(root, campaign, parentInCampaign, onLeaf, 0);
+
+        // Merge the root descriptor into the campaign's existing top-level Formation instead of
+        // nesting under it. Without this, the user gets a redundant level — their campaign's
+        // unit-name Formation (e.g. "The Operations Global") with a single child carrying the
+        // ratgen-generated top name (e.g. "Regiment") which then contains the real battalions.
+        // After merge: the campaign Formation keeps its user-chosen name, picks up the
+        // FormationLevel from the descriptor, and the descriptor's children become direct
+        // children of the campaign root.
+        boolean rootHasChildren = (root.getSubForces() != null && !root.getSubForces().isEmpty())
+              || (root.getAttached() != null && !root.getAttached().isEmpty());
+
+        int leaves;
+        if (rootHasChildren && parentInCampaign != null) {
+            FormationLevel level = mapEchelonToFormationLevel(root.getEchelon(), root.getFaction());
+            if (level != null) {
+                parentInCampaign.setFormationLevel(level);
+            }
+            LOGGER.info("[CompanyGen] Merged root descriptor into existing campaign Formation '{}' (id={} formationLevel={}); recursing into {} subForces + {} attached",
+                  parentInCampaign.getName(), parentInCampaign.getId(), level,
+                  root.getSubForces() == null ? 0 : root.getSubForces().size(),
+                  root.getAttached() == null ? 0 : root.getAttached().size());
+
+            leaves = 0;
+            if (root.getSubForces() != null) {
+                for (ForceDescriptor child : root.getSubForces()) {
+                    leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
+                }
+            }
+            if (root.getAttached() != null) {
+                for (ForceDescriptor child : root.getAttached()) {
+                    LOGGER.info("[CompanyGen]   (attached child of root)");
+                    leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
+                }
+            }
+        } else {
+            // Edge cases: the root descriptor is itself a leaf (single-unit generation), or no
+            // existing campaign Formation was supplied. Fall through to the normal walkInternal
+            // path which creates a Formation for the root and proceeds.
+            leaves = walkInternal(root, campaign, parentInCampaign, onLeaf, 0);
+        }
+
         LOGGER.info("[CompanyGen] ForceDescriptorWalker.walk DONE; {} leaves visited", leaves);
         return leaves;
     }
