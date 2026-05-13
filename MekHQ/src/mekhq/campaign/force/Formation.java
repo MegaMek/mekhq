@@ -398,6 +398,41 @@ public class Formation {
     }
 
     /**
+     * Returns the display-path of this formation as a leaf-first list of names with the campaign-root
+     * formation excluded, mirroring what the Hangar and Personnel tabs' Formation column shows. Capped
+     * at four levels so deeply-nested structures don't produce unbounded output.
+     *
+     * <p>Example: a Lance under Company "A Company" under Battalion "First Battalion" under the
+     * campaign-root Regiment produces {@code ["Lance Name", "A Company", "First Battalion"]}; the
+     * top-level Regiment is omitted because it's the campaign root.</p>
+     *
+     * @return formation names in leaf-first order, top-level excluded, up to four entries
+     */
+    public List<String> getDisplayPath() {
+        List<String> path = new ArrayList<>();
+        path.add(getName());
+        Formation parent = getParentFormation();
+        int levels = 1;
+        while ((parent != null) && (parent.getParentFormation() != null) && (levels < 4)) {
+            path.add(parent.getName());
+            levels++;
+            parent = parent.getParentFormation();
+        }
+        return path;
+    }
+
+    /**
+     * Convenience overload joining {@link #getDisplayPath()} with the supplied separator. Used by
+     * plain-text consumers (e.g. AssignmentLogger) that can't render multi-line HTML.
+     *
+     * @param separator the string inserted between adjacent names (e.g. {@code " > "})
+     * @return joined leaf-first breadcrumb with the top-level formation omitted
+     */
+    public String getDisplayPath(String separator) {
+        return String.join(separator, getDisplayPath());
+    }
+
+    /**
      * @return A String representation of the full hierarchical formation including ID for MM export
      */
     public String getFullMMName() {
