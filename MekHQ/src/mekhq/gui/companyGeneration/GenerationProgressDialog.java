@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ratgenerator.Ruleset;
+import megamek.logging.MMLogger;
 
 /**
  * Modal dialog with an indeterminate progress bar and a status label that the Company Generation
@@ -65,11 +66,15 @@ import megamek.client.ratgenerator.Ruleset;
  */
 public class GenerationProgressDialog extends JDialog {
 
+    private static final MMLogger LOGGER = MMLogger.create(GenerationProgressDialog.class);
+
     private final JLabel statusLabel;
     private final JProgressBar progressBar;
+    private final long createdAtNanos = System.nanoTime();
 
     public GenerationProgressDialog(JFrame parent) {
         super(parent, "Generating Force", Dialog.ModalityType.APPLICATION_MODAL);
+        LOGGER.info("[ProgressDialog] constructed (thread={})", Thread.currentThread().getName());
 
         statusLabel = new JLabel("Initializing...");
         statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 8, 4));
@@ -101,7 +106,14 @@ public class GenerationProgressDialog extends JDialog {
      * is dispatched through {@link SwingUtilities#invokeLater(Runnable)}.
      */
     public void setStatus(String message) {
-        SwingUtilities.invokeLater(() -> statusLabel.setText(message));
+        long elapsedMs = (System.nanoTime() - createdAtNanos) / 1_000_000;
+        String callerThread = Thread.currentThread().getName();
+        LOGGER.info("[ProgressDialog] setStatus '{}' (caller={} elapsed={}ms)",
+              message, callerThread, elapsedMs);
+        SwingUtilities.invokeLater(() -> {
+            statusLabel.setText(message);
+            LOGGER.info("[ProgressDialog]   statusLabel.setText '{}' applied (EDT)", message);
+        });
     }
 
     /**
@@ -117,9 +129,13 @@ public class GenerationProgressDialog extends JDialog {
      * Closes the dialog. Safe to call from any thread.
      */
     public void finish() {
+        long elapsedMs = (System.nanoTime() - createdAtNanos) / 1_000_000;
+        LOGGER.info("[ProgressDialog] finish requested (caller={} elapsed={}ms)",
+              Thread.currentThread().getName(), elapsedMs);
         SwingUtilities.invokeLater(() -> {
             setVisible(false);
             dispose();
+            LOGGER.info("[ProgressDialog] disposed (EDT)");
         });
     }
 

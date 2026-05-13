@@ -189,7 +189,9 @@ public final class CompanyGenerator {
         int[] leafCount = { 0 };
         int[] skippedNoEntity = { 0 };
         int[] skippedAddFailed = { 0 };
+        long[] stageStartNanos = { System.nanoTime() };
         ForceDescriptorWalker.walk(fd, campaign, root, (leaf, parent) -> {
+            long leafStart = System.nanoTime();
             Entity entity = leaf.getEntity();
             if (entity == null) {
                 LOGGER.warn("[CompanyGen]   LEAF SKIPPED (no entity): name={} unitType={} faction={}",
@@ -197,25 +199,40 @@ public final class CompanyGenerator {
                 skippedNoEntity[0]++;
                 return;
             }
+            String entityDisplay = entity.getDisplayName();
             Unit unit = campaign.addNewUnit(entity, false, 0);
+            long afterAddUnitNanos = System.nanoTime();
             if (unit == null) {
-                LOGGER.warn("[CompanyGen]   LEAF SKIPPED (addNewUnit failed): entity={}",
-                      entity.getDisplayName());
+                LOGGER.warn("[CompanyGen]   LEAF SKIPPED (addNewUnit failed): entity={}", entityDisplay);
                 skippedAddFailed[0]++;
                 return;
             }
             java.util.List<Person> crew = MultiCrewAssembler.assemble(unit, leaf.getCo(), campaign,
                   /* overrideName */ true);
+            long afterAssembleNanos = System.nanoTime();
             if (!crew.isEmpty()) {
                 RankAssigner.apply(leaf.getCo(), crew.get(0));
             }
             parent.addUnit(unit.getId());
             leafCount[0]++;
-            // Surface progress every 25 units to keep the dialog feeling alive on large forces.
-            // Per-leaf updates would flood the EDT for an Army-sized generation.
-            if (listener != null && leafCount[0] % 25 == 0) {
+            long leafTotalMs = (System.nanoTime() - leafStart) / 1_000_000;
+            long addUnitMs = (afterAddUnitNanos - leafStart) / 1_000_000;
+            long assembleMs = (afterAssembleNanos - afterAddUnitNanos) / 1_000_000;
+            // Warn on individual leaves that take more than 500ms — that's usually the sign of a
+            // pathological RATGenerator selection or a slow Entity construction. Useful for spotting
+            // hung-looking generation runs.
+            if (leafTotalMs > 500) {
+                LOGGER.warn("[CompanyGen]   leaf #{} slow: {}ms total (addNewUnit={}ms assemble={}ms) entity={}",
+                      leafCount[0], leafTotalMs, addUnitMs, assembleMs, entityDisplay);
+            }
+            // Surface progress every 5 units to keep the dialog feeling alive AND to give the
+            // log a heartbeat. Earlier batching at 25 was too coarse — a regiment with 36 leaves
+            // would only get one mid-progress update, looking frozen to the user.
+            if (listener != null && leafCount[0] % 5 == 0) {
+                long elapsedSec = (System.nanoTime() - stageStartNanos[0]) / 1_000_000_000;
                 listener.updateProgress(0.0,
-                      String.format("Materializing units and crews... (%d created)", leafCount[0]));
+                      String.format("Materializing units and crews... (%d created, %ds elapsed)",
+                            leafCount[0], elapsedSec));
             }
             LOGGER.info("[CompanyGen]   leaf #{}: entity={} -> Unit added, {} crew, parent Formation id={} ({})",
                   leafCount[0], entity.getDisplayName(), crew.size(),

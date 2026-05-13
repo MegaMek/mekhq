@@ -234,16 +234,30 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // minutes; without a dialog the app appears frozen). The worker's done() handler runs on
         // the EDT after generation completes and fires the post-gen extras.
         GenerationProgressDialog progressDialog = new GenerationProgressDialog(getFrame());
+        long okStartedNanos = System.nanoTime();
+        LOGGER.info("[CompanyGen] okAction prepared SwingWorker (thread={})", Thread.currentThread().getName());
 
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
-                CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
+                long workerStartNanos = System.nanoTime();
+                LOGGER.info("[CompanyGen] SwingWorker.doInBackground START (thread={})",
+                      Thread.currentThread().getName());
+                try {
+                    CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
+                } catch (Throwable t) {
+                    LOGGER.error(t, "[CompanyGen] SwingWorker.doInBackground threw");
+                    throw t;
+                }
+                long elapsedMs = (System.nanoTime() - workerStartNanos) / 1_000_000;
+                LOGGER.info("[CompanyGen] SwingWorker.doInBackground DONE in {}ms", elapsedMs);
                 return null;
             }
 
             @Override
             protected void done() {
+                LOGGER.info("[CompanyGen] SwingWorker.done START (thread={})",
+                      Thread.currentThread().getName());
                 progressDialog.finish();
                 try {
                     // Surface any uncaught exception from the background thread.
@@ -255,13 +269,18 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                           true);
                     return;
                 }
+                LOGGER.info("[CompanyGen] SwingWorker.done -> applyPostGenerationExtras");
                 applyPostGenerationExtras(options);
+                LOGGER.info("[CompanyGen] SwingWorker.done complete");
             }
         };
 
         worker.execute();
+        LOGGER.info("[CompanyGen] SwingWorker.execute() returned; about to setVisible(true) on progressDialog");
         // Modal dialog blocks the EDT until SwingWorker.done() calls finish().
         progressDialog.setVisible(true);
+        long modalElapsedMs = (System.nanoTime() - okStartedNanos) / 1_000_000;
+        LOGGER.info("[CompanyGen] progressDialog.setVisible(true) returned after {}ms (modal closed)", modalElapsedMs);
     }
 
     /**
