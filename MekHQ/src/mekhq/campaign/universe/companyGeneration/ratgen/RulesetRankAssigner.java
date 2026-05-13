@@ -44,7 +44,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -151,10 +153,10 @@ public final class RulesetRankAssigner {
                     continue;
                 }
                 if (person.isSupport()) {
-                    person.setRank(supportRank);
+                    setRankWithFallback(person, supportRank);
                     supportAssigned++;
                 } else if (person.isCombat()) {
-                    person.setRank(enlistedRank);
+                    setRankWithFallback(person, enlistedRank);
                     enlistedAssigned++;
                 }
             }
@@ -185,12 +187,12 @@ public final class RulesetRankAssigner {
         }
         Person commander = pickCommander(campaign, formation, promoted);
         if (commander != null) {
-            commander.setRank(rankIndex);
+            setRankWithFallback(commander, rankIndex);
             promoted.add(commander);
             count++;
-            LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {}",
+            LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {} (effective={})",
                   formation.getName(), formation.getFormationLevel(),
-                  commander.getFullName(), rankIndex);
+                  commander.getFullName(), rankIndex, commander.getRankNumeric());
         } else {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no unpromoted combat Person available",
                   formation.getName(), formation.getFormationLevel());
@@ -293,5 +295,45 @@ public final class RulesetRankAssigner {
      */
     private static int supportRankForFaction(Faction faction) {
         return (faction.isComStarOrWoB() || faction.isClan()) ? 4 : 8;
+    }
+
+    /**
+     * Assigns a rank to a person but walks DOWN the rank table when the preferred index has no
+     * name for the person's effective profession in the campaign's rank system. Prevents the
+     * personnel UI from showing a literal "-" prefix when the rank table has a gap in the
+     * profession's column at the chosen index (e.g., we asked for the IS Standard Sergeant
+     * slot but the active rank system marked that column "-" for Vehicle crew).
+     *
+     * <p>{@link Profession#getProfessionFromBase(RankSystem, Rank)} already walks alternate
+     * profession columns; this method handles the case where every profession in that walk
+     * is empty at the chosen rank index by stepping down through lower indices until it
+     * finds one that resolves to a real name.</p>
+     */
+    private static void setRankWithFallback(Person person, int preferredIndex) {
+        person.setRank(preferredIndex);
+        RankSystem rankSystem = person.getRankSystem();
+        if (rankSystem == null) {
+            return;
+        }
+        Profession base = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+
+        int safeIndex = Math.min(preferredIndex, rankSystem.getRanks().size() - 1);
+        for (int i = safeIndex; i >= 0; i--) {
+            Rank candidate = rankSystem.getRank(i);
+            if (candidate == null) {
+                continue;
+            }
+            Profession effective = base.getProfession(rankSystem, candidate);
+            if (!candidate.isEmpty(effective)) {
+                if (i != preferredIndex) {
+                    LOGGER.warn("[CompanyGen][RankAssign] preferred rank {} empty for {} (profession={}); falling back to {}",
+                          preferredIndex, person.getFullName(), effective, i);
+                    person.setRank(i);
+                }
+                return;
+            }
+        }
+        LOGGER.warn("[CompanyGen][RankAssign] no valid rank found for {} (preferred={}); leaving as-is",
+              person.getFullName(), preferredIndex);
     }
 }
