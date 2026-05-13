@@ -276,7 +276,12 @@ public enum AlternatePaymentModelValues {
     private static Money getUnitContractValue(Entity entity, boolean excludeInfantry, double combatMultiplier,
           double dropShipMultiplier, double warShipMultiplier, double jumpShipMultiplier) {
         int weightClass = entity.getWeightClass();
+
         if (entity.isAerospaceFighter()) {
+            if (entity.isConventionalFighter()) {
+                return CONVENTIONAL_FIGHTER.getValue().multipliedBy(combatMultiplier);
+            }
+
             Money base = switch (weightClass) {
                 case WEIGHT_LIGHT -> AEROSPACE_FIGHTER_LIGHT.getValue();
                 case WEIGHT_MEDIUM -> AEROSPACE_FIGHTER_MEDIUM.getValue();
@@ -379,11 +384,6 @@ public enum AlternatePaymentModelValues {
                                            SUPPORT_VEHICLE_HEAVY.getValue() :
                                            SUPPORT_VEHICLE_SUPER_HEAVY.getValue();
             return base.multipliedBy(combatMultiplier);
-        }
-
-        // Must be before Aerospace Fighter
-        if (entity.isConventionalFighter()) {
-            return CONVENTIONAL_FIGHTER.getValue().multipliedBy(combatMultiplier);
         }
 
         return Money.zero();
