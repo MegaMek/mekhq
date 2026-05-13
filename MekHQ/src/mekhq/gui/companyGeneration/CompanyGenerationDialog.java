@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.companyGeneration;
 
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
@@ -40,37 +40,32 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.buttons.MMButton;
-import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.ui.FastJScrollPane;
-import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
+import mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator;
+import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
-import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -81,31 +76,33 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.PrisonerTrackingCampaignOpt
 import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
-import mekhq.gui.panels.CompanyGenerationOptionsPanel;
 
 /**
- * This is currently just a temporary dialog over the CompanyGenerationOptionsPanel. Wave 5 will be when this gets
- * redone to be far nicer and more customizable.
+ * Top-level dialog for the Company Generation pipeline. Hosts a {@link CompanyGenerationPane} with
+ * four tabs (Setup, Force Generator, Spares, Other) and runs the ratgen pipeline on OK.
  *
- * @author Justin "Windchild" Bowen
+ * <p>This dialog used to wrap a monolithic {@code CompanyGenerationOptionsPanel} that exposed
+ * AtB / Windchild method pickers alongside the ratgen path. With the deletion of those legacy
+ * generators, the dialog runs the ratgen pipeline unconditionally: the four tabs persist user
+ * preferences into {@link CompanyGenerationOptions} and the campaign's auto-logistics percentages,
+ * then {@link CompanyGenerator#generate(Campaign, CompanyGenerationOptions)} performs the actual
+ * generation.</p>
+ *
+ * @author Justin "Windchild" Bowen (original)
  */
 public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
-    //region Variable Declarations
+
     private Campaign campaign;
     private CompanyGenerationOptions companyGenerationOptions;
-    private CompanyGenerationOptionsPanel companyGenerationOptionsPanel;
-    //endregion Variable Declarations
+    private CompanyGenerationPane pane;
 
-    //region Constructors
     public CompanyGenerationDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "CompanyGenerationDialog", "CompanyGenerationDialog.title");
         setCampaign(campaign);
         setCompanyGenerationOptions(null);
         initialize();
     }
-    //endregion Constructors
 
-    //region Getters/Setters
     public Campaign getCampaign() {
         return campaign;
     }
@@ -122,29 +119,29 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         this.companyGenerationOptions = companyGenerationOptions;
     }
 
-    public CompanyGenerationOptionsPanel getCompanyGenerationOptionsPanel() {
-        return companyGenerationOptionsPanel;
+    public CompanyGenerationPane getPane() {
+        return pane;
     }
 
-    public void setCompanyGenerationOptionsPanel(final CompanyGenerationOptionsPanel companyGenerationOptionsPanel) {
-        this.companyGenerationOptionsPanel = companyGenerationOptionsPanel;
-    }
-    //endregion Getters/Setters
-
-    //region Initialization
     @Override
     protected Container createCenterPane() {
-        // The panel is now self-contained: it builds its own tabbed layout including a Force
-        // Generator tab with the embedded ratgen view. The dialog just hands the panel a scroll
-        // pane around it for sizing.
-        setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
-              getCompanyGenerationOptions()));
-        return new FastJScrollPane(getCompanyGenerationOptionsPanel());
+        CompanyGenerationOptions startingOptions = companyGenerationOptions != null
+              ? companyGenerationOptions
+              : new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        pane = new CompanyGenerationPane(getFrame(), getCampaign(), startingOptions);
+
+        // Populate every tab from the supplied options on first show.
+        pane.getSetupTab().loadValuesFromOptions(startingOptions);
+        pane.getForceGeneratorTab().loadValuesFromOptions(startingOptions);
+        pane.getSparesTab().loadValuesFromOptions(startingOptions);
+        pane.getOtherTab().loadValuesFromOptions(startingOptions);
+
+        return new FastJScrollPane(pane);
     }
 
     @Override
     protected JPanel createButtonPanel() {
-        final JPanel panel = new JPanel(new GridLayout(2, 3));
+        final JPanel panel = new JPanel(new GridLayout(2, 2));
 
         setOkButton(new MMButton("btnGenerate", resources, "Generate.text",
               "CompanyGenerationDialog.btnGenerate.toolTipText", this::confirmationActionListener));
@@ -157,16 +154,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
               "Cancel.toolTipText", this::cancelActionPerformed));
 
         panel.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
-              "CompanyGenerationDialog.btnRestore.toolTipText",
-              evt -> getCompanyGenerationOptionsPanel().setOptions()));
-
-        panel.add(new MMButton("btnImport", resources, "Import.text",
-              "CompanyGenerationDialog.btnImport.toolTipText",
-              evt -> getCompanyGenerationOptionsPanel().importOptionsFromXML()));
-
-        panel.add(new MMButton("btnExport", resources, "Export.text",
-              "CompanyGenerationDialog.btnExport.toolTipText",
-              evt -> getCompanyGenerationOptionsPanel().exportOptionsToXML()));
+              "CompanyGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
 
         return panel;
     }
@@ -188,48 +176,33 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         new FactionJudgmentDialog(campaign, speaker, campaign.getCommander(), "HELLO", campaignFaction,
               FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
     }
-    //endregion Initialization
+
+    private void restoreDefaultsActionListener(final ActionEvent evt) {
+        CompanyGenerationOptions defaults = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        pane.getSetupTab().loadValuesFromOptions(defaults);
+        pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
+        pane.getSparesTab().loadValuesFromOptions(defaults);
+        pane.getOtherTab().loadValuesFromOptions(defaults);
+    }
 
     @Override
     protected void okAction() {
-        final CompanyGenerationOptions options = getCompanyGenerationOptionsPanel().createOptionsFromPanel();
+        // Build a CompanyGenerationOptions snapshot from the four tabs. The Setup / Force Generator /
+        // Other tabs all round-trip through this object; the Spares tab writes to CampaignOptions
+        // directly (see SparesTab.writeValuesToOptions for the rationale).
+        CompanyGenerationOptions options = companyGenerationOptions != null
+              ? companyGenerationOptions
+              : new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        pane.getSetupTab().writeValuesToOptions(options);
+        pane.getForceGeneratorTab().writeValuesToOptions(options);
+        pane.getSparesTab().writeValuesToOptions(options);
+        pane.getOtherTab().writeValuesToOptions(options);
 
-        // Dev-gated branch: route through the ratgen pipeline instead of the legacy strategy.
-        // Phase 1 only generates units + Formations + crews; parts / finance / contract polish stay
-        // on the legacy path until those helpers are extracted into the polish package.
-        if (options.getMethod().isRulesetBased()) {
-            // Pull the user's selections from the embedded Force Generator panel (now living inside
-            // the panel's Force Generator tab) into the snapshot. CompanyGenerator.generate's Stage 0
-            // re-anchors year from the campaign regardless, so the snapshot ends up with the canonical
-            // campaign year even if the panel's year field shows something else.
-            ForceGeneratorOptionsView ratgenView = getCompanyGenerationOptionsPanel().getRatgenOptionsView();
-            if (ratgenView != null) {
-                ForceDescriptor fd = ratgenView.buildForceDescriptor();
-                options.getForceDescriptorSnapshot().populateFromForceDescriptor(fd);
-            }
-            mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator.generate(getCampaign(), options);
-            MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
-                  getCompanyGenerationOptionsPanel().getCampaign().getFormations()));
-            return;
-        }
-
-        final AbstractCompanyGenerator generator = options.getMethod().getGenerator(getCampaign(), options);
-
-        final List<CompanyGenerationPersonTracker> trackers = generator.generatePersonnel(getCampaign());
-        generator.generateUnitGenerationParameters(trackers);
-        generator.generateEntities(getCampaign(), trackers);
-        final List<Unit> units = generator.applyPhaseOneToCampaign(getCampaign(), trackers);
-
-        final List<Entity> mothballedEntities = generator.generateMothballedEntities(getCampaign(), trackers);
-        final List<Part> parts = generator.generateSpareParts(units);
-        final List<Armor> armour = generator.generateArmour(units);
-        final List<AmmoStorage> ammunition = generator.generateAmmunition(getCampaign(), units);
-        units.addAll(generator.applyPhaseTwoToCampaign(getCampaign(), mothballedEntities, parts, armour, ammunition));
-
-        generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, null);
-
-        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
-              getCompanyGenerationOptionsPanel().getCampaign().getFormations()));
+        // Run the ratgen pipeline. Stage 0 anchors year/faction from the campaign, the walker
+        // materializes Units + Persons under the ToE, and Stage 8 (when wired) applies parts /
+        // finance / contract polish per the snapshot above and the campaign's auto-logistics.
+        CompanyGenerator.generate(getCampaign(), options);
+        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
 
         if (campaign.getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
@@ -240,7 +213,13 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         reputationController.initializeReputation(campaign);
         campaign.setReputation(reputationController);
 
-        processBonusUnitsBasedOnCampaignOptions(trackers, options);
+        // processBonusUnitsBasedOnCampaignOptions takes the legacy CompanyGenerationPersonTracker
+        // list. The ratgen pipeline doesn't produce trackers; passing an empty list means the
+        // alternative-advanced-medical spare-personnel loop won't fire. The other branches of
+        // processBonusUnitsBasedOnCampaignOptions only consult the campaign, so they still work.
+        // TODO: have CompanyGenerator.generate return the generated Persons so we can supply a
+        // real tracker list and restore the alt-medical spare-pilot top-up.
+        processBonusUnitsBasedOnCampaignOptions(Collections.emptyList(), options);
     }
 
     private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
@@ -338,6 +317,9 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected ValidationState validateAction(final boolean display) {
-        return getCompanyGenerationOptionsPanel().validateOptions(display);
+        // Alpha: no validation. The Force Generator panel doesn't expose an obviously-invalid state,
+        // and the tabs persist or default cleanly. Validation can grow as user feedback identifies
+        // genuinely invalid combinations.
+        return ValidationState.SUCCESS;
     }
 }
