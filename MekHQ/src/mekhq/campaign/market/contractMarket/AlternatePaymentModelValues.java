@@ -291,7 +291,7 @@ public enum AlternatePaymentModelValues {
 
         if (entity.isBattleMek()) {
             if (entity instanceof LandAirMek) {
-                return LAM.getValue();
+                return LAM.getValue().multipliedBy(combatMultiplier);
             }
 
             Money base = switch (weightClass) {
@@ -362,7 +362,7 @@ public enum AlternatePaymentModelValues {
 
         // Must be after large craft
         if (entity.isSmallCraft()) {
-            return SMALL_CRAFT.getValue();
+            return SMALL_CRAFT.getValue().multipliedBy(combatMultiplier);
         }
 
         if (entity.isProtoMek()) {
@@ -383,7 +383,7 @@ public enum AlternatePaymentModelValues {
 
         // Must be before Aerospace Fighter
         if (entity.isConventionalFighter()) {
-            return CONVENTIONAL_FIGHTER.getValue();
+            return CONVENTIONAL_FIGHTER.getValue().multipliedBy(combatMultiplier);
         }
 
         return Money.zero();
