@@ -818,7 +818,7 @@ public class AtBDynamicScenarioFactory {
                         // swap out standard armor for snowsuits or heat suits as appropriate
                         if (actualUnitType == INFANTRY) {
                             for (Entity curPlatoon : generatedLance) {
-                                changeInfantryKit((Infantry) curPlatoon,
+                                changeInfantryKit((ConvInfantry) curPlatoon,
                                       isLowPressure,
                                       isTainted,
                                       scenario.getTemperature());
@@ -1101,7 +1101,7 @@ public class AtBDynamicScenarioFactory {
         if (!transportedEntities.isEmpty()) {
             // Transported units need to filter out battle armor before applying armor changes
             for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == INFANTRY).toList()) {
-                changeInfantryKit((Infantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+                changeInfantryKit((ConvInfantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
             }
         }
 
@@ -2277,7 +2277,7 @@ public class AtBDynamicScenarioFactory {
 
         // If needed, temporarily assign troops hostile environmental suits
         if (temporaryXCT) {
-            changeInfantryKit((Infantry) crewedPlatoon, false, true, 25);
+            changeInfantryKit((ConvInfantry) crewedPlatoon, false, true, 25);
         }
 
         return crewedPlatoon;
@@ -2293,7 +2293,8 @@ public class AtBDynamicScenarioFactory {
      * @param isTainted     true if atmosphere has contaminants
      * @param temperature   Scenario temperature, in degrees C
      */
-    private static void changeInfantryKit(Infantry platoon, boolean isLowPressure, boolean isTainted, int temperature) {
+    private static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
+          int temperature) {
         boolean isHot = temperature > 50;
         boolean isCold = temperature < -30;
 
@@ -2619,7 +2620,7 @@ public class AtBDynamicScenarioFactory {
 
         // If needed, temporarily assign troops hostile environmental suits
         if (temporaryXCT) {
-            changeInfantryKit(((Infantry) crewedPlatoon), false, true, 25);
+            changeInfantryKit((ConvInfantry) crewedPlatoon, false, true, 25);
         }
 
         return crewedPlatoon;

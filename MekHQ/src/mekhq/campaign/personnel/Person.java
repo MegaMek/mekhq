@@ -4674,7 +4674,7 @@ public class Person {
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if ((getUnit() != null) &&
                       getUnit().isConventionalInfantry() &&
-                      ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                      ((ConvInfantry) getUnit().getEntity()).hasSpecialization()) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
                                                              .getSalarySpecialistInfantryMultiplier());
             }
