@@ -300,8 +300,21 @@ public final class FormationIconBuilder {
 
     /**
      * Maps a {@link FormationLevel} to the formation-shape filename appropriate for the faction
-     * family. Returns {@code null} for levels that don't have a matching icon (TEAM/INVALID/NONE
-     * fallbacks aside, every IS / Clan / ComStar level is covered).
+     * family. Every level from the smallest (Team / Point / Level I) up through the largest the
+     * ratgen engine can produce is covered:
+     *
+     * <ul>
+     *   <li>Inner Sphere / Periphery / Mercenary: TEAM / LANCE / COMPANY / BATTALION / REGIMENT /
+     *       BRIGADE map directly. DIVISION / CORPS / ARMY / ARMY_GROUP fall back to the BRIGADE icon
+     *       because mm-data only ships IS shapes up to Brigade.</li>
+     *   <li>Clan: TEAM (Point) / STAR_OR_NOVA / BINARY_OR_TRINARY / CLUSTER / GALAXY map directly.
+     *       TOUMAN falls back to the GALAXY icon (no Touman shape ships in mm-data).</li>
+     *   <li>ComStar / WoB: TEAM (Level I) / LEVEL_II_OR_CHOIR through LEVEL_VI all map directly;
+     *       all five levels ship in mm-data.</li>
+     * </ul>
+     *
+     * <p>Returns {@code null} only for non-canonical levels (NONE, INVALID, REMOVE_OVERRIDE) so the
+     * caller can skip those nodes cleanly.</p>
      */
     private static String formationFilenameFor(FormationLevel level, Faction faction) {
         if (level == null) {
@@ -313,7 +326,8 @@ public final class FormationIconBuilder {
                 case STAR_OR_NOVA -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME;
                 case BINARY_OR_TRINARY -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME;
                 case CLUSTER -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_CLUSTER_FILENAME;
-                case GALAXY -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_GALAXY_FILENAME;
+                // GALAXY is the largest Clan shape shipped in mm-data; TOUMAN falls back to it.
+                case GALAXY, TOUMAN -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_GALAXY_FILENAME;
                 default -> null;
             };
         }
@@ -328,14 +342,17 @@ public final class FormationIconBuilder {
                 default -> null;
             };
         }
-        // Inner Sphere / Periphery / Mercenary default.
+        // Inner Sphere / Periphery / Mercenary default. BRIGADE is the largest IS shape shipped in
+        // mm-data; the SLDF (SL.xml) can produce DIVISION / CORPS / ARMY, and FormationLevel also
+        // declares ARMY_GROUP, so all three fall back to BRIGADE rather than going icon-less.
         return switch (level) {
             case TEAM -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_TEAM_FILENAME;
             case LANCE -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME;
             case COMPANY -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME;
             case BATTALION -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_BATTALION_FILENAME;
             case REGIMENT -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_REGIMENT_FILENAME;
-            case BRIGADE -> MHQConstants.LAYERED_FORCE_ICON_FORMATION_BRIGADE_FILENAME;
+            case BRIGADE, DIVISION, CORPS, ARMY, ARMY_GROUP ->
+                  MHQConstants.LAYERED_FORCE_ICON_FORMATION_BRIGADE_FILENAME;
             default -> null;
         };
     }
