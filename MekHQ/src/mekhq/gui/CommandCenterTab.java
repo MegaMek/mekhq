@@ -1081,15 +1081,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ReportEvent ev) {
-        refreshGeneralLog();
-        refreshSkillLog();
-        refreshBattleLog();
-        refreshPoliticsLog();
-        refreshPersonnelLog();
-        refreshMedicalLog();
-        refreshFinancesLog();
-        refreshAcquisitionsLog();
-        refreshTechnicalLog();
+        // Dispatch onto the EDT regardless of caller thread. The Daily Report log panels are
+        // HTML-bearing JTextPanes; their appendLog path mutates the HTMLDocument and the JTextPane
+        // caret. Off-EDT writes here deadlocked with a queued DefaultCaret repaint runnable when
+        // the worker fired ReportEvent during force generation (EDT held AWTTreeLock and wanted
+        // the document read-lock; worker held the document write-lock).
+        SwingUtilities.invokeLater(() -> {
+            refreshGeneralLog();
+            refreshSkillLog();
+            refreshBattleLog();
+            refreshPoliticsLog();
+            refreshPersonnelLog();
+            refreshMedicalLog();
+            refreshFinancesLog();
+            refreshAcquisitionsLog();
+            refreshTechnicalLog();
+        });
     }
 
     @Subscribe

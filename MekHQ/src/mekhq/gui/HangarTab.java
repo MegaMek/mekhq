@@ -608,7 +608,11 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitNewEvent ev) {
-        unitListScheduler.schedule();
+        // Force EDT dispatch so the underlying javax.swing.Timer.restart() in ActionScheduler runs
+        // on the EDT regardless of caller thread. Defensive pairing with the ReportEvent handler:
+        // both events can now fire from a SwingWorker (force generation), and the unit-table refresh
+        // chain ultimately touches Swing component state we don't want racing with the EDT.
+        SwingUtilities.invokeLater(unitListScheduler::schedule);
     }
 
     @Subscribe
