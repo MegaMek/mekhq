@@ -234,6 +234,16 @@ public final class CompanyGenerator {
         }
         FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
+        // 7c. Tree-aware rank assignment. Walks the Formation tree post-order and assigns each
+        // node's commander the officer rank matching their FormationLevel (Lt → Lance, Capt →
+        // Company, Major → Battalion, …). Non-officer combat crew get Sergeant-equivalent; support
+        // crew get Corporal-equivalent. Gated on isAutomaticallyAssignRanks.
+        LOGGER.info("[CompanyGen] Stage 7c: tree-aware rank assignment");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Assigning ranks...");
+        }
+        RulesetRankAssigner.apply(campaign, options);
+
         // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
         // AbstractCompanyGenerator helpers in a follow-up commit. Phase 1 stops here so the
         // tree-walk integration can be verified end-to-end against a Mek-only scenario.
