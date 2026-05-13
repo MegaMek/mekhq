@@ -193,6 +193,12 @@ public final class CompanyGenerator {
         LOGGER.info("[CompanyGen] Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
               leafCount[0], skippedNoEntity[0], skippedAddFailed[0]);
 
+        // 7b. Apply layered formation icons to every node in the campaign's Formation tree. Honors
+        // the four formation-icon toggles on the options; bails cleanly if generation is disabled
+        // or the formation-icon image directory is unavailable.
+        LOGGER.info("[CompanyGen] Stage 7b: apply layered formation icons");
+        FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
+
         // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
         // AbstractCompanyGenerator helpers in a follow-up commit. Phase 1 stops here so the
         // tree-walk integration can be verified end-to-end against a Mek-only scenario.
