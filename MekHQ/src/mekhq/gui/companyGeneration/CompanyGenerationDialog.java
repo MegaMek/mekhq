@@ -43,7 +43,9 @@ import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
@@ -51,6 +53,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.camOpsReputation.ReputationController;
@@ -91,6 +94,8 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
  * @author Justin "Windchild" Bowen (original)
  */
 public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
+
+    private static final MMLogger LOGGER = MMLogger.create(CompanyGenerationDialog.class);
 
     private Campaign campaign;
     private CompanyGenerationOptions companyGenerationOptions;
@@ -198,10 +203,85 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getSparesTab().writeValuesToOptions(options);
         pane.getOtherTab().writeValuesToOptions(options);
 
-        // Run the ratgen pipeline. Stage 0 anchors year/faction from the campaign, the walker
-        // materializes Units + Persons under the ToE, and Stage 8 (when wired) applies parts /
-        // finance / contract polish per the snapshot above and the campaign's auto-logistics.
-        CompanyGenerator.generate(getCampaign(), options);
+        // For large forces (Brigade and above for IS, Galaxy and above for Clan, Level V+ for
+        // ComStar), warn the user that generation will take a noticeable amount of time. The
+        // warning lets them cancel out and pick a smaller force without committing to a multi-minute
+        // wait, especially when they were testing and didn't realize they'd picked the SLDF Army.
+        Integer chosenEchelon = options.getForceDescriptorSnapshot().getEchelon();
+        if (chosenEchelon != null && chosenEchelon >= 7) {
+            String estimate = estimateGenerationDuration(chosenEchelon);
+            int choice = JOptionPane.showConfirmDialog(getFrame(),
+                  "<html>You've picked a large force; estimated generation time: <b>" + estimate
+                        + "</b>.<br><br>"
+                        + "Continue?</html>",
+                  "Long Generation",
+                  JOptionPane.OK_CANCEL_OPTION,
+                  JOptionPane.WARNING_MESSAGE);
+            if (choice != JOptionPane.OK_OPTION) {
+                LOGGER.info("[CompanyGen] User cancelled at long-generation warning (echelon={})", chosenEchelon);
+                return;
+            }
+        }
+
+        // Run the ratgen pipeline on a background thread with a modal progress dialog up front so
+        // the user gets feedback during long generations (Star League Defense Force Armies take
+        // minutes; without a dialog the app appears frozen). The worker's done() handler runs on
+        // the EDT after generation completes and fires the post-gen extras.
+        GenerationProgressDialog progressDialog = new GenerationProgressDialog(getFrame());
+
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                progressDialog.finish();
+                try {
+                    // Surface any uncaught exception from the background thread.
+                    get();
+                } catch (Exception ex) {
+                    LOGGER.error(ex, "Force generation failed");
+                    new ImmersiveDialogNotification(campaign,
+                          "Force generation failed: " + ex.getMessage(),
+                          true);
+                    return;
+                }
+                applyPostGenerationExtras(options);
+            }
+        };
+
+        worker.execute();
+        // Modal dialog blocks the EDT until SwingWorker.done() calls finish().
+        progressDialog.setVisible(true);
+    }
+
+    /**
+     * Returns a human-readable duration estimate for generating a force at the given ratgen echelon.
+     * Numbers come from empirical observation of generation runs on Phase 1 hardware; the engine's
+     * processRoot is roughly exponential in the echelon, and the per-leaf walker work is roughly
+     * 50ms per unit (RATGenerator selection + Entity construction + Person creation + Formation
+     * attachment). The estimate is intentionally rough — it just needs to convey "seconds" vs
+     * "minutes" vs "many minutes" so the user can decide whether to proceed.
+     */
+    private static String estimateGenerationDuration(int echelon) {
+        return switch (echelon) {
+            case 7 -> "1-3 minutes (Brigade / Galaxy / Level V)";
+            case 8 -> "3-8 minutes (Division / Touman / Level VI)";
+            case 9 -> "10-20 minutes (Corps)";
+            case 10 -> "20+ minutes (Army)";
+            default -> "less than a minute";
+        };
+    }
+
+    /**
+     * Runs the post-generation extras (organization-changed event, auto-awards, reputation, bonus
+     * units) after {@link CompanyGenerator#generate} completes. Split out of {@link #okAction()} so
+     * the EDT-side cleanup is the only thing the {@link SwingWorker#done()} callback has to do.
+     */
+    private void applyPostGenerationExtras(CompanyGenerationOptions options) {
         MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
 
         if (campaign.getCampaignOptions().isEnableAutoAwards()) {

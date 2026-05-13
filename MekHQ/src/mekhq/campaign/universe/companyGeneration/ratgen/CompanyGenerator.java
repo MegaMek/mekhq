@@ -77,9 +77,26 @@ public final class CompanyGenerator {
      *         engine layer
      */
     public static ForceDescriptor generate(Campaign campaign, CompanyGenerationOptions options) {
+        return generate(campaign, options, null);
+    }
+
+    /**
+     * Same as {@link #generate(Campaign, CompanyGenerationOptions)} but accepts a
+     * {@link Ruleset.ProgressListener} the engine and the rest of the pipeline use to surface status
+     * updates. Pass {@code null} to suppress all progress callbacks (the default behavior of the
+     * two-arg overload).
+     *
+     * <p>The listener is called from a background thread (typically a SwingWorker), so any UI work
+     * triggered from it must be dispatched onto the EDT.</p>
+     */
+    public static ForceDescriptor generate(Campaign campaign, CompanyGenerationOptions options,
+          Ruleset.ProgressListener listener) {
         long startedAt = System.currentTimeMillis();
         LOGGER.info("[CompanyGen] ==================================================");
         LOGGER.info("[CompanyGen] CompanyGenerator.generate() START");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Preparing generation parameters...");
+        }
         ForceDescriptorSnapshot snap = options.getForceDescriptorSnapshot();
 
         // Stage 0: anchor inputs that the snapshot shouldn't be allowed to override.
@@ -110,6 +127,9 @@ public final class CompanyGenerator {
 
         // 1. Bootstrap MegaMek-side state for the target year.
         LOGGER.info("[CompanyGen] Stage 1: bootstrap engine state");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Loading factions and rulesets...");
+        }
         RulesetEngineBootstrap.ensureLoaded(snap.getYear());
 
         // 2. Build a fresh ForceDescriptor from the snapshot. The Force Generator panel does this
@@ -146,16 +166,22 @@ public final class CompanyGenerator {
 
         // 3. Run the engine. Null listener is safe per Ruleset.processRoot's internal guards.
         LOGGER.info("[CompanyGen] Stage 3: Ruleset.processRoot()");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Building force structure...");
+        }
         long t0 = System.currentTimeMillis();
         Ruleset ruleset = Ruleset.findRuleset(fd);
         LOGGER.info("[CompanyGen]   Ruleset.findRuleset({}) resolved to ruleset for faction={}",
               fd.getFaction(), ruleset.getFaction());
-        ruleset.processRoot(fd, null);
+        ruleset.processRoot(fd, listener);
         LOGGER.info("[CompanyGen]   Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - t0);
 
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
         LOGGER.info("[CompanyGen] Stage 4-7: walk tree, materialize Units + crews into Formations");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Materializing units and crews...");
+        }
         Formation root = campaign.getFormations();
         LOGGER.info("[CompanyGen]   campaign root Formation: id={} name={}",
               root == null ? "null" : root.getId(),
@@ -185,6 +211,12 @@ public final class CompanyGenerator {
             }
             parent.addUnit(unit.getId());
             leafCount[0]++;
+            // Surface progress every 25 units to keep the dialog feeling alive on large forces.
+            // Per-leaf updates would flood the EDT for an Army-sized generation.
+            if (listener != null && leafCount[0] % 25 == 0) {
+                listener.updateProgress(0.0,
+                      String.format("Materializing units and crews... (%d created)", leafCount[0]));
+            }
             LOGGER.info("[CompanyGen]   leaf #{}: entity={} -> Unit added, {} crew, parent Formation id={} ({})",
                   leafCount[0], entity.getDisplayName(), crew.size(),
                   parent.getId(), parent.getName());
@@ -197,6 +229,9 @@ public final class CompanyGenerator {
         // the four formation-icon toggles on the options; bails cleanly if generation is disabled
         // or the formation-icon image directory is unavailable.
         LOGGER.info("[CompanyGen] Stage 7b: apply layered formation icons");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Applying formation icons...");
+        }
         FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
         // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
