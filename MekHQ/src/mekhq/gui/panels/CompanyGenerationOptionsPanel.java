@@ -32,6 +32,7 @@
  */
 package mekhq.gui.panels;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,6 +63,8 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
+import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -72,6 +75,10 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     // region Variable Declarations
     private final Campaign campaign;
+
+    // Tabbed pane holding the option groups. The Force Generator tab is the last entry.
+    private JTabbedPane tabbedPane;
+    private ForceGeneratorOptionsView ratgenOptionsView;
 
     // Base Information
     private MMComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod;
@@ -176,7 +183,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         initialize();
 
         if (companyGenerationOptions == null) {
-            setOptions(MekHQ.getMHQOptions().getDefaultCompanyGenerationMethod());
+            // When the user hasn't already chosen a method (fresh dialog), prefer the ruleset path if
+            // it's available in this build. The dev gate is the source of truth for "is ratgen ready
+            // for end users" — when set, RULESET_BASED is the default; otherwise fall back to the
+            // user's stored MHQ option, which is the AtB/Windchild path.
+            CompanyGenerationMethod defaultMethod = Boolean.getBoolean("mekhq.companyGenerator.ruleset")
+                  ? CompanyGenerationMethod.RULESET_BASED
+                  : MekHQ.getMHQOptions().getDefaultCompanyGenerationMethod();
+            setOptions(defaultMethod);
         } else {
             setOptions(companyGenerationOptions);
         }
@@ -808,43 +822,153 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     // region Initialization
     @Override
     protected void initialize() {
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(createBaseInformationPanel(), gbc);
+        // Switch from the constructor's GridBagLayout to a single BorderLayout that hosts a tabbed
+        // pane. Each tab is one of the existing create*Panel() results, plus a final Force Generator
+        // tab carrying the embedded MegaMek ratgen view. Tab order follows the user-configured
+        // workflow: tweak rules first, then on the last tab pick the force shape and click OK.
+        setLayout(new BorderLayout());
 
-        gbc.gridx++;
-        add(createPersonnelPanel(), gbc);
+        tabbedPane = new JTabbedPane();
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        add(createPersonnelRandomizationPanel(), gbc);
+        tabbedPane.addTab(resources.getString("baseInformationPanel.title"),
+              wrapInScrollPane(createBaseInformationPanel()));
 
-        gbc.gridx++;
-        add(createStartingSimulationPanel(), gbc);
+        // Personnel + Personnel Randomization sit side-by-side because they're tightly related
+        // (skill / name rules share a mental model with origin / loyalty / advantages).
+        JPanel personnelTab = new JPanel(new GridBagLayout());
+        GridBagConstraints personnelGbc = new GridBagConstraints();
+        personnelGbc.gridx = 0;
+        personnelGbc.gridy = 0;
+        personnelGbc.anchor = GridBagConstraints.NORTHWEST;
+        personnelGbc.fill = GridBagConstraints.HORIZONTAL;
+        personnelTab.add(createPersonnelPanel(), personnelGbc);
+        personnelGbc.gridx = 1;
+        personnelTab.add(createPersonnelRandomizationPanel(), personnelGbc);
+        tabbedPane.addTab(resources.getString("personnelPanel.title"), wrapInScrollPane(personnelTab));
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        add(createUnitsPanel(), gbc);
+        // Units + Unit sit side-by-side (unit-generation rules + per-unit options + weight limits).
+        JPanel unitsTab = new JPanel(new GridBagLayout());
+        GridBagConstraints unitsGbc = new GridBagConstraints();
+        unitsGbc.gridx = 0;
+        unitsGbc.gridy = 0;
+        unitsGbc.anchor = GridBagConstraints.NORTHWEST;
+        unitsGbc.fill = GridBagConstraints.HORIZONTAL;
+        unitsTab.add(createUnitsPanel(), unitsGbc);
+        unitsGbc.gridx = 1;
+        unitsTab.add(createUnitPanel(), unitsGbc);
+        tabbedPane.addTab(resources.getString("unitsPanel.title"), wrapInScrollPane(unitsTab));
 
-        gbc.gridx++;
-        add(createUnitPanel(), gbc);
+        tabbedPane.addTab(resources.getString("sparesPanel.title"),
+              wrapInScrollPane(createSparesPanel()));
+        tabbedPane.addTab(resources.getString("contractsPanel.title"),
+              wrapInScrollPane(createContractsPanel()));
+        tabbedPane.addTab(resources.getString("financesPanel.title"),
+              wrapInScrollPane(createFinancesPanel()));
+        tabbedPane.addTab(resources.getString("startingSimulationPanel.title"),
+              wrapInScrollPane(createStartingSimulationPanel()));
+        tabbedPane.addTab(resources.getString("surprisesPanel.title"),
+              wrapInScrollPane(createSurprisesPanel()));
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        add(createSparesPanel(), gbc);
+        // Force Generator — the embedded MegaMek ratgen view. Constructed lazily so we only pay the
+        // initialization cost (RATGenerator load, Ruleset load) when this panel is shown.
+        tabbedPane.addTab("Force Generator", wrapInScrollPane(createForceGeneratorPanel()));
 
-        gbc.gridx++;
-        add(createContractsPanel(), gbc);
+        add(tabbedPane, BorderLayout.CENTER);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        add(createFinancesPanel(), gbc);
+        // Method-change wiring: when the user picks the RULESET_BASED method, jump to the Force
+        // Generator tab and grey out the AtB/Windchild-only spinners. When they switch back, re-enable
+        // those spinners.
+        if (getComboCompanyGenerationMethod() != null) {
+            getComboCompanyGenerationMethod().addActionListener(evt -> applyMethodVisibility());
+            applyMethodVisibility();
+        }
+    }
 
-        gbc.gridx++;
-        add(createSurprisesPanel(), gbc);
+    /**
+     * Wraps a sub-panel in a {@link FastJScrollPane} (or plain {@link JScrollPane}) so each tab can
+     * scroll independently when its content is taller than the dialog. Sub-panels remain unaware of
+     * the scroll wrapper.
+     */
+    private JScrollPane wrapInScrollPane(JPanel content) {
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setBorder(null);
+        return scroll;
+    }
+
+    /**
+     * Builds the Force Generator tab content: a single embedded {@link ForceGeneratorOptionsView}.
+     * The panel's own Generate / Export MUL / Clear buttons are hidden (the dialog's OK drives
+     * generation) and its year field is locked to the campaign year — {@code CompanyGenerator}'s
+     * Stage 0 anchors year on the snapshot regardless, but locking the displayed field keeps the UX
+     * honest.
+     */
+    private JPanel createForceGeneratorPanel() {
+        ratgenOptionsView = new ForceGeneratorOptionsView(fd -> {}, getCampaign().getGameOptions());
+        ratgenOptionsView.setGenerateButtonVisible(false);
+        ratgenOptionsView.setExportMULButtonVisible(false);
+        ratgenOptionsView.setClearButtonVisible(false);
+        ratgenOptionsView.setYearFieldEditable(false);
+        ratgenOptionsView.setCurrentYear(getCampaign().getGameYear());
+
+        JPanel host = new JPanel(new BorderLayout());
+        host.add(ratgenOptionsView, BorderLayout.CENTER);
+        return host;
+    }
+
+    /**
+     * Returns the embedded Force Generator panel so the parent dialog can call
+     * {@link ForceGeneratorOptionsView#buildForceDescriptor()} on OK.
+     */
+    public ForceGeneratorOptionsView getRatgenOptionsView() {
+        return ratgenOptionsView;
+    }
+
+    /**
+     * Returns the tabbed pane so the parent dialog can select a tab programmatically (e.g. auto-jump
+     * to the Force Generator tab when method = RULESET_BASED).
+     */
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    /**
+     * Applies enable/disable + auto-tab-select rules based on the current method selection. Called
+     * once at construction and on every method-combo change.
+     */
+    private void applyMethodVisibility() {
+        Object selected = getComboCompanyGenerationMethod() == null
+              ? null
+              : getComboCompanyGenerationMethod().getSelectedItem();
+        boolean ruleset = (selected instanceof CompanyGenerationMethod m) && m.isRulesetBased();
+
+        // AtB/Windchild-only spinners. Faction picker stays enabled because the ratgen Stage 0
+        // fallback uses it when the snapshot is at constructor default.
+        if (getSpnCompanyCount() != null) {
+            getSpnCompanyCount().setEnabled(!ruleset);
+        }
+        if (getSpnIndividualLanceCount() != null) {
+            getSpnIndividualLanceCount().setEnabled(!ruleset);
+        }
+        if (getSpnLancesPerCompany() != null) {
+            getSpnLancesPerCompany().setEnabled(!ruleset);
+        }
+        if (getSpnLanceSize() != null) {
+            getSpnLanceSize().setEnabled(!ruleset);
+        }
+        if (getSpnStarLeagueYear() != null) {
+            getSpnStarLeagueYear().setEnabled(!ruleset);
+        }
+
+        // Auto-select the Force Generator tab when the user picks the ratgen method so they don't
+        // have to hunt for it. We don't auto-switch the other direction — the user might want to
+        // edit personnel/spares/etc. after switching back, and forcing a tab change would surprise.
+        if (ruleset && tabbedPane != null) {
+            int last = tabbedPane.getTabCount() - 1;
+            if (last >= 0) {
+                tabbedPane.setSelectedIndex(last);
+            }
+        }
     }
 
     private JPanel createBaseInformationPanel() {
