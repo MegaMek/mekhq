@@ -41,7 +41,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -66,7 +65,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
@@ -244,21 +242,23 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         long okStartedNanos = System.nanoTime();
         LOGGER.info("[CompanyGen][Worker] okAction prepared SwingWorker (thread={})", Thread.currentThread().getName());
 
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+        SwingWorker<CompanyGenerator.Result, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() {
+            protected CompanyGenerator.Result doInBackground() {
                 long workerStartNanos = System.nanoTime();
                 LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground START (thread={})",
                       Thread.currentThread().getName());
+                CompanyGenerator.Result result;
                 try {
-                    CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
+                    result = CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
                 } catch (Throwable t) {
                     LOGGER.error(t, "[CompanyGen][Worker] SwingWorker.doInBackground threw");
                     throw t;
                 }
                 long elapsedMs = (System.nanoTime() - workerStartNanos) / 1_000_000;
-                LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground DONE in {}ms", elapsedMs);
-                return null;
+                LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground DONE in {}ms ({} persons)",
+                      elapsedMs, result.generatedPersons().size());
+                return result;
             }
 
             @Override
@@ -266,9 +266,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                 LOGGER.info("[CompanyGen][Worker] SwingWorker.done START (thread={})",
                       Thread.currentThread().getName());
                 progressDialog.finish();
+                CompanyGenerator.Result result;
                 try {
                     // Surface any uncaught exception from the background thread.
-                    get();
+                    result = get();
                 } catch (Exception ex) {
                     LOGGER.error(ex, "Force generation failed");
                     new ImmersiveDialogNotification(campaign,
@@ -277,7 +278,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                     return;
                 }
                 LOGGER.info("[CompanyGen][Worker] SwingWorker.done -> applyPostGenerationExtras");
-                applyPostGenerationExtras(options);
+                applyPostGenerationExtras(options, result.generatedPersons());
                 LOGGER.info("[CompanyGen][Worker] SwingWorker.done complete");
             }
         };
@@ -315,9 +316,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
      * units) after {@link CompanyGenerator#generate} completes. Split out of {@link #okAction()} so
      * the EDT-side cleanup is the only thing the {@link SwingWorker#done()} callback has to do.
      */
-    private void applyPostGenerationExtras(CompanyGenerationOptions options) {
+    private void applyPostGenerationExtras(CompanyGenerationOptions options, List<Person> generatedPersons) {
         long startNanos = System.nanoTime();
-        LOGGER.info("[CompanyGen][PostGen] START (thread={})", Thread.currentThread().getName());
+        LOGGER.info("[CompanyGen][PostGen] START (thread={}, generatedPersons={})",
+              Thread.currentThread().getName(), generatedPersons.size());
         LOGGER.info("[CompanyGen][PostGen] firing OrganizationChangedEvent");
         MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
 
@@ -332,25 +334,19 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         reputationController.initializeReputation(campaign);
         campaign.setReputation(reputationController);
 
-        // processBonusUnitsBasedOnCampaignOptions takes the legacy CompanyGenerationPersonTracker
-        // list. The ratgen pipeline doesn't produce trackers; passing an empty list means the
-        // alternative-advanced-medical spare-personnel loop won't fire. The other branches of
-        // processBonusUnitsBasedOnCampaignOptions only consult the campaign, so they still work.
-        // TODO: have CompanyGenerator.generate return the generated Persons so we can supply a
-        // real tracker list and restore the alt-medical spare-pilot top-up.
         LOGGER.info("[CompanyGen][PostGen] running processBonusUnitsBasedOnCampaignOptions");
-        processBonusUnitsBasedOnCampaignOptions(Collections.emptyList(), options);
+        processBonusUnitsBasedOnCampaignOptions(generatedPersons, options);
         long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][PostGen] DONE in {}ms", totalMs);
     }
 
-    private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
+    private void processBonusUnitsBasedOnCampaignOptions(List<Person> generatedPersons,
           CompanyGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.isUseAlternativeAdvancedMedical()) {
             int combatants = 0;
-            for (CompanyGenerationPersonTracker tracker : trackers) {
-                if (tracker.getPersonType().isCombat()) {
+            for (Person person : generatedPersons) {
+                if (person.isCombat()) {
                     combatants++;
                 }
             }

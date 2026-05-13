@@ -32,18 +32,23 @@
  */
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 
@@ -62,6 +67,20 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
  * {@code RULESET_BASED} branch and from unit tests.</p>
  */
 public final class CompanyGenerator {
+
+    /**
+     * Result of a generation run: the engine's descriptor tree plus the flat list of {@link Person}s
+     * the pipeline created during materialization. The list is used by post-generation steps that
+     * need to iterate every fresh hire — e.g. setting the founder flag, generating callsigns, or
+     * counting combatants for the alt-medical spare-personnel top-up.
+     *
+     * @param descriptor       the descriptor tree returned by {@link Ruleset#processRoot}, or
+     *                         {@code null} if the engine layer failed
+     * @param generatedPersons every Person added to the campaign by this generation, in the order
+     *                         they were created (leaf order)
+     */
+    public record Result(@Nullable ForceDescriptor descriptor, List<Person> generatedPersons) {
+    }
 
     private static final MMLogger LOGGER = MMLogger.create(CompanyGenerator.class);
 
@@ -110,10 +129,10 @@ public final class CompanyGenerator {
      * @param options  the user's {@link CompanyGenerationOptions}; the
      *                 {@link CompanyGenerationOptions#getForceDescriptorSnapshot()} block supplies the
      *                 ratgen inputs
-     * @return the generated {@link ForceDescriptor} tree, or {@code null} if generation failed at the
-     *         engine layer
+     * @return the generated {@link Result} bundling the descriptor tree and the flat list of Persons
+     *         the pipeline created (the descriptor is {@code null} if the engine layer failed)
      */
-    public static ForceDescriptor generate(Campaign campaign, CompanyGenerationOptions options) {
+    public static Result generate(Campaign campaign, CompanyGenerationOptions options) {
         return generate(campaign, options, null);
     }
 
@@ -126,7 +145,7 @@ public final class CompanyGenerator {
      * <p>The listener is called from a background thread (typically a SwingWorker), so any UI work
      * triggered from it must be dispatched onto the EDT.</p>
      */
-    public static ForceDescriptor generate(Campaign campaign, CompanyGenerationOptions options,
+    public static Result generate(Campaign campaign, CompanyGenerationOptions options,
           Ruleset.ProgressListener listener) {
         long startedAt = System.currentTimeMillis();
         LOGGER.info("[CompanyGen][Pipeline]==================================================");
@@ -227,6 +246,10 @@ public final class CompanyGenerator {
         int[] skippedNoEntity = { 0 };
         int[] skippedAddFailed = { 0 };
         long[] stageStartNanos = { System.nanoTime() };
+        // Flat accumulator of every Person the leaf walker creates. Stage 7d consumes this for
+        // founder / callsign flags and the dialog hands it to processBonusUnitsBasedOnCampaignOptions
+        // so the alt-medical spare-personnel branch can count combatants without re-walking the tree.
+        List<Person> generatedPersons = new ArrayList<>();
         ForceDescriptorWalker.walk(fd, campaign, root, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
@@ -271,12 +294,13 @@ public final class CompanyGenerator {
             LOGGER.info("[CompanyGen][Leaf][CrewAssemble] BEFORE MultiCrewAssembler.assemble unit={} crewDescriptor={}",
                   unit.getId(), leaf.getCo() == null ? "null" : "present");
             long assembleStart = System.nanoTime();
-            java.util.List<Person> crew = MultiCrewAssembler.assemble(unit, leaf.getCo(), campaign,
+            List<Person> crew = MultiCrewAssembler.assemble(unit, leaf.getCo(), campaign,
                   /* overrideName */ true);
             long afterAssembleNanos = System.nanoTime();
             long assembleMs = (afterAssembleNanos - assembleStart) / 1_000_000;
             LOGGER.info("[CompanyGen][Leaf][CrewAssemble] AFTER MultiCrewAssembler.assemble crewSize={} elapsed={}ms",
                   crew.size(), assembleMs);
+            generatedPersons.addAll(crew);
 
             if (!crew.isEmpty()) {
                 LOGGER.info("[CompanyGen][Leaf][Rank] BEFORE RankAssigner.apply commander='{}'",
@@ -342,7 +366,17 @@ public final class CompanyGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Assigning ranks...");
         }
-        RulesetRankAssigner.apply(campaign, options);
+        Person rootCommander = RulesetRankAssigner.apply(campaign, options);
+
+        // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
+        // officer, founder flag on every fresh hire, and random callsigns for non-Clan MekWarriors.
+        // These are pure Person-state mutations with no algorithmic logic, so they live in the
+        // pipeline rather than in a dedicated helper class.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7d: personnel flags");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Applying personnel flags...");
+        }
+        applyPersonnelFlags(campaign, options, generatedPersons, rootCommander);
 
         // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
         // AbstractCompanyGenerator helpers in a follow-up commit. Phase 1 stops here so the
@@ -352,6 +386,44 @@ public final class CompanyGenerator {
         LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() DONE in {}ms",
               System.currentTimeMillis() - startedAt);
         LOGGER.info("[CompanyGen][Pipeline]==================================================");
-        return fd;
+        return new Result(fd, generatedPersons);
+    }
+
+    /**
+     * Stage 7d: applies the Setup tab's personnel-flag toggles to the generation result.
+     *
+     * <ul>
+     *   <li>{@code isAssignCompanyCommanderFlag} → {@link Person#setCommander(boolean)} on the
+     *       commander {@link RulesetRankAssigner} promoted at the campaign-root formation.</li>
+     *   <li>{@code isAssignFounderFlag} → {@link Person#setFounder(boolean)} on every Person this
+     *       generation created.</li>
+     *   <li>{@code isAssignMekWarriorsCallSigns} → {@link Person#setCallsign(String)} from
+     *       {@link RandomCallsignGenerator} for every primary-role MekWarrior, skipped in Clan
+     *       campaigns (Clan MekWarriors get their bloodname instead of a fixed-wing-style callsign).</li>
+     * </ul>
+     */
+    private static void applyPersonnelFlags(Campaign campaign, CompanyGenerationOptions options,
+          List<Person> generatedPersons, @Nullable Person rootCommander) {
+        if (options.isAssignCompanyCommanderFlag() && rootCommander != null) {
+            rootCommander.setCommander(true);
+            LOGGER.info("[CompanyGen][Pipeline][Flags] commander flag set on '{}'", rootCommander.getFullName());
+        }
+        int founderCount = 0;
+        int callsignCount = 0;
+        boolean applyFounder = options.isAssignFounderFlag();
+        boolean applyCallsigns = options.isAssignMekWarriorsCallSigns() && !campaign.isClanCampaign();
+        RandomCallsignGenerator callsigns = applyCallsigns ? RandomCallsignGenerator.getInstance() : null;
+        for (Person person : generatedPersons) {
+            if (applyFounder) {
+                person.setFounder(true);
+                founderCount++;
+            }
+            if (applyCallsigns && person.getPrimaryRole() == PersonnelRole.MEKWARRIOR) {
+                person.setCallsign(callsigns.generate());
+                callsignCount++;
+            }
+        }
+        LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={})",
+              founderCount, callsignCount, campaign.isClanCampaign());
     }
 }

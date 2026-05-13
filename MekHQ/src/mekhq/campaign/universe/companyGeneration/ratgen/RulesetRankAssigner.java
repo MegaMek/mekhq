@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -88,20 +89,29 @@ public final class RulesetRankAssigner {
         // utility class
     }
 
-    public static void apply(Campaign campaign, CompanyGenerationOptions options) {
+    /**
+     * Runs the rank-assignment passes on the campaign's formation tree.
+     *
+     * @return the commander promoted at the campaign-root formation (i.e. the top-echelon commander
+     *         the dialog will tag with the commander flag in Stage 7d), or {@code null} when ranks
+     *         are disabled, the campaign has no formations, or the root has no eligible Person to
+     *         promote
+     */
+    @Nullable
+    public static Person apply(Campaign campaign, CompanyGenerationOptions options) {
         long startNanos = System.nanoTime();
         if (campaign == null || options == null) {
             LOGGER.info("[CompanyGen][RankAssign] apply: campaign or options null, skipping");
-            return;
+            return null;
         }
         if (!options.isAutomaticallyAssignRanks()) {
             LOGGER.info("[CompanyGen][RankAssign] apply: disabled by isAutomaticallyAssignRanks");
-            return;
+            return null;
         }
         Formation root = campaign.getFormations();
         if (root == null) {
             LOGGER.info("[CompanyGen][RankAssign] apply: campaign has no root Formation, skipping");
-            return;
+            return null;
         }
 
         Faction faction = options.isUseSpecifiedFactionToAssignRanks()
@@ -124,10 +134,12 @@ public final class RulesetRankAssigner {
         LOGGER.info("[CompanyGen][RankAssign][Pass1] BEFORE walkPostOrder");
         long pass1Start = System.nanoTime();
         Set<Person> promoted = new LinkedHashSet<>();
-        int officersAssigned = walkPostOrder(campaign, root, promoted);
+        int[] officerCount = { 0 };
+        Person rootCommander = walkPostOrder(campaign, root, promoted, officerCount);
+        int officersAssigned = officerCount[0];
         long pass1Ms = (System.nanoTime() - pass1Start) / 1_000_000;
-        LOGGER.info("[CompanyGen][RankAssign][Pass1] AFTER walkPostOrder officers={} elapsed={}ms",
-              officersAssigned, pass1Ms);
+        LOGGER.info("[CompanyGen][RankAssign][Pass1] AFTER walkPostOrder officers={} rootCommander={} elapsed={}ms",
+              officersAssigned, rootCommander == null ? "null" : rootCommander.getFullName(), pass1Ms);
 
         // Pass 2: every other combat Person gets the enlisted rank; every support Person gets the
         // Corporal-equivalent. Walk the tree's Units to limit the impact to crew we generated, not
@@ -168,28 +180,37 @@ public final class RulesetRankAssigner {
         long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][RankAssign] DONE; officers={} enlisted={} support={} totalMs={}",
               officersAssigned, enlistedAssigned, supportAssigned, totalMs);
+        return rootCommander;
     }
 
     /**
      * Walks the formation tree post-order, promoting one Person per Formation node to that
-     * Formation's officer rank. Returns the count of officers promoted.
+     * Formation's officer rank.
+     *
+     * @param officerCount single-element counter incremented for every Person promoted (the array
+     *                     wrapping lets the recursive call accumulate while we return the actual
+     *                     promoted Person for the caller's formation)
+     * @return the {@link Person} promoted at this formation, or {@code null} if the formation has
+     *         no rank mapping or no eligible Person remained. The top-level call's return is the
+     *         force commander.
      */
-    private static int walkPostOrder(Campaign campaign, Formation formation, Set<Person> promoted) {
-        int count = 0;
+    @Nullable
+    private static Person walkPostOrder(Campaign campaign, Formation formation, Set<Person> promoted,
+          int[] officerCount) {
         for (Formation sub : formation.getSubFormations()) {
-            count += walkPostOrder(campaign, sub, promoted);
+            walkPostOrder(campaign, sub, promoted, officerCount);
         }
         int rankIndex = rankIndexForLevel(formation.getFormationLevel());
         if (rankIndex < 0) {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
                   formation.getName(), formation.getFormationLevel());
-            return count;
+            return null;
         }
         Person commander = pickCommander(campaign, formation, promoted);
         if (commander != null) {
             setRankWithFallback(commander, rankIndex);
             promoted.add(commander);
-            count++;
+            officerCount[0]++;
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {} (effective={})",
                   formation.getName(), formation.getFormationLevel(),
                   commander.getFullName(), rankIndex, commander.getRankNumeric());
@@ -197,7 +218,7 @@ public final class RulesetRankAssigner {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no unpromoted combat Person available",
                   formation.getName(), formation.getFormationLevel());
         }
-        return count;
+        return commander;
     }
 
     /**
