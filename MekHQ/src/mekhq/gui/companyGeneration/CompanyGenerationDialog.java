@@ -37,8 +37,9 @@ import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
@@ -146,20 +147,26 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected JPanel createButtonPanel() {
-        final JPanel panel = new JPanel(new GridLayout(2, 2));
+        // Standard dialog button arrangement: destructive / reset actions on the far left,
+        // primary actions on the right with the default Generate button at the far right so
+        // Enter triggers it. Replaces the previous 2x2 grid where Cancel sat diagonally
+        // opposite Generate — that layout was awkward to scan.
+        final JPanel panel = new JPanel(new BorderLayout());
 
+        JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        leftButtons.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
+              "CompanyGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
+        panel.add(leftButtons, BorderLayout.WEST);
+
+        JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        rightButtons.add(new MMButton("btnCancel", resources, "Cancel.text",
+              "Cancel.toolTipText", this::cancelActionPerformed));
+        rightButtons.add(new MMButton("btnApply", resources, "Apply.text",
+              "CompanyGenerationDialog.btnApply.toolTipText", this::confirmationActionListener));
         setOkButton(new MMButton("btnGenerate", resources, "Generate.text",
               "CompanyGenerationDialog.btnGenerate.toolTipText", this::confirmationActionListener));
-        panel.add(getOkButton());
-
-        panel.add(new MMButton("btnApply", resources, "Apply.text",
-              "CompanyGenerationDialog.btnApply.toolTipText", this::confirmationActionListener));
-
-        panel.add(new MMButton("btnCancel", resources, "Cancel.text",
-              "Cancel.toolTipText", this::cancelActionPerformed));
-
-        panel.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
-              "CompanyGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
+        rightButtons.add(getOkButton());
+        panel.add(rightButtons, BorderLayout.EAST);
 
         return panel;
     }

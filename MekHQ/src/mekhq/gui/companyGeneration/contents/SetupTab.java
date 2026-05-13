@@ -137,19 +137,49 @@ public class SetupTab {
     };
 
     public JPanel createTab() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setName("pnlSetupTab");
 
-        panel.add(buildForceShapeSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildSupportPersonnelSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildOfficerSelectionSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildNamingAndRanksSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildRandomOriginSection());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(3, 6, 3, 6);
+
+        // Row 0: Force Shape spans the full width — it's only two controls so giving it both
+        // columns avoids leaving an awkward gap on the right.
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        panel.add(buildForceShapeSection(), gbc);
+
+        // Row 1: left column stacks Support Personnel above Naming & Ranks; right column hosts
+        // Officer Selection. Officer Selection is taller than either left section alone, so the
+        // pair on the left balances it visually.
+        JPanel leftColumn = new JPanel();
+        leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
+        leftColumn.add(buildSupportPersonnelSection());
+        leftColumn.add(Box.createVerticalStrut(6));
+        leftColumn.add(buildNamingAndRanksSection());
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        panel.add(leftColumn, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        panel.add(buildOfficerSelectionSection(), gbc);
+
+        // Row 2: Random Origin spans full width — it's a dense sub-panel with its own internal
+        // layout, so giving it the whole width keeps its controls from being cramped.
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        panel.add(buildRandomOriginSection(), gbc);
 
         return panel;
     }
@@ -170,6 +200,9 @@ public class SetupTab {
                   int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ForceNamingMethod m) {
+                    // Append the first-three preview inline so the user can see what each scheme
+                    // produces without hovering for the tooltip.
+                    setText(m.toString() + " — " + m.getExample());
                     list.setToolTipText(m.getToolTipText());
                 }
                 return this;
@@ -197,11 +230,16 @@ public class SetupTab {
         section.setLayout(new GridBagLayout());
         GridBagConstraints gbc = sectionConstraints();
 
-        int row = 0;
         spnSupportPersonnelNumbers.clear();
         String spinnerTooltipTemplate = getTextAt(getCompanyGenerationResourceBundle(),
               "supportPersonnelNumber.toolTipText");
-        for (PersonnelRole role : SUPPORT_ROLES) {
+
+        // 2-column grid (label/spinner per role). Roles are split down the middle so the right
+        // column starts at the Administrator group — keeps tech-roles together on the left and
+        // admin-roles together on the right.
+        int halfCount = (SUPPORT_ROLES.length + 1) / 2;
+        for (int i = 0; i < SUPPORT_ROLES.length; i++) {
+            PersonnelRole role = SUPPORT_ROLES[i];
             String roleDisplay = role.getLabel(campaign != null && campaign.getFaction().isClan());
 
             JLabel roleLabel = new JLabel(roleDisplay);
@@ -215,21 +253,20 @@ public class SetupTab {
                 roleLabel.setToolTipText(spinner.getToolTipText());
             }
             roleLabel.setLabelFor(spinner);
-
             spnSupportPersonnelNumbers.put(role, spinner);
 
-            gbc.gridy = row;
-            gbc.gridx = 0;
+            boolean leftColumn = i < halfCount;
+            gbc.gridy = leftColumn ? i : i - halfCount;
+            gbc.gridx = leftColumn ? 0 : 2;
             section.add(roleLabel, gbc);
-            gbc.gridx = 1;
+            gbc.gridx = leftColumn ? 1 : 3;
             section.add(spinner, gbc);
-            row++;
         }
 
         chkPoolAssistants = new CompanyGenerationCheckBox("PoolAssistants");
-        gbc.gridy = row;
+        gbc.gridy = halfCount;
         gbc.gridx = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 4;
         section.add(chkPoolAssistants, gbc);
 
         return section;
@@ -245,12 +282,14 @@ public class SetupTab {
         chkAssignBestCompanyCommander = new CompanyGenerationCheckBox("AssignBestCompanyCommander");
         chkPrioritizeCompanyCommanderCombatSkills =
               new CompanyGenerationCheckBox("PrioritizeCompanyCommanderCombatSkills");
+        indentAsSubOption(chkPrioritizeCompanyCommanderCombatSkills);
         chkAssignBestCompanyCommander.addActionListener(evt ->
               chkPrioritizeCompanyCommanderCombatSkills.setEnabled(chkAssignBestCompanyCommander.isSelected()));
 
         chkAssignBestOfficers = new CompanyGenerationCheckBox("AssignBestOfficers");
         chkPrioritizeOfficerCombatSkills =
               new CompanyGenerationCheckBox("PrioritizeOfficerCombatSkills");
+        indentAsSubOption(chkPrioritizeOfficerCombatSkills);
         chkAssignBestOfficers.addActionListener(evt ->
               chkPrioritizeOfficerCombatSkills.setEnabled(chkAssignBestOfficers.isSelected()));
 
@@ -282,6 +321,9 @@ public class SetupTab {
 
         chkAutomaticallyAssignRanks = new CompanyGenerationCheckBox("AutomaticallyAssignRanks");
         chkUseSpecifiedFactionToAssignRanks = new CompanyGenerationCheckBox("UseSpecifiedFactionToAssignRanks");
+        indentAsSubOption(chkUseSpecifiedFactionToAssignRanks);
+        chkAutomaticallyAssignRanks.addActionListener(evt ->
+              chkUseSpecifiedFactionToAssignRanks.setEnabled(chkAutomaticallyAssignRanks.isSelected()));
         chkAssignMekWarriorsCallSigns = new CompanyGenerationCheckBox("AssignMekWarriorsCallSigns");
         chkAssignFounderFlag = new CompanyGenerationCheckBox("AssignFounderFlag");
 
@@ -333,6 +375,15 @@ public class SetupTab {
     }
 
     /**
+     * Adds a left-margin border to a checkbox so it visually reads as a sub-option of the checkbox
+     * above it. Pairs with the existing parent-toggle ActionListener that disables the sub-option
+     * when the parent is unchecked.
+     */
+    private static void indentAsSubOption(JComponent component) {
+        component.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+    }
+
+    /**
      * Pushes values from the supplied options onto this tab's controls. Field-by-field copy; matches
      * the legacy {@code CompanyGenerationOptionsPanel.setOptions(CompanyGenerationOptions)} mapping.
      */
@@ -365,6 +416,7 @@ public class SetupTab {
 
         chkAutomaticallyAssignRanks.setSelected(sourceOptions.isAutomaticallyAssignRanks());
         chkUseSpecifiedFactionToAssignRanks.setSelected(sourceOptions.isUseSpecifiedFactionToAssignRanks());
+        chkUseSpecifiedFactionToAssignRanks.setEnabled(chkAutomaticallyAssignRanks.isSelected());
         chkAssignMekWarriorsCallSigns.setSelected(sourceOptions.isAssignMekWarriorsCallSigns());
         chkAssignFounderFlag.setSelected(sourceOptions.isAssignFounderFlag());
     }
