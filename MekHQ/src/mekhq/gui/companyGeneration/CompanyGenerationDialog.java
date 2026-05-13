@@ -207,13 +207,19 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // ComStar), warn the user that generation will take a noticeable amount of time. The
         // warning lets them cancel out and pick a smaller force without committing to a multi-minute
         // wait, especially when they were testing and didn't realize they'd picked the SLDF Army.
+        //
+        // Plain text rather than HTML for the message: an HTML-bearing JOptionPane goes through
+        // BasicHTML / BasicTextUI / DefaultCaret on dismissal. When this modal disposes and the
+        // next modal (the GenerationProgressDialog) opens immediately afterward, the pending caret
+        // repaint event fires against a torn-down view and throws
+        // "Cannot invoke java.util.Vector.add(Object) because this.viewBuffer is null" (a
+        // long-standing Swing bug). Plain text routes through BasicLabelUI instead and avoids the
+        // FlowView code path entirely.
         Integer chosenEchelon = options.getForceDescriptorSnapshot().getEchelon();
         if (chosenEchelon != null && chosenEchelon >= 7) {
             String estimate = estimateGenerationDuration(chosenEchelon);
             int choice = JOptionPane.showConfirmDialog(getFrame(),
-                  "<html>You've picked a large force; estimated generation time: <b>" + estimate
-                        + "</b>.<br><br>"
-                        + "Continue?</html>",
+                  "You've picked a large force.\n\nEstimated generation time: " + estimate + ".\n\nContinue?",
                   "Long Generation",
                   JOptionPane.OK_CANCEL_OPTION,
                   JOptionPane.WARNING_MESSAGE);
