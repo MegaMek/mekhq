@@ -34,6 +34,7 @@ package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -47,6 +48,9 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.market.PartsInUseManager;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -378,10 +382,16 @@ public final class CompanyGenerator {
         }
         applyPersonnelFlags(campaign, options, generatedPersons, rootCommander);
 
-        // 8. Polish stage (parts, spares, finances, contracts, naming) — wired into existing
-        // AbstractCompanyGenerator helpers in a follow-up commit. Phase 1 stops here so the
-        // tree-walk integration can be verified end-to-end against a Mek-only scenario.
-        LOGGER.info("[CompanyGen][Pipeline]Stage 8: polish (parts/finance/contract) DEFERRED in Phase 1");
+        // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
+        // and ongoing auto-logistics rely on, so the starting inventory is consistent with the
+        // user's ongoing stocking policy: each part type's stocking percentage comes from the
+        // CampaignOptions.getAutoLogistics*() values that the Spares tab writes into. Finance
+        // and contract polish remain deferred.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 8: spare-parts warehouse stock-up");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Stocking spare parts warehouse...");
+        }
+        stockSpareParts(campaign);
 
         LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() DONE in {}ms",
               System.currentTimeMillis() - startedAt);
@@ -425,5 +435,32 @@ public final class CompanyGenerator {
         }
         LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={})",
               founderCount, callsignCount, campaign.isClanCampaign());
+    }
+
+    /**
+     * Stage 8: GM-stocks the warehouse with spare parts based on the campaign's auto-logistics
+     * percentages. Mirrors what the WarehouseTab does on a daily refresh: builds a
+     * {@link PartInUse} set for every part type the current force depends on, then asks
+     * {@link PartsInUseManager#stockUpPartsInUseGM} to add enough of each to meet the per-type
+     * target percentage. The percentages themselves come from {@code CampaignOptions.getAutoLogistics*}
+     * — the same values that drive ongoing auto-logistics restocking during play, written by the
+     * Spares tab's spinners.
+     *
+     * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn,
+     * matching the legacy {@code PartGenerationMethod.DISABLED} behavior.</p>
+     */
+    private static void stockSpareParts(Campaign campaign) {
+        long start = System.nanoTime();
+        PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
+        // ignoreMothballedUnits=true matches WarehouseTab's daily refresh: at generation time
+        // nothing is mothballed yet, but keep the call shape consistent with the rest of the
+        // codebase. isResupply=false skips the resupply-specific prohibited-unit-type filter.
+        // ignoreSparesUnderQuality=QUALITY_A accepts any quality already on hand as inventory
+        // toward the target.
+        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, false, PartQuality.QUALITY_A);
+        partsInUseManager.stockUpPartsInUseGM(partsInUse);
+        long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+        LOGGER.info("[CompanyGen][Pipeline][Spares] reviewed {} distinct part types; elapsed={}ms",
+              partsInUse.size(), elapsedMs);
     }
 }

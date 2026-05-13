@@ -744,7 +744,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     @Subscribe
     public void handle(PartChangedEvent ev) {
-        filterParts();
+        // Dispatch onto the EDT regardless of caller thread. filterParts() rebuilds a RowFilter
+        // and applies it to the TableRowSorter; both are Swing operations and must run on the
+        // EDT. Off-EDT calls are possible whenever a worker thread (e.g. the ratgen pipeline's
+        // Stage 8 spare-parts stock-up) triggers a PartChangedEvent through Quartermaster.addPart,
+        // which would race the EDT for the underlying Document/table locks the same way the
+        // ReportEvent deadlock did.
+        SwingUtilities.invokeLater(this::filterParts);
     }
 
     @Subscribe
