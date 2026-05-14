@@ -671,7 +671,9 @@ public final class FinancesTab extends CampaignGuiTab {
         financialReportScheduler.schedule();
     }
 
-    /**
+    /*
+     * (non-Javadoc)
+     *
      * This overridden updateUI method is needed due to updateComponentTreeUI limitations: Standard L&F updates
      * recursively trigger updateUI() on conventional Swing components to refresh their UI delegates. Because JFreeChart
      * coordinates internal graphic elements independently of Swing's UIManager dictionary, these updates are not
