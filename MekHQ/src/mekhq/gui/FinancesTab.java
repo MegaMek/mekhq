@@ -55,6 +55,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.assets.AssetEvent;
@@ -339,7 +340,13 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private XYDataset setupNetWorthDataset() {
         TimeSeries timeSeries = new TimeSeries("C-Bills");
-        List<WeeklyNetWorth> netWorthRecords = getCampaign().getFinances().getNetWorthOverTime();
+        Campaign campaign = getCampaign();
+        List<WeeklyNetWorth> netWorthRecords = campaign.getFinances().getNetWorthOverTime();
+        //Create a starting datapoint when there are none so far
+        if (netWorthRecords.isEmpty()) {
+            FinancialReport financialReport = FinancialReport.calculate(campaign);
+            campaign.getFinances().setWeeklyNetWorth(campaign.getLocalDate(), financialReport.getNetWorth());
+        }
         for (WeeklyNetWorth weeklyNetWorth : netWorthRecords) {
             LocalDate date = weeklyNetWorth.getDate();
             timeSeries.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
@@ -662,5 +669,55 @@ public final class FinancesTab extends CampaignGuiTab {
     @Subscribe
     public void handle(AssetEvent ev) {
         financialReportScheduler.schedule();
+    }
+
+    /**
+     * This overridden updateUI method is needed due to updateComponentTreeUI limitations: Standard L&F updates
+     * recursively trigger updateUI() on conventional Swing components to refresh their UI delegates. Because JFreeChart
+     * coordinates internal graphic elements independently of Swing's UIManager dictionary, these updates are not
+     * cascaded to the plot layouts.
+     */
+    @Override
+    public void updateUI() {
+        super.updateUI();
+
+        if (financeAmountPanel != null && financeMonthlyPanel != null && financeNetWorthPanel != null) {
+            Color panelColor = UIManager.getColor("Panel.background");
+            Color textColor = UIManager.getColor("Button.foreground");
+            updateChartColors(financeAmountPanel.getChart(), panelColor, textColor);
+            updateChartColors(financeMonthlyPanel.getChart(), panelColor, textColor);
+            updateChartColors(financeNetWorthPanel.getChart(), panelColor, textColor);
+            financeAmountPanel.repaint();
+            financeMonthlyPanel.repaint();
+            financeNetWorthPanel.repaint();
+        }
+    }
+
+    private void updateChartColors(org.jfree.chart.JFreeChart chart, Color panelColor, Color textColor) {
+        if (chart == null) {
+            return;
+        }
+        chart.setBackgroundPaint(panelColor);
+
+        org.jfree.chart.plot.Plot plot = chart.getPlot();
+
+        if (plot instanceof org.jfree.chart.plot.XYPlot xyPlot) {
+            xyPlot.setDomainGridlinePaint(textColor);
+            xyPlot.setRangeGridlinePaint(textColor);
+            xyPlot.getDomainAxis().setLabelPaint(textColor);
+            xyPlot.getDomainAxis().setTickLabelPaint(textColor);
+            xyPlot.getRangeAxis().setLabelPaint(textColor);
+            xyPlot.getRangeAxis().setTickLabelPaint(textColor);
+        } else if (plot instanceof org.jfree.chart.plot.CategoryPlot categoryPlot) {
+            categoryPlot.getDomainAxis().setLabelPaint(textColor);
+            categoryPlot.getDomainAxis().setTickLabelPaint(textColor);
+            categoryPlot.getRangeAxis().setLabelPaint(textColor);
+            categoryPlot.getRangeAxis().setTickLabelPaint(textColor);
+        }
+
+        if (chart.getLegend() != null) {
+            chart.getLegend().setBackgroundPaint(panelColor);
+            chart.getLegend().setItemPaint(textColor);
+        }
     }
 }
