@@ -314,7 +314,7 @@ public final class RulesetRankAssigner {
      * generator's {@code generateSupportPerson} switch: Corporal-equivalent for IS / Periphery,
      * lower index for Clan / ComStar / WoB.
      */
-    private static int supportRankForFaction(Faction faction) {
+    static int supportRankForFaction(Faction faction) {
         return (faction.isComStarOrWoB() || faction.isClan()) ? 4 : 8;
     }
 
@@ -330,7 +330,7 @@ public final class RulesetRankAssigner {
      * is empty at the chosen rank index by stepping down through lower indices until it
      * finds one that resolves to a real name.</p>
      */
-    private static void setRankWithFallback(Person person, int preferredIndex) {
+    static void setRankWithFallback(Person person, int preferredIndex) {
         person.setRank(preferredIndex);
         RankSystem rankSystem = person.getRankSystem();
         if (rankSystem == null) {

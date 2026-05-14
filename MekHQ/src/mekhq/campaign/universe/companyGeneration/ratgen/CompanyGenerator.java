@@ -372,6 +372,20 @@ public final class CompanyGenerator {
         }
         Person rootCommander = RulesetRankAssigner.apply(campaign, options);
 
+        // 7c-bis. CamOps-aligned support personnel (techs / doctors / admins / astechs / medics)
+        // derived from the just-materialized force. Creates the "Headquarters Staff" SUPPORT
+        // sub-formation under the root (Phase 1 empty; Phase 2 will populate with team-Units)
+        // and GM-recruits the support persons with the faction-appropriate support rank. The
+        // returned list is appended to generatedPersons so Stage 7d picks them up uniformly.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7c-bis: support personnel");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Generating support personnel...");
+        }
+        List<Person> supportPersons = SupportPersonnelGenerator.generate(campaign, options);
+        generatedPersons.addAll(supportPersons);
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7c-bis: added {} support persons (total generatedPersons={})",
+              supportPersons.size(), generatedPersons.size());
+
         // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
         // officer, founder flag on every fresh hire, and random callsigns for non-Clan MekWarriors.
         // These are pure Person-state mutations with no algorithmic logic, so they live in the

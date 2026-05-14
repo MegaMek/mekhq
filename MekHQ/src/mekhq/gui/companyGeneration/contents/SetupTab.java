@@ -66,9 +66,10 @@ import mekhq.gui.panels.RandomOriginOptionsPanel;
  * <ol>
  *   <li><b>Force Shape</b> — Company Command Lance toggle, formation-naming method</li>
  *   <li><b>Support Personnel</b> — count spinners for the nine support roles (Mek Tech, Mechanic, Aero
- *       Tek, BA Tech, Doctor, Administrator × 4) plus the Pool Assistants toggle. Step 4 keeps the
- *       legacy absolute-count semantics; a follow-up step swaps these for percentage sliders driven
- *       by the canonical hours-needed formulas in {@code FieldManualMercRevDragoonsRating}.</li>
+ *       Tek, BA Tech, Doctor, Administrator × 4) plus the Pool Assistants toggle. For the ratgen
+ *       pipeline a value of {@code 0} means "auto" — {@code SupportPersonnelGenerator} derives the
+ *       count per CamOps 5e Support Personnel; a positive value forces an explicit per-role
+ *       headcount and overrides the auto-computed value.</li>
  *   <li><b>Officer Selection</b> — eight toggles controlling commander / officer picks and skill
  *       weighting</li>
  *   <li><b>Naming &amp; Ranks</b> — four toggles for rank auto-assignment, callsigns, and the founder
