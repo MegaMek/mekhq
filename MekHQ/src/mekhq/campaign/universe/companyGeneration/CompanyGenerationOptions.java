@@ -187,7 +187,19 @@ public class CompanyGenerationOptions {
 
         // Personnel
         final Map<PersonnelRole, Integer> supportPersonnel = new HashMap<>();
-        if (method.isWindchild()) {
+        if (method.isRulesetBased()) {
+            // 0 = auto (CamOps); SupportPersonnelGenerator derives counts from the generated
+            // force. A positive value here lets the user force a specific headcount per role.
+            supportPersonnel.put(PersonnelRole.MEK_TECH, 0);
+            supportPersonnel.put(PersonnelRole.MECHANIC, 0);
+            supportPersonnel.put(PersonnelRole.AERO_TEK, 0);
+            supportPersonnel.put(PersonnelRole.BA_TECH, 0);
+            supportPersonnel.put(PersonnelRole.DOCTOR, 0);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_COMMAND, 0);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 0);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_TRANSPORT, 0);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 0);
+        } else if (method.isWindchild()) {
             supportPersonnel.put(PersonnelRole.MEK_TECH, 12);
             supportPersonnel.put(PersonnelRole.MECHANIC, 4);
             supportPersonnel.put(PersonnelRole.AERO_TEK, 1);
