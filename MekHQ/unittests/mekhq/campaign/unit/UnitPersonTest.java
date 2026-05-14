@@ -770,7 +770,6 @@ public class UnitPersonTest {
                 assertEquals(0, testUnit.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER));
                 assertEquals(3, testUnit.getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR));
             }
-
         }
 
         /**
