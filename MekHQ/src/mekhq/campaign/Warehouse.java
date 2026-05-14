@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -147,10 +147,15 @@ public class Warehouse {
     /**
      * Executes a function for each part in the warehouse.
      *
+     * <p>Iterates over a snapshot of the parts collection so callers from a non-EDT thread are
+     * insulated from concurrent mutations (e.g. {@code campaign.addNewUnit} adding installed parts
+     * on a SwingWorker while the EDT is reading). The {@code consumer} may freely call
+     * {@code addPart} / {@code removePart} without a {@link java.util.ConcurrentModificationException}.</p>
+     *
      * @param consumer A function to apply to each part.
      */
     public void forEachPart(Consumer<Part> consumer) {
-        for (Part part : parts.values()) {
+        for (Part part : new ArrayList<>(parts.values())) {
             consumer.accept(part);
         }
     }
@@ -332,17 +337,24 @@ public class Warehouse {
     /**
      * Gets a list of spare parts in the warehouse.
      *
+     * <p>Streams over a snapshot of the underlying parts collection so this is safe to call while
+     * another thread is mutating the warehouse (Force Generator's SwingWorker adds installed and
+     * spare parts during generation; the EDT calls this from
+     * {@code CampaignSummary.updateInformation}). The result is a fresh list either way, so callers
+     * see no behavior change beyond the absence of {@link java.util.ConcurrentModificationException}.</p>
+     *
      * @return A list of spare parts in the warehouse.
      */
     public List<Part> getSpareParts() {
-        return getParts().stream()
+        return new ArrayList<>(getParts()).stream()
                      .filter(Part::isSpare)
                      .collect(Collectors.toList());
     }
 
     public int getSparePartsCount(Part targetPart) {
         int count = 0;
-        for (Part warehousePart : getParts()) {
+        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.
+        for (Part warehousePart : new ArrayList<>(getParts())) {
             if (warehousePart.isSamePartType(targetPart)) {
                 count += getPartQuantity(warehousePart, true);
             }
@@ -386,7 +398,8 @@ public class Warehouse {
      * @param consumer The method to apply to each spare part in the warehouse.
      */
     public void forEachSparePart(Consumer<Part> consumer) {
-        for (Part part : getParts()) {
+        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.
+        for (Part part : new ArrayList<>(getParts())) {
             if (part.isSpare()) {
                 consumer.accept(part);
             }
@@ -401,7 +414,8 @@ public class Warehouse {
      * @return A matching spare {@link Part} or {@code null} if no suitable match was found.
      */
     public @Nullable Part findSparePart(Predicate<Part> predicate) {
-        for (Part part : getParts()) {
+        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.
+        for (Part part : new ArrayList<>(getParts())) {
             if (part.isSpare() && predicate.test(part)) {
                 return part;
             }
@@ -415,7 +429,9 @@ public class Warehouse {
      * @return A stream of spare parts in the campaign.
      */
     public Stream<Part> streamSpareParts() {
-        return getParts().stream().filter(Part::isSpare);
+        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration
+        // (Force Generator's SwingWorker adds parts while UI refreshers read this from the EDT).
+        return new ArrayList<>(getParts()).stream().filter(Part::isSpare);
     }
 
     /**
