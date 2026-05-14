@@ -46,15 +46,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -94,6 +86,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -379,12 +372,19 @@ public final class FinancesTab extends CampaignGuiTab {
               resourceMap.getString("graphCBills.text"), // y-axis label
               dataset);
 
-        chart.setBackgroundPaint(Color.WHITE);
+        Color panelColor = UIManager.getColor("Panel.background");
+        Color textColor = UIManager.getColor("Button.foreground");
+
+        chart.setBackgroundPaint(panelColor);
 
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setBackgroundPaint(Color.LIGHT_GRAY);
-        plot.setDomainGridlinePaint(Color.WHITE);
-        plot.setRangeGridlinePaint(Color.WHITE);
+        plot.setDomainGridlinePaint(textColor);
+        plot.setRangeGridlinePaint(textColor);
+        plot.getDomainAxis().setLabelPaint(textColor);
+        plot.getDomainAxis().setTickLabelPaint(textColor);
+        plot.getRangeAxis().setLabelPaint(textColor);
+        plot.getRangeAxis().setTickLabelPaint(textColor);
         plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
         plot.setDomainCrosshairVisible(true);
         plot.setRangeCrosshairVisible(true);
@@ -410,9 +410,20 @@ public final class FinancesTab extends CampaignGuiTab {
               resourceMap.getString("graphCBills.text"), // y-axis label
               dataset);
 
-        chart.setBackgroundPaint(Color.WHITE);
+        Color panelColor = UIManager.getColor("Panel.background");
+        Color textColor = UIManager.getColor("Button.foreground");
+
+        chart.setBackgroundPaint(panelColor);
+
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        plot.getDomainAxis().setLabelPaint(textColor);
+        plot.getDomainAxis().setTickLabelPaint(textColor);
+        plot.getRangeAxis().setLabelPaint(textColor);
+        plot.getRangeAxis().setTickLabelPaint(textColor);
 
         chart.getLegend().setPosition(RectangleEdge.TOP);
+        chart.getLegend().setBackgroundPaint(panelColor);
+        chart.getLegend().setItemPaint(textColor);
 
         return chart;
     }
@@ -496,7 +507,7 @@ public final class FinancesTab extends CampaignGuiTab {
               .append(String.format(formatted, r.getCash().toAmountAndSymbolString()))
               .append('\n');
         if (r.getMekValue().isPositive()) {
-            sb.append("       Meks............. ")
+            sb.append("       Meks.............. ")
                   .append(String.format(formatted, r.getMekValue().toAmountAndSymbolString()))
                   .append('\n');
         }
