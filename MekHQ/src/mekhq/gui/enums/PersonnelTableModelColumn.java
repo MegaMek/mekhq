@@ -713,35 +713,33 @@ public enum PersonnelTableModelColumn {
                     Unit unit = person.getUnit();
                     if (unit != null) {
                         String name = unit.getName();
-                        switch (unit.getEntity()) {
-                            case Entity e when e instanceof SmallCraft ||
-                                                     e instanceof Jumpship ||
-                                                     e instanceof Tank -> {
-                                if (unit.isNavigator(person)) {
-                                    name = name + " [Navigator]";
-                                } else if (unit.isDriver(person)) {
-                                    name = name + " [Pilot]";
-                                } else if (unit.isGunner(person)) {
-                                    name = name + " [Gunner]";
-                                } else {
-                                    name = name + " [Crew]";
-                                }
-                            }
+                        Entity entity = unit.getEntity();
+                        String role = null;
 
-                            case Entity e when e instanceof Mek -> {
-                                if (unit.getFullCrewSize() > 1) {
-                                    if (unit.isDriver(person)) {
-                                        name = name + " [Pilot]";
-                                    } else if (unit.isGunner(person)) {
-                                        name = name + " [Gunner]";
-                                    } else if (unit.isTechOfficer(person)) {
-                                        name = name + " [Tech Officer]";
-                                    } else if (unit.isCommander(person)) {
-                                        name = name + " [Commander]";
-                                    }
-                                }
+                        if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof Tank) {
+                            if (unit.isNavigator(person)) {
+                                role = "Navigator";
+                            } else if (unit.isDriver(person)) {
+                                role = (entity instanceof Tank) ? "Driver" : "Pilot";
+                            } else if (unit.isGunner(person)) {
+                                role = "Gunner";
+                            } else {
+                                role = "Crew";
                             }
-                            default -> {}
+                        } else if (entity instanceof Mek && unit.getFullCrewSize() > 1) {
+                            if (unit.isDriver(person)) {
+                                role = "Pilot";
+                            } else if (unit.isGunner(person)) {
+                                role = "Gunner";
+                            } else if (unit.isTechOfficer(person)) {
+                                role = "Tech Officer";
+                            } else if (unit.isCommander(person)) {
+                                role = "Commander";
+                            }
+                        }
+
+                        if (role != null) {
+                            name += " [" + role + "]";
                         }
 
                         return name;
