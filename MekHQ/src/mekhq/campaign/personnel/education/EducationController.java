@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.max;
+import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
@@ -864,15 +865,23 @@ public class EducationController {
      */
     private static void checkForTrainingAccidents(Campaign campaign, Academy academy, Person person,
           ResourceBundle resources) {
-        if (academy.isMilitary()) {
-            int militaryDiceSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
+        int bloodmarkSeverity = person.getBloodmark();
+        double bloodmarkDivisor = bloodmarkSeverity + 1;
+
+        int accidentDieSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
+        accidentDieSize = (int) round(accidentDieSize / bloodmarkDivisor);
+
+        boolean isMilitary = academy.isMilitary();
+        boolean isBloodmarked = bloodmarkSeverity != 0;
+
+        if (academy.isMilitary() || bloodmarkSeverity != 0) {
             int roll;
 
-            if (militaryDiceSize > 1) {
-                roll = randomInt(militaryDiceSize);
+            if (accidentDieSize > 1) {
+                roll = randomInt(accidentDieSize);
 
                 if (academy.isHomeSchool()) {
-                    int secondRoll = randomInt(militaryDiceSize);
+                    int secondRoll = randomInt(accidentDieSize);
 
                     if (secondRoll < roll) {
                         roll = secondRoll;
@@ -894,6 +903,10 @@ public class EducationController {
                         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
                               person.getHyperlinkedFullTitle(),
                               resultString);
+
+                        if (bloodmarkSeverity != 0) {
+                            reportMessage += ' ' + resources.getString("eventTrainingAccidentSuspicious.text");
+                        }
 
                         campaign.addReport(PERSONNEL, reportMessage);
 
@@ -926,6 +939,10 @@ public class EducationController {
         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
               person.getHyperlinkedFullTitle(),
               resultString);
+
+        if (person.getBloodmark() != 0) {
+            reportMessage += ' ' + resources.getString("eventTrainingAccidentSuspicious.text");
+        }
 
         campaign.addReport(PERSONNEL, reportMessage);
 
