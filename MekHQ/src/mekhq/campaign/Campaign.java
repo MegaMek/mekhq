@@ -556,7 +556,7 @@ public class Campaign implements ITechManager {
           PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
           RandomDeath randomDeath, CampaignSummary campaignSummary,
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
-          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
+          Systems systemsInstance, AbstractLocation startLocation, ReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Formation formation, Finances finances,
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
@@ -1739,7 +1739,7 @@ public class Campaign implements ITechManager {
         return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
     }
 
-    public void setLocation(CurrentLocation l) {
+    public void setLocation(AbstractLocation l) {
         location = l;
     }
 
