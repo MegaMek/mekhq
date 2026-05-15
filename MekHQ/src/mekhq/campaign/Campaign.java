@@ -87,6 +87,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -640,42 +641,55 @@ public class Campaign implements ITechManager {
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
-        // Reports
+        // Reports.
+        //
+        // The `newXxxReports` lists are CopyOnWriteArrayList rather than ArrayList because
+        // Campaign.addReport (worker thread during Force Generator's Stage 7e / 7c-bis) appends
+        // to them while the EDT iterates the lists returned by fetchAndClear* (via
+        // CommandCenterTab.handle(ReportEvent) -> DailyReportLogPanel.appendLog ->
+        // Utilities.combineString). With ArrayList, the EDT's iterator goes fail-fast and throws
+        // ConcurrentModificationException; CopyOnWriteArrayList iterators walk an immutable
+        // snapshot taken at iterator-creation time, so concurrent writes from the worker thread
+        // are safe. Writes are O(n) but report lists are short (~hundreds of entries max).
+        //
+        // The `currentReport` / `personnelReport` / etc. lists stay ArrayList because they're
+        // only mutated through addReport on the same thread that reads them via the daily-log
+        // refresh; they're not subject to the worker/EDT race the `newXxxReports` lists face.
         currentReport = new ArrayList<>();
         currentReportHTML = "";
-        newReports = new ArrayList<>();
+        newReports = new CopyOnWriteArrayList<>();
 
         personnelReport = new ArrayList<>();
         personnelReportHTML = "";
-        newPersonnelReports = new ArrayList<>();
+        newPersonnelReports = new CopyOnWriteArrayList<>();
 
         skillReport = new ArrayList<>();
         skillReportHTML = "";
-        newSkillReports = new ArrayList<>();
+        newSkillReports = new CopyOnWriteArrayList<>();
 
         technicalReport = new ArrayList<>();
         technicalReportHTML = "";
-        newTechnicalReports = new ArrayList<>();
+        newTechnicalReports = new CopyOnWriteArrayList<>();
 
         financesReport = new ArrayList<>();
         financesReportHTML = "";
-        newFinancesReports = new ArrayList<>();
+        newFinancesReports = new CopyOnWriteArrayList<>();
 
         acquisitionsReport = new ArrayList<>();
         acquisitionsReportHTML = "";
-        newAcquisitionsReports = new ArrayList<>();
+        newAcquisitionsReports = new CopyOnWriteArrayList<>();
 
         medicalReport = new ArrayList<>();
         medicalReportHTML = "";
-        newMedicalReports = new ArrayList<>();
+        newMedicalReports = new CopyOnWriteArrayList<>();
 
         battleReport = new ArrayList<>();
         battleReportHTML = "";
-        newBattleReports = new ArrayList<>();
+        newBattleReports = new CopyOnWriteArrayList<>();
 
         politicsReport = new ArrayList<>();
         politicsReportHTML = "";
-        newPoliticsReports = new ArrayList<>();
+        newPoliticsReports = new CopyOnWriteArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -3022,7 +3036,14 @@ public class Campaign implements ITechManager {
 
         List<Person> activePersonnel = new ArrayList<>();
 
-        for (Person person : getPersonnel()) {
+        // Snapshot personnel.values() before iterating: Force Generator's SwingWorker mutates
+        // the personnel map (recruitPerson during Stage 7c-bis support generation) while the EDT
+        // calls this method through PartsAcquisitionService.generateSummaryCounts ->
+        // Campaign.getLogisticsPerson, triggered by Swing Timers in RepairTab.refreshPartsAcquisition.
+        // Without the snapshot the EDT trips ConcurrentModificationException on the
+        // LinkedHashMap$LinkedValueIterator backing getPersonnel(). Matches the snapshot pattern
+        // applied to getServiceableUnits for the unit-iteration race in the same call site.
+        for (Person person : new ArrayList<>(getPersonnel())) {
             PersonnelStatus status = person.getStatus();
             PrisonerStatus prisonerStatus = person.getPrisonerStatus();
             boolean isActive = status.isActiveFlexible();
@@ -3319,7 +3340,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewReports() {
         List<String> oldReports = newReports;
-        setNewReports(new ArrayList<>());
+        setNewReports(new CopyOnWriteArrayList<>());
         return oldReports;
     }
 
@@ -3345,7 +3366,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewSkillReports() {
         List<String> oldSkillReports = newSkillReports;
-        setNewSkillReports(new ArrayList<>());
+        setNewSkillReports(new CopyOnWriteArrayList<>());
         return oldSkillReports;
     }
 
@@ -3371,7 +3392,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewTechnicalReports() {
         List<String> oldTechnicalReports = newTechnicalReports;
-        setNewTechnicalReports(new ArrayList<>());
+        setNewTechnicalReports(new CopyOnWriteArrayList<>());
         return oldTechnicalReports;
     }
 
@@ -3397,7 +3418,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewFinancesReports() {
         List<String> oldFinancesReports = newFinancesReports;
-        setNewFinancesReports(new ArrayList<>());
+        setNewFinancesReports(new CopyOnWriteArrayList<>());
         return oldFinancesReports;
     }
 
@@ -3423,7 +3444,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewAcquisitionsReports() {
         List<String> oldAcquisitionsReports = newAcquisitionsReports;
-        setNewAcquisitionsReports(new ArrayList<>());
+        setNewAcquisitionsReports(new CopyOnWriteArrayList<>());
         return oldAcquisitionsReports;
     }
 
@@ -3449,7 +3470,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewMedicalReports() {
         List<String> oldMedicalReports = newMedicalReports;
-        setNewMedicalReports(new ArrayList<>());
+        setNewMedicalReports(new CopyOnWriteArrayList<>());
         return oldMedicalReports;
     }
 
@@ -3475,7 +3496,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewPersonnelReports() {
         List<String> oldPersonnelReports = newPersonnelReports;
-        setNewPersonnelReports(new ArrayList<>());
+        setNewPersonnelReports(new CopyOnWriteArrayList<>());
         return oldPersonnelReports;
     }
 
@@ -3501,7 +3522,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewBattleReports() {
         List<String> oldBattleReports = newBattleReports;
-        setNewBattleReports(new ArrayList<>());
+        setNewBattleReports(new CopyOnWriteArrayList<>());
         return oldBattleReports;
     }
 
@@ -3527,7 +3548,7 @@ public class Campaign implements ITechManager {
 
     public List<String> fetchAndClearNewPoliticsReports() {
         List<String> oldPoliticsReports = newPoliticsReports;
-        setNewPoliticsReports(new ArrayList<>());
+        setNewPoliticsReports(new CopyOnWriteArrayList<>());
         return oldPoliticsReports;
     }
 

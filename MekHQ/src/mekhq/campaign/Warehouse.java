@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -60,7 +60,16 @@ import mekhq.utilities.MHQXMLUtility;
 public class Warehouse {
     private static final MMLogger LOGGER = MMLogger.create(Warehouse.class);
 
-    private final TreeMap<Integer, Part> parts = new TreeMap<>();
+    // ConcurrentSkipListMap rather than TreeMap so the value iterators are weakly consistent and
+    // never throw ConcurrentModificationException. The earlier snapshot helpers (forEachPart,
+    // streamSpareParts, etc.) call `new ArrayList<>(parts.values())` whose ArrayList(Collection)
+    // constructor internally iterates via toArray() — if the worker thread's addPart fires while
+    // the EDT is mid-copy, TreeMap's fail-fast iterator throws. Force Generator's SwingWorker
+    // mutates parts while the EDT keeps reading (UnitTableModel.getValueAt -> AmmoBin ->
+    // getAmmoAvailable -> streamSpareParts; HangarTab.filterUnits -> DefaultRowSorter), so the
+    // race is reachable in normal play. Same NavigableMap API; the snapshot helpers stay in
+    // place for deterministic per-call views but no longer trip during construction.
+    private final ConcurrentSkipListMap<Integer, Part> parts = new ConcurrentSkipListMap<>();
 
     /**
      * Adds a part to the warehouse.
