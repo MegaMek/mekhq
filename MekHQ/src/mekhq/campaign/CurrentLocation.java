@@ -35,24 +35,12 @@ package mekhq.campaign;
 
 import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
-import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
-import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -60,21 +48,11 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -86,12 +64,9 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class CurrentLocation {
+public class CurrentLocation extends AbstractLocation {
     private static final MMLogger logger = MMLogger.create(CurrentLocation.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
-
-    private PlanetarySystem currentSystem;
     // keep track of jump path
     private JumpPath jumpPath;
     private double rechargeTime;
@@ -105,44 +80,38 @@ public class CurrentLocation {
     }
 
     public CurrentLocation(PlanetarySystem system, double time) {
-        this.currentSystem = system;
+        super(system);
         this.transitTime = time;
         this.rechargeTime = 0d;
         this.jumpZenith = true;
     }
 
+    @Override
     public void setTransitTime(double time) {
         transitTime = time;
     }
 
+    @Override
     public boolean isOnPlanet() {
         return transitTime <= 0;
     }
 
+    @Override
     public boolean isAtJumpPoint() {
         return transitTime >= currentSystem.getTimeToJumpPoint(1.0);
     }
 
+    @Override
     public double getPercentageTransit() {
         return 1 - transitTime / currentSystem.getTimeToJumpPoint(1.0);
     }
 
+    @Override
     public boolean isInTransit() {
         return !isOnPlanet() && !isAtJumpPoint();
     }
 
-    public PlanetarySystem getCurrentSystem() {
-        return currentSystem;
-    }
-
-    /**
-     * @return the current planet location. This is currently the primary planet of the system, but in the future this
-     *       will not be the case.
-     */
-    public Planet getPlanet() {
-        return getCurrentSystem().getPrimaryPlanet();
-    }
-
+    @Override
     public double getTransitTime() {
         return transitTime;
     }
@@ -150,8 +119,19 @@ public class CurrentLocation {
     /**
      * @return a <code>boolean</code> indicating whether the JumpShip is at the zenith or not (nadir if false).
      */
+    @Override
     public boolean isJumpZenith() {
         return jumpZenith;
+    }
+
+    @Override
+    protected double getRechargeTime() {
+        return rechargeTime;
+    }
+
+    @Override
+    protected void setRechargeTime(double t) {
+        rechargeTime = t;
     }
 
     /**
@@ -259,10 +239,12 @@ public class CurrentLocation {
         return report.toString();
     }
 
+    @Override
     public JumpPath getJumpPath() {
         return jumpPath;
     }
 
+    @Override
     public void setJumpPath(JumpPath path) {
         jumpPath = path;
     }
@@ -298,6 +280,7 @@ public class CurrentLocation {
     /**
      * Check for a jump path and if found, do whatever needs to be done to move forward
      */
+    @Override
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
@@ -401,175 +384,6 @@ public class CurrentLocation {
             }
 
             testForEarlyArrival(campaign);
-        }
-    }
-
-    private void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
-        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(currentSystem.getId(),
-              today, true);
-
-        // Check for bioweapon attacks
-        Set<InjuryType> activeBioweapons = getAllActiveBioweapons(currentSystem.getId(), today, true);
-        for (InjuryType bioweapon : activeBioweapons) {
-            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
-                  campaign.getCommanderAddress());
-            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.outOfCharacter",
-                  currentSystem.getName(today), bioweapon.getSimpleName());
-            if (availableCures.contains(bioweapon)) {
-                bottomMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.available");
-            } else {
-                bottomMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.none");
-            }
-
-            new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorMedicalPerson(),
-                  null,
-                  centerMessage,
-                  null,
-                  bottomMessage,
-                  null,
-                  false,
-                  ImmersiveDialogWidth.LARGE);
-        }
-
-        // Check for active disease outbreaks
-        Set<InjuryType> activeDiseases = getAllActiveDiseases(currentSystem.getId(), today, true);
-        for (InjuryType disease : activeDiseases) {
-            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter",
-                  campaign.getCommanderAddress());
-            if (availableCures.contains(disease)) {
-                centerMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.available");
-            } else {
-                centerMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.none");
-            }
-
-            new ImmersiveDialogNotification(campaign, centerMessage, true);
-        }
-    }
-
-    /**
-     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
-     *
-     * <p>This method iterates over all active personnel (excluding departed and absent individuals) and checks
-     * whether each person has the {@code FLAW_TRANSIT_DISORIENTATION_SYNDROME} flag enabled. If so, one of two effects
-     * occurs depending on campaign medical rules:</p>
-     *
-     * <ul>
-     *     <li><b>Advanced Medical enabled:</b>
-     *     <ul>
-     *         <li>An appropriate injury is created and added.</li>
-     *         <li>If the Alternative Advanced Medical system is active, the Alternate Injury version is used;
-     *         otherwise the standard injury is used.</li>
-     *     </ul>
-     *     </li>
-     *     <li><b>Advanced Medical disabled:</b>
-     *     <ul>
-     *         <li>The character simply gains +1 hit.</li>
-     *     </ul>
-     *     </li>
-     * </ul>
-     *
-     * <p>If the Fatigue subsystem is enabled, the character also gains fatigue equal to the configured campaign
-     * fatigue rate.</p>
-     *
-     * @param campaign        the current campaign, used for personnel state and injury construction
-     * @param campaignOptions the campaign's ruleset and configuration
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
-        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
-        final boolean useFatigue = campaignOptions.isUseFatigue();
-        final int fatigueRate = campaignOptions.getFatigueRate();
-
-        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
-            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                continue;
-            }
-
-            if (useAdvancedMedical) {
-                Injury injury = createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical);
-                person.addInjury(injury);
-            } else {
-                person.setHits(person.getHits() + 1);
-            }
-
-            if (useFatigue) {
-                person.changeFatigue(fatigueRate);
-            }
-        }
-    }
-
-    /**
-     * Creates the appropriate Transit Disorientation Syndrome injury instance based on the currently active medical
-     * ruleset.
-     *
-     * <p>If the Alternative Advanced Medical system is active, this method uses the {@code AlternateInjuries}
-     * version of the injury definition using a generic location. Otherwise it uses the standard {@code InjuryTypes}
-     * version with an internal location.</p>
-     *
-     * @param campaign              the campaign context needed for injury construction
-     * @param person                the affected character
-     * @param useAltAdvancedMedical whether the Alternative Advanced Medical system is active
-     *
-     * @return an {@link Injury} instance representing Transit Disorientation Syndrome
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static Injury createTransitDisorientationInjury(Campaign campaign, Person person,
-          boolean useAltAdvancedMedical) {
-        return useAltAdvancedMedical
-                     ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME
-                       .newInjury(campaign, person, GENERIC, 1)
-                     : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME
-                       .newInjury(campaign, person, INTERNAL, 1);
-    }
-
-    /**
-     * Tests for whether the campaign arrived at a contract location before it's due to start.
-     *
-     * <p>This method checks if the campaign has arrived early by comparing the current system with the system of
-     * each future contract. If the campaign has arrived early, it calculates the number of days until the contract's
-     * start date and generates both in-character and out-of-character messages. These messages are then displayed using
-     * an {@link ImmersiveDialogSimple} dialog.</p>
-     *
-     * <p>The first matching contract in the system ends the loop after handling early arrival notifications.</p>
-     *
-     * @param campaign The {@link Campaign} instance containing details of the current campaign, including the current
-     *                 system, future contracts, local date, and related resources needed for messaging.
-     */
-    private void testForEarlyArrival(Campaign campaign) {
-        List<Contract> futureContracts = campaign.getFutureContracts();
-
-        for (Contract contract : futureContracts) {
-            if (Objects.equals(currentSystem, contract.getSystem())) {
-                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
-
-                String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "contract.arrivedEarly.ic." + randomInt(10),
-                      campaign.getCommanderAddress(),
-                      daysTillStart);
-
-                String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "contract.arrivedEarly.ooc");
-
-                new ImmersiveDialogSimple(campaign,
-                      campaign.getSeniorAdminPerson(TRANSPORT),
-                      null,
-                      inCharacterMessage,
-                      null,
-                      outOfCharacterMessage,
-                      null,
-                      false);
-                break;
-            }
         }
     }
 
