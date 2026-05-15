@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,7 +91,20 @@ public class PartsTableModel extends DataTableModel<Part> {
      */
     public PartsTableModel(@Nullable Set<PartInUse> partsInUse) {
         data = new ArrayList<>();
+        setPartsInUse(partsInUse);
+    }
 
+    /**
+     * Replaces the part-to-use-count map used by the In Use column with the given snapshot. Callers
+     * (notably {@code WarehouseTab.refreshPartsList()}) must invoke this whenever the campaign's
+     * unit roster or installed-part inventory changes; otherwise the column keeps rendering the
+     * counts captured at construction time and a force-generated campaign reads 0 across the board.
+     *
+     * @param partsInUse the latest {@link PartInUse} set from {@code PartsInUseManager.getPartsInUse()},
+     *                   or {@code null} to clear the in-use mapping
+     */
+    public void setPartsInUse(@Nullable Set<PartInUse> partsInUse) {
+        partsUseData.clear();
         if (partsInUse != null) {
             for (PartInUse partInUse : partsInUse) {
                 IAcquisitionWork description = partInUse.getPartToBuy();

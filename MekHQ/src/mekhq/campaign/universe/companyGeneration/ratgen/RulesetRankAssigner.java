@@ -313,9 +313,12 @@ public final class RulesetRankAssigner {
      * Returns the rank index for support personnel (techs, doctors, admins). Mirrors the legacy
      * generator's {@code generateSupportPerson} switch: Corporal-equivalent for IS / Periphery,
      * lower index for Clan / ComStar / WoB.
+     *
+     * <p>Package-private so {@code SupportPersonnelGenerator} can share the same faction-to-rank
+     * mapping when it creates fresh techs, doctors, admins, astechs, and medics.</p>
      */
     static int supportRankForFaction(Faction faction) {
-        return (faction.isComStarOrWoB() || faction.isClan()) ? 4 : 8;
+        return (faction != null && (faction.isComStarOrWoB() || faction.isClan())) ? 4 : 8;
     }
 
     /**
@@ -330,7 +333,7 @@ public final class RulesetRankAssigner {
      * is empty at the chosen rank index by stepping down through lower indices until it
      * finds one that resolves to a real name.</p>
      */
-    static void setRankWithFallback(Person person, int preferredIndex) {
+    private static void setRankWithFallback(Person person, int preferredIndex) {
         person.setRank(preferredIndex);
         RankSystem rankSystem = person.getRankSystem();
         if (rankSystem == null) {

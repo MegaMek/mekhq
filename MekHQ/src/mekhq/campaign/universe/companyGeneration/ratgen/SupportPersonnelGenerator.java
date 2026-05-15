@@ -34,301 +34,287 @@ package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import megamek.common.units.Entity;
+import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.ratgen.SupportPersonnelCalculator.SupportDemand;
 
 /**
- * Stage 7c-bis of the ratgen pipeline: generates the CamOps 5th-print support personnel
- * (techs, doctors, admins, astechs, medics) for the just-materialized combat force.
+ * Stage 7e of the ratgen company-generation pipeline: creates the support staff (techs, doctors,
+ * administrators) the freshly-generated force needs to maintain itself, plus their astech and
+ * medic assistants.
  *
- * <p>Headcount per role is derived from {@link Campaign#getActiveUnits()} using the canonical
- * CamOps tech-team / non-admin-members formulas. A positive spinner value in
- * {@link CompanyGenerationOptions#getSupportPersonnel()} for any role overrides the computed
- * value for that role; a zero (the {@code RULESET_BASED} default) leaves the role on
- * auto.</p>
+ * <p>The flow:</p>
  *
- * <p>Side effects:</p>
- * <ul>
- *   <li>Creates a {@link FormationType#SUPPORT}-typed sub-formation named
- *       "Headquarters Staff" under the campaign root. Empty in Phase 1; Phase 2 will populate
- *       it with team-as-Unit objects.</li>
- *   <li>GM-recruits each generated {@link Person} into the campaign roster.</li>
- *   <li>Assigns the faction-appropriate support rank via
- *       {@link RulesetRankAssigner#setRankWithFallback}.</li>
- *   <li>If {@link CompanyGenerationOptions#isPoolAssistants()}, fills the AsTech / Medic pools
- *       AFTER recruiting techs / doctors instead of creating ASTECH / MEDIC Persons.</li>
- * </ul>
+ * <ol>
+ *   <li>{@link SupportPersonnelCalculator#compute(Campaign)} returns the 100%-coverage demand for
+ *       each role from the campaign's current force composition.</li>
+ *   <li>For each support role this class multiplies the baseline by the user's per-role coverage
+ *       percentage on {@link CompanyGenerationOptions#getSupportPersonnelCoveragePercents()}
+ *       (default 100%), creates that many Persons via {@link Campaign#newPerson(PersonnelRole)},
+ *       regenerates their skills at the user-selected experience tier via
+ *       {@link AbstractSkillGenerator#generateSkills(Campaign, Person, int)}, sets the
+ *       faction-appropriate support rank, and recruits them through
+ *       {@link Campaign#recruitPerson(Person, PrisonerStatus, boolean, boolean)}.</li>
+ *   <li>The four administrator roles share a single CamOps "1 admin per 20 personnel" demand —
+ *       this class splits that demand equally across Command / Logistics / Transport / HR, then
+ *       each role applies its own per-role coverage percentage independently.</li>
+ *   <li>Astech and medic generation are independent toggles. When on, 6 astechs are generated per
+ *       tech and 4 medics per doctor (the canonical {@code MHQConstants.AS_TECH_TEAM_SIZE} and
+ *       {@code Campaign.getMedicsNeed} ratios). The pool-vs-individual-Personnel radio picks
+ *       between adding to the campaign's anonymous pool counts or creating named Persons with the
+ *       chosen skill level.</li>
+ * </ol>
+ *
+ * <p>Every Person this class generates is added to the returned {@link Result#generatedPersons}
+ * list so Stage 7d's founder/callsign flags can target them.</p>
  */
 public final class SupportPersonnelGenerator {
 
     private static final MMLogger LOGGER = MMLogger.create(SupportPersonnelGenerator.class);
 
-    /** CamOps p.180 Support Vehicle weight tier boundary between Medium and Large (tons). */
-    private static final double LARGE_SUPPORT_VEHICLE_WEIGHT_THRESHOLD = 100.0;
-
-    /** Per-vehicle admin-tally divisor: 1 admin-tally point per N tons of combat vehicle weight. */
-    private static final int ADMIN_TALLY_TONS_PER_COMBAT_VEHICLE = 15;
-
-    /** CamOps p.190: 1 admin per 10 non-administrative Force members, round up. */
-    private static final int ADMIN_DIVISOR = 10;
-
-    /** Government Forces halve their admin requirement (round up). */
-    private static final int GOVERNMENT_ADMIN_DIVISOR = 2;
-
-    /**
-     * CamOps lists ~6 admin specialties (paper-pushers, doctors, intelligence, comms,
-     * quartermasters, lawyers). Doctors are 1 of those 6; carving 1/6 of the admin pool
-     * to the DOCTOR role preserves functional doctors in the campaign without changing
-     * the CamOps total.
-     */
-    private static final int DOCTOR_CARVE_DIVISOR = 6;
-
-    /** Legacy MekHQ ratio: 4 medics per doctor (matches {@link Campaign#getMedicsNeed}). */
+    /** Canonical 6 astechs per tech (one full astech team). */
+    private static final int ASTECHS_PER_TECH = 6;
+    /** Canonical 4 medics per doctor (one full medical team). */
     private static final int MEDICS_PER_DOCTOR = 4;
+    /** Number of administrator roles the total admin demand is split across. */
+    private static final int ADMIN_ROLE_COUNT = 4;
 
     private SupportPersonnelGenerator() {
         // utility class
     }
 
+    /** Counts emitted by the generator, useful for logging and reporting. */
+    public record Result(
+          int mekTechsGenerated,
+          int mechanicsGenerated,
+          int aeroTeksGenerated,
+          int baTechsGenerated,
+          int doctorsGenerated,
+          int administratorCommandGenerated,
+          int administratorLogisticsGenerated,
+          int administratorTransportGenerated,
+          int administratorHRGenerated,
+          int astechsAdded,
+          int medicsAdded,
+          List<Person> generatedPersons
+    ) {
+        /** Sum of the four tech-role generated counts. */
+        public int totalTechsGenerated() {
+            return mekTechsGenerated + mechanicsGenerated + aeroTeksGenerated + baTechsGenerated;
+        }
+
+        /** Sum of the four administrator-role generated counts. */
+        public int totalAdministratorsGenerated() {
+            return administratorCommandGenerated
+                  + administratorLogisticsGenerated
+                  + administratorTransportGenerated
+                  + administratorHRGenerated;
+        }
+    }
+
+    public static Result generate(Campaign campaign, CompanyGenerationOptions options) {
+        if (campaign == null || options == null) {
+            return new Result(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
+        }
+        return generate(campaign, options,
+              new DefaultSkillGenerator(campaign.getRandomSkillPreferences()));
+    }
+
     /**
-     * Aggregated counts of units / troopers tallied from {@link Campaign#getActiveUnits()},
-     * with the CamOps-specific shape needed by the support-personnel formulas. Vehicle and
-     * crewman counts are kept per-unit (not summed) because the admin tally rounds up
-     * <em>per vehicle</em> on the weight/15 rule, and large craft / support vehicle crew
-     * counts come from each unit's TRO crew size.
+     * Package-private overload that lets tests inject a no-op or stubbed
+     * {@link AbstractSkillGenerator}. Production callers should use the public single-arg form
+     * which constructs a {@link DefaultSkillGenerator} from the campaign's skill preferences.
      */
-    record UnitTally(int mek, int asfOrConvFighter, int smallCraft, int protoMek, int baTroopers,
-          int infantryTroopers, List<Integer> combatVehicleWeights,
-          List<Integer> nonLargeSupportVehicleCrew, List<Integer> largeCraftCrew) { }
+    static Result generate(Campaign campaign, CompanyGenerationOptions options,
+          AbstractSkillGenerator skillGen) {
+        if (campaign == null || options == null) {
+            return new Result(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
+        }
 
-    /** Per-role headcount to recruit at the end of the pipeline. */
-    record Counts(int mekTech, int mechanic, int aeroTek, int baTech, int doctor,
-          int adminCmd, int adminLog, int adminTxp, int adminHr, int astech, int medic) { }
+        long start = System.nanoTime();
 
-    /**
-     * Entry point: tallies the just-generated force, computes CamOps-aligned counts (or
-     * applies per-role overrides), creates the Headquarters Staff sub-formation, then
-     * GM-recruits the support persons.
-     *
-     * @return the flat list of {@link Person}s this stage added to the campaign; the caller
-     *         appends them to its {@code generatedPersons} accumulator so Stage 7d's founder
-     *         / callsign flags pick them up uniformly.
-     */
-    public static List<Person> generate(Campaign campaign, CompanyGenerationOptions options) {
-        long startNanos = System.nanoTime();
-
-        Faction faction = options.isUseSpecifiedFactionToAssignRanks() && options.getSpecifiedFaction() != null
-                                ? options.getSpecifiedFaction()
-                                : campaign.getFaction();
+        SupportDemand demand = SupportPersonnelCalculator.compute(campaign);
+        Faction faction = resolveFaction(campaign, options);
         int supportRank = RulesetRankAssigner.supportRankForFaction(faction);
-        boolean isGovernment = !faction.isMercenary() && !faction.isPirate();
-
-        Formation hq = createHeadquartersFormation(campaign);
-        LOGGER.info("[CompanyGen][Support] HQ formation created id={} name='{}'",
-              hq.getId(), hq.getName());
-
-        UnitTally tally = tallyUnits(campaign);
-        Counts counts = compute(tally, isGovernment, options);
-
-        LOGGER.info("[CompanyGen][Support] CamOps counts: mekTech={} mechanic={} aeroTek={} baTech={} doctor={} adminCmd={} adminLog={} adminTxp={} adminHr={} astech={} medic={} (faction={} government={} poolAssistants={})",
-              counts.mekTech(), counts.mechanic(), counts.aeroTek(), counts.baTech(),
-              counts.doctor(), counts.adminCmd(), counts.adminLog(), counts.adminTxp(),
-              counts.adminHr(), counts.astech(), counts.medic(),
-              faction.getShortName(), isGovernment, options.isPoolAssistants());
 
         List<Person> generated = new ArrayList<>();
-		 recruit(campaign, PersonnelRole.MEK_TECH, counts.mekTech(), supportRank, generated);
-        recruit(campaign, PersonnelRole.MECHANIC, counts.mechanic(), supportRank, generated);
-        recruit(campaign, PersonnelRole.AERO_TEK, counts.aeroTek(), supportRank, generated);
-        recruit(campaign, PersonnelRole.BA_TECH, counts.baTech(), supportRank, generated);
-        recruit(campaign, PersonnelRole.DOCTOR, counts.doctor(), supportRank, generated);
-        recruit(campaign, PersonnelRole.ADMINISTRATOR_COMMAND, counts.adminCmd(), supportRank, generated);
-        recruit(campaign, PersonnelRole.ADMINISTRATOR_LOGISTICS, counts.adminLog(), supportRank, generated);
-        recruit(campaign, PersonnelRole.ADMINISTRATOR_TRANSPORT, counts.adminTxp(), supportRank, generated);
-        recruit(campaign, PersonnelRole.ADMINISTRATOR_HR, counts.adminHr(), supportRank, generated);
 
-        // Pool path: skip individual ASTECH/MEDIC creation; refresh pools from the now-current
-        // tech/doctor counts. fillAsTechPool reads getAsTechNeed() = techs*6 - existing astechs;
-        // resetMedicPool empties then fills doctors*4 - existing medics. Both pools were 0
-        // before this stage because we don't generate any astechs/medics during combat assembly.
-        if (options.isPoolAssistants()) {
-            campaign.fillAsTechPool();
-            campaign.resetMedicPool();
-            LOGGER.info("[CompanyGen][Support] Pool path: filled astech pool ({}) and medic pool ({})",
-                  campaign.getTemporaryAsTechPool(), campaign.getTemporaryMedicPool());
-        } else {
-            recruit(campaign, PersonnelRole.ASTECH, counts.astech(), supportRank, generated);
-            recruit(campaign, PersonnelRole.MEDIC, counts.medic(), supportRank, generated);
-        }
+        int mekTechs = generateRole(campaign, options, skillGen, PersonnelRole.MEK_TECH,
+              demand.mekTechsNeeded(), supportRank, generated);
+        int mechanics = generateRole(campaign, options, skillGen, PersonnelRole.MECHANIC,
+              demand.mechanicsNeeded(), supportRank, generated);
+        int aeroTeks = generateRole(campaign, options, skillGen, PersonnelRole.AERO_TEK,
+              demand.aeroTeksNeeded(), supportRank, generated);
+        int baTechs = generateRole(campaign, options, skillGen, PersonnelRole.BA_TECH,
+              demand.baTechsNeeded(), supportRank, generated);
+        int doctors = generateRole(campaign, options, skillGen, PersonnelRole.DOCTOR,
+              demand.doctorsNeeded(), supportRank, generated);
 
-        long elapsedMs = (System.nanoTime() - startNanos) / 1_000_000;
-        LOGGER.info("[CompanyGen][Support] DONE generated={} elapsedMs={}", generated.size(), elapsedMs);
-        return generated;
+        // Equal split of total admin demand across the four administrator roles. Each role then
+        // applies its own per-role coverage percentage in generateRole().
+        int adminBaselinePerRole = (int) Math.ceil(demand.administratorsNeeded() / (double) ADMIN_ROLE_COUNT);
+        int adminCmd = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_COMMAND,
+              adminBaselinePerRole, supportRank, generated);
+        int adminLog = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_LOGISTICS,
+              adminBaselinePerRole, supportRank, generated);
+        int adminTpt = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_TRANSPORT,
+              adminBaselinePerRole, supportRank, generated);
+        int adminHR = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_HR,
+              adminBaselinePerRole, supportRank, generated);
+
+        int totalTechs = mekTechs + mechanics + aeroTeks + baTechs;
+        int astechs = applyAstechs(campaign, options, skillGen, supportRank, totalTechs, generated);
+        int medics = applyMedics(campaign, options, skillGen, supportRank, doctors, generated);
+
+        long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+        LOGGER.info("[CompanyGen][Pipeline][Support] generated techs(mekTech={} mechanic={} aero={} ba={}) " +
+                          "doctors={} admin(cmd={} log={} tpt={} hr={}) astechs={} medics={} elapsed={}ms",
+              mekTechs, mechanics, aeroTeks, baTechs, doctors,
+              adminCmd, adminLog, adminTpt, adminHR, astechs, medics, elapsedMs);
+
+        return new Result(mekTechs, mechanics, aeroTeks, baTechs, doctors,
+              adminCmd, adminLog, adminTpt, adminHR, astechs, medics, generated);
     }
 
     /**
-     * Creates the "Headquarters Staff" sub-formation under the campaign root and marks it
-     * SUPPORT. Empty in Phase 1; provides a stable hook for Phase 2 to attach team-Units.
+     * Generates {@code ceil(baselineDemand × coverage / 100)} Persons of the given role, applying
+     * the user-selected skill level and faction-appropriate rank to each. Returns the actual count
+     * created (zero if either baseline or coverage is non-positive).
      */
-    static Formation createHeadquartersFormation(Campaign campaign) {
-        Formation hq = new Formation("Headquarters Staff");
-        hq.setFormationType(FormationType.SUPPORT, false);
-        campaign.addFormation(hq, campaign.getFormations());
-        return hq;
-    }
-
-    /** Walks {@link Campaign#getActiveUnits()} and bins entities into the CamOps categories. */
-    static UnitTally tallyUnits(Campaign campaign) {
-        int mek = 0, asfOrConv = 0, smallCraft = 0, protoMek = 0, baTroopers = 0, infTroopers = 0;
-        List<Integer> combatVehicleWeights = new ArrayList<>();
-        List<Integer> nonLargeSupportVehicleCrew = new ArrayList<>();
-        List<Integer> largeCraftCrew = new ArrayList<>();
-
-        for (Unit unit : campaign.getActiveUnits()) {
-            Entity entity = unit.getEntity();
-            if (entity == null) {
-                continue;
-            }
-            // Order matters: check BA before generic Infantry (BattleArmor extends Infantry in
-            // MegaMek), and check Large/SmallCraft before generic Vehicle / Aero.
-            if (entity.isMek()) {
-                mek++;
-            } else if (entity.isProtoMek()) {
-                protoMek++;
-            } else if (entity.isBattleArmor()) {
-                baTroopers += unit.getFullCrewSize();
-            } else if (entity.isInfantry()) {
-                infTroopers += unit.getFullCrewSize();
-            } else if (entity.isLargeCraft()) {
-                largeCraftCrew.add(unit.getFullCrewSize());
-            } else if (entity.isSmallCraft()) {
-                smallCraft++;
-            } else if (entity.isAerospaceFighter() || entity.isConventionalFighter()) {
-                asfOrConv++;
-            } else if (entity.isSupportVehicle()) {
-                // Large support vehicles (>100 tons) get folded into the large-craft bucket: no
-                // tech team, crew counted for admin tally only. Smaller support vehicles need a
-                // tech team and contribute their crew to the admin tally.
-                int crew = unit.getFullCrewSize();
-                if (entity.getWeight() >= LARGE_SUPPORT_VEHICLE_WEIGHT_THRESHOLD) {
-                    largeCraftCrew.add(crew);
-                } else {
-                    nonLargeSupportVehicleCrew.add(crew);
-                }
-            } else if (entity.isVehicle()) {
-                combatVehicleWeights.add((int) entity.getWeight());
-            }
-        }
-
-        return new UnitTally(mek, asfOrConv, smallCraft, protoMek, baTroopers, infTroopers,
-              combatVehicleWeights, nonLargeSupportVehicleCrew, largeCraftCrew);
-    }
-
-    /**
-     * Applies the CamOps formulas to {@code tally} and merges per-role spinner overrides from
-     * {@code options}. A positive override wins; zero / negative leaves the role on auto.
-     */
-    static Counts compute(UnitTally tally, boolean isGovernment, CompanyGenerationOptions options) {
-        // Tech teams (1 tech + 6 astechs each).
-        int mekTeams = tally.mek() + roundToInt(tally.protoMek() / 5.0);
-        int mechanicTeams = tally.combatVehicleWeights().size()
-                                  + tally.nonLargeSupportVehicleCrew().size()
-                                  + roundToInt(tally.infantryTroopers() / 112.0);
-        int aeroTeams = tally.asfOrConvFighter() + tally.smallCraft();
-        int baTeams = roundToInt(tally.baTroopers() / 5.0);
-        int totalTechTeams = mekTeams + mechanicTeams + aeroTeams + baTeams;
-
-        // Non-admin members tally for the admin formula. CamOps p.190 enumeration.
-        int nonAdminMembers = totalTechTeams * (1 + MHQConstants.AS_TECH_TEAM_SIZE)
-                                    + tally.mek()
-                                    + tally.asfOrConvFighter()
-                                    + tally.protoMek()
-                                    + tally.baTroopers()
-                                    + tally.infantryTroopers();
-        for (int weight : tally.combatVehicleWeights()) {
-            nonAdminMembers += ceilDiv(weight, ADMIN_TALLY_TONS_PER_COMBAT_VEHICLE);
-        }
-        for (int crew : tally.nonLargeSupportVehicleCrew()) {
-            nonAdminMembers += crew;
-        }
-        for (int crew : tally.largeCraftCrew()) {
-            nonAdminMembers += crew;
-        }
-
-        int admins = ceilDiv(nonAdminMembers, ADMIN_DIVISOR);
-        if (isGovernment) {
-            admins = ceilDiv(admins, GOVERNMENT_ADMIN_DIVISOR);
-        }
-
-        // Carve doctors from the admin pool (1/6 of the admin slots, minimum 1 if admins > 0).
-        int doctorAuto = admins > 0 ? Math.max(1, roundToInt(admins / (double) DOCTOR_CARVE_DIVISOR)) : 0;
-        int remainingAdmins = Math.max(0, admins - doctorAuto);
-        int adminLogAuto = (int) Math.ceil(remainingAdmins * 0.50);
-        int adminCmdAuto = roundToInt(remainingAdmins * 0.20);
-        int adminHrAuto = roundToInt(remainingAdmins * 0.20);
-        int adminTxpAuto = Math.max(0, remainingAdmins - adminLogAuto - adminCmdAuto - adminHrAuto);
-
-        // Astechs/medics scale from final (post-override) tech/doctor counts so that an admin
-        // override of techs/doctors also rescales the pool-OFF support headcount.
-        Map<PersonnelRole, Integer> overrides = options.getSupportPersonnel();
-        int mekTech = override(overrides, PersonnelRole.MEK_TECH, mekTeams);
-        int mechanic = override(overrides, PersonnelRole.MECHANIC, mechanicTeams);
-        int aeroTek = override(overrides, PersonnelRole.AERO_TEK, aeroTeams);
-        int baTech = override(overrides, PersonnelRole.BA_TECH, baTeams);
-        int doctor = override(overrides, PersonnelRole.DOCTOR, doctorAuto);
-        int adminCmd = override(overrides, PersonnelRole.ADMINISTRATOR_COMMAND, adminCmdAuto);
-        int adminLog = override(overrides, PersonnelRole.ADMINISTRATOR_LOGISTICS, adminLogAuto);
-        int adminTxp = override(overrides, PersonnelRole.ADMINISTRATOR_TRANSPORT, adminTxpAuto);
-        int adminHr = override(overrides, PersonnelRole.ADMINISTRATOR_HR, adminHrAuto);
-
-        int totalTechsAfterOverride = mekTech + mechanic + aeroTek + baTech;
-        int astech = totalTechsAfterOverride * MHQConstants.AS_TECH_TEAM_SIZE;
-        int medic = doctor * MEDICS_PER_DOCTOR;
-
-        return new Counts(mekTech, mechanic, aeroTek, baTech, doctor,
-              adminCmd, adminLog, adminTxp, adminHr, astech, medic);
-    }
-
-    /** Creates {@code count} Persons of {@code role}, GM-recruits each, and sets the rank. */
-    private static void recruit(Campaign campaign, PersonnelRole role, int count, int rankIndex,
+    private static int generateRole(Campaign campaign, CompanyGenerationOptions options,
+          AbstractSkillGenerator skillGen, PersonnelRole role, int baselineDemand, int supportRank,
           List<Person> out) {
+        int percent = options.getSupportPersonnelCoveragePercents().getOrDefault(role, 100);
+        int count = SupportPersonnelCalculator.applyPercent(baselineDemand, percent);
         if (count <= 0) {
-            return;
-        }
-        for (int i = 0; i < count; i++) {
-            Person person = campaign.newPerson(role);
-            campaign.recruitPerson(person, /* gmAdd */ true, /* employ */ true);
-            RulesetRankAssigner.setRankWithFallback(person, rankIndex);
-            out.add(person);
-        }
-    }
-
-    private static int override(Map<PersonnelRole, Integer> overrides, PersonnelRole role, int auto) {
-        Integer requested = overrides == null ? null : overrides.get(role);
-        return (requested != null && requested > 0) ? requested : auto;
-    }
-
-    /** Integer ceiling division for non-negative inputs; returns 0 if {@code divisor} is 0. */
-    private static int ceilDiv(int dividend, int divisor) {
-        if (divisor <= 0 || dividend <= 0) {
             return 0;
         }
-        return (dividend + divisor - 1) / divisor;
+        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().getOrDefault(role, SkillLevel.REGULAR);
+        int expLvl = toExperienceLevel(skillLevel);
+
+        for (int i = 0; i < count; i++) {
+            Person person = createAndRecruit(campaign, skillGen, role, expLvl, supportRank);
+            if (person != null) {
+                out.add(person);
+            }
+        }
+        return count;
     }
 
-    /** Math.round to int (half-up), with a long-to-int narrow that's safe for our domain. */
-    private static int roundToInt(double value) {
-        return (int) Math.round(value);
+    /**
+     * Pool-or-Person dispatch for astech generation. Returns the number of astechs added (pool
+     * count or Person count, semantics depend on the mode).
+     */
+    private static int applyAstechs(Campaign campaign, CompanyGenerationOptions options,
+          AbstractSkillGenerator skillGen, int supportRank, int totalTechs, List<Person> out) {
+        if (!options.isGenerateAstechs() || totalTechs <= 0) {
+            return 0;
+        }
+        int needed = ASTECHS_PER_TECH * totalTechs;
+        return applyAssistant(campaign, skillGen, PersonnelRole.ASTECH, needed,
+              options.isAstechsAsPersonnel(),
+              options.getAstechSkillLevel(), supportRank, out, AssistantPool.ASTECH);
+    }
+
+    /**
+     * Pool-or-Person dispatch for medic generation. Returns the number of medics added.
+     */
+    private static int applyMedics(Campaign campaign, CompanyGenerationOptions options,
+          AbstractSkillGenerator skillGen, int supportRank, int totalDoctors, List<Person> out) {
+        if (!options.isGenerateMedics() || totalDoctors <= 0) {
+            return 0;
+        }
+        int needed = MEDICS_PER_DOCTOR * totalDoctors;
+        return applyAssistant(campaign, skillGen, PersonnelRole.MEDIC, needed,
+              options.isMedicsAsPersonnel(),
+              options.getMedicSkillLevel(), supportRank, out, AssistantPool.MEDIC);
+    }
+
+    private enum AssistantPool { ASTECH, MEDIC }
+
+    private static int applyAssistant(Campaign campaign, AbstractSkillGenerator skillGen,
+          PersonnelRole role, int needed, boolean asPersonnel, SkillLevel skillLevel,
+          int supportRank, List<Person> out, AssistantPool pool) {
+        if (needed <= 0) {
+            return 0;
+        }
+        if (asPersonnel) {
+            int expLvl = toExperienceLevel(skillLevel == null ? SkillLevel.REGULAR : skillLevel);
+            for (int i = 0; i < needed; i++) {
+                Person person = createAndRecruit(campaign, skillGen, role, expLvl, supportRank);
+                if (person != null) {
+                    out.add(person);
+                }
+            }
+            return needed;
+        }
+        // Pool mode: anonymous slots in the campaign's astech / medic pool. No Persons created.
+        switch (pool) {
+            case ASTECH -> campaign.increaseAsTechPool(needed);
+            case MEDIC -> campaign.increaseMedicPool(needed);
+        }
+        return needed;
+    }
+
+    /**
+     * Creates a Person of {@code role}, regenerates their skills at {@code expLvl}, sets their
+     * rank to {@code supportRank}, and recruits them into the campaign. Returns the created
+     * Person, or {@code null} if recruitment failed.
+     */
+    private static Person createAndRecruit(Campaign campaign, AbstractSkillGenerator skillGen,
+          PersonnelRole role, int expLvl, int supportRank) {
+        Person person = campaign.newPerson(role);
+        // newPerson already runs skill generation at the campaign's default level; regenerate at
+        // the user-selected experience tier so the role's primary skills land at the right level.
+        skillGen.generateSkills(campaign, person, expLvl);
+        person.setRank(supportRank);
+        boolean recruited = campaign.recruitPerson(person, PrisonerStatus.FREE, true, true);
+        if (!recruited) {
+            LOGGER.warn("[CompanyGen][Pipeline][Support] failed to recruit {} ({})",
+                  role.name(), person.getFullName());
+            return null;
+        }
+        return person;
+    }
+
+    /**
+     * Picks the rank-authority faction the same way {@link RulesetRankAssigner#apply} does:
+     * honors {@link CompanyGenerationOptions#isUseSpecifiedFactionToAssignRanks()} and falls back
+     * to the campaign's faction.
+     */
+    private static Faction resolveFaction(Campaign campaign, CompanyGenerationOptions options) {
+        Faction faction = options.isUseSpecifiedFactionToAssignRanks()
+              ? options.getSpecifiedFaction()
+              : campaign.getFaction();
+        return (faction != null) ? faction : campaign.getFaction();
+    }
+
+    /**
+     * Converts a {@link SkillLevel} (where {@code NONE = 0, ULTRA_GREEN = 1, …, ELITE = 5}) to a
+     * {@link SkillType} {@code EXP_*} constant (where {@code EXP_ULTRA_GREEN = 0, …, EXP_ELITE =
+     * 4}). The two enums use different baselines; this is the canonical mapping.
+     */
+    static int toExperienceLevel(SkillLevel skillLevel) {
+        if (skillLevel == null) {
+            return SkillType.EXP_REGULAR;
+        }
+        return switch (skillLevel) {
+            case ULTRA_GREEN -> SkillType.EXP_ULTRA_GREEN;
+            case GREEN -> SkillType.EXP_GREEN;
+            case REGULAR -> SkillType.EXP_REGULAR;
+            case VETERAN -> SkillType.EXP_VETERAN;
+            case ELITE -> SkillType.EXP_ELITE;
+            default -> SkillType.EXP_REGULAR;
+        };
     }
 }

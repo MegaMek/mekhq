@@ -49,6 +49,7 @@ import java.util.TreeMap;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.units.EntityWeightClass;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -63,6 +64,7 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
+import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -94,6 +96,31 @@ public class CompanyGenerationOptions {
     // Personnel
     private Map<PersonnelRole, Integer> supportPersonnel;
     private boolean poolAssistants;
+    // Ratgen pipeline (RULESET_BASED method) — per-role coverage percentages and skill levels.
+    // 100 = full canonical coverage, 0 = generate none, >100 = redundancy. Independent from the
+    // legacy absolute-count {@code supportPersonnel} map; SetupTab swaps which one it edits based
+    // on the active method.
+    private Map<PersonnelRole, Integer> supportPersonnelCoveragePercents;
+    private Map<PersonnelRole, SkillLevel> supportPersonnelSkillLevels;
+    // Astech / Medic generation. Split from the single {@code poolAssistants} flag so each
+    // auxiliary type can independently be skipped, pooled, or generated as named Persons. The
+    // legacy poolAssistants flag is kept for backward compat — old presets map it onto both
+    // generateAstechs and generateMedics during XML parse.
+    private boolean generateAstechs;
+    private boolean astechsAsPersonnel;
+    private SkillLevel astechSkillLevel;
+    private boolean generateMedics;
+    private boolean medicsAsPersonnel;
+    private SkillLevel medicSkillLevel;
+    // Tech-to-unit assignment sort grid (ratgen pipeline, RULESET_BASED method). Three sort slots
+    // each holding a {@link TechAssignmentSortFactor}; the assigner chains them in slot order
+    // (primary → secondary → tertiary). Each slot has its own ascending / descending direction.
+    private TechAssignmentSortFactor techAssignmentPrimarySort;
+    private boolean techAssignmentPrimaryDescending;
+    private TechAssignmentSortFactor techAssignmentSecondarySort;
+    private boolean techAssignmentSecondaryDescending;
+    private TechAssignmentSortFactor techAssignmentTertiarySort;
+    private boolean techAssignmentTertiaryDescending;
     private boolean generateCaptains;
     private boolean assignCompanyCommanderFlag;
     private boolean applyOfficerStatBonusToWorstSkill;
@@ -173,6 +200,23 @@ public class CompanyGenerationOptions {
     private Map<MysteryBoxType, Boolean> generateMysteryBoxTypes;
     // endregion Variable Declarations
 
+    /**
+     * Support roles seeded with default coverage percentages and skill levels for the RULESET_BASED
+     * pipeline. The four tech roles, doctor, and four administrator roles — matches the SetupTab
+     * spinner/dropdown layout.
+     */
+    private static final PersonnelRole[] SUPPORT_ROLES_FOR_COVERAGE = {
+          PersonnelRole.MEK_TECH,
+          PersonnelRole.MECHANIC,
+          PersonnelRole.AERO_TEK,
+          PersonnelRole.BA_TECH,
+          PersonnelRole.DOCTOR,
+          PersonnelRole.ADMINISTRATOR_COMMAND,
+          PersonnelRole.ADMINISTRATOR_LOGISTICS,
+          PersonnelRole.ADMINISTRATOR_TRANSPORT,
+          PersonnelRole.ADMINISTRATOR_HR
+    };
+
     // region Constructors
     public CompanyGenerationOptions(final CompanyGenerationMethod method) {
         // Base Information
@@ -215,6 +259,41 @@ public class CompanyGenerationOptions {
         }
         setSupportPersonnel(supportPersonnel);
         setPoolAssistants(true);
+
+        // Ratgen per-role coverage percentages and skill levels. Defaults are 100% coverage and
+        // Regular skill for every SUPPORT role — the user opts into changes via the SetupTab.
+        // Initialized regardless of method so the maps are always non-null; only consumed when
+        // the user picks the RULESET_BASED method.
+        final Map<PersonnelRole, Integer> coveragePercents = new HashMap<>();
+        final Map<PersonnelRole, SkillLevel> skillLevels = new HashMap<>();
+        for (final PersonnelRole role : SUPPORT_ROLES_FOR_COVERAGE) {
+            coveragePercents.put(role, 100);
+            skillLevels.put(role, SkillLevel.REGULAR);
+        }
+        setSupportPersonnelCoveragePercents(coveragePercents);
+        setSupportPersonnelSkillLevels(skillLevels);
+
+        // Astech / Medic generation defaults. Match the legacy "poolAssistants = true" behavior
+        // out-of-box so existing presets generate identical forces; opting into named-Persons mode
+        // is explicit.
+        setGenerateAstechs(true);
+        setAstechsAsPersonnel(false);
+        setAstechSkillLevel(SkillLevel.REGULAR);
+        setGenerateMedics(true);
+        setMedicsAsPersonnel(false);
+        setMedicSkillLevel(SkillLevel.REGULAR);
+
+        // Tech-to-unit assignment grid defaults: officers first, then heaviest, then best pilot.
+        // Mirrors typical merc-company practice — the commander's Mek gets the best available
+        // tech, ties broken by mass, and pilot skill picks the winner among same-rank-and-weight
+        // crews.
+        setTechAssignmentPrimarySort(TechAssignmentSortFactor.PILOT_RANK);
+        setTechAssignmentPrimaryDescending(true);
+        setTechAssignmentSecondarySort(TechAssignmentSortFactor.UNIT_WEIGHT);
+        setTechAssignmentSecondaryDescending(true);
+        setTechAssignmentTertiarySort(TechAssignmentSortFactor.PILOT_SKILL);
+        setTechAssignmentTertiaryDescending(true);
+
         setGenerateCaptains(method.isWindchild());
         setAssignCompanyCommanderFlag(true);
         setApplyOfficerStatBonusToWorstSkill(method.isWindchild());
@@ -403,6 +482,120 @@ public class CompanyGenerationOptions {
 
     public void setPoolAssistants(final boolean poolAssistants) {
         this.poolAssistants = poolAssistants;
+    }
+
+    public Map<PersonnelRole, Integer> getSupportPersonnelCoveragePercents() {
+        return supportPersonnelCoveragePercents;
+    }
+
+    public void setSupportPersonnelCoveragePercents(
+          final Map<PersonnelRole, Integer> supportPersonnelCoveragePercents) {
+        this.supportPersonnelCoveragePercents = supportPersonnelCoveragePercents;
+    }
+
+    public Map<PersonnelRole, SkillLevel> getSupportPersonnelSkillLevels() {
+        return supportPersonnelSkillLevels;
+    }
+
+    public void setSupportPersonnelSkillLevels(
+          final Map<PersonnelRole, SkillLevel> supportPersonnelSkillLevels) {
+        this.supportPersonnelSkillLevels = supportPersonnelSkillLevels;
+    }
+
+    public boolean isGenerateAstechs() {
+        return generateAstechs;
+    }
+
+    public void setGenerateAstechs(final boolean generateAstechs) {
+        this.generateAstechs = generateAstechs;
+    }
+
+    public boolean isAstechsAsPersonnel() {
+        return astechsAsPersonnel;
+    }
+
+    public void setAstechsAsPersonnel(final boolean astechsAsPersonnel) {
+        this.astechsAsPersonnel = astechsAsPersonnel;
+    }
+
+    public SkillLevel getAstechSkillLevel() {
+        return astechSkillLevel;
+    }
+
+    public void setAstechSkillLevel(final SkillLevel astechSkillLevel) {
+        this.astechSkillLevel = astechSkillLevel;
+    }
+
+    public boolean isGenerateMedics() {
+        return generateMedics;
+    }
+
+    public void setGenerateMedics(final boolean generateMedics) {
+        this.generateMedics = generateMedics;
+    }
+
+    public boolean isMedicsAsPersonnel() {
+        return medicsAsPersonnel;
+    }
+
+    public void setMedicsAsPersonnel(final boolean medicsAsPersonnel) {
+        this.medicsAsPersonnel = medicsAsPersonnel;
+    }
+
+    public SkillLevel getMedicSkillLevel() {
+        return medicSkillLevel;
+    }
+
+    public void setMedicSkillLevel(final SkillLevel medicSkillLevel) {
+        this.medicSkillLevel = medicSkillLevel;
+    }
+
+    public TechAssignmentSortFactor getTechAssignmentPrimarySort() {
+        return techAssignmentPrimarySort;
+    }
+
+    public void setTechAssignmentPrimarySort(final TechAssignmentSortFactor factor) {
+        this.techAssignmentPrimarySort = factor;
+    }
+
+    public boolean isTechAssignmentPrimaryDescending() {
+        return techAssignmentPrimaryDescending;
+    }
+
+    public void setTechAssignmentPrimaryDescending(final boolean descending) {
+        this.techAssignmentPrimaryDescending = descending;
+    }
+
+    public TechAssignmentSortFactor getTechAssignmentSecondarySort() {
+        return techAssignmentSecondarySort;
+    }
+
+    public void setTechAssignmentSecondarySort(final TechAssignmentSortFactor factor) {
+        this.techAssignmentSecondarySort = factor;
+    }
+
+    public boolean isTechAssignmentSecondaryDescending() {
+        return techAssignmentSecondaryDescending;
+    }
+
+    public void setTechAssignmentSecondaryDescending(final boolean descending) {
+        this.techAssignmentSecondaryDescending = descending;
+    }
+
+    public TechAssignmentSortFactor getTechAssignmentTertiarySort() {
+        return techAssignmentTertiarySort;
+    }
+
+    public void setTechAssignmentTertiarySort(final TechAssignmentSortFactor factor) {
+        this.techAssignmentTertiarySort = factor;
+    }
+
+    public boolean isTechAssignmentTertiaryDescending() {
+        return techAssignmentTertiaryDescending;
+    }
+
+    public void setTechAssignmentTertiaryDescending(final boolean descending) {
+        this.techAssignmentTertiaryDescending = descending;
     }
 
     public boolean isGenerateCaptains() {
@@ -979,6 +1172,37 @@ public class CompanyGenerationOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
+        // Ratgen pipeline fields. Written AFTER poolAssistants so the legacy-migration fallback in
+        // parseFromXML (which mirrors poolAssistants onto generateAstechs / generateMedics) is
+        // safely overridden by these explicit values for any preset written by this code.
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnelCoveragePercents");
+        for (final Entry<PersonnelRole, Integer> entry : getSupportPersonnelCoveragePercents().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnelCoveragePercents");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnelSkillLevels");
+        for (final Entry<PersonnelRole, SkillLevel> entry : getSupportPersonnelSkillLevels().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue().name());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnelSkillLevels");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateAstechs", isGenerateAstechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechsAsPersonnel", isAstechsAsPersonnel());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechSkillLevel", getAstechSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMedics", isGenerateMedics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicsAsPersonnel", isMedicsAsPersonnel());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicSkillLevel", getMedicSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentPrimarySort",
+              getTechAssignmentPrimarySort().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentPrimaryDescending",
+              isTechAssignmentPrimaryDescending());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentSecondarySort",
+              getTechAssignmentSecondarySort().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentSecondaryDescending",
+              isTechAssignmentSecondaryDescending());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentTertiarySort",
+              getTechAssignmentTertiarySort().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentTertiaryDescending",
+              isTechAssignmentTertiaryDescending());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill",
@@ -1183,7 +1407,89 @@ public class CompanyGenerationOptions {
                         break;
                     }
                     case "poolAssistants":
-                        options.setPoolAssistants(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        final boolean pool = Boolean.parseBoolean(wn.getTextContent().trim());
+                        options.setPoolAssistants(pool);
+                        // Legacy migration: presets written before the astech/medic split only
+                        // have this flag. Mirror it onto the new fields so old presets keep
+                        // generating astechs/medics identically. New presets emit explicit
+                        // generateAstechs/generateMedics tags AFTER this one in writeToXML so
+                        // any explicit value overrides this fallback.
+                        options.setGenerateAstechs(pool);
+                        options.setGenerateMedics(pool);
+                        break;
+                    case "supportPersonnelCoveragePercents": {
+                        options.setSupportPersonnelCoveragePercents(new HashMap<>());
+                        final NodeList nl2 = wn.getChildNodes();
+                        for (int y = 0; y < nl2.getLength(); y++) {
+                            final Node wn2 = nl2.item(y);
+                            try {
+                                options.getSupportPersonnelCoveragePercents().put(
+                                      PersonnelRole.valueOf(wn2.getNodeName().trim()),
+                                      Integer.parseInt(wn2.getTextContent().trim()));
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                        break;
+                    }
+                    case "supportPersonnelSkillLevels": {
+                        options.setSupportPersonnelSkillLevels(new HashMap<>());
+                        final NodeList nl2 = wn.getChildNodes();
+                        for (int y = 0; y < nl2.getLength(); y++) {
+                            final Node wn2 = nl2.item(y);
+                            try {
+                                options.getSupportPersonnelSkillLevels().put(
+                                      PersonnelRole.valueOf(wn2.getNodeName().trim()),
+                                      SkillLevel.valueOf(wn2.getTextContent().trim()));
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                        break;
+                    }
+                    case "generateAstechs":
+                        options.setGenerateAstechs(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "astechsAsPersonnel":
+                        options.setAstechsAsPersonnel(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "astechSkillLevel":
+                        options.setAstechSkillLevel(
+                              parseSkillLevelSafe(wn.getTextContent().trim(), SkillLevel.REGULAR));
+                        break;
+                    case "generateMedics":
+                        options.setGenerateMedics(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "medicsAsPersonnel":
+                        options.setMedicsAsPersonnel(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "medicSkillLevel":
+                        options.setMedicSkillLevel(
+                              parseSkillLevelSafe(wn.getTextContent().trim(), SkillLevel.REGULAR));
+                        break;
+                    case "techAssignmentPrimarySort":
+                        options.setTechAssignmentPrimarySort(parseSortFactorSafe(
+                              wn.getTextContent().trim(), TechAssignmentSortFactor.PILOT_RANK));
+                        break;
+                    case "techAssignmentPrimaryDescending":
+                        options.setTechAssignmentPrimaryDescending(
+                              Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "techAssignmentSecondarySort":
+                        options.setTechAssignmentSecondarySort(parseSortFactorSafe(
+                              wn.getTextContent().trim(), TechAssignmentSortFactor.UNIT_WEIGHT));
+                        break;
+                    case "techAssignmentSecondaryDescending":
+                        options.setTechAssignmentSecondaryDescending(
+                              Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "techAssignmentTertiarySort":
+                        options.setTechAssignmentTertiarySort(parseSortFactorSafe(
+                              wn.getTextContent().trim(), TechAssignmentSortFactor.PILOT_SKILL));
+                        break;
+                    case "techAssignmentTertiaryDescending":
+                        options.setTechAssignmentTertiaryDescending(
+                              Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "generateCaptains":
                         options.setGenerateCaptains(Boolean.parseBoolean(wn.getTextContent().trim()));
@@ -1441,6 +1747,31 @@ public class CompanyGenerationOptions {
         }
 
         return options;
+    }
+
+    /**
+     * Parses a {@link SkillLevel} name with graceful fallback. Used by the parser so a hand-edited
+     * preset or a future-renamed enum value doesn't break the whole load.
+     */
+    private static SkillLevel parseSkillLevelSafe(final String text, final SkillLevel fallback) {
+        try {
+            return SkillLevel.valueOf(text);
+        } catch (IllegalArgumentException ex) {
+            return fallback;
+        }
+    }
+
+    /**
+     * Parses a {@link TechAssignmentSortFactor} name with graceful fallback. Same forgiveness as
+     * {@link #parseSkillLevelSafe(String, SkillLevel)} for unrecognized values.
+     */
+    private static TechAssignmentSortFactor parseSortFactorSafe(final String text,
+          final TechAssignmentSortFactor fallback) {
+        try {
+            return TechAssignmentSortFactor.valueOf(text);
+        } catch (IllegalArgumentException ex) {
+            return fallback;
+        }
     }
     // endregion File IO
 }

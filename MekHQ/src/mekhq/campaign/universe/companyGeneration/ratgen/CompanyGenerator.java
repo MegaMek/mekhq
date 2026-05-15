@@ -364,32 +364,42 @@ public final class CompanyGenerator {
 
         // 7c. Tree-aware rank assignment. Walks the Formation tree post-order and assigns each
         // node's commander the officer rank matching their FormationLevel (Lt → Lance, Capt →
-        // Company, Major → Battalion, …). Non-officer combat crew get Sergeant-equivalent; support
-        // crew get Corporal-equivalent. Gated on isAutomaticallyAssignRanks.
+        // Company, Major → Battalion, …). Non-officer combat crew get Sergeant-equivalent; any
+        // support crew already attached to a Unit at this point get Corporal-equivalent. Gated on
+        // isAutomaticallyAssignRanks.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7c: tree-aware rank assignment");
         if (listener != null) {
             listener.updateProgress(0.0, "Assigning ranks...");
         }
         Person rootCommander = RulesetRankAssigner.apply(campaign, options);
 
-        // 7c-bis. CamOps-aligned support personnel (techs / doctors / admins / astechs / medics)
-        // derived from the just-materialized force. Creates the "Headquarters Staff" SUPPORT
-        // sub-formation under the root (Phase 1 empty; Phase 2 will populate with team-Units)
-        // and GM-recruits the support persons with the faction-appropriate support rank. The
-        // returned list is appended to generatedPersons so Stage 7d picks them up uniformly.
-        LOGGER.info("[CompanyGen][Pipeline]Stage 7c-bis: support personnel");
+        // 7e. Support personnel: techs, doctors, administrators, plus astech and medic assistants.
+        // Reads per-role coverage % and skill level from the Setup tab, scales the canonical CamOps
+        // demand from SupportPersonnelCalculator, and creates the resulting Persons (or astech/medic
+        // pool counts) via SupportPersonnelGenerator. Each generated support Person already has its
+        // rank set by the generator — Stage 7c only ranks Persons in the Formation tree, and
+        // support staff are free-floating campaign personnel.
+        //
+        // Runs before Stage 7d so the founder/callsign flags below sweep across combat AND support
+        // staff in one pass.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7e: support personnel generation");
         if (listener != null) {
             listener.updateProgress(0.0, "Generating support personnel...");
         }
-        List<Person> supportPersons = SupportPersonnelGenerator.generate(campaign, options);
-        generatedPersons.addAll(supportPersons);
-        LOGGER.info("[CompanyGen][Pipeline]Stage 7c-bis: added {} support persons (total generatedPersons={})",
-              supportPersons.size(), generatedPersons.size());
+        SupportPersonnelGenerator.Result supportResult = SupportPersonnelGenerator.generate(campaign, options);
+        generatedPersons.addAll(supportResult.generatedPersons());
+
+        // 7e (continued). Assign techs to units using the Setup tab's three-slot sort grid (Pilot
+        // Rank / Unit Weight / Pilot Skill, each with its own direction). Gated on
+        // isAssignTechsToUnits; pulls only from the techs SupportPersonnelGenerator just created
+        // so we don't steal a pre-existing campaign tech from another duty.
+        SupportPersonnelAssigner.assign(campaign, options, supportResult);
 
         // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
-        // officer, founder flag on every fresh hire, and random callsigns for non-Clan MekWarriors.
-        // These are pure Person-state mutations with no algorithmic logic, so they live in the
-        // pipeline rather than in a dedicated helper class.
+        // officer, founder flag on every fresh hire (combat + support after the 7e merge above),
+        // and random callsigns for non-Clan MekWarriors (support staff don't have the MEKWARRIOR
+        // primary role so they're naturally skipped). These are pure Person-state mutations with
+        // no algorithmic logic, so they live in the pipeline rather than in a dedicated helper.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7d: personnel flags");
         if (listener != null) {
             listener.updateProgress(0.0, "Applying personnel flags...");

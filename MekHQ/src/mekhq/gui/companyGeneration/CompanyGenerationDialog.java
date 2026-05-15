@@ -41,6 +41,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -208,10 +209,11 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getSparesTab().writeValuesToOptions(options);
         pane.getOtherTab().writeValuesToOptions(options);
 
-        // For large forces (Brigade and above for IS, Galaxy and above for Clan, Level V+ for
-        // ComStar), warn the user that generation will take a noticeable amount of time. The
-        // warning lets them cancel out and pick a smaller force without committing to a multi-minute
-        // wait, especially when they were testing and didn't realize they'd picked the SLDF Army.
+        // Pre-generation warning. Collects every reason we should give the user one last chance to
+        // cancel — long generation (Brigade+ takes minutes), high Person counts (Regiment+ with
+        // astech/medic Person mode creates hundreds of named Persons) — and shows a single dialog
+        // listing all that apply. One Continue/Cancel decision instead of multiple sequential
+        // popups.
         //
         // Plain text rather than HTML for the message: an HTML-bearing JOptionPane goes through
         // BasicHTML / BasicTextUI / DefaultCaret on dismissal. When this modal disposes and the
@@ -221,17 +223,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // long-standing Swing bug). Plain text routes through BasicLabelUI instead and avoids the
         // FlowView code path entirely.
         Integer chosenEchelon = options.getForceDescriptorSnapshot().getEchelon();
-        if (chosenEchelon != null && chosenEchelon >= 7) {
-            String estimate = estimateGenerationDuration(chosenEchelon);
-            int choice = JOptionPane.showConfirmDialog(getFrame(),
-                  "You've picked a large force.\n\nEstimated generation time: " + estimate + ".\n\nContinue?",
-                  "Long Generation",
-                  JOptionPane.OK_CANCEL_OPTION,
-                  JOptionPane.WARNING_MESSAGE);
-            if (choice != JOptionPane.OK_OPTION) {
-                LOGGER.info("[CompanyGen][Worker] user cancelled at long-generation warning (echelon={})", chosenEchelon);
-                return;
-            }
+        if (!confirmPreGenerationWarnings(options, chosenEchelon)) {
+            return;
         }
 
         // Run the ratgen pipeline on a background thread with a modal progress dialog up front so
@@ -291,6 +284,62 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         long modalElapsedMs = (System.nanoTime() - okStartedNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][Worker] progressDialog.setVisible(true) returned after {}ms (modal closed, thread={})",
               modalElapsedMs, Thread.currentThread().getName());
+    }
+
+    /**
+     * Surfaces the pre-generation warnings that apply to the current options and lets the user
+     * confirm or cancel. Two kinds of warning combine into one dialog:
+     *
+     * <ul>
+     *   <li><b>Long generation</b> — echelon ≥ 7 (Brigade / Galaxy / Level V or higher). The
+     *       ratgen engine takes minutes at these scales; the user might have picked an SLDF Army
+     *       by accident while testing.</li>
+     *   <li><b>High Person count</b> — echelon ≥ 6 (Regiment / Cluster / Level IV+) with astech
+     *       or medic Person mode on. A regiment-sized force at full coverage produces hundreds
+     *       of named astechs and medics, which is real (and intentional) but worth flagging
+     *       since it bloats the Personnel list and slows generation noticeably.</li>
+     * </ul>
+     *
+     * @return {@code true} if the user accepted or no warning was needed, {@code false} if the
+     *       user cancelled and generation should abort
+     */
+    private boolean confirmPreGenerationWarnings(CompanyGenerationOptions options, Integer chosenEchelon) {
+        List<String> warnings = new ArrayList<>();
+
+        if (chosenEchelon != null && chosenEchelon >= 7) {
+            warnings.add("Large force: estimated generation time "
+                  + estimateGenerationDuration(chosenEchelon) + ".");
+        }
+
+        if (chosenEchelon != null && chosenEchelon >= 6) {
+            boolean astechPersons = options.isGenerateAstechs() && options.isAstechsAsPersonnel();
+            boolean medicPersons = options.isGenerateMedics() && options.isMedicsAsPersonnel();
+            if (astechPersons || medicPersons) {
+                String who = astechPersons && medicPersons ? "astechs and medics"
+                      : (astechPersons ? "astechs" : "medics");
+                warnings.add("At this echelon, generating " + who + " as individual personnel can "
+                      + "create hundreds of Persons (6 astechs per tech, 4 medics per doctor). "
+                      + "Pool mode is faster and keeps the Personnel list manageable.");
+            }
+        }
+
+        if (warnings.isEmpty()) {
+            return true;
+        }
+
+        String message = String.join("\n\n", warnings) + "\n\nContinue?";
+        int choice = JOptionPane.showConfirmDialog(getFrame(),
+              message,
+              "Confirm Force Generation",
+              JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.WARNING_MESSAGE);
+        if (choice != JOptionPane.OK_OPTION) {
+            LOGGER.info("[CompanyGen][Worker] user cancelled at pre-generation warning "
+                        + "(echelon={}, astechsAsPersonnel={}, medicsAsPersonnel={})",
+                  chosenEchelon, options.isAstechsAsPersonnel(), options.isMedicsAsPersonnel());
+            return false;
+        }
+        return true;
     }
 
     /**

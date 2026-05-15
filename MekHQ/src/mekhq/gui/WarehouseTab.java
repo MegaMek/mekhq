@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -633,6 +633,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
+        // Recompute the In Use snapshot on every refresh. PartsTableModel renders the In Use column
+        // from a one-shot map; without this call it stays at whatever it was at construction time,
+        // so a campaign that adds units after the WarehouseTab exists (force-generated or imported)
+        // reads 0 across the board even when units clearly carry the parts.
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
         partsModel.setData(getCampaign().getWarehouse().getSpareParts());
         getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
