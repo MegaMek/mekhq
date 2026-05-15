@@ -347,10 +347,16 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         lblSelection.setName("lblPlanetarySystemSelection");
         lblEditStatus = new JLabel(" ");
         lblEditStatus.setName("lblPlanetarySystemEditStatus");
+        JLabel lblOverrideNotice = new JLabel(resources.getString("PlanetarySystemEditorDialog.overrideNotice"));
+        lblOverrideNotice.setName("lblPlanetarySystemOverrideNotice");
+
+        JPanel statusPanel = new JPanel(new BorderLayout(0, PADDING / 2));
+        statusPanel.add(lblEditStatus, BorderLayout.NORTH);
+        statusPanel.add(lblOverrideNotice, BorderLayout.SOUTH);
 
         JPanel headerPanel = new JPanel(new BorderLayout(0, PADDING / 2));
         headerPanel.add(lblSelection, BorderLayout.NORTH);
-        headerPanel.add(lblEditStatus, BorderLayout.SOUTH);
+        headerPanel.add(statusPanel, BorderLayout.SOUTH);
         panel.add(headerPanel, BorderLayout.NORTH);
 
         txtSystemDetails = createReadOnlyTextArea("txtPlanetarySystemDetails");
