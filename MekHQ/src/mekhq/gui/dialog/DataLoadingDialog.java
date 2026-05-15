@@ -412,8 +412,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.refreshPersonnelMarkets(true);
                 ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
-                if (!contractMarketMethod.isNone()) {
-                    campaign.getContractMarket().generateContractOffers(campaign, true);
+                if (!contractMarketMethod.isNone() && !contractMarketMethod.isAtBMonthly()) {
+                    campaign.getContractMarket().generateContractOffersForNewCampaign(campaign);
                 }
                 if (!campaignOptions.getUnitMarketMethod().isNone()) {
                     campaign.setUnitMarket(campaignOptions.getUnitMarketMethod().getUnitMarket());

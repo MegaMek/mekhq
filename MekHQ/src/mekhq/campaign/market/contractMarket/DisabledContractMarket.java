@@ -52,6 +52,11 @@ public class DisabledContractMarket extends AbstractContractMarket {
     }
 
     @Override
+    public void generateContractOffersForNewCampaign(Campaign campaign) {
+
+    }
+
+    @Override
     public void checkForFollowup(Campaign campaign, AtBContract contract) {
 
     }

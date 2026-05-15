@@ -46,6 +46,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.mission.Contract.OH_NONE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -57,8 +58,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Vector;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
@@ -89,6 +92,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -287,6 +292,39 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
             updateReport(campaign);
         }
+    }
+
+    @Override
+    public void generateContractOffersForNewCampaign(Campaign campaign) {
+        AbstractContractMarket contractMarket = campaign.getContractMarket();
+
+        for (int i = 0; i < 4; i++) {
+            AtBContract contract = contractMarket.addAtBContract(campaign);
+            if (contract == null) {
+                continue;
+            }
+
+            contract.setAllySkill(VETERAN);
+            contract.setEnemySkill(GREEN);
+
+            contract.setEnemyCode(PIRATE_FACTION_CODE);
+            contract.setContractType(AtBContractType.PIRATE_HUNTING);
+
+            int salvageRoll = d6(1) * 10;
+            contract.setSalvagePct(salvageRoll);
+
+            int supportRoll = d6(1) * 10;
+            contract.setStraightSupport(supportRoll);
+            contract.setOverheadComp(OH_NONE);
+
+            int battleLossRoll = d6(1) * 10;
+            contract.setBattleLossComp(battleLossRoll);
+
+            int transportRoll = (4 + d6(1)) * 10;
+            contract.setTransportComp(transportRoll);
+        }
+
+        updateReport(campaign);
     }
 
     private void checkForSubcontracts(Campaign campaign, AtBContract contract, int unitRatingMod) {

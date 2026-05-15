@@ -153,6 +153,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     @Override
+    public void generateContractOffersForNewCampaign(Campaign campaign) {
+
+    }
+
+    @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
         double reputationFactor = campaign.getReputation().getReputationFactor();
         ContractTerms terms = getContractTerms(campaign, contract);

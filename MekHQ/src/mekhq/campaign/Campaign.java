@@ -9560,7 +9560,11 @@ public class Campaign implements ITechManager {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
-        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
+        if (newCampaign) {
+            getContractMarket().generateContractOffersForNewCampaign(this);
+        } else {
+            getContractMarket().generateContractOffers(this, false); // TODO : AbstractContractMarket : Remove
+        }
     }
 
     /**
