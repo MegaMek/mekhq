@@ -307,7 +307,7 @@ public class AttributeCheckUtility {
 
         if (includeMarginsOfSuccessText) {
             MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
-            String marginOfSuccessText = marginOfSuccessObject.getLabel();
+            String marginOfSuccessText = colorOpen + marginOfSuccessObject.getLabel() + CLOSING_SPAN_TAG;
             resultsText.append(" ").append(marginOfSuccessText);
         }
 

@@ -231,7 +231,7 @@ public class RetirementDefectionTracker {
                         SkillModifierData skillModifierData = commander.getSkillModifierData(true);
 
                         modifier -= commander.getSkill(SkillType.S_LEADER)
-                                          .getFinalSkillValue(skillModifierData);
+                                          .getTotalSkillLevel(skillModifierData);
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -632,7 +632,7 @@ public class RetirementDefectionTracker {
         if (commander.hasSkill(SkillType.S_LEADER)) {
             SkillModifierData skillModifierData = commander.getSkillModifierData();
 
-            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue(skillModifierData);
+            return commander.getSkill(SkillType.S_LEADER).getTotalSkillLevel(skillModifierData);
         } else {
             return 0;
         }

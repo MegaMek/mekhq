@@ -803,11 +803,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         } else if (campaignOptions.isUseGenericBattleValue()) {
             int contractDifficulty = contract.getDifficulty();
             if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
-                multiplier /= 0.5;
+                multiplier /= 0.5; // ×2.0 bonus
+            } else if (contractDifficulty >= 6 && contractDifficulty <= 7) {
+                multiplier *= 0.5; // ×0.5 moderate penalty
             } else if (contractDifficulty >= 8) {
-                multiplier *= 0.5;
-            } else if (contractDifficulty >= 6) {
-                multiplier *= 0.25;
+                multiplier *= 0.25; // ×0.25 severe penalty
             }
         }
 

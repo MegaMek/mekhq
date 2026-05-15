@@ -38,6 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
@@ -401,17 +402,20 @@ public class TrainingCombatTeams {
               new ArrayList<>(),
               0,
               true,
-              false,
+              true,
               useAgingEffects,
               isClanCampaign,
               today);
         int raw = skillCheck.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
 
-        String report = String.format(resources.getString("learnedProgress.text"),
+        String personnelReport = String.format(resources.getString("learnedProgress.text"),
               educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
               marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
-        campaign.addReport(PERSONNEL, report);
+        campaign.addReport(PERSONNEL, personnelReport);
+
+        String skillRollReport = skillCheck.getResultsText();
+        campaign.addReport(SKILL_CHECKS, skillRollReport);
 
         return raw;
     }

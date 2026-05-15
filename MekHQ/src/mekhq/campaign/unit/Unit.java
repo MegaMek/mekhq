@@ -1250,7 +1250,7 @@ public class Unit implements ITechnology {
         // then they can deploy
         // it
         if (entity instanceof BattleArmor) {
-            for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
+            for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
                 if (entity.getInternal(i) == 0) {
                     return "This BattleArmor unit has empty suits. Fill them with pilots or salvage them.";
                 }
@@ -3210,7 +3210,7 @@ public class Unit implements ITechnology {
             } else if (en instanceof Tank) {
                 return Money.of(25.0);
             } else if (en instanceof BattleArmor) {
-                return Money.of(((BattleArmor) en).getTroopers() * 50.0);
+                return Money.of(((BattleArmor) en).getSquadSize() * 50.0);
             } else if (en instanceof Infantry) {
                 return Money.of(((Infantry) en).getSquadCount() * 10.0);
             }
@@ -3907,7 +3907,7 @@ public class Unit implements ITechnology {
                         if (type instanceof InfantryAttack) {
                             continue;
                         }
-                        if ((entity instanceof Infantry) && (m.getLocation() != Infantry.LOC_FIELD_GUNS)) {
+                        if ((entity instanceof Infantry) && (m.getLocation() != ConvInfantry.LOC_FIELD_GUNS)) {
                             // don't add weapons here for infantry, unless field guns
                             continue;
                         }
@@ -4496,8 +4496,9 @@ public class Unit implements ITechnology {
         }
 
         if (isConventionalInfantry()) {
+            ConvInfantry infantry = (ConvInfantry) entity;
             if ((null == motiveType) && (entity.getMovementMode() != EntityMovementMode.INF_LEG)) {
-                int number = entity.getOInternal(Infantry.LOC_INFANTRY);
+                int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
                 if (((Infantry) entity).isMechanized()) {
                     number = ((Infantry) entity).getSquadCount();
                 }
@@ -4509,42 +4510,42 @@ public class Unit implements ITechnology {
                 }
             }
             if (null == infantryArmor) {
-                EquipmentType eq = ((Infantry) entity).getArmorKit();
+                EquipmentType eq = infantry.getArmorKit();
                 if (null != eq) {
                     infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
                 } else {
                     infantryArmor = new InfantryArmorPart(0,
                           getCampaign(),
-                          ((Infantry) entity).getCustomArmorDamageDivisor(),
-                          ((Infantry) entity).isArmorEncumbering(),
-                          ((Infantry) entity).hasDEST(),
-                          ((Infantry) entity).hasSneakCamo(),
-                          ((Infantry) entity).hasSneakECM(),
-                          ((Infantry) entity).hasSneakIR(),
-                          ((Infantry) entity).hasSpaceSuit());
+                          infantry.getCustomArmorDamageDivisor(),
+                          infantry.isArmorEncumbering(),
+                          infantry.hasDEST(),
+                          infantry.hasSneakCamo(),
+                          infantry.hasSneakECM(),
+                          infantry.hasSneakIR(),
+                          infantry.hasSpaceSuit());
                 }
                 if (infantryArmor.getStickerPrice().isPositive()) {
-                    int number = entity.getOInternal(Infantry.LOC_INFANTRY);
+                    int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
                     while (number > 0) {
                         infantryArmor = new InfantryArmorPart(0,
                               getCampaign(),
-                              ((Infantry) entity).getCustomArmorDamageDivisor(),
-                              ((Infantry) entity).isArmorEncumbering(),
-                              ((Infantry) entity).hasDEST(),
-                              ((Infantry) entity).hasSneakCamo(),
-                              ((Infantry) entity).hasSneakECM(),
-                              ((Infantry) entity).hasSneakIR(),
-                              ((Infantry) entity).hasSpaceSuit());
+                              infantry.getCustomArmorDamageDivisor(),
+                              infantry.isArmorEncumbering(),
+                              infantry.hasDEST(),
+                              infantry.hasSneakCamo(),
+                              infantry.hasSneakECM(),
+                              infantry.hasSneakIR(),
+                              infantry.hasSpaceSuit());
                         addPart(infantryArmor);
                         partsToAdd.add(infantryArmor);
                         number--;
                     }
                 }
             }
-            InfantryWeapon primaryType = ((Infantry) entity).getPrimaryWeapon();
-            InfantryWeapon secondaryType = ((Infantry) entity).getSecondaryWeapon();
+            InfantryWeapon primaryType = infantry.getPrimaryWeapon();
+            InfantryWeapon secondaryType = infantry.getSecondaryWeapon();
             if ((null == primaryW) && (null != primaryType)) {
-                int number = (((Infantry) entity).getSquadSize() - ((Infantry) entity).getSecondaryWeaponsPerSquad()) *
+                int number = (infantry.getSquadSize() - infantry.getSecondaryWeaponsPerSquad()) *
                                    ((Infantry) entity).getSquadCount();
                 while (number > 0) {
                     primaryW = new InfantryWeaponPart((int) entity.getWeight(), primaryType, -1, getCampaign(), true);
@@ -4555,7 +4556,7 @@ public class Unit implements ITechnology {
 
             }
             if (null == secondaryW && null != secondaryType) {
-                int number = ((Infantry) entity).getSecondaryWeaponsPerSquad() * ((Infantry) entity).getSquadCount();
+                int number = infantry.getSecondaryWeaponsPerSquad() * ((Infantry) entity).getSquadCount();
                 while (number > 0) {
                     secondaryW = new InfantryWeaponPart((int) entity.getWeight(),
                           secondaryType,
@@ -5341,7 +5342,7 @@ public class Unit implements ITechnology {
                 // more armor. Otherwise, we may put a soldier in a suit with no armor when a perfectly good suit is
                 // waiting further down the line.
                 Map<String, Integer> bestSuits = new HashMap<>();
-                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getTroopers(); i++) {
+                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
                     bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
                     if (entity.getInternal(i) < 0) {
                         bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
@@ -5377,7 +5378,7 @@ public class Unit implements ITechnology {
                       && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
                 nGunners += getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
             }
-            entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
+            entity.setInternal(nGunners, ConvInfantry.LOC_INFANTRY);
         }
 
         // Add temp crew for tanks/vehicles with intelligent allocation

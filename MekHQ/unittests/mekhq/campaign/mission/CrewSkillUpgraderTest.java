@@ -87,7 +87,7 @@ class CrewSkillUpgraderTest {
               TripodMek.class,
               AeroSpaceFighter.class,
               BattleArmor.class,
-              Infantry.class,
+              ConvInfantry.class,
               QuadMek.class,
               Jumpship.class));
         ArrayList<CrewType> crewTypes = new ArrayList<>(List.of(

@@ -642,7 +642,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
-        boolean newIsTrackPrisoners = !newOptions.trackPrisoners();
+        boolean newIsTrackPrisoners = newOptions.trackPrisoners();
         if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
             new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
         }
