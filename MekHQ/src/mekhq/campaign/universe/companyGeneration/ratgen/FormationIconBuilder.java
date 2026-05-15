@@ -33,9 +33,12 @@
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
+import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
@@ -192,8 +195,9 @@ public final class FormationIconBuilder {
 
         LayeredFormationIcon icon = new LayeredFormationIcon();
 
-        // TYPE: weight-class-driven 'Mek silhouette.
-        appendWeightClassType(icon, formation, campaign);
+        // TYPE: dominant-unit-type silhouette (Mek by default, Aero / BA / ProtoMek / Infantry /
+        // vehicle / vessel when those dominate the formation's subtree).
+        appendTypePieces(icon, formation, campaign);
 
         // FORMATION: shape file per level + faction family.
         String formationFolder = formationFolderFor(iconFaction);
@@ -212,42 +216,135 @@ public final class FormationIconBuilder {
     }
 
     /**
-     * Adds the weight-class TYPE piece(s) to the icon. Two-piece left+right pair when both files
-     * exist; single center silhouette otherwise.
+     * Adds the TYPE piece(s) to the icon based on which unit type dominates the formation's
+     * subtree. All file references stay inside {@code Pieces/Types/StratOps/} so the icon style
+     * is consistent across the campaign. Mek-dominant formations get the existing two-piece
+     * BattleMek (Left) + weight-class pair; Aerospace gets the matching Aerospace (Left) pair;
+     * ProtoMek / BattleArmor / Infantry / vessels get their single-piece silhouette. Ground
+     * vehicles (Tank, Naval) have no StratOps chassis silhouette — they fall back to the weight-
+     * class file alone, which is exactly the "H"/"A"/etc. letter seen on existing vehicle
+     * formations and visually distinguishes them from Mek formations. VTOL borrows Airship.png;
+     * Gun Emplacement uses Headquarters.png. Mixed / empty formations fall back to the generic
+     * BattleMek (Center) silhouette.
      */
-    private static void appendWeightClassType(LayeredFormationIcon icon, Formation formation, Campaign campaign) {
-        int weightClass = determineWeightClass(formation, campaign);
-        String weightClassName = EntityWeightClass.getClassName(weightClass);
-        String filename = String.format("%s.png", weightClassName);
-
+    private static void appendTypePieces(LayeredFormationIcon icon, Formation formation, Campaign campaign) {
         icon.getPieces().putIfAbsent(LayeredFormationIconLayer.TYPE, new ArrayList<>());
+        int dominantType = determineDominantUnitType(formation, campaign);
+        int weightClass = determineWeightClass(formation, campaign);
+        String weightFilename = EntityWeightClass.getClassName(weightClass) + ".png";
+        String stratOps = MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH;
+        LOGGER.info("[CompanyGen][Icons] formation '{}' dominantType={} ({}) weightClass={} ({})",
+              formation.getName(), dominantType, UnitType.getTypeName(dominantType),
+              weightClass, EntityWeightClass.getClassName(weightClass));
         try {
-            if (MHQStaticDirectoryManager.getFormationIcons().getItem(
-                  LayeredFormationIconLayer.TYPE.getLayerPath()
-                        + MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                  filename) == null) {
-                icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
-                      new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
-                            MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                            MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME));
-            } else {
-                icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
-                      new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
-                            MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                            MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME));
-                icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
-                      new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
-                            MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
+            switch (dominantType) {
+                case UnitType.MEK -> appendPairOrCenter(icon, stratOps,
+                      MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME,
+                      stratOps, weightFilename);
+                case UnitType.AEROSPACE_FIGHTER, UnitType.AERO, UnitType.CONV_FIGHTER ->
+                      appendPairOrCenter(icon, stratOps, "Aerospace (Left).png", stratOps, weightFilename);
+                case UnitType.PROTOMEK -> appendSingle(icon, stratOps, "ProtoMek.png");
+                case UnitType.BATTLE_ARMOR -> appendSingle(icon, stratOps, "Battle Armor.png");
+                case UnitType.INFANTRY -> appendSingle(icon, stratOps, "Infantry (Xenoplanetary).png");
+                case UnitType.DROPSHIP, UnitType.SMALL_CRAFT -> appendSingle(icon, stratOps, "DropShip.png");
+                case UnitType.JUMPSHIP -> appendSingle(icon, stratOps, "JumpShip.png");
+                case UnitType.WARSHIP -> appendSingle(icon, stratOps, "WarShip.png");
+                case UnitType.SPACE_STATION -> appendSingle(icon, stratOps, "Space Station.png");
+                case UnitType.VTOL -> appendSingle(icon, stratOps, "Airship.png");
+                case UnitType.GUN_EMPLACEMENT -> appendSingle(icon, stratOps, "Headquarters.png");
+                // Tank / Naval have no generic chassis silhouette under StratOps. Fall back to
+                // weight-class file alone — matches the "H"/"A"/etc. letter the existing vehicle
+                // formations already render, distinct from Mek formations' chassis-plus-letter
+                // pair. Adding StratOps-style tank/boat silhouettes to mm-data would let us
+                // upgrade these to a paired icon later without changing this code.
+                case UnitType.TANK, UnitType.NAVAL -> appendSingle(icon, stratOps, weightFilename);
+                default -> appendSingle(icon, stratOps,
+                      MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME);
             }
         } catch (Exception ex) {
-            LOGGER.error(ex, "Cannot resolve weight-class TYPE for {}; falling back to center silhouette",
-                  formation.getName());
+            LOGGER.error(ex, "[CompanyGen][Icons] cannot resolve TYPE for '{}' (dominantType={}); falling back to BattleMek (Center)",
+                  formation.getName(), dominantType);
             icon.getPieces().get(LayeredFormationIconLayer.TYPE).clear();
+            // Add the BattleMek (Center) fallback directly without going through appendSingle's
+            // getItem existence check — appendSingle itself throws, and we're already inside the
+            // catch block. Center is shipped in mm-data; if it ever isn't, the icon just renders
+            // without a TYPE layer.
             icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
                   new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
                         MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
                         MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME));
         }
+    }
+
+    /**
+     * Adds a single TYPE piece; verifies it exists on disk before adding so a missing icon falls
+     * back to the BattleMek (Center) generic silhouette.
+     */
+    private static void appendSingle(LayeredFormationIcon icon, String folder, String filename) throws Exception {
+        if (MHQStaticDirectoryManager.getFormationIcons().getItem(
+              LayeredFormationIconLayer.TYPE.getLayerPath() + folder, filename) == null) {
+            icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
+                  new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
+                        MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                        MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME));
+            return;
+        }
+        icon.getPieces().get(LayeredFormationIconLayer.TYPE)
+              .add(new FormationPieceIcon(LayeredFormationIconLayer.TYPE, folder, filename));
+    }
+
+    /**
+     * Adds a two-piece silhouette + weight-class pair; verifies both files exist before adding.
+     * Falls back to a single piece (just the silhouette) if the weight-class file is missing,
+     * and to BattleMek (Center) if the silhouette itself is missing.
+     */
+    private static void appendPairOrCenter(LayeredFormationIcon icon, String silhouetteFolder,
+          String silhouetteFilename, String weightFolder, String weightFilename) throws Exception {
+        if (MHQStaticDirectoryManager.getFormationIcons().getItem(
+              LayeredFormationIconLayer.TYPE.getLayerPath() + silhouetteFolder,
+              silhouetteFilename) == null) {
+            icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
+                  new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
+                        MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+                        MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME));
+            return;
+        }
+        icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
+              new FormationPieceIcon(LayeredFormationIconLayer.TYPE, silhouetteFolder, silhouetteFilename));
+        if (MHQStaticDirectoryManager.getFormationIcons().getItem(
+              LayeredFormationIconLayer.TYPE.getLayerPath() + weightFolder, weightFilename) != null) {
+            icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
+                  new FormationPieceIcon(LayeredFormationIconLayer.TYPE, weightFolder, weightFilename));
+        }
+    }
+
+    /**
+     * Returns the most common {@link UnitType} among the units in the formation's subtree, or
+     * {@link UnitType#MEK} when the formation has no units or all units' entities are null. Used
+     * by {@link #appendTypePieces} to pick the chassis silhouette.
+     */
+    private static int determineDominantUnitType(Formation formation, Campaign campaign) {
+        Map<Integer, Integer> counts = new java.util.HashMap<>();
+        for (UUID unitId : formation.getAllUnits(false)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit == null) {
+                continue;
+            }
+            Entity entity = unit.getEntity();
+            if (entity == null) {
+                continue;
+            }
+            counts.merge(entity.getUnitType(), 1, Integer::sum);
+        }
+        int dominantType = UnitType.MEK;
+        int dominantCount = 0;
+        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() > dominantCount) {
+                dominantType = entry.getKey();
+                dominantCount = entry.getValue();
+            }
+        }
+        return dominantType;
     }
 
     /**
