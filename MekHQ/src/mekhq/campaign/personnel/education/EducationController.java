@@ -871,9 +871,6 @@ public class EducationController {
         int accidentDieSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
         accidentDieSize = (int) round(accidentDieSize / bloodmarkDivisor);
 
-        boolean isMilitary = academy.isMilitary();
-        boolean isBloodmarked = bloodmarkSeverity != 0;
-
         if (academy.isMilitary() || bloodmarkSeverity != 0) {
             int roll;
 
