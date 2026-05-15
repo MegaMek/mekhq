@@ -407,7 +407,13 @@ class SupportPersonnelAssignerTest {
     // ===== Helpers =====
 
     private static CompanyGenerationOptions baseOptions() {
-        return new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        // Route through the mocked Campaign.getFaction() instead of the real default
+        // specifiedFaction (which would resolve through the Ranks singleton — not initialized in
+        // unit-test context). The assigner doesn't itself touch rank systems, but the
+        // SupportPersonnelGenerator that feeds it does.
+        options.setUseSpecifiedFactionToAssignRanks(false);
+        return options;
     }
 
     private Campaign newCampaign() {
