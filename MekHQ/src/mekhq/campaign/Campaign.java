@@ -414,7 +414,7 @@ public class Campaign implements ITechManager {
     private Finances finances;
 
     private Systems systemsInstance;
-    private CurrentLocation location;
+    private AbstractLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -1771,7 +1771,7 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public CurrentLocation getLocation() {
+    public AbstractLocation getLocation() {
         return location;
     }
 

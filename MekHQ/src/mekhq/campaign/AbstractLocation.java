@@ -45,6 +45,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Canonica
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
@@ -268,6 +269,8 @@ public class AbstractLocation implements ILocation {
                      ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign, person, GENERIC, 1)
                      : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign, person, INTERNAL, 1);
     }
+
+    public void writeToXML(PrintWriter writer, int indent) {}
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {
         private final Campaign campaign;
