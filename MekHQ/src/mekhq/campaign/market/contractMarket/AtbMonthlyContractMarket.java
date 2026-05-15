@@ -46,6 +46,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.Contract.OH_NONE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -76,11 +77,13 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -169,6 +172,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             if (hasActiveContract) {
                 return;
             }
+
+            // Generates up to 4 'pity contracts', easy contracts designed to get a campaign rolling
+            generatePityContracts(campaign);
 
             Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
             int negotiatorModifier = 0;
@@ -294,11 +300,23 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
     }
 
-    @Override
-    public void generateContractOffersForNewCampaign(Campaign campaign) {
+    public void generatePityContracts(Campaign campaign) {
         AbstractContractMarket contractMarket = campaign.getContractMarket();
 
-        for (int i = 0; i < 4; i++) {
+        int successfulContractCount = 0;
+        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
+            if (contract.getStatus().isSuccess()) {
+                successfulContractCount++;
+            }
+        }
+
+        int pityContractCount = 4;
+        int contractCount = pityContractCount - successfulContractCount;
+        if (contractCount <= 0) {
+            return;
+        }
+
+        for (int i = 0; i < pityContractCount; i++) {
             AtBContract contract = contractMarket.addAtBContract(campaign);
             if (contract == null) {
                 continue;
@@ -308,6 +326,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             contract.setEnemySkill(GREEN);
 
             contract.setEnemyCode(PIRATE_FACTION_CODE);
+            contract.updateEnemy(campaign, campaign.getLocalDate(), PIRATE_FACTION_CODE);
+
             contract.setContractType(AtBContractType.PIRATE_HUNTING);
 
             int salvageRoll = d6(1) * 10;
@@ -322,6 +342,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             int transportRoll = (4 + d6(1)) * 10;
             contract.setTransportComp(transportRoll);
+
+            contract.setName(generateDefaultName(contract.getEmployer(), contract));
         }
 
         updateReport(campaign);
@@ -559,16 +581,20 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        contract.setName(String.format("%s - %s - %s %s",
-              contract.getStartDate()
-                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              employer,
-              contract.getSystem().getName(contract.getStartDate()),
-              contract.getContractType()));
+        contract.setName(generateDefaultName(employer, contract));
 
         contract.clanTechSalvageOverride();
 
         return contract;
+    }
+
+    private static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract) {
+        return String.format("%s - %s - %s %s",
+              contract.getStartDate()
+                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              employer,
+              contract.getSystem().getName(contract.getStartDate()),
+              contract.getContractType());
     }
 
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {

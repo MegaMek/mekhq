@@ -137,8 +137,6 @@ public abstract class AbstractContractMarket {
      */
     public abstract void generateContractOffers(Campaign campaign, boolean newCampaign);
 
-    public abstract void generateContractOffersForNewCampaign(Campaign campaign);
-
     /**
      * Generate followup contracts and add them to the market if the currently selected market type supports them.
      *

@@ -175,6 +175,7 @@ import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -9560,11 +9561,8 @@ public class Campaign implements ITechManager {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
-        if (newCampaign) {
-            getContractMarket().generateContractOffersForNewCampaign(this);
-        } else {
-            getContractMarket().generateContractOffers(this, false); // TODO : AbstractContractMarket : Remove
-        }
+
+        getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
     }
 
     /**
