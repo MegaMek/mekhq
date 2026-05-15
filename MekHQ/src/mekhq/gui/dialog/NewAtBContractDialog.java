@@ -40,6 +40,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -547,9 +548,19 @@ public class NewAtBContractDialog extends NewContractDialog {
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (cbPlanets.getSelectedItem() == null) {
+        String planetName = getSelectedPlanetName();
+        if (planetName.isEmpty()) {
             JOptionPane.showMessageDialog(rootPane,
                   "Make sure you set the Planet!",
+                  "Contract is Missing Field",
+                  JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        PlanetarySystem selectedSystem = resolvePlanetName(planetName, campaign.getLocalDate(),
+              Systems.getInstance());
+        if (selectedSystem == null) {
+            JOptionPane.showMessageDialog(rootPane,
+                  "\"" + planetName + "\" is not a recognized system name.",
                   "Contract is Missing Field",
                   JOptionPane.WARNING_MESSAGE);
             return;
@@ -558,11 +569,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract) this.contract;
 
         contract.setName(txtName.getText());
-        if (!chkShowAllPlanets.isSelected()) {
-            contract.setSystemId((Systems.getInstance()
-                                        .getSystemByName((String) cbPlanets.getSelectedItem(),
-                                              campaign.getLocalDate())).getId());
-        }
+        contract.setSystemId(selectedSystem.getId());
         contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
         contract.setDesc(txtDesc.getText());
@@ -680,5 +687,48 @@ public class NewAtBContractDialog extends NewContractDialog {
         super.doUpdateContract(source);
 
         addAllListeners();
+    }
+
+    /**
+     * Returns the planet/system name from whichever planet-entry widget is currently active.
+     *
+     * <p>When "Show All Planets" is selected, the user types into {@code suggestPlanet}; otherwise
+     * they pick from {@code cbPlanets}. The previous implementation only consulted {@code cbPlanets},
+     * which produced spurious "Make sure you set the Planet!" warnings whenever the user populated
+     * the suggest-field via "Show All Planets" or when {@code cbPlanets} had no options for a
+     * planetless faction (see issues #5445 and #8547).</p>
+     *
+     * @return the trimmed planet/system name, or an empty string if no selection is present
+     */
+    private String getSelectedPlanetName() {
+        if (chkShowAllPlanets.isSelected()) {
+            String text = suggestPlanet.getText();
+            return text == null ? "" : text.trim();
+        }
+        Object selected = cbPlanets.getSelectedItem();
+        return selected == null ? "" : selected.toString().trim();
+    }
+
+    /**
+     * Resolves a planet/system name (as typed or selected by the user) to a
+     * {@link PlanetarySystem} using the supplied date.
+     *
+     * <p>Extracted as a static, dependency-injected helper so the resolution can be exercised by
+     * unit tests without instantiating the dialog or initializing the full {@link Systems}
+     * singleton.</p>
+     *
+     * @param planetName       user-entered planet/system name (already trimmed; may be {@code null}
+     *                         or empty, in which case {@code null} is returned)
+     * @param date             the campaign's local date, used to resolve era-dependent names
+     * @param systemsRegistry  the system registry to consult; in production this is
+     *                         {@code Systems.getInstance()}
+     * @return the matching {@link PlanetarySystem}, or {@code null} if {@code planetName} is empty
+     *         or does not resolve to a known system
+     */
+    static PlanetarySystem resolvePlanetName(String planetName, LocalDate date, Systems systemsRegistry) {
+        if (planetName == null || planetName.isEmpty()) {
+            return null;
+        }
+        return systemsRegistry.getSystemByName(planetName, date);
     }
 }
