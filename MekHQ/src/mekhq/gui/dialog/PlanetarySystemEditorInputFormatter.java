@@ -44,6 +44,9 @@ import javax.swing.text.DocumentFilter;
 
 /** Shared input filters and normalizers for the planetary system editor. */
 final class PlanetarySystemEditorInputFormatter {
+    private static final Set<String> SOCIO_INDUSTRIAL_TECH_CODES = Set.of("ADV", "A", "B", "C", "D", "F", "R",
+          "X");
+    private static final Set<String> SOCIO_INDUSTRIAL_RATING_CODES = Set.of("A", "B", "C", "D", "F", "X");
 
     private PlanetarySystemEditorInputFormatter() {
 
@@ -82,11 +85,11 @@ final class PlanetarySystemEditorInputFormatter {
     }
 
     static boolean isValidSocioIndustrialTechCode(String code) {
-        return Set.of("ADV", "A", "B", "C", "D", "F", "R", "X").contains(code.trim());
+        return SOCIO_INDUSTRIAL_TECH_CODES.contains(code.trim());
     }
 
     static boolean isValidSocioIndustrialRatingCode(String code) {
-        return Set.of("A", "B", "C", "D", "F", "X").contains(code.trim());
+        return SOCIO_INDUSTRIAL_RATING_CODES.contains(code.trim());
     }
 
     private static String formatPopulationInput(String text) {
