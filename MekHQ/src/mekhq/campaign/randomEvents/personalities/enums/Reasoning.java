@@ -197,7 +197,7 @@ public enum Reasoning {
      * @deprecated use {@link #getExamResults(int)} instead.
      *
      */
-    @Deprecated(since = "{SEMVER}", forRemoval = true)
+    @Deprecated(since = "0.51.00", forRemoval = true)
     public String getExamResults() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
     }
