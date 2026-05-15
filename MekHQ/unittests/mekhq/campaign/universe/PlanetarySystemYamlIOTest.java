@@ -44,6 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -151,6 +152,28 @@ class PlanetarySystemYamlIOTest {
         assertFalse(savedYaml.contains("\nrechargeStationsText:"));
         assertFalse(savedYaml.contains("\nparentSystem:"));
         assertFalse(savedYaml.contains("event: []"));
+    }
+
+    @Test
+    void writeAndCopyDoNotPopulateSerializationListFields() throws Exception {
+        PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
+        Planet planet = system.getPrimaryPlanet();
+
+        assertNull(getPrivateField(system, "planetList"));
+        assertNull(getPrivateField(system, "eventList"));
+        assertNull(getPrivateField(planet, "eventList"));
+
+        String savedYaml = writeSystem(system);
+        assertTrue(savedYaml.contains("\nplanet:"));
+        assertTrue(savedYaml.contains("\nevent:"));
+        assertNull(getPrivateField(system, "planetList"));
+        assertNull(getPrivateField(system, "eventList"));
+        assertNull(getPrivateField(planet, "eventList"));
+
+        assertNotNull(PlanetarySystemYamlIO.copy(system));
+        assertNull(getPrivateField(system, "planetList"));
+        assertNull(getPrivateField(system, "eventList"));
+        assertNull(getPrivateField(planet, "eventList"));
     }
 
     @Test
@@ -345,6 +368,12 @@ class PlanetarySystemYamlIOTest {
 
     private static int count(Collection<?> values) {
         return values == null ? 0 : values.size();
+    }
+
+    private static Object getPrivateField(Object target, String fieldName) throws ReflectiveOperationException {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(target);
     }
 
     private static PlanetarySystem readSystem(String yaml) throws IOException {

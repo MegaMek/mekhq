@@ -45,9 +45,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -203,7 +205,6 @@ public class PlanetarySystem {
     private TreeMap<Integer, Planet> planets;
 
     // for reading in because lists are easier
-    @JsonProperty("planet")
     private List<Planet> planetList;
 
     // the location of the primary planet for this system
@@ -219,8 +220,7 @@ public class PlanetarySystem {
      */
     TreeMap<LocalDate, PlanetarySystemEvent> events;
 
-    // For export and import only (lists are easier than maps) */
-    @JsonProperty("event")
+    // For import only; lists are easier than maps in YAML.
     private List<PlanetarySystemEvent> eventList;
 
     public PlanetarySystem() {
@@ -229,16 +229,6 @@ public class PlanetarySystem {
 
     public PlanetarySystem(String id) {
         this.id = id;
-    }
-
-    void prepareForSerialization() {
-        if (planets != null) {
-            planetList = new ArrayList<>(planets.values());
-            for (Planet planet : planetList) {
-                planet.prepareForSerialization();
-            }
-        }
-        eventList = ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
     }
 
     public String getId() {
@@ -649,6 +639,26 @@ public class PlanetarySystem {
             return null;
         }
         return new ArrayList<>(events.values());
+    }
+
+    @JsonGetter("planet")
+    private List<Planet> getPlanetListForSerialization() {
+        return ((planets == null) || planets.isEmpty()) ? null : new ArrayList<>(planets.values());
+    }
+
+    @JsonSetter("planet")
+    private void setPlanetList(List<Planet> planetList) {
+        this.planetList = planetList;
+    }
+
+    @JsonGetter("event")
+    private List<PlanetarySystemEvent> getEventListForSerialization() {
+        return ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
+    }
+
+    @JsonSetter("event")
+    private void setEventList(List<PlanetarySystemEvent> eventList) {
+        this.eventList = eventList;
     }
 
     /**

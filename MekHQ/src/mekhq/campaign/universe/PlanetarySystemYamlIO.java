@@ -99,7 +99,6 @@ public final class PlanetarySystemYamlIO {
     }
 
     public static void write(PlanetarySystem system, OutputStream destination) throws IOException {
-        system.prepareForSerialization();
         MAPPER.writeValue(destination, system);
     }
 

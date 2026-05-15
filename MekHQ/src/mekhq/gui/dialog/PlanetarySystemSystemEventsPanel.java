@@ -50,7 +50,10 @@ import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -59,6 +62,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.util.UIUtil;
@@ -105,6 +109,7 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         tblSystemEvents.setName("tblPlanetarySystemSystemEvents");
         tblSystemEvents.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSystemEvents.setRowHeight(UIUtil.scaleForGUI(22));
+            configureChargeColumns();
         tblSystemEvents.getSelectionModel().addListSelectionListener(evt -> updateButtonState());
         add(createTitledComponentPane("PlanetarySystemEditorDialog.systemEvents.events",
               new FastJScrollPane(tblSystemEvents)), BorderLayout.CENTER);
@@ -123,6 +128,28 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         add(buttons, BorderLayout.SOUTH);
 
         updateButtonState();
+    }
+
+    private void configureChargeColumns() {
+        ChargeStateCellRenderer renderer = new ChargeStateCellRenderer();
+        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_NADIR).setCellRenderer(renderer);
+        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_ZENITH).setCellRenderer(renderer);
+        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_NADIR).setCellEditor(
+              createChargeStateEditor());
+        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_ZENITH).setCellEditor(
+              createChargeStateEditor());
+    }
+
+    private DefaultCellEditor createChargeStateEditor() {
+        JComboBox<ChargeState> comboBox = new JComboBox<>(ChargeState.values());
+        DefaultListCellRenderer renderer = new DefaultListCellRenderer();
+        comboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = (JLabel) renderer.getListCellRendererComponent(list, value, index, isSelected,
+                  cellHasFocus);
+            label.setText(value == null ? "" : value.displayName(resources));
+            return label;
+        });
+        return new DefaultCellEditor(comboBox);
     }
 
     void refresh(LocalDate selectEventDate) {
@@ -377,7 +404,7 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         @Override
         public Class<?> getColumnClass(int column) {
             return switch (column) {
-                case COL_NADIR, COL_ZENITH -> Boolean.class;
+                case COL_NADIR, COL_ZENITH -> ChargeState.class;
                 default -> String.class;
             };
         }
@@ -391,12 +418,12 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         public Object getValueAt(int row, int column) {
             PlanetarySystemEvent event = getEventAt(row);
             if (event == null) {
-                return (column == COL_NADIR || column == COL_ZENITH) ? Boolean.FALSE : "";
+                return (column == COL_NADIR || column == COL_ZENITH) ? ChargeState.INHERIT : "";
             }
             return switch (column) {
                 case COL_DATE -> formatDate(event.date);
-                case COL_NADIR -> chargeValue(event.nadirCharge);
-                case COL_ZENITH -> chargeValue(event.zenithCharge);
+                case COL_NADIR -> ChargeState.fromValue(event.nadirCharge);
+                case COL_ZENITH -> ChargeState.fromValue(event.zenithCharge);
                 default -> "";
             };
         }
@@ -409,8 +436,8 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
             }
             switch (column) {
                 case COL_DATE -> updateEventDate(event, value);
-                case COL_NADIR -> updateBooleanField(event, value, true);
-                case COL_ZENITH -> updateBooleanField(event, value, false);
+                case COL_NADIR -> updateChargeField(event, value, true);
+                case COL_ZENITH -> updateChargeField(event, value, false);
                 default -> {
                     // no-op
                 }
@@ -445,12 +472,12 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
             }
         }
 
-        private void updateBooleanField(PlanetarySystemEvent event, Object value, boolean nadir) {
+        private void updateChargeField(PlanetarySystemEvent event, Object value, boolean nadir) {
             SourceableValue<Boolean> existing = nadir ? event.nadirCharge : event.zenithCharge;
-            Boolean newValue = Boolean.TRUE.equals(value);
+            ChargeState chargeState = (value instanceof ChargeState state) ? state : ChargeState.INHERIT;
             String source = (existing == null) ? null : existing.getSource();
             String version = (existing == null) ? null : existing.getVersion();
-            SourceableValue<Boolean> wrapped = SourceableValue.of(source, version, newValue);
+            SourceableValue<Boolean> wrapped = chargeState.toSourceableValue(source, version);
             if (nadir) {
                 event.nadirCharge = wrapped;
             } else {
@@ -462,9 +489,47 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
                 fireTableRowsUpdated(row, row);
             }
         }
+    }
 
-        private Boolean chargeValue(SourceableValue<Boolean> value) {
-            return (value != null) && Boolean.TRUE.equals(value.getValue());
+    private final class ChargeStateCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+              boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+                  column);
+            if (component instanceof JLabel label) {
+                label.setText(value instanceof ChargeState state ? state.displayName(resources) : "");
+            }
+            return component;
+        }
+    }
+
+    private enum ChargeState {
+        INHERIT("PlanetarySystemEditorDialog.systemEvents.charge.inherit", null),
+        YES("PlanetarySystemEditorDialog.systemEvents.charge.yes", Boolean.TRUE),
+        NO("PlanetarySystemEditorDialog.systemEvents.charge.no", Boolean.FALSE);
+
+        private final String resourceKey;
+        private final Boolean value;
+
+        ChargeState(String resourceKey, Boolean value) {
+            this.resourceKey = resourceKey;
+            this.value = value;
+        }
+
+        private String displayName(ResourceBundle resources) {
+            return resources.getString(resourceKey);
+        }
+
+        private SourceableValue<Boolean> toSourceableValue(String source, String version) {
+            return value == null ? null : SourceableValue.of(source, version, value);
+        }
+
+        private static ChargeState fromValue(SourceableValue<Boolean> value) {
+            if (value == null) {
+                return INHERIT;
+            }
+            return Boolean.TRUE.equals(value.getValue()) ? YES : NO;
         }
     }
 }

@@ -36,10 +36,12 @@ package mekhq.campaign.universe;
 import java.time.LocalDate;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
@@ -150,8 +152,7 @@ public class Planet {
      */
     CurrentEvents currentEvents;
 
-    // For export and import only (lists are easier than maps) */
-    @JsonProperty("event")
+    // For import only; lists are easier than maps in YAML.
     private List<Planet.PlanetaryEvent> eventList;
 
     public Planet() {
@@ -159,10 +160,6 @@ public class Planet {
 
     public Planet(String id) {
         this.id = id;
-    }
-
-    void prepareForSerialization() {
-        eventList = ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
     }
 
     // Constant base data
@@ -396,6 +393,16 @@ public class Planet {
             return null;
         }
         return new ArrayList<>(events.values());
+    }
+
+    @JsonGetter("event")
+    private List<PlanetaryEvent> getEventListForSerialization() {
+        return ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
+    }
+
+    @JsonSetter("event")
+    private void setEventList(List<PlanetaryEvent> eventList) {
+        this.eventList = eventList;
     }
 
     public void putEvent(PlanetaryEvent event) {
