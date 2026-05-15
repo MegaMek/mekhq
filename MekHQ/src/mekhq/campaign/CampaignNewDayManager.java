@@ -1826,7 +1826,20 @@ public class CampaignNewDayManager {
     private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
           boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
-        boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+
+        String reason = getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check");
+        AttributeCheckUtility attributeCheck = new AttributeCheckUtility(reason,
+              person,
+              SkillAttribute.WILLPOWER,
+              null,
+              null,
+              modifier,
+              true,
+              true);
+
+        campaign.addReport(SKILL_CHECKS, attributeCheck.getResultsText());
+
+        boolean failedWillpowerCheck = attributeCheck.isSuccess();
         person.processDiscontinuationSyndrome(campaign,
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
