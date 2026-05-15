@@ -213,8 +213,8 @@ public enum Reasoning {
      * @author Illiani
      * @since 0.50.06
      */
-    public String getExamResults(int examscore) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", examscore);
+    public String getExamResults(final int examScore) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", examScore);
     }
 
     /**
