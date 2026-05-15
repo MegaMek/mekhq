@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -242,6 +242,9 @@ public class SocioIndustrialData {
     }
 
     public static SocioIndustrialData parse(String text) {
+        if (text == null) {
+            return new SocioIndustrialData();
+        }
         String[] socio = text.split(SEPARATOR);
         SocioIndustrialData result = new SocioIndustrialData();
         if (socio.length >= 5) {
@@ -258,10 +261,11 @@ public class SocioIndustrialData {
         if (sophistication == null) {
             return PlanetarySophistication.C;
         }
+        String normalizedSophistication = sophistication.trim().toUpperCase(Locale.ROOT);
         try {
-            return PlanetarySophistication.fromName(sophistication.toUpperCase(Locale.ROOT));
+            return PlanetarySophistication.valueOf(normalizedSophistication);
         } catch (IllegalArgumentException e) {
-            return switch (sophistication.toUpperCase(Locale.ROOT)) {
+            return switch (normalizedSophistication) {
                 case "ADV" -> PlanetarySophistication.ADVANCED;
                 case "R", "X" -> PlanetarySophistication.REGRESSED;
                 default -> PlanetarySophistication.C;
@@ -273,10 +277,11 @@ public class SocioIndustrialData {
         if (rating == null) {
             return PlanetaryRating.C;
         }
+        String normalizedRating = rating.trim().toUpperCase(Locale.ROOT);
         try {
-            return PlanetaryRating.fromName(rating.toUpperCase(Locale.ROOT));
+            return PlanetaryRating.valueOf(normalizedRating);
         } catch (IllegalArgumentException e) {
-            if (rating.toUpperCase(Locale.ROOT).equals("X")) {
+            if ("X".equals(normalizedRating)) {
                 return PlanetaryRating.F;
             }
             return PlanetaryRating.C;

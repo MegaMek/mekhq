@@ -67,7 +67,6 @@ import java.util.stream.Collectors;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
@@ -87,14 +86,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
 
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.util.UIUtil;
@@ -106,7 +100,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.PlanetarySystemYamlIO;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.SourceableValue;
@@ -181,11 +174,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private JButton btnReviewChanges;
     private JButton btnSave;
 
-    // System Events tab
-    private SystemEventTableModel systemEventTableModel;
-    private JTable tblSystemEvents;
-    private JButton btnAddSystemEvent;
-    private JButton btnRemoveSystemEvent;
+    private PlanetarySystemSystemEventsPanel systemEventsPanel;
     private JButton btnRevertChanges;
     private JButton btnDeleteOverride;
     private PlanetarySystemPropertiesPanel propertiesPanel;
@@ -404,68 +393,9 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     }
 
     private Component createSystemEventsPane() {
-        JPanel panel = new JPanel(new BorderLayout(0, PADDING));
-        panel.setName("pnlPlanetarySystemSystemEvents");
-
-        JLabel warning = new JLabel(resources.getString(
-              "PlanetarySystemEditorDialog.systemEvents.warning"));
-        warning.setForeground(java.awt.Color.RED);
-        warning.setBorder(BorderFactory.createEmptyBorder(0, 0, PADDING, 0));
-        panel.add(warning, BorderLayout.NORTH);
-
-        systemEventTableModel = new SystemEventTableModel();
-        tblSystemEvents = new JTable(systemEventTableModel);
-        tblSystemEvents.setName("tblPlanetarySystemSystemEvents");
-        tblSystemEvents.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblSystemEvents.setRowHeight(UIUtil.scaleForGUI(22));
-        configureSystemEventChargeEditors();
-        tblSystemEvents.getSelectionModel().addListSelectionListener(
-              evt -> updateSystemEventButtonState());
-        panel.add(createTitledComponentPane("PlanetarySystemEditorDialog.systemEvents.events",
-              new FastJScrollPane(tblSystemEvents)), BorderLayout.CENTER);
-
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.TRAILING, PADDING, 0));
-        btnAddSystemEvent = new MMButton("btnAddSystemEvent",
-              resources.getString("PlanetarySystemEditorDialog.systemEvents.add"),
-              resources.getString("PlanetarySystemEditorDialog.systemEvents.add.toolTipText"),
-              evt -> addSystemEvent());
-        btnRemoveSystemEvent = new MMButton("btnRemoveSystemEvent",
-              resources.getString("PlanetarySystemEditorDialog.systemEvents.remove"),
-              resources.getString("PlanetarySystemEditorDialog.systemEvents.remove.toolTipText"),
-              evt -> removeSelectedSystemEvent());
-        buttons.add(btnAddSystemEvent);
-        buttons.add(btnRemoveSystemEvent);
-        panel.add(buttons, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    private void configureSystemEventChargeEditors() {
-        String[] chargeValues = systemEventChargeValues();
-        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_NADIR).setCellEditor(
-              new DefaultCellEditor(new JComboBox<>(chargeValues)));
-        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_ZENITH).setCellEditor(
-              new DefaultCellEditor(new JComboBox<>(chargeValues)));
-    }
-
-    private String[] systemEventChargeValues() {
-        return new String[] {
-              systemEventChargeInheritLabel(),
-              systemEventChargeYesLabel(),
-              systemEventChargeNoLabel()
-        };
-    }
-
-    private String systemEventChargeInheritLabel() {
-        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.inherit");
-    }
-
-    private String systemEventChargeYesLabel() {
-        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.yes");
-    }
-
-    private String systemEventChargeNoLabel() {
-        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.no");
+          systemEventsPanel = new PlanetarySystemSystemEventsPanel(this, resources, campaign::getLocalDate,
+              this::getSelectedSystem, campaign::isGM, this::onPropertiesChanged);
+          return systemEventsPanel;
     }
 
     private Component createPlanetListPane() {
@@ -569,14 +499,14 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         txtEventDate = new JTextField(10);
         txtEventFactions = new JTextField(18);
         txtEventPopulation = new JTextField(12);
-        attachPopulationFormatter(txtEventPopulation);
+        PlanetarySystemEditorInputFormatter.attachPopulationFormatter(txtEventPopulation);
         cboEventHpg = new JComboBox<>();
         cboEventHpg.addItem("");
         for (HPGRating hpgRating : HPGRating.values()) {
             cboEventHpg.addItem(hpgRating.name());
         }
         txtEventSocioIndustrial = new JTextField(12);
-        attachSocioIndustrialFormatter(txtEventSocioIndustrial);
+        PlanetarySystemEditorInputFormatter.attachSocioIndustrialFormatter(txtEventSocioIndustrial);
         txtEventSource = new JTextField(18);
         txtEventSource.setText(defaultEditorSource());
         txtEventVersion = new JTextField(10);
@@ -640,18 +570,6 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         panel.add(buttonPanel, constraints);
 
         return panel;
-    }
-
-    private void attachPopulationFormatter(JTextField textField) {
-        if (textField.getDocument() instanceof AbstractDocument document) {
-            document.setDocumentFilter(new PopulationDocumentFilter(textField));
-        }
-    }
-
-    private void attachSocioIndustrialFormatter(JTextField textField) {
-        if (textField.getDocument() instanceof AbstractDocument document) {
-            document.setDocumentFilter(new SocioIndustrialDocumentFilter(textField));
-        }
     }
 
     private Component createDateFieldPane(JTextField textField, String buttonName) {
@@ -1221,100 +1139,18 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         refreshEditedSystem(null);
     }
 
-    private void addSystemEvent() {
-        PlanetarySystem selectedSystem = getSelectedSystem();
-        if ((selectedSystem == null) || !campaign.isGM()) {
-            return;
-        }
-
-        JTextField txtNewDate = new JTextField(formatDate(campaign.getLocalDate()), 12);
-        JPanel panel = new JPanel(new GridBagLayout());
-        addEventField(panel, 0, 0, "PlanetarySystemEditorDialog.eventEditor.date",
-              createDateFieldPane(txtNewDate, "btnPickNewSystemEventDate"));
-
-        int choice = JOptionPane.showConfirmDialog(this, panel,
-              resources.getString("PlanetarySystemEditorDialog.systemEvents.add.title"),
-              JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (choice != JOptionPane.OK_OPTION) {
-            return;
-        }
-
-        try {
-            LocalDate eventDate = parseEventDate(txtNewDate.getText());
-            List<PlanetarySystemEvent> existing = nullToEmptyList(selectedSystem.getEvents());
-            for (PlanetarySystemEvent ev : existing) {
-                if (eventDate.equals(ev.date)) {
-                    JOptionPane.showMessageDialog(this, MessageFormat.format(resources.getString(
-                                "PlanetarySystemEditorDialog.systemEvents.add.duplicate"), formatDate(eventDate)),
-                          resources.getString("PlanetarySystemEditorDialog.eventEditor.invalid.title"),
-                          JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
-            PlanetarySystemEvent event = new PlanetarySystemEvent();
-            event.date = eventDate;
-            selectedSystem.putEvent(event);
-            markUnsavedChanges();
-            refreshSystemEvents(eventDate);
-            onPropertiesChanged();
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                  resources.getString("PlanetarySystemEditorDialog.eventEditor.invalid.title"),
-                  JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void removeSelectedSystemEvent() {
-        PlanetarySystem selectedSystem = getSelectedSystem();
-        PlanetarySystemEvent selectedEvent = getSelectedSystemEvent();
-        if ((selectedSystem == null) || (selectedEvent == null) || !campaign.isGM()) {
-            return;
-        }
-        selectedSystem.removeEvent(selectedEvent.date);
-        markUnsavedChanges();
-        refreshSystemEvents(null);
-        onPropertiesChanged();
-    }
-
-    private PlanetarySystemEvent getSelectedSystemEvent() {
-        if ((tblSystemEvents == null) || (systemEventTableModel == null)
-                  || (tblSystemEvents.getSelectedRow() < 0)) {
-            return null;
-        }
-        return systemEventTableModel.getEventAt(
-              tblSystemEvents.convertRowIndexToModel(tblSystemEvents.getSelectedRow()));
-    }
-
     private void refreshSystemEvents(LocalDate selectEventDate) {
-        if (systemEventTableModel != null) {
-            systemEventTableModel.setSystem(getSelectedSystem());
-            if (selectEventDate != null) {
-                int row = systemEventTableModel.findEventRow(selectEventDate);
-                if (row >= 0) {
-                    tblSystemEvents.setRowSelectionInterval(row, row);
-                    tblSystemEvents.scrollRectToVisible(tblSystemEvents.getCellRect(row, 0, true));
-                }
-            }
+        if (systemEventsPanel != null) {
+            systemEventsPanel.refresh(selectEventDate);
         }
-        updateSystemEventButtonState();
     }
 
     private void updateSystemEventButtonState() {
-        boolean canEdit = (getSelectedSystem() != null) && campaign.isGM();
-        if (btnAddSystemEvent != null) {
-            btnAddSystemEvent.setEnabled(canEdit);
-        }
-        if (btnRemoveSystemEvent != null) {
-            btnRemoveSystemEvent.setEnabled(canEdit && (getSelectedSystemEvent() != null));
-        }
-        if (tblSystemEvents != null) {
-            tblSystemEvents.setEnabled(canEdit);
+        if (systemEventsPanel != null) {
+            systemEventsPanel.updateButtonState();
         }
     }
 
-    private static <T> List<T> nullToEmptyList(List<T> list) {
-        return list == null ? List.of() : list;
-    }
     private void duplicateSelectedEvent() {
         Planet selectedPlanet = getSelectedPlanet();
         PlanetaryEvent selectedEvent = getSelectedEvent();
@@ -1445,7 +1281,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         if (text == null) {
             return null;
         }
-        String compactText = compactPopulationInput(text);
+        String compactText = PlanetarySystemEditorInputFormatter.compactPopulationInput(text);
         if (!text.equals(compactText)) {
             throw new IllegalArgumentException(MessageFormat.format(resources.getString(
                   "PlanetarySystemEditorDialog.eventEditor.invalid.population"), text));
@@ -1458,25 +1294,6 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
     }
 
-    private static String compactPopulationInput(String text) {
-        if (text == null) {
-            return "";
-        }
-
-        StringBuilder compactText = new StringBuilder(text.length());
-        for (int index = 0; index < text.length(); index++) {
-            int digit = Character.digit(text.charAt(index), 10);
-            if (digit >= 0) {
-                compactText.append(digit);
-            }
-        }
-        return compactText.toString();
-    }
-
-    private static String formatPopulationInput(String text) {
-        return compactPopulationInput(text);
-    }
-
     private HPGRating parseHpgRating() {
         String text = blankToNull((String) cboEventHpg.getSelectedItem());
         if (text == null) {
@@ -1486,7 +1303,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     }
 
     private SocioIndustrialData parseSocioIndustrialData() {
-        String text = blankToNull(formatSocioIndustrialInput(txtEventSocioIndustrial.getText()));
+          String text = blankToNull(PlanetarySystemEditorInputFormatter.formatSocioIndustrialInput(
+              txtEventSocioIndustrial.getText()));
         if (text == null) {
             return null;
         }
@@ -1501,79 +1319,16 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
                   "PlanetarySystemEditorDialog.eventEditor.invalid.socioIndustrial"), text));
         }
 
-        if (!isValidSocioIndustrialTechCode(ratings[0])) {
+        if (!PlanetarySystemEditorInputFormatter.isValidSocioIndustrialTechCode(ratings[0])) {
             throw new IllegalArgumentException(MessageFormat.format(resources.getString(
                   "PlanetarySystemEditorDialog.eventEditor.invalid.socioIndustrial"), text));
         }
         for (int index = 1; index < ratings.length; index++) {
-            if (!isValidSocioIndustrialRatingCode(ratings[index])) {
+            if (!PlanetarySystemEditorInputFormatter.isValidSocioIndustrialRatingCode(ratings[index])) {
                 throw new IllegalArgumentException(MessageFormat.format(resources.getString(
                       "PlanetarySystemEditorDialog.eventEditor.invalid.socioIndustrial"), text));
             }
         }
-    }
-
-    private static boolean isValidSocioIndustrialTechCode(String code) {
-        return Set.of("ADV", "A", "B", "C", "D", "F", "R", "X").contains(code.trim());
-    }
-
-    private static boolean isValidSocioIndustrialRatingCode(String code) {
-        return Set.of("A", "B", "C", "D", "F", "X").contains(code.trim());
-    }
-
-    private static String formatSocioIndustrialInput(String text) {
-        List<String> ratings = parseSocioIndustrialInputTokens(text);
-        return ratings.isEmpty() ? "" : String.join("-", ratings);
-    }
-
-    private static List<String> parseSocioIndustrialInputTokens(String text) {
-        String compactText = compactSocioIndustrialInput(text);
-        if (compactText.isEmpty()) {
-            return List.of();
-        }
-
-        List<String> ratings = new ArrayList<>();
-        while (!compactText.isEmpty() && ratings.isEmpty()) {
-            if (compactText.startsWith("ADVANCED")) {
-                ratings.add("ADV");
-                compactText = compactText.substring("ADVANCED".length());
-            } else if (compactText.startsWith("REGRESSED")) {
-                ratings.add("R");
-                compactText = compactText.substring("REGRESSED".length());
-            } else if (compactText.startsWith("ADV")) {
-                ratings.add("ADV");
-                compactText = compactText.substring("ADV".length());
-            } else {
-                String code = String.valueOf(compactText.charAt(0));
-                compactText = compactText.substring(1);
-                if (isValidSocioIndustrialTechCode(code)) {
-                    ratings.add(code);
-                }
-            }
-        }
-
-        for (int index = 0; (index < compactText.length()) && (ratings.size() < 5); index++) {
-            String code = String.valueOf(compactText.charAt(index));
-            if (isValidSocioIndustrialRatingCode(code)) {
-                ratings.add(code);
-            }
-        }
-        return ratings;
-    }
-
-    private static String compactSocioIndustrialInput(String text) {
-        if (text == null) {
-            return "";
-        }
-
-        StringBuilder compactText = new StringBuilder(text.length());
-        for (int index = 0; index < text.length(); index++) {
-            char character = text.charAt(index);
-            if (Character.isLetter(character)) {
-                compactText.append(Character.toUpperCase(character));
-            }
-        }
-        return compactText.toString();
     }
 
     private <T> SourceableValue<T> sourceableValue(T value) {
@@ -2689,84 +2444,6 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
     }
 
-    private static final class PopulationDocumentFilter extends DocumentFilter {
-        private final JTextField textField;
-
-        private PopulationDocumentFilter(JTextField textField) {
-            this.textField = textField;
-        }
-
-        @Override
-        public void insertString(FilterBypass bypass, int offset, String text, AttributeSet attributes)
-              throws BadLocationException {
-            replace(bypass, offset, 0, text, attributes);
-        }
-
-        @Override
-        public void replace(FilterBypass bypass, int offset, int length, String text, AttributeSet attributes)
-              throws BadLocationException {
-            StringBuilder proposedText = getCurrentText(bypass);
-            proposedText.replace(offset, offset + length, text == null ? "" : text);
-            replaceText(bypass, formatPopulationInput(proposedText.toString()), attributes);
-        }
-
-        @Override
-        public void remove(FilterBypass bypass, int offset, int length) throws BadLocationException {
-            StringBuilder proposedText = getCurrentText(bypass);
-            proposedText.delete(offset, offset + length);
-            replaceText(bypass, formatPopulationInput(proposedText.toString()), null);
-        }
-
-        private StringBuilder getCurrentText(FilterBypass bypass) throws BadLocationException {
-            return new StringBuilder(bypass.getDocument().getText(0, bypass.getDocument().getLength()));
-        }
-
-        private void replaceText(FilterBypass bypass, String text, AttributeSet attributes)
-              throws BadLocationException {
-            bypass.replace(0, bypass.getDocument().getLength(), text, attributes);
-            SwingUtilities.invokeLater(() -> textField.setCaretPosition(textField.getText().length()));
-        }
-    }
-
-    private static final class SocioIndustrialDocumentFilter extends DocumentFilter {
-        private final JTextField textField;
-
-        private SocioIndustrialDocumentFilter(JTextField textField) {
-            this.textField = textField;
-        }
-
-        @Override
-        public void insertString(FilterBypass bypass, int offset, String text, AttributeSet attributes)
-              throws BadLocationException {
-            replace(bypass, offset, 0, text, attributes);
-        }
-
-        @Override
-        public void replace(FilterBypass bypass, int offset, int length, String text, AttributeSet attributes)
-              throws BadLocationException {
-            StringBuilder proposedText = getCurrentText(bypass);
-            proposedText.replace(offset, offset + length, text == null ? "" : text);
-            replaceText(bypass, formatSocioIndustrialInput(proposedText.toString()), attributes);
-        }
-
-        @Override
-        public void remove(FilterBypass bypass, int offset, int length) throws BadLocationException {
-            StringBuilder proposedText = getCurrentText(bypass);
-            proposedText.delete(offset, offset + length);
-            replaceText(bypass, formatSocioIndustrialInput(proposedText.toString()), null);
-        }
-
-        private StringBuilder getCurrentText(FilterBypass bypass) throws BadLocationException {
-            return new StringBuilder(bypass.getDocument().getText(0, bypass.getDocument().getLength()));
-        }
-
-        private void replaceText(FilterBypass bypass, String text, AttributeSet attributes)
-              throws BadLocationException {
-            bypass.replace(0, bypass.getDocument().getLength(), text, attributes);
-            SwingUtilities.invokeLater(() -> textField.setCaretPosition(textField.getText().length()));
-        }
-    }
-
     private final class PlanetEventTableModel extends AbstractTableModel {
         private static final int COL_DATE = 0;
         private static final int COL_FACTIONS = 1;
@@ -2855,182 +2532,4 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
     }
 
-    private final class SystemEventTableModel extends AbstractTableModel {
-        private static final int COL_DATE = 0;
-        private static final int COL_NADIR = 1;
-        private static final int COL_ZENITH = 2;
-        private static final int COLUMN_COUNT = 3;
-
-        private PlanetarySystem system;
-        private List<PlanetarySystemEvent> events = new ArrayList<>();
-
-        void setSystem(PlanetarySystem system) {
-            this.system = system;
-            reload();
-        }
-
-        private void reload() {
-            events = new ArrayList<>();
-            if (system != null) {
-                List<PlanetarySystemEvent> source = system.getEvents();
-                if (source != null) {
-                    for (PlanetarySystemEvent event : source) {
-                        if ((event != null) && (event.date != null)) {
-                            events.add(event);
-                        }
-                    }
-                    events.sort(Comparator.comparing(event -> event.date));
-                }
-            }
-            fireTableDataChanged();
-        }
-
-        PlanetarySystemEvent getEventAt(int row) {
-            if ((row < 0) || (row >= events.size())) {
-                return null;
-            }
-            return events.get(row);
-        }
-
-        int findEventRow(LocalDate date) {
-            if (date == null) {
-                return -1;
-            }
-            for (int row = 0; row < events.size(); row++) {
-                if (date.equals(events.get(row).date)) {
-                    return row;
-                }
-            }
-            return -1;
-        }
-
-        @Override
-        public int getRowCount() {
-            return events.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return COLUMN_COUNT;
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return switch (column) {
-                case COL_DATE -> resources.getString("PlanetarySystemEditorDialog.eventEditor.date");
-                case COL_NADIR -> resources.getString("PlanetarySystemEditorDialog.systemEvents.nadirCharge");
-                case COL_ZENITH -> resources.getString("PlanetarySystemEditorDialog.systemEvents.zenithCharge");
-                default -> "";
-            };
-        }
-
-        @Override
-        public Class<?> getColumnClass(int column) {
-            return String.class;
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return (system != null) && campaign.isGM();
-        }
-
-        @Override
-        public Object getValueAt(int row, int column) {
-            PlanetarySystemEvent event = getEventAt(row);
-            if (event == null) {
-                return (column == COL_NADIR || column == COL_ZENITH) ? systemEventChargeInheritLabel() : "";
-            }
-            return switch (column) {
-                case COL_DATE -> formatDate(event.date);
-                case COL_NADIR -> formatSystemEventCharge(event.nadirCharge);
-                case COL_ZENITH -> formatSystemEventCharge(event.zenithCharge);
-                default -> "";
-            };
-        }
-
-        @Override
-        public void setValueAt(Object value, int row, int column) {
-            PlanetarySystemEvent event = getEventAt(row);
-            if ((system == null) || (event == null)) {
-                return;
-            }
-            switch (column) {
-                case COL_DATE -> updateEventDate(event, value);
-                case COL_NADIR -> updateBooleanField(event, value, true);
-                case COL_ZENITH -> updateBooleanField(event, value, false);
-                default -> {
-                    // no-op
-                }
-            }
-        }
-
-        private void updateEventDate(PlanetarySystemEvent event, Object value) {
-            String text = value == null ? "" : value.toString();
-            try {
-                LocalDate newDate = parseEventDate(text);
-                if (newDate.equals(event.date)) {
-                    return;
-                }
-                if (findEventRow(newDate) >= 0) {
-                    JOptionPane.showMessageDialog(PlanetarySystemEditorDialog.this,
-                          MessageFormat.format(resources.getString(
-                                "PlanetarySystemEditorDialog.systemEvents.add.duplicate"), formatDate(newDate)),
-                          resources.getString("PlanetarySystemEditorDialog.eventEditor.invalid.title"),
-                          JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                LocalDate oldDate = event.date;
-                event.date = newDate;
-                system.removeEvent(oldDate);
-                system.putEvent(event);
-                markUnsavedChanges();
-                refreshSystemEvents(newDate);
-                onPropertiesChanged();
-            } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(PlanetarySystemEditorDialog.this, ex.getMessage(),
-                      resources.getString("PlanetarySystemEditorDialog.eventEditor.invalid.title"),
-                      JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        private void updateBooleanField(PlanetarySystemEvent event, Object value, boolean nadir) {
-            SourceableValue<Boolean> existing = nadir ? event.nadirCharge : event.zenithCharge;
-            Boolean newValue = parseSystemEventCharge(value);
-            SourceableValue<Boolean> wrapped = null;
-            if (newValue != null) {
-                String source = (existing == null) ? null : existing.getSource();
-                String version = (existing == null) ? null : existing.getVersion();
-                wrapped = SourceableValue.of(source, version, newValue);
-            }
-            if (nadir) {
-                event.nadirCharge = wrapped;
-            } else {
-                event.zenithCharge = wrapped;
-            }
-            markUnsavedChanges();
-            fireTableRowsUpdated(events.indexOf(event), events.indexOf(event));
-            onPropertiesChanged();
-        }
-
-        private String formatSystemEventCharge(SourceableValue<Boolean> value) {
-            if ((value == null) || (value.getValue() == null)) {
-                return systemEventChargeInheritLabel();
-            }
-            return value.getValue() ? systemEventChargeYesLabel() : systemEventChargeNoLabel();
-        }
-
-        private Boolean parseSystemEventCharge(Object value) {
-            if (value instanceof Boolean booleanValue) {
-                return booleanValue;
-            }
-            String text = value == null ? "" : value.toString();
-            if (systemEventChargeYesLabel().equals(text)) {
-                return true;
-            }
-            if (systemEventChargeNoLabel().equals(text)) {
-                return false;
-            }
-            return null;
-        }
-    }
 }

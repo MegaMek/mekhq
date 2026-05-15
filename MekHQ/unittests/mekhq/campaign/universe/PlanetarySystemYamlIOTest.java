@@ -55,6 +55,8 @@ import java.util.stream.Stream;
 
 import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
@@ -181,6 +183,30 @@ class PlanetarySystemYamlIOTest {
         assertEquals(HPGRating.A, reloadedPlanet.getHPG(event.date));
         assertEquals("B-C-D-F-A", reloadedPlanet.getSocioIndustrial(event.date).toString());
         assertEquals("MekHQ GM", reloadedPlanet.getSourcedFactions(event.date).getSource());
+    }
+
+    @Test
+    void socioIndustrialDataRoundTripsDisplayNamesThroughYaml() throws Exception {
+        PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
+        Planet planet = system.getPrimaryPlanet();
+
+        Planet.PlanetaryEvent event = new Planet.PlanetaryEvent();
+        event.date = LocalDate.of(3050, 1, 1);
+        event.socioIndustrial = SourceableValue.of(new SocioIndustrialData(PlanetarySophistication.ADVANCED,
+              PlanetaryRating.A, PlanetaryRating.B, PlanetaryRating.C, PlanetaryRating.D));
+        planet.putEvent(event);
+
+                Planet.PlanetaryEvent regressedEvent = new Planet.PlanetaryEvent();
+                regressedEvent.date = LocalDate.of(3060, 1, 1);
+                regressedEvent.socioIndustrial = SourceableValue.of(new SocioIndustrialData(PlanetarySophistication.REGRESSED,
+              PlanetaryRating.F, PlanetaryRating.F, PlanetaryRating.F, PlanetaryRating.F));
+                planet.putEvent(regressedEvent);
+
+        PlanetarySystem reloadedSystem = readSystem(writeSystem(system));
+                Planet reloadedPlanet = reloadedSystem.getPrimaryPlanet();
+
+                assertEquals("Advanced-A-B-C-D", reloadedPlanet.getSocioIndustrial(event.date).toString());
+                assertEquals("Regressed-F-F-F-F", reloadedPlanet.getSocioIndustrial(regressedEvent.date).toString());
     }
 
     @Test

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -415,6 +415,9 @@ public class Planet {
         }
         boolean removed = events.remove(when) != null;
         if (removed) {
+            if (events.isEmpty()) {
+                events = null;
+            }
             currentEvents = null;
         }
         return removed;
@@ -428,6 +431,9 @@ public class Planet {
                     events.put(event.date, event);
                 }
             }
+        }
+        if (events.isEmpty()) {
+            events = null;
         }
         currentEvents = null;
     }

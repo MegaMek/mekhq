@@ -303,7 +303,7 @@ public class Systems {
      *
      */
     public static Systems loadDefault() throws DOMException, IOException {
-        logger.info("Starting load of system data from XML...");
+        logger.info("Starting load of system data from YAML...");
         long currentTime = java.lang.System.currentTimeMillis();
 
         Systems systems = new Systems();
@@ -331,7 +331,7 @@ public class Systems {
     /**
      * Loads Systems data from files.
      *
-     * @param planetsPath The path to the folder containing planetary XML files.
+     * @param planetsPath The path to the folder containing planetary YAML files.
      *
      */
     public void load(String planetsPath) throws DOMException {
