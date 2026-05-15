@@ -291,7 +291,10 @@ public class CompanyGenerationOptions {
         setPrioritizeOfficerCombatSkills(false);
         setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
-        setUseSpecifiedFactionToAssignRanks(false);
+        // Default ON so the target faction's rank system (Clan ranks for a Clan target, ComStar
+        // ranks for a CS target, etc.) drives the generated commanders' rank names. Users who
+        // want the campaign's home faction to override can flip this off in the Setup tab.
+        setUseSpecifiedFactionToAssignRanks(true);
         setAssignMekWarriorsCallSigns(true);
         setAssignFounderFlag(true);
 

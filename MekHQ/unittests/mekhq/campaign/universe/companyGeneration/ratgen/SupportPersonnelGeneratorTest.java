@@ -416,6 +416,11 @@ class SupportPersonnelGeneratorTest {
 
     private static CompanyGenerationOptions baseOptions() {
         CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        // Route through the mocked Campaign.getFaction() instead of the real default
+        // specifiedFaction (which would resolve through the Ranks singleton — not initialized in
+        // unit-test context, and would NPE on getRankSystem). The rank-system-swap path is
+        // covered by integration testing in the live MekHQ launch, not here.
+        options.setUseSpecifiedFactionToAssignRanks(false);
         return options;
     }
 
