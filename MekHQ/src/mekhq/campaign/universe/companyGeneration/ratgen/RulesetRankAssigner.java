@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -124,8 +125,17 @@ public final class RulesetRankAssigner {
         int enlistedRank = enlistedRankForFaction(faction);
         int supportRank = supportRankForFaction(faction);
 
-        LOGGER.info("[CompanyGen][RankAssign] START faction={} enlistedRank={} supportRank={} root='{}' thread={}",
-              faction.getShortName(), enlistedRank, supportRank, root.getName(),
+        // The Person's rank-name lookup uses its OWN rank system, not the campaign's. So an IS
+        // campaign generating a Clan force would render Clan-targeted rank indices through the
+        // campaign's IS rank table ("Lieutenant" instead of "Nova Commander"). Resolve the target
+        // faction's rank system here and apply it to every Person we rank below.
+        RankSystem targetRankSystem = faction.getRankSystem();
+        RankValidator rankValidator = new RankValidator();
+
+        LOGGER.info("[CompanyGen][RankAssign] START faction={} rankSystem={} enlistedRank={} supportRank={} root='{}' thread={}",
+              faction.getShortName(),
+              targetRankSystem == null ? "null" : targetRankSystem.getCode(),
+              enlistedRank, supportRank, root.getName(),
               Thread.currentThread().getName());
 
         // Pass 1: walk the tree post-order so lance / star commanders claim their officer rank
@@ -135,7 +145,7 @@ public final class RulesetRankAssigner {
         long pass1Start = System.nanoTime();
         Set<Person> promoted = new LinkedHashSet<>();
         int[] officerCount = { 0 };
-        Person rootCommander = walkPostOrder(campaign, root, promoted, officerCount);
+        Person rootCommander = walkPostOrder(campaign, root, promoted, officerCount, targetRankSystem, rankValidator);
         int officersAssigned = officerCount[0];
         long pass1Ms = (System.nanoTime() - pass1Start) / 1_000_000;
         LOGGER.info("[CompanyGen][RankAssign][Pass1] AFTER walkPostOrder officers={} rootCommander={} elapsed={}ms",
@@ -165,10 +175,10 @@ public final class RulesetRankAssigner {
                     continue;
                 }
                 if (person.isSupport()) {
-                    setRankWithFallback(person, supportRank);
+                    setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
                     supportAssigned++;
                 } else if (person.isCombat()) {
-                    setRankWithFallback(person, enlistedRank);
+                    setRankWithFallback(person, enlistedRank, targetRankSystem, rankValidator);
                     enlistedAssigned++;
                 }
             }
@@ -196,9 +206,9 @@ public final class RulesetRankAssigner {
      */
     @Nullable
     private static Person walkPostOrder(Campaign campaign, Formation formation, Set<Person> promoted,
-          int[] officerCount) {
+          int[] officerCount, RankSystem targetRankSystem, RankValidator rankValidator) {
         for (Formation sub : formation.getSubFormations()) {
-            walkPostOrder(campaign, sub, promoted, officerCount);
+            walkPostOrder(campaign, sub, promoted, officerCount, targetRankSystem, rankValidator);
         }
         int rankIndex = rankIndexForLevel(formation.getFormationLevel());
         if (rankIndex < 0) {
@@ -208,7 +218,7 @@ public final class RulesetRankAssigner {
         }
         Person commander = pickCommander(campaign, formation, promoted);
         if (commander != null) {
-            setRankWithFallback(commander, rankIndex);
+            setRankWithFallback(commander, rankIndex, targetRankSystem, rankValidator);
             promoted.add(commander);
             officerCount[0]++;
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> '{}' promoted to rank index {} (effective={})",
@@ -272,30 +282,54 @@ public final class RulesetRankAssigner {
 
     /**
      * Maps {@link FormationLevel} to the {@code Person.setRank(int)} index for that formation's
-     * commander, covering every echelon the ratgen engine can produce (Lance through Army Group
-     * for IS, Point through Touman for Clan, Level I through Level VI for ComStar/WoB).
+     * commander, covering every echelon the ratgen engine can produce. Cross-checked against
+     * {@code data/universe/ranks.xml} slots and
+     * {@code MekHQ/battletech_rank_command_mapping.xlsx} (the per-faction rank-to-command
+     * authoritative reference).
+     *
+     * <p>Each FormationLevel enum value tells us the faction family (Inner Sphere uses LANCE /
+     * COMPANY / ...; Clan uses STAR_OR_NOVA / BINARY_OR_TRINARY / ...; ComStar / WoB uses
+     * LEVEL_II_OR_CHOIR / LEVEL_III / ...), so the switch can pick the family-correct slot without
+     * a separate faction argument. See the rank-slot conventions block comment at the top of
+     * {@code ranks.xml} for the canonical command-size-to-slot mapping per family.</p>
+     *
+     * <p>Package-private so {@code RulesetRankAssignerTest} can pin the mapping without going
+     * through the full {@link #apply(Campaign, CompanyGenerationOptions)} pipeline.</p>
      */
-    private static int rankIndexForLevel(FormationLevel level) {
+    static int rankIndexForLevel(FormationLevel level) {
         if (level == null) {
             return -1;
         }
         return switch (level) {
-            // O3 — Lieutenant / Star Captain / Adept
-            case LANCE, STAR_OR_NOVA, LEVEL_II_OR_CHOIR -> Rank.RWO_MAX + 3;
-            // O4 — Captain / Star Colonel / Demi-Precentor
-            case COMPANY, BINARY_OR_TRINARY, LEVEL_III -> Rank.RWO_MAX + 4;
-            // O5 — Major / Galaxy Commander / Precentor
-            case BATTALION, CLUSTER, LEVEL_IV -> Rank.RWO_MAX + 5;
-            // O7 — Brigadier General / Khan / Precentor Martial. Skips O6 to match the legacy
-            // generator's force-size → rank table, which jumps from O5 directly to O7 for the
-            // higher echelons.
-            case REGIMENT, GALAXY, LEVEL_V -> Rank.RWO_MAX + 7;
-            // O8 — Major General
-            case BRIGADE, TOUMAN, LEVEL_VI -> Rank.RWO_MAX + 8;
-            case DIVISION -> Rank.RWO_MAX + 9;
-            case CORPS -> Rank.RWO_MAX + 10;
-            case ARMY -> Rank.RWO_MAX + 11;
-            case ARMY_GROUP -> Rank.RWO_MAX + 12;
+            // Inner Sphere / Periphery — uses STANDARD-style officer slots
+            case LANCE -> Rank.RWO_MAX + 3;       // Lieutenant
+            case COMPANY -> Rank.RWO_MAX + 4;     // Captain
+            case BATTALION -> Rank.RWO_MAX + 5;   // Major
+            case REGIMENT -> Rank.RWO_MAX + 8;    // Colonel (NOT O7 — O7 is empty in every IS rank XML)
+            case BRIGADE -> Rank.RWO_MAX + 9;     // Brigadier General / Lieutenant General
+            case DIVISION -> Rank.RWO_MAX + 10;   // Major General
+            case CORPS -> Rank.RWO_MAX + 11;      // General
+            case ARMY -> Rank.RWO_MAX + 12;       // Marshal / Major General (per faction)
+            case ARMY_GROUP -> Rank.RWO_MAX + 13; // Field Marshal / General of the Armies
+
+            // Clan — uses CLAN rank XML slots
+            case STAR_OR_NOVA -> Rank.RWO_MAX + 3;          // Nova Commander (covers both Stars
+                                                            // and Novas; FormationLevel collapses
+                                                            // the two)
+            case BINARY_OR_TRINARY -> Rank.RWO_MAX + 4;     // Star Captain
+            case CLUSTER -> Rank.RWO_MAX + 8;               // Star Colonel
+            case GALAXY -> Rank.RWO_MAX + 9;                // Galaxy Commander
+            case TOUMAN -> Rank.RWO_MAX + 18;               // Khan
+
+            // ComStar / Word of Blake — uses COMSTAR rank XML slots
+            case LEVEL_II_OR_CHOIR -> Rank.RWO_MAX + 3;     // Adept
+            case LEVEL_III -> Rank.RWO_MAX + 4;             // Demi-Precentor
+            case LEVEL_IV -> Rank.RWO_MAX + 7;              // Precentor
+            case LEVEL_V -> Rank.RWO_MAX + 7;               // Precentor (canon has no intermediate
+                                                            // rank between Precentor and Precentor
+                                                            // Martial; LEVEL_V and LEVEL_IV share)
+            case LEVEL_VI -> Rank.RWO_MAX + 12;             // Precentor Martial
+
             default -> -1;
         };
     }
@@ -322,18 +356,29 @@ public final class RulesetRankAssigner {
     }
 
     /**
-     * Assigns a rank to a person but walks DOWN the rank table when the preferred index has no
-     * name for the person's effective profession in the campaign's rank system. Prevents the
-     * personnel UI from showing a literal "-" prefix when the rank table has a gap in the
-     * profession's column at the chosen index (e.g., we asked for the IS Standard Sergeant
-     * slot but the active rank system marked that column "-" for Vehicle crew).
+     * Switches the Person's rank system to the target faction's, then assigns the preferred rank
+     * index — walking DOWN the rank table if that index has no name for the Person's profession.
+     *
+     * <p>Two-step assignment is necessary because a Person's rank-name lookup goes through its
+     * own {@code RankSystem} instance, not the campaign's. If a Mercenary campaign generates a
+     * Clan force, the freshly-created Persons inherit the Mercenary rank system on construction;
+     * setting their rank index to 33 then renders as "Lieutenant" (the IS slot 33 name) instead
+     * of "Nova Commander" (the Clan slot 33 name). Swapping the rank system first ensures the
+     * index resolves through the correct table.</p>
      *
      * <p>{@link Profession#getProfessionFromBase(RankSystem, Rank)} already walks alternate
      * profession columns; this method handles the case where every profession in that walk
      * is empty at the chosen rank index by stepping down through lower indices until it
      * finds one that resolves to a real name.</p>
      */
-    private static void setRankWithFallback(Person person, int preferredIndex) {
+    private static void setRankWithFallback(Person person, int preferredIndex,
+          RankSystem targetRankSystem, RankValidator rankValidator) {
+        if (targetRankSystem != null) {
+            RankSystem currentSystem = person.getRankSystem();
+            if (currentSystem == null || !targetRankSystem.equals(currentSystem)) {
+                person.setRankSystem(rankValidator, targetRankSystem);
+            }
+        }
         person.setRank(preferredIndex);
         RankSystem rankSystem = person.getRankSystem();
         if (rankSystem == null) {
