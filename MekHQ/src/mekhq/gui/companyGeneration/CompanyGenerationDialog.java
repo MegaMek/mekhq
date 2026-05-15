@@ -130,9 +130,13 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected Container createCenterPane() {
-        CompanyGenerationOptions startingOptions = companyGenerationOptions != null
-              ? companyGenerationOptions
-              : new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        CompanyGenerationOptions startingOptions;
+        if (companyGenerationOptions != null) {
+            startingOptions = companyGenerationOptions;
+        } else {
+            startingOptions = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+            seedSpecifiedFactionFromCampaign(startingOptions, "createCenterPane");
+        }
         pane = new CompanyGenerationPane(getFrame(), getCampaign(), startingOptions);
 
         // Populate every tab from the supplied options on first show.
@@ -190,10 +194,43 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     private void restoreDefaultsActionListener(final ActionEvent evt) {
         CompanyGenerationOptions defaults = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
         pane.getSetupTab().loadValuesFromOptions(defaults);
         pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
         pane.getSparesTab().loadValuesFromOptions(defaults);
         pane.getOtherTab().loadValuesFromOptions(defaults);
+    }
+
+    /**
+     * Overwrites {@link CompanyGenerationOptions#getSpecifiedFaction()} with the current
+     * campaign's faction. The CompanyGenerationOptions constructor defaults specifiedFaction to a
+     * global default (typically Mercenary) regardless of campaign, so a Clan campaign loading the
+     * dialog for the first time would otherwise have a MERC rank-authority faction seeded —
+     * meaning {@code RulesetRankAssigner} resolves to MERC, picks the IS rank-index policy
+     * (enlisted=12 / support=8), and assigns IS rank names to Clan Persons. Seeding here makes
+     * the campaign-creation faction choice the default for rank assignment too.
+     *
+     * @param options the fresh options about to be handed to the tabs
+     * @param caller  identifier for the call site (logged so traces can distinguish first-open
+     *                from restore-defaults from OK paths)
+     */
+    private void seedSpecifiedFactionFromCampaign(CompanyGenerationOptions options, String caller) {
+        if (options == null || campaign == null) {
+            return;
+        }
+        Faction campaignFaction = campaign.getFaction();
+        if (campaignFaction == null) {
+            LOGGER.warn("[CompanyGen][Dialog][Faction] seed({}): campaign has no faction, leaving specifiedFaction='{}'",
+                  caller,
+                  options.getSpecifiedFaction() == null ? "null" : options.getSpecifiedFaction().getShortName());
+            return;
+        }
+        Faction previous = options.getSpecifiedFaction();
+        options.setSpecifiedFaction(campaignFaction);
+        LOGGER.info("[CompanyGen][Dialog][Faction] seed({}): specifiedFaction '{}' -> '{}' (from campaign.getFaction())",
+              caller,
+              previous == null ? "null" : previous.getShortName(),
+              campaignFaction.getShortName());
     }
 
     @Override
@@ -201,9 +238,13 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // Build a CompanyGenerationOptions snapshot from the four tabs. The Setup / Force Generator /
         // Other tabs all round-trip through this object; the Spares tab writes to CampaignOptions
         // directly (see SparesTab.writeValuesToOptions for the rationale).
-        CompanyGenerationOptions options = companyGenerationOptions != null
-              ? companyGenerationOptions
-              : new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        CompanyGenerationOptions options;
+        if (companyGenerationOptions != null) {
+            options = companyGenerationOptions;
+        } else {
+            options = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+            seedSpecifiedFactionFromCampaign(options, "okAction-fresh");
+        }
         pane.getSetupTab().writeValuesToOptions(options);
         pane.getForceGeneratorTab().writeValuesToOptions(options);
         pane.getSparesTab().writeValuesToOptions(options);

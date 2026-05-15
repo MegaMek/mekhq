@@ -115,15 +115,28 @@ public final class RulesetRankAssigner {
             return null;
         }
 
-        Faction faction = options.isUseSpecifiedFactionToAssignRanks()
-              ? options.getSpecifiedFaction()
-              : campaign.getFaction();
+        Faction specifiedFaction = options.getSpecifiedFaction();
+        Faction campaignFaction = campaign.getFaction();
+        boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
+        Faction faction = useSpecified ? specifiedFaction : campaignFaction;
         if (faction == null) {
-            faction = campaign.getFaction();
+            faction = campaignFaction;
         }
+        LOGGER.info("[CompanyGen][RankAssign][Faction] resolve: useSpecified={} specifiedFaction={} campaignFaction={} -> resolved={} (isClan={} isComStarOrWoB={} isMercenary={})",
+              useSpecified,
+              specifiedFaction == null ? "null" : specifiedFaction.getShortName(),
+              campaignFaction == null ? "null" : campaignFaction.getShortName(),
+              faction == null ? "null" : faction.getShortName(),
+              faction != null && faction.isClan(),
+              faction != null && faction.isComStarOrWoB(),
+              faction != null && faction.isMercenary());
 
         int enlistedRank = enlistedRankForFaction(faction);
         int supportRank = supportRankForFaction(faction);
+        LOGGER.info("[CompanyGen][RankAssign][Faction] rank-index policy: enlistedRank={} supportRank={} (Clan/CS path={}, IS path={})",
+              enlistedRank, supportRank,
+              faction != null && (faction.isClan() || faction.isComStarOrWoB()),
+              faction == null || (!faction.isClan() && !faction.isComStarOrWoB()));
 
         // The Person's rank-name lookup uses its OWN rank system, not the campaign's. So an IS
         // campaign generating a Clan force would render Clan-targeted rank indices through the
@@ -376,8 +389,19 @@ public final class RulesetRankAssigner {
         if (targetRankSystem != null) {
             RankSystem currentSystem = person.getRankSystem();
             if (currentSystem == null || !targetRankSystem.equals(currentSystem)) {
+                LOGGER.info("[CompanyGen][RankAssign][RankSystem] swap person='{}' role={} oldSystem={} newSystem={} preferredIndex={}",
+                      person.getFullName(), person.getPrimaryRole().name(),
+                      currentSystem == null ? "null" : currentSystem.getCode(),
+                      targetRankSystem.getCode(), preferredIndex);
                 person.setRankSystem(rankValidator, targetRankSystem);
+            } else {
+                LOGGER.info("[CompanyGen][RankAssign][RankSystem] no-swap person='{}' already on system={} preferredIndex={}",
+                      person.getFullName(), targetRankSystem.getCode(), preferredIndex);
             }
+        } else {
+            LOGGER.warn("[CompanyGen][RankAssign][RankSystem] targetRankSystem is null for person='{}' — leaving on existing system={} (this is the wrong-rank-names path)",
+                  person.getFullName(),
+                  person.getRankSystem() == null ? "null" : person.getRankSystem().getCode());
         }
         person.setRank(preferredIndex);
         RankSystem rankSystem = person.getRankSystem();

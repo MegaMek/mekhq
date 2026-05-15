@@ -169,11 +169,27 @@ public final class CompanyGenerator {
         //   is still at its constructor default ("IS"). The embedded panel writes a non-default value
         //   on OK, in which case this is a no-op.
         snap.setYear(campaign.getGameYear());
+        String snapFactionBefore = snap.getFaction();
+        String specifiedFactionCode = options.getSpecifiedFaction() == null
+              ? "null"
+              : options.getSpecifiedFaction().getShortName();
+        String campaignFactionCode = campaign.getFaction() == null
+              ? "null"
+              : campaign.getFaction().getShortName();
+        LOGGER.info("[CompanyGen][Pipeline][Faction] Stage 0 inputs: snap.faction='{}' options.specifiedFaction='{}' campaign.faction='{}' isUseSpecifiedFactionToAssignRanks={}",
+              snapFactionBefore, specifiedFactionCode, campaignFactionCode,
+              options.isUseSpecifiedFactionToAssignRanks());
         if ("IS".equals(snap.getFaction()) && options.getSpecifiedFaction() != null) {
             String legacyFactionCode = options.getSpecifiedFaction().getShortName();
             if (legacyFactionCode != null && !legacyFactionCode.isBlank()) {
                 snap.setFaction(legacyFactionCode);
+                LOGGER.info("[CompanyGen][Pipeline][Faction] Stage 0 swap: snap.faction '{}' -> '{}' (sourced from options.specifiedFaction)",
+                      snapFactionBefore, legacyFactionCode);
             }
+        } else {
+            LOGGER.info("[CompanyGen][Pipeline][Faction] Stage 0 no swap (snap.faction='{}' specifiedFaction={})",
+                  snap.getFaction(),
+                  options.getSpecifiedFaction() == null ? "null" : specifiedFactionCode);
         }
         LOGGER.info("[CompanyGen][Pipeline]Stage 0: anchored snapshot -> faction={} year={} (campaign year) echelon={} unitType={}",
               snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType());

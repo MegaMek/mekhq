@@ -302,8 +302,19 @@ public final class SupportPersonnelGenerator {
         if (targetRankSystem != null) {
             RankSystem currentSystem = person.getRankSystem();
             if (currentSystem == null || !targetRankSystem.equals(currentSystem)) {
+                LOGGER.info("[CompanyGen][Support][RankSystem] swap person='{}' role={} oldSystem={} newSystem={} supportRank={}",
+                      person.getFullName(), person.getPrimaryRole().name(),
+                      currentSystem == null ? "null" : currentSystem.getCode(),
+                      targetRankSystem.getCode(), supportRank);
                 person.setRankSystem(rankValidator, targetRankSystem);
+            } else {
+                LOGGER.info("[CompanyGen][Support][RankSystem] no-swap person='{}' already on system={} supportRank={}",
+                      person.getFullName(), targetRankSystem.getCode(), supportRank);
             }
+        } else {
+            LOGGER.warn("[CompanyGen][Support][RankSystem] targetRankSystem is null for person='{}' — leaving on existing system={} (this is the wrong-rank-names path)",
+                  person.getFullName(),
+                  person.getRankSystem() == null ? "null" : person.getRankSystem().getCode());
         }
         person.setRank(supportRank);
         boolean recruited = campaign.recruitPerson(person, PrisonerStatus.FREE, true, true);
@@ -321,10 +332,22 @@ public final class SupportPersonnelGenerator {
      * to the campaign's faction.
      */
     private static Faction resolveFaction(Campaign campaign, CompanyGenerationOptions options) {
-        Faction faction = options.isUseSpecifiedFactionToAssignRanks()
-              ? options.getSpecifiedFaction()
-              : campaign.getFaction();
-        return (faction != null) ? faction : campaign.getFaction();
+        Faction specifiedFaction = options.getSpecifiedFaction();
+        Faction campaignFaction = campaign.getFaction();
+        boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
+        Faction resolved = useSpecified ? specifiedFaction : campaignFaction;
+        if (resolved == null) {
+            resolved = campaignFaction;
+        }
+        LOGGER.info("[CompanyGen][Support][Faction] resolve: useSpecified={} specifiedFaction={} campaignFaction={} -> resolved={} (isClan={} isComStarOrWoB={} isMercenary={})",
+              useSpecified,
+              specifiedFaction == null ? "null" : specifiedFaction.getShortName(),
+              campaignFaction == null ? "null" : campaignFaction.getShortName(),
+              resolved == null ? "null" : resolved.getShortName(),
+              resolved != null && resolved.isClan(),
+              resolved != null && resolved.isComStarOrWoB(),
+              resolved != null && resolved.isMercenary());
+        return resolved;
     }
 
     /**

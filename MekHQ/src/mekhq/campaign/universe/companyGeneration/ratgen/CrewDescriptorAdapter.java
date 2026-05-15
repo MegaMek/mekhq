@@ -103,6 +103,7 @@ public final class CrewDescriptorAdapter {
             LOGGER.info("[CompanyGen]         CrewDescriptorAdapter: descriptor has blank name, keeping random");
             return;
         }
+        String descriptorBloodname = descriptor.getBloodname();
         int firstSpace = fullName.indexOf(' ');
         if (firstSpace > 0 && firstSpace < fullName.length() - 1) {
             person.setGivenName(fullName.substring(0, firstSpace));
@@ -110,6 +111,20 @@ public final class CrewDescriptorAdapter {
         } else {
             person.setGivenName(fullName);
             person.setSurname("");
+        }
+        // The ratgen CrewDescriptor optionally carries a bloodname string for Clan-faction
+        // generation. If present, set it on the Person so the Clan family of rank-rendering
+        // code paths can surface it (e.g., "Star Captain Aidan Pryde"). When absent — either
+        // because we're generating an IS force or because Clan ratgen didn't pick a bloodname
+        // for this Person — leave it null, but log so a Clan campaign still showing IS-style
+        // names is traceable to the bloodname being empty, not to a rank-system mismatch.
+        if (descriptorBloodname != null && !descriptorBloodname.isBlank()) {
+            person.setBloodname(descriptorBloodname);
+            LOGGER.info("[CompanyGen][Bloodname] applied bloodname='{}' to person='{}' (descriptor name='{}')",
+                  descriptorBloodname, person.getFullName(), fullName);
+        } else {
+            LOGGER.info("[CompanyGen][Bloodname] descriptor has no bloodname for person='{}' (descriptor name='{}' — Clan-only field, expected blank for IS forces)",
+                  fullName, fullName);
         }
         person.setFullName();
         LOGGER.info("[CompanyGen]         CrewDescriptorAdapter renamed person to '{}' (gunnery={} piloting={} rank={})",
