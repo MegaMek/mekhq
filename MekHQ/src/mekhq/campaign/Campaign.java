@@ -3218,10 +3218,19 @@ public class Campaign implements ITechManager {
 
     /**
      * List of all units that can show up in the repair bay.
+     *
+     * <p>Iterates a snapshot of the units collection so callers from the EDT are insulated from
+     * concurrent mutations on a worker thread. Force Generator's SwingWorker mutates the Hangar
+     * (via {@code addNewUnit}) while the EDT calls this method through
+     * {@code RepairTab.refreshPartsAcquisition} -> {@code PartsAcquisitionService.buildPartsList},
+     * triggered by Swing Timers fired in response to {@code UnitNewEvent}. Without the snapshot,
+     * the EDT trips {@link java.util.ConcurrentModificationException} on the
+     * {@code LinkedHashMap$LinkedValueIterator} backing {@code Hangar.getUnits()}. Matches the
+     * snapshot-iteration fix landed in {@code Warehouse} for the same family of races.</p>
      */
     public List<Unit> getServiceableUnits() {
         List<Unit> service = new ArrayList<>();
-        for (Unit u : getUnits()) {
+        for (Unit u : new ArrayList<>(getUnits())) {
             if (u.isAvailable() && u.isServiceable() && !StratConRulesManager.isUnitDeployedToStratCon(u)) {
                 service.add(u);
             }
