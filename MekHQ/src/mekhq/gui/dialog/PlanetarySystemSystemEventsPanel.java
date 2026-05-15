@@ -50,9 +50,7 @@ import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -107,7 +105,6 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         tblSystemEvents.setName("tblPlanetarySystemSystemEvents");
         tblSystemEvents.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSystemEvents.setRowHeight(UIUtil.scaleForGUI(22));
-        configureSystemEventChargeEditors();
         tblSystemEvents.getSelectionModel().addListSelectionListener(evt -> updateButtonState());
         add(createTitledComponentPane("PlanetarySystemEditorDialog.systemEvents.events",
               new FastJScrollPane(tblSystemEvents)), BorderLayout.CENTER);
@@ -145,34 +142,6 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         btnAddSystemEvent.setEnabled(canEdit);
         btnRemoveSystemEvent.setEnabled(canEdit && (getSelectedSystemEvent() != null));
         tblSystemEvents.setEnabled(canEdit);
-    }
-
-    private void configureSystemEventChargeEditors() {
-        String[] chargeValues = systemEventChargeValues();
-        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_NADIR).setCellEditor(
-              new DefaultCellEditor(new JComboBox<>(chargeValues)));
-        tblSystemEvents.getColumnModel().getColumn(SystemEventTableModel.COL_ZENITH).setCellEditor(
-              new DefaultCellEditor(new JComboBox<>(chargeValues)));
-    }
-
-    private String[] systemEventChargeValues() {
-        return new String[] {
-              systemEventChargeInheritLabel(),
-              systemEventChargeYesLabel(),
-              systemEventChargeNoLabel()
-        };
-    }
-
-    private String systemEventChargeInheritLabel() {
-        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.inherit");
-    }
-
-    private String systemEventChargeYesLabel() {
-        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.yes");
-    }
-
-    private String systemEventChargeNoLabel() {
-        return resources.getString("PlanetarySystemEditorDialog.systemEvents.charge.no");
     }
 
     private Component createTitledComponentPane(String titleKey, Component component) {
@@ -407,7 +376,10 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
 
         @Override
         public Class<?> getColumnClass(int column) {
-            return String.class;
+            return switch (column) {
+                case COL_NADIR, COL_ZENITH -> Boolean.class;
+                default -> String.class;
+            };
         }
 
         @Override
@@ -419,12 +391,12 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         public Object getValueAt(int row, int column) {
             PlanetarySystemEvent event = getEventAt(row);
             if (event == null) {
-                return (column == COL_NADIR || column == COL_ZENITH) ? systemEventChargeInheritLabel() : "";
+                return (column == COL_NADIR || column == COL_ZENITH) ? Boolean.FALSE : "";
             }
             return switch (column) {
                 case COL_DATE -> formatDate(event.date);
-                case COL_NADIR -> formatSystemEventCharge(event.nadirCharge);
-                case COL_ZENITH -> formatSystemEventCharge(event.zenithCharge);
+                case COL_NADIR -> chargeValue(event.nadirCharge);
+                case COL_ZENITH -> chargeValue(event.zenithCharge);
                 default -> "";
             };
         }
@@ -475,13 +447,10 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
 
         private void updateBooleanField(PlanetarySystemEvent event, Object value, boolean nadir) {
             SourceableValue<Boolean> existing = nadir ? event.nadirCharge : event.zenithCharge;
-            Boolean newValue = parseSystemEventCharge(value);
-            SourceableValue<Boolean> wrapped = null;
-            if (newValue != null) {
-                String source = (existing == null) ? null : existing.getSource();
-                String version = (existing == null) ? null : existing.getVersion();
-                wrapped = SourceableValue.of(source, version, newValue);
-            }
+            Boolean newValue = Boolean.TRUE.equals(value);
+            String source = (existing == null) ? null : existing.getSource();
+            String version = (existing == null) ? null : existing.getVersion();
+            SourceableValue<Boolean> wrapped = SourceableValue.of(source, version, newValue);
             if (nadir) {
                 event.nadirCharge = wrapped;
             } else {
@@ -494,25 +463,8 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
             }
         }
 
-        private String formatSystemEventCharge(SourceableValue<Boolean> value) {
-            if ((value == null) || (value.getValue() == null)) {
-                return systemEventChargeInheritLabel();
-            }
-            return value.getValue() ? systemEventChargeYesLabel() : systemEventChargeNoLabel();
-        }
-
-        private Boolean parseSystemEventCharge(Object value) {
-            if (value instanceof Boolean booleanValue) {
-                return booleanValue;
-            }
-            String text = value == null ? "" : value.toString();
-            if (systemEventChargeYesLabel().equals(text)) {
-                return true;
-            }
-            if (systemEventChargeNoLabel().equals(text)) {
-                return false;
-            }
-            return null;
+        private Boolean chargeValue(SourceableValue<Boolean> value) {
+            return (value != null) && Boolean.TRUE.equals(value.getValue());
         }
     }
 }
