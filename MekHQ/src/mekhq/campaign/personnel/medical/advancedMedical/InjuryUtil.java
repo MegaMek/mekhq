@@ -599,7 +599,7 @@ public final class InjuryUtil {
                     dismissed = true;
                     MedicalLogger.dismissedFromInfirmary(person, campaign.getLocalDate());
                     //employed only; prisoners would probably be too much needless spam
-                    if (!person.getPrisonerStatus().isPrisoner()) {
+                    if (person.getPrisonerStatus().isFreeOrBondsman()) {
                         MedicalLogger.dismissedFromInfirmary(person, campaign);
                     }
                 }
