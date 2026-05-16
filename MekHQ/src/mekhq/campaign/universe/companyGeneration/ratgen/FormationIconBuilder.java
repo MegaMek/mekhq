@@ -348,38 +348,43 @@ public final class FormationIconBuilder {
     }
 
     /**
-     * Computes the formation's average weight class from the entities of every unit in its subtree.
-     * Light / Medium / Heavy / Assault / Super-Heavy.
+     * Computes the formation's average weight class across every unit in its subtree.
      *
-     * <p>Uses the standard 'Mek tonnage thresholds (Light ≤35, Medium ≤55, Heavy ≤75, Assault ≤100,
-     * Super-Heavy >100) regardless of the units' actual chassis types. The icon is a stylistic
-     * shorthand, not a strict per-chassis classification.</p>
+     * <p>Uses {@link Entity#getWeightClass()} (which dispatches on per-unit-type breakpoints —
+     * Mek {35/55/75/100/135}, Tank {39/59/79/100/300}, Aerospace {45/70/100}, etc.) and averages
+     * the class codes rather than raw tonnage. This avoids a long-standing bug where a 79-ton
+     * tank — Heavy by tank rules — was rendered Assault because the old code applied Mek
+     * thresholds to every unit type.</p>
+     *
+     * <p>Logs per-unit weight + class plus the formation total at {@code [CompanyGen][Icons][Weight]}
+     * so the rendered icon can be traced back to specific units.</p>
      */
     private static int determineWeightClass(Formation formation, Campaign campaign) {
-        double totalWeight = 0;
+        int totalClass = 0;
         int unitCount = 0;
         for (UUID unitId : formation.getAllUnits(false)) {
             Unit unit = campaign.getUnit(unitId);
             if (unit == null || unit.getEntity() == null) {
                 continue;
             }
-            totalWeight += unit.getEntity().getWeight();
+            Entity entity = unit.getEntity();
+            int entityClass = entity.getWeightClass();
+            totalClass += entityClass;
             unitCount++;
+            LOGGER.info("[CompanyGen][Icons][Weight] formation '{}' unit '{} {}' type={} weight={}t class={} ({})",
+                  formation.getName(), entity.getChassis(), entity.getModel(),
+                  UnitType.getTypeName(entity.getUnitType()),
+                  entity.getWeight(), entityClass, EntityWeightClass.getClassName(entityClass));
         }
         if (unitCount == 0) {
+            LOGGER.info("[CompanyGen][Icons][Weight] formation '{}' has no units; defaulting to MEDIUM",
+                  formation.getName());
             return EntityWeightClass.WEIGHT_MEDIUM;
         }
-        double averageWeight = totalWeight / unitCount;
-        if (averageWeight <= 35) {
-            return EntityWeightClass.WEIGHT_LIGHT;
-        } else if (averageWeight <= 55) {
-            return EntityWeightClass.WEIGHT_MEDIUM;
-        } else if (averageWeight <= 75) {
-            return EntityWeightClass.WEIGHT_HEAVY;
-        } else if (averageWeight <= 100) {
-            return EntityWeightClass.WEIGHT_ASSAULT;
-        }
-        return EntityWeightClass.WEIGHT_SUPER_HEAVY;
+        int averaged = (int) Math.round((double) totalClass / unitCount);
+        LOGGER.info("[CompanyGen][Icons][Weight] formation '{}' averaged class={} ({}) over {} units",
+              formation.getName(), averaged, EntityWeightClass.getClassName(averaged), unitCount);
+        return averaged;
     }
 
     /**
