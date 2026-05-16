@@ -33,13 +33,21 @@
 
 package mekhq.campaign.location;
 
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class LocationNode {
+    private static final MMLogger logger = MMLogger.create(LocationNode.class);
+
     private final ILocation locatable;
 
     LocationNode parent = null;
@@ -92,6 +100,24 @@ public class LocationNode {
 
     boolean removeChild(LocationNode childLocationNode) {
         return children.remove(childLocationNode);
+    }
+
+    public void writeToXML(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, "locationNodeChildren");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "locationNodeChildren");
+    }
+
+    public static void reconnectChildren(Node xmlNode, Campaign campaign) {
+        NodeList nl = xmlNode.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node wn = nl.item(i);
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            // Unit, Person, and Part child reconnection will be added here once
+            // those types implement ILocation and are serialized by writeToXML.
+            logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
+        }
     }
 
     public static class LocationManager {

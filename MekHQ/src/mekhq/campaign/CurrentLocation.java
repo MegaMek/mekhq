@@ -33,22 +33,18 @@
  */
 package mekhq.campaign;
 
-import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Locale;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -153,92 +149,6 @@ public class CurrentLocation extends AbstractLocation {
         return randomInt(2) == 1;
     }
 
-    /**
-     * Generates a detailed status report for the current location and travel state.
-     *
-     * <p>The report includes:</p>
-     * <ul>
-     *   <li>The current system and position, indicating if on a planet, at a jump point (with recharge status),
-     *       in transit from a planet, or close to a jump point.</li>
-     *   <li>Travel progress, including the destination system, remaining jumps, or if already at the destination.</li>
-     *   <li>The estimated jump cost for the current journey.</li>
-     * </ul>
-     *
-     * <p>The report is formatted as HTML suitable for display in GUI components.</p>
-     *
-     * @param date                the current {@link LocalDate} for context-sensitive names and status
-     * @param isUseCommandCircuit whether the command circuit option is enabled
-     *
-     * @return a formatted HTML string representing the travel and location status report
-     */
-    public String getReport(LocalDate date, boolean isUseCommandCircuit,
-          TransportCostCalculations transportCostCalculations) {
-        double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
-
-        StringBuilder report = new StringBuilder();
-        report.append("<html>")
-              // First Line
-              .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
-
-        if (isOnPlanet()) {
-            report.append("on planet ").append(getPlanet().getPrintableName(date));
-        } else if (isAtJumpPoint()) {
-            report.append("at jump point");
-            if (!Double.isInfinite(currentRechargeTime)) {
-                report.append(" (Jumpship ")
-                      .append(String.format(Locale.ROOT,
-                            "%.0f",
-                            (100.0 * rechargeTime) / currentRechargeTime))
-                      .append("% charged)");
-            }
-        } else {
-            if ((null != jumpPath) && (currentSystem == jumpPath.getLastSystem())) {
-                report.append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days from planet");
-            } else {
-                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
-                report.append(String.format(Locale.ROOT, "%.2f", timeToJP)).append(" days from jump point");
-            }
-        }
-
-        report.append("<br/>");
-
-        // Second Line
-        boolean hasIncludedCost = false;
-        if ((null != jumpPath) && !jumpPath.isEmpty()) {
-            report.append("Traveling to ").append(jumpPath.getLastSystem().getPrintableName(date)).append(": ");
-            if (jumpPath.getJumps() > 0) {
-                report.append(jumpPath.getJumps())
-                      .append(jumpPath.getJumps() == 1 ? " jump remaining" : " jumps remaining");
-
-                int duration = (int) ceil(jumpPath.getTotalTime(date, getTransitTime(), isUseCommandCircuit));
-                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
-                      jumpPath.getJumps());
-                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
-                                                                                                                      "C-Bills");
-                hasIncludedCost = true;
-            } else {
-                report.append("In destination system");
-            }
-        } else {
-            report.append("Not traveling");
-        }
-
-        report.append("<br/>");
-
-        // Third Line
-        if (hasIncludedCost) {
-            report.append("<br><br>");
-        } else {
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
-            report.append("Estimated Jump Cost (per week): ")
-                  .append(jumpCost.toAmountString())
-                  .append(" C-Bills<br><br>");
-        }
-
-        report.append("</html>");
-        return report.toString();
-    }
-
     @Override
     public JumpPath getJumpPath() {
         return jumpPath;
@@ -256,6 +166,7 @@ public class CurrentLocation extends AbstractLocation {
      *
      * @return True if the JumpShip has to spend time recharging, otherwise false.
      */
+    @Override
     public boolean isRecharging(Campaign campaign) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
@@ -269,6 +180,7 @@ public class CurrentLocation extends AbstractLocation {
      *
      * @param campaign The campaign object which owns the JumpShip.
      */
+    @Override
     public void setRecharged(Campaign campaign) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),

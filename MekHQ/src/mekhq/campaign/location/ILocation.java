@@ -208,6 +208,108 @@ public interface ILocation {
         }
     }
 
+    /**
+     * Checks whether {@code parent} can safely be set as this location's parent.
+     *
+     * <p>The operation is valid when all of the following hold:</p>
+     * <ul>
+     *   <li>{@code parent} is {@code null} (detaching is always safe), or</li>
+     *   <li>both this location and {@code parent} have a {@link LocationNode}, and</li>
+     *   <li>attaching would not create a cycle, and</li>
+     *   <li>the root-most node of {@code parent}'s chain has an {@link AbstractLocation} as its locatable.</li>
+     * </ul>
+     *
+     * @param parent the proposed parent, or {@code null} to detach
+     *
+     * @return {@code true} if the operation is valid
+     */
+    default boolean canSetParent(ILocation parent) {
+        if (parent == null) {
+            return true;
+        }
+        if (!hasLocationNode() || !parent.hasLocationNode()) {
+            return false;
+        }
+        if (wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
+            return false;
+        }
+        return findRoot(parent.getLocationNode()).getLocatable() instanceof AbstractLocation;
+    }
+
+    /**
+     * Checks whether {@code child} can safely be adopted as a child of this location.
+     *
+     * <p>Delegates to {@code child.canSetParent(this)}; see that method for the validity rules.</p>
+     *
+     * @param child the proposed child; {@code null} is always invalid
+     *
+     * @return {@code true} if the operation is valid
+     */
+    default boolean canSetChild(ILocation child) {
+        if (child == null) {
+            return false;
+        }
+        return child.canSetParent(this);
+    }
+
+    /**
+     * Sets {@code parent} as this location's parent in the {@link LocationNode} tree.
+     *
+     * <p>If {@link #canSetParent(ILocation)} returns {@code false} the tree is left unchanged
+     * and this method returns {@code false}.</p>
+     *
+     * @param parent the new parent, or {@code null} to detach from the current parent
+     *
+     * @return {@code true} if the tree was updated, {@code false} if the operation was rejected
+     */
+    default boolean setParent(ILocation parent) {
+        if (!canSetParent(parent)) {
+            return false;
+        }
+        LocationNode.LocationManager.setLocation(this, parent);
+        return true;
+    }
+
+    /**
+     * Adopts {@code child} as a child of this location in the {@link LocationNode} tree.
+     *
+     * <p>If {@link #canSetChild(ILocation)} returns {@code false} the tree is left unchanged
+     * and this method returns {@code false}.</p>
+     *
+     * @param child the location to adopt
+     *
+     * @return {@code true} if the tree was updated, {@code false} if the operation was rejected
+     */
+    default boolean setChild(ILocation child) {
+        if (!canSetChild(child)) {
+            return false;
+        }
+        return child.setParent(this);
+    }
+
+    /** Walks up via {@link LocationNode#getParent()} until reaching the root node. */
+    private static LocationNode findRoot(LocationNode node) {
+        while (node.getParent() != null) {
+            node = node.getParent();
+        }
+        return node;
+    }
+
+    /**
+     * Returns {@code true} if {@code node} appears anywhere in the ancestor chain of {@code potentialAncestor}, which
+     * would indicate that making {@code potentialAncestor} an ancestor of {@code node} would create a cycle.
+     */
+    private static boolean wouldCreateCycle(LocationNode node, LocationNode potentialAncestor) {
+        LocationNode cursor = potentialAncestor;
+        while (cursor != null) {
+            if (cursor == node) {
+                return true;
+            }
+            cursor = cursor.getParent();
+        }
+        return false;
+    }
+
     default Set<Person> getPersonnelAtLocation() {
         if (!hasLocationNode()) {
             return Set.of();

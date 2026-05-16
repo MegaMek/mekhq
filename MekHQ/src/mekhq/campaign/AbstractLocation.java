@@ -33,6 +33,7 @@
 
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -47,6 +48,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -56,9 +58,11 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -72,7 +76,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
-public class AbstractLocation implements ILocation {
+public abstract class AbstractLocation implements ILocation {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
@@ -114,6 +118,12 @@ public class AbstractLocation implements ILocation {
 
     public void setTransitTime(double time) {}
 
+    public boolean isRecharging(Campaign campaign) {
+        return false;
+    }
+
+    public void setRecharged(Campaign campaign) {}
+
     public JumpPath getJumpPath() {
         return null;
     }
@@ -130,6 +140,92 @@ public class AbstractLocation implements ILocation {
      */
     public Planet getPlanet() {
         return getCurrentSystem().getPrimaryPlanet();
+    }
+
+    /**
+     * Generates a detailed status report for the current location and travel state.
+     *
+     * <p>The report includes:</p>
+     * <ul>
+     *   <li>The current system and position, indicating if on a planet, at a jump point (with recharge status),
+     *       in transit from a planet, or close to a jump point.</li>
+     *   <li>Travel progress, including the destination system, remaining jumps, or if already at the destination.</li>
+     *   <li>The estimated jump cost for the current journey.</li>
+     * </ul>
+     *
+     * <p>The report is formatted as HTML suitable for display in GUI components.</p>
+     *
+     * @param date                the current {@link LocalDate} for context-sensitive names and status
+     * @param isUseCommandCircuit whether the command circuit option is enabled
+     *
+     * @return a formatted HTML string representing the travel and location status report
+     */
+    public String getReport(LocalDate date, boolean isUseCommandCircuit,
+          TransportCostCalculations transportCostCalculations) {
+        double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
+
+        StringBuilder report = new StringBuilder();
+        report.append("<html>")
+              // First Line
+              .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
+
+        if (isOnPlanet()) {
+            report.append("on planet ").append(getPlanet().getPrintableName(date));
+        } else if (isAtJumpPoint()) {
+            report.append("at jump point");
+            if (!Double.isInfinite(currentRechargeTime)) {
+                report.append(" (Jumpship ")
+                      .append(String.format(Locale.ROOT,
+                            "%.0f",
+                            (100.0 * getRechargeTime()) / currentRechargeTime))
+                      .append("% charged)");
+            }
+        } else {
+            if ((null != getJumpPath()) && (currentSystem == getJumpPath().getLastSystem())) {
+                report.append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days from planet");
+            } else {
+                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
+                report.append(String.format(Locale.ROOT, "%.2f", timeToJP)).append(" days from jump point");
+            }
+        }
+
+        report.append("<br/>");
+
+        // Second Line
+        boolean hasIncludedCost = false;
+        if ((null != getJumpPath()) && !getJumpPath().isEmpty()) {
+            report.append("Traveling to ").append(getJumpPath().getLastSystem().getPrintableName(date)).append(": ");
+            if (getJumpPath().getJumps() > 0) {
+                report.append(getJumpPath().getJumps())
+                      .append(getJumpPath().getJumps() == 1 ? " jump remaining" : " jumps remaining");
+
+                int duration = (int) ceil(getJumpPath().getTotalTime(date, getTransitTime(), isUseCommandCircuit));
+                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+                      getJumpPath().getJumps());
+                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
+                                                                                                                      "C-Bills");
+                hasIncludedCost = true;
+            } else {
+                report.append("In destination system");
+            }
+        } else {
+            report.append("Not traveling");
+        }
+
+        report.append("<br/>");
+
+        // Third Line
+        if (hasIncludedCost) {
+            report.append("<br><br>");
+        } else {
+            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
+            report.append("Estimated Jump Cost (per week): ")
+                  .append(jumpCost.toAmountString())
+                  .append(" C-Bills<br><br>");
+        }
+
+        report.append("</html>");
+        return report.toString();
     }
 
     public LocationNode getLocationNode() {
@@ -270,7 +366,7 @@ public class AbstractLocation implements ILocation {
                      : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign, person, INTERNAL, 1);
     }
 
-    public void writeToXML(PrintWriter writer, int indent) {}
+    public abstract void writeToXML(PrintWriter writer, int indent);
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {
         private final Campaign campaign;
