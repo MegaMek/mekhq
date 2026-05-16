@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.report;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -45,6 +44,22 @@ import org.junit.jupiter.api.Test;
 
 class TransportReportTest {
     @Test
+    void getTransportDetailsShowsColumnHeaders() {
+        Campaign campaign = mock(Campaign.class);
+        HangarStatistics hangarStatistics = mock(HangarStatistics.class);
+        when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
+
+        String report = new TransportReport(campaign).getTransportDetails();
+        String headerLine = report.lines().findFirst().orElseThrow();
+
+        assertTrue(headerLine.startsWith("Transport Capacity Total (Occupied)"));
+        assertTrue(headerLine.contains("Total Units (Not Transported)"));
+        assertFalse(report.contains("Transports\n"));
+        assertFalse(report.contains("(Occupied):"));
+        assertFalse(report.contains("Not Transported:"));
+    }
+
+    @Test
     void getTransportDetailsShowsHeavyVehiclesPlacedInSuperHeavyBays() {
         Campaign campaign = mock(Campaign.class);
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
@@ -53,28 +68,17 @@ class TransportReportTest {
         when(hangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(3);
 
         String report = new TransportReport(campaign).getTransportDetails();
-        String heavyVehicleLine = report.lines()
-                                        .filter(line -> line.startsWith("Heavy Vehicle Bays (Occupied):"))
-                                        .findFirst()
-                                        .orElseThrow();
-        String superHeavyVehicleLine = report.lines()
-                                             .filter(line -> line.startsWith("Super Heavy Vehicle Bays (Occupied):"))
-                                             .findFirst()
-                                             .orElseThrow();
-        String heavyInSuperHeavyVehicleLine = report.lines()
-                                                       .filter(line -> line.startsWith("   Heavy in Super Heavy Bays:"))
-                                                       .findFirst()
-                                                       .orElseThrow();
+        String heavyVehicleLine = lineStartingWith(report, "Heavy Vehicle Bays:");
+        String superHeavyVehicleLine = lineStartingWith(report, "Super Heavy Vehicle Bays:");
+        String heavyInSuperHeavyVehicleLine = lineStartingWith(report, "   Heavy in Super Heavy Bays:");
 
-        assertTrue(report.contains("Super Heavy Vehicle Bays (Occupied):"));
-        assertTrue(report.contains("Heavy in Super Heavy Bays:"));
-        assertTrue(heavyVehicleLine.endsWith("   0"));
+        assertTrue(heavyVehicleLine.contains("0 (   0)"));
+        assertTrue(heavyVehicleLine.contains("Heavy Vehicles:"));
+        assertTrue(heavyVehicleLine.contains("2 (   0)"));
         assertTrue(superHeavyVehicleLine.contains("3 (   2)"));
-        assertEquals(heavyVehicleLine.indexOf("0 ("), superHeavyVehicleLine.indexOf("3 ("));
-        assertEquals(heavyVehicleLine.lastIndexOf('0'), superHeavyVehicleLine.lastIndexOf('0'));
-        assertTrue(heavyInSuperHeavyVehicleLine.matches(".*\\s2"));
-        assertFalse(heavyInSuperHeavyVehicleLine.contains("("));
-        assertFalse(heavyInSuperHeavyVehicleLine.contains("Not Transported"));
+        assertTrue(superHeavyVehicleLine.contains("Super Heavy Vehicles:"));
+        assertTrue(superHeavyVehicleLine.contains("0 (   0)"));
+        assertDetailLineHasCountOnly(heavyInSuperHeavyVehicleLine, 2);
         assertFalse(report.contains("will be placed"));
     }
 
@@ -89,19 +93,27 @@ class TransportReportTest {
         when(hangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(3);
 
         String report = new TransportReport(campaign).getTransportDetails();
-        String superHeavyVehicleLine = report.lines()
-                                             .filter(line -> line.startsWith("Super Heavy Vehicle Bays (Occupied):"))
-                                             .findFirst()
-                                             .orElseThrow();
-        String heavyInSuperHeavyVehicleLine = report.lines()
-                                                       .filter(line -> line.startsWith("   Heavy in Super Heavy Bays:"))
-                                                       .findFirst()
-                                                       .orElseThrow();
+        String superHeavyVehicleLine = lineStartingWith(report, "Super Heavy Vehicle Bays:");
+        String heavyInSuperHeavyVehicleLine = lineStartingWith(report, "   Heavy in Super Heavy Bays:");
 
         assertTrue(superHeavyVehicleLine.contains("3 (   3)"));
-        assertTrue(heavyInSuperHeavyVehicleLine.matches(".*\\s2"));
-        assertFalse(heavyInSuperHeavyVehicleLine.contains("("));
-        assertFalse(heavyInSuperHeavyVehicleLine.contains("Not Transported"));
+        assertTrue(superHeavyVehicleLine.contains("1 (   0)"));
+        assertDetailLineHasCountOnly(heavyInSuperHeavyVehicleLine, 2);
+    }
+
+    @Test
+    void getTransportDetailsShowsLightBeforeHeavyInSuperHeavyBays() {
+        Campaign campaign = mock(Campaign.class);
+        HangarStatistics hangarStatistics = mock(HangarStatistics.class);
+        when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
+        when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true)).thenReturn(1);
+        when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK)).thenReturn(1);
+        when(hangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(2);
+
+        String report = new TransportReport(campaign).getTransportDetails();
+
+        assertTrue(report.indexOf("   Light in Super Heavy Bays:")
+                         < report.indexOf("   Heavy in Super Heavy Bays:"));
     }
 
     @Test
@@ -113,20 +125,15 @@ class TransportReportTest {
         when(hangarStatistics.getTotalHeavyVehicleBays()).thenReturn(5);
 
         String report = new TransportReport(campaign).getTransportDetails();
-        String heavyVehicleLine = report.lines()
-                        .filter(line -> line.startsWith("Heavy Vehicle Bays (Occupied):"))
-                        .findFirst()
-                        .orElseThrow();
-        String lightInHeavyVehicleLine = report.lines()
-                                                .filter(line -> line.startsWith("   Light in Heavy Vehicle Bays:"))
-                                                .findFirst()
-                                                .orElseThrow();
+        String heavyVehicleLine = lineStartingWith(report, "Heavy Vehicle Bays:");
+        String lightVehicleLine = lineStartingWith(report, "Light Vehicle Bays:");
+        String lightInHeavyVehicleLine = lineStartingWith(report, "   Light in Heavy Vehicle Bays:");
 
         assertTrue(heavyVehicleLine.contains("5 (   2)"));
-        assertTrue(heavyVehicleLine.endsWith("   0"));
-        assertTrue(lightInHeavyVehicleLine.matches(".*\\s2"));
-        assertFalse(lightInHeavyVehicleLine.contains("("));
-        assertFalse(lightInHeavyVehicleLine.contains("Not Transported"));
+        assertTrue(heavyVehicleLine.contains("0 (   0)"));
+        assertTrue(lightVehicleLine.contains("Light Vehicles:"));
+        assertTrue(lightVehicleLine.contains("2 (   0)"));
+        assertDetailLineHasCountOnly(lightInHeavyVehicleLine, 2);
     }
 
     @Test
@@ -138,14 +145,31 @@ class TransportReportTest {
         when(hangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(5);
 
         String report = new TransportReport(campaign).getTransportDetails();
-        String lightInSuperHeavyVehicleLine = report.lines()
-                                                     .filter(line -> line.startsWith("   Light in Super Heavy Bays:"))
-                                                     .findFirst()
-                                                     .orElseThrow();
+        String superHeavyVehicleLine = lineStartingWith(report, "Super Heavy Vehicle Bays:");
+        String lightVehicleLine = lineStartingWith(report, "Light Vehicle Bays:");
+        String lightInSuperHeavyVehicleLine = lineStartingWith(report, "   Light in Super Heavy Bays:");
 
-        assertTrue(lightInSuperHeavyVehicleLine.matches(".*\\s3"));
-        assertFalse(lightInSuperHeavyVehicleLine.contains("("));
-        assertFalse(lightInSuperHeavyVehicleLine.contains("Not Transported"));
+        assertTrue(superHeavyVehicleLine.contains("5 (   3)"));
+        assertTrue(lightVehicleLine.contains("3 (   0)"));
+        assertDetailLineHasCountOnly(lightInSuperHeavyVehicleLine, 3);
+    }
+
+    @Test
+    void getTransportDetailsShowsFightersPlacedInSmallCraftBays() {
+        Campaign campaign = mock(Campaign.class);
+        HangarStatistics hangarStatistics = mock(HangarStatistics.class);
+        when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
+        when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER)).thenReturn(2);
+        when(hangarStatistics.getTotalSmallCraftBays()).thenReturn(2);
+
+        String report = new TransportReport(campaign).getTransportDetails();
+        String fighterLine = lineStartingWith(report, "Fighter Bays:");
+        String smallCraftLine = lineStartingWith(report, "Small Craft Bays:");
+        String fightersInSmallCraftLine = lineStartingWith(report, "   Fighters in Small Craft Bays:");
+
+        assertTrue(fighterLine.contains("2 (   0)"));
+        assertTrue(smallCraftLine.contains("2 (   2)"));
+        assertDetailLineHasCountOnly(fightersInSmallCraftLine, 2);
     }
 
     @Test
@@ -158,12 +182,22 @@ class TransportReportTest {
         when(hangarStatistics.getTotalSuperHeavyVehicleBays()).thenReturn(3);
 
         String report = new TransportReport(campaign).getTransportDetails();
-        String superHeavyVehicleLine = report.lines()
-                                             .filter(line -> line.startsWith("Super Heavy Vehicle Bays (Occupied):"))
-                                             .findFirst()
-                                             .orElseThrow();
+        String superHeavyVehicleLine = lineStartingWith(report, "Super Heavy Vehicle Bays:");
 
         assertTrue(superHeavyVehicleLine.contains("3 (   1)"));
-        assertTrue(superHeavyVehicleLine.endsWith("   0"));
+        assertTrue(superHeavyVehicleLine.contains("1 (   0)"));
+    }
+
+    private static String lineStartingWith(String report, String prefix) {
+        return report.lines()
+                     .filter(line -> line.startsWith(prefix))
+                     .findFirst()
+                     .orElseThrow();
+    }
+
+    private static void assertDetailLineHasCountOnly(String line, int count) {
+        assertTrue(line.matches(".*\\s" + count));
+        assertFalse(line.contains("("));
+        assertFalse(line.contains("Not Transported"));
     }
 }

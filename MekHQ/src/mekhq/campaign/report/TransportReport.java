@@ -42,7 +42,10 @@ import mekhq.campaign.unit.Unit;
  * @author Jay Lawson
  */
 public class TransportReport extends AbstractReport {
-    private static final String CAPACITY_ROW_FORMAT = "%-36s      %4d (%4d)      %-37s     %4d\n";
+    private static final String CAPACITY_HEADER = "Transport Capacity (Occupied)";
+    private static final String UNITS_HEADER = "Total Units (Not Transported)";
+    private static final String HEADER_ROW_FORMAT = "%-59s%s\n\n";
+    private static final String CAPACITY_ROW_FORMAT = "%-36s      %4d (%4d)      %-37s     %4d (%4d)\n";
     private static final String DETAIL_ROW_FORMAT = "%-36s      %4d\n";
 
     //region Constructors
@@ -54,26 +57,27 @@ public class TransportReport extends AbstractReport {
     public String getTransportDetails() {
         HangarStatistics stats = getCampaign().getHangarStatistics();
 
-        int noMek = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_MEK) - stats.getOccupiedBays(Entity.ETYPE_MEK),
-              0);
-        int noDS = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) -
-                                  stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int noSC = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
-                                  stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int noASF = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
-                                   stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
-        int nolv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
-                                  stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - stats.getOccupiedBays(Entity.ETYPE_TANK),
-              0);
-        int nosh = Math.max(stats.getNumberOfSuperHeavyVehicles() - stats.getOccupiedSuperHeavyVehicleBays(), 0);
-        int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
-                                   stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
-                                  stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
-                                     stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
-              0);
+        int totalMek = stats.getNumberOfUnitsByType(Entity.ETYPE_MEK);
+        int totalDS = stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int totalSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
+        int totalASF = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER);
+        int totalLV = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
+        int totalHV = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int totalSH = stats.getNumberOfSuperHeavyVehicles();
+        int totalInf = stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
+        int totalBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
+        int totalProto = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
+
+        int noMek = Math.max(totalMek - stats.getOccupiedBays(Entity.ETYPE_MEK), 0);
+        int noDS = Math.max(totalDS - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
+        int noSC = Math.max(totalSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noASF = Math.max(totalASF - stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
+        int nolv = Math.max(totalLV - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(totalHV - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int nosh = Math.max(totalSH - stats.getOccupiedSuperHeavyVehicleBays(), 0);
+        int noinf = Math.max(totalInf - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(totalBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = Math.max(totalProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
         int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freesh = Math.max(stats.getTotalSuperHeavyVehicleBays() - stats.getOccupiedSuperHeavyVehicleBays(), 0);
         int freeSC = Math.max(stats.getTotalSmallCraftBays() - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
@@ -90,7 +94,7 @@ public class TransportReport extends AbstractReport {
         if ((nolv > 0) && (freehv > 0)) {
             freehv -= placedlv;
         }
-            int occupiedHeavyVehicleBays = stats.getOccupiedBays(Entity.ETYPE_TANK) + placedlv;
+        int occupiedHeavyVehicleBays = stats.getOccupiedBays(Entity.ETYPE_TANK) + placedlv;
 
         // Heavy Vehicles overflow into free Super Heavy Vehicle bays (SH bays accommodate any vehicle weight class).
         int newNohv = Math.max(nohv - freesh, 0);
@@ -108,35 +112,39 @@ public class TransportReport extends AbstractReport {
         }
         int occupiedSuperHeavyVehicleBays = stats.getOccupiedSuperHeavyVehicleBays()
               + placedhv + placedLvInSh;
+        int occupiedSmallCraftBays = stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF;
 
-        final StringBuilder sb = new StringBuilder("Transports\n\n");
+        final StringBuilder sb = new StringBuilder(String.format(HEADER_ROW_FORMAT, CAPACITY_HEADER, UNITS_HEADER));
 
         // Lets do Meks first.
-        sb.append(String.format(CAPACITY_ROW_FORMAT, "Mek Bays (Occupied):",
-              stats.getTotalMekBays(), stats.getOccupiedBays(Entity.ETYPE_MEK), "Meks Not Transported:", noMek));
+        sb.append(String.format(CAPACITY_ROW_FORMAT, "Mek Bays:",
+              stats.getTotalMekBays(), stats.getOccupiedBays(Entity.ETYPE_MEK), "Meks:", totalMek, noMek));
 
         // Let's do Fighters next (ASF, Conventional Fighters, Fixed-Wing Support all use Fighter bays).
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Fighter Bays (Occupied):",
+              "Fighter Bays:",
               stats.getTotalASFBays(),
               stats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER),
-              "Fighters Not Transported:",
+              "Fighters:",
+              totalASF,
               newNoASF));
 
         // Let's do Light Vehicles next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Light Vehicle Bays (Occupied):",
+              "Light Vehicle Bays:",
               stats.getTotalLightVehicleBays(),
               stats.getOccupiedBays(Entity.ETYPE_TANK, true),
-              "Light Vehicles Not Transported:",
+              "Light Vehicles:",
+              totalLV,
               newNolv));
 
         // Let's do Heavy Vehicles next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Heavy Vehicle Bays (Occupied):",
+              "Heavy Vehicle Bays:",
               stats.getTotalHeavyVehicleBays(),
               occupiedHeavyVehicleBays,
-              "Heavy Vehicles Not Transported:",
+              "Heavy Vehicles:",
+              totalHV,
               newNohv));
 
         if ((nolv > 0) && (placedlv > 0)) {
@@ -148,18 +156,12 @@ public class TransportReport extends AbstractReport {
 
         // Let's do Super Heavy Vehicles next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Super Heavy Vehicle Bays (Occupied):",
+              "Super Heavy Vehicle Bays:",
               stats.getTotalSuperHeavyVehicleBays(),
               occupiedSuperHeavyVehicleBays,
-              "Super Heavy Vehicles Not Transported:",
+              "Super Heavy Vehicles:",
+              totalSH,
               nosh));
-
-        if ((nohv > 0) && (placedhv > 0)) {
-            // Heavy Vehicles placed in free Super Heavy Vehicle bays.
-            sb.append(String.format(DETAIL_ROW_FORMAT,
-                  "   Heavy in Super Heavy Bays:",
-                  placedhv));
-        }
 
         if (placedLvInSh > 0) {
             // Light Vehicles placed in free Super Heavy Vehicle bays.
@@ -168,52 +170,64 @@ public class TransportReport extends AbstractReport {
                   placedLvInSh));
         }
 
+        if ((nohv > 0) && (placedhv > 0)) {
+            // Heavy Vehicles placed in free Super Heavy Vehicle bays.
+            sb.append(String.format(DETAIL_ROW_FORMAT,
+                  "   Heavy in Super Heavy Bays:",
+                  placedhv));
+        }
+
         // Let's do Infantry next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Infantry Bays (Occupied):",
+              "Infantry Bays:",
               stats.getTotalInfantryBays(),
               stats.getOccupiedBays(Entity.ETYPE_INFANTRY),
-              "Infantry Not Transported:",
+              "Infantry:",
+              totalInf,
               noinf));
 
         // Let's do Battle Armor next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Battle Armor Bays (Occupied):",
+              "Battle Armor Bays:",
               stats.getTotalBattleArmorBays(),
               stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR),
-              "Battle Armor Not Transported:",
+              "Battle Armor:",
+              totalBA,
               noBA));
 
         // Let's do Small Craft next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Small Craft Bays (Occupied):",
+              "Small Craft Bays:",
               stats.getTotalSmallCraftBays(),
-              stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT),
-              "Small Craft Not Transported:",
+              occupiedSmallCraftBays,
+              "Small Craft:",
+              totalSC,
               noSC));
 
-        if ((noASF > 0) && (freeSC > 0)) {
+        if (placedASF > 0) {
             // Let's do ASF in Free Small Craft Bays next.
-            sb.append(String.format(CAPACITY_ROW_FORMAT, "   Fighters in Small Craft Bays (Occupied):",
-                  stats.getTotalSmallCraftBays(), stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) + placedASF,
-                  "Fighters Not Transported:", newNoASF));
+            sb.append(String.format(DETAIL_ROW_FORMAT,
+                  "   Fighters in Small Craft Bays:",
+                  placedASF));
         }
 
         // Let's do ProtoMeks next.
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "ProtoMek Bays (Occupied):",
+              "ProtoMek Bays:",
               stats.getTotalProtoMekBays(),
               stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
-              "ProtoMeks Not Transported:",
+              "ProtoMeks:",
+              totalProto,
               noProto));
 
         sb.append("\n\n");
 
         sb.append(String.format(CAPACITY_ROW_FORMAT,
-              "Docking Collars (Occupied):",
+              "Docking Collars:",
               stats.getTotalDockingCollars(),
               stats.getOccupiedBays(Entity.ETYPE_DROPSHIP),
-              "DropShips Not Transported:",
+              "DropShips:",
+              totalDS,
               noDS));
 
         sb.append("\n\n");
