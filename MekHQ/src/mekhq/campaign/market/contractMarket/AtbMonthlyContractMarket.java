@@ -345,8 +345,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             contract.setName(generateDefaultName(contract.getEmployer(), contract));
         }
-
-        updateReport(campaign);
     }
 
     private void checkForSubcontracts(Campaign campaign, AtBContract contract, int unitRatingMod) {
