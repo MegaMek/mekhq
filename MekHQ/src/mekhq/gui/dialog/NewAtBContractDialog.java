@@ -34,6 +34,8 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -76,6 +78,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  */
 public class NewAtBContractDialog extends NewContractDialog {
     private static final MMLogger LOGGER = MMLogger.create(NewAtBContractDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.NewContractDialog";
 
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
@@ -534,25 +537,26 @@ public class NewAtBContractDialog extends NewContractDialog {
             return;
         }
 
+        String missingFieldTitle = getTextAt(RESOURCE_BUNDLE, "dlgContractMissingField.title");
         if (getCurrentEmployerCode() == null) {
             JOptionPane.showMessageDialog(rootPane,
-                  "Make sure you set Employer!",
-                  "Contract is Missing Field",
+                  getTextAt(RESOURCE_BUNDLE, "dlgMissingEmployer.text"),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
         if (getCurrentEnemyCode() == null) {
             JOptionPane.showMessageDialog(rootPane,
-                  "Make sure you set Enemy!",
-                  "Contract is Missing Field",
+                  getTextAt(RESOURCE_BUNDLE, "dlgMissingEnemy.text"),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
         String planetName = getSelectedPlanetName();
         if (planetName.isEmpty()) {
             JOptionPane.showMessageDialog(rootPane,
-                  "Make sure you set the Planet!",
-                  "Contract is Missing Field",
+                  getTextAt(RESOURCE_BUNDLE, "dlgMissingPlanet.text"),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -560,8 +564,8 @@ public class NewAtBContractDialog extends NewContractDialog {
               Systems.getInstance());
         if (selectedSystem == null) {
             JOptionPane.showMessageDialog(rootPane,
-                  "\"" + planetName + "\" is not a recognized system name.",
-                  "Contract is Missing Field",
+                  getFormattedTextAt(RESOURCE_BUNDLE, "dlgUnknownSystem.text", planetName),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
