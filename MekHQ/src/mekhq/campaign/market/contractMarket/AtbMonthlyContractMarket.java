@@ -174,7 +174,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
 
             // Generates up to 4 'pity contracts', easy contracts designed to get a campaign rolling
-            generatePityContracts(campaign);
+            PityContracts.generatePityContracts(campaign);
 
             Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
             int negotiatorModifier = 0;
@@ -297,53 +297,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 }
             }
             updateReport(campaign);
-        }
-    }
-
-    public void generatePityContracts(Campaign campaign) {
-        AbstractContractMarket contractMarket = campaign.getContractMarket();
-
-        int successfulContractCount = 0;
-        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
-            if (contract.getStatus().isSuccess()) {
-                successfulContractCount++;
-            }
-        }
-
-        int pityContractCount = 4;
-        int contractCount = pityContractCount - successfulContractCount;
-        if (contractCount <= 0) {
-            return;
-        }
-
-        for (int i = 0; i < pityContractCount; i++) {
-            AtBContract contract = contractMarket.addAtBContract(campaign);
-            if (contract == null) {
-                continue;
-            }
-
-            contract.setAllySkill(VETERAN);
-            contract.setEnemySkill(GREEN);
-
-            contract.setEnemyCode(PIRATE_FACTION_CODE);
-            contract.updateEnemy(campaign, campaign.getLocalDate(), PIRATE_FACTION_CODE);
-
-            contract.setContractType(AtBContractType.PIRATE_HUNTING);
-
-            int salvageRoll = d6(1) * 10;
-            contract.setSalvagePct(salvageRoll);
-
-            int supportRoll = d6(1) * 10;
-            contract.setStraightSupport(supportRoll);
-            contract.setOverheadComp(OH_NONE);
-
-            int battleLossRoll = d6(1) * 10;
-            contract.setBattleLossComp(battleLossRoll);
-
-            int transportRoll = (4 + d6(1)) * 10;
-            contract.setTransportComp(transportRoll);
-
-            contract.setName(generateDefaultName(contract.getEmployer(), contract));
         }
     }
 
@@ -586,7 +539,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         return contract;
     }
 
-    private static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract) {
+    static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract) {
         return String.format("%s - %s - %s %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
