@@ -129,6 +129,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblRatingHead;
     private JLabel lblRating;
     private JLabel lblExperience;
+    private JLabel lblUnitWeight;
     private JLabel lblPersonnel;
     private JLabel lblHRCapacity;
     private JLabel lblMissionSuccess;
@@ -365,6 +366,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblExperience, gridBagConstraints);
+
+        JLabel lblUnitWeightHead = new JLabel(resourceMap.getString("lblUnitWeight.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+        panInfo.add(lblUnitWeightHead, gridBagConstraints);
+        lblUnitWeight = new JLabel(getCampaign().getCampaignSummary().getUnitWeightReport());
+        lblUnitWeightHead.setLabelFor(lblUnitWeight);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        panInfo.add(lblUnitWeight, gridBagConstraints);
 
         JLabel lblMissionSuccessHead = new JLabel(resourceMap.getString("lblMissionSuccess.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -856,6 +871,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         campaignSummary.updateInformation();
         lblRating.setText(campaign.getUnitRatingText());
+        lblUnitWeight.setText(campaignSummary.getUnitWeightReport());
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
         lblComposition.setText(campaignSummary.getForceCompositionReport());

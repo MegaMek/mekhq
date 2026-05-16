@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -84,6 +85,20 @@ public class CampaignSummary {
     private int aeroCount;
     private int infantryCount;
     private int totalUnitCount;
+
+    // unit weight class (canonical class codes from Entity.getWeightClass, averaged within each unit
+    // type so 'Mek thresholds don't get applied to tanks). Gun emplacements and Infantry are
+    // intentionally excluded — they aren't meaningful here.
+    private int mekWeightCodeSum;
+    private int mekWeightCount;
+    private int veeWeightCodeSum;
+    private int veeWeightCount;
+    private int aeroWeightCodeSum;
+    private int aeroWeightCount;
+    private int protoWeightCodeSum;
+    private int protoWeightCount;
+    private int baWeightCodeSum;
+    private int baWeightCount;
 
     // unit damage status
     private int[] countDamageStatus;
@@ -149,6 +164,16 @@ public class CampaignSummary {
         veeCount = 0;
         aeroCount = 0;
         infantryCount = 0;
+        mekWeightCodeSum = 0;
+        mekWeightCount = 0;
+        veeWeightCodeSum = 0;
+        veeWeightCount = 0;
+        aeroWeightCodeSum = 0;
+        aeroWeightCount = 0;
+        protoWeightCodeSum = 0;
+        protoWeightCount = 0;
+        baWeightCodeSum = 0;
+        baWeightCount = 0;
         int squadCount = 0;
         for (Unit u : campaign.getHangar().getUnits()) {
             Entity e = u.getEntity();
@@ -161,21 +186,37 @@ public class CampaignSummary {
                 continue;
             }
             countDamageStatus[u.getDamageState()]++;
+            // Per-type weight-class buckets use canonical breakpoints from EntityWeightClass:
+            // 'Mek 35/55/75/100/135, Tank/VTOL 39/59/79/100/300, Aero 45/70/100,
+            // ProtoMek 3/5/7/9/10, BA 0.4/0.75/1/1.5/2 per trooper.
+            // Gun Emplacements and Infantry are deliberately not bucketed.
             switch (e.getUnitType()) {
                 case UnitType.MEK:
+                    mekCount++;
+                    mekWeightCodeSum += e.getWeightClass();
+                    mekWeightCount++;
+                    break;
                 case UnitType.PROTOMEK:
                     mekCount++;
+                    protoWeightCodeSum += e.getWeightClass();
+                    protoWeightCount++;
                     break;
                 case UnitType.VTOL:
                 case UnitType.TANK:
                     veeCount++;
+                    veeWeightCodeSum += e.getWeightClass();
+                    veeWeightCount++;
                     break;
                 case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
+                    aeroWeightCodeSum += e.getWeightClass();
+                    aeroWeightCount++;
                     break;
                 case UnitType.BATTLE_ARMOR:
                     infantryCount++;
+                    baWeightCodeSum += e.getWeightClass();
+                    baWeightCount++;
                     break;
                 case UnitType.INFANTRY:
                     Infantry i = (Infantry) e;
@@ -279,6 +320,32 @@ public class CampaignSummary {
                      " heavy, " +
                      countDamageStatus[Entity.DMG_CRIPPLED] +
                      " crippled";
+    }
+
+    /**
+     * Returns the per-unit-type average weight class as a comma-separated string, mirroring the style of
+     * {@link #getForceCompositionReport()}. Each unit's class code comes from {@link Entity#getWeightClass()}
+     * (Mek 35/55/75/100/135, Tank 39/59/79/100/300, Aero 45/70/100, ProtoMek 3/5/7/9/10, BA per-trooper
+     * 0.4/0.75/1/1.5/2), averaged within its own type bucket. Gun Emplacements and Infantry are excluded.
+     *
+     * @return a string such as {@code "Medium Mek, Heavy Armor, Light Aero"} — empty types are omitted
+     */
+    public String getUnitWeightReport() {
+        List<String> segments = new ArrayList<>();
+        appendWeightSegment(segments, mekWeightCodeSum, mekWeightCount, "Mek");
+        appendWeightSegment(segments, veeWeightCodeSum, veeWeightCount, "Armor");
+        appendWeightSegment(segments, aeroWeightCodeSum, aeroWeightCount, "Aero");
+        appendWeightSegment(segments, protoWeightCodeSum, protoWeightCount, "ProtoMek");
+        appendWeightSegment(segments, baWeightCodeSum, baWeightCount, "BA");
+        return String.join(", ", segments);
+    }
+
+    private static void appendWeightSegment(List<String> out, int codeSum, int count, String label) {
+        if (count == 0) {
+            return;
+        }
+        int averaged = (int) Math.round((double) codeSum / count);
+        out.add(EntityWeightClass.getClassName(averaged) + ' ' + label);
     }
 
     /**
