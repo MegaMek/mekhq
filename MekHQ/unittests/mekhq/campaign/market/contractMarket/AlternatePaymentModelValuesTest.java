@@ -264,16 +264,17 @@ class AlternatePaymentModelValuesTest {
             when(entity.isSmallCraft()).thenReturn(true);
 
             Money result = invokeGetUnitContractValue(entity, false, 0.25, 0, 0, 0);
-            assertEquals(AlternatePaymentModelValues.SMALL_CRAFT.getValue(), result);
+            assertEquals(AlternatePaymentModelValues.SMALL_CRAFT.getValue().multipliedBy(0.25), result);
         }
 
         @Test
         void conventionalFighter_usesConventionalFighterValue() throws Exception {
             Entity entity = mock(Entity.class);
+            when(entity.isAerospaceFighter()).thenReturn(true);
             when(entity.isConventionalFighter()).thenReturn(true);
 
-            Money result = invokeGetUnitContractValue(entity, false, 1.0, 0, 0, 0);
-            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_FIGHTER.getValue(), result);
+            Money result = invokeGetUnitContractValue(entity, false, 0.95, 0, 0, 0);
+            assertEquals(AlternatePaymentModelValues.CONVENTIONAL_FIGHTER.getValue().multipliedBy(0.95), result);
         }
 
         @Test
@@ -282,7 +283,7 @@ class AlternatePaymentModelValuesTest {
             when(lam.isBattleMek()).thenReturn(true);
 
             Money result = invokeGetUnitContractValue(lam, false, 0.25, 0, 0, 0);
-            assertEquals(AlternatePaymentModelValues.LAM.getValue(), result);
+            assertEquals(AlternatePaymentModelValues.LAM.getValue().multipliedBy(0.25), result);
         }
 
         @Test

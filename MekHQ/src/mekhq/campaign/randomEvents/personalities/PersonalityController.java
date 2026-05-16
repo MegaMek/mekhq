@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -232,8 +232,7 @@ public class PersonalityController {
 
         // Reasoning and personality quirk are handled differently to general personality traits.
         // Build the description proper
-        Reasoning reasoning = person.getReasoning();
-        String examResults = reasoning.getExamResults();
+        String examResults = person.getReasoning().getExamResults(person.getPerformanceExamScore());
         StringBuilder interviewersNotes = new StringBuilder("<html>");
 
         interviewersNotes.append(examResults);
