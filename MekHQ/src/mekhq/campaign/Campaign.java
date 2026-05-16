@@ -82,6 +82,7 @@ import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -128,6 +129,7 @@ import megamek.common.units.*;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
@@ -757,15 +759,52 @@ public class Campaign implements ITechManager {
     }
 
     public String getTitle() {
+        MHQOptions options = MekHQ.getMHQOptions();
+        String formattedDate = options.getLongDisplayFormattedDate(getLocalDate());
+
+        // Only prepend the short weekday when the configured long date pattern does not already
+        // contain an unquoted day-of-week field. Otherwise we duplicate the day on default
+        // settings, e.g. "Sun, Sunday, 4 May 3025". Locale is sourced from the same getter the
+        // date formatter uses, so the weekday and date are localized consistently.
+        if (!patternHasWeekdayField(options.getLongDisplayDateFormat())) {
+            String shortWeekday = getLocalDate().getDayOfWeek()
+                                        .getDisplayName(TextStyle.SHORT, options.getDateLocale());
+            formattedDate = shortWeekday + ", " + formattedDate;
+        }
+
         return getName() +
                      " (" +
                      getFaction().getFullName(getGameYear()) +
                      ')' +
                      " - " +
-                     MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) +
+                     formattedDate +
                      " (" +
                      getEra() +
                      ')';
+    }
+
+    /**
+     * Returns {@code true} if the given {@link java.time.format.DateTimeFormatter} pattern contains
+     * an unquoted day-of-week field token ({@code E}, {@code e}, or {@code c}). Single-quoted
+     * literal segments are skipped, and {@code ''} is treated as a literal single quote.
+     */
+    private static boolean patternHasWeekdayField(String pattern) {
+        boolean inQuote = false;
+        int i = 0;
+        while (i < pattern.length()) {
+            char ch = pattern.charAt(i);
+            if (ch == '\'') {
+                if (i + 1 < pattern.length() && pattern.charAt(i + 1) == '\'') {
+                    i += 2;
+                    continue;
+                }
+                inQuote = !inQuote;
+            } else if (!inQuote && (ch == 'E' || ch == 'e' || ch == 'c')) {
+                return true;
+            }
+            i++;
+        }
+        return false;
     }
 
     public LocalDate getLocalDate() {
@@ -8323,7 +8362,8 @@ public class Campaign implements ITechManager {
                  VEHICLE_CREW_NAVAL,
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> unit.canTakeMoreVesselCrew(); // ??
+            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter)) &&
+                                      unit.canTakeMoreVesselCrew();
             default -> false;
         };
     }

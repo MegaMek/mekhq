@@ -2736,8 +2736,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * Suggest a new name for the unit being refit. Only works for infantry.
      */
     public void suggestNewName() {
-        if (newEntity.isConventionalInfantry()) {
-            Infantry infantry = (Infantry) newEntity;
+        if (newEntity instanceof ConvInfantry infantry) {
             String chassis = getChassis(infantry);
             newEntity.setChassis(chassis);
             String model = "?";
