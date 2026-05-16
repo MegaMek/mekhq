@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -280,7 +280,7 @@ public class Utilities {
             // Weight of the two units must match, or we continue, but BA weight gets checked
             // differently
             if (en instanceof BattleArmor battleArmor) {
-                if (battleArmor.getTroopers() != (int) summary.getTWWeight()) {
+                if (battleArmor.getSquadSize() != (int) summary.getTWWeight()) {
                     continue;
                 }
             } else {
