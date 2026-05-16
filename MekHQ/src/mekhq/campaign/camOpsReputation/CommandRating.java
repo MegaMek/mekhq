@@ -112,7 +112,7 @@ public class CommandRating {
     /**
      * Calculates the ATOW (A Time of War) trait score for the provided commander.
      *
-     * <p>The score one point for each positive trait and loses one point for each negative trait.</p>
+     * <p>The score gains one point for each positive trait and loses one point for each negative trait.</p>
      *
      * <p>Positive traits:
      *     <ul>
