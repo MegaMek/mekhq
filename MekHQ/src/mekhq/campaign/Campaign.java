@@ -303,7 +303,7 @@ public class Campaign implements ITechManager {
     CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this,
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
-    private final Map<UUID, Person> personnel = new LinkedHashMap<>();
+    private final Personnel personnel = new Personnel();
 
     /**
      * This can easily be expanded for other personnel lists by providing a unique String as the map's key.
@@ -6576,11 +6576,7 @@ public class Campaign implements ITechManager {
         // Lists of objects:
         units.writeToXML(writer, indent, "units"); // Units
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnel");
-        for (final Person person : getPersonnel()) {
-            person.writeToXML(writer, indent, this);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnel");
+        personnel.writeToXML(writer, indent, this);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "missions");
         for (final Mission mission : getMissions()) {

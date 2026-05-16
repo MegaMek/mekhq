@@ -95,6 +95,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.ReputationController;
@@ -1433,33 +1434,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processPersonnelNodes(Campaign campaign, Node wn, Version version) {
         LOGGER.info("Loading Personnel Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
+        Personnel.loadFromXML(wn, campaign, version);
 
-        // Okay, let's iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                LOGGER.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
-
-                continue;
-            }
-
-            Person p = Person.generateInstanceFromXML(wn2, campaign, version);
-
-            if (p != null) {
-                campaign.importPerson(p);
-
-                // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based
-                performEdgeConversion(campaign, p);
-            }
+        // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
+        for (Person person : campaign.getPersonnel()) {
+            performEdgeConversion(campaign, person);
         }
 
         // this block verifies all in-use academies are valid
