@@ -35,7 +35,6 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.force.FormationType.SECURITY;
@@ -346,7 +345,7 @@ public class EventEffectsManager {
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
-            int wounds = clamp(d6(), 1, 5);
+            int wounds = Math.clamp(d6(), 1, 5);
 
             int priorHits = max(target.getHits(), target.getInjuries().size());
 

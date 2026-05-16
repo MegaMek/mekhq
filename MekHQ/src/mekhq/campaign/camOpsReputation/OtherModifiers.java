@@ -57,7 +57,7 @@ public class OtherModifiers {
      */
     protected static Map<String, Integer> calculateOtherModifiers(Campaign campaign) {
         // Calculate inactive years if campaign options allow
-        int inactiveYears = campaign.getCampaignOptions().isUseAtB() ? getInactiveYears(campaign) : 0;
+        int inactiveYears = campaign.getCampaignOptions().isUseStratCon() ? getInactiveYears(campaign) : 0;
         int manualModifier = campaign.getCampaignOptions().getManualUnitRatingModifier();
 
         // Crime rating improvements are handled on New Day, so are not included here.
@@ -95,9 +95,9 @@ public class OtherModifiers {
         // or the campaign start date if there are no completed contracts
         LocalDate oldestMissionDate = contracts.isEmpty() ? campaign.getCampaignStartDate()
                                             : contracts.stream()
-                                                    .map(AtBContract::getEndingDate)
-                                                    .min(LocalDate::compareTo)
-                                                    .orElse(today);
+                                              .map(AtBContract::getEndingDate)
+                                              .min(LocalDate::compareTo)
+                                              .orElse(today);
 
         if (oldestMissionDate == null) {
             oldestMissionDate = today;

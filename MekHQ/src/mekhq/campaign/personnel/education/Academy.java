@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.min;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,6 +60,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionHints.FactionHints;
@@ -702,6 +704,231 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
+     * Campus-aware variant of {@link #getFilteredFaction(Campaign, Person, List)} that resolves
+     * faction-restricted academy access against the campus system's <em>current</em> controller, applying the
+     * BattleTech-canonical FedCom era rules and a general bidirectional faction-lineage check (#8915).
+     *
+     * <p>The legacy restricted branch denies any combination where the person's origin faction does not
+     * literally equal the system's current controller. That breaks across mergers and splits:
+     * a Lyran-origin character on FedCom-controlled Tharkad in 3050 was denied Nagelring even though the
+     * academy is the same institution and the character has a legitimate institutional connection.</p>
+     *
+     * <p>The new check asks: <em>who owns the academy now, and does this character's nationality support
+     * entry?</em> The "support entry" question is resolved in three ways, in order:</p>
+     *
+     * <ol>
+     *   <li><strong>Direct equality</strong> against the person's effective faction (origin, with a
+     *       birthworld fallback for FC-origin characters in 3068+).</li>
+     *   <li><strong>FedCom era rules</strong> — see {@link #isFedComCompatible(String, String, LocalDate)}
+     *       for the LA / FS / FC matrix across the 3028-3057, 3058-3067, and 3068+ eras.</li>
+     *   <li><strong>General lineage</strong> via {@link Faction#isLineageCompatible(Faction)} — handles
+     *       CGB↔RD, FRR↔RD, WOB↔CS, and any other bidirectional fallBackFactions relationship.</li>
+     * </ol>
+     *
+     * <p>Campaign faction is gated identically — symmetric with origin.</p>
+     *
+     * <p>For non-restricted academies (faction-conflict / reeducation camp / general), the at-war check
+     * is unchanged and runs against the campus's current controllers via the legacy method.</p>
+     *
+     * @param campaign the campaign being played
+     * @param person   the person whose eligibility is being checked
+     * @param campusId the planetary-system id where the academy (or local campus) is located
+     *
+     * @return the faction short name granting access, or {@code null} if no eligible faction exists for
+     *       this person at this campus
+     */
+    public String getFilteredFactionAtCampus(Campaign campaign, Person person, String campusId) {
+        if (campusId == null) {
+            return null;
+        }
+        PlanetarySystem campus = campaign.getSystemById(campusId);
+        if (campus == null) {
+            return null;
+        }
+
+        if (isFactionRestricted) {
+            return getFilteredFactionRestricted(campaign, person, campus);
+        }
+
+        // For non-restricted academies, retain the legacy at-war behavior against current controllers.
+        return getFilteredFaction(campaign, person, campus.getFactions(campaign.getLocalDate()));
+    }
+
+    /**
+     * Restricted-academy access check: for each current controller of the campus, test the person's
+     * effective faction and the campaign faction against direct equality, the FedCom era rules, and the
+     * general lineage walk. Returns the first compatible owner short name, or {@code null} if none match.
+     *
+     * @param campaign the campaign being played (provides today's date)
+     * @param person   the person whose eligibility is being checked
+     * @param campus   the planetary system hosting the academy or local campus
+     *
+     * @return the owner short name granting access, or {@code null} if no current owner is compatible
+     */
+    private String getFilteredFactionRestricted(Campaign campaign, Person person, PlanetarySystem campus) {
+        LocalDate today = campaign.getLocalDate();
+        List<String> currentOwners = campus.getFactions(today);
+        if (currentOwners == null || currentOwners.isEmpty()) {
+            return null;
+        }
+
+        String effectiveOrigin = effectiveFactionFor(person, today);
+        String campaignShort = campaign.getFaction().getShortName();
+        Factions factionsRegistry = Factions.getInstance();
+
+        for (String ownerShort : currentOwners) {
+            Faction owner = factionsRegistry.getFaction(ownerShort);
+            if (owner == null) {
+                continue;
+            }
+
+            // Origin checks
+            if (effectiveOrigin != null) {
+                if (effectiveOrigin.equals(ownerShort)) {
+                    return ownerShort;
+                }
+                if (isFedComCompatible(effectiveOrigin, ownerShort, today)) {
+                    return ownerShort;
+                }
+            }
+            Faction originFaction = person.getOriginFaction();
+            // Skip the general lineage walk for FC origin: FC.fallBackFactions = [LA, FS] would match
+            // BOTH Lyran and FedSuns owners regardless of birthworld side, defeating the era rules
+            // and the FC-origin birthworld fallback in effectiveFactionFor. FC's compatibility is
+            // fully described by isFedComCompatible above. Other FedCom codes (LA, FS) are harmless
+            // here because their fallBackFactions are meta-only ([IS]), excluded by isLineageCompatible.
+            if (originFaction != null && !"FC".equals(originFaction.getShortName())
+                      && originFaction.isLineageCompatible(owner)) {
+                return ownerShort;
+            }
+
+            // Campaign-faction checks (same gates, in case the unit's national affiliation grants access
+            // even when the individual character's origin does not — e.g. a Davion merc unit on tour)
+            if (campaignShort != null) {
+                if (campaignShort.equals(ownerShort)) {
+                    return ownerShort;
+                }
+                if (isFedComCompatible(campaignShort, ownerShort, today)) {
+                    return ownerShort;
+                }
+            }
+            Faction campaignFaction = campaign.getFaction();
+            if (campaignFaction != null && !"FC".equals(campaignFaction.getShortName())
+                      && campaignFaction.isLineageCompatible(owner)) {
+                return ownerShort;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the faction short name to test against academy owners for this person, applying the
+     * birthworld fallback only for FC-origin characters in the post-FedCom era (3068+). For every other
+     * origin (LA, FS, DC, CC, ...) returns {@code person.getOriginFaction().getShortName()} directly.
+     *
+     * <p>FedCom (FC) ended in 3067. An FC-origin character in 3068+ has no current state to map to;
+     * we infer their post-FedCom alignment from their birthworld:</p>
+     *
+     * <ol>
+     *   <li>Look up the birthworld's faction at the character's birth date (literal owner).</li>
+     *   <li>If that returns a usable LA / FS / other code, use it.</li>
+     *   <li>If it returns FC itself (offers no LA/FS routing) or is empty, fall back to the birthworld's
+     *       <em>current</em> owner — most worlds reverted to their geographic alignment after the
+     *       3057 secession and 3067 dissolution.</li>
+     * </ol>
+     *
+     * @param person the person whose effective faction we want
+     * @param today  the campaign's current date
+     *
+     * @return the effective faction short name, or {@code null} if the person has no origin faction
+     */
+    private static String effectiveFactionFor(Person person, LocalDate today) {
+        Faction origin = person.getOriginFaction();
+        if (origin == null) {
+            return null;
+        }
+        String originShort = origin.getShortName();
+        if (!"FC".equals(originShort) || today.getYear() <= 3067) {
+            return originShort;
+        }
+
+        // FC origin in post-FedCom era: derive effective faction from birthworld.
+        Planet birthPlanet = person.getOriginPlanet();
+        if (birthPlanet == null) {
+            return originShort;
+        }
+        LocalDate birth = person.getDateOfBirth();
+        String fromBirth = firstUsableNonFc(birth == null ? null : birthPlanet.getFactions(birth));
+        if (fromBirth != null) {
+            return fromBirth;
+        }
+        // Fallback: birthworld's current owner (post-split reversion).
+        String fromCurrent = firstUsableNonFc(birthPlanet.getFactions(today));
+        return fromCurrent != null ? fromCurrent : originShort;
+    }
+
+    private static String firstUsableNonFc(List<String> codes) {
+        if (codes == null) {
+            return null;
+        }
+        for (String code : codes) {
+            if (code != null && !"FC".equals(code) && !"ABN".equals(code)) {
+                return code;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Encodes the BattleTech-canonical FedCom academy access rules. Returns {@code true} only when both
+     * {@code origin} and {@code owner} are members of the FedCom set ({@code LA}, {@code FS}, {@code FC})
+     * and the era allows the cross-faction grant.
+     *
+     * <ul>
+     *   <li><strong>3028-3057</strong> (FedCom proper, before LA secession): every FedCom citizen may
+     *       attend any FedCom academy.</li>
+     *   <li><strong>3058-3067</strong> (LA seceded; Davion half retains FedCom name): Lyran academies
+     *       (owner = LA) admit LA only; FedSuns and FedCom academies (owner = FS or FC) admit LA, FS,
+     *       FC.</li>
+     *   <li><strong>3068+</strong> (Yvonne reverts to "Federated Suns"; FC defunct): each side admits
+     *       only its own. FC-origin characters reach this method via {@link #effectiveFactionFor} which
+     *       has already mapped them to LA or FS through the birthworld fallback.</li>
+     * </ul>
+     *
+     * <p>Returns {@code false} for any combination outside the FedCom set, or when the date and the
+     * specific (owner, origin) pair fall outside the allowed era rules. Direct equality and the general
+     * lineage check are handled separately at the call site.</p>
+     */
+    private static boolean isFedComCompatible(String origin, String owner, LocalDate today) {
+        if (origin == null || owner == null) {
+            return false;
+        }
+        if (!isFedComCode(origin) || !isFedComCode(owner)) {
+            return false;
+        }
+
+        int year = today.getYear();
+        if (year >= 3028 && year <= 3057) {
+            return true; // any FedCom citizen at any FedCom academy
+        }
+        if (year >= 3058 && year <= 3067) {
+            // Lyran academies are LA-only; Davion-side and FedCom-labelled academies still accept all.
+            if ("LA".equals(owner)) {
+                return "LA".equals(origin);
+            }
+            return true;
+        }
+        // 3068+: direct equality only — handled by the equality check at the call site, not here.
+        // Returning false from this method delegates that case to the equality and lineage gates.
+        return false;
+    }
+
+    private static boolean isFedComCode(String code) {
+        return "LA".equals(code) || "FS".equals(code) || "FC".equals(code);
+    }
+
+    /**
      * Checks if a person is qualified to enroll based on their highest education level.
      *
      * @param person The person to check qualification for.
@@ -843,7 +1070,7 @@ public class Academy implements Comparable<Academy> {
             tooltip.append("<i>").append(description).append("</i><br><br>");
             tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
-            Person person = personnel.get(0);
+            Person person = personnel.getFirst();
 
             int educationLevel = 0;
 

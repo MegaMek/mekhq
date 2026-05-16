@@ -383,7 +383,7 @@ public final class BriefingTab extends CampaignGuiTab {
         paneLanceDeployment.setBorder(null);
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaignOptions().isUseAtB());
+        paneLanceDeployment.setVisible(getCampaignOptions().isUseStratCon());
         splitScenario = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panScenario, paneLanceDeployment);
         splitScenario.setOneTouchExpandable(true);
         splitScenario.setResizeWeight(1.0);
@@ -404,7 +404,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true);
         mtd.setVisible(true);
         if (mtd.isContract()) {
-            NewContractDialog ncd = getCampaignOptions().isUseAtB() ?
+            NewContractDialog ncd = getCampaignOptions().isUseStratCon() ?
                                           new NewAtBContractDialog(getFrame(), true, getCampaign()) :
                                           new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
@@ -423,7 +423,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaignOptions().isUseStratCon() && (mission instanceof AtBContract)) {
             CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(),
                   true,
                   (AtBContract) mission,
@@ -466,7 +466,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (campaignOptions.isUseAtB() && (mission instanceof AtBContract)) {
+        if (campaignOptions.isUseStratCon() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
             }
@@ -495,6 +495,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Prisoners
         boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
+
+        List<Person> POWPersonnel = getCampaign().getFriendlyPrisoners();
 
         // We only resolve prisoners if there are no active Missions
         if (getCampaign().getActiveMissions(false).isEmpty()) {
@@ -542,7 +544,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (campaignOptions.isUseAtB() && (mission instanceof AtBContract)) {
+        if (campaignOptions.isUseStratCon() && (mission instanceof AtBContract)) {
             getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
         }
 
@@ -554,7 +556,8 @@ public final class BriefingTab extends CampaignGuiTab {
             // Successes as Success
             autoAwardsController.PostMissionController(getCampaign(),
                   mission,
-                  Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+                  Objects.equals(String.valueOf(cmd.getStatus()), "Success"),
+                  POWPersonnel);
         }
 
         // Update Faction Standings
@@ -643,7 +646,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
-        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
     }
 
     /**
@@ -749,7 +752,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         getCampaign().removeMission(mission);
         final List<Mission> missions = getCampaign().getSortedMissions();
-        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+        comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -1051,7 +1054,7 @@ public final class BriefingTab extends CampaignGuiTab {
         for (UUID techID : assignedTechs) {
             Person tech = getCampaign().getPerson(techID);
             if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
-                availableTechs.add(0, tech);
+                availableTechs.addFirst(tech);
             }
         }
 
@@ -1573,7 +1576,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
+        if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario atBScenario)) {
             atBScenario.refresh(getCampaign());
 
             // Autoconfigure munitions for all non-player forces once more, using finalized
@@ -1933,7 +1936,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         changeMission();
-        if (getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseStratCon()) {
             refreshLanceAssignments();
         }
     }
@@ -1958,7 +1961,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         selectedScenario = scenario.getId();
-        if (getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(new AtBScenarioViewPanel((AtBScenario) scenario,
                   getCampaign(),
                   getFrame()));
@@ -2146,7 +2149,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
-        splitScenario.getBottomComponent().setVisible(getCampaignOptions().isUseAtB());
+        splitScenario.getBottomComponent().setVisible(getCampaignOptions().isUseStratCon());
         splitScenario.resetToPreferredSizes();
     }
 
@@ -2171,7 +2174,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
-        if (getCampaignOptions().isUseAtB()) {
+        if (getCampaignOptions().isUseStratCon()) {
             lanceAssignmentScheduler.schedule();
         }
     }

@@ -39,6 +39,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
+import megamek.common.ui.FastJScrollPane;
+
 /**
  * This class implements a markdown editor that comes with buttons for common markup as well as a preview tab for seeing
  * what the results look like. It can be embedded as a panel in other components.
@@ -74,7 +76,7 @@ public class MarkdownEditorPanel extends JPanel {
         editor.setEditable(true);
         editor.setLineWrap(true);
         editor.setWrapStyleWord(true);
-        scrollEditor = new JScrollPaneWithSpeed(editor);
+        scrollEditor = new FastJScrollPane(editor);
         scrollEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         //set up buttons
@@ -143,7 +145,7 @@ public class MarkdownEditorPanel extends JPanel {
         viewer = new JTextPane();
         viewer.setEditable(false);
         viewer.setContentType("text/html");
-        scrollViewer = new JScrollPaneWithSpeed(viewer);
+        scrollViewer = new FastJScrollPane(viewer);
         scrollViewer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tabPane.add("Preview", scrollViewer);
 
@@ -246,7 +248,7 @@ public class MarkdownEditorPanel extends JPanel {
      */
     private void insertHeader(int level) {
         StringBuilder toInsert = new StringBuilder();
-        toInsert.append("#".repeat(Math.max(0, level)));
+        toInsert.repeat("#", Math.max(0, level));
         toInsert.append(" ");
         int start = editor.getSelectionStart();
         editor.insert(toInsert.toString(), start);

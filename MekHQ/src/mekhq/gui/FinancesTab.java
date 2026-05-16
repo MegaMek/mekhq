@@ -60,6 +60,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.events.AcquisitionEvent;
@@ -88,7 +89,6 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -174,7 +174,7 @@ public final class FinancesTab extends CampaignGuiTab {
         }
         loanTable.setIntercellSpacing(new Dimension(0, 0));
         loanTable.setShowGrid(false);
-        JScrollPane scrollLoanTable = new JScrollPaneWithSpeed(loanTable);
+        JScrollPane scrollLoanTable = new FastJScrollPane(loanTable);
         scrollLoanTable.setBorder(null);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -185,7 +185,7 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
-        JScrollPane scrollFinanceTable = new JScrollPaneWithSpeed(financeTable);
+        JScrollPane scrollFinanceTable = new FastJScrollPane(financeTable);
         scrollFinanceTable.setBorder(null);
         panBalance.add(scrollFinanceTable, gridBagConstraints);
         panBalance.setMinimumSize(new Dimension(350, 100));
@@ -241,7 +241,7 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setText(getFormattedFinancialReport());
         areaNetWorth.setEditable(false);
 
-        JScrollPane descriptionScroll = new JScrollPaneWithSpeed(areaNetWorth);
+        JScrollPane descriptionScroll = new FastJScrollPane(areaNetWorth);
         descriptionScroll.setBorder(RoundedLineBorder.createRoundedLineBorder());
         panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
         areaNetWorth.setCaretPosition(0);
@@ -511,7 +511,7 @@ public final class FinancesTab extends CampaignGuiTab {
                     assetName = new StringBuilder(assetName.substring(0, 17));
                 } else {
                     int numPeriods = 18 - assetName.length();
-                    assetName.append(".".repeat(Math.max(0, numPeriods)));
+                    assetName.repeat(".", Math.max(0, numPeriods));
                 }
                 assetName.append(" ");
                 sb.append("       ")

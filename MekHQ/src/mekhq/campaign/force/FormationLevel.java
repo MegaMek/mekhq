@@ -122,6 +122,7 @@ public enum FormationLevel {
     // endregion Getters
 
     // region Boolean Comparison Methods
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isRemoveOverride() {
         return this == REMOVE_OVERRIDE;
     }
@@ -134,7 +135,7 @@ public enum FormationLevel {
         return this == INVALID;
     }
 
-    public boolean isTeam() { return this == TEAM; }
+    public boolean isTeam() {return this == TEAM;}
 
     public boolean isLance() {
         return this == LANCE;
@@ -148,10 +149,12 @@ public enum FormationLevel {
         return this == BATTALION;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isRegiment() {
         return this == REGIMENT;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isBrigade() {
         return this == BRIGADE;
     }
@@ -160,6 +163,7 @@ public enum FormationLevel {
         return this == DIVISION;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCorps() {
         return this == CORPS;
     }
@@ -168,14 +172,17 @@ public enum FormationLevel {
         return this == ARMY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isStarOrNova() {
         return this == STAR_OR_NOVA;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isBinaryOrTrinary() {
         return this == BINARY_OR_TRINARY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCluster() {
         return this == CLUSTER;
     }
@@ -184,38 +191,47 @@ public enum FormationLevel {
         return this == GALAXY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isTouman() {
         return this == TOUMAN;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLevelTwoOrChoir() {
         return this == LEVEL_II_OR_CHOIR;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLevelThree() {
         return this == LEVEL_III;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLevelFour() {
         return this == LEVEL_IV;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLevelFive() {
         return this == LEVEL_V;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLevelSix() {
         return this == LEVEL_VI;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLanceEquivalent() {
         return this == LANCE || this == STAR_OR_NOVA || this == LEVEL_II_OR_CHOIR;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCompanyEquivalent() {
         return this == COMPANY || this == BINARY_OR_TRINARY || this == LEVEL_III;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isBattalionEquivalent() {
         return this == BATTALION || this == CLUSTER || this == LEVEL_IV;
     }
@@ -282,6 +298,7 @@ public enum FormationLevel {
      * @throws IllegalStateException if the given formation level has no corresponding FormationLevel enum value.
      */
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static FormationLevel parseFromInt(final int formationLevel) {
         return switch (formationLevel) {
             case 0 -> REMOVE_OVERRIDE;
@@ -329,6 +346,7 @@ public enum FormationLevel {
      * @throws IllegalStateException If the given FormationLevel is unexpected.
      */
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int parseToInt() {
         return switch (this) {
             case REMOVE_OVERRIDE -> 0;

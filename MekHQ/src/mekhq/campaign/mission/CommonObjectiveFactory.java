@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.mission;
 
-import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
-
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;

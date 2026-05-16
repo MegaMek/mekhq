@@ -68,18 +68,22 @@ public enum ForceNamingMethod {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCCB1943() {
         return this == CCB_1943;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isICAO1956() {
         return this == ICAO_1956;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isEnglishAlphabet() {
         return this == ENGLISH_ALPHABET;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isGreekAlphabet() {
         return this == GREEK_ALPHABET;
     }

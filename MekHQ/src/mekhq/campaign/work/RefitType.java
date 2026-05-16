@@ -35,6 +35,7 @@ package mekhq.campaign.work;
 import java.util.Arrays;
 import java.util.Locale;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public enum RefitType {
     // The order is important, so that sorting and taking the highest works properly
     NO_CHANGE(0, "no change", 0.0, 0),

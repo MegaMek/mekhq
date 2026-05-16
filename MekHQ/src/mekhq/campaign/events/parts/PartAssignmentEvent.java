@@ -40,6 +40,7 @@ import mekhq.campaign.personnel.Person;
  * Triggered when a part is assigned to a tech for repair. If getTech() == null, the tech has been removed from the
  * assignment.
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class PartAssignmentEvent extends PartChangedEvent {
 
     private final Person tech;

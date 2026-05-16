@@ -52,6 +52,7 @@ public class MissingGravDeck extends MissingPart {
     private int deckType;
     private int deckNumber;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingGravDeck() {
         this(0, 0, null, GravDeck.GRAV_DECK_TYPE_STANDARD);
     }
@@ -70,10 +71,12 @@ public class MissingGravDeck extends MissingPart {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getDeckNumber() {
         return deckNumber;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getDeckType() {
         return deckType;
     }

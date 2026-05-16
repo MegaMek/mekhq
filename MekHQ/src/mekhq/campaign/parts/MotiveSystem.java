@@ -58,6 +58,7 @@ public class MotiveSystem extends Part {
     int damage;
     int penalty;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MotiveSystem() {
         this(0, null);
     }

@@ -176,6 +176,7 @@ public class ContractMarketDialog extends JDialog {
      *
      * @return the total number of available contracts
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getAvailableContractsCount(Campaign campaign) {
         int contractCount = 0;
 
@@ -247,7 +248,7 @@ public class ContractMarketDialog extends JDialog {
         spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
             for (Contract c : contractMarket.getContracts()) {
-                if (campaign.getCampaignOptions().isUseAtB() &&
+                if (campaign.getCampaignOptions().isUseStratCon() &&
                           campaign.getCampaignOptions().isUseShareSystem() &&
                           c instanceof AtBContract) {
                     ((AtBContract) c).setAtBSharesPercent(sharePct);
@@ -747,7 +748,7 @@ public class ContractMarketDialog extends JDialog {
         }
         contractView = new ContractSummaryPanel(selectedContract,
               campaign,
-              campaign.getCampaignOptions().isUseAtB() &&
+              campaign.getCampaignOptions().isUseStratCon() &&
                     selectedContract instanceof AtBContract &&
                     !((AtBContract) selectedContract).isSubcontract() &&
                     !campaign.isPirateCampaign());

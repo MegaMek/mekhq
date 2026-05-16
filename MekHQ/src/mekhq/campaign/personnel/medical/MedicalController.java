@@ -200,14 +200,6 @@ public class MedicalController {
     }
 
     /**
-     * Use {@link #healPerson(Person, Person, boolean, boolean, LocalDate)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    private void healPerson(Person patient, Person doctor) {
-        healPerson(patient, doctor, false, false, LocalDate.of(3151, 1, 1));
-    }
-
-    /**
      * Applies medical treatment to the specified patient, using the given doctor as the medical provider.
      *
      * <p>This method performs a skill check for the doctor using current campaign rules and relevant situational

@@ -33,7 +33,6 @@
  */
 package mekhq.campaign.finances;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.io.PrintWriter;
@@ -325,7 +324,7 @@ public class Loan {
      * @return the clamped rating, guaranteed to be a value between 1 and 7 (inclusive).
      */
     public static int getMaxYears(int rating) {
-        return clamp(rating, 1, 7);
+        return Math.clamp(rating, 1, 7);
     }
 
     public static int getCollateralIncrement(final int rating, final boolean interestPositive) {

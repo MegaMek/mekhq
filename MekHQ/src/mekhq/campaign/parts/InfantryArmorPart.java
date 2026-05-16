@@ -61,6 +61,7 @@ public class InfantryArmorPart extends Part {
     private boolean sneak_ir;
     private boolean sneak_ecm;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public InfantryArmorPart() {
         this(0, null, 1.0, false, false, false, false, false, false);
     }

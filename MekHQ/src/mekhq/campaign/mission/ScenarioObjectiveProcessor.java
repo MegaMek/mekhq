@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.OffBoardDirection;
+import megamek.common.units.AbstractBuildingEntity;
 import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
@@ -204,8 +205,8 @@ public class ScenarioObjectiveProcessor {
                         break;
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
-                                                     !forceEntityDestruction &&
-                                                           !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                                                     (!forceEntityDestruction &&
+                                                           (!entityIsDestroyed(entity, opponentHasBattlefieldControl) || entityIsCaptured(entity, opponentHasBattlefieldControl)));
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
@@ -239,9 +240,10 @@ public class ScenarioObjectiveProcessor {
             return switch (objective.getObjectiveCriterion()) {
                 case Destroy -> entityIsDestroyed(entity, opponentHasBattlefieldControl);
                 case ForceWithdraw -> entityIsForcedWithdrawal(entity);
-                case Capture -> entityIsCaptured(entity, !opponentHasBattlefieldControl);
+                case Capture -> entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case PreventReachMapEdge -> !entityHasReachedDestinationEdge(entity, objective);
-                case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl)
+                        || entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case ReachMapEdge -> entityHasReachedDestinationEdge(entity, objective);
                 default -> false;
             };
@@ -274,12 +276,17 @@ public class ScenarioObjectiveProcessor {
 
     /**
      * Check whether we should consider an entity as being captured for the purposes of a Capture objective.
+     *
+     * @param entity                        Entity to check
+     * @param opponentHasBattlefieldControl Whether the entity's opponent has battlefield control
      */
     private boolean entityIsCaptured(Entity entity, boolean opponentHasBattlefieldControl) {
         // we consider an entity captured if it's been immobilized but not destroyed and hasn't left the field
         // obviously can't capture it if we don't control the battlefield
-        return entity.isImmobile() && !entity.isDestroyed() &&
-                     entity.getRetreatedDirection() == OffBoardDirection.NONE && !opponentHasBattlefieldControl;
+        // Non-collapsed buildings should count as captured
+        return entity.isImmobile() &&
+                     (!entity.isDestroyed() || (entity instanceof AbstractBuildingEntity && entity.isSalvage())) &&
+                     entity.getRetreatedDirection() == OffBoardDirection.NONE && opponentHasBattlefieldControl;
     }
 
     /**

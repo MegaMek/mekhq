@@ -93,6 +93,7 @@ public class Factions {
         return ratGenerator;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setRATGenerator(RATGenerator ratGenerator) {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }

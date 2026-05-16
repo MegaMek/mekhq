@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -354,6 +355,27 @@ public class ArmorTest {
         // Assert
         assertEquals(0, amountAvailable);
         assertEquals(1, partCount);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void changeTypeProducesConsistentName(Armor armor) {
+        assumeFalse(armor instanceof SVArmor || armor instanceof ProtoMekArmor,
+              "SVArmor and ProtoMekArmor have their own name logic");
+
+        for (boolean clan : new boolean[] { false, true }) {
+            // Arrange - create armor via constructor with the target type
+            Armor constructedArmor = new Armor(1, DIFFERENT_ARMOR_TYPE, ARMOR_AMOUNT, Entity.LOC_NONE, false, clan,
+                  mockCampaign);
+
+            // Act - create armor via changeType with the same type
+            Armor changedArmor = armor.clone();
+            changedArmor.changeType(DIFFERENT_ARMOR_TYPE, clan);
+
+            // Assert - names must match regardless of how the armor was created
+            assertEquals(constructedArmor.getName(), changedArmor.getName(),
+                  "Name mismatch for clan=" + clan);
+        }
     }
 
     private Armor getDifferentArmorType(Armor armor) {

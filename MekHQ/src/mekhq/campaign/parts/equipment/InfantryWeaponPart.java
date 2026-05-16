@@ -51,6 +51,7 @@ public class InfantryWeaponPart extends EquipmentPart {
 
     private boolean primary;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public InfantryWeaponPart() {
         this(0, null, -1, null, false);
     }

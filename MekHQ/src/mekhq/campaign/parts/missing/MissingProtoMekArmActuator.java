@@ -57,10 +57,12 @@ public class MissingProtoMekArmActuator extends MissingPart {
 
     protected int location;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingProtoMekArmActuator() {
         this(0, 0, null);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingProtoMekArmActuator(int tonnage, Campaign c) {
         this(tonnage, -1, c);
     }

@@ -63,7 +63,7 @@ import org.w3c.dom.NodeList;
 public class FactionHints {
     private static final MMLogger LOGGER = MMLogger.create(FactionHints.class);
 
-    private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replaceAll("factionhints",
+    private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replace("factionhints",
           "factionhints_test");
 
     private static volatile FactionHints instance;

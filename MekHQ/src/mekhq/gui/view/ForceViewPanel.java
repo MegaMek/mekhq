@@ -381,7 +381,7 @@ public class ForceViewPanel extends JScrollablePanel {
         nextY++;
 
         // if AtB is enabled, set tooltip to show lance weight breakdowns
-        if (campaign.getCampaignOptions().isUseAtB()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             // see Lance.java for lance weight breakdowns
             lblTonnage1.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
             lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));

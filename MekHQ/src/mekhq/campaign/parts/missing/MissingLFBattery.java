@@ -62,6 +62,7 @@ public class MissingLFBattery extends MissingPart {
         return docks;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingLFBattery() {
         this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
     }

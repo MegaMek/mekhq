@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.compute.Compute;
 
 /**
@@ -66,6 +67,7 @@ public record GameEffect(String desc, Consumer<IntUnaryOperator> action) {
     }
 
     @Override
+    @Nonnull
     public String toString() {
         return desc;
     }

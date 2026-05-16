@@ -210,10 +210,10 @@ public class AccoladeSelectionDialog extends JDialog {
         activeFactions.sort(Comparator.comparing(faction -> faction.getFullName(today.getYear())));
 
         Faction piracySuccessIndex = factions.getFaction("PSI");
-        activeFactions.add(0, piracySuccessIndex);
+        activeFactions.addFirst(piracySuccessIndex);
 
         Faction mercenaryOrganization = Faction.getActiveMercenaryOrganization(today.getYear());
-        activeFactions.add(0, mercenaryOrganization);
+        activeFactions.addFirst(mercenaryOrganization);
 
         allFactions.clear();
         allFactions.addAll(activeFactions);

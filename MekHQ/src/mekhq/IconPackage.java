@@ -76,6 +76,7 @@ public class IconPackage {
         return loadingScreenImages;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public TreeMap<Integer, String> getAutoResolveScreenImages() {
         return autoResolveScreenImages;
     }

@@ -112,6 +112,7 @@ import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.SVArmor;
@@ -142,17 +143,14 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyArc.StoryArc;
-import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.campaignOptions.optionChangeDialogs.StratConMaplessCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.DOMException;
@@ -251,14 +249,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
                           version));
-
-                    //  < 50.10 compatibility handler
-                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                    if (campaignOptions.isHadAtBEnabledMarker() && !campaignOptions.isUseStratCon()) {
-                        // Mapless StratCon replaced AtB in 50.10
-                        campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
-                        new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
-                    }
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
@@ -443,7 +433,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (options.isUseAtB()) {
+        if (options.isUseStratCon()) {
             Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
             for (Formation f : campaign.getAllFormations()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
@@ -659,10 +649,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             campaign.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
 
-        if (campaign.getCampaignOptions().isUseAtB()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             campaign.setHasActiveContract();
             campaign.setAtBConfig(AtBConfiguration.loadFromXml());
-            campaign.setAtBEventProcessor(new AtBEventProcessor(campaign));
         }
 
         // Sanity Checks
@@ -699,6 +688,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
         for (Part part : campaign.getWarehouse().getParts()) {
+            // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
+            if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
+                LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
+                continue;
+            }
+
             // < 50.08 compatibility handler
             if (part instanceof SVArmor svArmor) {
                 final int PROHIBITED_BAR_RATING = 0;
@@ -1111,7 +1106,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                     PersonnelRole role = PersonnelRole.valueOf(roleStr);
                                     campaign.setTempCrewPool(role, size);
                                 } catch (IllegalArgumentException e) {
-                                    LOGGER.warn("Unknown PersonnelRole: " + roleStr);
+                                    LOGGER.warn("Unknown PersonnelRole: {}", roleStr);
                                 }
                             }
                         }
@@ -2299,7 +2294,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     //region Migration Methods
     //region Ancestry Migration
-    private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
     // endregion Ancestry Migration
     // endregion Migration Methods

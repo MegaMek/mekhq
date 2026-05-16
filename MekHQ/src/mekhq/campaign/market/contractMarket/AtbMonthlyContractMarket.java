@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2012-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2012-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,6 @@
 package mekhq.campaign.market.contractMarket;
 
 import static java.lang.Math.max;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
@@ -472,10 +471,24 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                   contract.getSystem().getName(campaign.getLocalDate()));
         }
 
-        if (jp == null) {
+        // Validate the jump path to the contract's target system. We reject and retry if any of the following hold:
+        //   - jp == null or jp.isEmpty(): no path could be calculated at all.
+        //   - jp.getLastSystem() != contract.getSystem(): contract.getJumpPath delegates to
+        //     Campaign.calculateJumpPath, which returns a *partial* path (not null) when the destination is
+        //     unreachable. The contract's systemId would still point at the unreachable target, but the cached
+        //     jump path would not actually go there, so the contract would be offered for a system the player
+        //     has no route to.
+        //   - jp.getFirstSystem() != campaign.getCurrentSystem(): defensive check; the path should always start
+        //     where the campaign currently is.
+        if (jp == null
+                  || jp.isEmpty()
+                  || !jp.getLastSystem().equals(contract.getSystem())
+                  || !jp.getFirstSystem().equals(campaign.getCurrentSystem())) {
+            logger.warn("Could not find a valid jump path to contract location {} from {}; retrying.",
+                  contract.getSystem().getName(campaign.getLocalDate()),
+                  campaign.getCurrentSystem().getName(campaign.getLocalDate()));
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
-
         final ReputationController reputation = campaign.getReputation();
         final SkillLevel campaignSkillLevel = reputation == null ? REGULAR : reputation.getAverageSkillLevel();
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
@@ -771,7 +784,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         double reputationFactor = campaign.getReputation().getReputationFactor();
 
         if (campaignOptions.isClampReputationPayMultiplier()) {
-            reputationFactor = clamp(reputationFactor, 0.5, 2.0);
+            reputationFactor = Math.clamp(reputationFactor, 0.5, 2.0);
         }
 
         multiplier *= reputationFactor;
@@ -790,11 +803,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         } else if (campaignOptions.isUseGenericBattleValue()) {
             int contractDifficulty = contract.getDifficulty();
             if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
-                multiplier /= 0.5;
+                multiplier /= 0.5; // ×2.0 bonus
+            } else if (contractDifficulty >= 6 && contractDifficulty <= 7) {
+                multiplier *= 0.5; // ×0.5 moderate penalty
             } else if (contractDifficulty >= 8) {
-                multiplier *= 0.5;
-            } else if (contractDifficulty >= 6) {
-                multiplier *= 0.25;
+                multiplier *= 0.25; // ×0.25 severe penalty
             }
         }
 

@@ -75,6 +75,7 @@ public class GravDeck extends Part {
     public static final int GRAV_DECK_TYPE_LARGE = 1;
     public static final int GRAV_DECK_TYPE_HUGE = 2;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public GravDeck() {
         this(0, 0, null, GRAV_DECK_TYPE_STANDARD);
     }

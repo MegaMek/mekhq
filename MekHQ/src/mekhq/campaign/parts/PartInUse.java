@@ -158,6 +158,7 @@ public class PartInUse {
         this.useCount = useCount;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void incUseCount() {
         ++useCount;
     }
@@ -174,6 +175,7 @@ public class PartInUse {
         this.storeCount = storeCount;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void incStoreCount() {
         ++storeCount;
     }
@@ -182,6 +184,7 @@ public class PartInUse {
         return transferCount;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void incTransferCount() {
         ++transferCount;
     }
@@ -198,6 +201,7 @@ public class PartInUse {
         this.plannedCount = plannedCount;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void incPlannedCount() {
         ++plannedCount;
     }
@@ -218,6 +222,7 @@ public class PartInUse {
         return isBundle;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setIsBundle(boolean isBundle) {
         this.isBundle = isBundle;
     }

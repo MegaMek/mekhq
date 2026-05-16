@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -517,6 +517,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean needsFixing() {
         return (shotsNeeded > 0) || ammoTypeChanged();
+    }
+
+    /**
+     * Checks whether ammo of the needed type is available in the warehouse.
+     *
+     * @return {@code true} if the warehouse has at least one shot of the required ammo type.
+     */
+    public boolean isAmmoAvailable() {
+        return getCampaign().getQuartermaster().getAmmoAvailable(getType()) > 0;
     }
 
     @Override

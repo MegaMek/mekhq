@@ -66,10 +66,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is a hierarchical object to define formations for TO&amp;E. Each Formation object can have a parent formation object and a
- * vector of child formation objects. Each formation can also have a vector of PilotPerson objects. The idea is that any time
- * TOE is refreshed in MekHQView, the formation object can be traversed to generate a set of TreeNodes that can be applied
- * to the JTree showing the formation TO&amp;E.
+ * This is a hierarchical object to define formations for TO&amp;E. Each Formation object can have a parent formation
+ * object and a vector of child formation objects. Each formation can also have a vector of PilotPerson objects. The
+ * idea is that any time TOE is refreshed in MekHQView, the formation object can be traversed to generate a set of
+ * TreeNodes that can be applied to the JTree showing the formation TO&amp;E.
  *
  * <p>Known as {@code Force} prior to 0.50.12</p>
  *
@@ -83,8 +83,8 @@ public class Formation {
     // pathway to formation icon
     public static final int FORMATION_NONE = -1;
     /**
-     * This is the id of the 'origin node'. The formation from which all other formations descend. Normally named after the
-     * campaign.
+     * This is the id of the 'origin node'. The formation from which all other formations descend. Normally named after
+     * the campaign.
      */
     public static final int FORMATION_ORIGIN = 0;
 
@@ -166,7 +166,9 @@ public class Formation {
 
     public Camouflage getCamouflageOrElse(final Camouflage camouflage) {
         return getCamouflage().hasDefaultCategory() ?
-                     ((getParentFormation() == null) ? camouflage : getParentFormation().getCamouflageOrElse(camouflage)) :
+                     ((getParentFormation() == null) ?
+                      camouflage :
+                            getParentFormation().getCamouflageOrElse(camouflage)) :
                      getCamouflage();
     }
 
@@ -190,13 +192,13 @@ public class Formation {
     }
 
     /**
-     * This method compares the provided {@code formationType} with the current instance's {@code FormationType} to determine if
-     * they match.
+     * This method compares the provided {@code formationType} with the current instance's {@code FormationType} to
+     * determine if they match.
      *
      * @param formationType The {@code FormationType} to compare against.
      *
-     * @return {@code true} if the current instance matches the specified {@code formationType}; otherwise, {@code
-     * false}.
+     * @return {@code true} if the current instance matches the specified {@code formationType}; otherwise,
+     *       {@code false}.
      */
     public boolean isFormationType(FormationType formationType) {
         return this.formationType == formationType;
@@ -314,12 +316,12 @@ public class Formation {
     }
 
     /**
-     * This method generates a list of all parent formations for the current formation object in the hierarchy. It repeatedly
-     * fetches the parent formation of the current formation and adds it to a list until no more parent formations can be found
-     * (i.e., until the top of the formation hierarchy is reached).
+     * This method generates a list of all parent formations for the current formation object in the hierarchy. It
+     * repeatedly fetches the parent formation of the current formation and adds it to a list until no more parent
+     * formations can be found (i.e., until the top of the formation hierarchy is reached).
      *
-     * @return A list of {@link Formation} objects representing all the parent formations of the current formation object in the
-     *       hierarchy. The list will be empty if there are no parent formations.
+     * @return A list of {@link Formation} objects representing all the parent formations of the current formation
+     *       object in the hierarchy. The list will be empty if there are no parent formations.
      */
     public List<Formation> getAllParents() {
         List<Formation> parentFormations = new ArrayList<>();
@@ -350,14 +352,14 @@ public class Formation {
     }
 
     /**
-     * Returns a list of all of this formations' descendant formations. This includes direct child formations and their descendents
-     * recursively.
+     * Returns a list of all of this formations' descendant formations. This includes direct child formations and their
+     * descendents recursively.
      * <p>
      * This method works by first adding all direct child formations to the list, and then recursively adding their
      * descendants by calling this method on each child formation.
      *
-     * @return A list of {@link Formation} objects representing all descendant formations. If there are no descendant formations,
-     *       this method will return an empty list.
+     * @return A list of {@link Formation} objects representing all descendant formations. If there are no descendant
+     *       formations, this method will return an empty list.
      */
     public List<Formation> getAllSubFormations() {
         List<Formation> allSubFormations = new ArrayList<>();
@@ -479,9 +481,9 @@ public class Formation {
      * {@link Unit} objects by fetching them from the provided {@link Hangar}. Units are only included if they can be
      * successfully resolved from the hangar.</p>
      *
-     * @param hangar             the {@link Hangar} containing the units to retrieve.
-     * @param standardFormationsOnly a flag indicating whether to include only standard formations. If {@code true}, only units
-     *                           belonging to standard formations are returned.
+     * @param hangar                 the {@link Hangar} containing the units to retrieve.
+     * @param standardFormationsOnly a flag indicating whether to include only standard formations. If {@code true},
+     *                               only units belonging to standard formations are returned.
      *
      * @return a list of {@link Unit} objects associated with the formation.
      */
@@ -547,7 +549,11 @@ public class Formation {
         if (unit != null) {
             for (Person person : unit.getCrew()) {
                 if (useTransfers) {
-                    AssignmentLogger.reassignedTOEFormation(campaign, person, campaign.getLocalDate(), oldFormation, this);
+                    AssignmentLogger.reassignedTOEFormation(campaign,
+                          person,
+                          campaign.getLocalDate(),
+                          oldFormation,
+                          this);
                 } else {
                     AssignmentLogger.addedToTOEFormation(campaign, person, campaign.getLocalDate(), this);
                 }
@@ -631,18 +637,20 @@ public class Formation {
     }
 
     /**
-     * Sets the formation commander ID to the provided UUID. You probably want to use setOverrideFormationCommanderID(UUID)
-     * followed by updateCommander(campaign).
+     * Sets the formation commander ID to the provided UUID. You probably want to use
+     * setOverrideFormationCommanderID(UUID) followed by updateCommander(campaign).
      *
      * @param commanderID UUID of the commander
      *
      * @see #setOverrideFormationCommanderID(UUID)
      * @see #updateCommander(Campaign)
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     private void setFormationCommanderID(@Nullable UUID commanderID) {
         formationCommanderID = commanderID;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public UUID getOverrideFormationCommanderID() {
         return overrideFormationCommanderID;
     }
@@ -652,7 +660,8 @@ public class Formation {
     }
 
     /**
-     * Returns a list of unit or formation commanders eligible to be considered for the position of formation commander.
+     * Returns a list of unit or formation commanders eligible to be considered for the position of formation
+     * commander.
      *
      * @param campaign the campaign to get eligible commanders from
      *
@@ -715,7 +724,7 @@ public class Formation {
         }
 
         Collections.shuffle(eligibleCommanders);
-        Person highestRankedPerson = campaign.getPerson(eligibleCommanders.get(0));
+        Person highestRankedPerson = campaign.getPerson(eligibleCommanders.getFirst());
 
         for (UUID eligibleCommanderId : eligibleCommanders) {
             Person eligibleCommander = campaign.getPerson(eligibleCommanderId);
@@ -888,8 +897,9 @@ public class Formation {
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel") || wn2.getNodeName().equalsIgnoreCase(
                       "forceLevel")) {
                     formation.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("overrideForceLevel") || wn2.getNodeName().equalsIgnoreCase(
-                      "overrideFormationLevel")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideForceLevel") ||
+                                 wn2.getNodeName().equalsIgnoreCase(
+                                       "overrideFormationLevel")) {
                     formation.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("preferredRole")) {
                     formation.setCombatRoleInMemory(CombatRole.parseFromString(wn2.getTextContent().trim()));
@@ -952,12 +962,12 @@ public class Formation {
     }
 
     /**
-     * Returns a vector containing all children of this formation, including sub-formations and units, sorted by commander
-     * rank.
+     * Returns a vector containing all children of this formation, including sub-formations and units, sorted by
+     * commander rank.
      *
-     * <p>This method gathers all subordinate objects belonging to this formation: first, it adds all sub-formations, then it
-     * adds all units under this formation (with crewed units before uncrewed units), finally sorting crewed units by their
-     * commander's numeric rank in descending order.</p>
+     * <p>This method gathers all subordinate objects belonging to this formation: first, it adds all sub-formations,
+     * then it adds all units under this formation (with crewed units before uncrewed units), finally sorting crewed
+     * units by their commander's numeric rank in descending order.</p>
      *
      * @param campaign The {@link Campaign} instance used to look up unit and personnel data.
      *
@@ -996,7 +1006,9 @@ public class Formation {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Formation) && (((Formation) o).getId() == id) && ((Formation) o).getFullName().equals(getFullName());
+        return (o instanceof Formation) &&
+                     (((Formation) o).getId() == id) &&
+                     ((Formation) o).getFullName().equals(getFullName());
     }
 
     @Override
@@ -1007,9 +1019,10 @@ public class Formation {
     /**
      * Calculates the formation's total BV, including sub formations.
      *
-     * @param campaign                 The working campaign. This is the campaign object that the formation belongs to.
-     * @param formationStandardBattleValue Flag indicating whether to override campaign settings that call for the use of
-     *                                 Generic BV
+     * @param campaign                     The working campaign. This is the campaign object that the formation belongs
+     *                                     to.
+     * @param formationStandardBattleValue Flag indicating whether to override campaign settings that call for the use
+     *                                     of Generic BV
      *
      * @return The total battle value (BV) of the formation.
      */
@@ -1124,7 +1137,7 @@ public class Formation {
      * Uses a recursive search to find the maximum distance (depth) from the origin formation
      *
      * @param formation the current formation. Should always equal campaign.getFormation(0), if called remotely
-     * @param depth the current recursive depth.
+     * @param depth     the current recursive depth.
      *
      * @deprecated
      */
@@ -1144,8 +1157,9 @@ public class Formation {
     }
 
     /**
-     * Populates the formation levels of a formation hierarchy starting from the origin formation. For all subformations, it will
-     * determine the smallest formations - Teams/Lances - and then parent formations will be one formation higher.
+     * Populates the formation levels of a formation hierarchy starting from the origin formation. For all
+     * subformations, it will determine the smallest formations - Teams/Lances - and then parent formations will be one
+     * formation higher.
      *
      * @param campaign campaign that the formation belongs to
      */
@@ -1171,7 +1185,9 @@ public class Formation {
      */
     public void defaultFormationLevelForFormation(Campaign campaign) {
         Formation largestSubFormation =
-              getAllSubFormations().stream().max(Comparator.comparing(f -> f.getFormationLevel().getDepth())).orElse(null);
+              getAllSubFormations().stream()
+                    .max(Comparator.comparing(f -> f.getFormationLevel().getDepth()))
+                    .orElse(null);
         if (largestSubFormation == null) {
             int depth = 1;
             setFormationLevel(FormationLevel.parseFromDepth(campaign, depth + getOddFormationSizeModifier(campaign,
@@ -1195,95 +1211,6 @@ public class Formation {
     }
 
     /**
-     * Changes the formation level of a formation and its sub-formations.
-     *
-     * @param formation                 the formation whose formation level is to be changed
-     * @param currentFormationLevel the current formation level of the formation
-     * @param lowerBoundary         the lower boundary for the formation level
-     *
-     * @deprecated See {@link Formation#recursivelyUpdateFormationLevel}
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private static void changeFormationLevel(Formation formation, int currentFormationLevel, int lowerBoundary) {
-        for (Formation subFormation : formation.getSubFormations()) {
-            if (currentFormationLevel - 1 < lowerBoundary) {
-                subFormation.setFormationLevel(FormationLevel.INVALID);
-            } else if (subFormation.getSubFormations().isEmpty()) {
-                subFormation.setFormationLevel(FormationLevel.parseFromInt(lowerBoundary));
-            } else {
-                subFormation.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
-            }
-
-            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
-
-            changeFormationLevel(subFormation, currentFormationLevel - 1, lowerBoundary);
-        }
-    }
-
-    /**
-     * Retrieves the lower boundary value based on the given campaign.
-     *
-     * @param campaign the campaign object to retrieve the lower boundary for
-     *
-     * @return the lower boundary value as an integer
-     *
-     * @deprecated
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private static int getLowerBoundary(Campaign campaign) {
-        int lowerBoundary = FormationLevel.values().length;
-
-        for (FormationLevel level : FormationLevel.values()) {
-            if (level.isNone() || level.isInvalid() || level.isRemoveOverride()) {
-                continue;
-            }
-
-            boolean isValid = false;
-
-            if (campaign.getFaction().isClan() && level.isClan()) {
-                isValid = true;
-            } else if (campaign.getFaction().isComStarOrWoB()) {
-                isValid = true;
-            }
-            if (!campaign.getFaction().isClan() && !campaign.getFaction().isComStarOrWoB()) {
-                isValid = level.isInnerSphere();
-            }
-
-            if (isValid) {
-                lowerBoundary = Math.min(level.parseToInt(), lowerBoundary);
-            }
-        }
-        return lowerBoundary;
-    }
-
-    /**
-     * Populates the origin node (the formation normally named after the campaign) with an appropriate Formation Level.
-     *
-     * @param campaign the current campaign
-     * @param origin   the origin node
-     *
-     * @return the parsed integer value of the origin node's formation level
-     *
-     * @deprecated See {@link Formation#recursivelyUpdateFormationLevel}
-     */
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    private static int populateOriginNode(Campaign campaign, Formation origin) {
-        FormationLevel overrideFormationLevel = origin.getOverrideFormationLevel();
-        int maximumDepth = getMaximumDepth(origin, 0);
-
-        if (!overrideFormationLevel.isNone() && !overrideFormationLevel.isRemoveOverride()) {
-            origin.setFormationLevel(overrideFormationLevel);
-        } else {
-            origin.setFormationLevel(FormationLevel.parseFromDepth(campaign, maximumDepth));
-            origin.setOverrideFormationLevel(FormationLevel.NONE);
-        }
-
-        MekHQ.triggerEvent(new OrganizationChangedEvent(origin));
-
-        return origin.getFormationLevel().parseToInt();
-    }
-
-    /**
      * Determines whether a formation consists solely of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in Ground
      * Effect) units.
      *
@@ -1298,7 +1225,7 @@ public class Formation {
      *   <li>Returns {@code true} if all resolved units meet the VTOL or WIGE criteria.</li>
      * </ul>
      *
-     * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param hangar                 The {@link Hangar} instance from which to retrieve the {@link Unit}.
      * @param standardFormationsOnly A flag to filter and include only standard formations from the formation.
      *
      * @return {@code true} if all resolved units in the formation are VTOL or WIGE units, {@code false} otherwise.
@@ -1320,8 +1247,8 @@ public class Formation {
     }
 
     /**
-     * Determines whether a formation contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in Ground
-     * Effect) units.
+     * Determines whether a formation contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE (Wing in
+     * Ground Effect) units.
      *
      * <p>This method evaluates the formation by calculating whether at least half of the resolved units
      * in the formation are categorized as VTOLs or WIGE units.</p>
@@ -1336,11 +1263,11 @@ public class Formation {
      *       all entities.</li>
      * </ul>
      *
-     * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param hangar                 The {@link Hangar} instance from which to retrieve the {@link Unit}.
      * @param standardFormationsOnly A flag to filter and include only standard formations from the formation.
      *
-     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved formation units, {@code false}
-     *       otherwise.
+     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved formation units,
+     *       {@code false} otherwise.
      */
     public boolean formationContainsMajorityVTOLForces(Hangar hangar, boolean standardFormationsOnly) {
         Vector<UUID> allUnits = getAllUnits(standardFormationsOnly);
@@ -1386,12 +1313,12 @@ public class Formation {
      * </ul>
      *
      * @param hangar                      The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardFormationsOnly          A flag to filter and include only standard formations from the formation.
+     * @param standardFormationsOnly      A flag to filter and include only standard formations from the formation.
      * @param excludeConventionalFighters A flag determining if conventional fighters should be excluded from the
      *                                    assessment.
      *
-     * @return {@code true} if the formation consists only of aerial units (respecting the provided filters), {@code false}
-     *       otherwise.
+     * @return {@code true} if the formation consists only of aerial units (respecting the provided filters),
+     *       {@code false} otherwise.
      */
     public boolean formationContainsOnlyAerialForces(Hangar hangar, boolean standardFormationsOnly,
           boolean excludeConventionalFighters) {

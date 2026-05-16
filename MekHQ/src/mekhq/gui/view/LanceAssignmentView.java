@@ -231,7 +231,7 @@ public class LanceAssignmentView extends JPanel {
         for (AtBContract contract : activeContracts) {
             cbContract.addItem(contract);
         }
-        AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
+        AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsMap().values()) {
             if ((combatTeam.getContract(campaign) == null) ||
                       !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {

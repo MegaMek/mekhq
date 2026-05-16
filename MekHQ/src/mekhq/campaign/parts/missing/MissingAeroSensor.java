@@ -55,6 +55,7 @@ import org.w3c.dom.NodeList;
 public class MissingAeroSensor extends MissingPart {
     private boolean dropship;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingAeroSensor() {
         this(0, false, null);
     }

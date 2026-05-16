@@ -185,7 +185,7 @@ public enum Profession {
             return false;
         }
 
-        final Rank rank = rankSystem.getRanks().get(0);
+        final Rank rank = rankSystem.getRanks().getFirst();
         if (!rank.indicatesAlternativeSystem(this)) {
             // Return false if the first rank doesn't indicate an alternative rank system,
             // as the
@@ -211,7 +211,7 @@ public enum Profession {
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final RankSystem rankSystem) {
-        return getAlternateProfession(rankSystem.getRanks().get(0));
+        return getAlternateProfession(rankSystem.getRanks().getFirst());
     }
 
     /**

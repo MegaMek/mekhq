@@ -231,6 +231,7 @@ public enum BodyLocation {
         children.add(child);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isParentOf(BodyLocation child) {
         if (children.contains(child)) {
             return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -237,7 +237,20 @@ public class PartsInUseManager {
             return;
         }
 
-        // Case 2: Part is present and meets quality requirements
+        // Case 2: Part is reserved for a refit — count as in-use if present, or as
+        // in-transfer if still being delivered, so the auto-resupply system sees the
+        // real available warehouse stock, not parts committed to refits.
+        if (incomingPart.isReservedForRefit()) {
+            if (incomingPart.isPresent()) {
+                partInUse.setUseCount(partInUse.getUseCount() + incomingPart.getBaseQuantityForPartsInUse());
+            } else {
+                partInUse.setTransferCount(
+                      partInUse.getTransferCount() + incomingPart.getBaseQuantityForPartsInUse());
+            }
+            return;
+        }
+
+        // Case 3: Part is present and meets quality requirements
         if (incomingPart.isPresent()) {
             if (incomingPart.getQuality().toNumeric() >= ignoreSparesUnderQuality.toNumeric()) {
                 partInUse.setStoreCount(partInUse.getStoreCount() + incomingPart.getQuantityForPartsInUse());
@@ -246,7 +259,7 @@ public class PartsInUseManager {
             return;
         }
 
-        // Case 3: Part is not present, update transfer count
+        // Case 4: Part is not present, update transfer count
         partInUse.setTransferCount(partInUse.getTransferCount() + incomingPart.getQuantityForPartsInUse());
     }
 

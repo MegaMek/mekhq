@@ -50,6 +50,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
@@ -58,7 +59,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Class that handles the GUI for assigning forces and units to individual templates associated with a dynamic
@@ -88,8 +88,9 @@ public class ForceTemplateAssignmentDialog extends JDialog {
           "mekhq.resources.ForceTemplateAssignmentDialog",
           MekHQ.getMHQOptions().getLocale());
 
-    public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Formation> assignedFormations, Vector<Unit> assignedUnits,
-                                         AtBDynamicScenario scenario) {
+    public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Formation> assignedFormations,
+          Vector<Unit> assignedUnits,
+          AtBDynamicScenario scenario) {
         currentFormationVector = assignedFormations;
         currentUnitVector = assignedUnits;
 
@@ -117,7 +118,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.gridy++;
 
-        JScrollPane itemListPane = new JScrollPaneWithSpeed();
+        JScrollPane itemListPane = new FastJScrollPane();
         if (individualUnits) {
             itemListPane.setViewportView(unitList);
             refreshUnitList();
@@ -128,7 +129,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         getContentPane().add(itemListPane, gbc);
         gbc.gridx++;
 
-        JScrollPane templateListPane = new JScrollPaneWithSpeed();
+        JScrollPane templateListPane = new FastJScrollPane();
         templateListPane.setViewportView(templateList);
         itemListPane.setPreferredSize(
               new Dimension((int) itemListPane.getPreferredSize().getWidth() +
@@ -307,8 +308,8 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                                      String.format("%s (%s)",
                                            formation.getName(),
                                            currentScenario.getPlayerForceTemplates()
-                                                 .get(formation.getId())
-                                                 .getForceName()) :
+                                           .get(formation.getId())
+                                           .getForceName()) :
                                      formation.getName();
             ((JLabel) cmp).setText(cellValue);
             return cmp;

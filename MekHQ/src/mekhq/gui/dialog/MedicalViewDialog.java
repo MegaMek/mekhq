@@ -59,6 +59,7 @@ import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -73,7 +74,6 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PaperDoll;
 
 public class MedicalViewDialog extends JDialog {
@@ -217,7 +217,7 @@ public class MedicalViewDialog extends JDialog {
 
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         Container scrollPanel = new JPanel();
-        getContentPane().add(new JScrollPaneWithSpeed(scrollPanel,
+        getContentPane().add(new FastJScrollPane(scrollPanel,
               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         initComponents(scrollPanel);
@@ -449,7 +449,7 @@ public class MedicalViewDialog extends JDialog {
                   } else {
                       panel.add(genWrittenText(String.format(resourceMap.getString("historyDateAndText.format"),
                             e.getKey(),
-                            e.getValue().get(0).getDesc())));
+                            e.getValue().getFirst().getDesc())));
                   }
               });
         return panel;

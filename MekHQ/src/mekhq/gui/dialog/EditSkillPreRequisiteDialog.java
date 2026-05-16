@@ -49,11 +49,11 @@ import javax.swing.WindowConstants;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.SkillLevel;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -123,7 +123,7 @@ public class EditSkillPreRequisiteDialog extends JDialog {
         setTitle("Select Abilities");
         getContentPane().setLayout(new BorderLayout());
 
-        getContentPane().add(new JScrollPaneWithSpeed(panMain), BorderLayout.CENTER);
+        getContentPane().add(new FastJScrollPane(panMain), BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.SOUTH);
 
         this.setPreferredSize(new Dimension(400, 700));

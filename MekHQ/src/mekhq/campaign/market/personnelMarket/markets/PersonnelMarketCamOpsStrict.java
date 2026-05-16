@@ -34,7 +34,6 @@ package mekhq.campaign.market.personnelMarket.markets;
 
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.CAMPAIGN_OPERATIONS_STRICT;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 
 /**

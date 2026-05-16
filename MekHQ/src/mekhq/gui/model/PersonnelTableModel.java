@@ -282,7 +282,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                     } else {
                         Unit u = person.getUnit();
                         if ((u == null) && !person.getTechUnits().isEmpty()) {
-                            u = person.getTechUnits().get(0);
+                            u = person.getTechUnits().getFirst();
                         }
 
                         if (u != null) {

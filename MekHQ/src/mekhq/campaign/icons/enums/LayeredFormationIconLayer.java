@@ -106,6 +106,7 @@ public enum LayeredFormationIconLayer {
         return layerPath;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getTableName() {
         return tableName;
     }
@@ -128,10 +129,12 @@ public enum LayeredFormationIconLayer {
         return this == ADJUSTMENT;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAlphanumeric() {
         return this == ALPHANUMERIC;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isSpecialModifier() {
         return this == SPECIAL_MODIFIER;
     }

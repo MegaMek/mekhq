@@ -528,6 +528,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return syncDeploymentType;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean getSyncRetreatThreshold() {
         return syncRetreatThreshold;
     }
@@ -578,6 +579,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     @XmlElementWrapper(name = "roleChoices")
     @XmlElement(name = "forceRole")
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<String> getRoleCollections() {
         return forceRoleStrings;
     }
@@ -607,6 +609,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.generationMethod = generationMethod;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setForceMultiplier(double forceMultiplier) {
         this.forceMultiplier = forceMultiplier;
     }
@@ -615,10 +618,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.deploymentZones = deploymentZones;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDestinationZone(int destinationZone) {
         this.destinationZone = destinationZone;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setRetreatThreshold(int retreatThreshold) {
         this.retreatThreshold = retreatThreshold;
     }
@@ -705,6 +710,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      * read/write.
      *
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void addRequiredRoles(Collection<ModelRecord> newRoles) {
     }
 
@@ -712,6 +718,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return subjectToRandomRemoval;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setSubjectToRandomRemoval(boolean subjectToRandomRemoval) {
         this.subjectToRandomRemoval = subjectToRandomRemoval;
     }
@@ -731,6 +738,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return objectiveLinkedForces;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setObjectiveLinkedForces(List<String> objectiveLinkedForces) {
         this.objectiveLinkedForces = objectiveLinkedForces;
     }
@@ -755,6 +763,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      * Whether this force is bot-controlled and allied to the player
      *
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAlliedBotForce() {
         return getForceAlignment() == ForceAlignment.Allied.ordinal() &&
                      getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal();

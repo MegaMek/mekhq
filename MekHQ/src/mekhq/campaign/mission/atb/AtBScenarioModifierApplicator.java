@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.atb;
 
-import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.*;
 
 import java.util.UUID;
@@ -40,7 +39,6 @@ import java.util.UUID;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.HitData;
 import megamek.common.ToHitData;
 import megamek.common.board.Board;
@@ -231,8 +229,8 @@ public class AtBScenarioModifierApplicator {
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient,
           int skillAdjustment) {
         // We want a non-none Skill Level
-        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[MathUtility.clamp(scenario.getEffectiveOpForSkill()
-                                                                                     .ordinal() + skillAdjustment,
+        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[Math.clamp(scenario.getEffectiveOpForSkill()
+                                                                              .ordinal() + skillAdjustment,
               SkillLevel.ULTRA_GREEN.ordinal(),
               SkillLevel.LEGENDARY.ordinal())];
         // fire up a skill generator set to the appropriate skill model

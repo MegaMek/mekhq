@@ -55,11 +55,13 @@ public class JScrollablePopupMenu extends JPopupMenu {
     //endregion Variable Declarations
 
     //region Constructors
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JScrollablePopupMenu(final String name) {
         super();
         setName(name);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JScrollablePopupMenu(final String name, final String text) {
         super(text);
         setName(name);

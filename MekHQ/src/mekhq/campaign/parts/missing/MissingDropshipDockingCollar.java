@@ -53,6 +53,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
     private int collarType;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingDropshipDockingCollar() {
         this(0, null, Dropship.COLLAR_STANDARD);
     }

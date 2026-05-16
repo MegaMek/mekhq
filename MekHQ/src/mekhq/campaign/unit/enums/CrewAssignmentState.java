@@ -84,6 +84,7 @@ public enum CrewAssignmentState {
         return this == UNCREWED;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isPartiallyCrewed() {
         return this == PARTIALLY_CREWED;
     }

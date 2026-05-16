@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,6 +51,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
@@ -58,6 +59,7 @@ import javax.swing.WindowConstants;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
@@ -70,7 +72,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.RepairTab;
 import mekhq.gui.enums.MHQTabType;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 import mekhq.utilities.ReportingUtilities;
@@ -134,7 +135,7 @@ public class AcquisitionsDialog extends JDialog {
 
         pnlSummary.firePropertyChange("counts", -1, 0);
 
-        JScrollPane scrollMain = new JScrollPaneWithSpeed(pnlMain);
+        JScrollPane scrollMain = new FastJScrollPane(pnlMain);
         scrollMain.setPreferredSize(new Dimension(700, 500));
 
         content.add(scrollMain, BorderLayout.CENTER);
@@ -408,7 +409,7 @@ public class AcquisitionsDialog extends JDialog {
         }
 
         private void initComponents() {
-            targetWork = awList.get(0);
+            targetWork = awList.getFirst();
             part = targetWork.getAcquisitionPart();
 
             partCountInfo = PartsAcquisitionService.getPartCountInfoMap().get(targetWork.getAcquisitionDisplayName());
@@ -563,6 +564,30 @@ public class AcquisitionsDialog extends JDialog {
                                       part.isOmniPoddable());
             btnDepod.addActionListener(ev -> {
                 MissingPart podded = part.getMissingPart();
+                if (podded == null) {
+                    // btnDepod is only shown when part.getMissingPart() != null at panel
+                    // construction. If we get here, campaign state changed between build and
+                    // click. Recoverable: capture diagnostics (forwarded to Sentry by MMLogger),
+                    // tell the user, then refresh the view.
+                    IllegalStateException ise = new IllegalStateException(
+                          "AcquisitionsDialog btnDepod: part.getMissingPart() returned null for part " +
+                                part.getName() + " (id=" + part.getId() + ')');
+                    logger.error(ise,
+                          "btnDepod clicked but part.getMissingPart() returned null. " +
+                                "part={} (id={}), omniPodCount={}, missingCount={}, isOmniPoddable={}",
+                          part.getName(),
+                          part.getId(),
+                          partCountInfo.getOmniPodCount(),
+                          partCountInfo.getMissingCount(),
+                          part.isOmniPoddable());
+                    JOptionPane.showMessageDialog(campaignGUI.getFrame(),
+                          "The state of this acquisition changed before the action could complete. " +
+                                "The view will be refreshed; please try again.",
+                          "Acquisition state changed",
+                          JOptionPane.WARNING_MESSAGE);
+                    refresh();
+                    return;
+                }
                 podded.setOmniPodded(true);
                 Part replacement = podded.findReplacement(false);
 

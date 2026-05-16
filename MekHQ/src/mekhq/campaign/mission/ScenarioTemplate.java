@@ -144,6 +144,7 @@ public class ScenarioTemplate implements Cloneable {
         return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStratConScenarioType(String scenarioType) {
         try {
             this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim().toUpperCase());
@@ -172,6 +173,7 @@ public class ScenarioTemplate implements Cloneable {
         return scenarioForces;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setScenarioForces(Map<String, ScenarioForceTemplate> forces) {
         scenarioForces = forces;
     }
@@ -180,6 +182,7 @@ public class ScenarioTemplate implements Cloneable {
         return isHostileFacility;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isAlliedFacility() {
         return isAlliedFacility;
     }

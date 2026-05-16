@@ -610,13 +610,13 @@ public class GenealogyTest {
 
         assertEquals(spouse.getId(), genealogy.getSpouse().getId());
         assertEquals(1, genealogy.getFormerSpouses().size());
-        assertEquals(formerSpouse.getId(), genealogy.getFormerSpouses().get(0).getFormerSpouse().getId());
-        assertEquals(LocalDate.of(3025, 1, 1), genealogy.getFormerSpouses().get(0).getDate());
-        assertEquals(FormerSpouseReason.DIVORCE, genealogy.getFormerSpouses().get(0).getReason());
+        assertEquals(formerSpouse.getId(), genealogy.getFormerSpouses().getFirst().getFormerSpouse().getId());
+        assertEquals(LocalDate.of(3025, 1, 1), genealogy.getFormerSpouses().getFirst().getDate());
+        assertEquals(FormerSpouseReason.DIVORCE, genealogy.getFormerSpouses().getFirst().getReason());
         assertEquals(1, genealogy.getFamily().size());
         assertTrue(genealogy.getFamily().containsKey(FamilialRelationshipType.CHILD));
         assertEquals(1, genealogy.getFamily().get(FamilialRelationshipType.CHILD).size());
-        assertEquals(child.getId(), genealogy.getFamily().get(FamilialRelationshipType.CHILD).get(0).getId());
+        assertEquals(child.getId(), genealogy.getFamily().get(FamilialRelationshipType.CHILD).getFirst().getId());
     }
 
     @Test

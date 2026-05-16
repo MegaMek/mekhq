@@ -55,6 +55,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.preference.IPreferenceChangeListener;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -83,7 +84,6 @@ import mekhq.gui.sorter.PersonTitleStringSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.UnitViewPanel;
 
 /**
@@ -237,7 +237,7 @@ public final class HangarTab extends CampaignGuiTab {
         changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
-        JScrollPane scrollUnitTable = new JScrollPaneWithSpeed(unitTable);
+        JScrollPane scrollUnitTable = new FastJScrollPane(unitTable);
         scrollUnitTable.setFocusable(false);
         scrollUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
@@ -247,7 +247,7 @@ public final class HangarTab extends CampaignGuiTab {
         tableAndInfoPanel.add(scrollUnitTable, BorderLayout.CENTER);
         tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
 
-        scrollUnitView = new JScrollPaneWithSpeed();
+        scrollUnitView = new FastJScrollPane();
         scrollUnitView.setBorder(RoundedLineBorder.createRoundedLineBorder());
         scrollUnitView.setMinimumSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new Dimension(UNIT_VIEW_WIDTH, 600));

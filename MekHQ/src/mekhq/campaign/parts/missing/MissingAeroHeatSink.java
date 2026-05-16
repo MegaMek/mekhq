@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
 public class MissingAeroHeatSink extends MissingPart {
     private final int type;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingAeroHeatSink() {
         this(0, Aero.HEAT_SINGLE, false, null);
     }

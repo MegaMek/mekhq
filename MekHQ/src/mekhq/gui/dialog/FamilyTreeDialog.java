@@ -60,7 +60,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 
 /**
  * A dialog that displays an interactive family tree visualization.
@@ -130,8 +129,24 @@ public class FamilyTreeDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         setPreferredSize(scaleForGUI(900, 700));
+        // pack() is required: setPreferredSize is only a layout hint, so without it the JDialog opens at its
+        // minimum displayable size (a "bar") for any user who does not yet have a saved JWindowPreference.
+        // setPreferences() below still overrides this with a restored size if one was previously saved.
+        pack();
         setLocationRelativeTo(owner);
         setPreferences(this); // Must be before setVisible
+
+        // Defensive: an earlier version of this constructor lacked pack() and could persist a degenerate
+        // dialog size (e.g. ~150x40, just title bar plus tab strip) into JWindowPreference. setPreferences
+        // above unconditionally restores that bad size via element.setSize() and would re-trap affected
+        // users in the bar state on every subsequent open. If the restored size is clearly below usable
+        // thresholds, fall back to the preferred 900x700.
+        Dimension restored = getSize();
+        Dimension minimum = scaleForGUI(400, 300);
+        if (restored.width < minimum.width || restored.height < minimum.height) {
+            setSize(scaleForGUI(900, 700));
+        }
+
         setVisible(true); // Should always be last
     }
 
@@ -217,9 +232,14 @@ public class FamilyTreeDialog extends JDialog {
                 int targetX = personCenterX - viewW / 2;
                 int targetY = personCenterY - viewH / 2;
 
-                // Clamp to viewport and panel bounds for correct scrolling
-                targetX = Math.max(0, Math.min(targetX, panelW - viewW));
-                targetY = Math.max(0, Math.min(targetY, panelH - viewH));
+                // Clamp to viewport and panel bounds for correct scrolling. When the rendered tree fits
+                // entirely inside the viewport (lone characters with no relatives, or any small tree on a
+                // sufficiently large dialog), panel - view goes negative, which violates Math.clamp's
+                // min <= max contract. Floor max at 0 — there's nothing to scroll when content fits.
+                int maxX = Math.max(0, panelW - viewW);
+                int maxY = Math.max(0, panelH - viewH);
+                targetX = Math.clamp(targetX, 0, maxX);
+                targetY = Math.clamp(targetY, 0, maxY);
 
                 scrollPane.getViewport().setViewPosition(new Point(targetX, targetY));
             }
@@ -365,12 +385,16 @@ class FamilyTreePanel extends JPanel {
                 int newX = (int) (contentX * zoomFactor - mousePos.x);
                 int newY = (int) (contentY * zoomFactor - mousePos.y);
 
-                // Clamp to valid bounds
+                // Clamp to valid bounds. When the user zooms out far enough that the panel fits inside the
+                // viewport, content - view goes negative and violates Math.clamp's min <= max contract.
+                // Floor max at 0 — there's nothing to scroll when content fits.
                 Dimension viewSize = parentScrollPane.getViewport().getExtentSize();
                 Dimension contentSize = getPreferredSize();
 
-                newX = Math.max(0, Math.min(newX, contentSize.width - viewSize.width));
-                newY = Math.max(0, Math.min(newY, contentSize.height - viewSize.height));
+                int maxX = Math.max(0, contentSize.width - viewSize.width);
+                int maxY = Math.max(0, contentSize.height - viewSize.height);
+                newX = Math.clamp(newX, 0, maxX);
+                newY = Math.clamp(newY, 0, maxY);
 
                 parentScrollPane.getViewport().setViewPosition(new Point(newX, newY));
 
@@ -556,7 +580,7 @@ class FamilyTreePanel extends JPanel {
 
             // Add the first parent, if any
             if (parentCount > 0) {
-                Person parent0 = parents.get(0);
+                Person parent0 = parents.getFirst();
                 if (parent0 != null && !visited.contains(parent0)) {
                     TreeNodeBox parent0Box = nodeMap.computeIfAbsent(parent0, TreeNodeBox::new);
                     node.parents.add(parent0Box);

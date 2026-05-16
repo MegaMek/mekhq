@@ -62,6 +62,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.TechConstants;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
@@ -82,7 +83,6 @@ import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -303,7 +303,7 @@ public class RetirementDefectionDialog extends JDialog {
             });
             setBonusAndShareTotals(getTotalBonus());
 
-            JScrollPane scroll = new JScrollPaneWithSpeed();
+            JScrollPane scroll = new FastJScrollPane();
             scroll.setViewportView(personnelTable);
             scroll.setPreferredSize(new Dimension(500, 500));
             panOverview.add(scroll, BorderLayout.CENTER);
@@ -415,7 +415,7 @@ public class RetirementDefectionDialog extends JDialog {
 
         JPanel panResults = new JPanel();
         panResults.setLayout(new BoxLayout(panResults, BoxLayout.X_AXIS));
-        JScrollPane scroll = new JScrollPaneWithSpeed();
+        JScrollPane scroll = new FastJScrollPane();
         scroll.setViewportView(retireeTable);
         panResults.add(scroll);
         JPanel panAddRemoveButtons = new JPanel();
@@ -430,7 +430,7 @@ public class RetirementDefectionDialog extends JDialog {
         panAddRemoveButtons.add(btnRemoveUnit);
         panResults.add(panAddRemoveButtons);
 
-        scroll = new JScrollPaneWithSpeed();
+        scroll = new FastJScrollPane();
         scroll.setViewportView(unitAssignmentTable);
         panResults.add(scroll);
 

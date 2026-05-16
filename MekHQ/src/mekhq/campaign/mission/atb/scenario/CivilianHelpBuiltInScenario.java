@@ -100,7 +100,8 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().getFirst()),
+              campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 4, campaign);

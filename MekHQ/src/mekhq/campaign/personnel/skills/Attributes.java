@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
@@ -209,14 +208,14 @@ public class Attributes {
      */
     public int getAttribute(SkillAttribute attribute) {
         return switch (attribute) {
-            case STRENGTH -> clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case BODY -> clamp(body, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case REFLEXES -> clamp(reflexes, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case DEXTERITY -> clamp(dexterity, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case INTELLIGENCE -> clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case WILLPOWER -> clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-            case EDGE -> clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case STRENGTH -> Math.clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case BODY -> Math.clamp(body, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case REFLEXES -> Math.clamp(reflexes, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case DEXTERITY -> Math.clamp(dexterity, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case INTELLIGENCE -> Math.clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case WILLPOWER -> Math.clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case CHARISMA -> Math.clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case EDGE -> Math.clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
     }
@@ -249,7 +248,7 @@ public class Attributes {
         int abilityModifier = getAbilityAdjustment(attribute, options);
 
         int total = attributeScore + injuryModifier + agingModifier + abilityModifier;
-        return clamp(total, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        return Math.clamp(total, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     public int getAbilityAdjustment(SkillAttribute attribute, PersonnelOptions options) {
@@ -429,17 +428,17 @@ public class Attributes {
 
         // This ensures we never fall outside the hard boundaries, no matter how many SPAs or other weirdness the
         // player piles on.
-        cap = clamp(cap, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        cap = Math.clamp(cap, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
 
         switch (attribute) {
-            case STRENGTH -> strength = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case BODY -> body = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case REFLEXES -> reflexes = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case DEXTERITY -> dexterity = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
-            case EDGE -> edge = clamp(score, MINIMUM_EDGE_SCORE, cap);
+            case STRENGTH -> strength = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case BODY -> body = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case REFLEXES -> reflexes = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case DEXTERITY -> dexterity = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case INTELLIGENCE -> intelligence = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case WILLPOWER -> willpower = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case CHARISMA -> charisma = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case EDGE -> edge = Math.clamp(score, MINIMUM_EDGE_SCORE, cap);
             default -> LOGGER.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
         }
     }
@@ -596,7 +595,7 @@ public class Attributes {
      */
     public void changeEdge(int delta) {
         edge += delta;
-        edge = clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        edge = Math.clamp(edge, MINIMUM_EDGE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     public int getCurrentEdge() {
@@ -605,7 +604,7 @@ public class Attributes {
 
     public void changeCurrentEdge(int delta) {
         currentEdge += delta;
-        currentEdge = clamp(currentEdge, MINIMUM_EDGE_SCORE, edge);
+        currentEdge = Math.clamp(currentEdge, MINIMUM_EDGE_SCORE, edge);
     }
 
     public void setCurrentEdge(final int currentEdge) {

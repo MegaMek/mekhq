@@ -35,8 +35,6 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 
-import megamek.codeUtilities.MathUtility;
-
 /**
  * Represents the possible outcomes of a healing attempt under the "Advanced Medical Alternate" ruleset.
  *
@@ -179,7 +177,7 @@ public enum HealingMarginOfSuccessEffects {
      * @since 0.50.10
      */
     public static HealingMarginOfSuccessEffects getEffectFromHealingAttempt(int marginOfSuccess) {
-        int clampedRoll = MathUtility.clamp(marginOfSuccess, MINIMUM_MARGIN_OF_SUCCESS, MAXIMUM_MARGIN_OF_SUCCESS);
+        int clampedRoll = Math.clamp(marginOfSuccess, MINIMUM_MARGIN_OF_SUCCESS, MAXIMUM_MARGIN_OF_SUCCESS);
 
         return switch (clampedRoll) {
             case 3 -> RECOVERY;

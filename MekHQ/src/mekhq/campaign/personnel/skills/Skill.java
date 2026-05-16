@@ -144,6 +144,7 @@ public class Skill {
     /**
      * Retrieves the minimum value that can be used for skills that count down.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getCountDownMaxValue() {
         return COUNT_DOWN_MIN_VALUE;
     }
@@ -242,6 +243,7 @@ public class Skill {
         return hasNaturalAptitude;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
         this.hasNaturalAptitude = hasNaturalAptitude;
     }

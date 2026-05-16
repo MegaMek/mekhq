@@ -41,6 +41,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
+import static megamek.common.units.UnitType.DROPSHIP;
 import static megamek.common.units.UnitType.JUMPSHIP;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
@@ -121,6 +122,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
@@ -264,7 +266,7 @@ public class StratConRulesManager {
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
             List<StratConTrackState> tracks = campaignState.getTracks();
-            StratConTrackState track = campaignState.getTracks().get(0);
+            StratConTrackState track = campaignState.getTracks().getFirst();
 
             if (tracks.size() > 1) {
                 track = getRandomItem(tracks);
@@ -497,11 +499,11 @@ public class StratConRulesManager {
      * unoccupied coordinates on the track. If the scenario setup is successful, it is finalized and the deployment date
      * for the scenario is set as the current date.
      *
-     * @param campaign         the current campaign
-     * @param contract         the {@link AtBContract} for which the scenario is created
-     * @param track            the {@link StratConTrackState} where the scenario is located, or {@code null} if not
-     *                         located on a track
-     * @param template         the {@link ScenarioTemplate} used to create the scenario
+     * @param campaign             the current campaign
+     * @param contract             the {@link AtBContract} for which the scenario is created
+     * @param track                the {@link StratConTrackState} where the scenario is located, or {@code null} if not
+     *                             located on a track
+     * @param template             the {@link ScenarioTemplate} used to create the scenario
      * @param interceptedFormation the {@link Formation} that's being intercepted in the scenario
      */
     public static @Nullable void generateReinforcementInterceptionScenario(Campaign campaign,
@@ -558,6 +560,7 @@ public class StratConRulesManager {
      *           <li>All coordinates in the selected {@link StratConTrackState} are occupied and scenario placement is not possible.</li>
      *       </ul>
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static @Nullable StratConScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
           @Nullable StratConTrackState trackState, @Nullable ScenarioTemplate template, boolean allowPlayerFacilities,
           boolean allowPlayerForces, boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
@@ -666,7 +669,7 @@ public class StratConRulesManager {
         finalizeScenario(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
 
-        if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
+        if (!autoAssignLances && !scenario.overrideForceAutoAssignment()) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
                 backingScenario.removeFormation(forceID);
             }
@@ -901,7 +904,8 @@ public class StratConRulesManager {
             for (Unit unit : potentialUnits) {
                 if (isValidUnitForScenario(unit,
                       scenarioForceTemplate,
-                      campaign.getCampaignOptions().isUseDropShips())) {
+                      campaign,
+                      scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
                     scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
                     AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
                           scenarioForceTemplate.getForceName(),
@@ -1006,24 +1010,49 @@ public class StratConRulesManager {
 
     /**
      * Validates if a given unit can be included in the scenario based on the template's rules and restrictions. It
-     * checks unit type, availability, functionality, and specific conditions such as DropShip usage.
+     * checks unit type, availability, functionality, and specific conditions such as DropShip usage and map
+     * compatibility.
      *
      * @param unit                  The unit to validate.
      * @param scenarioForceTemplate The force template containing the rules for unit validation.
-     * @param isUsePlayerDropShips  Indicates if DropShips are allowed based on campaign options.
+     * @param campaign              The current campaign, used to check campaign options and planetary conditions.
+     * @param mapLocation           The map location type of the scenario, used to check if the unit can operate there.
      *
      * @return {@code true} if the unit matches the template's requirements and can be included in the scenario,
      *       {@code false} otherwise.
      */
-    private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
-          boolean isUsePlayerDropShips) {
-        // Check if DropShips are allowed and the correct unit type matches
-        if (scenarioForceTemplate.getAllowedUnitType() == 11 && !isUsePlayerDropShips) {
+    static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
+          Campaign campaign, MapLocation mapLocation) {
+        // Check if the unit is a DropShip and player DropShips are disabled
+        Entity entity = unit.getEntity();
+        if (entity == null) {
             return false;
         }
 
+        if (entity.getUnitType() == DROPSHIP && !campaign.getCampaignOptions().isUseDropShips()) {
+            return false;
+        }
+
+        boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
+        boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
+
+        if ((isGround && entity.doomedOnGround())
+                  || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+                  || (mapLocation == Space && entity.doomedInSpace())) {
+            return false;
+        }
+
+        // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
+        // but they can operate on airless worlds (vacuum)
+        if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
+            Planet planet = campaign.getLocation().getPlanet();
+            if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
+                return false;
+            }
+        }
+
         // Validate the unit type, availability, and functionality
-        return forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(),
               scenarioForceTemplate.getAllowedUnitType()) && unit.isAvailable() && unit.isFunctional();
     }
 
@@ -1089,7 +1118,9 @@ public class StratConRulesManager {
         // this is theoretically possible if forceIDs is empty - not likely in practice
         // but might as well, to future-proof.
         if (scenario != null) {
-            scenario.setIgnoreForceAutoAssignment(true);
+            // Don't auto-assign forces for Official Challenge scenarios - the player should choose their force
+            boolean isOfficialChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
+            scenario.setOverrideForceAutoAssignment(!isOfficialChallenge);
         }
 
         return scenario;
@@ -1155,16 +1186,18 @@ public class StratConRulesManager {
 
         // we may stumble on a fixed objective scenario - in that case assign the force
         // to it and finalize we also will not be encountering any of the other stuff so bug out
-        // afterward
+        // afterward. Official Challenge scenarios should not auto-assign forces.
         StratConScenario revealedScenario = track.getScenario(coords);
         if (revealedScenario != null) {
-            revealedScenario.addPrimaryForce(forceID);
-            commitPrimaryForces(campaign, revealedScenario, track);
-            if (!revealedScenario.getBackingScenario().isFinalized()) {
-                setScenarioParametersFromBiome(track,
-                      revealedScenario,
-                      campaign.getCampaignOptions().isUseNoTornadoes());
-                finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+            if (!revealedScenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+                revealedScenario.addPrimaryForce(forceID);
+                commitPrimaryForces(campaign, revealedScenario, track);
+                if (!revealedScenario.getBackingScenario().isFinalized()) {
+                    setScenarioParametersFromBiome(track,
+                          revealedScenario,
+                          campaign.getCampaignOptions().isUseNoTornadoes());
+                    finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+                }
             }
             return;
         }
@@ -1229,6 +1262,43 @@ public class StratConRulesManager {
         // If we didn't trip a scenario or facility, Training forces should deploy 'sticky'
         if (isTraining) {
             track.addStickyForce(forceID);
+        }
+    }
+
+    /**
+     * Explicitly assigns a player-selected force to an existing StratCon scenario.
+     *
+     * @param coords   the {@link StratConCoords} containing the scenario.
+     * @param forceID  the unique ID of the combat team being assigned.
+     * @param campaign the current {@link Campaign} context.
+     * @param contract the {@link AtBContract} associated with the scenario.
+     * @param track    the {@link StratConTrackState} containing the scenario.
+     * @param sticky   whether the force should remain persistently assigned to this track.
+     */
+    public static void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign,
+          AtBContract contract, StratConTrackState track, boolean sticky) {
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
+
+        if (combatTeam == null) {
+            return;
+        }
+
+        processForceDeployment(coords, forceID, campaign, track, sticky);
+
+        StratConScenario scenario = track.getScenario(coords);
+        if (scenario == null) {
+            return;
+        }
+
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        if (!backingScenario.getForceIDs().contains(forceID)) {
+            scenario.addPrimaryForce(forceID);
+        }
+
+        commitPrimaryForces(campaign, scenario, track);
+        if (!backingScenario.isFinalized()) {
+            setScenarioParametersFromBiome(track, scenario, campaign.getCampaignOptions().isUseNoTornadoes());
+            finalizeScenario(backingScenario, contract, campaign);
         }
     }
 
@@ -1739,7 +1809,7 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation                       the {@link Formation} containing units to evaluate
+     * @param formation                   the {@link Formation} containing units to evaluate
      * @param hangar                      the {@link Hangar} used to help retrieve units from the force
      * @param isCommandersOnlyVehicles    {@code true} to only use the skills possessed by the unit commander (if
      *                                    vehicle)
@@ -1889,7 +1959,7 @@ public class StratConRulesManager {
      *   <li>Generating follow-up scenarios for intercepted reinforcements or handling delays.</li>
      * </ul>
      *
-     * @param formation                     the {@link Formation} being deployed as a reinforcement
+     * @param formation                 the {@link Formation} being deployed as a reinforcement
      * @param reinforcementType         the type of reinforcement (e.g., auxiliary or chained scenario)
      * @param campaignState             the current state of the campaign
      * @param scenario                  the scenario to which the reinforcements are being deployed
@@ -2090,9 +2160,9 @@ public class StratConRulesManager {
      *     <li>A default ground template is selected if no specific cases are matched.</li>
      * </ul>
      *
-     * @param formation  The {@link Formation} instance that the scenario is based on. The force composition is used to
-     *               determine the appropriate scenario template.
-     * @param hangar The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param formation The {@link Formation} instance that the scenario is based on. The force composition is used to
+     *                  determine the appropriate scenario template.
+     * @param hangar    The {@link Hangar} instance from which to retrieve the {@link Unit}.
      *
      * @return A {@link ScenarioTemplate} instance representing the chosen scenario template file based on the logic
      *       described, or a default template if no special conditions are satisfied.
@@ -2293,9 +2363,9 @@ public class StratConRulesManager {
      * Categorizes a list of force IDs into groups based on the type of map they can primarily support.
      *
      * <p>This overloaded method analyzes each force associated with the given force IDs in the context of
-     * the provided {@link Hangar} and a pre-resolved list of {@link Formation} objects. It determines whether each force is
-     * suited for ground, atmospheric, or space maps, assigning them to the appropriate map types. Forces may belong to
-     * multiple map types based on their composition.</p>
+     * the provided {@link Hangar} and a pre-resolved list of {@link Formation} objects. It determines whether each
+     * force is suited for ground, atmospheric, or space maps, assigning them to the appropriate map types. Forces may
+     * belong to multiple map types based on their composition.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
@@ -2312,10 +2382,11 @@ public class StratConRulesManager {
      *       be found in the provided list of forces.</li>
      * </ul>
      *
-     * @param forceIDs  A list of force IDs to classify.
-     * @param hangar    The {@link Hangar} instance containing aerial or aerospace-related information about forces.
-     * @param allFormations A pre-resolved list of {@link Formation} objects. Forces are accessed using their IDs as indices,
-     *                  providing performance benefits when compared to fetching forces on demand.
+     * @param forceIDs      A list of force IDs to classify.
+     * @param hangar        The {@link Hangar} instance containing aerial or aerospace-related information about
+     *                      forces.
+     * @param allFormations A pre-resolved list of {@link Formation} objects. Forces are accessed using their IDs as
+     *                      indices, providing performance benefits when compared to fetching forces on demand.
      *
      * @return A {@link Map} where each {@link MapLocation} key corresponds to a map type, and the value is a list of
      *       force IDs that can operate in that map type.
@@ -2387,7 +2458,7 @@ public class StratConRulesManager {
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable Integer daysTilDeployment) {
         int unitType = MEK;
-        ;
+
         if (forceID != null) {
             unitType = campaign.getFormation(forceID).getPrimaryUnitType(campaign);
         }
@@ -2421,8 +2492,8 @@ public class StratConRulesManager {
      * @param campaign          the {@link Campaign} managing the gameplay state
      * @param contract          the {@link AtBContract} governing the StratCon campaign
      * @param track             the {@link StratConTrackState} to which the scenario belongs
-     * @param forceID           the ID of the force for which the scenario is generated, or {@link Formation#FORMATION_NONE} if
-     *                          none
+     * @param forceID           the ID of the force for which the scenario is generated, or
+     *                          {@link Formation#FORMATION_NONE} if none
      * @param coords            the {@link StratConCoords} specifying where the scenario will be placed
      * @param template          the {@link ScenarioTemplate} to use for scenario generation; if {@code null}, a random
      *                          one is selected
@@ -3372,7 +3443,8 @@ public class StratConRulesManager {
                     for (int forceId : linkedForces.keySet()) {
                         track.unassignFormation(forceId);
 
-                        if (linkedForces.get(forceId).size() == campaign.getFormation(forceId).getAllUnits(false).size()) {
+                        if (linkedForces.get(forceId).size() ==
+                                  campaign.getFormation(forceId).getAllUnits(false).size()) {
                             scenario.addForce(campaign.getFormation(forceId),
                                   ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID,
                                   campaign);
@@ -3674,6 +3746,7 @@ public class StratConRulesManager {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void shutdown() {
         MekHQ.unregisterHandler(this);
     }
