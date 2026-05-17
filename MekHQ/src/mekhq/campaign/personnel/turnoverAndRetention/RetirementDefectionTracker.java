@@ -143,8 +143,7 @@ public class RetirementDefectionTracker {
         }
 
         for (Person person : campaign.getActivePersonnel(false, false)) {
-            if ((person.getPrimaryRole().isCivilian()) ||
-                      (person.isDeployed())) {
+            if (person.isDeployed()) {
                 continue;
             }
 
@@ -498,9 +497,8 @@ public class RetirementDefectionTracker {
             case NAVAL -> navalCommanderModifier;
             case TECH -> techCommanderModifier;
             case MEDICAL -> medicalCommanderModifier;
-            case ADMINISTRATOR -> administrationCommanderModifier;
+            case ADMINISTRATOR, CIVILIAN -> administrationCommanderModifier;
             case MEKWARRIOR -> mekWarriorCommanderModifier;
-            case CIVILIAN -> 0;
         };
     }
 
@@ -520,103 +518,99 @@ public class RetirementDefectionTracker {
             }
 
             switch (Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())) {
-                case AEROSPACE:
+                case AEROSPACE -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, asfCommander)) {
                         asfCommander = person;
                         asfCommanderModifier = getIndividualCommanderLeadership(asfCommander);
                     }
-                    break;
-                case VEHICLE:
+                }
+                case VEHICLE -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, vehicleCrewCommander)) {
                         vehicleCrewCommander = person;
                         vehicleCrewCommanderModifier = getIndividualCommanderLeadership(vehicleCrewCommander);
                     }
-                    break;
-                case INFANTRY:
+                }
+                case INFANTRY -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, infantryCommander)) {
                         infantryCommander = person;
                         infantryCommanderModifier = getIndividualCommanderLeadership(infantryCommander);
                     }
-                    break;
-                case NAVAL:
+                }
+                case NAVAL -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, navalCommander)) {
                         navalCommander = person;
                         navalCommanderModifier = getIndividualCommanderLeadership(navalCommander);
                     }
-                    break;
-                case TECH:
+                }
+                case TECH -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, techCommander)) {
                         techCommander = person;
                         techCommanderModifier = getIndividualCommanderLeadership(techCommander);
                     }
-                    break;
-                case MEDICAL:
+                }
+                case MEDICAL -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, medicalCommander)) {
                         medicalCommander = person;
                         medicalCommanderModifier = getIndividualCommanderLeadership(medicalCommander);
                     }
-                    break;
-                case ADMINISTRATOR:
+                }
+                case ADMINISTRATOR, CIVILIAN -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, administrationCommander)) {
                         administrationCommander = person;
                         administrationCommanderModifier = getIndividualCommanderLeadership(administrationCommander);
                     }
-                    break;
-                case MEKWARRIOR:
+                }
+                case MEKWARRIOR -> {
                     if (person.outRanksUsingSkillTiebreaker(campaign, mekWarriorCommander)) {
                         mekWarriorCommander = person;
                         mekWarriorCommanderModifier = getIndividualCommanderLeadership(mekWarriorCommander);
                     }
-                    break;
-                case CIVILIAN:
-                    break;
+                }
             }
         }
 
         for (Profession profession : Profession.values()) {
             switch (profession) {
-                case AEROSPACE:
+                case AEROSPACE -> {
                     if (asfCommander == null) {
                         asfCommanderModifier = 0;
                     }
-                    break;
-                case VEHICLE:
+                }
+                case VEHICLE -> {
                     if (vehicleCrewCommander == null) {
                         vehicleCrewCommanderModifier = 0;
                     }
-                    break;
-                case INFANTRY:
+                }
+                case INFANTRY -> {
                     if (infantryCommander == null) {
                         infantryCommanderModifier = 0;
                     }
-                    break;
-                case NAVAL:
+                }
+                case NAVAL -> {
                     if (navalCommander == null) {
                         navalCommanderModifier = 0;
                     }
-                    break;
-                case TECH:
+                }
+                case TECH -> {
                     if (techCommander == null) {
                         techCommanderModifier = 0;
                     }
-                    break;
-                case MEDICAL:
+                }
+                case MEDICAL -> {
                     if (medicalCommander == null) {
                         medicalCommanderModifier = 0;
                     }
-                    break;
-                case ADMINISTRATOR:
+                }
+                case ADMINISTRATOR, CIVILIAN -> {
                     if (administrationCommander == null) {
                         administrationCommanderModifier = 0;
                     }
-                    break;
-                case MEKWARRIOR:
+                }
+                case MEKWARRIOR -> {
                     if (mekWarriorCommander == null) {
                         mekWarriorCommanderModifier = 0;
                     }
-                    break;
-                case CIVILIAN:
-                    break;
+                }
             }
         }
     }
