@@ -5006,6 +5006,30 @@ public class Person {
             return getRankNumeric() > otherPerson.getRankNumeric();
         }
     }
+
+    public boolean outRanksUsingSkillTiebreaker(final CampaignOptions campaignOptions, final boolean isClanCampaign,
+          final LocalDate today, @Nullable Person otherPerson) {
+        if (otherPerson == null) {
+            return true;
+        } else if (getRankNumeric() == otherPerson.getRankNumeric()) {
+            if (getRankLevel() > otherPerson.getRankLevel()) {
+                return true;
+            } else if (getRankLevel() < otherPerson.getRankLevel()) {
+                return false;
+            } else {
+                if (getExperienceLevel(campaignOptions, isClanCampaign, today, false, true) ==
+                          otherPerson.getExperienceLevel(campaignOptions, isClanCampaign, today, false, true)) {
+                    return getExperienceLevel(campaignOptions, isClanCampaign, today, true, true) >
+                                 otherPerson.getExperienceLevel(campaignOptions, isClanCampaign, today, true, true);
+                } else {
+                    return getExperienceLevel(campaignOptions, isClanCampaign, today, false, true) >
+                                 otherPerson.getExperienceLevel(campaignOptions, isClanCampaign, today, false, true);
+                }
+            }
+        } else {
+            return getRankNumeric() > otherPerson.getRankNumeric();
+        }
+    }
     // endregion Ranks
 
     @Override
@@ -5045,6 +5069,11 @@ public class Person {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
     }
 
+    public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
+          final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
+    }
+
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         return getExperienceLevel(campaign, secondary, false);
     }
@@ -5080,15 +5109,29 @@ public class Person {
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
      */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
+        return getExperienceLevel(campaign.getCampaignOptions(), campaign.isClanCampaign(),
+              campaign.getLocalDate(), secondary, excludeInjuryEffects);
+    }
+
+    /**
+     * Determines the experience level of a person in their current profession.
+     *
+     * @param campaignOptions      the campaign options providing configuration
+     * @param isClanCampaign       whether this is a Clan campaign
+     * @param today                the current in-game date
+     * @param secondary            if {@code true}, evaluates the person's secondary role
+     * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
+     *
+     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     */
+    public int getExperienceLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
+          final LocalDate today, final boolean secondary, boolean excludeInjuryEffects) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
 
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
         final boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-        final boolean isClanCampaign = campaign.isClanCampaign();
-        final LocalDate today = campaign.getLocalDate();
 
         final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects,
               isClanCampaign,

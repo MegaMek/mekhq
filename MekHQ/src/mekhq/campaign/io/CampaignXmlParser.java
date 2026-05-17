@@ -319,9 +319,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(
                           workingNode,
                           version));
+                } else if (nodeName.equalsIgnoreCase("humanResources")) {
+                    campaign.setHumanResources(
+                          mekhq.campaign.HumanResources.loadFromXML(workingNode, campaign, version));
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
+                    // backward compat: old save without <humanResources> wrapper
                     // TODO: Make this depending on campaign options
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
