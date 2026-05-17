@@ -206,14 +206,6 @@ public class HumanResources {
     }
 
     /**
-     * @deprecated use {@link #getActivePersonnel(boolean, boolean)} instead.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public List<Person> getActivePersonnel(boolean includePrisoners) {
-        return getActivePersonnel(includePrisoners, false);
-    }
-
-    /**
      * Returns a list of personnel who are considered "active" according to various status filters.
      *
      * @param includePrisoners     {@code true} to include prisoners
@@ -291,11 +283,6 @@ public class HumanResources {
         return people.stream()
                      .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
                      .collect(Collectors.toList());
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public List<Person> getActiveCombatPersonnel() {
-        return getActiveCombatPersonnel(getActivePersonnel(false, false));
     }
 
     /**
@@ -442,12 +429,6 @@ public class HumanResources {
         asTechPool = size;
     }
 
-    /** @deprecated no longer in use **/
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public int getAsTechPool() {
-        return getTemporaryAsTechPool();
-    }
-
     public int getTemporaryAsTechPool() {
         return asTechPool;
     }
@@ -584,12 +565,6 @@ public class HumanResources {
 
     public void setMedicPool(int size) {
         medicPool = size;
-    }
-
-    /** @deprecated no longer in use **/
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public int getMedicPool() {
-        return getTemporaryMedicPool();
     }
 
     public int getTemporaryMedicPool() {
@@ -1899,24 +1874,8 @@ public class HumanResources {
         return recruitPerson(campaign, person, person.getPrisonerStatus(), false, true, true, false);
     }
 
-    /**
-     * @deprecated use {@link #recruitPerson(Campaign, Person, boolean, boolean)} instead
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public boolean recruitPerson(Campaign campaign, Person person, boolean gmAdd) {
-        return recruitPerson(campaign, person, person.getPrisonerStatus(), gmAdd, true);
-    }
-
     public boolean recruitPerson(Campaign campaign, Person person, boolean gmAdd, boolean employ) {
         return recruitPerson(campaign, person, person.getPrisonerStatus(), gmAdd, true, employ, false);
-    }
-
-    /**
-     * @deprecated use {@link #recruitPerson(Campaign, Person, PrisonerStatus, boolean)} instead
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public boolean recruitPerson(Campaign campaign, Person person, PrisonerStatus prisonerStatus) {
-        return recruitPerson(campaign, person, prisonerStatus, false, true);
     }
 
     public boolean recruitPerson(Campaign campaign, Person person, PrisonerStatus prisonerStatus, boolean employ) {
@@ -1926,16 +1885,6 @@ public class HumanResources {
     public boolean recruitPerson(Campaign campaign, Person person, PrisonerStatus prisonerStatus, boolean gmAdd,
           boolean log, boolean employ) {
         return recruitPerson(campaign, person, prisonerStatus, gmAdd, log, employ, false);
-    }
-
-    /**
-     * @deprecated use {@link #recruitPerson(Campaign, Person, PrisonerStatus, boolean, boolean, boolean, boolean)}
-     *       instead.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public boolean recruitPerson(Campaign campaign, Person person, PrisonerStatus prisonerStatus, boolean gmAdd,
-          boolean log) {
-        return recruitPerson(campaign, person, prisonerStatus, gmAdd, log, true, false);
     }
 
     /**

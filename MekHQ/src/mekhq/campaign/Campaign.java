@@ -2237,7 +2237,7 @@ public class Campaign implements ITechManager {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean recruitPerson(Person person, boolean gmAdd) {
-        return humanResources.recruitPerson(this, person, gmAdd);
+        return humanResources.recruitPerson(this, person, gmAdd, true);
     }
 
     /**
@@ -2265,7 +2265,7 @@ public class Campaign implements ITechManager {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus) {
-        return humanResources.recruitPerson(this, person, prisonerStatus);
+        return humanResources.recruitPerson(this, person, prisonerStatus, true);
     }
 
     /**
@@ -2408,7 +2408,7 @@ public class Campaign implements ITechManager {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public List<Person> getActivePersonnel(boolean includePrisoners) {
-        return humanResources.getActivePersonnel(includePrisoners);
+        return humanResources.getActivePersonnel(includePrisoners, false);
     }
 
     /**
@@ -2447,7 +2447,7 @@ public class Campaign implements ITechManager {
      */
     @Deprecated(since = "0.51.0", forRemoval = true)
     public List<Person> getActiveCombatPersonnel() {
-        return humanResources.getActiveCombatPersonnel();
+        return HumanResources.getActiveCombatPersonnel(humanResources.getActivePersonnel(false, false));
     }
 
     /**
@@ -6613,7 +6613,7 @@ public class Campaign implements ITechManager {
     /** @deprecated no longer in use **/
     @Deprecated(since = "0.50.07", forRemoval = true)
     public int getAsTechPool() {
-        return humanResources.getAsTechPool();
+        return humanResources.getTemporaryAsTechPool();
     }
 
     public int getTemporaryAsTechPool() {
