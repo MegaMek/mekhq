@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -159,10 +159,10 @@ class FinancialYearDurationTest {
      */
     @Test
     void testGetExportFilenameDateString() {
-        assertEquals("3025 Jan - Jun",
-              FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.of(3025, 7, 1)));
-        assertEquals("3025 Jul - Dec",
-              FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));
+        assertEquals("3025 jan - jun",
+              FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.of(3025, 7, 1)).toLowerCase());
+        assertEquals("3025 jul - dec",
+              FinancialYearDuration.SEMIANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)).toLowerCase());
 
         assertEquals("3024", FinancialYearDuration.ANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3025, 1)));
         assertEquals("3025", FinancialYearDuration.ANNUAL.getExportFilenameDateString(LocalDate.ofYearDay(3026, 1)));

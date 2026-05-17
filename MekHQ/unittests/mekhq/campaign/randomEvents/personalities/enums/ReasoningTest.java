@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.OBTUSE;
 import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.UNDER_PERFORMING;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -82,5 +83,13 @@ public class ReasoningTest {
             String label = status.getLabel();
             assertTrue(isResourceKeyValid(label));
         }
+    }
+
+    @Test
+    public void testGetExamResultsWithSpecificScore() {
+        int testScore = 55;
+        String result = Reasoning.AVERAGE.getExamResults(testScore);
+        assertNotNull(result);
+        assertTrue(result.contains("55"));
     }
 }

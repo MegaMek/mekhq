@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,12 +32,15 @@
  */
 package mekhq.campaign.log;
 
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -225,6 +228,12 @@ public class MedicalLogger {
     public static void dismissedFromInfirmary(Person person, LocalDate date) {
         person.addMedicalLogEntry(new MedicalLogEntry(date,
               logEntriesResourceMap.getString("dismissedFromInfirmary.text")));
+    }
+
+    public static void dismissedFromInfirmary(Person person, Campaign campaign) {
+        String message = person.getHyperlinkedName() + " " +
+                         logEntriesResourceMap.getString("dismissedFromInfirmary.text").toLowerCase();
+        campaign.addReport(MEDICAL, message);
     }
 
     public static void deliveredBaby(Person patient, Person baby, LocalDate date) {
