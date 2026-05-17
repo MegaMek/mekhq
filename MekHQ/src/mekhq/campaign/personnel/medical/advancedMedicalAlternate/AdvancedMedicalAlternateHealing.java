@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,6 +50,7 @@ import java.util.Set;
 
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
@@ -74,6 +75,12 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 public class AdvancedMedicalAlternateHealing {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedMedicalAlternateHealing";
     private static final int PROSTHETIC_PENALTY = 4; // Interstellar Operations page 70
+
+    private static Campaign campaign;
+
+    public static void setCampaign(Campaign campaign) {
+        AdvancedMedicalAlternateHealing.campaign = campaign;
+    }
 
     /**
      * Processes the start-of-day healing for a given patient.
@@ -451,6 +458,9 @@ public class AdvancedMedicalAlternateHealing {
             patient.removeInjury(injury, today);
 
             if (patient.getInjuries().isEmpty()) {
+                if (!(null == patient.getDoctorId()) && patient.getPrisonerStatus().isFreeOrBondsman()) {
+                    MedicalLogger.dismissedFromInfirmary(patient, campaign);
+                }
                 // AAM doesn't use 'days to wait for healing' so we just set it to '1.' If the player toggles AAM off,
                 // they will get a free day's worth of healing the next day, but that's not a huge issue.
                 patient.setDoctorId(null, 1); // Clear old doctor assignment, if any
