@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,15 +32,13 @@
  */
 package mekhq.campaign.icons.enums;
 
-import static megamek.codeUtilities.MathUtility.clamp;
-
 import megamek.common.units.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.unit.Unit;
 
 /**
  * This is the Operational Status of a force or unit, as part of automatically assigning and updating the force's
- * LayeredForceIcon on a new day. It is also used to determine the Operation Status for a unit.
+ * LayeredFormationIcon on a new day. It is also used to determine the Operation Status for a unit.
  *
  * @author Justin "Windchild" Bowen
  */
@@ -70,22 +68,27 @@ public enum OperationalStatus {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isFullyOperational() {
         return this == FULLY_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isSubstantiallyOperational() {
         return this == SUBSTANTIALLY_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMarginallyOperational() {
         return this == MARGINALLY_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isNotOperational() {
         return this == NOT_OPERATIONAL;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isFactoryFresh() {
         return this == FACTORY_FRESH;
     }
@@ -99,7 +102,7 @@ public enum OperationalStatus {
      *
      * @return the determined operational status
      */
-    public static OperationalStatus determineLayeredForceIconOperationalStatus(final Unit unit) {
+    public static OperationalStatus determineLayeredFormationIconOperationalStatus(final Unit unit) {
         if (unit.isMothballing() || unit.isMothballed() || !unit.isPresent() || unit.isRefitting()
                   || !unit.isRepairable() || !unit.isFunctional()) {
             return NOT_OPERATIONAL;
@@ -114,19 +117,20 @@ public enum OperationalStatus {
     }
 
     /**
-     * Retrieves the {@code LayeredForceIconOperationalStatus} corresponding to the given ordinal value.
+     * Retrieves the {@code LayeredFormationIconOperationalStatus} corresponding to the given ordinal value.
      * <p>
      * If the specified ordinal is out of range, it will be clamped to ensure it lies within the valid range of the
      * available enumeration values.
      *
-     * @param ordinal the ordinal value to map to a {@code LayeredForceIconOperationalStatus}. If the value is less than
-     *                0, it will be clamped to 0. If it exceeds the maximum ordinal value, it will be clamped to the
-     *                last index.
+     * @param ordinal the ordinal value to map to a {@code LayeredFormationIconOperationalStatus}. If the value is less
+     *                than 0, it will be clamped to 0. If it exceeds the maximum ordinal value, it will be clamped to
+     *                the last index.
      *
-     * @return the corresponding {@code LayeredForceIconOperationalStatus} enum value for the adjusted ordinal.
+     * @return the corresponding {@code LayeredFormationIconOperationalStatus} enum value for the adjusted ordinal.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static OperationalStatus fromInt(int ordinal) {
-        ordinal = clamp(ordinal, 0, values().length);
+        ordinal = Math.clamp(ordinal, 0, values().length);
 
         return values()[ordinal];
     }

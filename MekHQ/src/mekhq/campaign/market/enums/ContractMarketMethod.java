@@ -76,6 +76,7 @@ public enum ContractMarketMethod {
         return this == ATB_MONTHLY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCamOps() {
         return this == CAM_OPS;
     }

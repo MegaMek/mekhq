@@ -71,6 +71,7 @@ public class ProtoMekJumpJet extends Part {
                                                                        AvailabilityValue.C)
                                                                  .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ProtoMekJumpJet() {
         this(0, null);
     }

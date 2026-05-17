@@ -197,6 +197,8 @@ public enum PartQuality {
     /**
      * @return A list of PartQualities in order bad to good
      */
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static List<PartQuality> allQualities(boolean reversed) {
         if (reversed) {
             return List.of(QUALITY_F, QUALITY_E, QUALITY_D, QUALITY_C, QUALITY_B, QUALITY_A);

@@ -87,7 +87,7 @@ public class JumpBlockers {
      * Collects all units in the campaign that are classified as {@link Jumpship Jumpships} but are not currently able
      * to jump.
      *
-     * <p>A unit is considered a “jump blocker” if:</p>
+     * <p>A unit is considered a “jump blocker" if:</p>
      * <ul>
      *     <li>Its entity is a {@code Jumpship}, and</li>
      *     <li>It has no drive core ({@code DRIVE_CORE_NONE}) <em>or</em> {@link Jumpship#canJump()} returns

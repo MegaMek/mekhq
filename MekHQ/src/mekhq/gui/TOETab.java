@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,6 +49,7 @@ import javax.swing.*;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
@@ -58,7 +59,7 @@ import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
@@ -77,7 +78,6 @@ import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
@@ -241,34 +241,34 @@ public final class TOETab extends CampaignGuiTab {
      */
     private void deployToRegularScenario(Scenario selectedScenario) {
         // Get available forces
-        List<Force> forceOptions = getCampaign().getCombatTeamsAsList().stream()
-                                         .map(combatTeam -> getCampaign().getForce(combatTeam.getForceId()))
-                                         .filter(force -> force != null && !force.isDeployed())
-                                         .sorted(Comparator.comparing(Force::getFullName))
-                                         .toList();
+        List<Formation> formationOptions = getCampaign().getCombatTeamsAsList().stream()
+                                                 .map(combatTeam -> getCampaign().getFormation(combatTeam.getFormationId()))
+                                                 .filter(force -> force != null && !force.isDeployed())
+                                                 .sorted(Comparator.comparing(Formation::getFullName))
+                                                 .toList();
 
         // Show force picker
-        MaplessStratConForcePicker forcePicker = new MaplessStratConForcePicker(getCampaign(), forceOptions);
+        MaplessStratConForcePicker forcePicker = new MaplessStratConForcePicker(getCampaign(), formationOptions);
         if (!forcePicker.wasConfirmed()) {
             return;
         }
 
-        Force selectedForce = forceOptions.get(forcePicker.getComboBoxChoiceIndex());
+        Formation selectedFormation = formationOptions.get(forcePicker.getComboBoxChoiceIndex());
 
         // Deploy force to scenario
         if (selectedScenario instanceof AtBDynamicScenario dynamicScenario) {
             new ForceTemplateAssignmentDialog(getCampaignGui(),
-                  new Vector<>(List.of(selectedForce)),
+                  new Vector<>(List.of(selectedFormation)),
                   null,
                   dynamicScenario);
         } else {
-            getCampaignGui().undeployForce(selectedForce);
-            selectedForce.clearScenarioIds(getCampaign(), true);
+            getCampaignGui().undeployForce(selectedFormation);
+            selectedFormation.clearScenarioIds(getCampaign(), true);
             if (selectedScenario != null) {
-                selectedScenario.addForces(selectedForce.getId());
-                selectedForce.setScenarioId(selectedScenario.getId(), getCampaign());
+                selectedScenario.addForces(selectedFormation.getId());
+                selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             }
-            MekHQ.triggerEvent(new DeploymentChangedEvent(selectedForce, selectedScenario));
+            MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
         }
     }
 
@@ -301,7 +301,7 @@ public final class TOETab extends CampaignGuiTab {
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 crewPanel.getAccessibleContext().setAccessibleName("Crew for " + unit.getName());
-                final JScrollPane scrollPerson = new JScrollPaneWithSpeed();
+                final JScrollPane scrollPerson = new FastJScrollPane();
                 scrollPerson.setBorder(null);
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
@@ -312,7 +312,7 @@ public final class TOETab extends CampaignGuiTab {
                  */
                 final JList<Person> crewList = getCrewList(model, scrollPerson);
                 if (crewSize > 1) {
-                    JScrollPaneWithSpeed crewScrollPane = new JScrollPaneWithSpeed(crewList);
+                    FastJScrollPane crewScrollPane = new FastJScrollPane(crewList);
                     crewScrollPane.setBorder(null);
                     crewPanel.add(crewScrollPane, BorderLayout.NORTH);
                 }
@@ -324,7 +324,7 @@ public final class TOETab extends CampaignGuiTab {
                 tabUnit.add(name, crewPanel);
                 SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
-            final JScrollPane scrollUnit = new JScrollPaneWithSpeed(new UnitViewPanel(unit, getCampaign()));
+            final JScrollPane scrollUnit = new FastJScrollPane(new UnitViewPanel(unit, getCampaign()));
             scrollUnit.setBorder(null);
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
@@ -335,8 +335,8 @@ public final class TOETab extends CampaignGuiTab {
             } catch (IndexOutOfBoundsException ignored) {}
             // We can ignore here because if the selected index is out of bounds, we're just going
             // to not select the unit in the TO&E.
-        } else if (node instanceof Force) {
-            final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Force) node, getCampaign()));
+        } else if (node instanceof Formation) {
+            final JScrollPane scrollForce = new FastJScrollPane(new ForceViewPanel((Formation) node, getCampaign()));
             scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             panForceView.setBorder(null);

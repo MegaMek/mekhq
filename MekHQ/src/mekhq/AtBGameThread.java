@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ package mekhq;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -68,9 +67,9 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
-import megamek.common.net.packets.InvalidPacketDataException;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -88,6 +87,7 @@ import mekhq.utilities.ScenarioUtils;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class AtBGameThread extends GameThread {
     private static final MMLogger LOGGER = MMLogger.create(AtBGameThread.class);
 
@@ -251,15 +251,16 @@ public class AtBGameThread extends GameThread {
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
                         if (scenario.getCombatRole().isPatrol() &&
                                   (scenario.getCombatTeamById(campaign) != null) &&
-                                  (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId()) &&
+                                  (scenario.getCombatTeamById(campaign).getFormationId() ==
+                                         scenario.getCombatTeamId()) &&
                                   !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    Force force = campaign.getForceFor(unit);
-                    if (force != null) {
-                        entity.setForceString(force.getFullMMName());
+                    Formation formation = campaign.getFormationFor(unit);
+                    if (formation != null) {
+                        entity.setForceString(formation.getFullMMName());
                     }
                     entities.add(entity);
 
@@ -309,7 +310,8 @@ public class AtBGameThread extends GameThread {
                         if (!useDropship &&
                                   scenario.getCombatRole().isPatrol() &&
                                   (scenario.getCombatTeamById(campaign) != null) &&
-                                  (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+                                  (scenario.getCombatTeamById(campaign).getFormationId() ==
+                                         scenario.getCombatTeamId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
@@ -546,7 +548,7 @@ public class AtBGameThread extends GameThread {
                         if (towUnits) {
                             // Convert the list of Unit UUIDs to MM EntityIds
                             Unit towedUnit = campaign.getUnit(potentialTransports.getTransportedUnits(TOW_TRANSPORT,
-                                  transportId).get(0));
+                                  transportId).getFirst());
                             if (towedUnit != null && towedUnit.getEntity() != null) {
                                 // And now tow the units.
                                 Utilities.towPlayerTrailers(transport.getEntity().getId(),
@@ -625,8 +627,7 @@ public class AtBGameThread extends GameThread {
         return useDropship;
     }
 
-    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException,
-                                                                               InvalidPacketDataException{
+    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
         var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
@@ -736,9 +737,9 @@ public class AtBGameThread extends GameThread {
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = getStandardForceSize(contract.getEnemy());
+            lanceSize = CombatTeam.getStandardFormationSize(contract.getEnemy());
         } else {
-            lanceSize = getStandardForceSize(contract.getEmployerFaction());
+            lanceSize = CombatTeam.getStandardFormationSize(contract.getEmployerFaction());
         }
 
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));

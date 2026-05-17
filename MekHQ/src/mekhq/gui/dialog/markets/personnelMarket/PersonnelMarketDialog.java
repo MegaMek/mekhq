@@ -194,7 +194,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         AtomicReference<Person> selectedPerson = new AtomicReference<>();
         if (!currentApplicants.isEmpty()) {
-            selectedPerson.set(tablePanel.getSelectedApplicants().get(0));
+            selectedPerson.set(tablePanel.getSelectedApplicants().getFirst());
         }
 
         // This handles the initializing and display of the applicant panel
@@ -455,7 +455,7 @@ public class PersonnelMarketDialog extends JDialog {
             if (!e.getValueIsAdjusting()) {
                 SwingUtilities.invokeLater(() -> {
                     List<Person> selected = tablePanel.getSelectedApplicants();
-                    Person selectedPerson = selected.isEmpty() ? null : selected.get(0);
+                    Person selectedPerson = selected.isEmpty() ? null : selected.getFirst();
                     personViewPanel.setPerson(selectedPerson);
                 });
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,6 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import static java.lang.Math.round;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -168,7 +167,7 @@ public enum Reasoning {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public String getDescription(int reasoningDescriptionIndex, final Gender gender, final String givenName) {
-        reasoningDescriptionIndex = clamp(reasoningDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+        reasoningDescriptionIndex = Math.clamp(reasoningDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = comparison + ".description." + reasoningDescriptionIndex;
         final PronounData pronounData = new PronounData(gender);
@@ -195,18 +194,27 @@ public enum Reasoning {
     }
 
     /**
+     * @deprecated use {@link #getExamResults(int)} instead.
+     *
+     */
+    @Deprecated(since = "0.51.00", forRemoval = true)
+    public String getExamResults() {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
+    }
+
+    /**
      * Retrieves the formatted exam results text.
      *
-     * <p>Calculates the result percentage based on the current {@code level} relative to {@code GENIUS.level},
-     * and uses this value to format the exam results text from the resource bundle.</p>
+     * <p>Uses the supplied result percentage (that was calculated earlier using {@link #getExamScore()} ) to format
+     * the exam results text from the resource bundle.</p>
      *
-     * @return the formatted exam results string with the calculated percentage inserted.
+     * @return the formatted exam results string with the supplied result percentage inserted.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getExamResults() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
+    public String getExamResults(final int examScore) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", examScore);
     }
 
     /**
@@ -222,7 +230,7 @@ public enum Reasoning {
     public int getExamScore() {
         int results = (int) round(((double) this.level / GENIUS.level) * 100) - 5;
         results += randomInt(11);
-        results = clamp(results, 0, 100);
+        results = Math.clamp(results, 0, 100);
 
         return results;
     }
@@ -272,6 +280,7 @@ public enum Reasoning {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPersonalityTraitTypeLabel() {
         return getPersonalityTraitType().getLabel();
     }

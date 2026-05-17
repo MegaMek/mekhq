@@ -101,6 +101,7 @@ public class PerformanceLogger {
         }
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static void changedEdge(final Campaign campaign, final Person person, final LocalDate date) {
         if (campaign.getCampaignOptions().isPersonnelLogEdgeGain()) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,

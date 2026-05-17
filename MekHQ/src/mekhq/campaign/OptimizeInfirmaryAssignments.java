@@ -147,7 +147,7 @@ public class OptimizeInfirmaryAssignments {
                 continue;
             }
 
-            Person doctor = doctors.get(0);
+            Person doctor = doctors.getFirst();
             if (doctorCapacity == 0) {
                 doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
@@ -163,7 +163,7 @@ public class OptimizeInfirmaryAssignments {
 
             // Check if the current doctor has reached their patient limit
             if (++patientCounter == doctorCapacity) {
-                doctors.remove(0); // Move to the next doctor
+                doctors.removeFirst(); // Move to the next doctor
                 patientCounter = 0; // Reset patient counter
                 doctorCapacity = 0; // Reset doctor capacity
             }

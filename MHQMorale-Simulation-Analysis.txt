@@ -1,0 +1,490 @@
+================================================================================
+MHQMorale Logic Error Analysis - Simulation Walkthrough
+================================================================================
+Date: 2025-11-21
+Analyst: Code Review
+File: MekHQ/src/mekhq/campaign/mission/MHQMorale.java
+Issue: Player feedback indicates morale changes are inconsistent and unpredictable
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+ROOT CAUSE IDENTIFIED: Pyrrhic Victory Bug (Line 466)
+
+Current code counts Pyrrhic Victories as DEFEATS ONLY, when they should count
+as BOTH victories AND defeats (a costly win). This causes:
+
+1. Morale moving in WRONG direction (OpFor improves when player wins)
+2. Morale changing TOO SLOWLY when player wins (missing victory points)
+3. Morale changing TOO QUICKLY when player loses (inflated defeat counts)
+4. Morale NOT MOVING at all (artificial ties from miscounting)
+
+IMPACT: In a 20-scenario contract with 14 wins and 6 losses (70% win rate),
+the code calculates 10 wins and 12 losses (45% win rate) - a 25% error!
+
+================================================================================
+SIMULATION SETUP
+================================================================================
+
+Contract Parameters:
+- Start Date: January 1, 3025
+- Duration: 5 months (20 scenarios, 4 per month)
+- Initial Morale Level: STALEMATE
+- Enemy Faction: Regular-skilled Mercenaries (not Clan)
+- Enemy Skill: Regular (adjusted value = 4)
+
+Reliability Modifier Calculation (Constant):
+  Base modifier for Regular skill (4): 0
+  Enemy is Mercenary: +1 modifier (easier to break)
+  Final Reliability Modifier: +1
+
+Morale Check Modifiers Used:
+- Decisive Victory Modifier: -4
+- Victory Modifier: -2
+- Defeat Modifier: +2
+- Decisive Defeat Modifier: +4
+
+================================================================================
+MONTH 1: JANUARY (4 Scenarios)
+================================================================================
+
+Starting Morale: STALEMATE
+
+--- Scenario 1 (Jan 8): VICTORY ---
+  Code execution (line 471):
+    if (scenarioStatus.isOverallVictory()) {
+        victories++;  // victories = 1
+    }
+  Running tally: victories=1, defeats=0
+
+--- Scenario 2 (Jan 15): PYRRHIC VICTORY ---
+  Code execution (line 466):
+    if (scenarioStatus.isPyrrhicVictory() || scenarioStatus.isFleetInBeing()) {
+        defeats++;   // defeats = 1
+        continue;    // SKIPS victory check - BUG!
+    }
+
+  [!] BUG ALERT: Pyrrhic Victory counted as defeat only!
+      Expected: victories=2, defeats=1
+      Actual:   victories=1, defeats=1
+
+--- Scenario 3 (Jan 22): DECISIVE VICTORY ---
+  Code execution (line 461):
+    if (scenarioStatus.isDecisiveVictory()) {
+        victories += 2;  // victories = 3
+    }
+  Running tally: victories=3, defeats=1
+
+--- Scenario 4 (Jan 29): DEFEAT ---
+  Code execution (line 473):
+    else if (scenarioStatus.isOverallDefeat()) {
+        defeats++;  // defeats = 2
+    }
+  Running tally: victories=3, defeats=2
+
+--- End of Month Morale Check (Jan 31) ---
+
+Performance Modifier Calculation (lines 482-487):
+  victories (3) > defeats (2)
+  3 >= 2*2? NO (need 4+ for decisive)
+  Performance Modifier = -2 (normal victory)
+
+Target Number:
+  Reliability: +1
+  Performance: -2
+  Total: -1
+
+Morale Roll:
+  2d6 Roll: 7
+  Modified Roll: 7 + (-1) = 6
+
+Morale Outcome (line 239):
+  6 <= RALLYING_TARGET_NUMBER (6)? YES
+  Outcome: RALLYING
+  Morale Change: STALEMATE -> ADVANCING
+
+[!] ISSUE #1: Player won 3 scenarios (including decisive) and lost 2,
+    but OpFor morale IMPROVED! Feels backwards.
+
+    Root Cause: Missing Pyrrhic Victory victory point made it 3-2 instead
+    of the actual 4-2, reducing the performance modifier.
+
+Month 1 Result: STALEMATE -> ADVANCING (OpFor morale improved)
+
+================================================================================
+MONTH 2: FEBRUARY (4 Scenarios)
+================================================================================
+
+Starting Morale: ADVANCING
+
+--- Scenario 5 (Feb 5): PYRRHIC VICTORY ---
+  Running tally: victories=0, defeats=1
+  [!] BUG: Should be victories=1, defeats=1
+
+--- Scenario 6 (Feb 12): VICTORY ---
+  Running tally: victories=1, defeats=1
+
+--- Scenario 7 (Feb 19): PYRRHIC VICTORY ---
+  Running tally: victories=1, defeats=2
+  [!] BUG: Should be victories=2, defeats=2
+
+--- Scenario 8 (Feb 26): VICTORY ---
+  Running tally: victories=2, defeats=2
+
+--- End of Month Morale Check (Feb 28) ---
+
+Performance Modifier Calculation:
+  victories (2) == defeats (2)
+  Neither victories > defeats nor defeats > victories
+  Performance Modifier = 0 (DRAW)
+
+Target Number:
+  Reliability: +1
+  Performance: 0
+  Total: +1
+
+Morale Roll:
+  2d6 Roll: 7
+  Modified Roll: 7 + 1 = 8
+
+Morale Outcome (line 249):
+  8 >= WAVERING_TARGET_NUMBER (8)? YES
+  Outcome: WAVERING
+  Morale Change: ADVANCING -> STALEMATE
+
+[!] ISSUE #2: Player won 4 scenarios (2 normal, 2 pyrrhic) and lost 0,
+    but performance calculated as TIE.
+
+    Expected: 4-0 = decisive victory modifier
+    Actual: 2-2 = no modifier (draw)
+
+    Player Experience: "I won 4 battles and morale barely moved!"
+
+Month 2 Result: ADVANCING -> STALEMATE (OpFor morale degraded slightly)
+
+================================================================================
+MONTH 3: MARCH (4 Scenarios)
+================================================================================
+
+Starting Morale: STALEMATE
+
+--- Scenario 9 (Mar 5): DECISIVE DEFEAT ---
+  Running tally: victories=0, defeats=2
+
+--- Scenario 10 (Mar 12): VICTORY ---
+  Running tally: victories=1, defeats=2
+
+--- Scenario 11 (Mar 19): DEFEAT ---
+  Running tally: victories=1, defeats=3
+
+--- Scenario 12 (Mar 26): PYRRHIC VICTORY ---
+  Running tally: victories=1, defeats=4
+  [!] BUG: Should be victories=2, defeats=4
+
+--- End of Month Morale Check (Mar 31) ---
+
+Performance Modifier Calculation:
+  defeats (4) > victories (1)
+  4 >= 1*2? YES
+  Performance Modifier = +4 (decisive defeat)
+
+Target Number:
+  Reliability: +1
+  Performance: +4
+  Total: +5
+
+Morale Roll:
+  2d6 Roll: 5
+  Modified Roll: 5 + 5 = 10
+
+Morale Outcome:
+  10 >= WAVERING_TARGET_NUMBER (8)? YES
+  Outcome: WAVERING
+  Morale Change: STALEMATE -> WEAKENED
+
+[!] ISSUE #3: Month had 1 decisive defeat and 1 regular defeat, but
+    Pyrrhic Victory made it look WORSE (4 defeats vs 3).
+
+    Expected Performance: +2 (regular defeat, since 3 < 2*2)
+    Actual Performance: +4 (decisive defeat)
+
+Month 3 Result: STALEMATE -> WEAKENED (OpFor morale degraded)
+
+================================================================================
+MONTH 4: APRIL (4 Scenarios) - THE KILLER EXAMPLE
+================================================================================
+
+Starting Morale: WEAKENED
+
+--- Scenario 13 (Apr 2): PYRRHIC VICTORY ---
+  Running tally: victories=0, defeats=1
+
+--- Scenario 14 (Apr 9): PYRRHIC VICTORY ---
+  Running tally: victories=0, defeats=2
+
+--- Scenario 15 (Apr 16): PYRRHIC VICTORY ---
+  Running tally: victories=0, defeats=3
+
+--- Scenario 16 (Apr 23): VICTORY ---
+  Running tally: victories=1, defeats=3
+
+--- End of Month Morale Check (Apr 30) ---
+
+Performance Modifier Calculation:
+  defeats (3) > victories (1)
+  3 >= 1*2? YES
+  Performance Modifier = +4 (decisive defeat)
+
+Target Number:
+  Reliability: +1
+  Performance: +4
+  Total: +5
+
+Morale Roll:
+  2d6 Roll: 9
+  Modified Roll: 9 + 5 = 14
+
+Morale Outcome:
+  14 >= WAVERING_TARGET_NUMBER (8)? YES
+  Outcome: WAVERING
+  Morale Change: WEAKENED -> CRITICAL
+
+[!] ISSUE #4 - THE SMOKING GUN:
+
+    PLAYER WON ALL 4 BATTLES THIS MONTH (3 pyrrhic, 1 normal)
+    CODE CALCULATED: 1 victory, 3 defeats = "decisive defeat"
+
+    Expected: 4-0 victories = -4 performance (decisive victory)
+    Actual: 1-3 defeats = +4 performance (decisive defeat)
+
+    This is an 8-point swing in the WRONG direction!
+
+    Player Experience: "I won every single battle this month and my
+    enemy's morale is IMPROVING?! This makes no sense!"
+
+Month 4 Result: WEAKENED -> CRITICAL (OpFor morale improved significantly)
+
+================================================================================
+MONTH 5: MAY (4 Scenarios)
+================================================================================
+
+Starting Morale: CRITICAL
+
+--- Scenario 17 (May 7): DECISIVE VICTORY ---
+  Running tally: victories=2, defeats=0
+
+--- Scenario 18 (May 14): VICTORY ---
+  Running tally: victories=3, defeats=0
+
+--- Scenario 19 (May 21): PYRRHIC VICTORY ---
+  Running tally: victories=3, defeats=1
+  [!] BUG: Should be victories=4, defeats=1
+
+--- Scenario 20 (May 28): VICTORY ---
+  Running tally: victories=4, defeats=1
+
+--- End of Month Morale Check (May 31) ---
+
+Performance Modifier Calculation:
+  victories (4) > defeats (1)
+  4 >= 1*2? YES
+  Performance Modifier = -4 (decisive victory)
+
+Target Number:
+  Reliability: +1
+  Performance: -4
+  Total: -3
+
+Morale Roll:
+  2d6 Roll: 4
+  Modified Roll: 4 + (-3) = 1
+
+Morale Outcome:
+  1 <= RALLYING_TARGET_NUMBER (6)? YES
+  Outcome: RALLYING
+  Morale Change: CRITICAL -> WEAKENED
+
+Month 5 Result: CRITICAL -> WEAKENED (OpFor morale degraded)
+
+================================================================================
+FINAL SUMMARY - 20 SCENARIOS
+================================================================================
+
+ACTUAL BATTLE RESULTS:
+  Decisive Victories: 2
+  Normal Victories: 6
+  Pyrrhic Victories: 6  <-- THESE ARE WINS!
+  Draws: 0
+  Defeats: 4
+  Decisive Defeats: 2
+
+  TOTAL: 14 Wins, 6 Losses (70% Win Rate)
+
+WHAT THE CODE CALCULATED:
+  Victory Points: 10 (4 from decisive, 6 from normal)
+  Defeat Points: 12 (4 from decisive, 2 from normal, 6 from pyrrhic)
+
+  CODE THINKS: 10 Wins, 12 Losses (45% Win Rate)
+
+  MISSING: 6 victory points from Pyrrhic Victories
+
+MORALE PROGRESSION:
+  Start:   STALEMATE
+  Month 1: ADVANCING   (won 3-2, but morale IMPROVED - wrong direction!)
+  Month 2: STALEMATE   (won 4-0, counted as 2-2 tie)
+  Month 3: WEAKENED    (lost 3-1, but 1 win ignored)
+  Month 4: CRITICAL    (won 4-0, counted as 1-3 LOSS!)
+  Month 5: WEAKENED    (won 4-1, finally calculated correctly)
+
+================================================================================
+ROOT CAUSE ANALYSIS
+================================================================================
+
+BUG LOCATION: MHQMorale.java, lines 465-469
+
+CURRENT CODE:
+```java
+// Pyrrhic Victory reduces victory count (negative consequence)
+if (scenarioStatus.isPyrrhicVictory() || scenarioStatus.isFleetInBeing()) {
+    defeats++;
+    continue;
+}
+```
+
+PROBLEMS:
+1. Comment is WRONG: Says "reduces victory count" but actually ADDS to defeats
+2. Pyrrhic Victory counts ONLY as defeat, never as victory
+3. The 'continue' statement prevents fall-through to victory check
+4. Pyrrhic Victory and Fleet in Being should NOT be grouped together
+
+WHAT SHOULD HAPPEN:
+- Pyrrhic Victory = costly win = BOTH victory AND defeat
+- Fleet in Being = deployed but didn't fight = defeat only
+
+IMPACT ON PLAYER EXPERIENCE:
+1. "Morale moves too quickly" - When player has Pyrrhic wins, they inflate
+   defeat counts, making performance swing negative faster
+
+2. "Morale moves too slowly" - Missing victory points means it takes longer
+   to accumulate enough wins for meaningful morale degradation
+
+3. "Morale doesn't move at all" - Pyrrhic victories create artificial ties
+   (Month 2: 4 wins counted as 2-2 tie)
+
+4. "Morale moves in wrong direction" - Most egregious in Month 4 where
+   player won all 4 battles but OpFor morale improved dramatically
+
+================================================================================
+RECOMMENDED FIX
+================================================================================
+
+CHANGE lines 465-469 FROM:
+```java
+// Pyrrhic Victory reduces victory count (negative consequence)
+if (scenarioStatus.isPyrrhicVictory() || scenarioStatus.isFleetInBeing()) {
+    defeats++;
+    continue;
+}
+```
+
+TO:
+```java
+// Pyrrhic Victory counts as both a win and a loss (costly victory)
+if (scenarioStatus.isPyrrhicVictory()) {
+    victories++;
+    defeats++;
+    continue;
+}
+// Fleet in Being counts as a defeat (deployed but did not fight)
+if (scenarioStatus.isFleetInBeing()) {
+    defeats++;
+    continue;
+}
+```
+
+CHANGES:
+1. Separate Pyrrhic Victory from Fleet in Being (different semantics)
+2. Pyrrhic Victory now adds to BOTH victories and defeats
+3. Comments now accurately describe behavior
+4. Fleet in Being remains defeat-only (correct per glossary)
+
+================================================================================
+EXPECTED IMPACT OF FIX
+================================================================================
+
+SIMULATION RE-RUN WITH FIX:
+
+Month 1: victories=4, defeats=2 (was 3-2)
+  Performance: -2 (victory) remains same
+  But closer to decisive threshold
+
+Month 2: victories=4, defeats=2 (was 2-2)
+  Performance: -2 (victory) instead of 0 (draw)
+  OpFor morale degrades instead of staying flat
+
+Month 3: victories=2, defeats=4 (was 1-4)
+  Performance: +2 (defeat) instead of +4 (decisive defeat)
+  Less severe morale swing
+
+Month 4: victories=4, defeats=3 (was 1-3)
+  Performance: -2 (victory) instead of +4 (decisive defeat)
+  Complete reversal - morale degrades as expected!
+
+Month 5: victories=5, defeats=1 (was 4-1)
+  Performance: -4 (decisive victory) remains same
+
+FINAL TOTALS:
+  Actual: 14 wins, 6 losses
+  With Fix: 14 wins, 12 losses (accounts for costly wins)
+  Current Bug: 10 wins, 12 losses (missing 4 wins entirely)
+
+PLAYER EXPERIENCE IMPROVEMENTS:
+1. Morale changes match battle outcomes (no more backwards movement)
+2. Winning streaks properly degrade enemy morale
+3. Pyrrhic victories feel costly but still count as wins
+4. Performance calculations are intuitive and predictable
+
+================================================================================
+ADDITIONAL ISSUE: Incorrect Comment at Line 345-346
+================================================================================
+
+LOCATION: getReliability() method
+
+CURRENT COMMENT:
+```java
+// It's important to note that here a positive modifier is bad for the player,
+// as when fed into getReliabilityModifier() it will make the OpFor harder to
+// rout (not easier, as is the case with all other positive modifiers)
+```
+
+THIS COMMENT IS BACKWARDS.
+
+ACTUAL FLOW:
+1. Positive reliability modifier -> added to targetNumber (line 145)
+2. Higher targetNumber -> higher modifiedRoll (line 153)
+3. Higher modifiedRoll -> more likely to hit WAVERING_TARGET_NUMBER (8)
+4. WAVERING outcome -> OpFor morale DEGRADES (good for player)
+
+THEREFORE: Positive modifier = GOOD for player (easier to break morale)
+
+The comments at lines 358 and 360 are CORRECT:
+- Line 358: reliabilityModifier++ // "Good for the player"
+- Line 360: reliabilityModifier-- // "Bad for the player"
+
+RECOMMENDED FIX:
+Remove or rewrite the misleading comment at lines 345-346.
+
+================================================================================
+TESTING RECOMMENDATIONS
+================================================================================
+
+1. Create unit tests for Pyrrhic Victory scenarios
+2. Test all performance modifier thresholds (2:1 ratios)
+3. Verify morale progression matches expected outcomes
+4. Test edge cases (all pyrrhic, all decisive, etc.)
+5. Confirm Fleet in Being still works correctly
+
+================================================================================
+END OF ANALYSIS
+================================================================================

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,52 +38,52 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 
 public class OrgTreeModel implements TreeModel {
-    private final Force rootForce;
+    private final Formation rootFormation;
     private final Vector<TreeModelListener> listeners = new Vector<>();
     private final Campaign campaign;
 
     public OrgTreeModel(Campaign c) {
         campaign = c;
-        rootForce = campaign.getForces();
+        rootFormation = campaign.getFormations();
     }
 
     @Override
     public Object getChild(Object parent, int index) {
-        if (parent instanceof Force) {
-            return ((Force) parent).getAllChildren(campaign).get(index);
+        if (parent instanceof Formation) {
+            return ((Formation) parent).getAllChildren(campaign).get(index);
         }
         return null;
     }
 
     @Override
     public int getChildCount(Object parent) {
-        if (parent instanceof Force) {
-            return ((Force) parent).getAllChildren(campaign).size();
+        if (parent instanceof Formation) {
+            return ((Formation) parent).getAllChildren(campaign).size();
         }
         return 0;
     }
 
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        if (parent instanceof Force) {
-            return ((Force) parent).getAllChildren(campaign).indexOf(child);
+        if (parent instanceof Formation) {
+            return ((Formation) parent).getAllChildren(campaign).indexOf(child);
         }
         return 0;
     }
 
     @Override
     public Object getRoot() {
-        return rootForce;
+        return rootFormation;
     }
 
     @Override
     public boolean isLeaf(Object node) {
         return (node instanceof Unit)
-                     || ((node instanceof Force) && ((Force) node).getAllChildren(campaign).isEmpty());
+                     || ((node instanceof Formation) && ((Formation) node).getAllChildren(campaign).isEmpty());
     }
 
     @Override

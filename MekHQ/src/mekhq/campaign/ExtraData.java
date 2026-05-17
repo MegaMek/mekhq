@@ -184,6 +184,7 @@ public class ExtraData {
      *
      * @return The previous value if there was one.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public <T> T setString(Key<T> key, String value) {
         if (null == key) {
             return null;
@@ -262,6 +263,7 @@ public class ExtraData {
     /**
      * Register an adapter translating from String to the given value. Already existing adapters are not overwritten.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static <T> void registerAdapter(Class<T> cls, StringAdapter<T> adapter) {
         if ((null != cls) && (null != adapter) && !ADAPTERS.containsKey(cls)) {
             ADAPTERS.put(cls, adapter);
@@ -441,6 +443,7 @@ public class ExtraData {
     }
 
     /** A key referencing a Double or double value */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static class DoubleKey extends Key<Double> {
         public DoubleKey(String name) {
             super(name, Double.class);
@@ -448,6 +451,7 @@ public class ExtraData {
     }
 
     /** A key referencing a Boolean or boolean value */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static class BooleanKey extends Key<Boolean> {
         public BooleanKey(String name) {
             super(name, Boolean.class);

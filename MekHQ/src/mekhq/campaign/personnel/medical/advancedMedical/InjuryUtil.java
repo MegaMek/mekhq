@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -350,6 +350,7 @@ public final class InjuryUtil {
      *
      * @return calculated healing time in days (minimum 1)
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int genHealingTime(Campaign campaign, Person person, Injury injury) {
         return genHealingTime(campaign, person, injury.getType(), injury.getHits());
     }
@@ -508,7 +509,7 @@ public final class InjuryUtil {
             final int injuries = numTreated;
             final String treatmentSummary = (xpGained > 0) ?
                                                   String.format("%s successfully treated %s for %d injuries " +
-                                                                      "(%d XP gained, %d for mistakes, %d for critical successes, and %d for tasks).",
+                                                                "(%d XP gained, %d for mistakes, %d for critical successes, and %d for tasks).",
                                                         doctor.getHyperlinkedFullTitle(),
                                                         person.getHyperlinkedName(),
                                                         numTreated,
@@ -597,6 +598,10 @@ public final class InjuryUtil {
                 } else if (!person.needsFixing()) {
                     dismissed = true;
                     MedicalLogger.dismissedFromInfirmary(person, campaign.getLocalDate());
+                    //employed only; prisoners would probably be too much needless spam
+                    if (person.getPrisonerStatus().isFreeOrBondsman()) {
+                        MedicalLogger.dismissedFromInfirmary(person, campaign);
+                    }
                 }
 
                 if (dismissed) {

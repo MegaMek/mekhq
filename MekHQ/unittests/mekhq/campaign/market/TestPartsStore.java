@@ -38,7 +38,7 @@ import mekhq.campaign.Campaign;
 /**
  * Test-only PartsStore that does not stock by default.
  */
-public class TestPartsStore extends PartsStore{
+public class TestPartsStore extends PartsStore {
     public TestPartsStore() {
         super();
     }

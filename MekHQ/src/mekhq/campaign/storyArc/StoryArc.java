@@ -182,6 +182,7 @@ public class StoryArc {
         this.storyLoadingType = type;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public StoryLoadingType getStoryLoadingType() {
         return storyLoadingType;
     }
@@ -198,6 +199,7 @@ public class StoryArc {
         this.initCampaignPath = s;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public File getInitCampaignFile() {
         if (null == initCampaignPath) {
             return null;

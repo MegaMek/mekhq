@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,10 +59,9 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -333,9 +332,9 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         int effectCombatTeams = 0;
         for (Map.Entry<Integer, CombatTeam> combatTeam : campaign.getCombatTeamsAsMap().entrySet()) {
-            Force force = campaign.getForce(combatTeam.getKey());
-            if (force != null) {
-                CombatRole combatRoleInMemory = force.getCombatRoleInMemory();
+            Formation formation = campaign.getFormation(combatTeam.getKey());
+            if (formation != null) {
+                CombatRole combatRoleInMemory = formation.getCombatRoleInMemory();
                 if (combatRoleInMemory != CombatRole.TRAINING) {
                     effectCombatTeams++;
                 }
@@ -369,19 +368,6 @@ public abstract class AbstractContractMarket {
      */
     private int calculateBypassVarianceReduction(int availableForces) {
         return (int) Math.floor((double) availableForces / 3);
-    }
-
-    /**
-     * @deprecated unused.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public int calculateMaxDeployableCombatTeams(Campaign campaign) {
-        CampaignOptions options = campaign.getCampaignOptions();
-        int baseStrategyDeployment = options.getBaseStrategyDeployment();
-        int additionalStrategyDeployment = options.getAdditionalStrategyDeployment();
-        int commanderStrategy = campaign.getCommanderStrategy();
-
-        return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
     }
 
     /**

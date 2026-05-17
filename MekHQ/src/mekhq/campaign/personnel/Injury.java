@@ -334,6 +334,7 @@ public class Injury {
         return (hidingState != InjuryHiding.NO) && ((hidingState == InjuryHiding.YES) || type.isHidden(this));
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHidingState(InjuryHiding hidingState) {
         this.hidingState = Objects.requireNonNull(hidingState);
     }
@@ -352,10 +353,12 @@ public class Injury {
         return Utilities.capitalize(location.locationName());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getTypeKey() {
         return type.getKey();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getTypeId() {
         return type.getId();
     }

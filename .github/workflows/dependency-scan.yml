@@ -34,14 +34,14 @@ jobs:
           ref: main
           path: megamek
 
-      - name: Set up Temurin JDK 17
+      - name: Set up Temurin JDK 21
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v5
+        uses: gradle/actions/dependency-submission@v6
         with:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"

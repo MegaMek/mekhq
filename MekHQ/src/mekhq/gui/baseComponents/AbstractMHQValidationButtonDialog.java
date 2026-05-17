@@ -89,6 +89,7 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
      * This creates an AbstractMHQValidationButtonDialog using the specified resource bundle. This is not recommended by
      * default. Allows a JDialog to be specified as parent.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     protected AbstractMHQValidationButtonDialog(final JDialog dialog, final JFrame frame, final boolean modal,
           final ResourceBundle resources, final String name,
           final String title) {

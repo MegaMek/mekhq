@@ -48,6 +48,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import megamek.common.ui.FastJScrollPane;
+
 /**
  * Provides a text-field that makes suggestions using a provided data-vector. You might have seen this on Google (tm),
  * this is the Java implementation.
@@ -212,7 +214,7 @@ public class JSuggestField extends JTextField {
             public void mouseClicked(MouseEvent e) {
             }
         });
-        dialog.add(new JScrollPaneWithSpeed(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        dialog.add(new FastJScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         dialog.pack();
         addKeyListener(new KeyListener() {
@@ -288,6 +290,7 @@ public class JSuggestField extends JTextField {
      * @return Vector containing Strings
      */
     @SuppressWarnings(value = "unchecked")
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Vector<String> getSuggestData() {
         return (Vector<String>) data.clone();
     }
@@ -297,6 +300,7 @@ public class JSuggestField extends JTextField {
      *
      * @param size Preferred size of the drop-down list
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setPreferredSuggestSize(Dimension size) {
         dialog.setPreferredSize(size);
     }
@@ -306,6 +310,7 @@ public class JSuggestField extends JTextField {
      *
      * @param size Minimum size of the drop-down list
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setMinimumSuggestSize(Dimension size) {
         dialog.setMinimumSize(size);
     }
@@ -315,6 +320,7 @@ public class JSuggestField extends JTextField {
      *
      * @param size Maximum size of the drop-down list
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setMaximumSuggestSize(Dimension size) {
         dialog.setMaximumSize(size);
     }
@@ -342,6 +348,7 @@ public class JSuggestField extends JTextField {
     /**
      * Force the suggestions to be hidden (Useful for buttons, e.g. to use JSuggestionField like a ComboBox)
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void hideSuggest() {
         dialog.setVisible(false);
     }
@@ -349,6 +356,7 @@ public class JSuggestField extends JTextField {
     /**
      * @return boolean Visibility of the suggestion window
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isSuggestVisible() {
         return dialog.isVisible();
     }
@@ -415,6 +423,7 @@ public class JSuggestField extends JTextField {
      *
      * @param listener ActionListener to use
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void addSelectionListener(ActionListener listener) {
         if (listener != null) {
             listeners.add(listener);
@@ -426,6 +435,7 @@ public class JSuggestField extends JTextField {
      *
      * @param listener ActionListener to remove
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void removeSelectionListener(ActionListener listener) {
         listeners.remove(listener);
     }
@@ -445,6 +455,7 @@ public class JSuggestField extends JTextField {
      *
      * @return selected value from the user or null if the entered value does not exist
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public String getLastChosenExistingVariable() {
         return lastChosenExistingVariable;
     }

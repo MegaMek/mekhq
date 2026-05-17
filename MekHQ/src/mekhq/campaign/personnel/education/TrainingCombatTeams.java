@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
@@ -57,7 +58,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -86,9 +87,9 @@ import mekhq.utilities.ReportingUtilities;
  * <ul>
  *     <li>{@link #processTrainingCombatTeams(Campaign)}: Entry point for processing all combat
  *     team training in the campaign.</li>
- *     <li>{@link #processTraining(Campaign, Force)}: Applies training logic to a specific
+ *     <li>{@link #processTraining(Campaign, Formation)}: Applies training logic to a specific
  *     combat team.</li>
- *     <li>{@link #performTraining(Campaign, Force, Person, Map, int)}: Handles training for individual
+ *     <li>{@link #performTraining(Campaign, Formation, Person, Map, int)}: Handles training for individual
  *     trainees in a force.</li>
  *     <li>{@link #processTrainingTime(Person, Person, List, int, double, boolean, boolean, LocalDate)}  Updates a
  *     trainee's education progression and improves skills.</li>
@@ -100,7 +101,7 @@ public class TrainingCombatTeams {
     private static final MMLogger LOGGER = MMLogger.create(TrainingCombatTeams.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Education";
-    @Deprecated(since = "0.50.10", forRemoval = false)
+    @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
           MekHQ.getMHQOptions().getLocale());
 
@@ -134,20 +135,20 @@ public class TrainingCombatTeams {
 
             StratConCampaignState campaignState = contract.getStratconCampaignState();
             boolean isForceDeployed = campaignState != null &&
-                                            campaignState.isForceDeployedHere(combatTeam.getForceId());
+                                            campaignState.isForceDeployedHere(combatTeam.getFormationId());
             if (isUsingStratCon) {
                 if (!isUsingMaplessMode && !isForceDeployed) {
                     continue;
                 }
             }
 
-            Force force = combatTeam.getForce(campaign);
-            List<Force> allForces = new ArrayList<>();
-            allForces.add(force); // We want to include the force itself in the training process
-            allForces.addAll(force.getAllSubForces());
+            Formation formation = combatTeam.getFormation(campaign);
+            List<Formation> allFormations = new ArrayList<>();
+            allFormations.add(formation); // We want to include the force itself in the training process
+            allFormations.addAll(formation.getAllSubFormations());
 
-            for (Force trainingForce : allForces) {
-                processTraining(campaign, trainingForce);
+            for (Formation trainingFormation : allFormations) {
+                processTraining(campaign, trainingFormation);
             }
         }
     }
@@ -163,25 +164,25 @@ public class TrainingCombatTeams {
      * <p>If educators or trainees lack eligible skills, appropriate reports are generated.
      * Training updates for skills and progression are logged within the campaign.</p>
      *
-     * @param campaign the {@link Campaign} managing the combat team and its associated personnel
-     * @param force    the {@link Force} undergoing training during this session
+     * @param campaign  the {@link Campaign} managing the combat team and its associated personnel
+     * @param formation the {@link Formation} undergoing training during this session
      */
-    private static void processTraining(final Campaign campaign, final Force force) {
+    private static void processTraining(final Campaign campaign, final Formation formation) {
         // If the force is empty, we skip it
-        Vector<UUID> units = force.getUnits(); // We only want units in the direct force, not child forces
+        Vector<UUID> units = formation.getUnits(); // We only want units in the direct force, not child forces
         if (units.isEmpty()) {
-            LOGGER.info("No units in force '{}' for campaign '{}'", force.getName(), campaign.getName());
+            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getName());
             return;
         }
 
         // Identify the Combat Team's commander (i.e., the Trainer)
-        UUID commanderID = force.getForceCommanderID();
+        UUID commanderID = formation.getFormationCommanderID();
         Person commander = campaign.getPerson(commanderID);
 
         if (commander == null) {
-            campaign.addReport(GENERAL, String.format(resources.getString("noCommander.text"), force.getName(),
+            campaign.addReport(GENERAL, String.format(resources.getString("noCommander.text"), formation.getName(),
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
-            LOGGER.info("Failed to fetch commander for Force: {}", force.getName());
+            LOGGER.info("Failed to fetch commander for Force: {}", formation.getName());
             return;
         }
 
@@ -194,13 +195,13 @@ public class TrainingCombatTeams {
 
         int marginOfSuccess = performTrainingSkillCheck(campaign, commander);
 
-        performTraining(campaign, force, commander, educatorSkills, marginOfSuccess);
+        performTraining(campaign, formation, commander, educatorSkills, marginOfSuccess);
     }
 
     /**
      * Processes training for all eligible trainees within a force.
      *
-     * <p>This method iterates through every unit assigned to the specified {@link Force} and, for each unit,
+     * <p>This method iterates through every unit assigned to the specified {@link Formation} and, for each unit,
      * processes training for all of its active crew members (trainees). For each trainee, it determines which skills
      * are eligible for improvement by comparing the educator's skills against the trainee's skill and experience
      * levels. Only skills where the trainee's experience is less than one level below the educators are eligible.</p>
@@ -214,14 +215,14 @@ public class TrainingCombatTeams {
      * determine training time awarded and progress.</p>
      *
      * @param campaign        the current {@link Campaign} in which training is occurring
-     * @param force           the {@link Force} containing the units and trainees to train
+     * @param formation       the {@link Formation} containing the units and trainees to train
      * @param commander       the {@link Person} acting as the educator/commander providing the training
      * @param educatorSkills  a map containing all skills and their experience levels available for teaching by the
      *                        educator(s)
      * @param marginOfSuccess the margin of success for the training check, as an integer (affects training
      *                        speed/progress)
      */
-    private static void performTraining(Campaign campaign, Force force, Person commander,
+    private static void performTraining(Campaign campaign, Formation formation, Person commander,
           Map<String, Integer> educatorSkills, int marginOfSuccess) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useReasoningXPChanges = campaignOptions.isUseReasoningXpMultiplier();
@@ -230,7 +231,7 @@ public class TrainingCombatTeams {
         double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
 
         List<Person> educatorCrew = commander.getUnit().getActiveCrew();
-        for (UUID unitId : force.getUnits()) {
+        for (UUID unitId : formation.getUnits()) {
             Unit unit = campaign.getUnit(unitId);
 
             if (unit == null) {
@@ -355,7 +356,7 @@ public class TrainingCombatTeams {
 
         // The lowest skill is improved first
         skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
-        Skill targetSkill = skillsBeingTrained.get(0);
+        Skill targetSkill = skillsBeingTrained.getFirst();
 
         // The +1 is to account for the next experience level to be gained
         int targetSkillLevel = targetSkill.getLevel() + 1;
@@ -401,17 +402,20 @@ public class TrainingCombatTeams {
               new ArrayList<>(),
               0,
               true,
-              false,
+              true,
               useAgingEffects,
               isClanCampaign,
               today);
         int raw = skillCheck.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
 
-        String report = String.format(resources.getString("learnedProgress.text"),
+        String personnelReport = String.format(resources.getString("learnedProgress.text"),
               educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
               marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
-        campaign.addReport(PERSONNEL, report);
+        campaign.addReport(PERSONNEL, personnelReport);
+
+        String skillRollReport = skillCheck.getResultsText();
+        campaign.addReport(SKILL_CHECKS, skillRollReport);
 
         return raw;
     }

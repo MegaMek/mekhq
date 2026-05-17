@@ -144,6 +144,7 @@ public class CampaignTransporterMap {
      *
      * @return true if the unit is, false if not
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean hasTransport(Unit unit) {
         for (TransporterType transporterType : transportersMap.keySet()) {
             for (Double capacity : transportersMap.get(transporterType).keySet()) {

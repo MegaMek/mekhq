@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,7 +54,7 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
@@ -142,7 +142,7 @@ public class KillAwards {
 
                         // otherwise, we need to identify all relevant kills across the TO&E
                     } else {
-                        FormationLevel maximumDepth = campaign.getForce(0).getFormationLevel();
+                        FormationLevel maximumDepth = campaign.getFormation(0).getFormationLevel();
 
                         // in the event that the depth of the award exceeds the highest depth of the
                         // origin force
@@ -184,7 +184,7 @@ public class KillAwards {
                             // this will fail if the character doesn't have a unit,
                             // but that's ok, in that case we just use a default value
                             try {
-                                originForce = campaign.getPerson(person).getUnit().getForceId();
+                                originForce = campaign.getPerson(person).getUnit().getFormationId();
                             } catch (Exception ignored) {}
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {
@@ -199,13 +199,13 @@ public class KillAwards {
 
                                 try {
                                     // Get the current formation depth of the origin force
-                                    int depth = campaign.getForce(originForce).getFormationLevel().getDepth();
+                                    int depth = campaign.getFormation(originForce).getFormationLevel().getDepth();
 
                                     // Continue the loop until the depth of the original force is not smaller than
                                     // the award depth
                                     while (depth < awardDepth.getDepth()) {
                                         // Get the ID of the origin force's parent force
-                                        int parentForce = campaign.getForce(originForce).getParentForce().getId();
+                                        int parentForce = campaign.getFormation(originForce).getParentFormation().getId();
 
                                         // If the depth is greater or equal to the maximum depth, exit the loop
                                         if (depth >= maximumDepth.getDepth()) {
@@ -215,10 +215,10 @@ public class KillAwards {
                                         // Set the origin force to its parent force
                                         originForce = parentForce;
                                         // Update the depth to the depth of the new origin force
-                                        depth = campaign.getForce(originForce).getFormationLevel().getDepth();
+                                        depth = campaign.getFormation(originForce).getFormationLevel().getDepth();
                                     }
 
-                                    Force originNode = campaign.getForce(originForce);
+                                    Formation originNode = campaign.getFormation(originForce);
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
                                     LOGGER.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
@@ -346,25 +346,25 @@ public class KillAwards {
      *
      * @return a list of Kill objects that are associated with the traversed Force nodes
      */
-    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode) {
+    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Formation originNode) {
         List<Kill> kills = new ArrayList<>();
 
-        Stack<Force> stack = new Stack<>();
+        Stack<Formation> stack = new Stack<>();
         // we add visited nodes to a set, so we don't run the risk of re-evaluating
         // previously visited nodes
         Set<Integer> visitedForces = new HashSet<>();
         stack.push(originNode);
 
         while (!stack.isEmpty()) {
-            Force currentNode = stack.pop();
+            Formation currentNode = stack.pop();
 
             if (!visitedForces.contains(currentNode.getId())) {
                 if (killData.containsKey(currentNode.getId())) {
                     kills.addAll(killData.get(currentNode.getId()));
                 }
 
-                for (Force subForce : currentNode.getSubForces()) {
-                    stack.push(subForce);
+                for (Formation subFormation : currentNode.getSubFormations()) {
+                    stack.push(subFormation);
                 }
 
                 visitedForces.add(currentNode.getId());

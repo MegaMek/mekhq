@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -387,7 +387,7 @@ public class TransportationRating {
                     smallCraftCount++;
                 } else if (entity.isMek()) {
                     mekCount++;
-                } else if (entity.isAerospaceFighter() || entity.isConventionalFighter()) {
+                } else if (entity.isFighter()) {
                     asfCount++;
                 } else if (entity.isProtoMek()) {
                     protoMekCount++;
@@ -400,7 +400,7 @@ public class TransportationRating {
         }
 
         // Count the number of passengers by filtering the personnel list
-        int passengerCount = (int) campaign.getPersonnelFilteringOutDepartedAndAbsent().size();
+        int passengerCount = campaign.getPersonnelFilteringOutDepartedAndAbsent().size();
 
         // Map each unit count to its type
         Map<String, Integer> transportRequirements = new HashMap<>(Map.of(

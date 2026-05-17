@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@
 package mekhq.gui.stratCon;
 
 import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
-import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredFormationIconOperationalStatus;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -43,7 +43,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -63,11 +63,11 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
           boolean isSelected, boolean cellHasFocus) {
         Campaign campaign = unit.getCampaign();
 
-        int valueForceId = unit.getForceId();
-        Force force = campaign.getForce(valueForceId);
+        int valueForceId = unit.getFormationId();
+        Formation formation = campaign.getFormation(valueForceId);
 
         // Determine name color
-        OperationalStatus operationalStatus = determineLayeredForceIconOperationalStatus(unit);
+        OperationalStatus operationalStatus = determineLayeredFormationIconOperationalStatus(unit);
 
         String statusOpenFormat = switch (operationalStatus) {
             case NOT_OPERATIONAL -> "<s>";
@@ -83,9 +83,9 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
 
         // Adjust force name to remove unnecessary information
         String forceName = "";
-        if (force != null) {
-            forceName = force.getFullName();
-            String originNodeName = ", " + campaign.getForce(0).getName();
+        if (formation != null) {
+            forceName = formation.getFullName();
+            String originNodeName = ", " + campaign.getFormation(0).getName();
             forceName = forceName.replaceAll(originNodeName, "");
         }
 

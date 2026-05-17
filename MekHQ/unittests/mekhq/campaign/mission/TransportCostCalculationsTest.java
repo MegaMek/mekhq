@@ -1169,7 +1169,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         when(mockEntity.isSmallCraft()).thenReturn(false);
         when(mockEntity.isMek()).thenReturn(false);
-        when(mockEntity.isAerospaceFighter()).thenReturn(true);
+        when(mockEntity.isFighter()).thenReturn(true);
 
         Collection<Unit> units = new ArrayList<>();
         for (int i = 0; i < unitCount; i++) {
@@ -1194,8 +1194,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         when(mockEntity.isSmallCraft()).thenReturn(false);
         when(mockEntity.isMek()).thenReturn(false);
-        when(mockEntity.isAerospaceFighter()).thenReturn(false);
-        when(mockEntity.isConventionalFighter()).thenReturn(true);
+        when(mockEntity.isFighter()).thenReturn(true);
 
         Collection<Unit> units = new ArrayList<>();
         for (int i = 0; i < unitCount; i++) {
@@ -1220,8 +1219,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         when(mockEntity.isSmallCraft()).thenReturn(false);
         when(mockEntity.isMek()).thenReturn(false);
-        when(mockEntity.isAerospaceFighter()).thenReturn(false);
-        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isFighter()).thenReturn(false);
         when(mockEntity.isProtoMek()).thenReturn(true);
 
         Collection<Unit> units = new ArrayList<>();
@@ -1247,8 +1245,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         when(mockEntity.isSmallCraft()).thenReturn(false);
         when(mockEntity.isMek()).thenReturn(false);
-        when(mockEntity.isAerospaceFighter()).thenReturn(false);
-        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isFighter()).thenReturn(false);
         when(mockEntity.isProtoMek()).thenReturn(false);
         when(mockEntity.isBattleArmor()).thenReturn(true);
 
@@ -1275,8 +1272,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         when(mockEntity.isSmallCraft()).thenReturn(false);
         when(mockEntity.isMek()).thenReturn(false);
-        when(mockEntity.isAerospaceFighter()).thenReturn(false);
-        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isFighter()).thenReturn(false);
         when(mockEntity.isProtoMek()).thenReturn(false);
         when(mockEntity.isBattleArmor()).thenReturn(false);
         when(mockEntity.isInfantry()).thenReturn(true);
@@ -1304,8 +1300,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         when(mockEntity.isSmallCraft()).thenReturn(false);
         when(mockEntity.isMek()).thenReturn(false);
-        when(mockEntity.isAerospaceFighter()).thenReturn(false);
-        when(mockEntity.isConventionalFighter()).thenReturn(false);
+        when(mockEntity.isFighter()).thenReturn(false);
         when(mockEntity.isProtoMek()).thenReturn(false);
         when(mockEntity.isBattleArmor()).thenReturn(false);
         when(mockEntity.isInfantry()).thenReturn(false);

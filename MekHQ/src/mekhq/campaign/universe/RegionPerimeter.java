@@ -40,7 +40,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Given a list of planets, uses a convex hull algorithm to select the planets that form a polygon that completely
@@ -168,6 +169,7 @@ public class RegionPerimeter {
      *
      * @return True if the point is contained within the bounding rectangle.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isInsideBoundingBox(Point p) {
         return isInsideBoundingBox(p.x(), p.y());
     }
@@ -177,6 +179,7 @@ public class RegionPerimeter {
      *
      * @return True if the point is contained within the bounding rectangle.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isInsideBoundingBox(Planet p) {
         return isInsideBoundingBox(p.getX(), p.getY());
     }
@@ -315,18 +318,18 @@ public class RegionPerimeter {
         // Check for a special case: if there are more than two points that have the same least Y,
         // remove all but the right-most to prevent popping too many values off the stack in the next
         // step.
-        while ((sortedPoints.size() > 1) && (sortedPoints.get(0).y() == sortedPoints.get(1).y())) {
-            if (sortedPoints.get(0).x() > sortedPoints.get(1).x()) {
+        while ((sortedPoints.size() > 1) && (sortedPoints.getFirst().y() == sortedPoints.get(1).y())) {
+            if (sortedPoints.getFirst().x() > sortedPoints.get(1).x()) {
                 sortedPoints.remove(1);
             } else {
-                sortedPoints.remove(0);
+                sortedPoints.removeFirst();
             }
         }
 
         LinkedList<Point> stack = new LinkedList<>();
         stack.add(origin);
         if (!sortedPoints.isEmpty()) {
-            stack.add(sortedPoints.get(0));
+            stack.add(sortedPoints.getFirst());
         }
 
         if (sortedPoints.size() > 1) {

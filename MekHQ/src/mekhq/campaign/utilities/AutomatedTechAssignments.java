@@ -71,7 +71,7 @@ import org.jspecify.annotations.NonNull;
  *     <li><b>Bucket techs</b> into role-based lists (Mek techs, Aero techs, BA techs, Mechanics), including only
  *     roles that have at least one unmaintained unit to assign. A person may qualify for multiple roles, but
  *     assignment to more than two roles is prevented.</li>
- *     <li><b>Assign units to techs</b> by repeatedly selecting the “best” tech (least loaded first; if tied, highest
+ *     <li><b>Assign units to techs</b> by repeatedly selecting the “best" tech (least loaded first; if tied, highest
  *     skill level first) and assigning the next unit.</li>
  * </ol>
  *
@@ -204,7 +204,7 @@ public class AutomatedTechAssignments {
      * Assigns each unit in {@code unmaintainedUnits} to a tech from {@code techs} using a load-balancing priority rule
      * and a per-tech capacity limit.
      *
-     * <p>The “best” tech is selected by:</p>
+     * <p>The “best" tech is selected by:</p>
      * <ol>
      *     <li>{@link #getTechLevel(Person, String)} highest -> lowest</li>
      *     <li>tie-breaker: fewest assigned tech units lowest -> highest</li>

@@ -57,6 +57,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     private boolean fighter;
     private Money cost;
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingAeroLifeSupport() {
         this(0, Money.zero(), false, null);
     }

@@ -194,7 +194,7 @@ public class NewsDialog extends ImmersiveDialogSimple {
             }
         }
 
-        return NEWS_NETWORKS.get(NEWS_NETWORKS.size() - 1); // Affiliated News Networks
+        return NEWS_NETWORKS.getLast(); // Affiliated News Networks
     }
 
     /**

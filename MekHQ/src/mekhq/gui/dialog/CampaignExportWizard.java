@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,11 +39,13 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -52,6 +54,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 
 import megamek.common.equipment.AmmoType;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -62,7 +65,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AmmoStorage;
@@ -74,7 +77,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard. May Knuth forgive me.
@@ -84,7 +86,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class CampaignExportWizard extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CampaignExportWizard.class);
 
-    private JList<Force> forceList;
+    private JList<Formation> forceList;
     private JList<Person> personList;
     private JList<Unit> unitList;
     private JList<Part> partList;
@@ -123,6 +125,8 @@ public class CampaignExportWizard extends JDialog {
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
         chkExportCompletedContracts.setText(resourceMap.getString("chkExportCompletedContracts.text"));
         lblMoney.setText(resourceMap.getString("lblMoney.text"));
+        lblMoney.setToolTipText(resourceMap.getString("lblMoney.tooltip"));
+        txtExportMoney.setToolTipText(resourceMap.getString("lblMoney.tooltip"));
         chkDestructiveExport.setText(resourceMap.getString("chkDestructiveExport.text"));
 
         sourceCampaign = c;
@@ -151,7 +155,7 @@ public class CampaignExportWizard extends JDialog {
 
         gbc.gridy++;
 
-        JScrollPane scrollPane = new JScrollPaneWithSpeed();
+        JScrollPane scrollPane = new FastJScrollPane();
         switch (state) {
             case ForceSelection:
                 lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));
@@ -227,10 +231,13 @@ public class CampaignExportWizard extends JDialog {
                 btnNewCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.saveCampaign(null, sourceCampaign);
                     if (destinationCampaignFile.isPresent()) {
-                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                        if (exportToCampaign(destinationCampaignFile.get())) {
+                            setVisible(false);
+                        } else {
+                            // Keep the wizard open so the user can correct the input (e.g. an
+                            // invalid C-bill amount) instead of having to restart the export flow.
                             LOGGER.error("Failed to export campaign to new campaign file");
                         }
-                        setVisible(false);
                     }
                 });
                 getContentPane().add(btnNewCampaign, gbc);
@@ -240,10 +247,13 @@ public class CampaignExportWizard extends JDialog {
                 btnExistingCampaign.addActionListener(e -> {
                     destinationCampaignFile = FileDialogs.openCampaign(null);
                     if (destinationCampaignFile.isPresent()) {
-                        if (!exportToCampaign(destinationCampaignFile.get())) {
+                        if (exportToCampaign(destinationCampaignFile.get())) {
+                            setVisible(false);
+                        } else {
+                            // Keep the wizard open so the user can correct the input (e.g. an
+                            // invalid C-bill amount) instead of having to restart the export flow.
                             LOGGER.error("Failed to export campaign to existing campaign file");
                         }
-                        setVisible(false);
                     }
                 });
                 getContentPane().add(btnExistingCampaign, gbc);
@@ -268,9 +278,9 @@ public class CampaignExportWizard extends JDialog {
 
     private void setupForceList() {
         forceList = new JList<>();
-        DefaultListModel<Force> forceListModel = new DefaultListModel<>();
-        for (Force force : sourceCampaign.getAllForces()) {
-            forceListModel.addElement(force);
+        DefaultListModel<Formation> forceListModel = new DefaultListModel<>();
+        for (Formation formation : sourceCampaign.getAllFormations()) {
+            forceListModel.addElement(formation);
         }
         forceList.setModel(forceListModel);
         forceList.setCellRenderer(new ForceListCellRenderer());
@@ -360,8 +370,8 @@ public class CampaignExportWizard extends JDialog {
                                               .boxed()
                                               .collect(Collectors.toList());
 
-        for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits(false)) {
+        for (Formation formation : forceList.getSelectedValuesList()) {
+            for (UUID unitID : formation.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 for (Person person : unit.getActiveCrew()) {
@@ -377,8 +387,8 @@ public class CampaignExportWizard extends JDialog {
                 }
             }
 
-            if (force.getTechID() != null) {
-                personList.setSelectedValue(sourceCampaign.getPerson(force.getTechID()), false);
+            if (formation.getTechID() != null) {
+                personList.setSelectedValue(sourceCampaign.getPerson(formation.getTechID()), false);
                 selectedIndices.add(personList.getSelectedIndex());
             }
         }
@@ -409,8 +419,8 @@ public class CampaignExportWizard extends JDialog {
                                               .boxed()
                                               .collect(Collectors.toList());
 
-        for (Force force : forceList.getSelectedValuesList()) {
-            for (UUID unitID : force.getAllUnits(false)) {
+        for (Formation formation : forceList.getSelectedValuesList()) {
+            for (UUID unitID : formation.getAllUnits(false)) {
                 Unit unit = sourceCampaign.getUnit(unitID);
 
                 unitList.setSelectedValue(unit, false);
@@ -445,6 +455,35 @@ public class CampaignExportWizard extends JDialog {
         }
 
         display(CampaignExportWizardState.values()[state.ordinal() + 1]);
+    }
+
+    /**
+     * Parses the C-bill amount entered by the user using the supplied locale, so it accepts that locale's
+     * grouping and decimal separators (e.g. "1,000,000.50" in en-US, "1.000.000,50" in es-ES,
+     * "1 000 000,50" in fr-FR). Returns 0 for empty or null input. Throws {@link NumberFormatException}
+     * when the input is non-empty but not a valid number, so callers can surface the error rather than
+     * silently dropping the transfer (see issue #5939).
+     *
+     * <p>Note: C-bills are a real currency stored as {@link java.math.BigDecimal} inside {@link Money},
+     * so fractional amounts are allowed.
+     */
+    static double parseExportMoney(String text, Locale locale) {
+        if (text == null) {
+            return 0d;
+        }
+        String trimmed = text.trim();
+        if (trimmed.isEmpty()) {
+            return 0d;
+        }
+
+        NumberFormat nf = NumberFormat.getNumberInstance(locale);
+        nf.setGroupingUsed(true);
+        ParsePosition pp = new ParsePosition(0);
+        Number parsed = nf.parse(trimmed, pp);
+        if ((parsed == null) || (pp.getIndex() != trimmed.length())) {
+            throw new NumberFormatException("Could not parse '" + text + "' as a number in locale " + locale + ".");
+        }
+        return parsed.doubleValue();
     }
 
     /**
@@ -510,17 +549,24 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
-        int money = 0;
+        double money = 0;
 
         try {
-            money = Integer.parseInt(txtExportMoney.getText());
+            money = parseExportMoney(txtExportMoney.getText(), MekHQ.getMHQOptions().getLocale());
             if (money > 0) {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL,
                       Money.of(money),
                       String.format("Transfer from %s", sourceCampaign.getName()));
             }
-        } catch (Exception ignored) {
-
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                  resourceMap.getString("lblStatus.MoneyParseError.text"),
+                  resourceMap.getString("lblStatus.MoneyParseError.title"),
+                  JOptionPane.ERROR_MESSAGE);
+            // Make it easy for the user to fix the bad value without hunting for the field.
+            txtExportMoney.requestFocusInWindow();
+            txtExportMoney.selectAll();
+            return false;
         }
 
         // forces aren't moved/copied over, we just use the force selection to
@@ -528,7 +574,7 @@ public class CampaignExportWizard extends JDialog {
         // to be exported
 
         for (Unit unit : unitList.getSelectedValuesList()) {
-            int sourceForceID = unit.getForceId();
+            int sourceForceID = unit.getFormationId();
 
             if (destinationCampaign.getUnit(unit.getId()) != null) {
                 destinationCampaign.removeUnit(unit.getId());
@@ -667,14 +713,14 @@ public class CampaignExportWizard extends JDialog {
 
     private void attemptToAssignToForce(Unit unit, int sourceForceID, Campaign sourceCampaign,
           Campaign destinationCampaign) {
-        Force sourceForce = sourceCampaign.getForce(sourceForceID);
-        if (sourceForce == null) {
+        Formation sourceFormation = sourceCampaign.getFormation(sourceForceID);
+        if (sourceFormation == null) {
             return;
         }
 
         // this indicates a unit assigned to the root-level force
-        if (sourceForce.getParentForce() == null) {
-            destinationCampaign.getForces().addUnit(unit.getId());
+        if (sourceFormation.getParentFormation() == null) {
+            destinationCampaign.getFormations().addUnit(unit.getId());
         }
 
         // first thing we will try is to identify a force with the same name and tree
@@ -684,34 +730,34 @@ public class CampaignExportWizard extends JDialog {
 
         // hack: the root forces are irrelevant, so we replace the source root force
         // name with the destination root force name
-        String sourceForceFullName = getDestinationFullName(sourceForce, sourceCampaign, destinationCampaign);
+        String sourceForceFullName = getDestinationFullName(sourceFormation, sourceCampaign, destinationCampaign);
 
-        Force destForce = findForce(sourceForceFullName, destinationCampaign.getForces());
-        if (destForce != null) {
-            destForce.addUnit(unit.getId());
+        Formation destFormation = findForce(sourceForceFullName, destinationCampaign.getFormations());
+        if (destFormation != null) {
+            destFormation.addUnit(unit.getId());
         } else {
-            List<Force> parentForces = getForceAndParents(sourceForce);
-            Force currentDestinationForce = destinationCampaign.getForces();
+            List<Formation> parentFormations = getForceAndParents(sourceFormation);
+            Formation currentDestinationFormation = destinationCampaign.getFormations();
 
-            for (int x = parentForces.size() - 1; x >= 0; x--) {
-                Force nextSourceForce = parentForces.get(x);
-                String nextSourceForceFullName = getDestinationFullName(nextSourceForce,
+            for (int x = parentFormations.size() - 1; x >= 0; x--) {
+                Formation nextSourceFormation = parentFormations.get(x);
+                String nextSourceForceFullName = getDestinationFullName(nextSourceFormation,
                       sourceCampaign,
                       destinationCampaign);
-                Force nextDestinationForce = findForce(nextSourceForceFullName, currentDestinationForce);
+                Formation nextDestinationFormation = findForce(nextSourceForceFullName, currentDestinationFormation);
 
                 // if this level doesn't exist yet, add it to where we currently are
-                if (nextDestinationForce == null) {
-                    Force forceCopy = new Force(nextSourceForce.getName());
-                    destinationCampaign.addForce(forceCopy, currentDestinationForce);
-                    currentDestinationForce = forceCopy;
+                if (nextDestinationFormation == null) {
+                    Formation formationCopy = new Formation(nextSourceFormation.getName());
+                    destinationCampaign.addFormation(formationCopy, currentDestinationFormation);
+                    currentDestinationFormation = formationCopy;
                     // otherwise, update current location and move to next level
                 } else {
-                    currentDestinationForce = nextDestinationForce;
+                    currentDestinationFormation = nextDestinationFormation;
                 }
             }
 
-            currentDestinationForce.addUnit(unit.getId());
+            currentDestinationFormation.addUnit(unit.getId());
         }
     }
 
@@ -719,23 +765,24 @@ public class CampaignExportWizard extends JDialog {
      * Helper function that returns a full force name with the source campaign root force name swapped out for the
      * destination campaign root force name
      */
-    private String getDestinationFullName(Force sourceForce, Campaign sourceCampaign, Campaign destinationCampaign) {
-        return sourceForce.getFullName()
-                     .replace(sourceCampaign.getForces().getName(), destinationCampaign.getForces().getName());
+    private String getDestinationFullName(Formation sourceFormation, Campaign sourceCampaign,
+          Campaign destinationCampaign) {
+        return sourceFormation.getFullName()
+                     .replace(sourceCampaign.getFormations().getName(), destinationCampaign.getFormations().getName());
     }
 
     /**
      * Recurses through a Force structure to look for a force with the given "full force name"
      */
-    private Force findForce(String forceName, Force force) {
-        if (force.getFullName().equals(forceName)) {
-            return force;
+    private Formation findForce(String forceName, Formation formation) {
+        if (formation.getFullName().equals(forceName)) {
+            return formation;
         } else {
-            for (Force subForce : force.getSubForces()) {
-                Force foundForce = findForce(forceName, subForce);
+            for (Formation subFormation : formation.getSubFormations()) {
+                Formation foundFormation = findForce(forceName, subFormation);
 
-                if (foundForce != null) {
-                    return foundForce;
+                if (foundFormation != null) {
+                    return foundFormation;
                 }
             }
 
@@ -747,20 +794,20 @@ public class CampaignExportWizard extends JDialog {
      * Moves through a force's ancestors and returns a flattened list of force names in order from me to furthers
      * ancestor.
      */
-    private List<Force> getForceAndParents(Force force) {
-        List<Force> retVal = new ArrayList<>();
-        retVal.add(force);
+    private List<Formation> getForceAndParents(Formation formation) {
+        List<Formation> retVal = new ArrayList<>();
+        retVal.add(formation);
 
-        Force ancestorForce;
-        while (force.getParentForce() != null) {
-            ancestorForce = force.getParentForce();
+        Formation ancestorFormation;
+        while (formation.getParentFormation() != null) {
+            ancestorFormation = formation.getParentFormation();
 
             // we don't want the top-level force
-            if (ancestorForce.getParentForce() != null) {
-                retVal.add(ancestorForce);
+            if (ancestorFormation.getParentFormation() != null) {
+                retVal.add(ancestorFormation);
             }
 
-            force = ancestorForce;
+            formation = ancestorFormation;
         }
 
         return retVal;
@@ -852,8 +899,8 @@ public class CampaignExportWizard extends JDialog {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
               boolean cellHasFocus) {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            Force force = (Force) value;
-            String cellValue = force.getFullName();
+            Formation formation = (Formation) value;
+            String cellValue = formation.getFullName();
             ((JLabel) cmp).setText(cellValue);
             return cmp;
         }

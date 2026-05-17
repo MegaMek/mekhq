@@ -45,6 +45,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -53,7 +54,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -190,7 +190,7 @@ public class LootDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrUnits = new JScrollPaneWithSpeed(listUnits);
+        scrUnits = new FastJScrollPane(listUnits);
         listUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listUnits.getSelectionModel().addListSelectionListener(evt -> listUnitsValueChanged());
         refreshUnitList();
@@ -233,7 +233,7 @@ public class LootDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrParts = new JScrollPaneWithSpeed(listParts);
+        scrParts = new FastJScrollPane(listParts);
         listParts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listParts.getSelectionModel().addListSelectionListener(evt -> listPartsValueChanged());
         refreshPartList();

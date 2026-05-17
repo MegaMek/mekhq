@@ -66,8 +66,8 @@ public class BuildingLocation extends Part {
     public static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TechBase.ALL)
             .setAdvancement(2300, 2350, 2400)
             .setApproximate(true, false, false)
-            .setPrototypeFactions(Faction.TH)
-            .setProductionFactions(Faction.TH)
+            .setPrototypeFactions(Faction.TH, Faction.CS)
+            .setProductionFactions(Faction.TH, Faction.CS)
             .setTechRating(TechRating.C)
             .setAvailability(AvailabilityValue.A,
                     AvailabilityValue.A,
@@ -108,10 +108,12 @@ public class BuildingLocation extends Part {
         return loc;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getCFDamage() {
         return cfDamage;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getArmorDamage() {
         return armorDamage;
     }
@@ -236,12 +238,12 @@ public class BuildingLocation extends Part {
                 // Update CF damage
                 int originalInternal = unit.getEntity().getOInternal(loc);
                 int internal = unit.getEntity().getInternal(loc);
-                cfDamage = originalInternal - Math.min(originalInternal, Math.max(internal, 0));
+                cfDamage = originalInternal - Math.clamp(internal, 0, originalInternal);
 
                 // Update armor damage
                 int originalArmor = unit.getEntity().getOArmor(loc);
                 int armor = unit.getEntity().getArmor(loc);
-                armorDamage = originalArmor - Math.min(originalArmor, Math.max(armor, 0));
+                armorDamage = originalArmor - Math.clamp(armor, 0, originalArmor);
             }
         }
     }

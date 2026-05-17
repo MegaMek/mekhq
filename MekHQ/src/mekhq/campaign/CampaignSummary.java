@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.force.Force.FORCE_ORIGIN;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -63,7 +63,6 @@ import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
@@ -430,7 +429,7 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
-        List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
+        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
             fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
@@ -462,8 +461,7 @@ public class CampaignSummary {
 
             int injuredPersonnel = campaign.getPatients().size();
             boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
-            int mashTheatreCapacity = useMASHTheatres ? MASHCapacity.checkMASHCapacity(unitsInToe,
-                  campaignOptions.getMASHTheatreCapacity()) : Integer.MAX_VALUE;
+            int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
 
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();

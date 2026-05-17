@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -48,7 +47,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -73,7 +72,7 @@ public class AverageExperienceRating {
     protected static SkillLevel getSkillLevel(Campaign campaign, boolean log) {
         // values below 0 are treated as 'Legendary',
         // values above 7 are treated as 'wet behind the ears' which we call 'None'
-        int experienceScore = MathUtility.clamp(calculateAverageExperienceRating(campaign, log),
+        int experienceScore = Math.clamp(calculateAverageExperienceRating(campaign, log),
               0,
               NO_CAMPAIGN_EXPERIENCE);
 
@@ -133,19 +132,19 @@ public class AverageExperienceRating {
 
         boolean hasAtLeastOneCrew = false;
         for (CombatTeam combatTeam : combatTeams) {
-            Force force = combatTeam.getForce(campaign);
-            if (force == null) {
-                LOGGER.warn("Force returned null for forceId {}", combatTeam.getForceId());
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation == null) {
+                LOGGER.warn("Force returned null for forceId {}", combatTeam.getFormationId());
                 continue;
             }
 
             // CamOps is explicit in that we should only be counting combat forces. A decision was made during 50.10
             // to not consider Training forces combat forces. We're extending that logic here, too.
-            if (force.getCombatRoleInMemory().isTraining()) {
+            if (formation.getCombatRoleInMemory().isTraining()) {
                 continue;
             }
 
-            for (Unit unit : force.getAllUnitsAsUnits(hangar, true)) {
+            for (Unit unit : formation.getAllUnitsAsUnits(hangar, true)) {
                 Entity entity = unit.getEntity();
                 if (entity == null || entity instanceof Jumpship) {
                     continue;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,17 +44,22 @@ import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import megamek.Version;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -87,6 +92,56 @@ public class CampaignOptionsUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
     public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
+
+
+    /**
+     * Version marker for campaign options that existed before the metadata system was implemented and shouldn't have a
+     * version badge.
+     */
+    public static final Version LEGACY_RULE_BEFORE_METADATA = null;
+
+    /**
+     * Version marker for campaign options that existed before the metadata system was implemented, but still since the
+     * most recent milestone. This variable should be deprecated once the next milestone is declared.
+     */
+    public static final Version MILESTONE_BEFORE_METADATA = new Version(0, 50, 10);
+
+    /**
+     * Cache for reusing CampaignOptionMetadata instances to avoid creating duplicate objects.
+     */
+    private static final Map<String, CampaignOptionsMetadata> METADATA_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * Factory method to get or create a CampaignOptionMetadata instance with caching. This ensures that identical
+     * metadata configurations reuse the same object instance.
+     *
+     * @param version the version when this option was added, or null for no version badge
+     * @param flags   optional flags for this option (Custom, Important, Documented, Recommended)
+     *
+     * @return a CampaignOptionMetadata instance, either from cache or newly created
+     */
+    public static CampaignOptionsMetadata getMetadata(@Nullable Version version, CampaignOptionFlag... flags) {
+        String key = buildMetadataKey(version, flags);
+        return METADATA_CACHE.computeIfAbsent(key, k -> new CampaignOptionsMetadata(version, Set.of(flags)));
+    }
+
+    /**
+     * Builds a unique cache key for a metadata configuration.
+     *
+     * @param version the version, or null
+     * @param flags   the flags array
+     *
+     * @return a unique string key representing this configuration
+     */
+    private static String buildMetadataKey(@Nullable Version version, CampaignOptionFlag... flags) {
+        String versionKey = (version == null) ? "null" : version.toString();
+        String flagsKey = (flags == null || flags.length == 0) ? "none"
+                                : Arrays.stream(flags)
+                                  .sorted()
+                                  .map(Enum::name)
+                                  .collect(Collectors.joining(","));
+        return versionKey + ":" + flagsKey;
+    }
 
     public static String getCampaignOptionsResourceBundle() {
         return RESOURCE_BUNDLE;
@@ -185,7 +240,7 @@ public class CampaignOptionsUtilities {
 
         if (indexToMoveToFront != -1) {
             String tabName = tabNames.remove(indexToMoveToFront);
-            tabNames.add(0, tabName);
+            tabNames.addFirst(tabName);
         }
 
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -374,4 +429,45 @@ public class CampaignOptionsUtilities {
 
         return count;
     }
+
+    // region Badge Formatting
+
+    /**
+     * Formats version and flag badges for campaign options based on metadata.
+     * <p>
+     * The badges include:
+     * <ul>
+     *   <li>Special flag symbols (if any) - displayed first, uncolored</li>
+     *   <li>Added since badge - colored star indicating when the option was added</li>
+     * </ul>
+     *
+     * <p>
+     * Development releases use a filled purple star (★), while milestone releases use a hollow green star (☆).
+     * </p>
+     *
+     * @param metadata the campaign option metadata, or null if no badges should be shown
+     *
+     * @return an HTML-formatted string with all badges, or empty string if metadata is null
+     */
+    public static String formatBadges(@Nullable CampaignOptionsMetadata metadata) {
+        if (metadata == null) {
+            return "";
+        }
+
+        StringBuilder badges = new StringBuilder();
+
+        // Add flag symbols first
+        if (metadata.flags() != null && !metadata.flags().isEmpty()) {
+            for (CampaignOptionFlag flag : metadata.flags()) {
+                badges.append(" ").append(flag.getSymbol());
+            }
+        }
+
+        // Add "added since" badge if specified
+        badges.append(metadata.getAddedSinceBadgeHtml());
+
+        return badges.toString();
+    }
+
+    // endregion Badge Formatting
 }

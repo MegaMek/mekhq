@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -94,10 +94,14 @@ public class Armor extends Part implements IAcquisitionWork {
         this.location = loc;
         this.rear = r;
         this.clan = clan;
-        this.name = "Armor";
+    }
+
+    @Override
+    public String getName() {
         if (type > -1) {
-            this.name += " (" + (clan ? "Clan " : "IS ") + ArmorType.of(type, clan).getName() + ')';
+            return "Armor (" + (clan ? "Clan " : "IS ") + ArmorType.of(type, clan).getName() + ')';
         }
+        return "Armor";
     }
 
     @Override
@@ -178,7 +182,13 @@ public class Armor extends Part implements IAcquisitionWork {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            if (!isSalvaging()) {
+            if (isSalvaging()) {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                      .append(rear ? " (Rear)" : "")
+                      .append(", ")
+                      .append(amount)
+                      .append(amount == 1 ? " point" : " points");
+            } else {
                 toReturn.append(unit.getEntity().getLocationName(location))
                       .append(rear ? " (Rear)" : "")
                       .append(", ")
@@ -424,16 +434,12 @@ public class Armor extends Part implements IAcquisitionWork {
         // Options include: Waiting for Java to support that, or changing the entire
         // way the 'ETYPE' works on Entity to implement bitset or some similar.
         // For repair types, see CamOps, Master Repair Table, p207
-        String typeKey;
-        if (entity instanceof Tank) {
-            typeKey = "TANK";
-        } else if (entity instanceof Warship) {
-            typeKey = "CAPITAL";
-        } else if (entity instanceof Aero) {
-            typeKey = "AEROSPACE";
-        } else {
-            typeKey = "DEFAULT";
-        }
+        String typeKey = switch (entity) {
+            case Tank ignored -> "TANK";
+            case Warship ignored -> "CAPITAL";
+            case Aero ignored -> "AEROSPACE";
+            default -> "DEFAULT";
+        };
 
         return (switch (typeKey) {
             case "TANK" -> 3;
@@ -587,12 +593,17 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
+    public int getBaseQuantityForPartsInUse() {
+        return this.getAmount();
+    }
+
+    @Override
     public int getQuantityForPartsInUse() {
         if (isPartUsedOrReserved()) {
             return 0;
         }
 
-        return this.getAmount();
+        return getBaseQuantityForPartsInUse();
     }
 
     public Part getNewPart() {
@@ -639,7 +650,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
         if (amountRemaining > 0) {
             LOGGER.warn("Still trying to add armor but that shouldn't have been a problem!");
-        } else if (amount < 0) {
+        } else if (amountRemaining < 0) {
             LOGGER.warn("Still trying to remove armor but no more armor is in the warehouse!");
         }
     }
@@ -731,10 +742,6 @@ public class Armor extends Part implements IAcquisitionWork {
     public void changeType(int ty, boolean cl) {
         this.type = ty;
         this.clan = cl;
-        this.name = "Armor";
-        if (type > -1) {
-            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
-        }
     }
 
     @Override

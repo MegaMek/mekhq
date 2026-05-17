@@ -1,4 +1,5 @@
 # These are all in alphabetical file system display order
+/.claude/
 /.gradle/
 /.idea/
 /.recommenders/
@@ -28,6 +29,8 @@
 /MekHQ/mmconf/gameoptions.xml
 /MekHQ/mmconf/*.preferences
 /MekHQ/mmconf/*.properties
+/MekHQ/mmconf/searches/*.json
+/MekHQ/mmconf/recent-advanced-searches.json
 /MekHQ/out/
 /MekHQ/pkgdir/
 /MekHQ/savegames/

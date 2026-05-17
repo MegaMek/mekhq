@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 
+@Deprecated(since = "0.51.0", forRemoval = true)
 public enum LeadershipMethod {
     REGULAR("LeadershipMethod.REGULAR.text", "LeadershipMethod.REGULAR.toolTipText"),
     GREEN("LeadershipMethod.GREEN.text", "LeadershipMethod.GREEN.toolTipText"),
@@ -69,6 +70,7 @@ public enum LeadershipMethod {
         return this == FAMILY;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isIronFist() {
         return this == IRON_FIST;
     }

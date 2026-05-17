@@ -106,7 +106,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     @Override
     public void generateUnitOffers(final Campaign campaign) {
         final List<AtBContract> contracts = campaign.getActiveAtBContracts();
-        final AtBContract contract = contracts.isEmpty() ? null : contracts.get(0);
+        final AtBContract contract = contracts.isEmpty() ? null : contracts.getFirst();
 
         Faction faction = campaign.getFaction();
         int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();

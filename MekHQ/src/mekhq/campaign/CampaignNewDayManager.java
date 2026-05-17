@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,8 +46,8 @@ import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Force.FORCE_ORIGIN;
-import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
+import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.Bloodmark.getBloodhuntSchedule;
@@ -101,9 +101,7 @@ import java.util.UUID;
 import javax.swing.JOptionPane;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.common.loaders.MekSummary;
 import megamek.common.options.OptionsConstants;
-import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -115,7 +113,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -165,6 +163,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RiotScenario;
+import mekhq.campaign.randomEvents.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.stratCon.StratConCampaignState;
@@ -314,7 +313,7 @@ public class CampaignNewDayManager {
 
         // Determine if we have an active contract or not, as campaign can get used
         // elsewhere before we actually hit the AtB new day (e.g., personnel market)
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             campaign.setHasActiveContract();
         }
 
@@ -423,7 +422,7 @@ public class CampaignNewDayManager {
         }
 
         // Process New Day for AtB
-        if (campaignOptions.isUseAtB()) {
+        if (campaignOptions.isUseStratCon()) {
             processNewDayATB();
         }
 
@@ -457,7 +456,7 @@ public class CampaignNewDayManager {
 
         processNewDayUnits();
 
-        processNewDayForces();
+        processNewDayFormations();
 
         if (campaign.isProcessProcurement()) {
             campaign.setShoppingList(campaign.goShopping(campaign.getShoppingList()));
@@ -489,6 +488,11 @@ public class CampaignNewDayManager {
         // Random Events
         if (today.isAfter(GRAY_MONDAY_EVENTS_BEGIN) && today.isBefore(GRAY_MONDAY_EVENTS_END)) {
             new GrayMonday(campaign, today);
+        }
+
+        // Easter Egg: Voice of Kerensky
+        if (VoiceOfKerensky.shouldTrigger(today, campaign.getCurrentSystem())) {
+            VoiceOfKerensky.trigger(campaign);
         }
 
         // Faction Standing
@@ -561,9 +565,9 @@ public class CampaignNewDayManager {
     private Set<Integer> getAllScenariosWithAssignedStandardForces() {
         Set<Integer> scenarios = new HashSet<>();
 
-        for (Force force : campaign.getAllForces()) {
-            if (force.getForceType().isStandard()) {
-                int scenarioId = force.getScenarioId();
+        for (Formation formation : campaign.getAllFormations()) {
+            if (formation.getFormationType().isStandard()) {
+                int scenarioId = formation.getScenarioId();
                 if (scenarioId != NO_ASSIGNED_SCENARIO) {
                     scenarios.add(scenarioId);
                 }
@@ -586,6 +590,7 @@ public class CampaignNewDayManager {
      * @author Illiani
      * @since 0.50.10
      */
+
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();
@@ -624,7 +629,7 @@ public class CampaignNewDayManager {
     private void updateFieldKitchenCapacity() {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity =
-                  checkFieldKitchenCapacity(campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar,
+                  checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
@@ -690,7 +695,7 @@ public class CampaignNewDayManager {
         // Prep some data for vocational xp
         int vocationalXpRate = campaignOptions.getVocationalXP();
         if (campaign.hasActiveContract()) {
-            if (campaignOptions.isUseAtB()) {
+            if (campaignOptions.isUseStratCon()) {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
                     if (!contract.getContractType().isGarrisonType()) {
                         vocationalXpRate *= 2;
@@ -929,17 +934,7 @@ public class CampaignNewDayManager {
     private void processNewDayATB() {
         campaign.getContractMarket().generateContractOffers(campaign);
 
-        if ((campaign.getShipSearchExpiration() != null) && !campaign.getShipSearchExpiration().isAfter(today)) {
-            campaign.setShipSearchExpiration(null);
-            if (campaign.getShipSearchResult() != null) {
-                campaign.addReport(ACQUISITIONS, "Opportunity for purchase of " + campaign.getShipSearchResult() + " " +
-                                                       "has expired.");
-                campaign.setShipSearchResult(null);
-            }
-        }
-
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-            processShipSearch();
             processTrainingCombatTeams(campaign);
         }
 
@@ -1299,14 +1294,14 @@ public class CampaignNewDayManager {
         }
     }
 
-    private void processNewDayForces() {
+    private void processNewDayFormations() {
         // update formation levels
-        Force.populateFormationLevelsFromOrigin(campaign);
+        Formation.populateFormationLevelsFromOrigin(campaign);
         recalculateCombatTeams(campaign);
 
-        // Update the force icons based on the end-of-day unit status if desired
-        if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
-            campaign.getForces().updateForceIconOperationalStatus(campaign);
+        // Update the formation icons based on the end-of-day unit status if desired
+        if (MekHQ.getMHQOptions().getNewDayFormationIconOperationalStatus()) {
+            campaign.getFormations().updateFormationIconOperationalStatus(campaign);
         }
     }
 
@@ -1577,30 +1572,7 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
-            int prostheticMedicalReliance = 1; // Minimum of 1
-            int myomerProsthetics = 0;
-            boolean hasPowerSupply = false;
-
-            for (Injury injury : person.getInjuries()) {
-                InjurySubType injurySubType = injury.getSubType();
-                if (injurySubType.isPermanentModification()) {
-                    prostheticMedicalReliance++;
-                }
-
-                if (injurySubType.isMyomerProsthetic()) {
-                    myomerProsthetics++;
-                }
-
-                if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
-                    hasPowerSupply = true;
-                }
-            }
-
-            if (!hasPowerSupply) {
-                myomerProsthetics *= 2;
-            }
-
-            int totalProstheticCount = prostheticMedicalReliance + myomerProsthetics;
+            int totalProstheticCount = getTotalProstheticCount(person);
 
             Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
             if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
@@ -1721,6 +1693,33 @@ public class CampaignNewDayManager {
         }
     }
 
+    private static int getTotalProstheticCount(Person person) {
+        int prostheticMedicalReliance = 1; // Minimum of 1
+        int myomerProsthetics = 0;
+        boolean hasPowerSupply = false;
+
+        for (Injury injury : person.getInjuries()) {
+            InjurySubType injurySubType = injury.getSubType();
+            if (injurySubType.isPermanentModification()) {
+                prostheticMedicalReliance++;
+            }
+
+            if (injurySubType.isMyomerProsthetic()) {
+                myomerProsthetics++;
+            }
+
+            if (!hasPowerSupply && injury.getType() == SECONDARY_POWER_SUPPLY) {
+                hasPowerSupply = true;
+            }
+        }
+
+        if (!hasPowerSupply) {
+            myomerProsthetics *= 2;
+        }
+
+        return prostheticMedicalReliance + myomerProsthetics;
+    }
+
     private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
           boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
@@ -1733,67 +1732,6 @@ public class CampaignNewDayManager {
               fatigueRate,
               true,
               failedWillpowerCheck);
-    }
-
-    @Deprecated(since = "0.50.10", forRemoval = true)
-    void processShipSearch() {
-        if (campaign.getShipSearchStart() == null) {
-            return;
-        }
-
-        StringBuilder report = new StringBuilder();
-        if (finances.debit(TransactionType.UNIT_PURCHASE,
-              today,
-              campaign.getAtBConfig().shipSearchCostPerWeek(),
-              "Ship Search")) {
-            report.append(campaign.getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
-                  .append(" deducted for ship search.");
-        } else {
-            campaign.addReport(FINANCES, "<font color=" +
-                                               ReportingUtilities.getNegativeColor() +
-                                               ">Insufficient funds for ship search.</font>");
-            campaign.setShipSearchStart(null);
-            return;
-        }
-
-        long numDays = ChronoUnit.DAYS.between(campaign.getShipSearchStart(), today);
-        if (numDays > 21) {
-            int roll = d6(2);
-            TargetRoll target = campaign.getAtBConfig().shipSearchTargetRoll(campaign.getShipSearchType(), campaign);
-            campaign.setShipSearchStart(null);
-            report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ").append(roll);
-            // TODO : mos zero should make ship available on retainer
-            if (roll >= target.getValue()) {
-                report.append("<br/>Search successful. ");
-
-                MekSummary ms = campaign.getUnitGenerator().generate(faction.getShortName(),
-                      campaign.getShipSearchType(),
-                      -1,
-                      today.getYear(),
-                      campaign.getAtBUnitRatingMod());
-
-                if (ms == null) {
-                    ms = campaign.getAtBConfig().findShip(campaign.getShipSearchType());
-                }
-
-                if (ms != null) {
-                    campaign.setShipSearchResult(ms.getName());
-                    campaign.setShipSearchExpiration(today.plusDays(31));
-                    report.append(campaign.getShipSearchResult())
-                          .append(" is available for purchase for ")
-                          .append(Money.of(ms.getCost()).toAmountAndSymbolString())
-                          .append(" until ")
-                          .append(MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getShipSearchExpiration()));
-                } else {
-                    report.append(" <font color=")
-                          .append(ReportingUtilities.getNegativeColor())
-                          .append(">Could not determine ship type.</font>");
-                }
-            } else {
-                report.append("<br/>Ship search unsuccessful.");
-            }
-        }
-        campaign.addReport(ACQUISITIONS, report.toString());
     }
 
     /**
@@ -1974,7 +1912,8 @@ public class CampaignNewDayManager {
                         StratConCampaignState campaignState = contract.getStratconCampaignState();
 
                         if (campaignState == null) {
-                            return;
+                            LOGGER.warn("Scenario {} has no StratConCampaignState", scenario.getId());
+                            continue;
                         }
 
                         processIgnoredDynamicScenario(scenario.getId(), campaignState);
@@ -1984,7 +1923,7 @@ public class CampaignNewDayManager {
                             processAbandonedConvoy(campaign, contract, (AtBDynamicScenario) scenario);
                         }
 
-                        scenario.clearAllForcesAndPersonnel(campaign);
+                        scenario.clearAllFormationsAndPersonnel(campaign);
                     } else {
                         contract.addPlayerMinorBreach();
 
@@ -2013,11 +1952,11 @@ public class CampaignNewDayManager {
                 if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(today)) {
                     int forceId = atBScenario.getCombatTeamId();
                     if ((campaign.getCombatTeamsAsMap().get(forceId) != null) &&
-                              !campaign.getForceIds().get(forceId).isDeployed()) {
+                              !campaign.getFormationIds().get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : campaign.getForceIds().get(forceId).getAllUnits(false)) {
+                        for (UUID uid : campaign.getFormationIds().get(forceId).getAllUnits(false)) {
                             Unit u = hangar.getUnit(uid);
                             if ((u != null) && u.isUnderRepair()) {
                                 forceUnderRepair = true;
@@ -2026,14 +1965,14 @@ public class CampaignNewDayManager {
                         }
 
                         if (!forceUnderRepair) {
-                            campaign.getForceIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
+                            campaign.getFormationIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
                             atBScenario.addForces(forceId);
 
                             campaign.addReport(BATTLE, MessageFormat.format(resources.getString(
                                         "atbScenarioTodayWithForce.format"),
                                   atBScenario.getHyperlinkedName(),
-                                  campaign.getForceIds().get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getForceIds().get(forceId),
+                                  campaign.getFormationIds().get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getFormationIds().get(forceId),
                                   atBScenario));
                         } else {
                             if (atBScenario.getHasTrack()) {
@@ -2105,7 +2044,7 @@ public class CampaignNewDayManager {
     private void updateMASHTheatreCapacity() {
         if (campaignOptions.isUseMASHTheatres()) {
             int mashTheatreCapacity =
-                  MASHCapacity.checkMASHCapacity(campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(hangar,
+                  MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
                         false), campaignOptions.getMASHTheatreCapacity());
             mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.HOSPITAL_BEDS);

@@ -66,7 +66,7 @@ public class RollDiceStoryPoint extends StoryPoint {
     @Override
     public void start() {
         super.start();
-        value = Compute.individualDice(numDice, sides).get(0);
+        value = Compute.individualDice(numDice, sides).getFirst();
         complete();
     }
 

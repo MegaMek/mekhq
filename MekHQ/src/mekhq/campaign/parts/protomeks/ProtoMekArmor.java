@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,7 +57,11 @@ public class ProtoMekArmor extends Armor {
     public ProtoMekArmor(int tonnage, int type, int points, int loc, boolean clan, Campaign c) {
         // Amount is used for armor quantity, not tonnage
         super(tonnage, type, points, loc, false, clan, c);
-        this.name = "ProtoMek Armor";
+    }
+
+    @Override
+    public String getName() {
+        return "ProtoMek Armor";
     }
 
     @Override

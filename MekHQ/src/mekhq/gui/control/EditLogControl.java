@@ -49,11 +49,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AddOrEditLogEntryDialog;
 import mekhq.gui.model.LogTableModel;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A control panel for editing a person's log entries.
@@ -203,7 +203,7 @@ public class EditLogControl extends JPanel {
 
         configureTableColumns();
 
-        JScrollPane scrollPane = new JScrollPaneWithSpeed();
+        JScrollPane scrollPane = new FastJScrollPane();
         scrollPane.setName("scrollLogsTable.name");
         scrollPane.setViewportView(logsTable);
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -112,7 +111,7 @@ import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -439,7 +438,7 @@ public class Person {
     private ExtraData extraData;
 
     /** @deprecated Use {@link #RESOURCE_BUNDLE} instead for all new strings */
-    @Deprecated(since = "0.50.10", forRemoval = false)
+    @Deprecated(since = "0.50.10")
     private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
           MekHQ.getMHQOptions().getLocale());
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Personnel";
@@ -1652,7 +1651,7 @@ public class Person {
                 String secondInCommandHyperlink = secondInCommand.getHyperlinkedFullTitle();
                 campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
                       secondInCommandHyperlink));
-                campaign.addReport(PERSONNEL, String.format(resources.getString("setAsCommander.format"),
+                campaign.addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                       secondInCommandHyperlink));
 
                 campaign.personUpdated(secondInCommand);
@@ -2796,7 +2795,7 @@ public class Person {
      *                                   ensure it remains within the valid range.
      */
     public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
+        this.aggressionDescriptionIndex = Math.clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
     Aggression getStoredAggression() {
@@ -2834,7 +2833,7 @@ public class Person {
      *                                 it remains within the valid range.
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
+        this.ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     Ambition getStoredAmbition() {
@@ -2872,7 +2871,7 @@ public class Person {
      *                              remains within the valid range.
      */
     public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
+        this.greedDescriptionIndex = Math.clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
     Greed getStoredGreed() {
@@ -2910,7 +2909,7 @@ public class Person {
      *                               remains within the valid range.
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
+        this.socialDescriptionIndex = Math.clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     Social getStoredSocial() {
@@ -2948,7 +2947,7 @@ public class Person {
      *                                         ensure it remains within the valid range.
      */
     public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
-        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
+        this.personalityQuirkDescriptionIndex = Math.clamp(personalityQuirkDescriptionIndex,
               0,
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
@@ -4308,11 +4307,6 @@ public class Person {
                     person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityQuirk")) {
                     person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
-
-                    // < 50.07 compatibility handler
-                    if (person.personalityQuirk == PersonalityQuirk.BROKEN) {
-                        person.personalityQuirk = PersonalityQuirk.HAUNTED;
-                    }
                 } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
                     person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
@@ -4693,7 +4687,7 @@ public class Person {
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if ((getUnit() != null) &&
                       getUnit().isConventionalInfantry() &&
-                      ((Infantry) getUnit().getEntity()).hasSpecialization()) {
+                      ((ConvInfantry) getUnit().getEntity()).hasSpecialization()) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
                                                              .getSalarySpecialistInfantryMultiplier());
             }
@@ -5265,7 +5259,7 @@ public class Person {
 
         int averageSkillLevel = (int) floor((double) totalSkillLevel / skillNames.size());
 
-        Skill skill = getSkill(skillNames.get(0));
+        Skill skill = getSkill(skillNames.getFirst());
         if (skill == null) {
             return EXP_NONE;
         }
@@ -6177,9 +6171,9 @@ public class Person {
             }
         }
 
-        for (final Force force : campaign.getAllForces()) {
-            if (getId().equals(force.getTechID())) {
-                force.setTechID(null);
+        for (final Formation formation : campaign.getAllFormations()) {
+            if (getId().equals(formation.getTechID())) {
+                formation.setTechID(null);
             }
         }
     }
@@ -6776,11 +6770,11 @@ public class Person {
 
         modifiers += getDarkSecretModifier(false);
 
-        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        return Math.clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public void setConnections(final int connections) {
-        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        this.connections = Math.clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     /**
@@ -6793,7 +6787,7 @@ public class Person {
      */
     public void changeConnections(final int delta) {
         int newValue = connections + delta;
-        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        connections = Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -6801,7 +6795,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        this.wealth = Math.clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
@@ -6814,7 +6808,7 @@ public class Person {
      */
     public void changeWealth(final int delta) {
         int newValue = wealth + delta;
-        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        wealth = Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     public boolean isHasPerformedExtremeExpenditure() {
@@ -6861,7 +6855,7 @@ public class Person {
      * @since 0.50.10
      */
     public void setExtraIncomeFromTraitLevel(final int traitLevel) {
-        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        int newExtraIncomeTraitLevel = Math.clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
         extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
     }
 
@@ -6933,11 +6927,11 @@ public class Person {
 
         modifiers += getDarkSecretModifier(true);
 
-        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return Math.clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
-        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.reputation = Math.clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     /**
@@ -6950,7 +6944,7 @@ public class Person {
      */
     public void changeReputation(final int delta) {
         int newValue = reputation + delta;
-        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        reputation = Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -6958,12 +6952,12 @@ public class Person {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        this.unlucky = Math.clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
-        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        unlucky = Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public int getBloodmark() {
@@ -6975,12 +6969,12 @@ public class Person {
     }
 
     public void setBloodmark(final int unlucky) {
-        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        this.bloodmark = Math.clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public void changeBloodmark(final int delta) {
         int newValue = bloodmark + delta;
-        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        bloodmark = Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public List<LocalDate> getBloodhuntSchedule() {

@@ -157,7 +157,7 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
             getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecialScenarioEnemies().getFirst()), campaign);
     }
 
     @Override

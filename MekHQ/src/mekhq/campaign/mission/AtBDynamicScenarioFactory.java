@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.MathUtility.getGaussianAverage;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -48,7 +47,6 @@ import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
@@ -88,7 +86,6 @@ import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
-import megamek.common.equipment.GunEmplacement;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
@@ -116,7 +113,7 @@ import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -554,7 +551,7 @@ public class AtBDynamicScenarioFactory {
         // Get the number of units in the typical ground tactical formation.
         // This will differ depending on whether the owner uses Inner Sphere lances,
         // Clan stars, or CS/WOB Level II formations.
-        int lanceSize = getStandardForceSize(faction);
+        int lanceSize = CombatTeam.getStandardFormationSize(faction);
 
         // determine generation parameters
         int forceBV = 0;
@@ -821,7 +818,7 @@ public class AtBDynamicScenarioFactory {
                         // swap out standard armor for snowsuits or heat suits as appropriate
                         if (actualUnitType == INFANTRY) {
                             for (Entity curPlatoon : generatedLance) {
-                                changeInfantryKit((Infantry) curPlatoon,
+                                changeInfantryKit((ConvInfantry) curPlatoon,
                                       isLowPressure,
                                       isTainted,
                                       scenario.getTemperature());
@@ -1104,7 +1101,7 @@ public class AtBDynamicScenarioFactory {
         if (!transportedEntities.isEmpty()) {
             // Transported units need to filter out battle armor before applying armor changes
             for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == INFANTRY).toList()) {
-                changeInfantryKit((Infantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+                changeInfantryKit((ConvInfantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
             }
         }
 
@@ -1656,7 +1653,7 @@ public class AtBDynamicScenarioFactory {
             if (templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
                       templateObjective.getAssociatedForceNames()
                             .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
-                objectiveForceNames.add(campaign.getForce(forceID).getName());
+                objectiveForceNames.add(campaign.getFormation(forceID).getName());
                 calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
             }
         }
@@ -1762,7 +1759,7 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
-                primaryUnitCount += campaign.getForce(forceID).getAllUnits(false).size();
+                primaryUnitCount += campaign.getFormation(forceID).getAllUnits(false).size();
             }
         }
 
@@ -1828,9 +1825,12 @@ public class AtBDynamicScenarioFactory {
             scenario.setBoardType(T_GROUND);
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                                .floorEntry(kelvinTemp)
-                                                .getValue().allowedTerrainTypes;
+            var tempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+            var biomeEntry = tempMap.floorEntry(kelvinTemp);
+            if (biomeEntry == null) {
+                biomeEntry = tempMap.firstEntry();
+            }
+            List<String> allowedTerrain = biomeEntry.getValue().allowedTerrainTypes;
 
             int terrainIndex = randomInt(allowedTerrain.size());
             scenario.setTerrainType(allowedTerrain.get(terrainIndex));
@@ -1847,12 +1847,18 @@ public class AtBDynamicScenarioFactory {
         } else {
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            List<String> allowedFacility = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME)
-                                                 .floorEntry(kelvinTemp)
-                                                 .getValue().allowedTerrainTypes;
-            List<String> allowedTerrain = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME)
-                                                .floorEntry(kelvinTemp)
-                                                .getValue().allowedTerrainTypes;
+            var facilityTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+            var facilityBiomeEntry = facilityTempMap.floorEntry(kelvinTemp);
+            if (facilityBiomeEntry == null) {
+                facilityBiomeEntry = facilityTempMap.firstEntry();
+            }
+            List<String> allowedFacility = facilityBiomeEntry.getValue().allowedTerrainTypes;
+            var terrainTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+            var terrainBiomeEntry = terrainTempMap.floorEntry(kelvinTemp);
+            if (terrainBiomeEntry == null) {
+                terrainBiomeEntry = terrainTempMap.firstEntry();
+            }
+            List<String> allowedTerrain = terrainBiomeEntry.getValue().allowedTerrainTypes;
             List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
             // try to filter on temp
             allowedTerrain.addAll(allowedFacility);
@@ -2271,7 +2277,7 @@ public class AtBDynamicScenarioFactory {
 
         // If needed, temporarily assign troops hostile environmental suits
         if (temporaryXCT) {
-            changeInfantryKit((Infantry) crewedPlatoon, false, true, 25);
+            changeInfantryKit((ConvInfantry) crewedPlatoon, false, true, 25);
         }
 
         return crewedPlatoon;
@@ -2287,7 +2293,8 @@ public class AtBDynamicScenarioFactory {
      * @param isTainted     true if atmosphere has contaminants
      * @param temperature   Scenario temperature, in degrees C
      */
-    private static void changeInfantryKit(Infantry platoon, boolean isLowPressure, boolean isTainted, int temperature) {
+    private static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
+          int temperature) {
         boolean isHot = temperature > 50;
         boolean isCold = temperature < -30;
 
@@ -2613,7 +2620,7 @@ public class AtBDynamicScenarioFactory {
 
         // If needed, temporarily assign troops hostile environmental suits
         if (temporaryXCT) {
-            changeInfantryKit(((Infantry) crewedPlatoon), false, true, 25);
+            changeInfantryKit((ConvInfantry) crewedPlatoon, false, true, 25);
         }
 
         return crewedPlatoon;
@@ -3044,7 +3051,7 @@ public class AtBDynamicScenarioFactory {
             int adjustedValue = min(skill.getAdjustedValue(), EXP_LEGENDARY);
             int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
-            int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
+            int skillRoll = Math.clamp(d6(2) + commandSkillsModifier, 2, 12);
             skillLevel = switch (skillRoll) {
                 case 3, 4, 5 -> 1;
                 case 6, 7, 8, 9 -> 2;
@@ -3066,7 +3073,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        return clamp(skillLevel, 0, 10);
+        return Math.clamp(skillLevel, 0, 10);
     }
 
     /**
@@ -3080,11 +3087,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static String adjustForMaxWeight(String weights, int maxWeight) {
         if (maxWeight == EntityWeightClass.WEIGHT_HEAVY) {
-            return weights.replaceAll("A", "LM");
+            return weights.replace("A", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_MEDIUM) {
-            return weights.replaceAll("A", "MM").replaceAll("H", "LM");
+            return weights.replace("A", "MM").replace("H", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_LIGHT) {
-            return weights.replaceAll(".", "L");
+            return weights.replaceAll("\\.", "L");
         } else {
             return weights;
         }
@@ -3099,7 +3106,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static String adjustForMinWeight(String weights, int minWeight) {
         if (minWeight == EntityWeightClass.WEIGHT_MEDIUM) {
-            return weights.replaceAll("L", "M");
+            return weights.replace("L", "M");
         } else if (minWeight == EntityWeightClass.WEIGHT_HEAVY) {
             return weights.replaceAll("[LM]", "H");
         } else if (minWeight == EntityWeightClass.WEIGHT_ASSAULT) {
@@ -3477,10 +3484,10 @@ public class AtBDynamicScenarioFactory {
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
                 if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                    Force force = campaign.getForce(forceID);
-                    if (force != null) {
-                        bvBudget += force.getTotalBV(campaign, forceStandardBattleValue);
-                        LOGGER.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+                    Formation formation = campaign.getFormation(forceID);
+                    if (formation != null) {
+                        bvBudget += formation.getTotalBV(campaign, forceStandardBattleValue);
+                        LOGGER.info("Forced BV contribution for {}: {}", formation.getName(), bvBudget);
                     }
                 }
             }
@@ -3546,8 +3553,8 @@ public class AtBDynamicScenarioFactory {
      * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
      * {@link CombatRole#PATROL}.</p>
      *
-     * <p>Only Combat Teams with a non-null {@link Force} and a positive BV are counted. If at least one valid force
-     * is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
+     * <p>Only Combat Teams with a non-null {@link Formation} and a positive BV are counted. If at least one valid
+     * force is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
      *
      * <p>If the player has no qualifying forces, a default budget of {@code 10,000} BV is returned. This helps
      * ensure StratCon Singles generation can still proceed even when the player lacks suitable forces.</p>
@@ -3573,9 +3580,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation != null) {
+                int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
                     totalForces++;
                     totalBattleValue += battleValue;
@@ -3600,8 +3607,8 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method scans all player-controlled {@link CombatTeam}s that belong to a set of valid combat roles
      * (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the team's associated
-     * {@link Force} and collects its total BV. These values are then combined to compute a Gaussian-weighted average,
-     * which serves as a representative BV budget for force generation.</p>
+     * {@link Formation} and collects its total BV. These values are then combined to compute a Gaussian-weighted
+     * average, which serves as a representative BV budget for force generation.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
      * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
@@ -3640,9 +3647,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int battleValue = force.getTotalBV(campaign, forceStandardBattleValue);
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation != null) {
+                int battleValue = formation.getTotalBV(campaign, forceStandardBattleValue);
                 if (battleValue > 0) {
                     battleValues.add(battleValue);
                 }
@@ -3678,10 +3685,10 @@ public class AtBDynamicScenarioFactory {
             // deployed player forces:
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-                Force force = campaign.getForce(forceID);
+                Formation formation = campaign.getFormation(forceID);
 
-                if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && force != null) {
-                    unitCount += force.getTotalUnitCount(campaign, isClanBidding);
+                if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && formation != null) {
+                    unitCount += formation.getTotalUnitCount(campaign, isClanBidding);
                 }
             }
 
@@ -3719,7 +3726,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>If the player has no qualifying forces (i.e., no forces with units in the valid role categories), the
      * method falls back to the faction’s standard default force size as determined by
-     * {@link CombatTeam#getStandardForceSize(Faction)}.</p>
+     * {@link CombatTeam#getStandardFormationSize(Faction)}.</p>
      *
      * @param campaign the {@link Campaign} from which Combat Teams and forces are obtained
      *
@@ -3730,7 +3737,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountForStratConSingles(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
 
         int forceCount = 0;
         int unitCount = 0;
@@ -3741,9 +3748,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int unitsInForce = force.getAllUnits(false).size();
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation != null) {
+                int unitsInForce = formation.getAllUnits(false).size();
                 if (unitsInForce != 0) {
                     forceCount++;
                     unitCount += unitsInForce;
@@ -3766,7 +3773,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method reviews all player-controlled {@link CombatTeam}s whose roles fall within a predefined set of
      * valid combat roles (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the
-     * associated {@link Force} and records the number of units currently assigned to that force.</p>
+     * associated {@link Formation} and records the number of units currently assigned to that force.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
      * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
@@ -3779,7 +3786,7 @@ public class AtBDynamicScenarioFactory {
      *     <li>Only forces belonging to valid roles are considered.</li>
      *     <li>Any force with a unit count of {@code 0} is ignored.</li>
      *     <li>If no qualifying forces are found, a default unit count is returned. This default is derived from
-     *     {@link CombatTeam#getStandardForceSize(Faction)}, using the faction of the current campaign.</li>
+     *     {@link CombatTeam#getStandardFormationSize(Faction)}, using the faction of the current campaign.</li>
      *     <li>If valid forces exist, their unit counts are combined using the Gaussian-weighted averaging method to
      *     produce a representative force size.</li>
      * </ul>
@@ -3792,7 +3799,7 @@ public class AtBDynamicScenarioFactory {
      * @since 0.50.10
      */
     private static int getUnitCountWithoutUsingASeedForce(Campaign campaign) {
-        int defaultUnitCount = CombatTeam.getStandardForceSize(campaign.getFaction());
+        int defaultUnitCount = CombatTeam.getStandardFormationSize(campaign.getFaction());
 
         // We need to start by gathering the different unit counts. This is because we need that information for
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
@@ -3805,9 +3812,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            Force force = combatTeam.getForce(campaign);
-            if (force != null) {
-                int unitCount = force.getAllUnits(false).size();
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation != null) {
+                int unitCount = formation.getAllUnits(false).size();
                 if (unitCount > 0) {
                     unitCounts.add(unitCount);
                 }
@@ -4188,7 +4195,7 @@ public class AtBDynamicScenarioFactory {
 
         if (rolesByType != null) {
             if (unitTypes.size() == 1) {
-                roles = rolesByType.getOrDefault(unitTypes.get(0), new ArrayList<>());
+                roles = rolesByType.getOrDefault(unitTypes.getFirst(), new ArrayList<>());
             } else {
                 roles = rolesByType.getOrDefault(unitTypes.get(unitIndex), new ArrayList<>());
             }
@@ -4205,7 +4212,7 @@ public class AtBDynamicScenarioFactory {
 
         int unitType;
         if (unitTypes.size() == 1) {
-            unitType = unitTypes.get(0);
+            unitType = unitTypes.getFirst();
         } else {
             unitType = unitTypes.get(unitIndex);
         }
@@ -4393,9 +4400,9 @@ public class AtBDynamicScenarioFactory {
         }
 
         for (int forceID : scenario.getForceIDs()) {
-            Force playerForce = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getFormation(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits(true)) {
+            for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null &&
                           (currentUnit.getEntity().getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED)) {
@@ -4503,9 +4510,9 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             List<Entity> forceEntities = new ArrayList<>();
-            Force playerForce = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getFormation(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits(true)) {
+            for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());
@@ -4545,12 +4552,12 @@ public class AtBDynamicScenarioFactory {
                 // After we're overwritten, the template, as necessary, continue
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     LOGGER.info("We're using staggered deployment turn calculation for {}",
-                          playerForce.getName());
+                          playerFormation.getName());
 
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
                     LOGGER.info("We're using reinforcement deployment turn calculation for {}",
-                          playerForce.getName());
+                          playerFormation.getName());
 
                     setDeploymentTurnsForReinforcements(hangar,
                           scenario,
@@ -4558,7 +4565,7 @@ public class AtBDynamicScenarioFactory {
                           strategy + scenario.getFriendlyReinforcementDelayReduction());
                 } else {
                     LOGGER.info("We're using normal deployment turn calculation for {}",
-                          playerForce.getName());
+                          playerFormation.getName());
 
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
@@ -4566,7 +4573,7 @@ public class AtBDynamicScenarioFactory {
                 }
             } else {
                 LOGGER.info("We're using a fallback deployment turn calculation for {}",
-                      playerForce.getName());
+                      playerFormation.getName());
                 setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities, strategy);
             }
         }
@@ -4683,9 +4690,9 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             List<Entity> forceEntities = new ArrayList<>();
-            Force playerForce = campaign.getForce(forceID);
+            Formation playerFormation = campaign.getFormation(forceID);
 
-            for (UUID unitID : playerForce.getAllUnits(true)) {
+            for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
                 if (currentUnit != null) {
                     forceEntities.add(currentUnit.getEntity());
@@ -5085,7 +5092,7 @@ public class AtBDynamicScenarioFactory {
         // if there's no such thing, then mercenaries.
         List<String> planetFactions = contract.getSystem().getFactions(currentDate);
         if (planetFactions != null && !planetFactions.isEmpty()) {
-            factionCode = planetFactions.get(0);
+            factionCode = planetFactions.getFirst();
             Faction ownerFaction = Factions.getInstance().getFaction(factionCode);
 
             if (ownerFaction.is(FactionTag.ABANDONED)) {
@@ -5222,7 +5229,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             if ((botForce != null) && !botForce.getFixedEntityList().isEmpty()) {
-                Entity swapTarget = botForce.getFixedEntityList().get(0);
+                Entity swapTarget = botForce.getFixedEntityList().getFirst();
                 BenchedEntityData benchedEntity = new BenchedEntityData();
                 benchedEntity.entity = swapTarget;
                 benchedEntity.templateName = destinationTemplate.getForceName();

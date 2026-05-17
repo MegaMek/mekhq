@@ -71,6 +71,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      * @param elements the elements to add to this model
      */
     @SafeVarargs
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public SortedComboBoxModel(final E... elements) {
         this(null, elements);
     }
@@ -80,6 +81,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
      *
      * @param elements the elements to add to this model
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public SortedComboBoxModel(final Collection<E> elements) {
         this(null, elements);
     }

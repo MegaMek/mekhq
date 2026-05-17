@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -74,7 +74,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -115,7 +115,7 @@ public class StratConScenarioWizard extends JDialog {
     private final transient ResourceBundle resources = ResourceBundle.getBundle(resourcePath,
           MekHQ.getMHQOptions().getLocale());
 
-    private final Map<String, JList<Force>> availableForceLists = new HashMap<>();
+    private final Map<String, JList<Formation>> availableForceLists = new HashMap<>();
     private final Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
 
     private List<Unit> eligibleLeadershipUnits;
@@ -280,19 +280,19 @@ public class StratConScenarioWizard extends JDialog {
     private String getForceNameReversed(Unit unit) {
         List<String> forceNames = new ArrayList<>();
 
-        Force force = campaign.getForce(unit.getForceId());
+        Formation formation = campaign.getFormation(unit.getFormationId());
 
-        if (force == null) {
+        if (formation == null) {
             return "";
         }
 
-        forceNames.add(force.getName());
+        forceNames.add(formation.getName());
 
-        Force parentForce = force.getParentForce();
-        while (parentForce != null) {
-            forceNames.add(parentForce.getName());
+        Formation parentFormation = formation.getParentFormation();
+        while (parentFormation != null) {
+            forceNames.add(parentFormation.getName());
 
-            parentForce = parentForce.getParentForce();
+            parentFormation = parentFormation.getParentFormation();
         }
 
         Collections.reverse(forceNames);
@@ -402,7 +402,7 @@ public class StratConScenarioWizard extends JDialog {
                 // Add a list to display available forces
                 localGbc.gridy = 1;
                 JLabel selectedForceInfo = new JLabel();
-                JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
+                JList<Formation> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
                 availableForceList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 // Add a listener to handle changes to the selected force
                 availableForceList.addListSelectionListener(e -> {
@@ -501,8 +501,8 @@ public class StratConScenarioWizard extends JDialog {
     /**
      * Add an "available force list" to the given control
      */
-    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
-          ScenarioForceTemplate forceTemplate) {
+    private JList<Formation> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
+                                                   ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new FastJScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
@@ -514,7 +514,7 @@ public class StratConScenarioWizard extends JDialog {
                     currentCampaignState,
                     false));
 
-        JList<Force> availableForceList = new JList<>();
+        JList<Formation> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
         availableForceList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
 
@@ -604,7 +604,7 @@ public class StratConScenarioWizard extends JDialog {
     /**
      * Worker function that builds a "html-enabled" string indicating the brief status of a force
      */
-    private String buildForceStatus(Force f, boolean hideForceCost) {
+    private String buildForceStatus(Formation f, boolean hideForceCost) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(f.getFullName());
@@ -730,16 +730,16 @@ public class StratConScenarioWizard extends JDialog {
         //Final instructions:
         if (isPrimaryForce) {
             String instructions;
-            Force primaryForce = currentScenario.getBackingScenario()
+            Formation primaryFormation = currentScenario.getBackingScenario()
                                        .getForces(campaign)
-                                       .getAllSubForces()
+                                       .getAllSubFormations()
                                        .stream()
                                        .findFirst()
                                        .orElse(null);
-            if (primaryForce != null) {
+            if (primaryFormation != null) {
                 instructions = MHQInternationalization.getFormattedTextAt(resourcePath,
                       "lblLeadershipCommitForces.text",
-                      primaryForce.getName());
+                      primaryFormation.getName());
             } else {
                 instructions = getTextAt(resourcePath,
                       "lblLeadershipCommitForces.fallback.text");
@@ -946,14 +946,14 @@ public class StratConScenarioWizard extends JDialog {
         List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
         List<UUID> instantReinforcements = currentScenario.getBackingScenario().getFriendlyInstantReinforcements();
         for (String templateID : availableForceLists.keySet()) {
-            for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
+            for (Formation formation : availableForceLists.get(templateID).getSelectedValuesList()) {
                 if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    ReinforcementEligibilityType reinforcementType = getReinforcementType(force.getId(),
+                    ReinforcementEligibilityType reinforcementType = getReinforcementType(formation.getId(),
                           currentTrackState,
                           campaign,
                           currentCampaignState);
 
-                    ReinforcementResultsType reinforcementResults = processReinforcementDeployment(force,
+                    ReinforcementResultsType reinforcementResults = processReinforcementDeployment(formation,
                           reinforcementType,
                           currentCampaignState,
                           currentScenario,
@@ -963,21 +963,21 @@ public class StratConScenarioWizard extends JDialog {
                           isInstantlyDeployed);
 
                     if (reinforcementResults.ordinal() >= FAILED.ordinal()) {
-                        currentScenario.addFailedReinforcements(force.getId());
+                        currentScenario.addFailedReinforcements(formation.getId());
                         continue;
                     }
 
-                    currentScenario.addForce(force, templateID, campaign);
+                    currentScenario.addForce(formation, templateID, campaign);
 
                     if (reinforcementResults == DELAYED) {
-                        for (UUID unitId : force.getAllUnits(true)) {
+                        for (UUID unitId : formation.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
                                 delayedReinforcements.add(unitId);
                             }
                         }
                     } else if (reinforcementResults == INSTANT) {
 
-                        for (UUID unitId : force.getAllUnits(true)) {
+                        for (UUID unitId : formation.getAllUnits(true)) {
                             if (campaign.getUnit(unitId) != null) {
                                 instantReinforcements.add(unitId);
                             }
@@ -1122,7 +1122,7 @@ public class StratConScenarioWizard extends JDialog {
      *                             <li>Verifies that the event source is a {@link JList}. If the source is not a {@code JList}, the method returns immediately.</li>
      *                             <li>Retrieves the list of selected forces from the {@code JList}.</li>
      *                             <li>Builds an HTML-formatted string with status details for each selected force using the
-     *                                 {@link #buildForceStatus(Force, boolean)} method.</li>
+     *                                 {@link #buildForceStatus(Formation, boolean)} method.</li>
      *                             <li>Updates the provided status label with the constructed HTML string, effectively updating the displayed information.</li>
      *                             <li>Refreshes the UI by calling {@link #pack()} to ensure the dialog adjusts properly to any layout changes.</li>
      *                           </ul>
@@ -1137,26 +1137,26 @@ public class StratConScenarioWizard extends JDialog {
     private void availableForceSelectorChanged(ListSelectionEvent listSelectionEvent, JLabel forceStatusLabel,
           boolean isPrimaryForce) {
         Object source = listSelectionEvent.getSource();
-        Vector<Force> forceList = new Vector<>();
+        Vector<Formation> formationList = new Vector<>();
 
         if (source instanceof JList<?> objectList) {
             for (Object item : objectList.getSelectedValuesList()) {
-                if (item instanceof Force force) {
-                    forceList.add(force);
+                if (item instanceof Formation formation) {
+                    formationList.add(formation);
                 }
             }
         }
 
-        if (forceList.isEmpty()) {
+        if (formationList.isEmpty()) {
             return;
         }
 
-        JList<Force> sourceList = new JList<>(forceList);
+        JList<Formation> sourceList = new JList<>(formationList);
         StringBuilder statusBuilder = new StringBuilder();
         statusBuilder.append("<html>");
 
-        for (Force force : sourceList.getSelectedValuesList()) {
-            statusBuilder.append(buildForceStatus(force, isPrimaryForce));
+        for (Formation formation : sourceList.getSelectedValuesList()) {
+            statusBuilder.append(buildForceStatus(formation, isPrimaryForce));
         }
 
         statusBuilder.append("</html>");

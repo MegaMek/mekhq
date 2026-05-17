@@ -222,7 +222,7 @@ public class NagController {
         }
 
         // Deployment Shortfall
-        final boolean isUseAtB = campaignOptions.isUseAtB();
+        final boolean isUseAtB = campaignOptions.isUseStratCon();
 
         if (DeploymentShortfallNagDialog.checkNag(isUseAtB, campaign)) {
             DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);

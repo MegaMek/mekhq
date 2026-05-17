@@ -250,15 +250,18 @@ public final class StarUtil {
     private static boolean starIconDataLoaded = false;
 
     // Generators
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static double generateTemperature(Random rnd, int spectral, double subtype) {
         return MathUtility.lerp(getMinTemperature(spectral, subtype), getMaxTemperature(spectral, subtype),
               rnd.nextDouble());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static double generateMass(Random rnd, int spectral, double subtype) {
         return MathUtility.lerp(getMinMass(spectral, subtype), getMaxMass(spectral, subtype), rnd.nextDouble());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static double generateLuminosity(Random rnd, int spectral, double subtype) {
         return getAvgLuminosity(spectral, subtype) * (rnd.nextDouble() * 0.2 + 0.9);
     }
@@ -413,6 +416,7 @@ public final class StarUtil {
      *
      * @throws IllegalArgumentException if luminosity or temperature is less than or equal to 0.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static double estimateStarRadius(double luminosity, double temperature) {
         // Temperature raised to the 4th power
         double temperaturePower4 = Math.pow(temperature, 4);
@@ -441,6 +445,7 @@ public final class StarUtil {
      * @return The combined spectral type number, calculated as {@code spectralClass * 10 + spectralSubClass}, where
      *       {@code spectralSubClass} is the numeric portion of the spectral type string.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getSpectralTypeNumber(int spectralClass, String spectralType) {
         spectralClass *= 10;
 

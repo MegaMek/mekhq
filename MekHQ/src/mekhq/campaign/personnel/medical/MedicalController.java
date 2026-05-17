@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,6 +50,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
+import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
@@ -147,6 +148,7 @@ public class MedicalController {
             // Handle Advanced Medical
             if (isUseAdvancedMedical) {
                 if (isUseAltAdvancedMedical) {
+                    AdvancedMedicalAlternateHealing.setCampaign(campaign);
                     AdvancedMedicalAlternateHealing.processNewDay(campaign.getLocalDate(),
                           campaign.getCampaignOptions().isUseFatigue(), campaign.getCampaignOptions().getFatigueRate(),
                           patient, doctor);
@@ -200,14 +202,6 @@ public class MedicalController {
     }
 
     /**
-     * Use {@link #healPerson(Person, Person, boolean, boolean, LocalDate)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    private void healPerson(Person patient, Person doctor) {
-        healPerson(patient, doctor, false, false, LocalDate.of(3151, 1, 1));
-    }
-
-    /**
      * Applies medical treatment to the specified patient, using the given doctor as the medical provider.
      *
      * <p>This method performs a skill check for the doctor using current campaign rules and relevant situational
@@ -240,7 +234,11 @@ public class MedicalController {
         LOGGER.debug(skillCheckUtility.getResultsText());
 
         if (skillCheckUtility.isSuccess()) {
+            boolean inInfirmary = !(null == patient.getDoctorId());
             patient.heal();
+            if (inInfirmary && !patient.needsFixing() && patient.getPrisonerStatus().isFreeOrBondsman()) {
+                MedicalLogger.dismissedFromInfirmary(patient, campaign);
+            }
             Unit unit = patient.getUnit();
             if (unit != null) {
                 unit.resetPilotAndEntity();

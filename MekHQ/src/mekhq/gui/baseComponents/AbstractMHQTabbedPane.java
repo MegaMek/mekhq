@@ -50,6 +50,7 @@ public abstract class AbstractMHQTabbedPane extends AbstractTabbedPane {
      * This creates an AbstractMHQTabbedPane using the default MHQ resource bundle. This is the normal constructor to
      * use for an AbstractMHQTabbedPane.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     protected AbstractMHQTabbedPane(final JFrame frame, final String name) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
               MekHQ.getMHQOptions().getLocale()), name);

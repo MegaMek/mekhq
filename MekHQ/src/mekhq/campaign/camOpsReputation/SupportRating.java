@@ -69,7 +69,7 @@ public class SupportRating {
               transportationRequirements);
         // Calculate the administration requirements for this campaign
         Map<String, Integer> administrationRequirements = calculateAdministratorRequirements(campaign,
-              technicianRequirements.get("totals").get(0));
+              technicianRequirements.get("totals").getFirst());
 
         // Add the calculated requirements into the supportRating map
         supportRating.put("administrationRequirements", administrationRequirements);
@@ -79,7 +79,7 @@ public class SupportRating {
         // Calculate the total of requirements
         int total = administrationRequirements.get("total") +
                           crewRequirements.get("crewRequirements") +
-                          technicianRequirements.get("rating").get(0);
+                          technicianRequirements.get("rating").getFirst();
 
         // Add the total value into the supportRating map
         supportRating.put("total", Map.of("total", total));

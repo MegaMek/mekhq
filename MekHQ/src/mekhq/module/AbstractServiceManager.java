@@ -38,7 +38,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -97,6 +96,7 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
     /**
      * @return An unmodifiable collection of the services
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Collection<T> getAllServices() {
         return getAllServices(false);
     }
@@ -113,7 +113,7 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
             return services.values()
                          .stream()
                          .sorted(Comparator.comparing(MekHQModule::getModuleName))
-                         .collect(Collectors.toUnmodifiableList());
+                         .toList();
         }
         return Collections.unmodifiableCollection(services.values());
     }

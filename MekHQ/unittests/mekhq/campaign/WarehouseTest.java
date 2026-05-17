@@ -955,7 +955,7 @@ public class WarehouseTest {
         // Spare
         Part mockSparePart = spy(new MekLocation());
         Part addedPart = warehouse.addPart(mockSparePart, true);
-        ;
+        
         assertEquals(mockSparePart, warehouse.findSparePart(spare -> spare.getId() == mockSparePart.getId()));
 
         Part mockUnitPart = spy(new MekLocation());

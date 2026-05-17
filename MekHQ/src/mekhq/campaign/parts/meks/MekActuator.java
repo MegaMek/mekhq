@@ -64,7 +64,7 @@ public class MekActuator extends Part {
                                                             .setAdvancement(2300, 2350, 2505)
                                                             .setApproximate(true, false, false)
                                                             .setPrototypeFactions(Faction.TA)
-                                                            .setProductionFactions(Faction.TH)
+                                                            .setProductionFactions(Faction.TH, Faction.CS)
                                                             .setStaticTechLevel(SimpleTechLevel.INTRO);
     public static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TechBase.IS)
                                                               .setAdvancement(2905, 2940, 3076)

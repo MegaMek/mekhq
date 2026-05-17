@@ -58,6 +58,7 @@ public class FactionBorders {
      * @param faction The faction to calculate the border for
      * @param when    The date to use to determine planet control.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public FactionBorders(Faction faction, LocalDate when) {
         this.faction = faction;
         calculateRegion(when);

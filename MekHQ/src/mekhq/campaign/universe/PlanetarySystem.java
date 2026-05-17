@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -175,6 +176,20 @@ public class PlanetarySystem {
     @JsonProperty("spectralType")
     private SourceableValue<StarType> star;
 
+    /**
+     * {@code true} for synthetic systems loaded from {@code mm-data/data/universe/planetary_systems/connector_systems/}
+     * — these are jump-path routing helpers (DPR, HWY, LTR, FDR, ER, HL prefixes) with no inhabitants, no faction
+     * history, and no canonical lore. They share the loader and registry with real canon systems and need to be
+     * filtered out of any UI that asks the user to pick a real system (e.g. the origin-system picker in
+     * {@code CustomizePersonDialog} — see issue #8934).
+     *
+     * <p>Set by {@link Systems#parsePlanetarySystemFiles} based on the loading directory. {@code @JsonIgnore}
+     * keeps it out of any future YAML/JSON serialization round-trip (the YAML schema has no equivalent field
+     * and the value is reconstructed from the load path) — defensive against schema drift.</p>
+     */
+    @JsonIgnore
+    private boolean connector = false;
+
     // tree map of planets sorted by system position
     private TreeMap<Integer, Planet> planets;
 
@@ -211,6 +226,22 @@ public class PlanetarySystem {
         return id;
     }
 
+    /**
+     * @return {@code true} if this system was loaded from the {@code connector_systems/} subdirectory — a
+     *       synthetic jump-path routing helper with no inhabitants. UI code that asks the user to pick a
+     *       real system should filter these out. See {@link #connector} for full context.
+     */
+    @JsonIgnore
+    public boolean isConnector() {
+        return connector;
+    }
+
+    /** Marks this system as a synthetic connector (used by {@link Systems} during YAML loading). */
+    @JsonIgnore
+    public void setConnector(boolean connector) {
+        this.connector = connector;
+    }
+
     public Double getX() {
         return x;
     }
@@ -220,8 +251,8 @@ public class PlanetarySystem {
     }
 
     public String getName(LocalDate when) {
-        // if no primary slot, then just return the id
-        if (getPrimaryPlanetPosition() < 1 && null != id) {
+        // if no primary slot was explicitly defined, then just return the id
+        if (getSourcedPrimarySlot() == null && id != null) {
             return id;
         }
 
@@ -473,7 +504,8 @@ public class PlanetarySystem {
     }
 
     public StarType getStar() {
-        return getSourcedStar().getValue();
+        SourceableValue<StarType> sourcedStar = getSourcedStar();
+        return sourcedStar == null ? null : sourcedStar.getValue();
     }
 
     public SourceableValue<StarType> getSourcedStar() {
@@ -511,6 +543,7 @@ public class PlanetarySystem {
         return null;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public Set<Integer> getPlanetPositions() {
         return planets.keySet();
     }
@@ -540,6 +573,7 @@ public class PlanetarySystem {
         return Objects.hash(id);
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public PlanetarySystemEvent getEvent(LocalDate when) {
         if ((null == when) || (null == events)) {
             return null;

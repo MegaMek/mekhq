@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,10 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
@@ -67,7 +69,7 @@ import megamek.common.util.DateUtilities;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -122,7 +124,7 @@ public class GeneralTab {
     private Camouflage camouflage;
     private JLabel lblIcon;
     private RoundedJButton btnIcon;
-    private StandardForceIcon unitIcon;
+    private StandardFormationIcon unitIcon;
 
     /**
      * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
@@ -202,7 +204,7 @@ public class GeneralTab {
               getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Randomize faction
-        btnRandomFaction = new CampaignOptionsButton("RandomFaction");
+        btnRandomFaction = new CampaignOptionsButton("RandomFaction", getMetadata(MILESTONE_BEFORE_METADATA));
         btnRandomFaction.addActionListener(e -> {
             FactionDisplay randomFaction = pickRandomFaction();
             if (randomFaction != null) {
@@ -217,7 +219,7 @@ public class GeneralTab {
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Randomize starting date
-        btnRandomDate = new CampaignOptionsButton("RandomDate");
+        btnRandomDate = new CampaignOptionsButton("RandomDate", getMetadata(MILESTONE_BEFORE_METADATA));
         btnRandomDate.addActionListener(e -> {
             LocalDate randomDate = DateUtilities.getRandomDateBetween(RANDOM_DATE_EARLIEST, RANDOM_DATE_LATEST);
             setDate(randomDate);
@@ -565,7 +567,7 @@ public class GeneralTab {
             campaign.setName(txtName.getText());
 
             if (isStartUp) {
-                campaign.getForces().setName(campaign.getName());
+                campaign.getFormations().setName(campaign.getName());
                 campaign.setLocalDate(date);
             }
 

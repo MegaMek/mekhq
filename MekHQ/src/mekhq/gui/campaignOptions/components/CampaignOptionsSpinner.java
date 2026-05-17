@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -42,6 +43,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.annotations.Nullable;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 
 /**
  * A specialized {@link JSpinner} component for use in campaign options dialogs.
@@ -67,14 +69,17 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param maximum        the maximum value for the spinner (integer or double)
      * @param stepSize       the step value for incrementing or decrementing the spinner (integer or double)
      * @param noTooltip      if {@code true}, the spinner will not have a tooltip
+     * @param metadata       version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
     public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize,
-          Number defaultValue, Number minimum, Number maximum, Number stepSize, boolean noTooltip) {
+          Number defaultValue, Number minimum, Number maximum, Number stepSize, boolean noTooltip,
+          @Nullable CampaignOptionsMetadata metadata) {
         super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
 
         if (!noTooltip) {
             String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
-            setToolTipText(wordWrap(tooltipText));
+            String badges = formatBadges(metadata);
+            setToolTipText(wordWrap(tooltipText + badges));
         }
 
         configureSpinner(name);
@@ -94,7 +99,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      */
     public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
           int maximum, int stepSize) {
-        this(name, null, defaultValue, minimum, maximum, stepSize, false);
+        this(name, null, defaultValue, minimum, maximum, stepSize, false, null);
     }
 
     /**
@@ -111,7 +116,71 @@ public class CampaignOptionsSpinner extends JSpinner {
      */
     public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
           double maximum, double stepSize) {
-        this(name, null, defaultValue, minimum, maximum, stepSize, false);
+        this(name, null, defaultValue, minimum, maximum, stepSize, false, null);
+    }
+
+    /**
+     * Creates a {@link CampaignOptionsSpinner} for integer values with metadata support.
+     *
+     * @param name         the name of the spinner, used to construct its resource bundle keys and internal name
+     * @param defaultValue the default value of the spinner (integer)
+     * @param minimum      the minimum value for the spinner (integer)
+     * @param maximum      the maximum value for the spinner (integer)
+     * @param stepSize     the step value for incrementing or decrementing the spinner (integer)
+     * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
+     */
+    public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
+          int maximum, int stepSize, @Nullable CampaignOptionsMetadata metadata) {
+        this(name, null, defaultValue, minimum, maximum, stepSize, false, metadata);
+    }
+
+    /**
+     * Creates a {@link CampaignOptionsSpinner} for double values with metadata support.
+     *
+     * @param name         the name of the spinner, used to construct its resource bundle keys and internal name
+     * @param defaultValue the default value of the spinner (double)
+     * @param minimum      the minimum value for the spinner (double)
+     * @param maximum      the maximum value for the spinner (double)
+     * @param stepSize     the step value for incrementing or decrementing the spinner (double)
+     * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
+     */
+    public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
+          double maximum, double stepSize, @Nullable CampaignOptionsMetadata metadata) {
+        this(name, null, defaultValue, minimum, maximum, stepSize, false, metadata);
+    }
+
+    /**
+     * Creates a {@link CampaignOptionsSpinner} for integer values with custom wrap size and optional tooltip.
+     *
+     * @param name           the name of the spinner, used to construct its resource bundle keys and internal name
+     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if
+     *                       {@code null})
+     * @param defaultValue   the default value of the spinner (integer)
+     * @param minimum        the minimum value for the spinner (integer)
+     * @param maximum        the maximum value for the spinner (integer)
+     * @param stepSize       the step value for incrementing or decrementing the spinner (integer)
+     * @param noTooltip      if {@code true}, the spinner will not have a tooltip
+     */
+    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, int defaultValue, int minimum,
+          int maximum, int stepSize, boolean noTooltip) {
+        this(name, customWrapSize, defaultValue, minimum, maximum, stepSize, noTooltip, null);
+    }
+
+    /**
+     * Creates a {@link CampaignOptionsSpinner} for double values with custom wrap size and optional tooltip.
+     *
+     * @param name           the name of the spinner, used to construct its resource bundle keys and internal name
+     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if
+     *                       {@code null})
+     * @param defaultValue   the default value of the spinner (double)
+     * @param minimum        the minimum value for the spinner (double)
+     * @param maximum        the maximum value for the spinner (double)
+     * @param stepSize       the step value for incrementing or decrementing the spinner (double)
+     * @param noTooltip      if {@code true}, the spinner will not have a tooltip
+     */
+    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, double defaultValue, double minimum,
+          double maximum, double stepSize, boolean noTooltip) {
+        this(name, customWrapSize, defaultValue, minimum, maximum, stepSize, noTooltip, null);
     }
 
     /**

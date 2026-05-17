@@ -368,7 +368,7 @@ public class SkillCheckUtility {
 
         if (includeMarginsOfSuccessText) {
             MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
-            String marginOfSuccessText = marginOfSuccessObject.getLabel();
+            String marginOfSuccessText = colorOpen + marginOfSuccessObject.getLabel() + CLOSING_SPAN_TAG;
             resultsText.append(" ").append(marginOfSuccessText);
         }
 
@@ -466,6 +466,7 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.05
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isUsedEdge() {
         return usedEdge;
     }

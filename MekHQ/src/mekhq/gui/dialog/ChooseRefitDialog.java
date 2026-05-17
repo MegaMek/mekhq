@@ -57,6 +57,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -64,7 +65,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -128,7 +128,7 @@ public class ChooseRefitDialog extends JDialog {
         refitSorter.setComparator(RefitTableModel.COL_CLASS, new ClassSorter());
         refitSorter.setComparator(RefitTableModel.COL_COST, new FormattedNumberSorter());
         refitTable.setRowSorter(refitSorter);
-        JScrollPane scrRefitTable = new JScrollPaneWithSpeed();
+        JScrollPane scrRefitTable = new FastJScrollPane();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -141,7 +141,7 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(scrRefitTable, gridBagConstraints);
 
-        scrShoppingList = new JScrollPaneWithSpeed();
+        scrShoppingList = new FastJScrollPane();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "shoppingList.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
@@ -163,7 +163,7 @@ public class ChooseRefitDialog extends JDialog {
               "txtOldUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), false, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
-        scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
+        scrOldUnit = new FastJScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
@@ -183,7 +183,7 @@ public class ChooseRefitDialog extends JDialog {
         txtNewUnit.setContentType("text/html");
         txtNewUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtNewUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrNewUnit = new JScrollPaneWithSpeed(txtNewUnit);
+        scrNewUnit = new FastJScrollPane(txtNewUnit);
         scrNewUnit.setMinimumSize(new Dimension(300, 400));
         scrNewUnit.setPreferredSize(new Dimension(300, 400));
         gridBagConstraints.gridx = 2;

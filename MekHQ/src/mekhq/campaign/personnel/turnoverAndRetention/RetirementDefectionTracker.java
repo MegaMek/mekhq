@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
@@ -205,7 +204,7 @@ public class RetirementDefectionTracker {
             // Fatigue modifier
             if ((campaign.getCampaignOptions().isUseFatigue()) &&
                       (campaign.getCampaignOptions().isUseFatigueModifiers())) {
-                int fatigueModifier = MathUtility.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
+                int fatigueModifier = Math.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
 
                 if (fatigueModifier > 0) {
                     targetNumber.addModifier(fatigueModifier, resources.getString("fatigue.text"));
@@ -232,7 +231,7 @@ public class RetirementDefectionTracker {
                         SkillModifierData skillModifierData = commander.getSkillModifierData(true);
 
                         modifier -= commander.getSkill(SkillType.S_LEADER)
-                                          .getFinalSkillValue(skillModifierData);
+                                          .getTotalSkillLevel(skillModifierData);
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -399,7 +398,7 @@ public class RetirementDefectionTracker {
             }
 
             // Injury Modifiers
-            int injuryMod = (int) person.getInjuries().stream().filter(Injury::isPermanent).count();
+            int injuryMod = getInjuryTurnoverModifier(person);
 
             if (injuryMod > 0) {
                 targetNumber.addModifier(injuryMod, resources.getString("injuries.text"));
@@ -449,7 +448,7 @@ public class RetirementDefectionTracker {
         List<Contract> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
-            if (campaign.getCampaignOptions().isUseAtB()) {
+            if (campaign.getCampaignOptions().isUseStratCon()) {
                 Optional<Contract> defensiveContract = activeContracts.stream()
                                                              .filter(contract -> contract instanceof AtBContract)
                                                              .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
@@ -633,7 +632,7 @@ public class RetirementDefectionTracker {
         if (commander.hasSkill(SkillType.S_LEADER)) {
             SkillModifierData skillModifierData = commander.getSkillModifierData();
 
-            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue(skillModifierData);
+            return commander.getSkill(SkillType.S_LEADER).getTotalSkillLevel(skillModifierData);
         } else {
             return 0;
         }
@@ -1045,6 +1044,37 @@ public class RetirementDefectionTracker {
     }
 
     /**
+     * Returns the number of permanent, non-prosthetic injuries for turnover modifier calculation.
+     *
+     * <p>Prosthetics and implants are excluded because they are elective modifications,
+     * not debilitating injuries that would cause a person to leave a unit.</p>
+     *
+     * @param person the person to evaluate
+     *
+     * @return count of permanent injuries excluding prosthetics and implants
+     */
+    static int getInjuryTurnoverModifier(final Person person) {
+        return (int) person.getInjuries().stream()
+                           .filter(i -> !i.getSubType().isPermanentModification())
+                           .filter(Injury::isPermanent)
+                           .count();
+    }
+
+    /**
+     * Returns whether a person has permanent injuries (excluding prosthetics/implants) that qualify them for medical
+     * discharge.
+     *
+     * @param person the person to evaluate
+     *
+     * @return {@code true} if the person has at least one permanent non-prosthetic injury
+     */
+    static boolean hasMedicalDischargeInjuries(final Person person) {
+        return person.getInjuries().stream()
+                     .filter(i -> !i.getSubType().isPermanentModification())
+                     .anyMatch(Injury::isPermanent);
+    }
+
+    /**
      * Class used to record the required payout to each retired/defected/killed/sacked person.
      */
     public static class Payout {
@@ -1081,7 +1111,7 @@ public class RetirementDefectionTracker {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions()
                                                                                           .getPayoutRetirementMultiplier());
                 // person is getting medically discharged
-            } else if (!person.getPermanentInjuries().isEmpty()) {
+            } else if (hasMedicalDischargeInjuries(person)) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions()
                                                                                           .getPayoutRetirementMultiplier());
                 // person is defecting

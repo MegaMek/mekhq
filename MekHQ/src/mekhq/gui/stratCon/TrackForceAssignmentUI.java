@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,16 +46,16 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConCoords;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This class handles the "assign force to track" interaction, where a user may assign a force to a track directly,
@@ -69,7 +69,8 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
     private Campaign campaign;
     private StratConCampaignState currentCampaignState;
     private boolean restrictToSingleForce;
-    private final JList<Force> availableForceList = new JList<>();
+    private boolean assignToScenario;
+    private final JList<Formation> availableForceList = new JList<>();
     private final JButton btnConfirm;
     private final StratConPanel ownerPanel;
 
@@ -100,7 +101,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         getContentPane().add(forceAssignmentInstructions, gbc);
         gbc.gridy++;
 
-        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
+        JScrollPane forceListContainer = new FastJScrollPane();
 
         // if we're waiting to assign primary forces, we can only do so from the current track
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
@@ -134,10 +135,11 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
      * Display the track force assignment UI.
      */
     public void display(Campaign campaign, StratConCampaignState campaignState, StratConCoords coords,
-          boolean restrictToSingleForce) {
+          boolean restrictToSingleForce, boolean assignToScenario) {
         this.campaign = campaign;
         this.currentCampaignState = campaignState;
         this.restrictToSingleForce = restrictToSingleForce;
+        this.assignToScenario = assignToScenario;
 
         initializeUI();
     }
@@ -163,9 +165,22 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
                 }
             }
 
-            for (Force force : availableForceList.getSelectedValuesList()) {
-                StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
-                      force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
+            for (Formation formation : availableForceList.getSelectedValuesList()) {
+                if (assignToScenario) {
+                    StratConRulesManager.assignForceToScenario(ownerPanel.getSelectedCoords(),
+                          formation.getId(),
+                          campaign,
+                          currentCampaignState.getContract(),
+                          ownerPanel.getCurrentTrack(),
+                          false);
+                } else {
+                    StratConRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
+                          formation.getId(),
+                          campaign,
+                          currentCampaignState.getContract(),
+                          ownerPanel.getCurrentTrack(),
+                          false);
+                }
             }
             setVisible(false);
             ownerPanel.repaint();

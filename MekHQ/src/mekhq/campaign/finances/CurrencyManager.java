@@ -132,6 +132,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return this.uiAmountAndSymbolPrinter;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     MoneyFormatter getUiAmountAndNamePrinter() {
         return this.uiAmountAndNamePrinter;
     }

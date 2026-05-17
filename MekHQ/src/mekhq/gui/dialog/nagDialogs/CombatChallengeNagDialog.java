@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -65,6 +65,6 @@ public class CombatChallengeNagDialog extends ImmersiveDialogNag {
     @Override
     protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
         return getFormattedTextAt(getResourceBundle(), key + ".ic", commanderAddress,
-              CombatTeam.getStandardForceSize(campaign.getFaction()));
+              CombatTeam.getStandardFormationSize(campaign.getFaction()));
     }
 }

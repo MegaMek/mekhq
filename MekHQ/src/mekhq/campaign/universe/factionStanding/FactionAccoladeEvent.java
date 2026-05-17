@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -141,6 +141,7 @@ public class FactionAccoladeEvent {
                                      accoladeLevel.is(CASH_BONUS_4);
 
         Person commander = campaign.getCommander();
+        String factionName = getFactionName(accoladingFaction, campaign.getGameYear());
 
         boolean accoladeWasRefused;
 
@@ -153,13 +154,14 @@ public class FactionAccoladeEvent {
         } else {
             String lookupName = accoladeLevel.getLookupName();
             String oocText = null;
+
             if (accoladeLevel.is(ADOPTION_OR_MEKS)) {
                 lookupName += isSameFaction ? LOOKUP_AFFIX_MEKS : LOOKUP_AFFIX_ADOPTION;
 
                 String oocTextKey = isSameFaction
                                           ? "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.meks.ooc"
                                           : "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.adoption.ooc";
-                oocText = getTextAt(getFactionJudgmentDialogResourceBundle(), oocTextKey);
+                oocText = getFormattedTextAt(getFactionJudgmentDialogResourceBundle(), oocTextKey, factionName);
             }
 
             ImmersiveDialogWidth dialogWidth;
@@ -198,7 +200,7 @@ public class FactionAccoladeEvent {
             if (!isSameFaction && accoladeWasRefused) {
                 String message = getFormattedTextAt(getFactionJudgmentDialogResourceBundle(),
                       "FactionJudgmentDialog.message.ACCOLADE.ADOPTION_OR_MEKS.meks.campaign",
-                      getFactionName(accoladingFaction, campaign.getGameYear()),
+                      factionName,
                       spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG);
 
                 new ImmersiveDialogNotification(campaign, message, false);
@@ -347,7 +349,7 @@ public class FactionAccoladeEvent {
 
         Faction faction = Factions.getInstance().getFaction(factionCode);
         boolean factionIsClan = faction.isClan();
-        int formationSize = CombatTeam.getStandardForceSize(faction, FormationLevel.COMPANY.getDepth());
+        int formationSize = CombatTeam.getStandardFormationSize(faction, FormationLevel.COMPANY.getDepth());
 
         int gameYear = campaign.getGameYear();
 

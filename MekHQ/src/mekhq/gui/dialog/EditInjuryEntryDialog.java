@@ -43,7 +43,6 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -51,8 +50,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import jakarta.annotation.Nonnull;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
@@ -70,11 +71,11 @@ public class EditInjuryEntryDialog extends JDialog {
 
     private Injury injury;
 
-    private JTextArea txtDays;
+    private JTextField txtDays;
     private JComboBox<BodyLocationChoice> ddLocation;
     private JComboBox<InjuryTypeChoice> ddType;
     private JTextArea txtFluff;
-    private JTextArea txtHits;
+    private JTextField txtHits;
     private JComboBox<String> ddPermanent;
     private JComboBox<String> ddWorkedOn;
     private JComboBox<String> ddExtended;
@@ -127,9 +128,9 @@ public class EditInjuryEntryDialog extends JDialog {
             }
         }
 
-        txtDays = new JTextArea();
+        txtDays = new JTextField();
         txtFluff = new JTextArea();
-        txtHits = new JTextArea();
+        txtHits = new JTextField();
         String[] tf = { "True", "False" };
         ddPermanent = new JComboBox<>(tf);
         ddWorkedOn = new JComboBox<>(tf);
@@ -151,8 +152,6 @@ public class EditInjuryEntryDialog extends JDialog {
         txtDays.setText(Integer.toString(injury.getTime()));
         txtDays.setName("txtDays");
         txtDays.setEditable(true);
-        txtDays.setLineWrap(true);
-        txtDays.setWrapStyleWord(true);
         txtDays.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Days Remaining"),
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtDays.setPreferredSize(new Dimension(250, 75));
@@ -231,8 +230,6 @@ public class EditInjuryEntryDialog extends JDialog {
         txtHits.setText(Integer.toString(injury.getHits()));
         txtHits.setName("txtHits");
         txtHits.setEditable(true);
-        txtHits.setLineWrap(true);
-        txtHits.setWrapStyleWord(true);
         txtHits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Number of Hits"),
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtHits.setPreferredSize(new Dimension(250, 75));

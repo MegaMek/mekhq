@@ -68,10 +68,12 @@ public enum UnitRatingMethod {
         return this != NONE;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCampaignOperations() {
         return this == CAMPAIGN_OPS;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isFMMR() {
         return this == FLD_MAN_MERCS_REV;
     }

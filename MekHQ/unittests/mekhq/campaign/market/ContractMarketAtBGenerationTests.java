@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,7 +61,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
@@ -125,9 +125,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -230,9 +230,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -338,9 +338,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -446,9 +446,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -563,9 +563,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -715,9 +715,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -823,9 +823,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -923,9 +923,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1031,9 +1031,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1135,9 +1135,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1243,9 +1243,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1351,9 +1351,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1459,9 +1459,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1566,9 +1566,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1675,9 +1675,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1783,9 +1783,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1892,9 +1892,9 @@ public class ContractMarketAtBGenerationTests {
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
         when(campaign.getHangar()).thenReturn(hangar);
 
-        Force forces = mock(Force.class);
+        Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getForces()).thenReturn(forces);
+        when(campaign.getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);

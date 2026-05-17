@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,23 +32,24 @@
  */
 package mekhq.campaign.events.persons;
 
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 
 /**
  * Triggered when a tech is assigned to or removed from a force.
  */
+@Deprecated(since = "0.51.0", forRemoval = true)
 public class PersonForceAssignmentEvent extends PersonChangedEvent {
 
-    private final Force force;
+    private final Formation formation;
 
-    public PersonForceAssignmentEvent(Person person, Force force) {
+    public PersonForceAssignmentEvent(Person person, Formation formation) {
         super(person);
-        this.force = force;
+        this.formation = formation;
     }
 
-    public Force getForce() {
-        return force;
+    public Formation getForce() {
+        return formation;
     }
 
 }

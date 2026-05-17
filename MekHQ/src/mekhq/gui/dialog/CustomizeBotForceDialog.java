@@ -57,6 +57,7 @@ import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.MULParser;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityListFile;
 import megamek.common.units.EntityWeightClass;
@@ -72,7 +73,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeBotForceDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CustomizeBotForceDialog.class);
@@ -269,7 +269,7 @@ public class CustomizeBotForceDialog extends JDialog {
 
         panFixedUnits = new DefaultMHQScrollablePanel(frame, "panFixedEntity", new GridBagLayout());
         refreshFixedEntityPanel();
-        JScrollPane scrollFixedUnits = new JScrollPaneWithSpeed(panFixedUnits);
+        JScrollPane scrollFixedUnits = new FastJScrollPane(panFixedUnits);
         scrollFixedUnits.setMinimumSize(new Dimension(400, 200));
         scrollFixedUnits.setPreferredSize(new Dimension(400, 200));
         scrollFixedUnits.setBorder(BorderFactory.createCompoundBorder(

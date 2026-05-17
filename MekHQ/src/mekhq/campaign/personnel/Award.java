@@ -205,7 +205,7 @@ public class Award implements Comparable<Award> {
      */
     private String getFileName(int i, List<String> fileNames) {
         if (i > fileNames.size()) {
-            return fileNames.get(fileNames.size() - 1);
+            return fileNames.getLast();
         }
 
         return fileNames.get(i - 1);

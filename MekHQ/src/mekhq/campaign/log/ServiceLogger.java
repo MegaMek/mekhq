@@ -51,6 +51,7 @@ public class ServiceLogger {
     private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static void retireDueToWounds(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
         person.addPersonalLogEntry(new ServiceLogEntry(date,
@@ -62,6 +63,7 @@ public class ServiceLogger {
         person.addPersonalLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, name) + rankEntry));
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static void madeBondsman(Person person, LocalDate date) {
         person.addPersonalLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("madeBondsman.text")));
     }
@@ -71,6 +73,7 @@ public class ServiceLogger {
         person.addPersonalLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, name) + rankEntry));
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static void madePrisoner(Person person, LocalDate date) {
         person.addPersonalLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("madePrisoner.text")));
     }

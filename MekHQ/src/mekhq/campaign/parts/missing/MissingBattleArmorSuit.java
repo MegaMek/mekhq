@@ -117,6 +117,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         return null;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isQuad() {
         return quad;
     }
@@ -125,6 +126,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         return weightClass;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getGroundMP() {
         return groundMP;
     }

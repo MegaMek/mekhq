@@ -184,6 +184,6 @@ primaryfactory:St. Ives, Carver V/Liberty, New Valencia, Quentin, Robinson, Styk
 systemmanufacturer:CHASSIS:HildCo Type V
 systemmanufacturer:ENGINE:Pitban 340
 systemmanufacturer:ARMOR:Durallex Heavy
-systemmanufacturer:JUMPJET:HildCo Model 12
+systemmanufacturer:JUMP_JET:HildCo Model 12
 systemmanufacturer:COMMUNICATIONS:Opus III Highbeam
 systemmanufacturer:TARGETING:MaLandry 34

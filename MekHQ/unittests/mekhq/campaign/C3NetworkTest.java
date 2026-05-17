@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -75,14 +75,14 @@ class C3NetworkTest {
     /**
      * Creates a mock Unit with a mock Entity configured for C3i network testing.
      *
-     * @param hasC3i    whether the entity has C3i
-     * @param freeNodes number of free C3 nodes (5 = unnetworked, < 5 = networked)
-     * @param networkId the C3 network ID
-     * @param forceId   the force ID (-1 = not in TO&E)
+     * @param hasC3i      whether the entity has C3i
+     * @param freeNodes   number of free C3 nodes (5 = unnetworked, < 5 = networked)
+     * @param networkId   the C3 network ID
+     * @param formationId the formation ID (-1 = not in TO&E)
      *
      * @return configured mock Unit
      */
-    private Unit createMockC3iUnit(boolean hasC3i, int freeNodes, String networkId, int forceId) {
+    private Unit createMockC3iUnit(boolean hasC3i, int freeNodes, String networkId, int formationId) {
         Entity mockEntity = mock(Entity.class);
         when(mockEntity.hasC3i()).thenReturn(hasC3i);
         when(mockEntity.calculateFreeC3Nodes()).thenReturn(freeNodes);
@@ -91,7 +91,7 @@ class C3NetworkTest {
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        when(mockUnit.getForceId()).thenReturn(forceId);
+        when(mockUnit.getFormationId()).thenReturn(formationId);
 
         return mockUnit;
     }
@@ -99,7 +99,7 @@ class C3NetworkTest {
     /**
      * Creates a mock Unit with a mock Entity configured for NC3 network testing.
      */
-    private Unit createMockNC3Unit(boolean hasNC3, int freeNodes, String networkId, int forceId) {
+    private Unit createMockNC3Unit(boolean hasNC3, int freeNodes, String networkId, int formationId) {
         Entity mockEntity = mock(Entity.class);
         when(mockEntity.hasNavalC3()).thenReturn(hasNC3);
         when(mockEntity.calculateFreeC3Nodes()).thenReturn(freeNodes);
@@ -108,7 +108,7 @@ class C3NetworkTest {
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        when(mockUnit.getForceId()).thenReturn(forceId);
+        when(mockUnit.getFormationId()).thenReturn(formationId);
 
         return mockUnit;
     }
@@ -119,11 +119,11 @@ class C3NetworkTest {
      * @param hasNovaCEWS whether the entity has Nova CEWS
      * @param freeNodes   number of free nodes (2 = unnetworked, < 2 = networked for Nova)
      * @param networkId   the network ID
-     * @param forceId     the force ID (-1 = not in TO&E)
+     * @param formationId the formation ID (-1 = not in TO&E)
      *
      * @return configured mock Unit
      */
-    private Unit createMockNovaCEWSUnit(boolean hasNovaCEWS, int freeNodes, String networkId, int forceId) {
+    private Unit createMockNovaCEWSUnit(boolean hasNovaCEWS, int freeNodes, String networkId, int formationId) {
         Entity mockEntity = mock(Entity.class);
         when(mockEntity.hasNovaCEWS()).thenReturn(hasNovaCEWS);
         when(mockEntity.calculateFreeC3Nodes()).thenReturn(freeNodes);
@@ -132,7 +132,7 @@ class C3NetworkTest {
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        when(mockUnit.getForceId()).thenReturn(forceId);
+        when(mockUnit.getFormationId()).thenReturn(formationId);
 
         return mockUnit;
     }
@@ -153,8 +153,8 @@ class C3NetworkTest {
 
             // Assert - should find the network with 5 free nodes
             assertEquals(1, networks.size(), "Should find one available C3i network");
-            assertEquals("C3i.TestNetwork", networks.get(0)[0]);
-            assertEquals("5", networks.get(0)[1]);
+            assertEquals("C3i.TestNetwork", networks.getFirst()[0]);
+            assertEquals("5", networks.getFirst()[1]);
         }
 
         @Test
@@ -169,7 +169,7 @@ class C3NetworkTest {
 
             // Assert
             assertEquals(1, networks.size());
-            assertEquals("3", networks.get(0)[1]);
+            assertEquals("3", networks.getFirst()[1]);
         }
 
         @Test
@@ -189,7 +189,7 @@ class C3NetworkTest {
         @Test
         @DisplayName("getAvailableC3iNetworks excludes units not in TO&E")
         void testGetAvailableC3iNetworksExcludesUnitsNotInTOE() {
-            // Arrange - create a unit not in TO&E (forceId = -1)
+            // Arrange - create a unit not in TO&E (formationId = -1)
             Unit unassignedUnit = createMockC3iUnit(true, 5, "C3i.TestNetwork", -1);
             units.add(unassignedUnit);
 
@@ -247,7 +247,7 @@ class C3NetworkTest {
 
             // Assert
             assertEquals(1, networks.size(), "Should find one available NC3 network");
-            assertEquals("5", networks.get(0)[1]);
+            assertEquals("5", networks.getFirst()[1]);
         }
 
         @Test
@@ -281,8 +281,8 @@ class C3NetworkTest {
 
             // Assert
             assertEquals(1, networks.size(), "Should find one available Nova CEWS network");
-            assertEquals("C3Nova.TestNetwork", networks.get(0)[0]);
-            assertEquals("2", networks.get(0)[1]);
+            assertEquals("C3Nova.TestNetwork", networks.getFirst()[0]);
+            assertEquals("2", networks.getFirst()[1]);
         }
 
         @Test
@@ -297,7 +297,7 @@ class C3NetworkTest {
 
             // Assert
             assertEquals(1, networks.size());
-            assertEquals("1", networks.get(0)[1]);
+            assertEquals("1", networks.getFirst()[1]);
         }
 
         @Test

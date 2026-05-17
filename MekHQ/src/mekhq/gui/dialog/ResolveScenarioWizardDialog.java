@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -135,7 +135,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private boolean reinforcementsSent = false;
 
     // maps objectives to list of associated entity checkboxes
-    private Map<ScenarioObjective, List<JCheckBox>> objectiveCheckboxes;
+    private Map<ScenarioObjective, List<ObjectiveCheckboxEntry>> objectiveCheckboxes;
     private Map<ScenarioObjective, JCheckBox> objectiveOverrideCheckboxes;
 
     /*
@@ -220,13 +220,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             salvageUnit = contract.getSalvagedByUnit();
             maxSalvagePct = contract.getSalvagePct();
 
-            currentSalvagePct = 0;
-            if (salvageUnit.plus(salvageEmployer).isPositive()) {
-                currentSalvagePct = salvageUnit.multipliedBy(100)
-                                          .dividedBy(salvageUnit.plus(salvageEmployer))
-                                          .getAmount()
-                                          .intValue();
-            }
+            currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
         }
 
         initComponents();
@@ -1071,10 +1065,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 JCheckBox chkItemState = new JCheckBox(tracker.getAllInvolvedUnits().get(uuid).getShortName());
                 chkItemState.setSelected(qualifyingObjectiveUnits.get(objective).contains(unitID));
                 chkItemState.setActionCommand(unitID);
-                chkItemState.addItemListener(e -> updateObjectiveDisplay(objective, lblObjective));
+                ObjectiveCheckboxEntry entry = new ObjectiveCheckboxEntry(chkItemState);
+                chkItemState.addItemListener(e -> {
+                    entry.manuallySet = true;
+                    updateObjectiveDisplay(objective, lblObjective);
+                });
                 gbc.gridy++;
                 pnlObjectiveStatus.add(chkItemState, gbc);
-                objectiveCheckboxes.get(objective).add(chkItemState);
+                objectiveCheckboxes.get(objective).add(entry);
             }
 
             updateObjectiveDisplay(objective, lblObjective);
@@ -1363,6 +1361,34 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     /**
+     * Syncs the objective checkboxes with the current evaluation state of the objective processor. Called after unit or
+     * salvage statuses are updated to keep the objectives panel current.
+     */
+    private void recheckObjectives() {
+        Map<ScenarioObjective, Set<String>> qualifyingUnits = objectiveProcessor.getQualifyingObjectiveUnits();
+        for (Map.Entry<ScenarioObjective, List<ObjectiveCheckboxEntry>> entry : objectiveCheckboxes.entrySet()) {
+            ScenarioObjective objective = entry.getKey();
+            Set<String> qualifying = qualifyingUnits.get(objective);
+            if (qualifying == null) {
+                continue;
+            }
+            for (ObjectiveCheckboxEntry checkboxEntry : entry.getValue()) {
+                boolean autoValue = qualifying.contains(checkboxEntry.checkbox.getActionCommand());
+                if (checkboxEntry.lastAutoValue == null || autoValue != checkboxEntry.lastAutoValue) {
+                    // Auto-computed value changed (or first run) — underlying unit status changed,
+                    // so discard any manual override and apply the new value.
+                    checkboxEntry.manuallySet = false;
+                    checkboxEntry.lastAutoValue = autoValue;
+                    checkboxEntry.checkbox.setSelected(autoValue);
+                } else if (!checkboxEntry.manuallySet) {
+                    checkboxEntry.checkbox.setSelected(autoValue);
+                }
+                // else: auto value unchanged and user has manually overridden it — preserve their choice
+            }
+        }
+    }
+
+    /**
      * Updates the final panel with information taken from the other ones.
      */
     private void updatePreviewPanel() {
@@ -1380,8 +1406,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 int qualifyingUnitCount = 0;
 
                 if (objectiveCheckboxes.containsKey(objective)) {
-                    for (JCheckBox box : objectiveCheckboxes.get(objective)) {
-                        if (box.isSelected()) {
+                    for (ObjectiveCheckboxEntry entry : objectiveCheckboxes.get(objective)) {
+                        if (entry.checkbox.isSelected()) {
                             qualifyingUnitCount++;
                         }
                     }
@@ -1513,8 +1539,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         // Let's just call these all on tab change for safety for now
         updateFromUnitsTab();
         updateFromSalvageTab();
-        // TODO: WeaverThree - This wipes out user selections on the objective panel, so we can't use it right now.
-        // recheckObjectives();
+        recheckObjectives();
         updatePreviewPanel();
     }
 
@@ -1614,12 +1639,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             if (box.isSelected()) {
                 UUID id = UUID.fromString(box.getActionCommand());
 
-                if (!linkedForces.containsKey(campaign.getUnit(id).getForceId())) {
+                if (!linkedForces.containsKey(campaign.getUnit(id).getFormationId())) {
                     List<UUID> unitList = new ArrayList<>();
-                    linkedForces.put(campaign.getUnit(id).getForceId(), unitList);
+                    linkedForces.put(campaign.getUnit(id).getFormationId(), unitList);
                     reinforcementsSent = true;
                 }
-                linkedForces.get(campaign.getUnit(id).getForceId()).add(id);
+                linkedForces.get(campaign.getUnit(id).getFormationId()).add(id);
             }
         }
 
@@ -1632,8 +1657,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 int qualifyingUnitCount = 0;
 
                 if (objectiveCheckboxes.containsKey(objective)) {
-                    for (JCheckBox box : objectiveCheckboxes.get(objective)) {
-                        if (box.isSelected()) {
+                    for (ObjectiveCheckboxEntry entry : objectiveCheckboxes.get(objective)) {
+                        if (entry.checkbox.isSelected()) {
                             qualifyingUnitCount++;
                         }
                     }
@@ -1712,8 +1737,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (ScenarioObjective objective : objectiveCheckboxes.keySet()) {
             int qualifyingUnitCount = 0;
 
-            for (JCheckBox box : objectiveCheckboxes.get(objective)) {
-                if (box.isSelected()) {
+            for (ObjectiveCheckboxEntry entry : objectiveCheckboxes.get(objective)) {
+                if (entry.checkbox.isSelected()) {
                     qualifyingUnitCount++;
                 }
             }
@@ -1820,13 +1845,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        currentSalvagePct = 0;
-        if (salvageUnit.plus(salvageEmployer).isPositive()) {
-            currentSalvagePct = salvageUnit.multipliedBy(100)
-                                      .dividedBy(salvageUnit.plus(salvageEmployer))
-                                      .getAmount()
-                                      .intValue();
-        }
+        currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
 
         for (int i = 0; i < salvageBoxes.size(); i++) {
             // Skip the escaping units
@@ -1975,8 +1994,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void updateObjectiveDisplay(ScenarioObjective objective, JLabel label) {
         int qualifyingUnitCount = 0;
 
-        for (JCheckBox checkBox : objectiveCheckboxes.get(objective)) {
-            if (checkBox.isSelected()) {
+        for (ObjectiveCheckboxEntry entry : objectiveCheckboxes.get(objective)) {
+            if (entry.checkbox.isSelected()) {
                 qualifyingUnitCount++;
             }
         }
@@ -1988,6 +2007,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     public boolean wasAborted() {
         return aborted;
+    }
+
+    /**
+     * Wraps a per-unit objective checkbox and tracks whether the user has manually changed its state, so that
+     * {@link #recheckObjectives()} can preserve user overrides on tab navigation.
+     */
+    private static class ObjectiveCheckboxEntry {
+        final JCheckBox checkbox;
+        boolean manuallySet = false;
+        Boolean lastAutoValue = null;
+
+        ObjectiveCheckboxEntry(JCheckBox checkbox) {
+            this.checkbox = checkbox;
+        }
     }
 
     private class CheckTotalListener implements ItemListener {

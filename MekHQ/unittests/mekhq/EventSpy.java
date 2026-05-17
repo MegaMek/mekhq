@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartNewEvent;
 import mekhq.campaign.events.parts.PartRemovedEvent;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 
 /**
  * Provides a list of events captured during its lifetime. Use this as part of a try-with-resources block.
@@ -128,6 +129,11 @@ public class EventSpy implements AutoCloseable {
 
     @Subscribe
     public void handle(PartArrivedEvent e) {
+        record(e);
+    }
+
+    @Subscribe
+    public void handle(PersonStatusChangedEvent e) {
         record(e);
     }
 }

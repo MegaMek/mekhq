@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.min;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
@@ -77,8 +76,8 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Crew;
-import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -98,12 +97,11 @@ import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.gui.utilities.OriginFactionPickerHelper;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -169,6 +167,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JTextField textBloodname;
     private MarkdownEditorPanel txtBio;
     private JComboBox<Faction> choiceFaction;
+    private JCheckBox chkShowAllFactions;
     private JComboBox<PlanetarySystem> choiceSystem;
     private DefaultComboBoxModel<PlanetarySystem> allSystems;
     private JCheckBox chkOnlyOurFaction;
@@ -435,7 +434,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demographicPanel.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
-        DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel();
+        // Decide the initial faction-picker model up front so we can construct the JComboBox with
+        // the right contents from the start. Mirrors CustomizePersonDialog (PR #8937, issue #8929).
+        boolean originSurvivesStrictFilter = OriginFactionPickerHelper.wouldStrictFilterAdmit(
+              person.getOriginFaction(), person, campaign.getGameYear(), person.getJoinedCampaign());
+        boolean openExpanded = person.getOriginFaction() != null && !originSurvivesStrictFilter;
+        DefaultComboBoxModel<Faction> factionsModel = OriginFactionPickerHelper.buildModel(
+              person, campaign.getGameYear(), person.getJoinedCampaign(), openExpanded);
         choiceFaction = new JComboBox<>(factionsModel);
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -475,6 +480,23 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demographicPanel.add(choiceFaction, gridBagConstraints);
         choiceFaction.setEnabled(editOrigin);
+
+        // "Show All Factions" sibling checkbox. Default unchecked = strict lifespan filter (the
+        // canonically correct view); checked = unfiltered (escape hatch for long-lived or
+        // unusual-origin characters). State mirrors the model we just built. See issue #8929.
+        chkShowAllFactions = new JCheckBox("Show All Factions");
+        chkShowAllFactions.setSelected(openExpanded);
+        chkShowAllFactions.addActionListener(e -> rebuildFactionsModelPreservingSelection());
+        chkShowAllFactions.setEnabled(editOrigin);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        demographicPanel.add(chkShowAllFactions, gridBagConstraints);
 
         y++;
 
@@ -1066,9 +1088,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         rightPanel.add(topPanel, BorderLayout.PAGE_START);
 
-        JScrollPane scrOptions = new JScrollPaneWithSpeed();
+        JScrollPane scrOptions = new FastJScrollPane();
         panOptions = new JPanel();
-        JScrollPane scrSkills = new JScrollPaneWithSpeed();
+        JScrollPane scrSkills = new FastJScrollPane();
         panSkills = new JPanel();
 
         JTabbedPane tabStats = new JTabbedPane();
@@ -1129,38 +1151,20 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         preferences.manage(new JWindowPreference(this));
     }
 
-    private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
-        int year = campaign.getGameYear();
-        List<Faction> orderedFactions = Factions.getInstance()
-                                              .getFactions()
-                                              .stream()
-                                              .sorted((a, b) -> a.getFullName(year)
-                                                                      .compareToIgnoreCase(b.getFullName(year)))
-                                              .toList();
-
-        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
-        for (Faction faction : orderedFactions) {
-            // Always include the person's faction
-            if (faction.equals(person.getOriginFaction())) {
-                factionsModel.addElement(faction);
-            } else {
-                if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
-                    continue;
-                }
-
-                // Allow factions between the person's birthday
-                // and when they were recruited, or now if we're
-                // not tracking recruitment.
-                int endYear = person.getJoinedCampaign() != null ?
-                                    Math.min(person.getJoinedCampaign().getYear(), year) :
-                                    year;
-                if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
-                    factionsModel.addElement(faction);
-                }
-            }
-        }
-
-        return factionsModel;
+    /**
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
+     * current selection across the swap. If there was no current selection (or the previously
+     * selected faction has been filtered out by the new model), the index is explicitly set to
+     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
+     * would silently assign an unintended origin when OK is clicked.
+     */
+    private void rebuildFactionsModelPreservingSelection() {
+        Faction current = (Faction) choiceFaction.getSelectedItem();
+        DefaultComboBoxModel<Faction> rebuilt = OriginFactionPickerHelper.buildModel(
+              person, campaign.getGameYear(), person.getJoinedCampaign(), chkShowAllFactions.isSelected());
+        choiceFaction.setModel(rebuilt);
+        int idx = (current != null) ? rebuilt.getIndexOf(current) : -1;
+        choiceFaction.setSelectedIndex(idx);
     }
 
 
@@ -1283,8 +1287,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 Skill skill = person.getSkill(type);
                 // We had errors where player modified their skills beyond these values which then caused the
                 // JSpinners to break. This code here ensures that we self correct the values.
-                level = clamp(skill.getLevel(), 0, 10);
-                bonus = clamp(skill.getBonus(), -8, 8);
+                level = Math.clamp(skill.getLevel(), 0, 10);
+                bonus = Math.clamp(skill.getBonus(), -8, 8);
             }
             spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, skillType.getMaxLevel(), 1));
             spnLevel.addChangeListener(evt -> changeSkillValue(type));
@@ -1555,8 +1559,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
         LocalDate today = campaign.getLocalDate();
 
-        SkillType skillType = SkillType.getType(type);
-
         int level = (Integer) skillLvls.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
@@ -1718,22 +1720,22 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());
-        person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setConnections(Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
 
         newValue = MathUtility.parseInt(textWealth.getText(), person.getWealth());
-        person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
         newValue = MathUtility.parseInt(textReputation.getText(), person.getReputation());
-        person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        person.setReputation(Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
 
         newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
-        person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        person.setUnlucky(Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
         newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
-        person.setBloodmark(clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+        person.setBloodmark(Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
 
         newValue = MathUtility.parseInt(textExtraIncome.getText(), person.getExtraIncomeTraitLevel());
-        person.setExtraIncomeFromTraitLevel(clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 

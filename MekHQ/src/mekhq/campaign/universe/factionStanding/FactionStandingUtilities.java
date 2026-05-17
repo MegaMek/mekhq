@@ -123,6 +123,7 @@ public class FactionStandingUtilities {
      * @see FactionStandingLevel#getStandingLevel()
      * @since 0.50.07
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static int getStandingLevel(final double regard) {
         final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 

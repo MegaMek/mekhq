@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ package mekhq.campaign.io;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
@@ -103,7 +103,7 @@ import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -112,6 +112,7 @@ import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.SVArmor;
@@ -142,17 +143,14 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyArc.StoryArc;
-import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.campaignOptions.optionChangeDialogs.StratConMaplessCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.DOMException;
@@ -251,14 +249,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (xn.equalsIgnoreCase("campaignOptions")) {
                     campaign.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
                           version));
-
-                    //  < 50.10 compatibility handler
-                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                    if (campaignOptions.isHadAtBEnabledMarker() && !campaignOptions.isUseStratCon()) {
-                        // Mapless StratCon replaced AtB in 50.10
-                        campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
-                        new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
-                    }
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
@@ -341,6 +331,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     processMissionNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("forces")) {
                     processForces(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("formations")) {
+                    processFormations(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("finances")) {
                     processFinances(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("location")) {
@@ -422,9 +414,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         long timestamp = System.currentTimeMillis();
 
         // loop through forces to set force id
-        for (Force f : campaign.getAllForces()) {
+        for (Formation f : campaign.getAllFormations()) {
             Scenario s = campaign.getScenario(f.getScenarioId());
-            if (null != s && (null == f.getParentForce() || !f.getParentForce().isDeployed())) {
+            if (null != s && (null == f.getParentFormation() || !f.getParentFormation().isDeployed())) {
                 s.addForces(f.getId());
             }
             // some units may need force id set for backwards compatibility
@@ -432,7 +424,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             for (UUID uid : f.getUnits()) {
                 Unit u = campaign.getUnit(uid);
                 if (null != u) {
-                    u.setForceId(f.getId());
+                    u.setFormationId(f.getId());
                     if (f.isDeployed()) {
                         u.setScenarioId(f.getScenarioId());
                     }
@@ -441,9 +433,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (options.isUseAtB()) {
+        if (options.isUseStratCon()) {
             Hashtable<Integer, CombatTeam> lances = campaign.getCombatTeamsAsMap();
-            for (Force f : campaign.getAllForces()) {
+            for (Formation f : campaign.getAllFormations()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new CombatTeam(f.getId(), campaign));
                     LOGGER.warn("Added missing Lance {} to AtB list", f.getName());
@@ -481,8 +473,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             // lets make sure the force id set actually corresponds to a force
             // TODO: we have some reports of force id relics - need to fix
-            if ((unit.getForceId() > 0) && (campaign.getForce(unit.getForceId()) == null)) {
-                unit.setForceId(FORCE_NONE);
+            if ((unit.getFormationId() > 0) && (campaign.getFormation(unit.getFormationId()) == null)) {
+                unit.setFormationId(FORMATION_NONE);
             }
 
             // It's annoying to have to do this, but this helps to ensure
@@ -593,8 +585,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         timestamp = System.currentTimeMillis();
 
         // This removes the risk of having forces with invalid leadership getting locked in
-        for (Force force : campaign.getAllForces()) {
-            force.updateCommander(campaign);
+        for (Formation formation : campaign.getAllFormations()) {
+            formation.updateCommander(campaign);
         }
 
         // ok, once we are sure that campaign has been set for all units, we can
@@ -657,10 +649,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             campaign.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
 
-        if (campaign.getCampaignOptions().isUseAtB()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             campaign.setHasActiveContract();
             campaign.setAtBConfig(AtBConfiguration.loadFromXml());
-            campaign.setAtBEventProcessor(new AtBEventProcessor(campaign));
         }
 
         // Sanity Checks
@@ -697,6 +688,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
         for (Part part : campaign.getWarehouse().getParts()) {
+            // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
+            if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
+                LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
+                continue;
+            }
+
             // < 50.08 compatibility handler
             if (part instanceof SVArmor svArmor) {
                 final int PROHIBITED_BAR_RATING = 0;
@@ -1109,7 +1106,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                     PersonnelRole role = PersonnelRole.valueOf(roleStr);
                                     campaign.setTempCrewPool(role, size);
                                 } catch (IllegalArgumentException e) {
-                                    LOGGER.warn("Unknown PersonnelRole: " + roleStr);
+                                    LOGGER.warn("Unknown PersonnelRole: {}", roleStr);
                                 }
                             }
                         }
@@ -1352,6 +1349,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load of Finances complete!");
     }
 
+    /**
+     * Legacy for milestone 0.50.11 saves. Replaced by {@link #processFormations}. Do not remove until the next
+     * milestone.
+     */
+    @Deprecated(since = "0.50.11")
     private static void processForces(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Force Organization from XML...");
 
@@ -1376,9 +1378,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
 
             if (!foundForceAlready) {
-                Force f = Force.generateInstanceFromXML(wn2, retVal, version);
+                Formation f = Formation.generateInstanceFromXML(wn2, retVal, version);
                 if (null != f) {
-                    retVal.setForces(f);
+                    retVal.setFormations(f);
                     foundForceAlready = true;
                 }
             } else {
@@ -1388,6 +1390,44 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         recalculateCombatTeams(retVal);
         LOGGER.info("Load of Force Organization complete!");
+    }
+
+    private static void processFormations(Campaign retVal, Node wn, Version version) {
+        LOGGER.info("Loading Formation Organization from XML...");
+
+        NodeList wList = wn.getChildNodes();
+
+        boolean foundFormationAlready = false;
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("formation")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                LOGGER.error("Unknown node type not loaded in Formations nodes: {}", wn2.getNodeName());
+
+                continue;
+            }
+
+            if (!foundFormationAlready) {
+                Formation f = Formation.generateInstanceFromXML(wn2, retVal, version);
+                if (null != f) {
+                    retVal.setFormations(f);
+                    foundFormationAlready = true;
+                }
+            } else {
+                LOGGER.error("More than one type-level formation found");
+            }
+        }
+
+        recalculateCombatTeams(retVal);
+        LOGGER.info("Load of Formation Organization complete!");
     }
 
     private static void processPersonnelNodes(Campaign campaign, Node wn, Version version) {
@@ -2254,7 +2294,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     //region Migration Methods
     //region Ancestry Migration
-    private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
     // endregion Ancestry Migration
     // endregion Migration Methods

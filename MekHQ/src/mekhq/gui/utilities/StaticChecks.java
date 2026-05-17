@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@
  */
 package mekhq.gui.utilities;
 
-import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,33 +43,33 @@ import java.util.stream.Stream;
 
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
 public class StaticChecks {
 
-    public static boolean areAllForcesUnDeployed(final Campaign campaign, final List<Force> forces) {
-        return forces.stream().noneMatch(Force::isDeployed)
-                     && forces.stream().flatMap(force -> force.getAllUnits(false).stream())
+    public static boolean areAllForcesUnDeployed(final Campaign campaign, final List<Formation> formations) {
+        return formations.stream().noneMatch(Formation::isDeployed)
+                     && formations.stream().flatMap(force -> force.getAllUnits(false).stream())
                               .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
-    public static boolean areAllStandardForces(Vector<Force> forces) {
-        return forces.stream().allMatch(force -> force.isForceType(STANDARD));
+    public static boolean areAllStandardForces(Vector<Formation> formations) {
+        return formations.stream().allMatch(force -> force.isFormationType(STANDARD));
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {
         return units.stream().allMatch(Unit::isAvailable);
     }
 
-    public static boolean areAllForcesDeployed(Vector<Force> forces) {
-        return forces.stream().allMatch(Force::isDeployed);
+    public static boolean areAllForcesDeployed(Vector<Formation> formations) {
+        return formations.stream().allMatch(Formation::isDeployed);
     }
 
-    public static boolean areAnyForcesDeployed(Vector<Force> forces) {
-        return forces.stream().anyMatch(Force::isDeployed);
+    public static boolean areAnyForcesDeployed(Vector<Formation> formations) {
+        return formations.stream().anyMatch(Formation::isDeployed);
     }
 
     public static boolean areAllUnitsDeployed(Vector<Unit> units) {
@@ -88,6 +88,7 @@ public class StaticChecks {
      *
      * @return false if any unit in the passed-in Vector has not been assigned to a Transport ship
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean areAllUnitsTransported(Vector<Unit> units) {
         return units.stream().allMatch(Unit::hasTransportShipAssignment);
     }
@@ -233,10 +234,10 @@ public class StaticChecks {
     }
 
     public static boolean areAllUnitsOnSameC3iNetwork(Vector<Unit> units) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
-        final String network = units.get(0).getEntity().getC3NetId();
+        final String network = units.getFirst().getEntity().getC3NetId();
         if (network == null) {
             return false;
         }
@@ -289,10 +290,10 @@ public class StaticChecks {
      *       any of the units is on a different NC3 network from the others.
      */
     public static boolean areAllUnitsOnSameNC3Network(Vector<Unit> units) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
-        final String network = units.get(0).getEntity().getC3NetId();
+        final String network = units.getFirst().getEntity().getC3NetId();
         if (network == null) {
             return false;
         }
@@ -371,10 +372,10 @@ public class StaticChecks {
      *       if any of the units is on a different Nova network from the others.
      */
     public static boolean areAllUnitsOnSameNovaCEWSNetwork(Vector<Unit> units) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
-        final String network = units.get(0).getEntity().getC3NetId();
+        final String network = units.getFirst().getEntity().getC3NetId();
         if (network == null) {
             return false;
         }
@@ -391,13 +392,14 @@ public class StaticChecks {
      *
      * @return false if any unit in the passed-in Vector does not have the specified unit type
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean areAllUnitsSameType(Vector<Unit> units, int unitType) {
-        if (units.isEmpty() || (units.get(0).getEntity() == null)) {
+        if (units.isEmpty() || (units.getFirst().getEntity() == null)) {
             return false;
         }
         final boolean isTank = (unitType == UnitType.TANK) || (unitType == UnitType.VTOL)
                                      || (unitType == UnitType.NAVAL);
-        final int weightClass = units.get(0).getEntity().getWeightClass();
+        final int weightClass = units.getFirst().getEntity().getWeightClass();
         return units.stream().allMatch(u -> (u.getEntity() == null)
                                                   ||
                                                   ((u.getEntity() != null) &&
@@ -486,6 +488,7 @@ public class StaticChecks {
         return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isCurrentPrisoner());
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static boolean areAllPow(Person... people) {
         return Stream.of(people).allMatch(p -> p.getStatus().isPoW());
     }

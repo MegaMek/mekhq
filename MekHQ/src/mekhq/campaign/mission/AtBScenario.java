@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -79,7 +79,7 @@ import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
@@ -269,11 +269,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             combatTeamId = NO_COMBAT_TEAM;
             combatRole = CombatRole.RESERVE;
         } else {
-            this.combatTeamId = combatTeam.getForceId();
+            this.combatTeamId = combatTeam.getFormationId();
             combatRole = combatTeam.getRole();
             setMissionId(combatTeam.getMissionId());
 
-            for (UUID id : campaign.getForce(combatTeam.getForceId()).getAllUnits(true)) {
+            for (UUID id : campaign.getFormation(combatTeam.getFormationId()).getAllUnits(true)) {
                 entityIds.put(id, campaign.getUnit(id).getEntity());
             }
         }
@@ -596,7 +596,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (isBigBattle() && (getForces(campaign).getAllUnits(false).size() > 7)) {
             return false;
         } else {
-            return !isSpecialScenario() || (getForces(campaign).getAllUnits(false).size() == 0);
+            return !isSpecialScenario() || (getForces(campaign).getAllUnits(false).isEmpty());
         }
     }
 
@@ -605,8 +605,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      *
      * @return true if the force is eligible to deploy, otherwise false
      */
-    public boolean canDeploy(Force force, Campaign campaign) {
-        Vector<UUID> units = force.getAllUnits(false);
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public boolean canDeploy(Formation formation, Campaign campaign) {
+        Vector<UUID> units = formation.getAllUnits(false);
         if (isBigBattle() && getForces(campaign).getAllUnits(false).size() + units.size() > 8) {
             return false;
         } else if (isSpecialScenario() && getForces(campaign).getAllUnits(false).size() + units.size() > 0) {
@@ -642,16 +643,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines whether a list of forces is eligible to deploy to the scenario.
      *
-     * @param forces list of forces
-     * @param c      the campaign that the forces are part of
+     * @param formations list of forces
+     * @param c          the campaign that the forces are part of
      *
      * @return true if all units in all forces in the list are eligible, otherwise false
      */
     @Override
-    public boolean canDeployForces(Vector<Force> forces, Campaign c) {
+    public boolean canDeployForces(Vector<Formation> formations, Campaign c) {
         int total = 0;
-        for (Force force : forces) {
-            Vector<UUID> units = force.getAllUnits(false);
+        for (Formation formation : formations) {
+            Vector<UUID> units = formation.getAllUnits(false);
             total += units.size();
             if (isBigBattle()) {
                 return getForces(c).getAllUnits(false).size() + units.size() <= 8;
@@ -696,7 +697,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             if (deployed.isEmpty()) {
                 return;
             }
-            int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass();
+            int weight = campaign.getUnit(deployed.getFirst()).getEntity().getWeightClass();
             /*
              * In the event that Star League Cache 1 generates a primitive 'Mek,
              * the player can keep the 'Mek without a battle so no enemy
@@ -708,9 +709,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
 
             if ((specialScenarioEnemies != null) &&
-                      (getBotForces().get(0) != null) &&
+                      (getBotForces().getFirst() != null) &&
                       (specialScenarioEnemies.get(weight) != null)) {
-                getBotForces().get(0).setFixedEntityList(specialScenarioEnemies.get(weight));
+                getBotForces().getFirst().setFixedEntityList(specialScenarioEnemies.get(weight));
             }
             setObjectives(campaign, getContract(campaign));
         }
@@ -1237,11 +1238,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         String retVal = weights;
         if (maxWeight == EntityWeightClass.WEIGHT_HEAVY) {
             // Hide and Seek (defender)
-            retVal = weights.replaceAll("A", "LM");
+            retVal = weights.replace("A", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_MEDIUM) {
             // Probe, Recon Raid (attacker)
-            retVal = weights.replaceAll("A", "MM");
-            retVal = retVal.replaceAll("H", "LM");
+            retVal = weights.replace("A", "MM");
+            retVal = retVal.replace("H", "LM");
         }
         return retVal;
     }
@@ -1422,8 +1423,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         int unitsPerPoint = switch (unitType) {
-            case UnitType.TANK, UnitType.AEROSPACE_FIGHTER -> 2;
-            case UnitType.PROTOMEK -> 5;
+            case UnitType.TANK -> 2;
             default -> 1;
         };
 
@@ -1555,8 +1555,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
           Faction faction) {
         List<Entity> turrets =
               campaign.getCampaignOptions().isUseAdvancedBuildingGunEmplacements()
-                   ? AtBDynamicScenarioFactory.generateGunEmplacements(num, skill, quality, campaign, faction)
-                   : AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction);
+                    ? AtBDynamicScenarioFactory.generateGunEmplacements(num, skill, quality, campaign, faction)
+                    : AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction);
         list.addAll(turrets);
     }
 
@@ -2203,7 +2203,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setCombatTeam(CombatTeam combatTeam) {
-        combatTeamId = combatTeam.getForceId();
+        combatTeamId = combatTeam.getFormationId();
     }
 
     /**
@@ -2224,6 +2224,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return alliesPlayer;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public List<UUID> getAttachedUnitIds() {
         return attachedUnitIds;
     }
@@ -2288,6 +2289,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return transportLinkages;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setTransportLinkages(HashMap<String, List<String>> transportLinkages) {
         this.transportLinkages = transportLinkages;
     }

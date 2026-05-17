@@ -210,7 +210,7 @@ public class SpacecraftCoolingSystem extends Part {
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
             // How many sinks are we trying to remove? It'll be between 0 and 50.
-            int sinkBatch = Math.max(0, Math.min((currentSinks - engineSinks), 50));
+            int sinkBatch = Math.clamp(currentSinks - engineSinks, 0, 50);
             if (!salvage) {
                 // Scrapping. Shouldn't be able to get here, but don't do anything just in case.
             } else if (null != spare) {

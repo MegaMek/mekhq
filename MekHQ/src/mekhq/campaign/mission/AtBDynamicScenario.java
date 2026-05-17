@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,7 +54,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -188,8 +188,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    public void removeForce(int fid) {
-        super.removeForce(fid);
+    public void removeFormation(int fid) {
+        super.removeFormation(fid);
         playerForceTemplates.remove(fid);
     }
 
@@ -209,8 +209,8 @@ public class AtBDynamicScenario extends AtBScenario {
         // and there's a player force template associated with the first force
         // then return the generated deployment zone associated with the first force
         if (!getForceIDs().isEmpty() &&
-                  playerForceTemplates.containsKey(getForceIDs().get(0))) {
-            return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
+                  playerForceTemplates.containsKey(getForceIDs().getFirst())) {
+            return playerForceTemplates.get(getForceIDs().getFirst()).getActualDeploymentZone();
         }
 
         return super.getStartingPos();
@@ -423,7 +423,7 @@ public class AtBDynamicScenario extends AtBScenario {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }
 
-        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(getForceIDs().get(0));
+        CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(getForceIDs().getFirst());
 
         if (combatTeam != null) {
             combatTeam.refreshCommander(campaign);
@@ -661,10 +661,10 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    public void clearAllForcesAndPersonnel(Campaign campaign) {
+    public void clearAllFormationsAndPersonnel(Campaign campaign) {
         playerUnitTemplates.clear();
         playerForceTemplates.clear();
-        super.clearAllForcesAndPersonnel(campaign);
+        super.clearAllFormationsAndPersonnel(campaign);
     }
 
     @Override
@@ -716,7 +716,7 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         if (isAllied) {
-            Force playerForces = this.getForces(campaign);
+            Formation playerForces = this.getForces(campaign);
 
             for (UUID unitID : playerForces.getAllUnits(false)) {
                 try {

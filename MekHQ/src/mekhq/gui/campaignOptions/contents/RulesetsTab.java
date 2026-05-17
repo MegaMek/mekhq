@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,9 +32,12 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -46,6 +49,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import megamek.Version;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.FileNameComboBoxModel;
@@ -56,6 +60,7 @@ import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.stratCon.StratConPlayType;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -293,7 +298,8 @@ public class RulesetsTab {
     private void substantializeUniversalOptions() {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
-        lblBoardScalingType = new CampaignOptionsLabel("BoardScalingType");
+        lblBoardScalingType = new CampaignOptionsLabel("BoardScalingType",
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
         // CallSigns
         pnlCallSigns = createCallSignsPanel();
@@ -306,11 +312,15 @@ public class RulesetsTab {
 
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
         chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
-        chkUseAdvancedBuildingGunEmplacements = new CampaignOptionsCheckBox("UseAdvancedBuildingGunEmplacements");
+        chkUseAdvancedBuildingGunEmplacements = new CampaignOptionsCheckBox("UseAdvancedBuildingGunEmplacements",
+              getMetadata(new Version(0, 50, 12)));
         lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity",
               0, -1, 3, 1);
-        chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions");
+        chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
 
         // Other
         pnlScenarioModifiers = createUniversalModifiersPanel();
@@ -408,17 +418,24 @@ public class RulesetsTab {
      */
     private JPanel createAutoResolvePanel() {
         // Content
-        lblAutoResolveMethod = new CampaignOptionsLabel("AutoResolveMethod");
-        lblAutoResolveNumberOfScenarios = new CampaignOptionsLabel("AutoResolveNumberOfScenarios");
+        lblAutoResolveMethod = new CampaignOptionsLabel("AutoResolveMethod",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+        lblAutoResolveNumberOfScenarios = new CampaignOptionsLabel("AutoResolveNumberOfScenarios",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
               250, 10, 1000, 10);
-        chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled");
-        lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme");
+        chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+        lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox("AutoResolveExperimentalPacarGuiEnabled");
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoResolvePanel", true,
-              "AutoResolvePanel");
+              "AutoResolvePanel",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 1;
@@ -573,7 +590,8 @@ public class RulesetsTab {
         chkUseWeatherConditions = new CampaignOptionsCheckBox("UseWeatherConditions");
         chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
-        chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes");
+        chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance",
               0, 0, 100, 1);
@@ -634,25 +652,34 @@ public class RulesetsTab {
 
     private JPanel createUniversalMoralePanel() {
         // Content
-        lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory");
+        lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDecisiveVictory = new CampaignOptionsSpinner("MoraleDecisiveVictory",
-              4, 1, 10, 1);
+              4, 1, 10, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
-        lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory");
+        lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleVictory = new CampaignOptionsSpinner("MoraleVictory",
-              2, 1, 10, 1);
+              2, 1, 10, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
-        lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat");
+        lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDefeat = new CampaignOptionsSpinner("MoraleDefeat",
-              -3, -10, -1, 1);
+              -3, -10, -1, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
-        lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat");
+        lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDecisiveDefeat = new CampaignOptionsSpinner("MoraleDecisiveDefeat",
-              -5, -10, -1, 1);
+              -5, -10, -1, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalMoralePanel", true,
-              "UniversalMoralePanel");
+              "UniversalMoralePanel",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -818,12 +845,15 @@ public class RulesetsTab {
         chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
 
         // Content
-        lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType");
+        lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         lblStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
         comboStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
-        chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting");
+        chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting",
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
-        chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces");
+        chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater(stratConHeader, "NoSeedForces"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
@@ -904,6 +934,7 @@ public class RulesetsTab {
      *
      * @return a {@link JPanel} containing all Legacy AtB settings.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public JPanel createLegacyTab() {
         // Header
         legacyHeader = new CampaignOptionsHeaderPanel("LegacyTab",

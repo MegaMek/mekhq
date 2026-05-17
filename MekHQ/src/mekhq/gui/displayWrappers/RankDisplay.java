@@ -34,8 +34,8 @@ package mekhq.gui.displayWrappers;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;

@@ -362,6 +362,7 @@ public class SkillType {
         return lookupHash;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static void setSkillHash(final Map<String, SkillType> hash) {
         lookupHash = hash;
     }
@@ -662,6 +663,7 @@ public class SkillType {
      * @author Illiani
      * @since 0.50.06
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCombatSkill() {
         return this.subType == COMBAT_GUNNERY || this.subType == COMBAT_PILOTING;
     }
@@ -1541,7 +1543,7 @@ public class SkillType {
         skillType.secondAttribute = temporarySkillType.getSecondAttribute();
         skillType.countUp = temporarySkillType.isCountUp();
 
-        if (skillType.subType == SUPPORT_COMMAND) {
+        if (skillType.subType == UTILITY_COMMAND) {
             skillType.target = temporarySkillType.getTarget();
         }
     }

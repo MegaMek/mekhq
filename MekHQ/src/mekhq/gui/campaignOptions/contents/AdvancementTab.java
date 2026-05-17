@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,9 +32,11 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.GridBagConstraints;
 import java.util.List;
@@ -52,6 +54,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -294,7 +297,8 @@ public class AdvancementTab {
               6);
 
         // Contents
-        lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier");
+        lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
         spnXpCostMultiplier = new CampaignOptionsSpinner("XpCostMultiplier", 1, 0, 5, 0.05);
         spnXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
@@ -351,17 +355,21 @@ public class AdvancementTab {
         spnTaskXP = new CampaignOptionsSpinner("TaskXP", 0, 0, 20, 1);
         spnTaskXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "TaskXP"));
 
-        lblNTasksXP = new CampaignOptionsLabel("NTasksXP");
+        lblNTasksXP = new CampaignOptionsLabel("NTasksXP",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
+                    CampaignOptionFlag.RECOMMENDED));
         lblNTasksXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "NTasksXP"));
         spnNTasksXP = new CampaignOptionsSpinner("NTasksXP", 0, 0, 100, 1);
         spnNTasksXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "NTasksXP"));
 
-        lblSuccessXP = new CampaignOptionsLabel("SuccessXP");
+        lblSuccessXP = new CampaignOptionsLabel("SuccessXP",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblSuccessXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "SuccessXP"));
         spnSuccessXP = new CampaignOptionsSpinner("SuccessXP", 0, 0, 20, 1);
         spnSuccessXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "SuccessXP"));
 
-        lblMistakeXP = new CampaignOptionsLabel("MistakeXP");
+        lblMistakeXP = new CampaignOptionsLabel("MistakeXP",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblMistakeXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "MistakeXP"));
         spnMistakeXP = new CampaignOptionsSpinner("MistakeXP", 0, 0, 20, 1);
         spnMistakeXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "MistakeXP"));
@@ -421,7 +429,8 @@ public class AdvancementTab {
         spnKills.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "Kills"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ScenariosPanel", true, "ScenariosPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("ScenariosPanel", true, "ScenariosPanel",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -453,7 +462,8 @@ public class AdvancementTab {
      */
     private JPanel createMissionsPanel() {
         // Contents
-        lblVocationalXP = new CampaignOptionsLabel("VocationalXP");
+        lblVocationalXP = new CampaignOptionsLabel("VocationalXP",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblVocationalXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "VocationalXP"));
         spnVocationalXP = new CampaignOptionsSpinner("VocationalXP", 0, 0, 20, 1);
         spnVocationalXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "VocationalXP"));
@@ -539,18 +549,22 @@ public class AdvancementTab {
         lblAdminWeeklyXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXP"));
         spnAdminWeeklyXP = new CampaignOptionsSpinner("AdminWeeklyXP", 0, 0, 20, 1);
         spnAdminWeeklyXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXP"));
-        lblAdminWeeklyXPPeriod = new CampaignOptionsLabel("AdminWeeklyXPPeriod");
+        lblAdminWeeklyXPPeriod = new CampaignOptionsLabel("AdminWeeklyXPPeriod",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXPPeriod"));
         spnAdminWeeklyXPPeriod = new CampaignOptionsSpinner("AdminWeeklyXPPeriod", 1, 1, 52, 1);
         spnAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXPPeriod"));
 
-        lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP");
+        lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblContractNegotiationXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ContractNegotiationXP"));
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP", 0, 0, 20, 1);
         spnContractNegotiationXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ContractNegotiationXP"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsXpPanel", true, "AdministratorsXpPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsXpPanel", true, "AdministratorsXpPanel",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
+                    CampaignOptionFlag.RECOMMENDED));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -680,7 +694,8 @@ public class AdvancementTab {
               11);
 
         // Contents
-        chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
+        chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
 
         pnlPhenotype = createPhenotypePanel();
@@ -757,32 +772,39 @@ public class AdvancementTab {
      */
     private JPanel createAbilityPanel() {
         // Contents
-        lblAbilityUltraGreen = new CampaignOptionsLabel("AbilityUltraGreen");
+        lblAbilityUltraGreen = new CampaignOptionsLabel("AbilityUltraGreen",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAbilityUltraGreen = new CampaignOptionsSpinner("AbilityUltraGreen", 0, -12, 12, 1);
 
-        lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen");
+        lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityGreen"));
         spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen", 0, -12, 12, 1);
 
-        lblAbilityReg = new CampaignOptionsLabel("AbilityRegular");
+        lblAbilityReg = new CampaignOptionsLabel("AbilityRegular",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityRegular"));
         spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular", 0, -12, 12, 1);
         spnAbilityReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityRegular"));
 
-        lblAbilityVet = new CampaignOptionsLabel("AbilityVeteran");
+        lblAbilityVet = new CampaignOptionsLabel("AbilityVeteran",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityVeteran"));
         spnAbilityVet = new CampaignOptionsSpinner("AbilityVeteran", 0, -12, 12, 1);
         spnAbilityVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityVeteran"));
 
-        lblAbilityElite = new CampaignOptionsLabel("AbilityElite");
+        lblAbilityElite = new CampaignOptionsLabel("AbilityElite",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityElite"));
         spnAbilityElite = new CampaignOptionsSpinner("AbilityElite", 0, -12, 12, 1);
         spnAbilityElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityElite"));
 
-        lblAbilityHeroic = new CampaignOptionsLabel("AbilityHeroic");
+        lblAbilityHeroic = new CampaignOptionsLabel("AbilityHeroic",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAbilityHeroic = new CampaignOptionsSpinner("AbilityHeroic", 0, -12, 12, 1);
 
-        lblAbilityLegendary = new CampaignOptionsLabel("AbilityLegendary");
+        lblAbilityLegendary = new CampaignOptionsLabel("AbilityLegendary",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAbilityLegendary = new CampaignOptionsSpinner("AbilityLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
@@ -887,37 +909,44 @@ public class AdvancementTab {
      */
     private JPanel createCommandSkillsPanel() {
         // Contents
-        lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen");
+        lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
               "CommandSkillsUltraGreen"));
         spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
         spnCommandSkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
               "CommandSkillsUltraGreen"));
 
-        lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen");
+        lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsGreen"));
         spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen", 0, -12, 12, 1);
         spnCommandSkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsGreen"));
 
-        lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular");
+        lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsRegular"));
         spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular", 0, -12, 12, 1);
         spnCommandSkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsRegular"));
 
-        lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran");
+        lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsVeteran"));
         spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran", 0, -12, 12, 1);
         spnCommandSkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsVeteran"));
 
-        lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite");
+        lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsElite"));
         spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite", 0, -12, 12, 1);
         spnCommandSkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsElite"));
 
-        lblCommandSkillsHeroic = new CampaignOptionsLabel("CommandSkillsHeroic");
+        lblCommandSkillsHeroic = new CampaignOptionsLabel("CommandSkillsHeroic",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnCommandSkillsHeroic = new CampaignOptionsSpinner("CommandSkillsHeroic", 0, -12, 12, 1);
 
-        lblCommandSkillsLegendary = new CampaignOptionsLabel("CommandSkillsLegendary");
+        lblCommandSkillsLegendary = new CampaignOptionsLabel("CommandSkillsLegendary",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnCommandSkillsLegendary = new CampaignOptionsSpinner("CommandSkillsLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
@@ -977,37 +1006,44 @@ public class AdvancementTab {
      */
     private JPanel createUtilitySkillsPanel() {
         // Contents
-        lblUtilitySkillsUltraGreen = new CampaignOptionsLabel("UtilitySkillsUltraGreen");
+        lblUtilitySkillsUltraGreen = new CampaignOptionsLabel("UtilitySkillsUltraGreen",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
               "UtilitySkillsUltraGreen"));
         spnUtilitySkillsUltraGreen = new CampaignOptionsSpinner("UtilitySkillsUltraGreen", 0, -12, 12, 1);
         spnUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
               "UtilitySkillsUltraGreen"));
 
-        lblUtilitySkillsGreen = new CampaignOptionsLabel("UtilitySkillsGreen");
+        lblUtilitySkillsGreen = new CampaignOptionsLabel("UtilitySkillsGreen",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
         spnUtilitySkillsGreen = new CampaignOptionsSpinner("UtilitySkillsGreen", 0, -12, 12, 1);
         spnUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
 
-        lblUtilitySkillsReg = new CampaignOptionsLabel("UtilitySkillsRegular");
+        lblUtilitySkillsReg = new CampaignOptionsLabel("UtilitySkillsRegular",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
         spnUtilitySkillsReg = new CampaignOptionsSpinner("UtilitySkillsRegular", 0, -12, 12, 1);
         spnUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
 
-        lblUtilitySkillsVet = new CampaignOptionsLabel("UtilitySkillsVeteran");
+        lblUtilitySkillsVet = new CampaignOptionsLabel("UtilitySkillsVeteran",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
         spnUtilitySkillsVet = new CampaignOptionsSpinner("UtilitySkillsVeteran", 0, -12, 12, 1);
         spnUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
 
-        lblUtilitySkillsElite = new CampaignOptionsLabel("UtilitySkillsElite");
+        lblUtilitySkillsElite = new CampaignOptionsLabel("UtilitySkillsElite",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
         spnUtilitySkillsElite = new CampaignOptionsSpinner("UtilitySkillsElite", 0, -12, 12, 1);
         spnUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
 
-        lblUtilitySkillsHeroic = new CampaignOptionsLabel("UtilitySkillsHeroic");
+        lblUtilitySkillsHeroic = new CampaignOptionsLabel("UtilitySkillsHeroic",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnUtilitySkillsHeroic = new CampaignOptionsSpinner("UtilitySkillsHeroic", 0, -12, 12, 1);
 
-        lblUtilitySkillsLegendary = new CampaignOptionsLabel("UtilitySkillsLegendary");
+        lblUtilitySkillsLegendary = new CampaignOptionsLabel("UtilitySkillsLegendary",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnUtilitySkillsLegendary = new CampaignOptionsSpinner("UtilitySkillsLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
@@ -1156,7 +1192,8 @@ public class AdvancementTab {
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
         spnSecondBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "SecondarySkillBonus"));
 
-        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
+        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
               "RoleplaySkillsModifier"));
         spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);

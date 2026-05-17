@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -3075,5 +3075,35 @@ public class QuartermasterTest {
         assertEquals(25, Quartermaster.convertShotsNeeded(lrm5, 100, lrm20));
         assertEquals(75, Quartermaster.convertShotsNeeded(lrm15, 100, lrm20));
         assertEquals(100, Quartermaster.convertShotsNeeded(lrm20, 100, lrm20));
+    }
+
+    /**
+     * Regression test for GitHub #7414: removeAmmo should clean up 0-shot AmmoStorage entries
+     * rather than leaving them in the warehouse where they block future ammo lookups.
+     */
+    @Test
+    public void removeAmmoCleanUpZeroShotAmmoStorage() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+
+        AmmoType ammoType = getAmmoType("ISSRM4 Inferno Ammo");
+
+        // Set up a warehouse with a 0-shot AmmoStorage (the buggy state)
+        Warehouse warehouse = new Warehouse();
+        AmmoStorage emptyAmmo = new AmmoStorage(0, ammoType, 0, mockCampaign);
+        warehouse.addPart(emptyAmmo);
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        // Try to remove ammo — this should clean up the 0-shot entry
+        int shotsRemoved = quartermaster.removeAmmo(ammoType, 10);
+
+        assertEquals(0, shotsRemoved);
+
+        // The 0-shot AmmoStorage should have been removed from the warehouse
+        assertTrue(warehouse.getParts().isEmpty());
     }
 }
