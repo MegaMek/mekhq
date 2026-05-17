@@ -39,6 +39,7 @@ import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -134,6 +135,7 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
@@ -801,6 +803,9 @@ public class CampaignGUI extends JPanel {
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
 
+        JMenuItem menuHireBlank = new JMenuItem(resourceMap.getString("menuHire.blank"));
+        menuHireBlank.addActionListener(this::addBlankPerson);
+
         JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
         JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
         JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
@@ -837,6 +842,7 @@ public class CampaignGUI extends JPanel {
         miHire.addActionListener(this::hirePerson);
         menuHireCivilian.insert(miHire, 0);
 
+        menuHire.add(menuHireBlank);
         menuHire.add(menuHireCombat);
         menuHire.add(menuHireSupport);
         menuHire.add(menuHireCivilian);
@@ -2099,6 +2105,14 @@ public class CampaignGUI extends JPanel {
         if (null != news) {
             new NewsDialog(getCampaign(), news.getFullDescription());
         }
+    }
+
+    private void addBlankPerson(final ActionEvent evt) {
+        Person person = new Person(getCampaign(), MERCENARY_FACTION_CODE);
+        person.setOriginPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
+        person.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
+
+        getCampaign().recruitPerson(person, true, true);
     }
 
     private void hirePerson(final ActionEvent evt) {
