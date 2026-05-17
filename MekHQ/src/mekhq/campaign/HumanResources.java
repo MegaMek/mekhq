@@ -129,7 +129,6 @@ import org.w3c.dom.NodeList;
 public class HumanResources {
     private static final MMLogger LOGGER = MMLogger.create(HumanResources.class);
 
-    // Fields
 
     private final Personnel personnel = new Personnel();
 
@@ -145,7 +144,7 @@ public class HumanResources {
 
     /**
      * Map of PersonnelRole to temp crew pool size. Tracks TOTAL pool (not available). Use
-     * {@link #getAvailableTempCrewPool(PersonnelRole)} for available count.
+     * {@link #getAvailableTempCrewPool(Campaign, PersonnelRole)} for available count.
      */
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap = new HashMap<>();
 
@@ -161,7 +160,6 @@ public class HumanResources {
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
 
-    // Personnel roster
 
     /**
      * Imports a {@link Person} into the campaign.
@@ -394,7 +392,6 @@ public class HumanResources {
         return getAdmins(getActivePersonnel(false, false));
     }
 
-    // AsTech pool
 
     public void resetAsTechMinutes() {
         asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberAsTechs();
@@ -561,7 +558,6 @@ public class HumanResources {
         return helpMod;
     }
 
-    // Medic pool
 
     public void setMedicPool(int size) {
         medicPool = size;
@@ -648,7 +644,6 @@ public class HumanResources {
         }
     }
 
-    // Temp crew pool
 
     /**
      * Gets the total temp crew pool size for a specific personnel role.
@@ -902,7 +897,6 @@ public class HumanResources {
         }
     }
 
-    // Markets
 
     @Deprecated(since = "0.50.06")
     public PersonnelMarket getPersonnelMarket() {
@@ -979,7 +973,6 @@ public class HumanResources {
         }
     }
 
-    // Genealogy modules
 
     public AbstractDivorce getDivorce() {
         return divorce;
@@ -1005,7 +998,6 @@ public class HumanResources {
         this.procreation = procreation;
     }
 
-    // Personnel advancement tracking
 
     /**
      * Sets the list of personnel who have advanced in experience points via vocational XP.
@@ -1025,7 +1017,6 @@ public class HumanResources {
         return personnelWhoAdvancedInXP;
     }
 
-    // Retirement defection tracker
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker rdt) {
         retirementDefectionTracker = rdt;
@@ -1035,7 +1026,6 @@ public class HumanResources {
         return retirementDefectionTracker;
     }
 
-    // Selectors and generators (Tier 2)
 
     /**
      * Gets the {@link AbstractFactionSelector} to use with this campaign.
@@ -1136,8 +1126,18 @@ public class HumanResources {
         }
     }
 
-    // Senior staff finders (Tier 1)
 
+    /**
+     * Returns the highest-ranking administrator of the given specialization from {@code people}.
+     *
+     * @param people          the collection of people to search
+     * @param type            the administrator specialization to match
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     *
+     * @return the senior administrator, or {@code null} if none found
+     */
     public static @Nullable Person getSeniorAdminPerson(Collection<Person> people,
           AdministratorSpecialization type, CampaignOptions campaignOptions,
           boolean isClanCampaign, LocalDate today) {
@@ -1173,6 +1173,16 @@ public class HumanResources {
         return getSeniorAdminPerson(getAdmins(), type, campaignOptions, isClanCampaign, today);
     }
 
+    /**
+     * Returns the highest-ranking doctor from {@code people}.
+     *
+     * @param people          the collection of people to search
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     *
+     * @return the senior medical person, or {@code null} if none found
+     */
     public static @Nullable Person getSeniorMedicalPerson(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
         Person senior = null;
@@ -1224,6 +1234,7 @@ public class HumanResources {
     /**
      * Finds the current top two candidates for command among active personnel.
      *
+     * @param people          the collection of people to search
      * @param campaignOptions the campaign options
      * @param isClanCampaign  whether this is a Clan campaign
      * @param today           the current in-game date
@@ -1300,7 +1311,6 @@ public class HumanResources {
         return findTopCommanders(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
     }
 
-    // Tech listing
 
     public List<Person> getTechs(Collection<Unit> units, CampaignOptions campaignOptions,
           boolean isClanCampaign, LocalDate today) {
@@ -1386,8 +1396,17 @@ public class HumanResources {
         return unit != null;
     }
 
-    // Logistics personnel
 
+    /**
+     * Returns the best procurement character from {@code people} given the campaign's acquisition settings.
+     *
+     * @param people          the collection of people to search
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     *
+     * @return the best logistics person, or {@code null} if none found or acquisition is automatic
+     */
     public static @Nullable Person getLogisticsPerson(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
         final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
@@ -1468,6 +1487,16 @@ public class HumanResources {
         return getLogisticsPerson(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
     }
 
+    /**
+     * Returns all eligible procurement characters from {@code people} sorted by skill, best last.
+     *
+     * @param people          the collection of people to search
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     *
+     * @return list of eligible logistics personnel, sorted ascending by skill level
+     */
     public static List<Person> getLogisticsPersonnel(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
         final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
@@ -1559,7 +1588,6 @@ public class HumanResources {
         return getNumberPrimaryAsTechs(campaignOptions) + getNumberSecondaryAsTechs(campaignOptions);
     }
 
-    // Person creation (Tier 2)
 
     public Person newDependent(Campaign campaign, Gender gender) {
         return newDependent(campaign, gender, null, null);
@@ -1687,7 +1715,6 @@ public class HumanResources {
         return person;
     }
 
-    // Bloodnames (Tier 3)
 
     /**
      * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank.
@@ -1868,7 +1895,6 @@ public class HumanResources {
         }
     }
 
-    // Recruitment (Tier 3)
 
     public boolean recruitPerson(Campaign campaign, Person person) {
         return recruitPerson(campaign, person, person.getPrisonerStatus(), false, true, true, false);
@@ -2209,7 +2235,6 @@ public class HumanResources {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
-    // Remove person (Tier 3)
 
     public void removePerson(Campaign campaign, final @Nullable Person person) {
         removePerson(campaign, person, true);
@@ -2257,7 +2282,6 @@ public class HumanResources {
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
     }
 
-    // Person updated (Tier 3)
 
     /**
      * Fires events and updates state when a person's data has changed.
@@ -2279,8 +2303,21 @@ public class HumanResources {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
-    // Finder methods
 
+    /**
+     * Returns the person from {@code people} best suited to the given role, ranked by primary skill
+     * then secondary skill as a tiebreaker.
+     *
+     * @param people          the collection of people to search
+     * @param role            the required personnel role (primary or secondary)
+     * @param primary         the name of the primary skill to rank by
+     * @param secondary       optional secondary skill name used as a tiebreaker, or {@code null}
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     *
+     * @return the best person for the role, or {@code null} if none qualify
+     */
     public static Person findBestInRole(Collection<Person> people, PersonnelRole role,
           String primary, @Nullable String secondary,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
@@ -2337,6 +2374,17 @@ public class HumanResources {
         return findBestInRole(role, skill, null, campaignOptions, isClanCampaign, today);
     }
 
+    /**
+     * Returns the person from {@code people} with the highest total level in the named skill.
+     *
+     * @param people          the collection of people to search
+     * @param skillName       the name of the skill to rank by
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     *
+     * @return the person with the highest skill level, or {@code null} if none have the skill
+     */
     public static @Nullable Person findBestAtSkill(Collection<Person> people, String skillName,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
         boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
@@ -2366,7 +2414,6 @@ public class HumanResources {
         return findBestAtSkill(getActivePersonnel(false, false), skillName, campaignOptions, isClanCampaign, today);
     }
 
-    // XML persistence
 
     /**
      * Writes the human resources state to XML inside a {@code <humanResources>} wrapper element.

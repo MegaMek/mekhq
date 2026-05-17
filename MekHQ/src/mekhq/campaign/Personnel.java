@@ -44,7 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Roster of all {@link Person}s known to a campaign, keyed by UUID.
+ * Roster of {@link Person}s, keyed by UUID.
  *
  * <p>Extends {@link LinkedHashMap} so all standard map operations work on existing call sites.
  * Adds {@link #writeToXML} and {@link #loadFromXML} to own the canonical save/load loop for
