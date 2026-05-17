@@ -221,25 +221,25 @@ public class CampaignSummary {
         // transport capacity
         HangarStatistics hangarStats = campaign.getHangarStatistics();
         int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) -
-                                   hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
         int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
-                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int noLV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int noHV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noSH = Math.max(hangarStats.getNumberOfSuperHeavyVehicles() -
-                                  hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
+                                    hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
         int noInf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
-                                   hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
-                                  hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
-                                     hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
         int freeHV = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
-              0);
+                                    0);
         int freeSH = Math.max(hangarStats.getTotalSuperHeavyVehicleBays() -
                                     hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
         int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() -
@@ -248,22 +248,22 @@ public class CampaignSummary {
         // check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
         noLV = Math.max(noLV - freeHV, 0);
-                int heavyVehiclesInSuperHeavyBays = Math.min(noHV, freeSH);
-                noHV -= heavyVehiclesInSuperHeavyBays;
-                freeSH -= heavyVehiclesInSuperHeavyBays;
-                noLV = Math.max(noLV - freeSH, 0);
+        int heavyVehiclesInSuperHeavyBays = Math.min(noHV, freeSH);
+        noHV -= heavyVehiclesInSuperHeavyBays;
+        freeSH -= heavyVehiclesInSuperHeavyBays;
+        noLV = Math.max(noLV - freeSH, 0);
 
-                unitsOver = noMek + noSC + noASF + noLV + noHV + noSH + noInf + noBA + noProto;
-                int totalBayUnits = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) +
-                                                                    hangarStats.getNumberOfSuperHeavyVehicles() +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) +
-                                                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
-                unitsTransported = Math.max(totalBayUnits - unitsOver, 0);
+        unitsOver = noMek + noSC + noASF + noLV + noHV + noSH + noInf + noBA + noProto;
+        int totalBayUnits = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) +
+                                    hangarStats.getNumberOfSuperHeavyVehicles() +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) +
+                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
+        unitsTransported = Math.max(totalBayUnits - unitsOver, 0);
 
         nDS = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
     }

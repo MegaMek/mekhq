@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.report;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -52,7 +53,7 @@ class TransportReportTest {
         String report = new TransportReport(campaign).getTransportDetails();
         String headerLine = report.lines().findFirst().orElseThrow();
 
-        assertTrue(headerLine.startsWith("Transport Capacity Total (Occupied)"));
+        assertTrue(headerLine.startsWith("Transport Capacity (Occupied)"));
         assertTrue(headerLine.contains("Total Units (Not Transported)"));
         assertFalse(report.contains("Transports\n"));
         assertFalse(report.contains("(Occupied):"));
@@ -196,7 +197,10 @@ class TransportReportTest {
     }
 
     private static void assertDetailLineHasCountOnly(String line, int count) {
-        assertTrue(line.matches(".*\\s" + count));
+        String trimmedLine = line.trim();
+        String renderedCount = trimmedLine.substring(trimmedLine.lastIndexOf(' ') + 1);
+
+        assertEquals(String.valueOf(count), renderedCount);
         assertFalse(line.contains("("));
         assertFalse(line.contains("Not Transported"));
     }
