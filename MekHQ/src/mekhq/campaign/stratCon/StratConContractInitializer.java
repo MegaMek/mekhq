@@ -518,6 +518,12 @@ public class StratConContractInitializer {
             ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(objectiveScenarios.get(Compute.randomInt(
                   objectiveScenarios.size())));
 
+            if (template == null) {
+                LOGGER.error("Unable to place objective scenario on track {}, as no scenario template was available.",
+                    trackState.getDisplayableName());
+                continue;
+            }
+
             StratConCoords coords = getUnoccupiedCoords(trackState);
 
             if (coords == null) {
@@ -560,13 +566,13 @@ public class StratConContractInitializer {
                 }
 
                 trackState.addScenario(scenario);
-            }
 
-            StratConStrategicObjective sso = new StratConStrategicObjective();
-            sso.setObjectiveCoords(coords);
-            sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
-            sso.setDesiredObjectiveCount(1);
-            trackState.addStrategicObjective(sso);
+                StratConStrategicObjective sso = new StratConStrategicObjective();
+                sso.setObjectiveCoords(coords);
+                sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+                sso.setDesiredObjectiveCount(1);
+                trackState.addStrategicObjective(sso);
+            }
         }
     }
 

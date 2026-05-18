@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -146,8 +147,14 @@ public class StratConScenarioFactory {
     /**
      * Retrieves a specific scenario given the key (file name)
      */
-    public static ScenarioTemplate getSpecificScenario(String name) {
-        return dynamicScenarioNameMap.get(name).clone();
+    public static @Nullable ScenarioTemplate getSpecificScenario(String name) {
+        ScenarioTemplate template = dynamicScenarioNameMap.get(name);
+        if (template == null) {
+            logger.error("Scenario template {} not found.", name);
+            return null;
+        }
+
+        return template.clone();
     }
 
     /**

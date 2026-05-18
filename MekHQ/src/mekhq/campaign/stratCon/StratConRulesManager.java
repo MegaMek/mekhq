@@ -3595,18 +3595,16 @@ public class StratConRulesManager {
     }
 
     /**
-     * Processes an ignored StratCon scenario by removing it from the campaign state and updating related state
-     * variables, including victory points, facility ownership, and objectives.
+     * Processes an ignored StratCon scenario by updating related state variables (victory points, facility ownership,
+     * and objectives) and then removing it from the campaign state.
      *
      * <p>This method is called when a StratCon scenario is ignored, and it ensures that the state of the campaign is
-     * updated accordingly. The following operations are performed:</p>
+     * updated accordingly. The following operations are performed, in order:</p>
      *
-     * <ul>
+     * <ol>
      *   <li><b>Victory Points Adjustment:</b>
      *       If the scenario is marked as "special" or a "turning point," the campaign's victory points are reduced by 1
-     *       to reflect a penalty before the scenario is removed.</li>
-     *   <li><b>Scenario Removal:</b>
-     *       The ignored scenario is removed from its associated track.</li>
+     *       to reflect a penalty.</li>
      *   <li><b>Facility Ownership and Objective Status:</b>
      *       <ul>
      *         <li>If no facility is associated with the scenario's coordinates, the objective tied to the scenario's
@@ -3614,8 +3612,11 @@ public class StratConRulesManager {
      *         <li>If a facility exists at the scenario's location and is owned by allied forces, ownership is flipped
      *         to the opposing forces.</li>
      *       </ul>
-     *   </li>
-     * </ul>
+     *       This must happen before the scenario is removed so that any objective linked to the scenario's coordinates
+     *       can still be looked up.</li>
+     *   <li><b>Scenario Removal:</b>
+     *       The ignored scenario is removed from its associated track.</li>
+     * </ol>
      *
      * @param scenario      The {@link StratConScenario} that is being ignored and processed for removal. This includes
      *                      information such as the scenario type and coordinates.
@@ -3634,9 +3635,6 @@ public class StratConRulesManager {
             campaignState.updateVictoryPoints(-1);
         }
 
-        // Remove the scenario from the track
-        track.removeScenario(scenario);
-
         // Check the facility associated with the scenario, if any
         StratConFacility localFacility = track.getFacility(scenario.getCoords());
         if (localFacility == null) {
@@ -3646,6 +3644,9 @@ public class StratConRulesManager {
             // Update the facility's ownership if it belongs to allies
             localFacility.setOwner(Opposing);
         }
+
+        // Remove the scenario from the track
+        track.removeScenario(scenario);
     }
 
     public void startup() {
