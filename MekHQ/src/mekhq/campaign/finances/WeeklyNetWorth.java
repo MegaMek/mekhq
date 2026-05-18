@@ -47,8 +47,8 @@ import org.w3c.dom.NodeList;
 public class WeeklyNetWorth {
     private static final MMLogger LOGGER = MMLogger.create(WeeklyNetWorth.class);
 
-    LocalDate date;
-    Money amount;
+    private LocalDate date;
+    private Money amount;
 
     public WeeklyNetWorth(LocalDate date, Money amount) {
         this.date = date;
