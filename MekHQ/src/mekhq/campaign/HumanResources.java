@@ -391,9 +391,9 @@ public class HumanResources {
     }
 
 
-    public void resetAsTechMinutes() {
-        asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberAsTechs();
-        asTechPoolOvertime = Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberAsTechs();
+    public void resetAsTechMinutes(CampaignOptions campaignOptions) {
+        asTechPoolMinutes = Person.PRIMARY_ROLE_SUPPORT_TIME * getNumberAsTechs(campaignOptions);
+        asTechPoolOvertime = Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * getNumberAsTechs(campaignOptions);
     }
 
     public void setAsTechPoolMinutes(int minutes) {
@@ -428,14 +428,14 @@ public class HumanResources {
         return asTechPool;
     }
 
-    public boolean requiresAdditionalAsTechs() {
-        return getAsTechNeed() > 0;
+    public boolean requiresAdditionalAsTechs(CampaignOptions campaignOptions) {
+        return getAsTechNeed(campaignOptions) > 0;
     }
 
-    public int getAsTechNeed() {
+    public int getAsTechNeed(CampaignOptions campaignOptions) {
         return (Math.toIntExact(getActivePersonnel(false, false).stream().filter(Person::isTech).count()) *
                       MHQConstants.AS_TECH_TEAM_SIZE) -
-                     getNumberAsTechs();
+                     getNumberAsTechs(campaignOptions);
     }
 
     public void increaseAsTechPool(Campaign campaign, int i) {
@@ -463,14 +463,10 @@ public class HumanResources {
     }
 
     public void fillAsTechPool(Campaign campaign) {
-        final int need = getAsTechNeed();
+        final int need = getAsTechNeed(campaign.getCampaignOptions());
         if (need > 0) {
             increaseAsTechPool(campaign, need);
         }
-    }
-
-    public int getNumberAsTechs() {
-        return getNumberPrimaryAsTechs(null) + getNumberSecondaryAsTechs(null);
     }
 
     /**
@@ -517,7 +513,8 @@ public class HumanResources {
         return asTechs;
     }
 
-    public int getAvailableAsTechs(final int minutes, final boolean alreadyOvertime, boolean isOvertimeAllowed) {
+    public int getAvailableAsTechs(final int minutes, final boolean alreadyOvertime, boolean isOvertimeAllowed,
+          CampaignOptions campaignOptions) {
         if (minutes == 0) {
             return 0;
         }
@@ -536,7 +533,7 @@ public class HumanResources {
                 }
             }
         }
-        return Math.min(Math.min(availableHelp, MHQConstants.AS_TECH_TEAM_SIZE), getNumberAsTechs());
+        return Math.min(Math.min(availableHelp, MHQConstants.AS_TECH_TEAM_SIZE), getNumberAsTechs(campaignOptions));
     }
 
     public int getShorthandedMod(int availableHelp, boolean medicalStaff) {
@@ -674,6 +671,7 @@ public class HumanResources {
         }
 
         if (size != oldSize) {
+            fireTempCrewPoolChangedEvent(campaign, role, size - oldSize);
             fireTempCrewPoolChangedEvent(campaign, role, size - oldSize);
         }
     }
@@ -945,7 +943,9 @@ public class HumanResources {
         LocalDate currentDay = campaign.getLocalDate();
 
         if (isUsingLegacyPersonnelMarket(campaignOptions)) {
-            personnelMarket.generatePersonnelForDay(campaign);
+            if (personnelMarket != null) {
+                personnelMarket.generatePersonnelForDay(campaign);
+            }
         } else {
             if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
                 newPersonnelMarket.gatherApplications();
@@ -2371,15 +2371,16 @@ public class HumanResources {
             writer.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewPools>");
         }
 
+        // Personnel roster must be written before personnelWhoAdvancedInXP so that UUID→Person
+        // resolution in parsePersonnelWhoAdvancedInXP has the full roster available on reload.
+        personnel.writeToXML(writer, indent, campaign);
+
         // Personnel who advanced in XP
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnelWhoAdvancedInXP");
         for (Person person : personnelWhoAdvancedInXP) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "personWhoAdvancedInXP", person.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelWhoAdvancedInXP");
-
-        // Personnel roster
-        personnel.writeToXML(writer, indent, campaign);
 
         // Personnel market (deprecated)
         if (personnelMarket != null) {
@@ -2409,6 +2410,9 @@ public class HumanResources {
     public static HumanResources loadFromXML(Node wn, Campaign campaign, Version version) {
         LOGGER.info("Loading HumanResources from XML...");
         HumanResources hr = new HumanResources();
+        // Install hr on campaign immediately so that Personnel.loadFromXML → campaign.importPerson
+        // routes persons into this instance rather than the old empty one that campaign was created with.
+        campaign.setHumanResources(hr);
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {

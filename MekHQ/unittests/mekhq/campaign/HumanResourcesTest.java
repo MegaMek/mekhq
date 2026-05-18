@@ -52,7 +52,9 @@ import java.util.Collection;
 import java.util.List;
 
 import megamek.Version;
+import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -62,6 +64,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
@@ -1232,6 +1235,95 @@ public class HumanResourcesTest {
             // Assert
             assertTrue(fresh.getHumanResources().getPersonnel().isEmpty(),
                   "Empty <personnel/> node must produce an empty roster");
+        }
+    }
+
+    /**
+     * Tests for
+     * {@link HumanResources#getTechsExpanded(Collection, Collection, CampaignOptions, boolean, LocalDate, boolean,
+     * boolean, boolean)}
+     */
+    @Nested
+    class GetTechsExpanded {
+
+        private Person makeTech(SkillLevel skillLevel, int dailyMinutes) {
+            Person tech = mock(Person.class);
+            PersonnelRole primary = mock(PersonnelRole.class);
+            PersonnelRole secondary = mock(PersonnelRole.class);
+            when(primary.isTech()).thenReturn(true);
+            when(secondary.isTechSecondary()).thenReturn(false);
+            when(tech.getPrimaryRole()).thenReturn(primary);
+            when(tech.getSecondaryRole()).thenReturn(secondary);
+            when(tech.isTech()).thenReturn(true);
+            when(tech.isTechExpanded()).thenReturn(true);
+            when(tech.getMinutesLeft()).thenReturn(dailyMinutes);
+            when(tech.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean()))
+                  .thenReturn(skillLevel);
+            when(tech.getDailyAvailableTechTime(anyBoolean())).thenReturn(dailyMinutes);
+            when(tech.outRanks(any())).thenReturn(false);
+            return tech;
+        }
+
+        @Test
+        void emptyInputReturnsEmptyList() {
+            List<Person> result = HumanResources.getTechsExpanded(
+                  List.of(), List.of(), campaignOptions, false, today, false, false, true);
+
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void nonTechsAreExcluded() {
+            Person nonTech = mock(Person.class);
+            when(nonTech.isTechExpanded()).thenReturn(false);
+
+            List<Person> result = HumanResources.getTechsExpanded(
+                  List.of(nonTech), List.of(), campaignOptions, false, today, false, false, true);
+
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void eliteFirstPlacesHigherSkillFirst() {
+            Person veteran = makeTech(SkillLevel.VETERAN, 480);
+            Person regular = makeTech(SkillLevel.REGULAR, 480);
+
+            List<Person> result = HumanResources.getTechsExpanded(
+                  List.of(regular, veteran), List.of(), campaignOptions, false, today,
+                  false, true, true);
+
+            assertEquals(veteran, result.get(0), "Veteran tech must precede Regular tech when eliteFirst=true");
+            assertEquals(regular, result.get(1));
+        }
+
+        @Test
+        void noZeroMinuteExcludesTechWithNoTime() {
+            Person busy = makeTech(SkillLevel.REGULAR, 0);
+            Person available = makeTech(SkillLevel.REGULAR, 480);
+
+            List<Person> result = HumanResources.getTechsExpanded(
+                  List.of(busy, available), List.of(), campaignOptions, false, today,
+                  true, false, true);
+
+            assertFalse(result.contains(busy), "Tech with 0 minutes must be excluded when noZeroMinute=true");
+            assertTrue(result.contains(available));
+        }
+
+        @Test
+        void selfCrewedEngineerIsIncluded() {
+            Unit selfCrewedUnit = mock(Unit.class);
+            Person engineer = makeTech(SkillLevel.REGULAR, 240);
+            Entity entity = mock(Entity.class);
+
+            when(selfCrewedUnit.isSelfCrewed()).thenReturn(true);
+            when(selfCrewedUnit.getEntity()).thenReturn(entity);
+            when(selfCrewedUnit.getEngineer()).thenReturn(engineer);
+
+            List<Person> result = HumanResources.getTechsExpanded(
+                  List.of(), List.of(selfCrewedUnit), campaignOptions, false, today,
+                  false, false, true);
+
+            assertTrue(result.contains(engineer), "Engineer from self-crewed unit must be included");
         }
     }
 }
