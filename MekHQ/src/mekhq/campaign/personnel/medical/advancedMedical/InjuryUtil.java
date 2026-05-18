@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -598,6 +598,10 @@ public final class InjuryUtil {
                 } else if (!person.needsFixing()) {
                     dismissed = true;
                     MedicalLogger.dismissedFromInfirmary(person, campaign.getLocalDate());
+                    //employed only; prisoners would probably be too much needless spam
+                    if (person.getPrisonerStatus().isFreeOrBondsman()) {
+                        MedicalLogger.dismissedFromInfirmary(person, campaign);
+                    }
                 }
 
                 if (dismissed) {
