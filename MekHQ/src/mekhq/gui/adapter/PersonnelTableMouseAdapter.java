@@ -3805,21 +3805,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         popup.add(menuItem);
 
         // region Flags Menu
-        // This Menu contains the following flags, in the specified order:
-        // 1) Clan Personnel
-        // 2) Commander
-        // 3) Divorceable
-        // 4) Founder
-        // 5) Immortal
-        // 6) Marriageable
-        // 7) Trying To Marry
         menu = new JMenu(resources.getString("specialFlagsMenu.text"));
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miClanPersonnel.text"));
         cbMenuItem.setToolTipText(resources.getString("miClanPersonnel.toolTipText"));
         cbMenuItem.setName("miClanPersonnel");
-        cbMenuItem.setSelected(selected.length == 1 && person.isClanPersonnel());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setClanPersonnel(!p.isClanPersonnel())));
+
+        long eligibleCount = Stream.of(selected)
+                              .filter(Person::isClanPersonnel)
+                              .count();
+        boolean isClanPersonnel = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isClanPersonnel);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setClanPersonnel(!isClanPersonnel);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         if (oneSelected) {
@@ -3832,14 +3833,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     commander.setCommander(false);
                     getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
                           commander.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(commander);
+                    MekHQ.triggerEvent(new PersonChangedEvent(commander));
                 });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
                     person.setSecondInCommand(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                           person.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
             });
             menu.add(miCommander);
@@ -3853,14 +3854,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     secondInCommand.setSecondInCommand(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
                           secondInCommand.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(secondInCommand);
+                    MekHQ.triggerEvent(new PersonChangedEvent(secondInCommand));
                 });
                 if (miSecondInCommand.isSelected()) {
                     person.setSecondInCommand(true);
                     person.setCommander(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("setAsSecondInCommand.format",
                           person.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
             });
             menu.add(miSecondInCommand);
@@ -3869,88 +3870,179 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));
         cbMenuItem.setToolTipText(resources.getString("miDivorceable.toolTipText"));
         cbMenuItem.setName("miDivorceable");
-        cbMenuItem.setSelected(selected.length == 1 && person.isDivorceable());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setDivorceable(!p.isDivorceable())));
+
+        eligibleCount = Stream.of(selected)
+                                   .filter(Person::isDivorceable)
+                                   .count();
+        boolean isDivorceable = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isDivorceable);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setDivorceable(!isDivorceable);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miFounder.text"));
         cbMenuItem.setToolTipText(resources.getString("miFounder.toolTipText"));
         cbMenuItem.setName("miFounder");
-        cbMenuItem.setSelected(selected.length == 1 && person.isFounder());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setFounder(!p.isFounder())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isFounder)
+                              .count();
+        boolean isFounder = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isFounder);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setFounder(!isFounder);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
         cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
         cbMenuItem.setName("miImmortal");
-        cbMenuItem.setSelected(selected.length == 1 && person.isImmortal());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setImmortal(!p.isImmortal())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isImmortal)
+                              .count();
+        boolean isImmortal = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isImmortal);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setImmortal(!isImmortal);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miQuickTrainIgnore.text"));
         cbMenuItem.setToolTipText(resources.getString("miQuickTrainIgnore.toolTipText"));
         cbMenuItem.setName("miQuickTrainIgnore");
-        cbMenuItem.setSelected(selected.length == 1 && person.isQuickTrainIgnore());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setQuickTrainIgnore(!p.isQuickTrainIgnore())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isQuickTrainIgnore)
+                              .count();
+        boolean isQuickTrainIgnore = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isQuickTrainIgnore);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setQuickTrainIgnore(!isQuickTrainIgnore);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miSalvageSupervisor.text"));
         cbMenuItem.setToolTipText(resources.getString("miSalvageSupervisor.toolTipText"));
         cbMenuItem.setName("miSalvageSupervisor");
-        cbMenuItem.setSelected(selected.length == 1 && person.isSalvageSupervisor());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setSalvageSupervisor(!p.isSalvageSupervisor())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isSalvageSupervisor)
+                              .count();
+        boolean isSalvageSupervisor = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isSalvageSupervisor);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setSalvageSupervisor(!isSalvageSupervisor);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("isUnderProtection.text"));
         cbMenuItem.setToolTipText(resources.getString("isUnderProtection.toolTipText"));
         cbMenuItem.setName("isUnderProtection");
-        cbMenuItem.setSelected(selected.length == 1 && person.isUnderProtection());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setUnderProtection(!p.isUnderProtection())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isUnderProtection)
+                              .count();
+        boolean isUnderProtection = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isUnderProtection);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setUnderProtection(!isUnderProtection);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("neverAssignMaintenanceAutomatically.text"));
         cbMenuItem.setToolTipText(wordWrap(resources.getString("neverAssignMaintenanceAutomatically.toolTipText")));
         cbMenuItem.setName("neverAssignMaintenanceAutomatically");
-        cbMenuItem.setSelected(selected.length == 1 && person.isNeverAssignMaintenanceAutomatically());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setNeverAssignMaintenanceAutomatically(!p.isNeverAssignMaintenanceAutomatically())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isNeverAssignMaintenanceAutomatically)
+                              .count();
+        boolean isNeverAssignMaintenanceAutomatically = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isNeverAssignMaintenanceAutomatically);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setNeverAssignMaintenanceAutomatically(!isNeverAssignMaintenanceAutomatically);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
         cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
         cbMenuItem.setName("miPrefersMen");
-        cbMenuItem.setSelected(selected.length == 1 && person.isPrefersMen());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setPrefersMen(!p.isPrefersMen())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isPrefersMen)
+                              .count();
+        boolean isPrefersMen = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isPrefersMen);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setPrefersMen(!isPrefersMen);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersWomen.text"));
         cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersWomen.toolTipText")));
         cbMenuItem.setName("miPrefersWomen");
-        cbMenuItem.setSelected(selected.length == 1 && person.isPrefersWomen());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setPrefersWomen(!p.isPrefersWomen())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isPrefersWomen)
+                              .count();
+        boolean isPrefersWomen = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isPrefersWomen);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setPrefersWomen(!isPrefersWomen);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
-        if (Stream.of(selected).allMatch(p -> p.getGender().isFemale())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
-            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miTryingToConceive.toolTipText"),
-                  100));
-            cbMenuItem.setName("miTryingToConceive");
-            cbMenuItem.setSelected(selected.length == 1 && person.isTryingToConceive());
-            cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                      .forEach(p -> p.setTryingToConceive(!p.isTryingToConceive())));
-            menu.add(cbMenuItem);
-        }
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miTryingToConceive.toolTipText"),
+              100));
+        cbMenuItem.setName("miTryingToConceive");
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isTryingToConceive)
+                              .count();
+        boolean isTryingToConceive = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isTryingToConceive);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            if (selectedPerson.getGender().isFemale()) {
+                selectedPerson.setTryingToConceive(!isTryingToConceive);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+            }
+        }));
+        menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miHidePersonality.text"));
         cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miHidePersonality.toolTipText"),
               100));
         cbMenuItem.setName("miHidePersonality");
-        cbMenuItem.setSelected(selected.length == 1 && person.isHidePersonality());
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isHidePersonality)
+                              .count();
+        boolean isHidePersonality = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isHidePersonality);
         cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
-            selectedPerson.setHidePersonality(!selectedPerson.isHidePersonality());
+            selectedPerson.setHidePersonality(!isHidePersonality);
             MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
         }));
         menu.add(cbMenuItem);
@@ -4408,6 +4500,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    private static boolean isFlagEnabled(long eligibleCount, int selectedCount) {
+        return eligibleCount >= ((int) round(selectedCount / 2.0));
     }
 
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
