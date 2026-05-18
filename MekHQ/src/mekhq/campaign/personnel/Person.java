@@ -4974,18 +4974,6 @@ public class Person {
     }
 
     /**
-     * @deprecated Use {@link #outRanksUsingSkillTiebreaker(CampaignOptions, boolean, LocalDate, Person)} instead.
-     */
-    @Deprecated(since = "0.51.00")
-    public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
-        return outRanksUsingSkillTiebreaker(
-              campaign.getCampaignOptions(),
-              campaign.isClanCampaign(),
-              campaign.getLocalDate(),
-              otherPerson);
-    }
-
-    /**
      * Checks if the current person outranks another person using a skill tiebreaker. If the other person is null, it is
      * considered that the current person outranks them. If both persons have the same rank numeric value, the rank
      * level is compared. If both persons have the same rank numeric value and rank level, the experience levels are
