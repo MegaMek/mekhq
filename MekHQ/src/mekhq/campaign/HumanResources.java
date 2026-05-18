@@ -51,7 +51,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.swing.JOptionPane;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -113,7 +112,6 @@ import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -176,7 +174,7 @@ public class HumanResources {
     }
 
     public Collection<Person> getPersonnel() {
-        return personnel.values();
+        return Collections.unmodifiableCollection(personnel.values());
     }
 
     /**
@@ -675,7 +673,7 @@ public class HumanResources {
             tempPersonnelRoleMap.put(role, size);
         }
 
-        if (size != oldSize || !(size <= 0 && oldSize <= 0)) {
+        if (size != oldSize) {
             fireTempCrewPoolChangedEvent(campaign, role, size - oldSize);
         }
     }
@@ -917,6 +915,17 @@ public class HumanResources {
     }
 
     /**
+     * Returns {@code true} when campaign options select the legacy (deprecated) personnel market.
+     *
+     * <p>The market style named {@code PERSONNEL_MARKET_DISABLED} disables the <em>new</em> market
+     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate
+     * makes the intent explicit at every call site.</p>
+     */
+    private static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
+        return options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED;
+    }
+
+    /**
      * Refreshes the personnel markets.
      *
      * @param campaign the campaign
@@ -935,40 +944,11 @@ public class HumanResources {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
-        if (campaignOptions.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
+        if (isUsingLegacyPersonnelMarket(campaignOptions)) {
             personnelMarket.generatePersonnelForDay(campaign);
         } else {
             if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
                 newPersonnelMarket.gatherApplications();
-
-                if (newPersonnelMarket.getHasRarePersonnel()) {
-                    StringBuilder oocReport = new StringBuilder(campaign.getResources().getString(
-                          "personnelMarket.rareProfession.outOfCharacter"));
-                    for (PersonnelRole profession : newPersonnelMarket.getRareProfessions()) {
-                        oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
-                    }
-
-                    List<String> buttons = new ArrayList<>();
-                    buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.later"));
-                    buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.decline"));
-                    if (!isCampaignStart) {
-                        buttons.add(campaign.getResources()
-                                          .getString("personnelMarket.rareProfession.button.immediate"));
-                    }
-
-                    ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-                          campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
-                          null,
-                          campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
-                          buttons,
-                          oocReport.toString(),
-                          null,
-                          true);
-
-                    if (dialog.getDialogChoice() == 2) {
-                        newPersonnelMarket.showPersonnelMarketDialog();
-                    }
-                }
             }
         }
     }
@@ -1074,19 +1054,28 @@ public class HumanResources {
     /**
      * Gets the {@link AbstractPersonnelGenerator} to use with this campaign.
      *
-     * @param campaignOptions the campaign options
      * @param factionSelector the faction selector
      * @param planetSelector  the planet selector
      *
      * @return an {@link AbstractPersonnelGenerator}
      */
-    public AbstractPersonnelGenerator getPersonnelGenerator(CampaignOptions campaignOptions,
-          final AbstractFactionSelector factionSelector,
+    public AbstractPersonnelGenerator getPersonnelGenerator(final AbstractFactionSelector factionSelector,
           final AbstractPlanetSelector planetSelector) {
         final DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
         generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(new RandomSkillPreferences());
         return generator;
+    }
+
+    /**
+     * @deprecated Use {@link #getPersonnelGenerator(AbstractFactionSelector, AbstractPlanetSelector)} instead.
+     *             The {@code campaignOptions} parameter was never used.
+     */
+    @Deprecated(since = "0.50.07")
+    public AbstractPersonnelGenerator getPersonnelGenerator(CampaignOptions campaignOptions,
+          final AbstractFactionSelector factionSelector,
+          final AbstractPlanetSelector planetSelector) {
+        return getPersonnelGenerator(factionSelector, planetSelector);
     }
 
     /**
@@ -1427,56 +1416,23 @@ public class HumanResources {
 
         boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
 
-        int bestSkill = -1;
+        int bestSkill = Integer.MIN_VALUE;
         Person procurementCharacter = null;
-        if (isAnyTech) {
-            for (Person person : people) {
-                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
-                    continue;
-                }
-
-                if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= defaultMaxAcquisitions)) {
-                    continue;
-                }
-
-                SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
-                      today);
-                Skill skill = person.getBestTechSkill();
-
-                int totalSkillLevel = Integer.MIN_VALUE;
-                if (skill != null) {
-                    totalSkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                }
-
-                if (totalSkillLevel > bestSkill) {
-                    procurementCharacter = person;
-                    bestSkill = totalSkillLevel;
-                }
+        for (Person person : people) {
+            if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
+                continue;
             }
-        } else {
-            for (Person person : people) {
-                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
-                    continue;
-                }
 
-                if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= defaultMaxAcquisitions)) {
-                    continue;
-                }
+            if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= defaultMaxAcquisitions)) {
+                continue;
+            }
 
-                SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
-                      today);
+            int totalSkillLevel = logisticsSkillLevel(person, isAnyTech, fixedSkillName, isUseAgingEffects,
+                  isClanCampaign, today);
 
-                Skill skill = person.getSkill(fixedSkillName);
-
-                int totalSkillLevel = Integer.MIN_VALUE;
-                if (skill != null) {
-                    totalSkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                }
-
-                if (totalSkillLevel > bestSkill) {
-                    procurementCharacter = person;
-                    bestSkill = totalSkillLevel;
-                }
+            if (totalSkillLevel > bestSkill) {
+                procurementCharacter = person;
+                bestSkill = totalSkillLevel;
             }
         }
 
@@ -1485,6 +1441,19 @@ public class HumanResources {
 
     public @Nullable Person getLogisticsPerson(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
         return getLogisticsPerson(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
+    }
+
+    private static @Nullable Skill pickLogisticsSkill(Person person, boolean isAnyTech, String fixedSkillName) {
+        return isAnyTech ? person.getBestTechSkill() : person.getSkill(fixedSkillName);
+    }
+
+    private static int logisticsSkillLevel(Person person, boolean isAnyTech, String fixedSkillName,
+          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        Skill skill = pickLogisticsSkill(person, isAnyTech, fixedSkillName);
+        if (skill == null) {
+            return Integer.MIN_VALUE;
+        }
+        return skill.getTotalSkillLevel(person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today));
     }
 
     /**
@@ -1535,46 +1504,14 @@ public class HumanResources {
         }
 
         boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-        boolean finalIsAnyTech = isAnyTech;
-        String finalFixedSkillName = fixedSkillName;
+        final boolean sortByAnyTech = isAnyTech;
+        final String sortBySkillName = fixedSkillName;
         logisticsPersonnel.sort((person1, person2) -> {
-            if (finalIsAnyTech) {
-                Skill skill = person1.getBestTechSkill();
-                int person1SkillLevel = Integer.MIN_VALUE;
-                if (skill != null) {
-                    SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
-                          isClanCampaign, today);
-                    person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                }
-
-                skill = person2.getBestTechSkill();
-                int person2SkillLevel = Integer.MIN_VALUE;
-                if (skill != null) {
-                    SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
-                          isClanCampaign, today);
-                    person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                }
-
-                return Integer.compare(person1SkillLevel, person2SkillLevel);
-            } else {
-                Skill skill = person1.getSkill(finalFixedSkillName);
-                int person1SkillLevel = Integer.MIN_VALUE;
-                if (skill != null) {
-                    SkillModifierData skillModifierData = person1.getSkillModifierData(isUseAgingEffects,
-                          isClanCampaign, today);
-                    person1SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                }
-
-                skill = person2.getSkill(finalFixedSkillName);
-                int person2SkillLevel = Integer.MIN_VALUE;
-                if (skill != null) {
-                    SkillModifierData skillModifierData = person2.getSkillModifierData(isUseAgingEffects,
-                          isClanCampaign, today);
-                    person2SkillLevel = skill.getTotalSkillLevel(skillModifierData);
-                }
-
-                return Integer.compare(person1SkillLevel, person2SkillLevel);
-            }
+            int level1 = logisticsSkillLevel(person1, sortByAnyTech, sortBySkillName, isUseAgingEffects,
+                  isClanCampaign, today);
+            int level2 = logisticsSkillLevel(person2, sortByAnyTech, sortBySkillName, isUseAgingEffects,
+                  isClanCampaign, today);
+            return Integer.compare(level1, level2);
         });
 
         return logisticsPersonnel;
@@ -1661,7 +1598,7 @@ public class HumanResources {
         return newPerson(campaign,
               primaryRole,
               secondaryRole,
-              getPersonnelGenerator(campaign.getCampaignOptions(), factionSelector, planetSelector),
+              getPersonnelGenerator(factionSelector, planetSelector),
               gender);
     }
 
@@ -1729,19 +1666,10 @@ public class HumanResources {
         }
 
         if (!person.getBloodname().isEmpty()) {
-            int result = JOptionPane.showConfirmDialog(null,
-                  person.getFullTitle() +
-                        " already has the bloodname " +
-                        person.getBloodname() +
-                        "\nDo you wish to remove that bloodname and generate a new one?",
-                  "Already Has Bloodname",
-                  JOptionPane.YES_NO_OPTION,
-                  JOptionPane.QUESTION_MESSAGE);
-            if (result == JOptionPane.NO_OPTION) {
+            if (!ignoreDice) {
                 return;
-            } else {
-                ignoreDice = true;
             }
+            // ignoreDice == true means the caller has already confirmed replacement
         }
 
         SkillModifierData skillModifierData = person.getSkillModifierData();
@@ -2573,7 +2501,7 @@ public class HumanResources {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("personWhoAdvancedInXP")) {
-                LOGGER.error("Unknown node type not loaded in personnelWhoAdvancedInXP nodes: {}",
+                LOGGER.warn("Unknown node type not loaded in personnelWhoAdvancedInXP nodes: {}",
                       wn2.getNodeName());
                 continue;
             }
@@ -2585,7 +2513,7 @@ public class HumanResources {
                     result.add(person);
                 }
             } catch (Exception e) {
-                LOGGER.error("", e);
+                LOGGER.error("Failed to parse personWhoAdvancedInXP UUID", e);
             }
         }
 

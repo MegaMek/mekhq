@@ -75,7 +75,7 @@ public class Personnel extends LinkedHashMap<UUID, Person> {
                 continue;
             }
             if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                logger.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
+                logger.warn("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
                 continue;
             }
             Person p = Person.generateInstanceFromXML(wn2, campaign, version);
