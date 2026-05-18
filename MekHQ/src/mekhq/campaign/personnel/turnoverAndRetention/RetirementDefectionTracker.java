@@ -53,6 +53,7 @@ import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -138,26 +139,32 @@ public class RetirementDefectionTracker {
             rollRequired.add(mission.getId());
         }
 
-        if (campaign.getCampaignOptions().isUseManagementSkill()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseManagementSkill()) {
             getManagementSkillValues(campaign);
         }
 
+        boolean includeCivilians = campaignOptions.isIncludeCivilians();
         for (Person person : campaign.getActivePersonnel(false, false)) {
+            if (!includeCivilians && person.isCivilian()) {
+                continue;
+            }
+
             if (person.isDeployed()) {
                 continue;
             }
 
             if (person.isFounder()) {
                 if (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE) {
-                    if (!campaign.getCampaignOptions().isUseRandomFounderTurnover()) {
+                    if (!campaignOptions.isUseRandomFounderTurnover()) {
                         continue;
                     }
-                } else if (!campaign.getCampaignOptions().isUseFounderRetirement()) {
+                } else if (!campaignOptions.isUseFounderRetirement()) {
                     continue;
                 }
             }
 
-            if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
+            if (campaignOptions.isUseSubContractSoldiers()) {
                 if ((person.getUnit() != null) &&
                           (person.getUnit().usesSoldiers()) &&
                           (!person.getUnit().isCommander(person))) {
@@ -176,13 +183,13 @@ public class RetirementDefectionTracker {
             // Service Contract
             if (isBreakingContract(person,
                   campaign.getLocalDate(),
-                  campaign.getCampaignOptions().getServiceContractDuration())) {
-                targetNumber.addModifier(-campaign.getCampaignOptions().getServiceContractModifier(),
+                  campaignOptions.getServiceContractDuration())) {
+                targetNumber.addModifier(-campaignOptions.getServiceContractModifier(),
                       resources.getString("contract.text"));
             }
 
             // Desirability modifier
-            if ((campaign.getCampaignOptions().isUseSkillModifiers()) &&
+            if ((campaignOptions.isUseSkillModifiers()) &&
                       (person.getAge(campaign.getLocalDate()) < RETIREMENT_AGE)) {
                 targetNumber.addModifier(min(EXP_ELITE - 2, person.getExperienceLevel(campaign, false, true) - 2),
                       resources.getString("desirability.text"));
@@ -201,8 +208,8 @@ public class RetirementDefectionTracker {
             }
 
             // Fatigue modifier
-            if ((campaign.getCampaignOptions().isUseFatigue()) &&
-                      (campaign.getCampaignOptions().isUseFatigueModifiers())) {
+            if ((campaignOptions.isUseFatigue()) &&
+                      (campaignOptions.isUseFatigueModifiers())) {
                 int fatigueModifier = Math.clamp(((person.getAdjustedFatigue() - 1) / 4) - 1, 0, 3);
 
                 if (fatigueModifier > 0) {
@@ -211,7 +218,7 @@ public class RetirementDefectionTracker {
             }
 
             // HR Strain Modifiers
-            if (campaign.getCampaignOptions().isUseHRStrain()) {
+            if (campaignOptions.isUseHRStrain()) {
                 int hrStrainModifier = getHRStrainModifier(campaign);
 
                 if (hrStrainModifier > 0) {
@@ -221,10 +228,10 @@ public class RetirementDefectionTracker {
             }
 
             // Management Skill Modifier
-            if (campaign.getCampaignOptions().isUseManagementSkill()) {
-                int modifier = campaign.getCampaignOptions().getManagementSkillPenalty();
+            if (campaignOptions.isUseManagementSkill()) {
+                int modifier = campaignOptions.getManagementSkillPenalty();
 
-                if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
+                if (campaignOptions.isUseCommanderLeadershipOnly()) {
                     Person commander = campaign.getCommander();
                     if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
                         SkillModifierData skillModifierData = commander.getSkillModifierData(true);
@@ -240,7 +247,7 @@ public class RetirementDefectionTracker {
             }
 
             // Shares Modifiers
-            if (campaign.getCampaignOptions().isUseShareSystem()) {
+            if (campaignOptions.isUseShareSystem()) {
                 // If this retirement roll is not being made at the end of a contract (e.g. >12
                 // months since last roll),
                 // the share percentage should still apply.
@@ -274,20 +281,20 @@ public class RetirementDefectionTracker {
             }
 
             // Unit Rating modifier
-            if (campaign.getCampaignOptions().isUseUnitRatingModifiers()) {
+            if (campaignOptions.isUseUnitRatingModifiers()) {
                 int unitRatingModifier = getUnitRatingModifier(campaign);
                 targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
             }
 
             // Active Mission modifier
-            if (campaign.getCampaignOptions().isUseHostileTerritoryModifiers()) {
+            if (campaignOptions.isUseHostileTerritoryModifiers()) {
                 if (isHostileTerritory(campaign)) {
                     targetNumber.addModifier(-2, resources.getString("hostileTerritory.text"));
                 }
             }
 
             // Mission completion status modifiers
-            if ((mission != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
+            if ((mission != null) && (campaignOptions.isUseMissionStatusModifiers())) {
                 if (mission.getStatus().isSuccess()) {
                     targetNumber.addModifier(-1, resources.getString("missionSuccess.text"));
                 } else if (mission.getStatus().isFailed()) {
@@ -298,11 +305,11 @@ public class RetirementDefectionTracker {
             }
 
             // Loyalty
-            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                      (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            if ((campaignOptions.isUseLoyaltyModifiers()) &&
+                      (!campaignOptions.isUseHideLoyalty())) {
 
                 int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
-                      campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
+                      campaignOptions.isUseAlternativeAdvancedMedical());
 
                 if (person.isCommander()) {
                     loyaltyScore += 2;
@@ -316,7 +323,7 @@ public class RetirementDefectionTracker {
             }
 
             // Faction Modifiers
-            if (campaign.getCampaignOptions().isUseFactionModifiers()) {
+            if (campaignOptions.isUseFactionModifiers()) {
                 Faction campaignFaction = campaign.getFaction();
 
                 // campaign faction modifiers
@@ -353,7 +360,7 @@ public class RetirementDefectionTracker {
             }
 
             // Age Modifiers
-            if (campaign.getCampaignOptions().isUseAgeModifiers()) {
+            if (campaignOptions.isUseAgeModifiers()) {
                 int ageMod = getAgeMod(person.getAge(campaign.getLocalDate()));
 
                 if (ageMod < 0) {
@@ -361,13 +368,13 @@ public class RetirementDefectionTracker {
                 } else if ((ageMod > 0) &&
                                  (!isBreakingContract(person,
                                        campaign.getLocalDate(),
-                                       campaign.getCampaignOptions().getServiceContractDuration()))) {
+                                       campaignOptions.getServiceContractDuration()))) {
                     targetNumber.addModifier(ageMod, resources.getString("ageRetirement.text"));
                 }
             }
 
             // Family Modifier
-            if (campaign.getCampaignOptions().isUseFamilyModifiers()) {
+            if (campaignOptions.isUseFamilyModifiers()) {
                 Person spouse = person.getGenealogy().getSpouse();
                 List<Person> children = person.getGenealogy().getChildren();
 

@@ -548,6 +548,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "payBonusDefaultThreshold",
               campaignOptions.getPayBonusDefaultThreshold());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "includeCivilians",
+              campaignOptions.isIncludeCivilians());
 
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
