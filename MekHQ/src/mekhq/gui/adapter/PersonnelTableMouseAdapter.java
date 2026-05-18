@@ -3982,9 +3982,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("blockMaternityLeave.text"));
         cbMenuItem.setToolTipText(wordWrap(resources.getString("blockMaternityLeave.toolTipText")));
         cbMenuItem.setName("blockMaternityLeave");
-        cbMenuItem.setSelected(selected.length == 1 && person.isBlockMaternityLeave());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setBlockMaternityLeave(!p.isBlockMaternityLeave())));
+
+        eligibleCount = Stream.of(selected)
+                              .filter(Person::isBlockMaternityLeave)
+                              .count();
+        boolean isBlockMaternityLeave = isFlagEnabled(eligibleCount, selected.length);
+
+        cbMenuItem.setSelected(isBlockMaternityLeave);
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setBlockMaternityLeave(!isBlockMaternityLeave);
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
