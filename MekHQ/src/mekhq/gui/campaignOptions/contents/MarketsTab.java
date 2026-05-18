@@ -762,14 +762,12 @@ public class MarketsTab {
         // Contents
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.text"));
-        btnContractEquipment.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
         btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.tooltip"));
         btnContractEquipment.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
 
         btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.text"));
-        btnContractPersonnel.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
         btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.tooltip"));
         btnContractPersonnel.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
