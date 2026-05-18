@@ -8362,7 +8362,8 @@ public class Campaign implements ITechManager {
                  VEHICLE_CREW_NAVAL,
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> unit.canTakeMoreVesselCrew(); // ??
+            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter)) &&
+                                      unit.canTakeMoreVesselCrew();
             default -> false;
         };
     }
