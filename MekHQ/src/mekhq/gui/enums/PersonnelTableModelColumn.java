@@ -85,6 +85,7 @@ import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.ReasoningSorter;
 import mekhq.utilities.ReportingUtilities;
+import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn {
     // region Enum Declarations
@@ -622,6 +623,7 @@ public enum PersonnelTableModelColumn {
         // We define these here, as they're used in multiple cases
         int currentAttributeValue;
         int attributeCap;
+        int attributeModifier;
 
         String sign;
 
@@ -1122,33 +1124,19 @@ public enum PersonnelTableModelColumn {
                 Reasoning reasoning = person.getReasoning();
                 return reasoning.getLabel();
             case STRENGTH:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.STRENGTH);
-                attributeCap = person.getAttributeCap(SkillAttribute.STRENGTH);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.STRENGTH);
             case BODY:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.BODY);
-                attributeCap = person.getAttributeCap(SkillAttribute.BODY);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.BODY);
             case REFLEXES:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.REFLEXES);
-                attributeCap = person.getAttributeCap(SkillAttribute.REFLEXES);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.REFLEXES);
             case DEXTERITY:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.DEXTERITY);
-                attributeCap = person.getAttributeCap(SkillAttribute.DEXTERITY);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
             case INTELLIGENCE:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.INTELLIGENCE);
-                attributeCap = person.getAttributeCap(SkillAttribute.INTELLIGENCE);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.INTELLIGENCE);
             case WILLPOWER:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.WILLPOWER);
-                attributeCap = person.getAttributeCap(SkillAttribute.WILLPOWER);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.WILLPOWER);
             case CHARISMA:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.CHARISMA);
-                attributeCap = person.getAttributeCap(SkillAttribute.CHARISMA);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
             case EDGE:
                 currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
                 attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
@@ -1156,6 +1144,27 @@ public enum PersonnelTableModelColumn {
             default:
                 return "UNIMPLEMENTED";
         }
+    }
+
+    /**
+     * Constructs a displayable string representation of a person's skill attribute, including their current score,
+     * maximum possible score (cap), and attribute modifier.
+     *
+     * @param person    the person whose attribute scores are being represented
+     * @param attribute the specific skill attribute being evaluated
+     * @return a string in the format "currentScore / attributeCap (+/- modifier)"
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
+    private static @NonNull String getAttributeScoreDisplay(Person person, SkillAttribute attribute) {
+        int currentAttributeValue = person.getAttributeScore(attribute);
+        int attributeCap = person.getAttributeCap(attribute);
+
+        int attributeModifier = person.getAttributeModifier(attribute);
+        String sign = attributeModifier >= 0 ? "+" : "";
+
+        return currentAttributeValue + " / " + attributeCap + " (" + sign + attributeModifier + ")";
     }
 
     public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
