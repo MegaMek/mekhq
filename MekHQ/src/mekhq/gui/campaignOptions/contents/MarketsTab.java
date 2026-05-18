@@ -762,17 +762,17 @@ public class MarketsTab {
         // Contents
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.text"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
+        btnContractEquipment.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
         btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.tooltip"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
+        btnContractEquipment.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
 
         btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.text"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
+        btnContractPersonnel.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
         btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.tooltip"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
+        btnContractPersonnel.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
 
         ButtonGroup contractGroup = new ButtonGroup();
         contractGroup.add(btnContractEquipment);
