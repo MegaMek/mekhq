@@ -35,9 +35,6 @@ package mekhq.campaign.market.contractMarket;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
-import org.jspecify.annotations.Nullable;
-
-import java.time.LocalDate;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
@@ -50,8 +47,8 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
  *
  * <p>Pity contracts are intended to ensure that a campaign has access to a minimum number of easy contract
- * opportunities by creating additional contracts when the campaign has fewer than {@link #PITY_CONTRACT_COUNT}
- * successful completed contracts.</p>
+ * opportunities by creating additional contracts when the campaign has fewer than the requested number of pity
+ * contracts.</p>
  *
  * <p>This system is intended to smooth out early game progression.</p>
  *
@@ -60,18 +57,11 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
  */
 public class PityContracts {
     /**
-     * The target number of successful contracts used when determining how many pity contracts should be generated.
-     *
-     * <p>The number of successful contracts the campaign has completed is deducted from this value.</p>
-     */
-    static final int PITY_CONTRACT_COUNT = 4;
-
-    /**
      * Generates pity contracts for the supplied campaign.
      *
      * <p>The number of generated contracts is based on the number of successful completed contracts already present
-     * in the campaign. If the campaign already has at least {@link #PITY_CONTRACT_COUNT} successful completed
-     * contracts, no pity contracts are generated.</p>
+     * in the campaign. If the campaign already has at least a number of successful completed contracts in excess of
+     * the pity contract count, no pity contracts are generated.</p>
      *
      * @param campaign the campaign for which pity contracts are generated
      *
@@ -84,7 +74,10 @@ public class PityContracts {
         AbstractContractMarket contractMarket = campaign.getContractMarket();
 
         int successfulContractCount = getSuccessfulContractCount(campaign);
-        int contractCount = max(0, getPityContractCount(successfulContractCount));
+        int targetPityContractCount = campaign.getCampaignOptions().getPityContracts();
+
+        int contractCount = targetPityContractCount - successfulContractCount;
+        contractCount = max(0, contractCount);
 
         for (int i = 0; i < contractCount; i++) {
             PityContracts.createPityContract(campaign, contractMarket);
@@ -111,20 +104,6 @@ public class PityContracts {
             }
         }
         return successfulContractCount;
-    }
-
-    /**
-     * Calculates the number of pity contracts needed from the supplied successful contract count.
-     *
-     * @param successfulContractCount the number of successful completed contracts
-     *
-     * @return the raw number of pity contracts needed before lower-bound clamping
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    private static int getPityContractCount(int successfulContractCount) {
-        return PITY_CONTRACT_COUNT - successfulContractCount;
     }
 
     /**

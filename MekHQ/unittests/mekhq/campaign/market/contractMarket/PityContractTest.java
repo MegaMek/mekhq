@@ -40,7 +40,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import testUtilities.MHQTestUtilities;
 
-import static mekhq.campaign.market.contractMarket.PityContracts.PITY_CONTRACT_COUNT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PityContractTest {
@@ -102,8 +101,9 @@ public class PityContractTest {
         }
 
         int requestedContractCount = PityContracts.generatePityContracts(campaign);
+        int pityContractCount = 4; // This is normally defined in campaign options
 
-        assertEquals(PITY_CONTRACT_COUNT, requestedContractCount,
+        assertEquals(pityContractCount, requestedContractCount,
               "Invalid number of requested contracts for [" + failedContractCount + "] successful contracts");
     }
 }
