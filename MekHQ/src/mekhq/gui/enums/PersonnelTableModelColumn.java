@@ -620,11 +620,6 @@ public enum PersonnelTableModelColumn {
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        // We define these here, as they're used in multiple cases
-        int currentAttributeValue;
-        int attributeCap;
-        int attributeModifier;
-
         String sign;
 
         final boolean isClanCampaign = campaign.isClanCampaign();
@@ -1138,8 +1133,8 @@ public enum PersonnelTableModelColumn {
             case CHARISMA:
                 return getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
             case EDGE:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
-                attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
+                int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
+                int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
                 return currentAttributeValue + " / " + attributeCap;
             default:
                 return "UNIMPLEMENTED";
