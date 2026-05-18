@@ -56,6 +56,7 @@ import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -158,6 +159,8 @@ public class MarketsTab {
     private JSpinner spnContractMaxSalvagePercentage;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
+    private JLabel lblPityContracts;
+    private JSpinner spnPityContracts;
 
     private JPanel pnlContractPay;
     private JRadioButton btnContractEquipment;
@@ -564,6 +567,8 @@ public class MarketsTab {
         spnContractMaxSalvagePercentage = new JSpinner();
         lblDropShipBonusPercentage = new JLabel();
         spnDropShipBonusPercentage = new JSpinner();
+        lblPityContracts = new JLabel();
+        spnPityContracts = new JSpinner();
 
         pnlContractPay = new JPanel();
         btnContractEquipment = new JRadioButton();
@@ -692,6 +697,13 @@ public class MarketsTab {
         spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "DropShipBonusPercentage"));
 
+        lblPityContracts = new CampaignOptionsLabel("PityContracts", getMetadata(new Version(0, 51, 0)));
+        lblPityContracts.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "PityContracts"));
+        spnPityContracts = new CampaignOptionsSpinner("PityContracts", 4, 0, 20, 1);
+        spnPityContracts.addMouseListener(createTipPanelUpdater(contractMarketHeader,
+              "PityContracts"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -746,6 +758,12 @@ public class MarketsTab {
         panel.add(lblDropShipBonusPercentage, layout);
         layout.gridx++;
         panel.add(spnDropShipBonusPercentage, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPityContracts, layout);
+        layout.gridx++;
+        panel.add(spnPityContracts, layout);
 
         return panel;
     }
@@ -965,6 +983,7 @@ public class MarketsTab {
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
         spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
+        spnPityContracts.setValue(options.getPityContracts());
         if (options.isEquipmentContractBase()) {
             btnContractEquipment.setSelected(true);
         } else {
@@ -1039,6 +1058,7 @@ public class MarketsTab {
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setContractMaxSalvagePercentage((int) spnContractMaxSalvagePercentage.getValue());
         options.setDropShipBonusPercentage((int) spnDropShipBonusPercentage.getValue());
+        options.setPityContracts((int) spnPityContracts.getValue());
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
         options.setEquipmentContractPercent((double) spnEquipPercent.getValue());
         options.setDropShipContractPercent((double) spnDropShipPercent.getValue());

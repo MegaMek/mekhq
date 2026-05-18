@@ -624,6 +624,7 @@ public class CampaignOptions {
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
+    private int pityContracts;
     private boolean isUseTwoWayPay;
     private boolean isUseCamOpsSalvage;
     private boolean isUseRiskySalvage;
@@ -1296,6 +1297,7 @@ public class CampaignOptions {
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
+        setPityContracts(4);
         isUseTwoWayPay = true;
         isUseCamOpsSalvage = false;
         isUseRiskySalvage = false;
@@ -4068,6 +4070,14 @@ public class CampaignOptions {
 
     public void setDropShipBonusPercentage(final int dropShipBonusPercentage) {
         this.dropShipBonusPercentage = dropShipBonusPercentage;
+    }
+
+    public int getPityContracts() {
+        return pityContracts;
+    }
+
+    public void setPityContracts(final int pityContracts) {
+        this.pityContracts = pityContracts;
     }
 
     public boolean isUseTwoWayPay() {

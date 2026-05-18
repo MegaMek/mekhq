@@ -1055,6 +1055,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getDropShipBonusPercentage());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "pityContracts",
+              campaignOptions.getPityContracts());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "isUseTwoWayPay",
               campaignOptions.isUseTwoWayPay());
         MHQXMLUtility.writeSimpleXMLTag(pw,
