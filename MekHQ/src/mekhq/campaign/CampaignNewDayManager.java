@@ -1490,13 +1490,19 @@ public class CampaignNewDayManager {
                           campaign.getName()));
                 }
             }
-        } else if ((person.getAge(today) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (isBirthday) {
+        } else if (person.getAge(today) == 18 && isBirthday) {
+            if (campaignOptions.isAnnounceChildBirthdays()) {
                 campaign.addReport(PERSONNEL, String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                       person.getAge(today),
                       CLOSING_SPAN_TAG));
+            }
+
+            if (campaignOptions.isChildPortraitsWhenComingOfAge()) {
+                if (campaignOptions.isUsePortraitForRole(person.getPrimaryRole())) {
+                    campaign.assignRandomPortraitFor(person);
+                }
             }
         }
 
