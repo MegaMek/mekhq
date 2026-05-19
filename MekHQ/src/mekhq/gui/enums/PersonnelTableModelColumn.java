@@ -152,14 +152,22 @@ public enum PersonnelTableModelColumn {
     DUE_DATE("PersonnelTableModelColumn.DUE_DATE.text"),
     RETIREMENT_DATE("PersonnelTableModelColumn.RETIREMENT_DATE.text"),
     DEATH_DATE("PersonnelTableModelColumn.DEATH_DATE.text"),
-    COMMANDER("PersonnelTableModelColumn.COMMANDER.text"),
-    FOUNDER("PersonnelTableModelColumn.FOUNDER.text"),
     CLAN_PERSONNEL("PersonnelTableModelColumn.CLAN_PERSONNEL.text"),
-    MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
+    COMMANDER("PersonnelTableModelColumn.COMMANDER.text"),
     DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
-    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
-    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
     EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
+    FOUNDER("PersonnelTableModelColumn.FOUNDER.text"),
+    HIDE_PERSONALITY("PersonnelTableModelColumn.HIDE_PERSONALITY.text"),
+    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
+    MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
+    NEVER_ASSIGN_AUTO_MAINTENANCE("PersonnelTableModelColumn.NEVER_ASSIGN_AUTO_MAINTENANCE.text"),
+    PREFERS_MEN("PersonnelTableModelColumn.PREFERS_MEN.text"),
+    PREFERS_WOMEN("PersonnelTableModelColumn.PREFERS_WOMEN.text"),
+    QUICK_TRAIN_IGNORE("PersonnelTableModelColumn.QUICK_TRAIN_IGNORE.text"),
+    SALVAGE_SUPERVISOR("PersonnelTableModelColumn.SALVAGE_SUPERVISOR.text"),
+    SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
+    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
+    UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -1052,6 +1060,22 @@ public enum PersonnelTableModelColumn {
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
             case EMPLOYED:
                 return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
+            case HIDE_PERSONALITY:
+                return resources.getString(person.isHidePersonality() ? "Yes.text" : "No.text");
+            case NEVER_ASSIGN_AUTO_MAINTENANCE:
+                return resources.getString(person.isNeverAssignMaintenanceAutomatically() ? "Yes.text" : "No.text");
+            case PREFERS_MEN:
+                return resources.getString(person.isPrefersMen() ? "Yes.text" : "No.text");
+            case PREFERS_WOMEN:
+                return resources.getString(person.isPrefersWomen() ? "Yes.text" : "No.text");
+            case QUICK_TRAIN_IGNORE:
+                return resources.getString(person.isQuickTrainIgnore() ? "Yes.text" : "No.text");
+            case SALVAGE_SUPERVISOR:
+                return resources.getString(person.isSalvageSupervisor() ? "Yes.text" : "No.text");
+            case SECOND_IN_COMMAND:
+                return resources.getString(person.isSecondInCommand() ? "Yes.text" : "No.text");
+            case UNDER_PROTECTION:
+                return resources.getString(person.isUnderProtection() ? "Yes.text" : "No.text");
             case TOUGHNESS:
                 return Integer.toString(person.getAdjustedToughness());
             case CONNECTIONS:
@@ -1400,7 +1424,8 @@ public enum PersonnelTableModelColumn {
                                        !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
                 default -> false;
             };
-            case FLAGS -> switch (this) {
+            case FLAGS_A -> switch (this) {
+                // Max 7 flags
                 case RANK,
                      FIRST_NAME,
                      LAST_NAME,
@@ -1411,6 +1436,29 @@ public enum PersonnelTableModelColumn {
                      DIVORCEABLE,
                      TRYING_TO_CONCEIVE,
                      IMMORTAL -> true;
+                default -> false;
+            };
+            case FLAGS_B -> switch (this) {
+                // Max 7 flags
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     MARRIAGEABLE,
+                     NEVER_ASSIGN_AUTO_MAINTENANCE,
+                     PREFERS_MEN,
+                     PREFERS_WOMEN,
+                     QUICK_TRAIN_IGNORE,
+                     SALVAGE_SUPERVISOR,
+                     SECOND_IN_COMMAND -> true;
+                default -> false;
+            };
+            case FLAGS_C -> switch (this) {
+                // Max 7 flags
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     TRYING_TO_CONCEIVE,
+                     UNDER_PROTECTION -> true;
                 default -> false;
             };
             case PERSONALITY -> switch (this) {
