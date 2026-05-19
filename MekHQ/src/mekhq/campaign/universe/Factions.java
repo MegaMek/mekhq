@@ -35,6 +35,8 @@ package mekhq.campaign.universe;
 import static java.awt.Color.BLACK;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 
+import java.awt.Image;
+import java.awt.image.ImageObserver;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -225,23 +227,78 @@ public class Factions {
     }
 
     /**
-     * Returns the logo ImageIcon for a specific faction and game year.
+     * Returns a faction logo as a black-tinted {@link ImageIcon}, resolved for the given game year.
      *
-     * <p>This method resolves the appropriate logo file for the given {@code factionCode} and {@code gameYear},
-     * accounting for historical changes in faction logos over time where applicable.</p>
+     * <p>The logo file is selected based on {@code factionCode}, with some factions returning different logos
+     * depending on {@code gameYear} to reflect historical changes. Unknown or unsupported faction codes fall back to a
+     * generic clan logo or the mercenary logo.</p>
      *
-     * <p>The resulting image is loaded from the predefined directory as a PNG file and tinted black.
-     * For unknown or missing faction codes, a default logo is used.</p>
+     * @param gameYear    the in-game year, used to resolve era-appropriate logos for applicable factions
+     * @param factionCode the faction identifier (e.g., {@code "FS"} for Federated Suns)
      *
-     * @param gameYear    the year in the game context, potentially affecting logo selection for some factions
-     * @param factionCode the code identifying the faction (e.g., "FS" for Federated Suns)
-     *
-     * @return an {@link ImageIcon} object for the specified faction, tinted black
+     * @return a black-tinted {@link ImageIcon} representing the faction's logo
      *
      * @author Illiani
      * @since 0.50.06
      */
     public static ImageIcon getFactionLogo(int gameYear, String factionCode) {
+        String address = getFactionLogoAddress(gameYear, factionCode);
+        ImageIcon icon = new ImageIcon(address);
+        icon = addTintToImageIcon(icon.getImage(), BLACK);
+
+        return icon;
+    }
+
+    /**
+     * Returns a faction logo as a scaled, black-tinted {@link ImageIcon}, resolved for the given game year.
+     *
+     * <p>Scaling is performed on the original base image using {@link Image#SCALE_SMOOTH} to preserve
+     * quality. The target height is derived proportionally from the base image's aspect ratio and the requested
+     * {@code targetPixelWidth}, with a minimum width of {@code 1} pixel enforced.</p>
+     *
+     * @param gameYear         the in-game year, used to resolve era-appropriate logos for applicable factions
+     * @param factionCode      the faction identifier (e.g., {@code "FS"} for Federated Suns)
+     * @param targetPixelWidth the desired width in pixels; clamped to a minimum of {@code 1}
+     *
+     * @return a proportionally scaled, black-tinted {@link ImageIcon} representing the faction's logo
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static ImageIcon getFactionLogoWithScaling(int gameYear, String factionCode, int targetPixelWidth) {
+        ImageIcon icon = getFactionLogo(gameYear, factionCode);
+
+        Image baseImage = icon.getImage();
+
+        // The following sorcery is due to the compressed manner in which image icons scale. We need to manipulate the
+        // original base image, otherwise it looks grainy and terrible.
+        ImageObserver observer = (img, infoFlags, x, y, width, height) -> true;
+        int baseImageHeight = baseImage.getHeight(observer);
+        int baseImageWidth = baseImage.getWidth(observer);
+        int targetWidth = Math.max(1, targetPixelWidth);
+
+        int height = (int) Math.ceil((double) targetWidth * baseImageHeight / baseImageWidth);
+
+        return new ImageIcon(baseImage.getScaledInstance(targetWidth, height, Image.SCALE_SMOOTH));
+    }
+
+    /**
+     * Resolves the file path for a faction's logo image, accounting for era-based logo changes.
+     *
+     * <p>Most factions map to a fixed logo file. A small number of factions — such as Clan Ghost
+     * Bear and Clan Diamond Shark/Sea Fox — return different logos depending on {@code gameYear} to reflect historical
+     * transitions. Unrecognized faction codes fall back to a generic clan logo for clan factions, or the mercenary logo
+     * otherwise.</p>
+     *
+     * @param gameYear    the in-game year, used to select the correct logo for era-sensitive factions
+     * @param factionCode the faction identifier (e.g., {@code "DC"} for Draconis Combine)
+     *
+     * @return the relative file path to the faction's logo PNG, rooted at {@code data/images/universe/factions/}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static String getFactionLogoAddress(int gameYear, String factionCode) {
         final String IMAGE_DIRECTORY = "data/images/universe/factions/";
         final String FILE_TYPE = ".png";
 
@@ -345,9 +402,6 @@ public class Factions {
             }
         };
 
-        ImageIcon icon = new ImageIcon(IMAGE_DIRECTORY + key + FILE_TYPE);
-        icon = addTintToImageIcon(icon.getImage(), BLACK);
-
-        return icon;
+        return IMAGE_DIRECTORY + key + FILE_TYPE;
     }
 }

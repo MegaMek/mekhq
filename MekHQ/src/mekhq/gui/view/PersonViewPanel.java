@@ -92,8 +92,8 @@ import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
@@ -980,19 +980,19 @@ public class PersonViewPanel extends JScrollablePanel {
      * @return a tinted {@link ImageIcon} representing the person's portrait.
      */
     private ImageIcon getPortraitImageIcon() {
-        Portrait portrait = person.getPortrait();
-        ImageIcon portraitImageIcon = portrait.getImageIcon(175);
+        int targetPixelWidth = UIUtil.scaleForGUI(175);
+        ImageIcon icon = person.getPortraitImageIconWithFallback(true, targetPixelWidth);
 
         PersonnelStatus status = person.getStatus();
         if (status.isDead()) {
-            portraitImageIcon = addTintToImageIcon(portraitImageIcon.getImage(), DARK_RED);
+            icon = addTintToImageIcon(icon.getImage(), DARK_RED);
         } else if (status.isRetired()) {
-            portraitImageIcon = addTintToImageIcon(portrait.getImage(100), DARK_BLUE);
+            icon = addTintToImageIcon(icon.getImage(), DARK_BLUE);
         } else if (status.isDepartedUnit()) {
-            portraitImageIcon = addTintToImageIcon(portrait.getImage(100), BLACK);
+            icon = addTintToImageIcon(icon.getImage(), BLACK);
         }
 
-        return portraitImageIcon;
+        return icon;
     }
 
     /**

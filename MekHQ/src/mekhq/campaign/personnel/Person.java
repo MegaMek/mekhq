@@ -41,7 +41,6 @@ import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
@@ -100,7 +99,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
-import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -1047,33 +1045,66 @@ public class Person {
     }
 
     /**
-     * Retrieves the portrait image for a given entity. If the provided condition enables the use of an origin faction
-     * backup and the portrait image is unavailable or matches default filenames, a fallback image is retrieved based on
-     * the origin faction's logo.
+     * Retrieves the portrait image for a given entity, with optional scaling and fallback behavior.
      *
-     * @param useOriginFactionBackup a boolean flag indicating whether to use the origin faction backup for the portrait
-     *                               image if the primary portrait is unavailable or invalid
+     * <p>If the portrait is absent or matches a default/placeholder filename, and {@code useOriginFactionBackup} is
+     * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
+     * absent and no faction backup is requested, an empty {@link ImageIcon} is returned.</p>
      *
-     * @return the portrait image for the entity; if a fallback is required based on the condition, the fallback image
-     *       generated from the origin faction's logo is returned
+     * <p><b>Warning:/b> Do not attempt to manually scale the {@link ImageIcon} returned by this method, it will be
+     * very blurry. Instead, use {@link #getPortraitImageIconWithFallback(boolean, Integer)}.</p>
+     *
+     * @param useOriginFactionBackup if {@code true}, returns the origin faction's logo as a fallback when the portrait
+     *                               is absent or set to a default/placeholder
+     *
+     * @return the entity's portrait icon; a faction fallback icon if the portrait is default/absent and
+     *       {@code useOriginFactionBackup} is {@code true}; or an empty {@link ImageIcon} if the portrait is absent and
+     *       no fallback is requested
      *
      * @author Illiani
      * @since 0.50.10
      */
     public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup) {
-        if (useOriginFactionBackup) {
-            if (portrait == null) {
-                return getFallbackPortrait();
-            }
+        return getPortraitImageIconWithFallback(useOriginFactionBackup, null);
+    }
 
-            String portraitFilename = portrait.getFilename();
-            if (portraitFilename.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                      portraitFilename.equalsIgnoreCase(NO_PORTRAIT_NAME)) {
-                return getFallbackPortrait();
-            }
+    /**
+     * Retrieves the portrait image for a given entity, with optional scaling and fallback behavior.
+     *
+     * <p>If the portrait is absent or matches a default/placeholder filename, and {@code useOriginFactionBackup} is
+     * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
+     * absent and no faction backup is requested, an empty {@link ImageIcon} is returned.</p>
+     *
+     * @param useOriginFactionBackup if {@code true}, returns the origin faction's logo as a fallback when the portrait
+     *                               is absent or set to a default/placeholder
+     * @param targetPixelWidth       the desired width in pixels to scale the image to, or {@code null} to return the
+     *                               image at its native size
+     *
+     * @return the entity's portrait icon, scaled to {@code targetPixelWidth} if specified; a faction fallback icon if
+     *       the portrait is default/absent and {@code useOriginFactionBackup} is {@code true}; or an empty
+     *       {@link ImageIcon} if the portrait is absent and no fallback is requested
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup,
+          @Nullable Integer targetPixelWidth) {
+        final boolean isPortraitNull = portrait == null;
+        final String portraitFileName = isPortraitNull ? NO_PORTRAIT_NAME : portrait.getFilename();
+
+        final boolean isDefaultPortrait = isPortraitNull ||
+                                                portraitFileName.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                                                portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
+
+        if (isDefaultPortrait && useOriginFactionBackup) {
+            return targetPixelWidth == null ? getFallbackPortrait() : getFallbackPortrait(targetPixelWidth);
         }
 
-        return (portrait == null) ? new ImageIcon() : portrait.getImageIcon();
+        if (isPortraitNull) {
+            return new ImageIcon();
+        }
+
+        return targetPixelWidth == null ? portrait.getImageIcon() : portrait.getImageIcon(targetPixelWidth);
     }
 
     /**
@@ -1088,9 +1119,14 @@ public class Person {
      * @since 0.50.10
      */
     private ImageIcon getFallbackPortrait() {
-        ImageIcon fallbackImage = Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
-        return ImageUtilities.scaleImageIcon(fallbackImage, DEFAULT_IMAGE_WIDTH, true);
+        return Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
     }
+
+    private ImageIcon getFallbackPortrait(int targetPixelWidth) {
+        return Factions.getFactionLogoWithScaling(birthday.getYear(), originFaction.getShortName(),
+              targetPixelWidth);
+    }
+
 
     public void setPortrait(final Portrait portrait) {
         this.portrait = Objects.requireNonNull(portrait, "Illegal assignment: cannot have a null Portrait");
@@ -7076,8 +7112,9 @@ public class Person {
     /**
      * Retrieves the modifier value for a specified skill attribute.
      *
-     * @param attribute the skill attribute for which the modifier is to be calculated;
-     *                  if the attribute is null or represents "none", a warning is logged and the method returns 0
+     * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
+     *                  represents "none", a warning is logged and the method returns 0
+     *
      * @return the calculated modifier value for the provided skill attribute, or 0 if the attribute is null or "none"
      *
      * @author Illiani
