@@ -709,7 +709,7 @@ public abstract class AbstractProcreation {
                 return;
             }
 
-            if (campaign.getCampaignOptions().isUseMaternityLeave()) {
+            if (campaign.getCampaignOptions().isUseMaternityLeave() && !person.isBlockMaternityLeave()) {
                 if (!person.isBusy() && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
