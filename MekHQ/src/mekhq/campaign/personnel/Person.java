@@ -4974,17 +4974,32 @@ public class Person {
     }
 
     /**
+     * @deprecated Use {@link #outRanksUsingSkillTiebreaker(CampaignOptions, boolean, LocalDate, Person)} instead.
+     */
+    @Deprecated(since = "0.51.00")
+    public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
+        return outRanksUsingSkillTiebreaker(
+              campaign.getCampaignOptions(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate(),
+              otherPerson);
+    }
+
+    /**
      * Checks if the current person outranks another person using a skill tiebreaker. If the other person is null, it is
      * considered that the current person outranks them. If both persons have the same rank numeric value, the rank
      * level is compared. If both persons have the same rank numeric value and rank level, the experience levels are
      * compared.
      *
-     * @param campaign    the campaign used to calculate the experience levels
-     * @param otherPerson the other person to compare ranks with
+     * @param campaignOptions the campaign options used to calculate experience levels
+     * @param isClanCampaign  whether the campaign is a Clan campaign
+     * @param today           the current in-game date, used for aging effects
+     * @param otherPerson     the other person to compare ranks with
      *
      * @return true if the current person outranks the other person, false otherwise
      */
-    public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
+    public boolean outRanksUsingSkillTiebreaker(final CampaignOptions campaignOptions, final boolean isClanCampaign,
+          final LocalDate today, @Nullable Person otherPerson) {
         if (otherPerson == null) {
             return true;
         } else if (getRankNumeric() == otherPerson.getRankNumeric()) {
@@ -4993,13 +5008,13 @@ public class Person {
             } else if (getRankLevel() < otherPerson.getRankLevel()) {
                 return false;
             } else {
-                if (getExperienceLevel(campaign, false, true) ==
-                          otherPerson.getExperienceLevel(campaign, false, true)) {
-                    return getExperienceLevel(campaign, true, true) >
-                                 otherPerson.getExperienceLevel(campaign, true, true);
+                if (getExperienceLevel(campaignOptions, isClanCampaign, today, false, true) ==
+                          otherPerson.getExperienceLevel(campaignOptions, isClanCampaign, today, false, true)) {
+                    return getExperienceLevel(campaignOptions, isClanCampaign, today, true, true) >
+                                 otherPerson.getExperienceLevel(campaignOptions, isClanCampaign, today, true, true);
                 } else {
-                    return getExperienceLevel(campaign, false, true) >
-                                 otherPerson.getExperienceLevel(campaign, false, true);
+                    return getExperienceLevel(campaignOptions, isClanCampaign, today, false, true) >
+                                 otherPerson.getExperienceLevel(campaignOptions, isClanCampaign, today, false, true);
                 }
             }
         } else {
@@ -5045,6 +5060,11 @@ public class Person {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
     }
 
+    public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
+          final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
+    }
+
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         return getExperienceLevel(campaign, secondary, false);
     }
@@ -5080,15 +5100,29 @@ public class Person {
      * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
      */
     public int getExperienceLevel(final Campaign campaign, final boolean secondary, boolean excludeInjuryEffects) {
+        return getExperienceLevel(campaign.getCampaignOptions(), campaign.isClanCampaign(),
+              campaign.getLocalDate(), secondary, excludeInjuryEffects);
+    }
+
+    /**
+     * Determines the experience level of a person in their current profession.
+     *
+     * @param campaignOptions      the campaign options providing configuration
+     * @param isClanCampaign       whether this is a Clan campaign
+     * @param today                the current in-game date
+     * @param secondary            if {@code true}, evaluates the person's secondary role
+     * @param excludeInjuryEffects if {@code true} injury effect modifiers will be excluded from calculations
+     *
+     * @return the calculated experience level for the relevant role, or {@link SkillType#EXP_NONE} if not qualified
+     */
+    public int getExperienceLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
+          final LocalDate today, final boolean secondary, boolean excludeInjuryEffects) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
 
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean doAdminCountNegotiation = campaignOptions.isAdminExperienceLevelIncludeNegotiation();
         final boolean isUseArtillery = campaignOptions.isUseArtillery();
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
         final boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-        final boolean isClanCampaign = campaign.isClanCampaign();
-        final LocalDate today = campaign.getLocalDate();
 
         final SkillModifierData skillModifierData = getSkillModifierData(isUseAgingEffects,
               isClanCampaign,

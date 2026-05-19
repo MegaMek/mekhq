@@ -45,7 +45,9 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -80,10 +82,13 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.storyArc.StoryArc;
@@ -410,6 +415,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Setup Markets
                 campaign.refreshPersonnelMarkets(true);
+                showRarePersonnelDialog(campaign, true);
                 ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
                 if (!contractMarketMethod.isNone()) {
@@ -515,6 +521,38 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          *
          * @param units The {@link Collection} of {@link Unit} instances to process. Must not be {@code null}.
          */
+        private static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
+            if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
+                return;
+            }
+
+            StringBuilder oocReport = new StringBuilder(
+                  campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
+            for (PersonnelRole profession : campaign.getNewPersonnelMarket().getRareProfessions()) {
+                oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+            }
+
+            List<String> buttons = new ArrayList<>();
+            buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.later"));
+            buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.decline"));
+            if (!isCampaignStart) {
+                buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.immediate"));
+            }
+
+            ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
+                  null,
+                  campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
+                  buttons,
+                  oocReport.toString(),
+                  null,
+                  true);
+
+            if (dialog.getDialogChoice() == 2) {
+                campaign.getNewPersonnelMarket().showPersonnelMarketDialog();
+            }
+        }
+
         private void unassignCrewFromUnsupportedUnits(Collection<Unit> units) {
             for (Unit unit : units) {
                 Entity entity = unit.getEntity();

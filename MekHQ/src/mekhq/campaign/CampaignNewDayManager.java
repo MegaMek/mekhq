@@ -104,6 +104,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
@@ -404,6 +405,7 @@ public class CampaignNewDayManager {
 
         // Manage the Markets
         campaign.refreshPersonnelMarkets(false);
+        showRarePersonnelDialog(campaign, false);
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(campaign);
@@ -2051,6 +2053,38 @@ public class CampaignNewDayManager {
             campaign.setMashTheatreCapacity(mashTheatreCapacity);
         } else {
             campaign.setMashTheatreCapacity(0);
+        }
+    }
+
+    private void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
+        if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
+            return;
+        }
+
+        StringBuilder oocReport = new StringBuilder(
+              campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
+        for (PersonnelRole profession : campaign.getNewPersonnelMarket().getRareProfessions()) {
+            oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+        }
+
+        List<String> buttons = new ArrayList<>();
+        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.later"));
+        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.decline"));
+        if (!isCampaignStart) {
+            buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.immediate"));
+        }
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
+              null,
+              campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
+              buttons,
+              oocReport.toString(),
+              null,
+              true);
+
+        if (dialog.getDialogChoice() == 2) {
+            campaign.getNewPersonnelMarket().showPersonnelMarketDialog();
         }
     }
 }
