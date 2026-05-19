@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
@@ -185,11 +184,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Document xmlDoc;
 
         try {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
+            xmlDoc = MHQXMLUtility.parseDocument(is);
         } catch (Exception ex) {
             LOGGER.error("", ex);
             throw new CampaignXmlParseException(ex);
