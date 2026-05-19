@@ -48,7 +48,6 @@ import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -162,7 +161,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        CurrentLocation location = campaign.getLocation();
+        mekhq.campaign.AbstractLocation location = campaign.getLocation();
         boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 
@@ -265,7 +264,7 @@ public record Accountant(Campaign campaign) {
      * @author Illiani
      * @since 0.50.07
      */
-    private double setFactionStandingBarrackCostMultiplier(CurrentLocation location) {
+    private double setFactionStandingBarrackCostMultiplier(mekhq.campaign.AbstractLocation location) {
         FactionStandings factionStandings = campaign.getFactionStandings();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 

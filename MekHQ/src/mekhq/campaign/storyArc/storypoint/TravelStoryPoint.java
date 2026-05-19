@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,6 @@ import java.text.ParseException;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -110,7 +109,7 @@ public class TravelStoryPoint extends StoryPoint {
             // if we don't have a valid destination, then complete the story point
             complete();
         } else if (autoStart) {
-            CurrentLocation location = getStoryArc().getCampaign().getLocation();
+            mekhq.campaign.AbstractLocation location = getStoryArc().getCampaign().getLocation();
             JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(),
                   getDestination());
             getStoryArc().getCampaign().getLocation().setJumpPath(path);

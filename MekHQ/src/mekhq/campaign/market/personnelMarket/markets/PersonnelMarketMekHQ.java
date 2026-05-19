@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,6 @@ import java.util.Set;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -199,7 +198,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public String getAvailabilityMessage() {
-        CurrentLocation location = getCampaign().getLocation();
+        mekhq.campaign.AbstractLocation location = getCampaign().getLocation();
         String color;
         String closingBrace = CLOSING_SPAN_TAG;
 
@@ -373,7 +372,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     private double getFactionStandingsRecruitmentModifier() {
         FactionStandings factionStandings = getCampaign().getFactionStandings();
 
-        CurrentLocation location = getCampaign().getLocation();
+        mekhq.campaign.AbstractLocation location = getCampaign().getLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         double multiplier = 0;
 
@@ -399,7 +398,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @since 0.50.06
      */
     public int getSystemStatusRecruitmentMultiplier() {
-        CurrentLocation location = getCampaign().getLocation();
+        mekhq.campaign.AbstractLocation location = getCampaign().getLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 
         LocalDate today = getCampaign().getLocalDate();

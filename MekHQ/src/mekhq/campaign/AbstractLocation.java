@@ -1,0 +1,402 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+
+package mekhq.campaign;
+
+import static java.lang.Math.ceil;
+import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
+import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.logging.MMLogger;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.TransportCostCalculations;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+
+public abstract class AbstractLocation implements ILocation {
+    protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
+    static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
+
+    @XmlElement(name = "currentSystemId")
+    @XmlJavaTypeAdapter(PlanetarySystemAdapter.class)
+    protected PlanetarySystem currentSystem;
+
+    @XmlTransient
+    protected LocationNode locationNode;
+
+    public AbstractLocation(PlanetarySystem system) {
+        this.currentSystem = system;
+        locationNode = new LocationNode(this);
+    }
+
+    public boolean isOnPlanet() {
+        return true;
+    }
+
+    public boolean isAtJumpPoint() {
+        return false;
+    }
+
+    public boolean isInTransit() {
+        return false;
+    }
+
+    public double getPercentageTransit() {
+        return 1.0;
+    }
+
+    public boolean isJumpZenith() {
+        return false;
+    }
+
+    public double getTransitTime() {
+        return 0.0;
+    }
+
+    public void setTransitTime(double time) {}
+
+    public boolean isRecharging(Campaign campaign) {
+        return false;
+    }
+
+    public void setRecharged(Campaign campaign) {}
+
+    public JumpPath getJumpPath() {
+        return null;
+    }
+
+    public void setJumpPath(JumpPath path) {}
+
+    public PlanetarySystem getCurrentSystem() {
+        return currentSystem;
+    }
+
+    /**
+     * @return the current planet location. This is currently the primary planet of the system, but in the future this
+     *       will not be the case.
+     */
+    public Planet getPlanet() {
+        return getCurrentSystem().getPrimaryPlanet();
+    }
+
+    /**
+     * Generates a detailed status report for the current location and travel state.
+     *
+     * <p>The report includes:</p>
+     * <ul>
+     *   <li>The current system and position, indicating if on a planet, at a jump point (with recharge status),
+     *       in transit from a planet, or close to a jump point.</li>
+     *   <li>Travel progress, including the destination system, remaining jumps, or if already at the destination.</li>
+     *   <li>The estimated jump cost for the current journey.</li>
+     * </ul>
+     *
+     * <p>The report is formatted as HTML suitable for display in GUI components.</p>
+     *
+     * @param date                the current {@link LocalDate} for context-sensitive names and status
+     * @param isUseCommandCircuit whether the command circuit option is enabled
+     *
+     * @return a formatted HTML string representing the travel and location status report
+     */
+    public String getReport(LocalDate date, boolean isUseCommandCircuit,
+          TransportCostCalculations transportCostCalculations) {
+        double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
+
+        StringBuilder report = new StringBuilder();
+        report.append("<html>")
+              // First Line
+              .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
+
+        if (isOnPlanet()) {
+            report.append("on planet ").append(getPlanet().getPrintableName(date));
+        } else if (isAtJumpPoint()) {
+            report.append("at jump point");
+            if (!Double.isInfinite(currentRechargeTime)) {
+                report.append(" (Jumpship ")
+                      .append(String.format(Locale.ROOT,
+                            "%.0f",
+                            (100.0 * getRechargeTime()) / currentRechargeTime))
+                      .append("% charged)");
+            }
+        } else {
+            if ((null != getJumpPath()) && (currentSystem == getJumpPath().getLastSystem())) {
+                report.append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days from planet");
+            } else {
+                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
+                report.append(String.format(Locale.ROOT, "%.2f", timeToJP)).append(" days from jump point");
+            }
+        }
+
+        report.append("<br/>");
+
+        // Second Line
+        boolean hasIncludedCost = false;
+        if ((null != getJumpPath()) && !getJumpPath().isEmpty()) {
+            report.append("Traveling to ").append(getJumpPath().getLastSystem().getPrintableName(date)).append(": ");
+            if (getJumpPath().getJumps() > 0) {
+                report.append(getJumpPath().getJumps())
+                      .append(getJumpPath().getJumps() == 1 ? " jump remaining" : " jumps remaining");
+
+                int duration = (int) ceil(getJumpPath().getTotalTime(date, getTransitTime(), isUseCommandCircuit));
+                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+                      getJumpPath().getJumps());
+                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
+                                                                                                                      "C-Bills");
+                hasIncludedCost = true;
+            } else {
+                report.append("In destination system");
+            }
+        } else {
+            report.append("Not traveling");
+        }
+
+        report.append("<br/>");
+
+        // Third Line
+        if (hasIncludedCost) {
+            report.append("<br><br>");
+        } else {
+            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
+            report.append("Estimated Jump Cost (per week): ")
+                  .append(jumpCost.toAmountString())
+                  .append(" C-Bills<br><br>");
+        }
+
+        report.append("</html>");
+        return report.toString();
+    }
+
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
+        return FactionStandingUtilities.isUseCommandCircuit(
+              campaign.isOverridingCommandCircuitRequirements(),
+              campaign.isGM(),
+              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+              campaign.getFactionStandings(),
+              campaign.getFutureAtBContracts());
+    }
+
+    protected double getRechargeTime() {
+        return 0.0;
+    }
+
+    protected void setRechargeTime(double t) {}
+
+    /**
+     * Applies up to {@code availableHours} of JumpShip recharging at the current system and reports progress.
+     *
+     * @return the number of hours actually used for recharging
+     */
+    protected double applyRechargeForHours(Campaign campaign, LocalDate today, boolean isUseCommandCircuit,
+          double availableHours) {
+        double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
+        double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
+        if (usedRechargeTime > 0) {
+            campaign.addReport(GENERAL, "JumpShips spent " +
+                                              (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                              " hours recharging drives");
+            setRechargeTime(getRechargeTime() + usedRechargeTime);
+            if (getRechargeTime() >= neededRechargeTime) {
+                campaign.addReport(GENERAL, "JumpShip drives fully charged");
+            }
+        }
+        return usedRechargeTime;
+    }
+
+    // recharge even if there is no jump path because JumpShips don't go anywhere
+    public void newDay(Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0);
+    }
+
+    void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(currentSystem.getId(), today, true);
+
+        Set<InjuryType> activeBioweapons = getAllActiveBioweapons(currentSystem.getId(), today, true);
+        for (InjuryType bioweapon : activeBioweapons) {
+            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
+                  campaign.getCommanderAddress());
+            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.outOfCharacter",
+                  currentSystem.getName(today), bioweapon.getSimpleName());
+            bottomMessage += availableCures.contains(bioweapon)
+                                   ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
+                                   : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
+
+            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+                  centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
+        }
+
+        Set<InjuryType> activeDiseases = getAllActiveDiseases(currentSystem.getId(), today, true);
+        for (InjuryType disease : activeDiseases) {
+            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter",
+                  campaign.getCommanderAddress());
+            centerMessage += availableCures.contains(disease)
+                                   ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
+                                   : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
+
+            new ImmersiveDialogNotification(campaign, centerMessage, true);
+        }
+    }
+
+    /**
+     * Tests for whether the campaign arrived at a contract location before it's due to start.
+     *
+     * <p>The first matching contract in the system ends the loop after handling early arrival notifications.</p>
+     *
+     * @param campaign The {@link Campaign} instance.
+     */
+    void testForEarlyArrival(Campaign campaign) {
+        for (Contract contract : campaign.getFutureContracts()) {
+            if (Objects.equals(currentSystem, contract.getSystem())) {
+                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
+
+                String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "contract.arrivedEarly.ic." + randomInt(10),
+                      campaign.getCommanderAddress(),
+                      daysTillStart);
+
+                new ImmersiveDialogSimple(campaign, campaign.getSeniorAdminPerson(TRANSPORT), null,
+                      inCharacterMessage, null,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "contract.arrivedEarly.ooc"),
+                      null, false);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
+     *
+     * @param campaign        the current campaign
+     * @param campaignOptions the campaign's ruleset and configuration
+     */
+    static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
+        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        final boolean useFatigue = campaignOptions.isUseFatigue();
+        final int fatigueRate = campaignOptions.getFatigueRate();
+
+        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
+            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                continue;
+            }
+
+            if (useAdvancedMedical) {
+                person.addInjury(createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical));
+            } else {
+                person.setHits(person.getHits() + 1);
+            }
+
+            if (useFatigue) {
+                person.changeFatigue(fatigueRate);
+            }
+        }
+    }
+
+    private static Injury createTransitDisorientationInjury(Campaign campaign, Person person,
+          boolean useAltAdvancedMedical) {
+        return useAltAdvancedMedical
+                     ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign, person, GENERIC, 1)
+                     : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign, person, INTERNAL, 1);
+    }
+
+    public abstract void writeToXML(PrintWriter writer, int indent);
+
+    static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {
+        private final Campaign campaign;
+
+        @SuppressWarnings("unused")
+        public PlanetarySystemAdapter() {
+            this.campaign = null;
+        }
+
+        public PlanetarySystemAdapter(Campaign campaign) {
+            this.campaign = campaign;
+        }
+
+        @Override
+        public PlanetarySystem unmarshal(String id) {
+            PlanetarySystem p = Systems.getInstance().getSystemById(id);
+            if (p != null) {
+                return p;
+            }
+            logger.error("Couldn't find system: {}", id);
+            if (campaign == null) {
+                return null;
+            }
+            p = campaign.getSystemByName("Terra");
+            return p != null ? p : campaign.getSystems().get(0);
+        }
+
+        @Override
+        public String marshal(PlanetarySystem p) {
+            return p != null ? p.getId() : null;
+        }
+    }
+}

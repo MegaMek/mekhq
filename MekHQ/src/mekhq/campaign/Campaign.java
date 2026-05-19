@@ -158,6 +158,8 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
@@ -256,7 +258,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Taharqa
  */
-public class Campaign implements ITechManager {
+public class Campaign implements ITechManager, ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
@@ -375,7 +377,8 @@ public class Campaign implements ITechManager {
     private Finances finances;
 
     private Systems systemsInstance;
-    private CurrentLocation location;
+    private LocationNode locationNode;
+    private List<AbstractLocation> locations = new ArrayList<>();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -508,7 +511,7 @@ public class Campaign implements ITechManager {
           PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
           RandomDeath randomDeath, CampaignSummary campaignSummary,
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
-          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
+          Systems systemsInstance, AbstractLocation startLocation, ReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Formation formation, Finances finances,
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
@@ -530,7 +533,11 @@ public class Campaign implements ITechManager {
         game.setOptions(gameOptions);
         this.techFaction = techFaction;
         this.systemsInstance = systemsInstance;
-        location = startLocation;
+        this.locationNode = new LocationNode(this);
+        if (startLocation != null) {
+            locations.add(startLocation);
+        }
+        this.setParent(startLocation);
         reputation = reputationController;
         this.factionStandings = factionStandings;
         formations = formation;
@@ -799,7 +806,7 @@ public class Campaign implements ITechManager {
     }
 
     public PlanetarySystem getCurrentSystem() {
-        return location.getCurrentSystem();
+        return getLocation().getCurrentSystem();
     }
 
     public boolean isAvoidingEmptySystems() {
@@ -1714,8 +1721,22 @@ public class Campaign implements ITechManager {
         return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
     }
 
-    public void setLocation(CurrentLocation l) {
-        location = l;
+    public void setLocation(AbstractLocation l) {
+        locations.clear();
+        if (l != null) {
+            locations.add(l);
+        }
+        setParent(l);
+    }
+
+    public void addLocation(AbstractLocation l) {
+        if (l != null) {
+            locations.add(l);
+        }
+    }
+
+    public List<AbstractLocation> getLocations() {
+        return Collections.unmodifiableList(locations);
     }
 
     /**
@@ -1746,13 +1767,14 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public CurrentLocation getLocation() {
-        return location;
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
     }
 
     public boolean isOnContractAndPlanetside() {
         boolean isOnContract = !getActiveMissions(false).isEmpty();
-        boolean isPlanetside = location.isOnPlanet();
+        boolean isPlanetside = isOnPlanet();
         return isPlanetside && isOnContract;
     }
 
@@ -5390,7 +5412,12 @@ public class Campaign implements ITechManager {
         formations.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
-        location.writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
+        for (AbstractLocation loc : locations) {
+            loc.writeToXML(writer, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
+        locationNode.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         MHQXMLUtility.writeSimpleXMLTag(writer,
               indent,
@@ -8289,7 +8316,7 @@ public class Campaign implements ITechManager {
      *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
      */
     public int checkTurnoverPrompt() {
-        if (!location.isOnPlanet()) {
+        if (!isOnPlanet()) {
             return -1;
         }
 

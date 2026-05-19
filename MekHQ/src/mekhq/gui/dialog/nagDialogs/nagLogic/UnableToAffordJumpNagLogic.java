@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.util.Objects;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 
@@ -69,7 +68,7 @@ public class UnableToAffordJumpNagLogic {
      * </p>
      */
     public static Money getNextJumpCost(Campaign campaign) {
-        CurrentLocation location = campaign.getLocation();
+        mekhq.campaign.AbstractLocation location = campaign.getLocation();
         JumpPath jumpPath = location.getJumpPath();
 
         if (jumpPath == null) {
