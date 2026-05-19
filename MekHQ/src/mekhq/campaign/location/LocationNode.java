@@ -103,20 +103,49 @@ public class LocationNode {
     }
 
     public void writeToXML(PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, "locationNodeChildren");
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "locationNodeChildren");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "locationNodeChildren");
+        for (LocationNode child : children) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                campus.writeToXML(pw, indent);
+            }
+            // Future: Person, Unit, and Part children serialized here
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
 
+    /**
+     * Reconnects deserialized children of a {@link Campaign} location node.
+     *
+     * <p>Person, Unit, and Part reconnection will be added here once those types are fully
+     * serialized through the location tree.</p>
+     */
     public static void reconnectChildren(Node xmlNode, Campaign campaign) {
+        reconnectChildren(xmlNode, campaign, campaign);
+    }
+
+    /**
+     * Reconnects deserialized children of any {@link ILocation} node.
+     *
+     * @param xmlNode  the {@code <locationNodeChildren>} DOM node
+     * @param parent   the {@link ILocation} to attach deserialized children to
+     * @param campaign the owning campaign (used for UUID-keyed lookups when needed)
+     */
+    public static void reconnectChildren(Node xmlNode, ILocation parent, Campaign campaign) {
         NodeList nl = xmlNode.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
             if (wn.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            // Unit, Person, and Part child reconnection will be added here once
-            // those types implement ILocation and are serialized by writeToXML.
-            logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
+            if (wn.getNodeName().equalsIgnoreCase("academyCampus")) {
+                AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn);
+                if (campus != null) {
+                    LocationManager.setLocation(campus, parent);
+                }
+            } else {
+                // Person, Unit, and Part reconnection will be added here
+                logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
+            }
         }
     }
 

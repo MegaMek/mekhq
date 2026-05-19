@@ -75,6 +75,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import org.w3c.dom.Node;
 
 public abstract class AbstractLocation implements ILocation {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
@@ -367,6 +368,23 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     public abstract void writeToXML(PrintWriter writer, int indent);
+
+    /**
+     * Dispatches XML deserialization to the correct {@link AbstractLocation} subclass based on the element name of
+     * {@code wn}.
+     *
+     * @return the deserialized location, or {@code null} if the node name is unrecognized
+     */
+    public static AbstractLocation generateInstanceFromXML(Node wn, Campaign campaign) {
+        return switch (wn.getNodeName().toLowerCase()) {
+            case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
+            case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);
+            default -> {
+                logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
+                yield null;
+            }
+        };
+    }
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {
         private final Campaign campaign;

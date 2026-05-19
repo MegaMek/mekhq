@@ -158,6 +158,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -806,7 +807,8 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public PlanetarySystem getCurrentSystem() {
-        return getLocation().getCurrentSystem();
+        AbstractLocation location = getLocation();
+        return location != null ? location.getCurrentSystem() : null;
     }
 
     public boolean isAvoidingEmptySystems() {
@@ -1735,8 +1737,76 @@ public class Campaign implements ITechManager, ILocation {
         }
     }
 
+    public void removeLocation(AbstractLocation l) {
+        locations.remove(l);
+    }
+
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
+    }
+
+    /**
+     * Creates a {@link FixedLocation} with an {@link AcademyCampusLocation} child and registers it in
+     * {@link #locations}.
+     *
+     * @return the newly created campus location node
+     */
+    public AcademyCampusLocation addCampusLocation(String academySet, String academyName,
+          String systemId) {
+        PlanetarySystem system = getSystemById(systemId);
+        if (system == null) {
+            return null;
+        }
+        FixedLocation fixedLocation = new FixedLocation(system);
+        AcademyCampusLocation campus =
+              new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, fixedLocation);
+        locations.add(fixedLocation);
+        return campus;
+    }
+
+    /**
+     * Removes the {@link FixedLocation} whose {@link AcademyCampusLocation} child matches the given academy set, name,
+     * and system.
+     */
+    public void removeCampusLocation(String academySet, String academyName, String systemId) {
+        locations.removeIf(loc -> {
+            if (!(loc instanceof FixedLocation fixedLoc)) {
+                return false;
+            }
+            if (!fixedLoc.getCurrentSystem().getId().equals(systemId)) {
+                return false;
+            }
+            return fixedLoc.getLocationNode().getChildren().stream()
+                         .anyMatch(child ->
+                                         child.getLocatable() instanceof AcademyCampusLocation c
+                                               && academySet.equals(c.getAcademySet())
+                                               && academyName.equals(c.getAcademyName()));
+        });
+    }
+
+    /**
+     * Returns the existing {@link AcademyCampusLocation} for the given campus, creating it on demand if it does not yet
+     * exist.
+     */
+    public AcademyCampusLocation getOrCreateCampusLocation(String academySet,
+          String academyName, String systemId) {
+        for (AbstractLocation loc : locations) {
+            if (!(loc instanceof FixedLocation fixedLoc)) {
+                continue;
+            }
+            if (!fixedLoc.getCurrentSystem().getId().equals(systemId)) {
+                continue;
+            }
+            for (LocationNode child : fixedLoc.getLocationNode().getChildren()) {
+                if (child.getLocatable() instanceof AcademyCampusLocation campus
+                          && academySet.equals(campus.getAcademySet())
+                          && academyName.equals(campus.getAcademyName())) {
+                    return campus;
+                }
+            }
+        }
+        return addCampusLocation(academySet, academyName, systemId);
     }
 
     /**

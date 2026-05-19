@@ -38,6 +38,8 @@ import java.util.UUID;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -50,8 +52,10 @@ import org.w3c.dom.NodeList;
  * Adds {@link #writeToXML} and {@link #loadFromXML} to own the canonical save/load loop for
  * the {@code <personnel>} XML block.</p>
  */
-public class Personnel extends LinkedHashMap<UUID, Person> {
+public class Personnel extends LinkedHashMap<UUID, Person> implements ILocation {
     private static final MMLogger logger = MMLogger.create(Personnel.class);
+
+    private final LocationNode locationNode = new LocationNode(this);
 
     public void writeToXML(PrintWriter writer, int indent, Campaign campaign) {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnel");
@@ -83,5 +87,10 @@ public class Personnel extends LinkedHashMap<UUID, Person> {
                 campaign.importPerson(p);
             }
         }
+    }
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
     }
 }

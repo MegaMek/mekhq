@@ -1363,10 +1363,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if (!child.getNodeName().equalsIgnoreCase("location")) {
+            AbstractLocation loc = AbstractLocation.generateInstanceFromXML(child, campaign);
+            if (loc == null) {
                 continue;
             }
-            AbstractLocation loc = CurrentLocation.generateInstanceFromXML(child, campaign);
             if (first) {
                 campaign.setLocation(loc);
                 first = false;

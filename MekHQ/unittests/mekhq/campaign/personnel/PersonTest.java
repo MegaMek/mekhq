@@ -37,7 +37,9 @@ import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
@@ -51,6 +53,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,8 +68,12 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -76,6 +83,9 @@ import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -1430,6 +1440,286 @@ public class PersonTest {
         verify(mockCampaign, atLeast(2)).addReport(eq(DailyReportType.PERSONNEL),
               argThat(s -> s.contains(person.getHyperlinkedFullTitle())));
     }
+
+    // region Nested Test Classes for Education Travel
+    @Nested
+    class EducationTravel {
+
+        Person person;
+
+        @BeforeEach
+        void setUp() {
+            person = new Person("Test", "Student", null, "MERC");
+        }
+
+        /** Tests for {@link Person#incrementEduDaysOfTravel()} and related travel-day fields. */
+        @Nested
+        class DaysOfTravel {
+
+            @Test
+            void incrementEduDaysOfTravel_incrementsByOne() {
+                person.setEduDaysOfTravel(0);
+                person.incrementEduDaysOfTravel();
+                assertEquals(1, person.getEduDaysOfTravel());
+            }
+
+            @Test
+            void incrementEduDaysOfTravel_calledTwice_resultIsTwo() {
+                person.setEduDaysOfTravel(0);
+                person.incrementEduDaysOfTravel();
+                person.incrementEduDaysOfTravel();
+                assertEquals(2, person.getEduDaysOfTravel());
+            }
+
+            @Test
+            void setEduDaysOfTravel_roundTrip() {
+                person.setEduDaysOfTravel(7);
+                assertEquals(7, person.getEduDaysOfTravel());
+            }
+
+            @Test
+            void setEduDaysOfTravel_zero_roundTrip() {
+                person.setEduDaysOfTravel(0);
+                assertEquals(0, person.getEduDaysOfTravel());
+            }
+        }
+
+        /** Tests for {@link Person#setEduJourneyTime} and {@link Person#getEduJourneyTime}. */
+        @Nested
+        class JourneyTime {
+
+            @Test
+            void setEduJourneyTime_roundTrip() {
+                person.setEduJourneyTime(14);
+                assertEquals(14, person.getEduJourneyTime());
+            }
+
+            @Test
+            void defaultJourneyTime_isZero() {
+                assertEquals(0, person.getEduJourneyTime());
+            }
+        }
+
+        /** Tests for {@link Person#setEduAcademySystem} and {@link Person#getEduAcademySystem}. */
+        @Nested
+        class AcademySystem {
+
+            @Test
+            void setEduAcademySystem_roundTrip() {
+                person.setEduAcademySystem("Galatea");
+                assertEquals("Galatea", person.getEduAcademySystem());
+            }
+
+            @Test
+            void setEduAcademySystem_null_roundTrip() {
+                person.setEduAcademySystem("Galatea");
+                person.setEduAcademySystem(null);
+                assertNull(person.getEduAcademySystem());
+            }
+        }
+
+        /** Tests for {@link Person#setEduEducationStage} and {@link Person#getEduEducationStage}. */
+        @Nested
+        class EducationStageField {
+
+            @Test
+            void defaultStage_isNone() {
+                assertEquals(EducationStage.NONE, person.getEduEducationStage());
+            }
+
+            @Test
+            void setEduEducationStage_roundTrip() {
+                person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+                assertEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
+            }
+
+            @Test
+            void setEduEducationStage_allTravelStages() {
+                for (EducationStage stage : EducationStage.values()) {
+                    person.setEduEducationStage(stage);
+                    assertEquals(stage, person.getEduEducationStage());
+                }
+            }
+        }
+
+        /**
+         * Tests that verify {@link EducationController#enrollPerson} populates the Person's travel fields correctly.
+         */
+        @Nested
+        class EnrollPersonTravelFields {
+
+            static final String ACADEMY_SET = "TestSet";
+            static final String ACADEMY_NAME = "Test Academy";
+
+            Campaign campaign;
+
+            static Academy buildAcademy(boolean isHomeSchool, boolean isLocal) {
+                return new Academy(ACADEMY_SET, ACADEMY_NAME, "College",
+                      false, false, false,
+                      "Test Academy Description",
+                      0, false,
+                      List.of("TestSystem"),
+                      isLocal, isHomeSchool,
+                      3025, null, null,
+                      1000, 365, 5,
+                      EducationLevel.HIGH_SCHOOL, EducationLevel.COLLEGE,
+                      18, 35,
+                      List.of("Test Course"),
+                      List.of("Test Curriculum"),
+                      List.of(3025),
+                      0, 0);
+            }
+
+            @BeforeEach
+            void setUp() {
+                campaign = mock(Campaign.class);
+                when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+
+                CampaignOptions options = mock(CampaignOptions.class);
+                when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+                when(campaign.getCampaignOptions()).thenReturn(options);
+
+                Hangar hangar = mock(Hangar.class);
+                when(campaign.getHangar()).thenReturn(hangar);
+
+                Warehouse warehouse = mock(Warehouse.class);
+                when(warehouse.getParts()).thenReturn(Collections.emptyList());
+                when(campaign.getWarehouse()).thenReturn(warehouse);
+
+                when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
+
+                PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+                when(currentSystem.getId()).thenReturn("CurrentSystem");
+                when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+            }
+
+            @Test
+            void localAcademy_setsAcademySystemToCurrentSystemId() {
+                Academy academy = buildAcademy(false, true);
+                EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+                assertEquals("CurrentSystem", person.getEduAcademySystem());
+            }
+
+            @Test
+            void remoteAcademy_setsAcademySystemToCampusParam() {
+                Academy academy = buildAcademy(false, false);
+                PlanetarySystem destSystem = mock(PlanetarySystem.class);
+                when(destSystem.getName(any())).thenReturn("Galatea");
+                when(campaign.getSystemById("Galatea")).thenReturn(destSystem);
+                when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(10);
+
+                EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+
+                assertEquals("Galatea", person.getEduAcademySystem());
+            }
+
+            @Test
+            void anyAcademy_setsEducationTimeFromAcademyDuration() {
+                Academy academy = buildAcademy(true, false);
+                when(campaign.getName()).thenReturn("TestCampaign");
+
+                EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+                assertEquals(academy.getDurationDays(), person.getEduEducationTime());
+            }
+
+            @Test
+            void anyAcademy_setsFactionOnPerson() {
+                Academy academy = buildAcademy(true, false);
+                when(campaign.getName()).thenReturn("TestCampaign");
+
+                EducationController.enrollPerson(campaign, person, academy, null, "DC", 0);
+
+                assertEquals("DC", person.getEduAcademyFaction());
+            }
+
+            @Test
+            void anyAcademy_setsCourseIndexOnPerson() {
+                Academy academy = buildAcademy(true, false);
+                when(campaign.getName()).thenReturn("TestCampaign");
+
+                EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+                assertEquals(0, (int) person.getEduCourseIndex());
+            }
+
+            @Test
+            void anyAcademy_daysOfTravelResetToZero() {
+                Academy academy = buildAcademy(true, false);
+                when(campaign.getName()).thenReturn("TestCampaign");
+                person.setEduDaysOfTravel(5);
+
+                EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+                assertEquals(0, person.getEduDaysOfTravel());
+            }
+        }
+
+        /**
+         * Tests that verify {@link Person#changeStatus} clears education travel fields when a person transitions to
+         * student status.
+         */
+        @Nested
+        class ChangeStatusClearsEducationFields {
+
+            Campaign campaign;
+
+            @BeforeEach
+            void setUp() {
+                campaign = mock(Campaign.class);
+                when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+
+                CampaignOptions options = mock(CampaignOptions.class);
+                when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+                when(campaign.getCampaignOptions()).thenReturn(options);
+
+                Hangar hangar = mock(Hangar.class);
+                when(campaign.getHangar()).thenReturn(hangar);
+
+                Warehouse warehouse = mock(Warehouse.class);
+                when(warehouse.getParts()).thenReturn(Collections.emptyList());
+                when(campaign.getWarehouse()).thenReturn(warehouse);
+
+                when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
+            }
+
+            @Test
+            void changeStatus_toStudent_clearsEduDaysOfTravel() {
+                person.setEduDaysOfTravel(5);
+                person.changeStatus(campaign, LocalDate.of(3025, 1, 1), PersonnelStatus.STUDENT);
+                assertEquals(0, person.getEduDaysOfTravel());
+            }
+
+            @Test
+            void changeStatus_toStudent_clearsEduJourneyTime() {
+                person.setEduJourneyTime(14);
+                person.changeStatus(campaign, LocalDate.of(3025, 1, 1), PersonnelStatus.STUDENT);
+                assertEquals(0, person.getEduJourneyTime());
+            }
+
+            @Test
+            void changeStatus_toStudent_clearsEduAcademySystem() {
+                person.setEduAcademySystem("Galatea");
+                person.changeStatus(campaign, LocalDate.of(3025, 1, 1), PersonnelStatus.STUDENT);
+                assertNull(person.getEduAcademySystem());
+            }
+
+            @Test
+            void changeStatus_toStudent_clearsEduEducationStage() {
+                person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+                person.changeStatus(campaign, LocalDate.of(3025, 1, 1), PersonnelStatus.STUDENT);
+                assertEquals(EducationStage.NONE, person.getEduEducationStage());
+            }
+
+            @Test
+            void changeStatus_toStudent_clearsEduAcademySet() {
+                person.setEduAcademySet("TestSet");
+                person.changeStatus(campaign, LocalDate.of(3025, 1, 1), PersonnelStatus.STUDENT);
+                assertNull(person.getEduAcademySet());
+            }
+        }
+    }
+    // endregion Nested Test Classes for Education Travel
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {
         Field declaredField = target.getClass().getDeclaredField(fieldName);

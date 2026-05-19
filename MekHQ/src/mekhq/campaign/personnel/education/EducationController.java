@@ -310,6 +310,12 @@ public class EducationController {
         if (academy.isHomeSchool()) {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
+            mekhq.campaign.location.AcademyCampusLocation campusLocation =
+                  campaign.getOrCreateCampusLocation(academy.getSet(), academy.getName(),
+                        campaign.getCurrentSystem().getId());
+            if (campusLocation != null) {
+                person.setParent(campusLocation);
+            }
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         }
@@ -627,6 +633,12 @@ public class EducationController {
             campaign.addReport(PERSONNEL,
                   String.format(resources.getString("arrived.text"), person.getHyperlinkedFullTitle()));
             person.setEduEducationStage(EducationStage.EDUCATION);
+            mekhq.campaign.location.AcademyCampusLocation campusLocation =
+                  campaign.getOrCreateCampusLocation(person.getEduAcademySet(),
+                        person.getEduAcademyNameInSet(), person.getEduAcademySystem());
+            if (campusLocation != null) {
+                person.setParent(campusLocation);
+            }
         }
     }
 
@@ -723,6 +735,7 @@ public class EducationController {
     private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         // if the student is being homeschooled, they skip the journey home.
         if (academy.isHomeSchool()) {
+            person.setParent(null);
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
 
             return;
@@ -738,6 +751,7 @@ public class EducationController {
         person.setEduJourneyTime(travelTime);
         person.setEduDaysOfTravel(0);
         person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+        person.setParent(null);
     }
 
     /**

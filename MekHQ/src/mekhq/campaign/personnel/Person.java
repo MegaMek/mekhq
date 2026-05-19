@@ -112,6 +112,8 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -168,7 +170,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
  */
-public class Person {
+public class Person implements ILocation {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
@@ -206,6 +208,8 @@ public class Person {
 
 
     private PersonAwardController awardController;
+
+    private LocationNode locationNode = new LocationNode(this);
 
     // region Family Variables
     // Lineage
@@ -7666,6 +7670,16 @@ public class Person {
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
                       OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
+    }
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public java.util.Set<Person> getPersonnelAtLocation() {
+        return java.util.Set.of(this);
     }
 
     public static class PersonUnitRef extends Unit {
