@@ -195,7 +195,7 @@ public class StratConScenarioFactory {
     /**
      * Get an allied or hostile facility scenario, depending on passed on parameter.
      */
-    public static ScenarioTemplate getFacilityScenario(boolean allied) {
+    public static @Nullable ScenarioTemplate getFacilityScenario(boolean allied) {
         if (allied) {
             return getSpecificScenario(MHQConstants.ALLIED_FACILITY_SCENARIO);
         } else {

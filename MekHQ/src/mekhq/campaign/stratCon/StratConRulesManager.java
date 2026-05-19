@@ -1417,7 +1417,15 @@ public class StratConRulesManager {
             StratConFacility facility = track.getFacility(coords);
             boolean alliedFacility = facility.getOwner() == Allied;
             template = StratConScenarioFactory.getFacilityScenario(alliedFacility);
+            if (template == null) {
+                return null;
+            }
+
             scenario = generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment);
+            if (scenario == null) {
+                return null;
+            }
+
             setupFacilityScenario(scenario, facility);
         } else {
             if (template != null) {
@@ -2503,8 +2511,8 @@ public class StratConRulesManager {
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
     static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
-          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords, ScenarioTemplate template,
-          @Nullable Integer daysTilDeployment) {
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario = new StratConScenario();
 
         if (forceID == null) {
@@ -3612,8 +3620,8 @@ public class StratConRulesManager {
      *         <li>If a facility exists at the scenario's location and is owned by allied forces, ownership is flipped
      *         to the opposing forces.</li>
      *       </ul>
-     *       This must happen before the scenario is removed so that any objective linked to the scenario's coordinates
-     *       can still be looked up.</li>
+     *       These ignored-scenario consequences are applied before removal so {@code removeScenario} only has to unlink
+     *       scenario state.</li>
      *   <li><b>Scenario Removal:</b>
      *       The ignored scenario is removed from its associated track.</li>
      * </ol>

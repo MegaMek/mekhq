@@ -533,11 +533,13 @@ public class StratConContractInitializer {
             }
 
             // facility
+            boolean addedFacility = false;
             if (template.isFacilityScenario()) {
                 StratConFacility facility = template.isHostileFacility() ?
                                                   StratConFacilityFactory.getRandomHostileFacility() :
                                                   StratConFacilityFactory.getRandomAlliedFacility();
                 trackState.addFacility(coords, facility);
+                addedFacility = true;
             }
 
             // create scenario - don't assign a force yet
@@ -572,6 +574,8 @@ public class StratConContractInitializer {
                 sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
                 sso.setDesiredObjectiveCount(1);
                 trackState.addStrategicObjective(sso);
+            } else if (addedFacility) {
+                trackState.removeFacility(coords);
             }
         }
     }
