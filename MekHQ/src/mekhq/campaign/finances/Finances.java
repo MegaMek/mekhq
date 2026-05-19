@@ -35,6 +35,7 @@ package mekhq.campaign.finances;
 
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.finances.WeeklyNetWorth.parseWeeklyNetWorthFromXML;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
@@ -89,6 +91,8 @@ public class Finances {
     private int failedCollateral;
     private LocalDate wentIntoDebt;
 
+    private List<WeeklyNetWorth> netWorthOverTime;
+
     private Money balance;
     private int transactionSize = -1;
 
@@ -99,6 +103,7 @@ public class Finances {
         loanDefaults = 0;
         failedCollateral = 0;
         wentIntoDebt = null;
+        netWorthOverTime = new ArrayList<>();
     }
 
     public List<Transaction> getTransactions() {
@@ -147,6 +152,21 @@ public class Finances {
 
     public void setWentIntoDebt(final @Nullable LocalDate wentIntoDebt) {
         this.wentIntoDebt = wentIntoDebt;
+    }
+
+    public List<WeeklyNetWorth> getNetWorthOverTime() {
+        return netWorthOverTime;
+    }
+
+    public void setNetWorthOverTime(List<WeeklyNetWorth> netWorthOverTime) {
+        this.netWorthOverTime = netWorthOverTime;
+    }
+
+    public void addWeeklyNetWorth(LocalDate date, Money amount) {
+        if (netWorthOverTime.size() == (52 * 10)) { //keep about 10 years max TODO add option to select number of years
+            netWorthOverTime.removeFirst();
+        }
+        this.netWorthOverTime.add(new WeeklyNetWorth(date, amount));
     }
 
     /**
@@ -327,6 +347,7 @@ public class Finances {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isNewYear = campaignOptions.getFinancialYearDuration().isEndOfFinancialYear(today);
         boolean isNewMonth = (today.getDayOfMonth() == 1);
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         Accountant accountant = campaign.getAccountant();
         // check for a new fiscal year
         if (isNewYear) {
@@ -517,6 +538,16 @@ public class Finances {
         }
 
         loans = newLoans;
+
+        //Create a starting datapoint when there are none so far, then add one each monday
+        if (netWorthOverTime.isEmpty() || isMonday) {
+            boolean alreadyRecordedToday = !netWorthOverTime.isEmpty() &&
+                                                 netWorthOverTime.getLast().getDate().equals(campaign.getLocalDate());
+            if (!alreadyRecordedToday) {
+                FinancialReport financialReport = FinancialReport.calculate(campaign);
+                addWeeklyNetWorth(campaign.getLocalDate(), financialReport.getNetWorth());
+            }
+        }
     }
 
     /**
@@ -728,6 +759,13 @@ public class Finances {
         if (getWentIntoDebt() != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
         }
+        if (!getNetWorthOverTime().isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "netWorthOverTime");
+            for (final WeeklyNetWorth weeklyNetWorth : getNetWorthOverTime()) {
+                weeklyNetWorth.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "netWorthOverTime");
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "finances");
     }
 
@@ -755,6 +793,9 @@ public class Finances {
                         break;
                     case "wentIntoDebt":
                         retVal.setWentIntoDebt(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                        break;
+                    case "netWorthOverTime":
+                        retVal.setNetWorthOverTime(parseWeeklyNetWorthFromXML(wn2));
                         break;
                     default:
                         break;
@@ -805,6 +846,7 @@ public class Finances {
                      .map(Asset::generateInstanceFromXML)
                      .collect(Collectors.toList());
     }
+
     // endregion XML
     // endregion File I/O
 }
