@@ -7074,6 +7074,28 @@ public class Person {
     }
 
     /**
+     * Retrieves the modifier value for a specified skill attribute.
+     *
+     * @param attribute the skill attribute for which the modifier is to be calculated;
+     *                  if the attribute is null or represents "none", a warning is logged and the method returns 0
+     * @return the calculated modifier value for the provided skill attribute, or 0 if the attribute is null or "none"
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
+    public int getAttributeModifier(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            LOGGER.warn("(getAttributeModifier) SkillAttribute is null or NONE.");
+            return 0;
+        }
+
+        return atowAttributes.getAttributeModifier(attribute,
+              getActiveInjuryEffects(),
+              options,
+              ageForAttributeModifiers);
+    }
+
+    /**
      * Sets the character's {@link Attributes} object which contains their ATOW Attribute scores.
      *
      * <p><b>Usage:</b> This completely wipes the character's attribute scores and is likely not the method you're
