@@ -466,7 +466,18 @@ public class Formation {
     }
 
     /**
-     * @return A String representation of the full hierarchical formation including ID for MM export
+     * Returns the MegaMek force string for this formation: the chain of ancestor formations from the
+     * top-level formation down to and including this one, each rendered as {@code name|id} (plus the
+     * camouflage category/filename when non-default). MegaMek's server reconstructs its {@code Forces}
+     * tree from this string when units are added to a game.
+     *
+     * <p>Each segment uses the formation's own campaign-unique {@link #id} directly. A previous
+     * implementation derived the id from a {@code 17 * id + ancestor.id + 1} recurrence, but that
+     * accumulation collides — distinct formations produced the same id, so the server merged them and
+     * support detachments ended up inside the wrong formation. The campaign formation id is already
+     * unique, so it can be emitted as-is.</p>
+     *
+     * @return the full hierarchical force string for MegaMek export
      */
     public String getFullMMName() {
         var ancestors = new ArrayList<Formation>();
@@ -478,11 +489,9 @@ public class Formation {
         }
 
         StringBuilder result = new StringBuilder();
-        int id = 0;
         for (int i = ancestors.size() - 1; i >= 0; i--) {
             Formation ancestor = ancestors.get(i);
-            id = 17 * id + ancestor.id + 1;
-            result.append(ancestor.getName()).append('|').append(id);
+            result.append(ancestor.getName()).append('|').append(ancestor.id);
             if (!ancestor.getCamouflage().isDefault()) {
                 result.append('|')
                       .append(ancestor.getCamouflage().getCategory())
