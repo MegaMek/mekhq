@@ -1051,7 +1051,7 @@ public class Person {
      * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
      * absent and no faction backup is requested, an empty {@link ImageIcon} is returned.</p>
      *
-     * <p><b>Warning:/b> Do not attempt to manually scale the {@link ImageIcon} returned by this method, it will be
+     * <p><b>Warning:</b> Do not attempt to manually scale the {@link ImageIcon} returned by this method, it will be
      * very blurry. Instead, use {@link #getPortraitImageIconWithFallback(boolean, Integer)}.</p>
      *
      * @param useOriginFactionBackup if {@code true}, returns the origin faction's logo as a fallback when the portrait
