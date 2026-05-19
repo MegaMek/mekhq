@@ -241,6 +241,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
+    public static final String CONFIRMATION_ASSIGN_TECHS = "confirmationAssignTechs";
     // endregion Nag Tab
 
     // region Miscellaneous Options
