@@ -589,6 +589,8 @@ public class CampaignOptions {
     private boolean assignPortraitOnRoleChange;
     private boolean allowDuplicatePortraits;
     private boolean useGenderedPortraitsOnly;
+    private boolean noRandomPortraitsForChildren;
+    private boolean childPortraitsWhenComingOfAge;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -1260,6 +1262,8 @@ public class CampaignOptions {
         assignPortraitOnRoleChange = false;
         allowDuplicatePortraits = true;
         useGenderedPortraitsOnly = false;
+        noRandomPortraitsForChildren = true;
+        childPortraitsWhenComingOfAge = true;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -4373,6 +4377,22 @@ public class CampaignOptions {
 
     public void setUseGenderedPortraitsOnly(final boolean useGenderedPortraitsOnly) {
         this.useGenderedPortraitsOnly = useGenderedPortraitsOnly;
+    }
+
+    public boolean isNoRandomPortraitsForChildren() {
+        return noRandomPortraitsForChildren;
+    }
+
+    public void setNoRandomPortraitsForChildren(final boolean noRandomPortraitsForChildren) {
+        this.noRandomPortraitsForChildren = noRandomPortraitsForChildren;
+    }
+
+    public boolean isChildPortraitsWhenComingOfAge() {
+        return childPortraitsWhenComingOfAge;
+    }
+
+    public void setChildPortraitsWhenComingOfAge(final boolean childPortraitsWhenComingOfAge) {
+        this.childPortraitsWhenComingOfAge = childPortraitsWhenComingOfAge;
     }
 
     public int getVocationalXP() {

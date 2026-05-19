@@ -1144,6 +1144,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAllowDuplicatePortraits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenderedPortraitsOnly",
               campaignOptions.isUseGenderedPortraitsOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPortraitsWhenComingOfAge",
+              campaignOptions.isChildPortraitsWhenComingOfAge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noRandomPortraitsForChildren",
+              campaignOptions.isNoRandomPortraitsForChildren());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

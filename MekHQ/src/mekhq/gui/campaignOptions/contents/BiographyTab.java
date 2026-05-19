@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 
+import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
@@ -207,6 +208,8 @@ public class BiographyTab {
     private JCheckBox chkAssignPortraitOnRoleChange;
     private JCheckBox chkAllowDuplicatePortraits;
     private JCheckBox chkUseGenderedPortraitsOnly;
+    private JCheckBox chkNoRandomPortraitsForChildren;
+    private JCheckBox chkChildPortraitsWhenComingOfAge;
     //end Name and Portrait Tab
 
     //start Rank Tab
@@ -267,6 +270,8 @@ public class BiographyTab {
         chkAssignPortraitOnRoleChange = new JCheckBox();
         chkAllowDuplicatePortraits = new JCheckBox();
         chkUseGenderedPortraitsOnly = new JCheckBox();
+        chkNoRandomPortraitsForChildren = new JCheckBox();
+        chkChildPortraitsWhenComingOfAge = new JCheckBox();
 
         pnlRandomPortrait = new JPanel();
         personnelRoles = PersonnelRole.getCombatRoles();
@@ -1364,6 +1369,16 @@ public class BiographyTab {
         chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "UseGenderedPortraitsOnly"));
 
+        chkNoRandomPortraitsForChildren = new CampaignOptionsCheckBox("NoRandomPortraitsForChildren",
+              getMetadata(new Version(0, 51, 0)));
+        chkNoRandomPortraitsForChildren.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
+              "NoRandomPortraitsForChildren"));
+
+        chkChildPortraitsWhenComingOfAge = new CampaignOptionsCheckBox("ChildPortraitsWhenComingOfAge",
+              getMetadata(new Version(0, 51, 0)));
+        chkChildPortraitsWhenComingOfAge.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
+              "ChildPortraitsWhenComingOfAge"));
+
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
         chkUseOriginFactionForNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
               "UseOriginFactionForNames"));
@@ -1394,6 +1409,13 @@ public class BiographyTab {
         panelTop.add(lblFactionNames, layoutTop);
         layoutTop.gridx++;
         panelTop.add(comboFactionNames, layoutTop);
+
+        layoutTop.gridx = 0;
+        layoutTop.gridy++;
+        panelTop.add(chkNoRandomPortraitsForChildren, layoutTop);
+
+        layoutTop.gridy++;
+        panelTop.add(chkChildPortraitsWhenComingOfAge, layoutTop);
 
         final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
@@ -1609,6 +1631,8 @@ public class BiographyTab {
         chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
         chkAllowDuplicatePortraits.setSelected(options.isAllowDuplicatePortraits());
         chkUseGenderedPortraitsOnly.setSelected(options.isUseGenderedPortraitsOnly());
+        chkNoRandomPortraitsForChildren.setSelected(options.isNoRandomPortraitsForChildren());
+        chkChildPortraitsWhenComingOfAge.setSelected(options.isChildPortraitsWhenComingOfAge());
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
@@ -1707,6 +1731,8 @@ public class BiographyTab {
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
         options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
         options.setUseGenderedPortraitsOnly(chkUseGenderedPortraitsOnly.isSelected());
+        options.setNoRandomPortraitsForChildren(chkNoRandomPortraitsForChildren.isSelected());
+        options.setChildPortraitsWhenComingOfAge(chkChildPortraitsWhenComingOfAge.isSelected());
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
 
         for (int i = 0; i < chkUsePortrait.length; i++) {
