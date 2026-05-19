@@ -4510,8 +4510,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
+    /**
+     * Determines if a flag is enabled based on the eligible and selected count values.
+     *
+     * @param eligibleCount the count of eligible items, represented as a long value
+     * @param selectedCount the count of selected items, represented as an integer value
+     * @return {@code true} if the eligible count multiplied by 2 is greater than or equal to the selected count
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
     private static boolean isFlagEnabled(long eligibleCount, int selectedCount) {
-        return eligibleCount >= ((int) round(selectedCount / 2.0));
+        return (eligibleCount * 2) >= selectedCount;
     }
 
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
