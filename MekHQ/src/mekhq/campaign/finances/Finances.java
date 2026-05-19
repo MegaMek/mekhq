@@ -162,7 +162,10 @@ public class Finances {
         this.netWorthOverTime = netWorthOverTime;
     }
 
-    public void setWeeklyNetWorth(LocalDate date, Money amount) {
+    public void addWeeklyNetWorth(LocalDate date, Money amount) {
+        if (netWorthOverTime.size() == (52 * 10)) { //keep about 10 years max TODO add option to select number of years
+            netWorthOverTime.removeFirst();
+        }
         this.netWorthOverTime.add(new WeeklyNetWorth(date, amount));
     }
 
@@ -536,9 +539,14 @@ public class Finances {
 
         loans = newLoans;
 
-        if (isMonday) {
-            FinancialReport financialReport = FinancialReport.calculate(campaign);
-            setWeeklyNetWorth(campaign.getLocalDate(), financialReport.getNetWorth());
+        //Create a starting datapoint when there are none so far, then add one each monday
+        if (netWorthOverTime.isEmpty() || isMonday) {
+            boolean alreadyRecordedToday = !netWorthOverTime.isEmpty() &&
+                                                 netWorthOverTime.getLast().getDate().equals(campaign.getLocalDate());
+            if (!alreadyRecordedToday) {
+                FinancialReport financialReport = FinancialReport.calculate(campaign);
+                addWeeklyNetWorth(campaign.getLocalDate(), financialReport.getNetWorth());
+            }
         }
     }
 

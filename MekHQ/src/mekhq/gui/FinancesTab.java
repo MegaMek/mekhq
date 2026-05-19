@@ -88,6 +88,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -114,6 +115,8 @@ public final class FinancesTab extends CampaignGuiTab {
     private ChartPanel financeAmountPanel;
     private ChartPanel financeMonthlyPanel;
     private ChartPanel financeNetWorthPanel;
+
+    private boolean chartsInitialized = false;
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
           MekHQ.getMHQOptions().getLocale());
@@ -197,6 +200,15 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTab.setMinimumSize(new Dimension(450, 300));
         financeTab.setPreferredSize(new Dimension(450, 300));
 
+        financeTab.addChangeListener(e -> {
+            int selectedIndex = financeTab.getSelectedIndex();
+            switch (selectedIndex) {
+                case 1 -> financeAmountPanel.getChart().getXYPlot().setDataset(setupFinanceDataset());
+                case 2 -> financeMonthlyPanel.getChart().getCategoryPlot().setDataset(setupMonthlyDataset());
+                case 3 -> financeNetWorthPanel.getChart().getXYPlot().setDataset(setupNetWorthDataset());
+            }
+        });
+
         JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBalance, financeTab);
         splitFinances.setOneTouchExpandable(true);
         splitFinances.setContinuousLayout(true);
@@ -257,12 +269,8 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
-    }
 
-    public void updateCharts() {
-        financeAmountPanel.getChart().getXYPlot().setDataset(setupFinanceDataset());
-        financeMonthlyPanel.getChart().getCategoryPlot().setDataset(setupMonthlyDataset());
-        financeNetWorthPanel.getChart().getXYPlot().setDataset(setupNetWorthDataset());
+        chartsInitialized = true;
     }
 
     private XYDataset setupFinanceDataset() {
@@ -339,14 +347,9 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private XYDataset setupNetWorthDataset() {
-        TimeSeries timeSeries = new TimeSeries("C-Bills");
+        TimeSeries timeSeries = new TimeSeries("Net Worth");
         Campaign campaign = getCampaign();
         List<WeeklyNetWorth> netWorthRecords = campaign.getFinances().getNetWorthOverTime();
-        //Create a starting datapoint when there are none so far
-        if (netWorthRecords.isEmpty()) {
-            FinancialReport financialReport = FinancialReport.calculate(campaign);
-            campaign.getFinances().setWeeklyNetWorth(campaign.getLocalDate(), financialReport.getNetWorth());
-        }
         for (WeeklyNetWorth weeklyNetWorth : netWorthRecords) {
             LocalDate date = weeklyNetWorth.getDate();
             timeSeries.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
@@ -379,8 +382,12 @@ public final class FinancesTab extends CampaignGuiTab {
               resourceMap.getString("graphCBills.text"), // y-axis label
               dataset);
 
-        Color panelColor = UIManager.getColor("Panel.background");
-        Color textColor = UIManager.getColor("Button.foreground");
+        Color panelColor = !(UIManager.getColor("Panel.background") == null) ?
+                                 UIManager.getColor("Panel.background") :
+                                 Color.GRAY;
+        Color textColor = !(UIManager.getColor("Label.foreground") == null) ?
+                                UIManager.getColor("Label.foreground") :
+                                Color.WHITE;
 
         chart.setBackgroundPaint(panelColor);
 
@@ -417,8 +424,12 @@ public final class FinancesTab extends CampaignGuiTab {
               resourceMap.getString("graphCBills.text"), // y-axis label
               dataset);
 
-        Color panelColor = UIManager.getColor("Panel.background");
-        Color textColor = UIManager.getColor("Button.foreground");
+        Color panelColor = !(UIManager.getColor("Panel.background") == null) ?
+                                 UIManager.getColor("Panel.background") :
+                                 Color.GRAY;
+        Color textColor = !(UIManager.getColor("Label.foreground") == null) ?
+                                UIManager.getColor("Label.foreground") :
+                                Color.WHITE;
 
         chart.setBackgroundPaint(panelColor);
 
@@ -479,7 +490,6 @@ public final class FinancesTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> {
             financeModel.setData(getCampaign().getFinances().getTransactions());
             loanModel.setData(getCampaign().getFinances().getLoans());
-            updateCharts();
             refreshFinancialReport();
         });
     }
@@ -683,9 +693,13 @@ public final class FinancesTab extends CampaignGuiTab {
     public void updateUI() {
         super.updateUI();
 
-        if (financeAmountPanel != null && financeMonthlyPanel != null && financeNetWorthPanel != null) {
-            Color panelColor = UIManager.getColor("Panel.background");
-            Color textColor = UIManager.getColor("Button.foreground");
+        if (chartsInitialized) {
+            Color panelColor = !(UIManager.getColor("Panel.background") == null) ?
+                                     UIManager.getColor("Panel.background") :
+                                     Color.GRAY;
+            Color textColor = !(UIManager.getColor("Label.foreground") == null) ?
+                                    UIManager.getColor("Label.foreground") :
+                                    Color.WHITE;
             updateChartColors(financeAmountPanel.getChart(), panelColor, textColor);
             updateChartColors(financeMonthlyPanel.getChart(), panelColor, textColor);
             updateChartColors(financeNetWorthPanel.getChart(), panelColor, textColor);
@@ -695,22 +709,22 @@ public final class FinancesTab extends CampaignGuiTab {
         }
     }
 
-    private void updateChartColors(org.jfree.chart.JFreeChart chart, Color panelColor, Color textColor) {
+    private void updateChartColors(JFreeChart chart, Color panelColor, Color textColor) {
         if (chart == null) {
             return;
         }
         chart.setBackgroundPaint(panelColor);
 
-        org.jfree.chart.plot.Plot plot = chart.getPlot();
+        Plot plot = chart.getPlot();
 
-        if (plot instanceof org.jfree.chart.plot.XYPlot xyPlot) {
+        if (plot instanceof XYPlot xyPlot) {
             xyPlot.setDomainGridlinePaint(textColor);
             xyPlot.setRangeGridlinePaint(textColor);
             xyPlot.getDomainAxis().setLabelPaint(textColor);
             xyPlot.getDomainAxis().setTickLabelPaint(textColor);
             xyPlot.getRangeAxis().setLabelPaint(textColor);
             xyPlot.getRangeAxis().setTickLabelPaint(textColor);
-        } else if (plot instanceof org.jfree.chart.plot.CategoryPlot categoryPlot) {
+        } else if (plot instanceof CategoryPlot categoryPlot) {
             categoryPlot.getDomainAxis().setLabelPaint(textColor);
             categoryPlot.getDomainAxis().setTickLabelPaint(textColor);
             categoryPlot.getRangeAxis().setLabelPaint(textColor);

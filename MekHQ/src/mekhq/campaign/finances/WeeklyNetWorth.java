@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -88,6 +89,7 @@ public class WeeklyNetWorth {
                      .mapToObj(nl::item)
                      .filter(node -> "weeklyNetWorth".equals(node.getNodeName()))
                      .map(WeeklyNetWorth::generateInstanceFromXML)
+                     .filter(Objects::nonNull)
                      .collect(Collectors.toList());
     }
 
@@ -106,7 +108,11 @@ public class WeeklyNetWorth {
                 LOGGER.error(exception, "exception loading WeeklyNetWorth from save file");
             }
         }
-        return weeklyNetWorth;
+        if (weeklyNetWorth.getDate() == null || weeklyNetWorth.getMoney() == null) {
+            return null;
+        } else {
+            return weeklyNetWorth;
+        }
     }
 
 }
