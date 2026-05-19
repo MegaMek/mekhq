@@ -444,19 +444,20 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollHistoryScenarioView.setViewportView(null);
         scrollHistoryScenarioView.setMinimumSize(new Dimension(350, 220));
 
-        JSplitPane splitMissionAndScenario = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollMissionView, panScenario);
-        splitMissionAndScenario.setOneTouchExpandable(true);
-        splitMissionAndScenario.setResizeWeight(0.25);
-        splitMissionAndScenario.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+        JSplitPane splitMissionAndScenarioQueue = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollMissionView,
+              panScenarioQueue);
+        splitMissionAndScenarioQueue.setOneTouchExpandable(true);
+        splitMissionAndScenarioQueue.setResizeWeight(0.45);
+        splitMissionAndScenarioQueue.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
               ev -> refreshScenarioView());
 
-            JSplitPane splitOverview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitMissionAndScenario,
-              panScenarioQueue);
+        JSplitPane splitOverview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitMissionAndScenarioQueue,
+              panScenario);
         splitOverview.setOneTouchExpandable(true);
-        splitOverview.setResizeWeight(0.75);
+        splitOverview.setResizeWeight(0.62);
         splitOverview.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
 
-            JSplitPane splitHistory = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panHistoryScenarioQueue,
+        JSplitPane splitHistory = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panHistoryScenarioQueue,
               scrollHistoryScenarioView);
         splitHistory.setOneTouchExpandable(true);
         splitHistory.setResizeWeight(0.35);
@@ -1809,7 +1810,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // Autoconfigure munitions for all non-player forces once more, using finalized
             // forces
             if (getCampaignOptions().isAutoConfigMunitions()) {
-                autoconfigureBotMunitions(atBScenario, chosen);
+              autoconfigureBotMunitions(atBScenario, chosen);
             }
             configureBotAi(atBScenario);
         }
