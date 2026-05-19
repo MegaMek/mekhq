@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,7 +52,15 @@ public class LandMass {
         return name;
     }
 
+    public void setSourcedName(SourceableValue<String> name) {
+        this.name = name;
+    }
+
     public SourceableValue<String> getSourcedCapital() {
         return capital;
+    }
+
+    public void setSourcedCapital(SourceableValue<String> capital) {
+        this.capital = capital;
     }
 }

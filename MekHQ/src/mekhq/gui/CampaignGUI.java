@@ -39,6 +39,7 @@ import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -134,6 +135,7 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
@@ -191,6 +193,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
+    private JMenuItem miPlanetarySystemEditor;
 
     private final EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
 
@@ -802,6 +805,9 @@ public class CampaignGUI extends JPanel {
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
 
+        JMenuItem menuHireBlank = new JMenuItem(resourceMap.getString("menuHire.blank"));
+        menuHireBlank.addActionListener(this::addBlankPerson);
+
         JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
         JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
         JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
@@ -838,6 +844,7 @@ public class CampaignGUI extends JPanel {
         miHire.addActionListener(this::hirePerson);
         menuHireCivilian.insert(miHire, 0);
 
+        menuHire.add(menuHireBlank);
         menuHire.add(menuHireCombat);
         menuHire.add(menuHireSupport);
         menuHire.add(menuHireCivilian);
@@ -1409,9 +1416,6 @@ public class CampaignGUI extends JPanel {
         // endregion View Menu
 
         // region Manage Campaign Menu
-        // The Manage Campaign menu uses the following Mnemonic keys as of
-        // 19-March-2020:
-        // A, B, C, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
@@ -1420,6 +1424,13 @@ public class CampaignGUI extends JPanel {
         miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
         miGMToolsDialog.addActionListener(evt -> new GMToolsDialog(getFrame(), this, null).setVisible(true));
         menuManage.add(miGMToolsDialog);
+
+        miPlanetarySystemEditor = new JMenuItem(resourceMap.getString("miPlanetarySystemEditor.text"));
+        miPlanetarySystemEditor.setMnemonic(KeyEvent.VK_P);
+        miPlanetarySystemEditor.setVisible(getCampaign().isGM());
+        miPlanetarySystemEditor.addActionListener(evt -> new PlanetarySystemEditorDialog(getFrame(), getCampaign())
+                                .setVisible(true));
+        menuManage.add(miPlanetarySystemEditor);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
@@ -1758,7 +1769,10 @@ public class CampaignGUI extends JPanel {
 
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
+        btnGMMode.addActionListener(e -> {
+            getCampaign().setGMMode(btnGMMode.isSelected());
+            refreshGMMenuItems();
+        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -2100,6 +2114,14 @@ public class CampaignGUI extends JPanel {
         if (null != news) {
             new NewsDialog(getCampaign(), news.getFullDescription());
         }
+    }
+
+    private void addBlankPerson(final ActionEvent evt) {
+        Person person = new Person(getCampaign(), MERCENARY_FACTION_CODE);
+        person.setOriginPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
+        person.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
+
+        getCampaign().recruitPerson(person, true, true);
     }
 
     private void hirePerson(final ActionEvent evt) {
@@ -3328,6 +3350,12 @@ public class CampaignGUI extends JPanel {
             // FIXME : Localize
             lblPartsAvailabilityRating.setText(String.format("<html><b>Parts Availability Modifier</b>: %d</html>",
                   partsAvailability));
+        }
+    }
+
+    private void refreshGMMenuItems() {
+        if (miPlanetarySystemEditor != null) {
+            miPlanetarySystemEditor.setVisible(getCampaign().isGM());
         }
     }
 
