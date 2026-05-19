@@ -33,31 +33,20 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
-import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -80,7 +69,6 @@ public class MissionViewPanel extends JScrollablePanel {
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
-    protected JPanel pnlTutorial;
     protected JTextPane txtDesc;
 
     /* Basic Mission Parameters */
@@ -109,15 +97,12 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel lblSalvageValueEmployer;
     private JLabel txtSalvageValueEmployer;
 
-    protected JTable scenarioTable;
-
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
+    public MissionViewPanel(Mission m, CampaignGUI gui) {
         super();
         this.mission = m;
-        this.scenarioTable = scenarioTable;
         this.gui = gui;
         initComponents();
     }
@@ -126,7 +111,6 @@ public class MissionViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
-        pnlTutorial = new JPanel();
         txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
@@ -145,33 +129,6 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
-
-        if (mission instanceof AtBContract) {
-            pnlStats.setName("pnlTutorial");
-            pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
-            fillTutorial();
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.weightx = 2.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlTutorial, gridBagConstraints);
-        }
-
-        JScrollPane scrollScenarioTable = new FastJScrollPane(scenarioTable);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 2;
-        add(scrollScenarioTable, gridBagConstraints);
     }
 
     private void fillStats() {
@@ -1100,46 +1057,4 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtDesc, gridBagConstraints);
     }
 
-    /**
-     * Initializes and populates the tutorial panel with formatted HTML content inside a {@link JEditorPane}, applies
-     * font scaling and styling, wraps the editor in a scroll pane with appropriate padding, and adds it to the main
-     * tutorial panel with a visual border and size constraints.
-     *
-     * <p>The content is sourced from a resource bundle and displayed using an HTML/CSS styled {@code JEditorPane}
-     * for enhanced presentation.</p>
-     *
-     * <p>The method ensures the scroll position starts at the top of the content.</p>
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private void fillTutorial() {
-        JEditorPane editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setFocusable(false);
-        editorPane.setBorder(BorderFactory.createEmptyBorder());
-
-        String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<div style='width: %s; %s padding:%spx;'>%s</div>",
-              scaleForGUI(590),
-              fontStyle,
-              scaleForGUI(5),
-              resourceMap.getString("txtStratConTutorial.text")));
-        setFontScaling(editorPane, false, 1.1);
-
-        JScrollPane scrollPane = new JScrollPane(editorPane);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
-
-        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
-        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
-
-        pnlTutorial = new JPanel(new BorderLayout());
-
-        pnlTutorial.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        pnlTutorial.setPreferredSize(new Dimension(600, 0));
-        pnlTutorial.setMinimumSize(new Dimension(600, 0));
-        pnlTutorial.add(scrollPane, BorderLayout.CENTER);
-    }
 }

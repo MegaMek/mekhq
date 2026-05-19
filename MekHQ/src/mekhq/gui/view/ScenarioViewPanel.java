@@ -120,18 +120,37 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private void initComponents() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setTracksViewportWidth(true);
 
         fillBasicInfo();
         pnlInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(pnlInfo);
 
+        if (scenario.getStatus().isCurrent()) {
+            addDeploymentPanel();
+            addObjectivesPanel();
+            addMapPanel();
+            addForcesPanel();
+            addLootPanel();
+            addReportPanel();
+        } else {
+            addReportPanel();
+            addLootPanel();
+            addObjectivesPanel();
+            addMapPanel();
+            addForcesPanel();
+        }
+    }
 
+    private void addReportPanel() {
         if (null != scenario.getReport() && !scenario.getReport().isEmpty()) {
             fillReport();
             pnlReport.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlReport);
         }
+    }
 
+    private void addForcesPanel() {
         fillForces();
         pnlForces.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(pnlForces);
@@ -140,25 +159,33 @@ public class ScenarioViewPanel extends JScrollablePanel {
             pnlOtherForces.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlOtherForces);
         }
+    }
 
+    private void addDeploymentPanel() {
         if (null != scenario.getDeploymentLimit()) {
             fillDeployment();
             pnlDeployment.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlDeployment);
         }
+    }
 
+    private void addObjectivesPanel() {
         if (!scenario.getScenarioObjectives().isEmpty()) {
             fillObjectives();
             pnlObjectives.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlObjectives);
         }
+    }
 
+    private void addLootPanel() {
         if (!scenario.getLoot().isEmpty()) {
             fillLoot();
             pnlLoot.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(pnlLoot);
         }
+    }
 
+    private void addMapPanel() {
         if (null != scenario.getMap()) {
             fillMapData();
             pnlMap.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -35,11 +35,13 @@ package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.TableModelEvent;
@@ -48,6 +50,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.models.XTableColumnModel;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -67,11 +70,16 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  */
 public class LanceAssignmentView extends JPanel {
     private final Campaign campaign;
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+          MekHQ.getMHQOptions().getLocale());
 
     private JTable tblRequiredLances;
     private JTable tblAssignments;
+    private JLabel lblDeploymentSummary;
     private JPanel panRequiredLances;
     private JComboBox<AtBContract> cbContract;
+    private RequiredLancesTableModel requiredLancesModel;
+    private LanceAssignmentTableModel lanceAssignmentModel;
 
     public LanceAssignmentView(Campaign c) {
         campaign = c;
@@ -90,26 +98,26 @@ public class LanceAssignmentView extends JPanel {
 
         JComboBox<CombatRole> cbRole = getCbRole();
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout(0, 5));
 
-        RequiredLancesTableModel rlModel = new RequiredLancesTableModel(campaign);
-        tblRequiredLances = new JTable(rlModel);
+        requiredLancesModel = new RequiredLancesTableModel(campaign);
+        tblRequiredLances = new JTable(requiredLancesModel);
         tblRequiredLances.setColumnModel(new XTableColumnModel());
         tblRequiredLances.createDefaultColumnsFromModel();
         tblRequiredLances.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column;
         for (int i = 0; i < RequiredLancesTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel) tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
-            column.setPreferredWidth(rlModel.getColumnWidth(i));
+            column.setPreferredWidth(requiredLancesModel.getColumnWidth(i));
             column.setCellRenderer(new MekHqTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                       boolean hasFocus, int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    setHorizontalAlignment(((RequiredLancesTableModel) table.getModel()).getAlignment(table.convertColumnIndexToModel(
-                          column)));
-                    if (table.convertColumnIndexToModel(column) > RequiredLancesTableModel.COL_CONTRACT) {
-                        if (((String) value).indexOf('/') >= 0) {
+                    int modelColumn = table.convertColumnIndexToModel(column);
+                    setHorizontalAlignment(((RequiredLancesTableModel) table.getModel()).getAlignment(modelColumn));
+                    if (modelColumn > RequiredLancesTableModel.COL_CONTRACT) {
+                        if ((value instanceof String text) && (text.indexOf('/') >= 0)) {
                             setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
                         }
                     }
@@ -117,31 +125,37 @@ public class LanceAssignmentView extends JPanel {
                 }
             });
         }
-        TableRowSorter<RequiredLancesTableModel> sorter = new TableRowSorter<>(rlModel);
+        TableRowSorter<RequiredLancesTableModel> sorter = new TableRowSorter<>(requiredLancesModel);
         tblRequiredLances.setRowSorter(sorter);
 
         tblRequiredLances.setIntercellSpacing(new Dimension(0, 0));
         tblRequiredLances.setShowGrid(false);
+        tblRequiredLances.setFillsViewportHeight(true);
 
-        LanceAssignmentTableModel laModel = new LanceAssignmentTableModel(campaign);
-        tblAssignments = new JTable(laModel);
+        lanceAssignmentModel = new LanceAssignmentTableModel(campaign);
+        tblAssignments = new JTable(lanceAssignmentModel);
         tblAssignments.setColumnModel(new XTableColumnModel());
         tblAssignments.createDefaultColumnsFromModel();
         tblAssignments.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         for (int i = 0; i < LanceAssignmentTableModel.COL_NUM; i++) {
             column = ((XTableColumnModel) tblAssignments.getColumnModel()).getColumnByModelIndex(i);
-            column.setPreferredWidth(rlModel.getColumnWidth(i));
+            column.setPreferredWidth(lanceAssignmentModel.getColumnWidth(i));
             column.setCellRenderer(new MekHqTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                       boolean hasFocus, int row, int column) {
-                    switch (column) {
+                    super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    int modelColumn = table.convertColumnIndexToModel(column);
+                    setHorizontalAlignment(((LanceAssignmentTableModel) table.getModel()).getAlignment(modelColumn));
+                    switch (modelColumn) {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
                                 String forceName = (((Formation) value)).getFullName();
                                 String originNodeName = ", " + campaign.getFormation(0).getName();
                                 forceName = forceName.replaceAll(originNodeName, "");
                                 setText(forceName);
+                            } else {
+                                setText("");
                             }
                             break;
                         case LanceAssignmentTableModel.COL_CONTRACT:
@@ -152,7 +166,7 @@ public class LanceAssignmentView extends JPanel {
                             }
                             break;
                         default:
-                            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                            break;
                     }
                     return this;
                 }
@@ -175,34 +189,42 @@ public class LanceAssignmentView extends JPanel {
             }
         };
         final NaturalOrderComparator noc = new NaturalOrderComparator();
-        TableRowSorter<LanceAssignmentTableModel> laSorter = new TableRowSorter<>(laModel);
+        TableRowSorter<LanceAssignmentTableModel> laSorter = new TableRowSorter<>(lanceAssignmentModel);
         laSorter.setRowFilter(laFilter);
         laSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
         laSorter.setComparator(LanceAssignmentTableModel.COL_CONTRACT,
-              (c1, c2) -> noc.compare(((AtBContract) c1).getName(), ((AtBContract) c2).getName()));
+              (c1, c2) -> noc.compare((c1 == null) ? "" : ((AtBContract) c1).getName(),
+                                        (c2 == null) ? "" : ((AtBContract) c2).getName()));
         laSorter.setComparator(LanceAssignmentTableModel.COL_ROLE,
               (r1, r2) -> noc.compare(r1.toString(), r2.toString()));
         List<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(LanceAssignmentTableModel.COL_FORCE, SortOrder.ASCENDING));
-        sorter.setSortKeys(sortKeys);
+        laSorter.setSortKeys(sortKeys);
         tblAssignments.setRowSorter(laSorter);
 
         tblAssignments.setIntercellSpacing(new Dimension(0, 0));
         tblAssignments.setShowGrid(false);
+        tblAssignments.setFillsViewportHeight(true);
 
-        panRequiredLances = new JPanel();
-        panRequiredLances.setLayout(new BoxLayout(panRequiredLances, BoxLayout.Y_AXIS));
-        panRequiredLances.setBorder(RoundedLineBorder.createRoundedLineBorder("Deployment Requirements"));
-        panRequiredLances.add(tblRequiredLances.getTableHeader());
-        panRequiredLances.add(tblRequiredLances);
-        add(panRequiredLances);
+        lblDeploymentSummary = new JLabel();
+                lblDeploymentSummary.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              resourceMap.getString("briefingTab.assignments.coverage.title")));
+        add(lblDeploymentSummary, BorderLayout.PAGE_START);
 
-        JPanel panAssignments = new JPanel();
-        panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));
-        panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder("Current Assignments"));
-        panAssignments.add(tblAssignments.getTableHeader());
-        panAssignments.add(tblAssignments);
-        add(panAssignments);
+        panRequiredLances = new JPanel(new BorderLayout());
+                panRequiredLances.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              resourceMap.getString("briefingTab.assignments.requirements.title")));
+        panRequiredLances.add(new FastJScrollPane(tblRequiredLances), BorderLayout.CENTER);
+
+        JPanel panAssignments = new JPanel(new BorderLayout());
+                panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder(
+              resourceMap.getString("briefingTab.assignments.current.title")));
+        panAssignments.add(new FastJScrollPane(tblAssignments), BorderLayout.CENTER);
+
+        JSplitPane splitAssignments = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panRequiredLances, panAssignments);
+        splitAssignments.setOneTouchExpandable(true);
+        splitAssignments.setResizeWeight(0.35);
+        add(splitAssignments, BorderLayout.CENTER);
 
         refresh();
         tblAssignments.getModel().addTableModelListener(assignmentTableListener);
@@ -242,12 +264,57 @@ public class LanceAssignmentView extends JPanel {
         ((DataTableModel<AtBContract>) tblRequiredLances.getModel()).setData(activeContracts);
         ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getCombatTeamsAsList());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
+        updateDeploymentSummary();
+    }
+
+    private void updateDeploymentSummary() {
+        if (requiredLancesModel.getRowCount() == 0) {
+            lblDeploymentSummary.setForeground(null);
+            lblDeploymentSummary.setText(resourceMap.getString("briefingTab.assignments.coverage.none"));
+            return;
+        }
+
+        List<String> shortfalls = new ArrayList<>();
+        for (int row = 0; row < requiredLancesModel.getRowCount(); row++) {
+            List<String> contractShortfalls = new ArrayList<>();
+            for (int column = RequiredLancesTableModel.COL_TOTAL; column < RequiredLancesTableModel.COL_NUM; column++) {
+                Object value = requiredLancesModel.getValueAt(row, column);
+                if ((value instanceof String text) && text.contains("/")) {
+                    contractShortfalls.add(requiredLancesModel.getColumnName(column) + ' ' + text);
+                }
+            }
+
+            if (!contractShortfalls.isEmpty()) {
+                shortfalls.add(escapeHtml((String) requiredLancesModel.getValueAt(row,
+                      RequiredLancesTableModel.COL_CONTRACT)) +
+                                     ": " +
+                                     escapeHtml(String.join(", ", contractShortfalls)));
+            }
+        }
+
+        if (shortfalls.isEmpty()) {
+            lblDeploymentSummary.setForeground(null);
+            lblDeploymentSummary.setText(resourceMap.getString("briefingTab.assignments.coverage.ready"));
+        } else {
+            lblDeploymentSummary.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+            lblDeploymentSummary.setText(String.format(
+                  resourceMap.getString("briefingTab.assignments.coverage.shortfalls"),
+                  String.join("; ", shortfalls)));
+        }
+    }
+
+    private String escapeHtml(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     TableModelListener assignmentTableListener = new TableModelListener() {
         @Override
         public void tableChanged(TableModelEvent ev) {
             ((RequiredLancesTableModel) tblRequiredLances.getModel()).fireTableDataChanged();
+            updateDeploymentSummary();
         }
     };
 
