@@ -1415,9 +1415,6 @@ public class CampaignGUI extends JPanel {
         // endregion View Menu
 
         // region Manage Campaign Menu
-        // The Manage Campaign menu uses the following Mnemonic keys as of
-        // 19-March-2020:
-        // A, B, C, G, M, P, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
