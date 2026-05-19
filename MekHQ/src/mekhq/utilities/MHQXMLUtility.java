@@ -642,9 +642,6 @@ public class MHQXMLUtility extends MMXMLUtility {
      * Parses an XML {@link Document} from {@code is}, automatically retrying with a doubled
      * {@code maxGeneralEntitySizeLimit} if Java 24+'s tightened default limit is exceeded.
      *
-     * <p>The last limit that succeeded is remembered for the rest of the session so that
-     * subsequent large-file loads skip the retry cycle entirely.</p>
-     *
      * @param is the input stream to read from (consumed and closed by this method is <em>not</em> the caller's
      *           responsibility to reset)
      *
