@@ -85,6 +85,7 @@ import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.ReasoningSorter;
 import mekhq.utilities.ReportingUtilities;
+import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn {
     // region Enum Declarations
@@ -151,14 +152,22 @@ public enum PersonnelTableModelColumn {
     DUE_DATE("PersonnelTableModelColumn.DUE_DATE.text"),
     RETIREMENT_DATE("PersonnelTableModelColumn.RETIREMENT_DATE.text"),
     DEATH_DATE("PersonnelTableModelColumn.DEATH_DATE.text"),
-    COMMANDER("PersonnelTableModelColumn.COMMANDER.text"),
-    FOUNDER("PersonnelTableModelColumn.FOUNDER.text"),
     CLAN_PERSONNEL("PersonnelTableModelColumn.CLAN_PERSONNEL.text"),
-    MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
+    COMMANDER("PersonnelTableModelColumn.COMMANDER.text"),
     DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
-    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
-    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
     EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
+    FOUNDER("PersonnelTableModelColumn.FOUNDER.text"),
+    HIDE_PERSONALITY("PersonnelTableModelColumn.HIDE_PERSONALITY.text"),
+    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
+    MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
+    NEVER_ASSIGN_AUTO_MAINTENANCE("PersonnelTableModelColumn.NEVER_ASSIGN_AUTO_MAINTENANCE.text"),
+    PREFERS_MEN("PersonnelTableModelColumn.PREFERS_MEN.text"),
+    PREFERS_WOMEN("PersonnelTableModelColumn.PREFERS_WOMEN.text"),
+    QUICK_TRAIN_IGNORE("PersonnelTableModelColumn.QUICK_TRAIN_IGNORE.text"),
+    SALVAGE_SUPERVISOR("PersonnelTableModelColumn.SALVAGE_SUPERVISOR.text"),
+    SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
+    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
+    UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -619,10 +628,6 @@ public enum PersonnelTableModelColumn {
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        // We define these here, as they're used in multiple cases
-        int currentAttributeValue;
-        int attributeCap;
-
         String sign;
 
         final boolean isClanCampaign = campaign.isClanCampaign();
@@ -1055,6 +1060,22 @@ public enum PersonnelTableModelColumn {
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
             case EMPLOYED:
                 return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
+            case HIDE_PERSONALITY:
+                return resources.getString(person.isHidePersonality() ? "Yes.text" : "No.text");
+            case NEVER_ASSIGN_AUTO_MAINTENANCE:
+                return resources.getString(person.isNeverAssignMaintenanceAutomatically() ? "Yes.text" : "No.text");
+            case PREFERS_MEN:
+                return resources.getString(person.isPrefersMen() ? "Yes.text" : "No.text");
+            case PREFERS_WOMEN:
+                return resources.getString(person.isPrefersWomen() ? "Yes.text" : "No.text");
+            case QUICK_TRAIN_IGNORE:
+                return resources.getString(person.isQuickTrainIgnore() ? "Yes.text" : "No.text");
+            case SALVAGE_SUPERVISOR:
+                return resources.getString(person.isSalvageSupervisor() ? "Yes.text" : "No.text");
+            case SECOND_IN_COMMAND:
+                return resources.getString(person.isSecondInCommand() ? "Yes.text" : "No.text");
+            case UNDER_PROTECTION:
+                return resources.getString(person.isUnderProtection() ? "Yes.text" : "No.text");
             case TOUGHNESS:
                 return Integer.toString(person.getAdjustedToughness());
             case CONNECTIONS:
@@ -1122,40 +1143,47 @@ public enum PersonnelTableModelColumn {
                 Reasoning reasoning = person.getReasoning();
                 return reasoning.getLabel();
             case STRENGTH:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.STRENGTH);
-                attributeCap = person.getAttributeCap(SkillAttribute.STRENGTH);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.STRENGTH);
             case BODY:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.BODY);
-                attributeCap = person.getAttributeCap(SkillAttribute.BODY);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.BODY);
             case REFLEXES:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.REFLEXES);
-                attributeCap = person.getAttributeCap(SkillAttribute.REFLEXES);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.REFLEXES);
             case DEXTERITY:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.DEXTERITY);
-                attributeCap = person.getAttributeCap(SkillAttribute.DEXTERITY);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
             case INTELLIGENCE:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.INTELLIGENCE);
-                attributeCap = person.getAttributeCap(SkillAttribute.INTELLIGENCE);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.INTELLIGENCE);
             case WILLPOWER:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.WILLPOWER);
-                attributeCap = person.getAttributeCap(SkillAttribute.WILLPOWER);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.WILLPOWER);
             case CHARISMA:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.CHARISMA);
-                attributeCap = person.getAttributeCap(SkillAttribute.CHARISMA);
-                return currentAttributeValue + " / " + attributeCap;
+                return getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
             case EDGE:
-                currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
-                attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
+                int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
+                int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
                 return currentAttributeValue + " / " + attributeCap;
             default:
                 return "UNIMPLEMENTED";
         }
+    }
+
+    /**
+     * Constructs a displayable string representation of a person's skill attribute, including their current score,
+     * maximum possible score (cap), and attribute modifier.
+     *
+     * @param person    the person whose attribute scores are being represented
+     * @param attribute the specific skill attribute being evaluated
+     * @return a string in the format "currentScore / attributeCap (+/- modifier)"
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
+    private static @NonNull String getAttributeScoreDisplay(Person person, SkillAttribute attribute) {
+        int currentAttributeValue = person.getAttributeScore(attribute);
+        int attributeCap = person.getAttributeCap(attribute);
+
+        int attributeModifier = person.getAttributeModifier(attribute);
+        String sign = attributeModifier >= 0 ? "+" : "";
+
+        return currentAttributeValue + " / " + attributeCap + " (" + sign + attributeModifier + ")";
     }
 
     public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
@@ -1396,7 +1424,8 @@ public enum PersonnelTableModelColumn {
                                        !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
                 default -> false;
             };
-            case FLAGS -> switch (this) {
+            case FLAGS_A -> switch (this) {
+                // Max 7 flags
                 case RANK,
                      FIRST_NAME,
                      LAST_NAME,
@@ -1407,6 +1436,29 @@ public enum PersonnelTableModelColumn {
                      DIVORCEABLE,
                      TRYING_TO_CONCEIVE,
                      IMMORTAL -> true;
+                default -> false;
+            };
+            case FLAGS_B -> switch (this) {
+                // Max 7 flags
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     MARRIAGEABLE,
+                     NEVER_ASSIGN_AUTO_MAINTENANCE,
+                     PREFERS_MEN,
+                     PREFERS_WOMEN,
+                     QUICK_TRAIN_IGNORE,
+                     SALVAGE_SUPERVISOR,
+                     SECOND_IN_COMMAND -> true;
+                default -> false;
+            };
+            case FLAGS_C -> switch (this) {
+                // Max 7 flags
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     TRYING_TO_CONCEIVE,
+                     UNDER_PROTECTION -> true;
                 default -> false;
             };
             case PERSONALITY -> switch (this) {
