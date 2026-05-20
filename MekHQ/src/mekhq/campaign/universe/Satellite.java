@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,11 +53,23 @@ public class Satellite {
         return name;
     }
 
+    public void setSourcedName(SourceableValue<String> name) {
+        this.name = name;
+    }
+
     public String getSize() {
         if (null == size) {
             return "medium";
         }
         return size.getValue();
+    }
+
+    public SourceableValue<String> getSourcedSize() {
+        return size;
+    }
+
+    public void setSourcedSize(SourceableValue<String> size) {
+        this.size = size;
     }
 
     public String getIcon() {

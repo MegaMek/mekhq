@@ -248,7 +248,8 @@ public class Attributes {
         int abilityModifier = getAbilityAdjustment(attribute, options);
 
         int total = attributeScore + injuryModifier + agingModifier + abilityModifier;
-        return Math.clamp(total, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+        int minimumValue = attribute == SkillAttribute.EDGE ? MINIMUM_EDGE_SCORE : MINIMUM_ATTRIBUTE_SCORE;
+        return Math.clamp(total, minimumValue, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     public int getAbilityAdjustment(SkillAttribute attribute, PersonnelOptions options) {
