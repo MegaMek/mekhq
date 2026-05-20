@@ -147,6 +147,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystemCampaignXmlIO;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -246,6 +247,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           version));
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
+                } else if (xn.equalsIgnoreCase(PlanetarySystemCampaignXmlIO.XML_TAG)) {
+                    processPlanetarySystemOverrides(campaign, wn);
                 }
             }
             // If it's a text node or attribute or whatever at this level,
@@ -763,6 +766,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     LOGGER.warn("Tech {} {} {} (fixed)", tech.getFullName(), reason, unitDesc);
                 }
             }
+        }
+    }
+
+    private static void processPlanetarySystemOverrides(Campaign campaign, Node parentNode)
+          throws CampaignXmlParseException {
+        try {
+            campaign.setPlanetarySystemOverrides(PlanetarySystemCampaignXmlIO.parse(parentNode));
+        } catch (IOException ex) {
+            throw new CampaignXmlParseException(ex);
         }
     }
 

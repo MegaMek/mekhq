@@ -45,9 +45,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -64,21 +61,71 @@ import org.w3c.dom.DOMException;
 public class Systems {
     private static final MMLogger logger = MMLogger.create(Systems.class);
 
-    private static Systems systems;
+    private static Systems activeSystems;
+    private static Systems canonicalSystems;
 
     private final int HPG_RADIUS_A_STATION = 50;
     private final int HPG_RADIUS_B_STATION = 30;
 
+    /**
+     * Returns the active runtime systems registry.
+     *
+     * <p>During normal campaign play this may be a campaign overlay containing campaign-save planetary overrides. New
+     * campaign-aware code should prefer {@link mekhq.campaign.Campaign} system accessors when a campaign is available.
+     */
     public static Systems getInstance() {
-        if (systems == null) {
-            systems = new Systems();
+        if (activeSystems == null) {
+            activeSystems = new Systems();
+            if (canonicalSystems == null) {
+                canonicalSystems = activeSystems;
+            }
         }
 
-        return systems;
+        return activeSystems;
     }
 
+    /** Replaces the active runtime systems registry. Primarily retained for legacy callers and tests. */
     public static void setInstance(Systems instance) {
-        systems = instance;
+        activeSystems = instance;
+        if (canonicalSystems == null) {
+            canonicalSystems = instance;
+        }
+    }
+
+    /** Loads startup systems data and makes it active until a campaign overlay is installed. */
+    public static void initializeDefaultSystems() throws DOMException, IOException {
+        setCanonicalSystems(loadDefault());
+    }
+
+    /** Creates a systems registry for a campaign with no planetary overrides. */
+    public static Systems createCampaignSystems() {
+        return createCampaignSystems(List.of());
+    }
+
+    /** Creates a systems registry for a campaign by applying campaign-save overrides to the startup systems data. */
+    public static Systems createCampaignSystems(Collection<PlanetarySystem> overrides) {
+        return getCanonicalSystems().copyWithOverrides(overrides);
+    }
+
+    /**
+     * Creates and activates a campaign systems registry by applying campaign-save overrides to the startup systems data.
+     */
+    public static Systems activateCampaignSystems(Collection<PlanetarySystem> overrides) {
+        Systems campaignSystems = createCampaignSystems(overrides);
+        setInstance(campaignSystems);
+        return campaignSystems;
+    }
+
+    private static void setCanonicalSystems(Systems systems) {
+        canonicalSystems = systems;
+        activeSystems = systems;
+    }
+
+    private static Systems getCanonicalSystems() {
+        if (canonicalSystems == null) {
+            canonicalSystems = getInstance();
+        }
+        return canonicalSystems;
     }
 
     protected ConcurrentMap<String, PlanetarySystem> systemList = new ConcurrentHashMap<>();
@@ -139,6 +186,20 @@ public class Systems {
 
     public ConcurrentMap<String, PlanetarySystem> getSystems() {
         return systemList;
+    }
+
+    private Systems copyWithOverrides(Collection<PlanetarySystem> overrides) {
+        Systems copy = new Systems();
+        copy.systemList.putAll(systemList);
+        if (overrides != null) {
+            for (PlanetarySystem override : overrides) {
+                if ((override != null) && (override.getId() != null)) {
+                    copy.systemList.put(override.getId(), override);
+                }
+            }
+        }
+        copy.cleanupSystems();
+        return copy;
     }
 
     public PlanetarySystem getSystemById(String id) {
@@ -236,12 +297,13 @@ public class Systems {
     // Data loading methods
 
     /**
-     * Loads the default planetary system data. This includes all *.yml files in data/universe/planetary_systems and
-     * subfolders. It also loads a player's custom planets in their custom user directory, if it exists.
+     * Loads startup planetary system data. This includes all *.yml files in data/universe/planetary_systems,
+     * subfolders, and any matching files in the configured user directory. Campaign-save planetary overrides are
+     * applied separately.
      *
      */
     public static Systems loadDefault() throws DOMException, IOException {
-        logger.info("Starting load of system data from XML...");
+        logger.info("Starting load of system data from YAML...");
         long currentTime = java.lang.System.currentTimeMillis();
 
         Systems systems = new Systems();
@@ -249,9 +311,11 @@ public class Systems {
         // load default systems
         systems.load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
 
-        // load user directory systems
+        // load user-installed systems for backwards compatibility
         String userDir = PreferenceManager.getClientPreferences().getUserDir();
-        systems.load(new File(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
+        if ((userDir != null) && !userDir.isBlank()) {
+            systems.load(new File(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
+        }
 
         // a bit of post loading clean up
         systems.cleanupSystems();
@@ -267,23 +331,11 @@ public class Systems {
     /**
      * Loads Systems data from files.
      *
-     * @param planetsPath The path to the folder containing planetary XML files.
+     * @param planetsPath The path to the folder containing planetary YAML files.
      *
      */
     public void load(String planetsPath) throws DOMException {
-        // set up mapper
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        // add custom deserializer for any complex objects that need to be read from Strings, etc.
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
-        module.addDeserializer(StarType.class, new StarType.StarTypeDeserializer());
-        module.addDeserializer(SourceableValue.class, new SourceableValue.SourceableValueDeserializer());
-        mapper.registerModule(module);
-        // this will allow the mapper to deserialize LocalDate objects
-        mapper.registerModule(new JavaTimeModule());
-
-        // Now we can Load all the yml files in the planetsPath and subdirectories
-        parsePlanetarySystemFiles(planetsPath, mapper);
+        parsePlanetarySystemFiles(planetsPath, PlanetarySystemYamlIO.createMapper());
     }
 
     /**
