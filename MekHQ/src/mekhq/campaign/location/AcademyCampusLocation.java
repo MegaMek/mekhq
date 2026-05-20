@@ -33,8 +33,13 @@
 package mekhq.campaign.location;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.utilities.MHQXMLUtility;
@@ -81,12 +86,30 @@ public class AcademyCampusLocation implements ILocation {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "academyCampus");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academySet", academySet);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academyName", academyName);
+        for (LocationNode child : locationNode.getChildren()) {
+            if (child.getLocatable() instanceof CurrentLocation currentLoc) {
+                currentLoc.writeToXML(pw, indent);
+            } else if (child.getLocatable() instanceof Person p) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
+            }
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "academyCampus");
+    }
+
+    // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.
+    private transient List<UUID> pendingPersonIds = new ArrayList<>();
+
+    /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
+    public List<UUID> drainPendingPersonIds() {
+        List<UUID> ids = new ArrayList<>(pendingPersonIds);
+        pendingPersonIds.clear();
+        return ids;
     }
 
     public static @Nullable AcademyCampusLocation generateInstanceFromXML(Node wn) {
         String academySet = null;
         String academyName = null;
+        List<UUID> personIds = new ArrayList<>();
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -97,11 +120,15 @@ public class AcademyCampusLocation implements ILocation {
                 academySet = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("academyName")) {
                 academyName = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                personIds.add(UUID.fromString(wn2.getTextContent().trim()));
             }
         }
         if (academySet == null || academyName == null) {
             return null;
         }
-        return new AcademyCampusLocation(academySet, academyName);
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        campus.pendingPersonIds.addAll(personIds);
+        return campus;
     }
 }

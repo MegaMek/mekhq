@@ -39,12 +39,16 @@ import static mekhq.campaign.market.contractMarket.ContractAutomation.performAut
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -70,6 +74,16 @@ public class CurrentLocation extends AbstractLocation {
     private double transitTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
+
+    // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.
+    private transient List<UUID> pendingPersonIds = new ArrayList<>();
+
+    /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
+    public List<UUID> drainPendingPersonIds() {
+        List<UUID> ids = new ArrayList<>(pendingPersonIds);
+        pendingPersonIds.clear();
+        return ids;
+    }
 
     public CurrentLocation() {
         this(null, 0d);
@@ -308,6 +322,11 @@ public class CurrentLocation extends AbstractLocation {
         if (jumpPath != null) {
             jumpPath.writeToXML(pw, indent);
         }
+        for (LocationNode child : locationNode.getChildren()) {
+            if (child.getLocatable() instanceof mekhq.campaign.personnel.Person p) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
+            }
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "location");
     }
 
@@ -342,6 +361,8 @@ public class CurrentLocation extends AbstractLocation {
                     retVal.jumpZenith = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("jumpPath")) {
                     retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
+                } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                    retVal.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 }
             }
         } catch (Exception ex) {

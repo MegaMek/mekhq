@@ -380,6 +380,7 @@ public class Campaign implements ITechManager, ILocation {
     private Systems systemsInstance;
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
+    private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -539,6 +540,9 @@ public class Campaign implements ITechManager, ILocation {
             locations.add(startLocation);
         }
         this.setParent(startLocation);
+        if (startLocation != null) {
+            mainForcePersonnel.setParent(this);
+        }
         reputation = reputationController;
         this.factionStandings = factionStandings;
         formations = formation;
@@ -1744,6 +1748,11 @@ public class Campaign implements ITechManager, ILocation {
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
     }
+
+    public Personnel getMainForcePersonnel() {
+        return mainForcePersonnel;
+    }
+
 
     /**
      * Creates a {@link FixedLocation} with an {@link AcademyCampusLocation} child and registers it in
@@ -5484,6 +5493,10 @@ public class Campaign implements ITechManager, ILocation {
         finances.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
         for (AbstractLocation loc : locations) {
+            // Skip locations parented to a campus — they are serialized inside their parent's XML.
+            if (loc.getLocationNode().getParent() != null) {
+                continue;
+            }
             loc.writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");

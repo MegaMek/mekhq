@@ -32,20 +32,32 @@
  */
 package mekhq.campaign.location;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.util.Set;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.location.LocationNode.LocationManager;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
 
 public class LocationNodeTest {
 
@@ -227,6 +239,111 @@ public class LocationNodeTest {
 
             assertSame(parentNode, childNode.getParent());
             assertTrue(parentNode.getChildren().contains(childNode));
+        }
+    }
+
+    @Nested
+    class ReconnectChildren {
+
+        Campaign mockCampaign;
+        FixedLocation parentFixed;
+
+        @BeforeEach
+        void setUp() {
+            mockCampaign = mock(Campaign.class);
+            parentFixed = new FixedLocation(mock(PlanetarySystem.class));
+        }
+
+        @Test
+        void parsesCampusAsChildOfParent() throws Exception {
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            Set<LocationNode> children = parentFixed.getLocationNode().getChildren();
+            assertEquals(1, children.size());
+            assertTrue(children.iterator().next().getLocatable() instanceof AcademyCampusLocation);
+        }
+
+        @Test
+        void campusHasCorrectSetAndName() throws Exception {
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            AcademyCampusLocation campus =
+                  (AcademyCampusLocation) parentFixed.getLocationNode().getChildren()
+                                                .iterator().next().getLocatable();
+            assertEquals("TestSet", campus.getAcademySet());
+            assertEquals("TestAcademy", campus.getAcademyName());
+        }
+
+        @Test
+        void parsesNestedCurrentLocationAsCampusChild() throws Exception {
+            when(mockCampaign.getSystemById(any())).thenReturn(mock(PlanetarySystem.class));
+
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "<location>"
+                               + "<system>Outreach</system>"
+                               + "<transitTime>5.0</transitTime>"
+                               + "</location>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            AcademyCampusLocation campus =
+                  (AcademyCampusLocation) parentFixed.getLocationNode().getChildren()
+                                                .iterator().next().getLocatable();
+            Set<LocationNode> campusChildren = campus.getLocationNode().getChildren();
+            assertEquals(1, campusChildren.size());
+            assertTrue(campusChildren.iterator().next().getLocatable() instanceof CurrentLocation);
+        }
+
+        @Test
+        void addLocationCalledForNestedCurrentLocation() throws Exception {
+            when(mockCampaign.getSystemById(any())).thenReturn(mock(PlanetarySystem.class));
+
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "<location><system>Outreach</system><transitTime>5.0</transitTime></location>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            verify(mockCampaign).addLocation(any(CurrentLocation.class));
+        }
+
+        @Test
+        void skipsUnrecognizedElements() throws Exception {
+            String xml = "<locationNodeChildren>"
+                               + "<unknownTag>someValue</unknownTag>"
+                               + "</locationNodeChildren>";
+
+            assertDoesNotThrow(() ->
+                                     LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign));
+            assertTrue(parentFixed.getLocationNode().getChildren().isEmpty());
+        }
+
+        private Node parseXml(String xml) throws Exception {
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
         }
     }
 }

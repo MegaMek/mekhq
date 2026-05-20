@@ -381,6 +381,13 @@ public class CampaignNewDayManager {
         campaign.getLocation().newDay(campaign);
         updatedLocation = campaign.getLocation();
 
+        List<AbstractLocation> extraLocations = new ArrayList<>(campaign.getLocations());
+        for (AbstractLocation loc : extraLocations) {
+            if (loc != updatedLocation) {
+                loc.newDay(campaign);
+            }
+        }
+
         updateFacilities();
 
         processNewDayPersonnel();

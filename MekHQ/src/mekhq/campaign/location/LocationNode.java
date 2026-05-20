@@ -141,6 +141,20 @@ public class LocationNode {
                 AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn);
                 if (campus != null) {
                     LocationManager.setLocation(campus, parent);
+                    NodeList campusChildren = wn.getChildNodes();
+                    for (int j = 0; j < campusChildren.getLength(); j++) {
+                        Node campusChild = campusChildren.item(j);
+                        if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        if (campusChild.getNodeName().equalsIgnoreCase("location")) {
+                            CurrentLocation travelLoc = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
+                            if (travelLoc != null) {
+                                LocationManager.setLocation(travelLoc, campus);
+                                campaign.addLocation(travelLoc);
+                            }
+                        }
+                    }
                 }
             } else {
                 // Person, Unit, and Part reconnection will be added here

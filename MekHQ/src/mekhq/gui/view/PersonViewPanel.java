@@ -2481,18 +2481,21 @@ public class PersonViewPanel extends JScrollablePanel {
                         educationLabel = resourceMap.getString("lblEducationStage.journeyTime");
 
                         if (educationStage.isJourneyToCampus()) {
+                            String systemId = person.getEduAcademySystem();
+                            PlanetarySystem system = systemId != null ? campaign.getSystemById(systemId) : null;
+                            String systemName = system != null ? system.getName(campaign.getLocalDate()) : "?";
                             educationValue = String.format(resourceMap.getString("lblEducationTravelTo.text"),
                                   person.getEduDaysOfTravel(),
                                   person.getEduJourneyTime(),
-                                  campaign.getSystemById(person.getEduAcademySystem())
-                                        .getName(campaign.getLocalDate()));
+                                  systemName);
                         } else {
+                            String systemId = person.getEduAcademySystem();
+                            PlanetarySystem system = systemId != null ? campaign.getSystemById(systemId) : null;
+                            String systemName = system != null ? system.getName(campaign.getLocalDate()) : "?";
                             educationValue = String.format(resourceMap.getString("lblEducationTravelFrom.text"),
                                   person.getEduDaysOfTravel(),
                                   person.getEduJourneyTime(),
-                                  campaign.getSystemById(person.getEduAcademySystem())
-                                        .getName(campaign.getLocalDate()));
-
+                                  systemName);
                         }
                     }
                     default -> {

@@ -38,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
@@ -55,6 +55,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.TechConstants;
@@ -63,11 +64,14 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import mekhq.EventSpy;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -1500,24 +1504,6 @@ public class PersonTest {
             }
         }
 
-        /** Tests for {@link Person#setEduAcademySystem} and {@link Person#getEduAcademySystem}. */
-        @Nested
-        class AcademySystem {
-
-            @Test
-            void setEduAcademySystem_roundTrip() {
-                person.setEduAcademySystem("Galatea");
-                assertEquals("Galatea", person.getEduAcademySystem());
-            }
-
-            @Test
-            void setEduAcademySystem_null_roundTrip() {
-                person.setEduAcademySystem("Galatea");
-                person.setEduAcademySystem(null);
-                assertNull(person.getEduAcademySystem());
-            }
-        }
-
         /** Tests for {@link Person#setEduEducationStage} and {@link Person#getEduEducationStage}. */
         @Nested
         class EducationStageField {
@@ -1591,26 +1577,6 @@ public class PersonTest {
                 PlanetarySystem currentSystem = mock(PlanetarySystem.class);
                 when(currentSystem.getId()).thenReturn("CurrentSystem");
                 when(campaign.getCurrentSystem()).thenReturn(currentSystem);
-            }
-
-            @Test
-            void localAcademy_setsAcademySystemToCurrentSystemId() {
-                Academy academy = buildAcademy(false, true);
-                EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
-                assertEquals("CurrentSystem", person.getEduAcademySystem());
-            }
-
-            @Test
-            void remoteAcademy_setsAcademySystemToCampusParam() {
-                Academy academy = buildAcademy(false, false);
-                PlanetarySystem destSystem = mock(PlanetarySystem.class);
-                when(destSystem.getName(any())).thenReturn("Galatea");
-                when(campaign.getSystemById("Galatea")).thenReturn(destSystem);
-                when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(10);
-
-                EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
-
-                assertEquals("Galatea", person.getEduAcademySystem());
             }
 
             @Test
@@ -1719,7 +1685,226 @@ public class PersonTest {
             }
         }
     }
+
+    /**
+     * Tests that XML tags written by the pre-location-refactor code are silently ignored when loading a save file. The
+     * fields {@code eduJourneyTime}, {@code eduDaysOfTravel}, and {@code eduAcademySystem} no longer exist on
+     * {@link Person}; travel state is derived from the person's location node instead.
+     */
+    @Nested
+    class LegacyPreLocationXml {
+
+        private static final String LEGACY_EDUCATION_XML = """
+              <person>
+                <givenName>Legacy</givenName>
+                <surname>Cadet</surname>
+                <eduAcademySet>TestSet</eduAcademySet>
+                <eduAcademyNameInSet>Test Academy</eduAcademyNameInSet>
+                <eduAcademyName>Test Academy (Galatea)</eduAcademyName>
+                <eduAcademyFaction>MERC</eduAcademyFaction>
+                <eduEducationStage>Journeying to Campus</eduEducationStage>
+                <eduJourneyTime>10</eduJourneyTime>
+                <eduDaysOfTravel>3</eduDaysOfTravel>
+                <eduAcademySystem>Galatea</eduAcademySystem>
+              </person>
+              """;
+
+        private Person parsePerson(String xml) throws Exception {
+            javax.xml.parsers.DocumentBuilderFactory dbf =
+                  javax.xml.parsers.DocumentBuilderFactory.newInstance();
+            javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
+            org.w3c.dom.Document doc = db.parse(
+                  new java.io.ByteArrayInputStream(
+                        xml.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+
+            Campaign campaign = mock(Campaign.class);
+            mekhq.campaign.universe.Faction faction = mock(mekhq.campaign.universe.Faction.class);
+            when(faction.getShortName()).thenReturn("MERC");
+            when(campaign.getFaction()).thenReturn(faction);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+
+            return Person.generateInstanceFromXML(
+                  doc.getDocumentElement(), campaign, new megamek.Version("0.51.0"));
+        }
+
+        @Test
+        void legacyXml_parsesWithoutException() throws Exception {
+            assertNotNull(parsePerson(LEGACY_EDUCATION_XML));
+        }
+
+        @Test
+        void legacyXml_nonLocationEduFieldsAreLoaded() throws Exception {
+            Person loaded = parsePerson(LEGACY_EDUCATION_XML);
+            assertEquals("TestSet", loaded.getEduAcademySet());
+            assertEquals("Test Academy", loaded.getEduAcademyNameInSet());
+            assertEquals("Test Academy (Galatea)", loaded.getEduAcademyName());
+            assertEquals(EducationStage.JOURNEY_TO_CAMPUS, loaded.getEduEducationStage());
+        }
+    }
     // endregion Nested Test Classes for Education Travel
+
+    @Nested
+    class LocationBehavior {
+
+        Person person;
+
+        @BeforeEach
+        void setUp() {
+            person = new Person("Test", "Person", null, "MERC");
+        }
+
+        @Test
+        void getLocationNode_isNotNull() {
+            assertNotNull(person.getLocationNode());
+        }
+
+        @Test
+        void getLocationNode_locatableIsThis() {
+            assertSame(person, person.getLocationNode().getLocatable());
+        }
+
+        @Test
+        void getLocationNode_noParentByDefault() {
+            assertNull(person.getLocationNode().getParent());
+        }
+
+        @Test
+        void getPersonnelAtLocation_returnsSelf() {
+            Set<Person> result = person.getPersonnelAtLocation();
+            assertTrue(result.contains(person));
+        }
+
+        @Test
+        void getPersonnelAtLocation_returnsExactlyOnePerson() {
+            assertEquals(1, person.getPersonnelAtLocation().size());
+        }
+
+        @Nested
+        class ParentLinking {
+
+            FixedLocation fixed;
+            AcademyCampusLocation campus;
+
+            @BeforeEach
+            void setUp() {
+                fixed = new FixedLocation(mock(PlanetarySystem.class));
+                campus = new AcademyCampusLocation("TestSet", "TestAcademy");
+                campus.setParent(fixed);
+            }
+
+            @Test
+            void setParent_toCampus_succeeds() {
+                assertTrue(person.setParent(campus));
+            }
+
+            @Test
+            void setParent_toCampus_wiresParentLink() {
+                person.setParent(campus);
+                assertSame(campus.getLocationNode(), person.getLocationNode().getParent());
+            }
+
+            @Test
+            void setParent_toCampus_addsToChildrenOfCampus() {
+                person.setParent(campus);
+                assertTrue(campus.getLocationNode().getChildren().contains(person.getLocationNode()));
+            }
+
+            @Test
+            void setParent_null_clearsParentLink() {
+                person.setParent(campus);
+                person.setParent(null);
+                assertNull(person.getLocationNode().getParent());
+            }
+
+            @Test
+            void setParent_null_removesFromCampusChildren() {
+                person.setParent(campus);
+                person.setParent(null);
+                assertFalse(campus.getLocationNode().getChildren().contains(person.getLocationNode()));
+            }
+
+            @Test
+            void campus_getPersonnelAtLocation_includesPersonAtCampus() {
+                person.setParent(campus);
+                assertTrue(campus.getPersonnelAtLocation().contains(person));
+            }
+
+            @Test
+            void campus_getPersonnelAtLocation_excludesPersonAfterDetach() {
+                person.setParent(campus);
+                person.setParent(null);
+                assertFalse(campus.getPersonnelAtLocation().contains(person));
+            }
+
+            @Test
+            void fixed_getPersonnelAtLocation_includesPersonViaCampus() {
+                person.setParent(campus);
+                assertTrue(fixed.getPersonnelAtLocation().contains(person));
+            }
+        }
+
+        @Nested
+        class GetEduAcademySystem {
+
+            @Test
+            void returnsNullWithNoTreeAndNoLegacyField() {
+                assertNull(person.getEduAcademySystem());
+            }
+
+            @Test
+            void returnsLegacyFallbackWhenNoCampusInTree() {
+                person.setEduAcademySystem("Sol");
+                assertEquals("Sol", person.getEduAcademySystem());
+            }
+
+            @Test
+            void legacyFieldClearedByNullSet() {
+                person.setEduAcademySystem("Sol");
+                person.setEduAcademySystem(null);
+                assertNull(person.getEduAcademySystem());
+            }
+
+            @Test
+            void returnsSystemIdFromTree_whenParentedUnderCampus() {
+                PlanetarySystem sys = mock(PlanetarySystem.class);
+                when(sys.getId()).thenReturn("Outreach");
+                FixedLocation fixed2 = new FixedLocation(sys);
+                AcademyCampusLocation campus2 = new AcademyCampusLocation("S", "A");
+                campus2.setParent(fixed2);
+                person.setParent(campus2);
+
+                assertEquals("Outreach", person.getEduAcademySystem());
+            }
+
+            @Test
+            void returnsSystemIdFromTree_whenParentedUnderTravelCurrentLocationUnderCampus() {
+                PlanetarySystem sys = mock(PlanetarySystem.class);
+                when(sys.getId()).thenReturn("Outreach");
+                when(sys.getTimeToJumpPoint(1.0)).thenReturn(10.0);
+                FixedLocation fixed2 = new FixedLocation(sys);
+                AcademyCampusLocation campus2 = new AcademyCampusLocation("S", "A");
+                campus2.setParent(fixed2);
+                CurrentLocation travelLoc = new CurrentLocation(sys, 5.0);
+                travelLoc.setParent(campus2);
+                person.setParent(travelLoc);
+
+                assertEquals("Outreach", person.getEduAcademySystem());
+            }
+
+            @Test
+            void treeWalkTakesPrecedenceOverLegacyField() {
+                PlanetarySystem sys = mock(PlanetarySystem.class);
+                when(sys.getId()).thenReturn("Outreach");
+                FixedLocation fixed2 = new FixedLocation(sys);
+                AcademyCampusLocation campus2 = new AcademyCampusLocation("S", "A");
+                campus2.setParent(fixed2);
+                person.setParent(campus2);
+
+                person.setEduAcademySystem("OtherSystem");
+                assertEquals("Outreach", person.getEduAcademySystem());
+            }
+        }
+    }
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {
         Field declaredField = target.getClass().getDeclaredField(fieldName);

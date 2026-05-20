@@ -2409,10 +2409,7 @@ public class HumanResources {
      */
     public static HumanResources loadFromXML(Node wn, Campaign campaign, Version version) {
         LOGGER.info("Loading HumanResources from XML...");
-        HumanResources hr = new HumanResources();
-        // Install hr on campaign immediately so that Personnel.loadFromXML → campaign.importPerson
-        // routes persons into this instance rather than the old empty one that campaign was created with.
-        campaign.setHumanResources(hr);
+        HumanResources hr = campaign.getHumanResources();
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {

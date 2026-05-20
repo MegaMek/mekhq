@@ -95,6 +95,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Kill;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
@@ -107,6 +108,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -137,6 +139,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -151,6 +154,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -748,6 +752,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         if (version.isLowerThan(new Version("0.50.10"))) {
             correctSexualPreferencesForCurrentSpouse(campaign.getPersonnel());
         }
+
+        reconnectPersonsToTravelLocations(campaign);
+        migrateLegacyEducationTravel(campaign);
 
         LOGGER.info("Load of campaign file complete!");
 
@@ -1561,6 +1568,125 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (spouseGender.isFemale()) {
                     person.setPrefersWomen(true);
                 }
+            }
+        }
+    }
+
+    /**
+     * Reconnects persons to their location nodes after a save/load.
+     *
+     * <p>During save, each {@link CurrentLocation} (traveling persons) and each
+     * {@link AcademyCampusLocation} (persons already at campus) writes the UUIDs of its direct {@link Person} children.
+     * On load those parent links are lost. This pass restores them.</p>
+     */
+    private static void reconnectPersonsToTravelLocations(Campaign campaign) {
+        for (AbstractLocation loc : campaign.getLocations()) {
+            // Persons traveling to/from campus — parented under a CurrentLocation
+            if (loc instanceof CurrentLocation currentLoc) {
+                for (UUID personId : currentLoc.drainPendingPersonIds()) {
+                    Person person = campaign.getPerson(personId);
+                    if (person != null) {
+                        person.setParent(currentLoc);
+                    }
+                }
+            }
+
+            // Persons at campus — parented directly under AcademyCampusLocation (no CurrentLocation)
+            if (loc instanceof FixedLocation fixedLoc) {
+                for (LocationNode campusNode : fixedLoc.getLocationNode().getChildren()) {
+                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLoc)) {
+                        continue;
+                    }
+                    for (UUID personId : campusLoc.drainPendingPersonIds()) {
+                        Person person = campaign.getPerson(personId);
+                        if (person != null) {
+                            person.setParent(campusLoc);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Migrates persons mid-journey on legacy saves (pre-location-tree) into real {@link CurrentLocation} nodes so they
+     * are handled by the location-aware travel code.
+     *
+     * <p>For each person in JOURNEY_TO_CAMPUS or JOURNEY_FROM_CAMPUS whose location chain contains
+     * no {@link CurrentLocation}, a new {@code CurrentLocation} is created at the target system (academy system for
+     * outbound, campaign current system for return). Transit time is set from the jump-point approach time so they
+     * arrive on planet within a day or two via normal {@code newDay()} processing.</p>
+     */
+    private static void migrateLegacyEducationTravel(Campaign campaign) {
+        for (Person person : campaign.getPersonnel()) {
+            EducationStage stage = person.getEduEducationStage();
+            if (stage != EducationStage.JOURNEY_TO_CAMPUS
+                      && stage != EducationStage.JOURNEY_FROM_CAMPUS
+                      && stage != EducationStage.EDUCATION
+                      && stage != EducationStage.GRADUATING
+                      && stage != EducationStage.DROPPING_OUT) {
+                continue;
+            }
+            if (person.hasLocation()) {
+                continue;
+            }
+
+            // Persons at campus (EDUCATION / GRADUATING / DROPPING_OUT) on old saves have no
+            // campus in the location tree. Reconnect them so getEduAcademySystem() works.
+            if (stage == EducationStage.EDUCATION
+                      || stage == EducationStage.GRADUATING
+                      || stage == EducationStage.DROPPING_OUT) {
+                String systemId = person.getEduAcademySystem();
+                if (systemId == null) {
+                    continue;
+                }
+                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+                if (campusLoc != null) {
+                    person.setParent(campusLoc);
+                }
+                continue;
+            }
+
+            PlanetarySystem targetSystem;
+            if (stage == EducationStage.JOURNEY_TO_CAMPUS) {
+                String systemId = person.getEduAcademySystem();
+                if (systemId == null) {
+                    continue;
+                }
+                targetSystem = campaign.getSystemById(systemId);
+                if (targetSystem == null) {
+                    continue;
+                }
+                double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
+                CurrentLocation travelLoc = new CurrentLocation(targetSystem, transitTime);
+                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+                if (campusLoc != null) {
+                    travelLoc.setParent(campusLoc);
+                }
+                person.setParent(travelLoc);
+                campaign.addLocation(travelLoc);
+            } else {
+                String systemId = person.getEduAcademySystem();
+                if (systemId == null) {
+                    continue;
+                }
+                targetSystem = campaign.getSystemById(systemId);
+                if (targetSystem == null) {
+                    continue;
+                }
+                double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
+                CurrentLocation returnLoc = new CurrentLocation(targetSystem, transitTime);
+                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+                if (campusLoc != null) {
+                    returnLoc.setParent(campusLoc);
+                } else {
+                    returnLoc.setParent(campaign);
+                }
+                person.setParent(returnLoc);
+                campaign.addLocation(returnLoc);
             }
         }
     }
