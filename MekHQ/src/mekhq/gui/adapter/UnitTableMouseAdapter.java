@@ -637,9 +637,23 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
-                mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                if (tech != null) {
+                    if ((!selectedUnit.getActiveCrew().isEmpty()) || (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
+                        int result = JOptionPane.showConfirmDialog(
+                              gui.getFrame(),
+                              "Also clear all assignments and designations?",
+                              "Mothball Unit",
+                              JOptionPane.YES_NO_OPTION
+                        );
+                        if (result == JOptionPane.YES_OPTION) {
+                            selectedUnit.clearCrew();
+                            selectedUnit.getCampaign().removeUnitFromFormation(selectedUnit);
+                        }
+                    }
+                    MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
+                    mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                }
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
             if (units.length > 1) {
