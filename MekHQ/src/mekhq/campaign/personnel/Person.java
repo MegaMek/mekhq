@@ -41,6 +41,7 @@ import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
@@ -1045,7 +1046,7 @@ public class Person {
     }
 
     /**
-     * Retrieves the portrait image for a given entity, with optional scaling and fallback behavior.
+     * Retrieves the portrait image for a given entity, with optional fallback behavior.
      *
      * <p>If the portrait is absent or matches a default/placeholder filename, and {@code useOriginFactionBackup} is
      * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
@@ -1078,7 +1079,7 @@ public class Person {
      * @param useOriginFactionBackup if {@code true}, returns the origin faction's logo as a fallback when the portrait
      *                               is absent or set to a default/placeholder
      * @param targetPixelWidth       the desired width in pixels to scale the image to, or {@code null} to return the
-     *                               image at its native size
+     *                               image sized based on {@link Portrait#DEFAULT_IMAGE_WIDTH}.
      *
      * @return the entity's portrait icon, scaled to {@code targetPixelWidth} if specified; a faction fallback icon if
      *       the portrait is default/absent and {@code useOriginFactionBackup} is {@code true}; or an empty
@@ -1097,14 +1098,18 @@ public class Person {
                                                 portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
 
         if (isDefaultPortrait && useOriginFactionBackup) {
-            return targetPixelWidth == null ? getFallbackPortrait() : getFallbackPortrait(targetPixelWidth);
+            return targetPixelWidth == null ?
+                         getFallbackPortrait(DEFAULT_IMAGE_WIDTH) :
+                         getFallbackPortrait(targetPixelWidth);
         }
 
         if (isPortraitNull) {
             return new ImageIcon();
         }
 
-        return targetPixelWidth == null ? portrait.getImageIcon() : portrait.getImageIcon(targetPixelWidth);
+        return targetPixelWidth == null ?
+                     portrait.getImageIcon(DEFAULT_IMAGE_WIDTH) :
+                     portrait.getImageIcon(targetPixelWidth);
     }
 
     /**
