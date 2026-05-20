@@ -254,15 +254,17 @@ public abstract class AbstractLocation implements ILocation {
      * @return the number of hours actually used for recharging
      */
     protected double applyRechargeForHours(Campaign campaign, LocalDate today, boolean isUseCommandCircuit,
-          double availableHours) {
+          double availableHours, boolean suppressReports) {
         double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
         double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
         if (usedRechargeTime > 0) {
-            campaign.addReport(GENERAL, "JumpShips spent " +
-                                              (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                              " hours recharging drives");
+            if (!suppressReports) {
+                campaign.addReport(GENERAL, "JumpShips spent " +
+                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                                  " hours recharging drives");
+            }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
-            if (getRechargeTime() >= neededRechargeTime) {
+            if (getRechargeTime() >= neededRechargeTime && !suppressReports) {
                 campaign.addReport(GENERAL, "JumpShip drives fully charged");
             }
         }
@@ -270,10 +272,11 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     // recharge even if there is no jump path because JumpShips don't go anywhere
-    public void newDay(Campaign campaign) {
+    public void newDay(Campaign campaign, boolean suppressReports) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0);
+        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0,
+              suppressReports);
     }
 
     void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {

@@ -378,13 +378,13 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
-        campaign.getLocation().newDay(campaign);
+        campaign.getLocation().newDay(campaign, false);
         updatedLocation = campaign.getLocation();
 
         List<AbstractLocation> extraLocations = new ArrayList<>(campaign.getLocations());
         for (AbstractLocation loc : extraLocations) {
             if (loc != updatedLocation) {
-                loc.newDay(campaign);
+                loc.newDay(campaign, true);
             }
         }
 

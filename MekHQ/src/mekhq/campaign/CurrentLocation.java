@@ -207,7 +207,7 @@ public class CurrentLocation extends AbstractLocation {
      * Check for a jump path and if found, do whatever needs to be done to move forward
      */
     @Override
-    public void newDay(Campaign campaign) {
+    public void newDay(Campaign campaign, boolean suppressReports) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
 
@@ -222,11 +222,13 @@ public class CurrentLocation extends AbstractLocation {
         double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
-            campaign.addReport(GENERAL, "JumpShips spent " +
-                                              (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                              " hours recharging drives");
+            if (!suppressReports) {
+                campaign.addReport(GENERAL, "JumpShips spent " +
+                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                                  " hours recharging drives");
+            }
             rechargeTime += usedRechargeTime;
-            if (rechargeTime >= neededRechargeTime) {
+            if (rechargeTime >= neededRechargeTime && !suppressReports) {
                 campaign.addReport(GENERAL, "JumpShip drives fully charged");
             }
         }
@@ -240,11 +242,13 @@ public class CurrentLocation extends AbstractLocation {
             double usedTransitTime = Math.min(hours, 24.0 * (currentSystem.getTimeToJumpPoint(1.0) - transitTime));
             if (usedTransitTime > 0) {
                 transitTime += usedTransitTime / 24.0;
-                campaign.addReport(GENERAL, "DropShips spent " +
-                                                  (Math.round(100.0 * usedTransitTime) / 100.0) +
-                                                  " hours in transit to jump point");
-                if (isAtJumpPoint()) {
-                    campaign.addReport(GENERAL, "Jump point reached");
+                if (!suppressReports) {
+                    campaign.addReport(GENERAL, "DropShips spent " +
+                                                      (Math.round(100.0 * usedTransitTime) / 100.0) +
+                                                      " hours in transit to jump point");
+                    if (isAtJumpPoint()) {
+                        campaign.addReport(GENERAL, "Jump point reached");
+                    }
                 }
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
@@ -252,7 +256,9 @@ public class CurrentLocation extends AbstractLocation {
                 if (campaignOptions.isUseAbilities()) {
                     checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
-                campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
+                if (!suppressReports) {
+                    campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
+                }
                 currentSystem = jumpPath.get(1);
                 jumpZenith = pickJumpPoint(today);
                 jumpPath.removeFirstSystem();
@@ -265,11 +271,13 @@ public class CurrentLocation extends AbstractLocation {
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
                 if (usedRechargeTime > 0) {
-                    campaign.addReport(GENERAL, "JumpShips spent " +
-                                                      (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                                      " hours recharging drives");
+                    if (!suppressReports) {
+                        campaign.addReport(GENERAL, "JumpShips spent " +
+                                                          (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                                          " hours recharging drives");
+                    }
                     rechargeTime += usedRechargeTime;
-                    if (rechargeTime >= neededRechargeTime) {
+                    if (rechargeTime >= neededRechargeTime && !suppressReports) {
                         campaign.addReport(GENERAL, "JumpShip drives fully charged");
                     }
                 }
@@ -278,13 +286,17 @@ public class CurrentLocation extends AbstractLocation {
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
-            campaign.addReport(GENERAL, "DropShips spent " +
-                                              (Math.round(100.0 * usedTransitTime) / 100.0) +
-                                              " hours transiting into system");
+            if (!suppressReports) {
+                campaign.addReport(GENERAL, "DropShips spent " +
+                                                  (Math.round(100.0 * usedTransitTime) / 100.0) +
+                                                  " hours transiting into system");
+            }
             transitTime -= usedTransitTime / 24.0;
             if (transitTime <= 0) {
-                campaign.addReport(GENERAL,
-                      jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
+                if (!suppressReports) {
+                    campaign.addReport(GENERAL,
+                          jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
+                }
                 // we are here!
                 transitTime = 0;
                 jumpPath = null;
