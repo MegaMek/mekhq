@@ -64,7 +64,7 @@ public class MRMSOption {
     // region Constructors
     public MRMSOption(PartRepairType type) {
         this(type,
-              false,
+              true,
               SkillType.EXP_ULTRA_GREEN,
               SkillType.EXP_LEGENDARY,
               TARGET_NUMBER_PREFERRED,
