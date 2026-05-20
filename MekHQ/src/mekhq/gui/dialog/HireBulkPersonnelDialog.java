@@ -385,13 +385,14 @@ public class HireBulkPersonnelDialog extends JDialog {
                 }
 
                 // Limit skills by age for children and adolescents
-                if (age < 16) {
+                boolean isUnderSixteen = age < 16;
+                if (isUnderSixteen) {
                     person.removeAllSkills();
                 } else if (age < 18) {
                     person.limitSkills(0);
                 }
 
-                if (age < 18 && campaignOptions.isNoRandomPortraitsForChildren()) {
+                if (isUnderSixteen && campaignOptions.isNoRandomPortraitsForChildren()) {
                     person.setPortrait(new Portrait());
                 }
             }

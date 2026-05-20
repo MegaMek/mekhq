@@ -1498,12 +1498,6 @@ public class CampaignNewDayManager {
                       person.getAge(today),
                       CLOSING_SPAN_TAG));
             }
-
-            if (campaignOptions.isChildPortraitsWhenComingOfAge()) {
-                if (campaignOptions.isUsePortraitForRole(person.getPrimaryRole())) {
-                    campaign.assignRandomPortraitFor(person);
-                }
-            }
         }
 
         // This is where we update all the aging modifiers for the character.
@@ -1521,6 +1515,14 @@ public class CampaignNewDayManager {
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(campaign.getRandomSkillPreferences());
                 skillGenerator.generateRoleplaySkills(person);
+            }
+
+            boolean isUsePortraitForRole = campaignOptions.isUsePortraitForRole(person.getPrimaryRole());
+            boolean hasDefaultPortrait = person.getPortrait().isDefault();
+            if (campaignOptions.isChildPortraitsWhenComingOfAge() &&
+                      isUsePortraitForRole &&
+                      hasDefaultPortrait) {
+                campaign.assignRandomPortraitFor(person);
             }
 
             // We want the event trigger to fire before the dialog is shown, so that the character will have finished
