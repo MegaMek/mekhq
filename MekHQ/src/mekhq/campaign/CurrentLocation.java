@@ -318,7 +318,11 @@ public class CurrentLocation extends AbstractLocation {
             }
 
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                Inoculations.triggerInoculationPrompt(campaign, false);
+                if (!suppressReports) {
+                    Inoculations.triggerInoculationPrompt(campaign, false);
+                } else {
+                    Inoculations.autoInoculateAll(campaign, this);
+                }
             }
 
             testForEarlyArrival(campaign);

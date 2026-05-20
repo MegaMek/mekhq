@@ -217,6 +217,32 @@ public class Inoculations {
               civilianInoculationCost);
     }
 
+    /**
+     * Silently inoculates eligible personnel at the given location's planet without displaying a dialog.
+     *
+     * <p>Only personnel nested under {@code location}'s node are vaccinated — personnel at other
+     * locations are not affected. Vaccine dodgers are still excluded. No cost is charged.</p>
+     *
+     * @param campaign the current campaign
+     * @param location the location whose personnel should be inoculated
+     */
+    public static void autoInoculateAll(Campaign campaign, mekhq.campaign.AbstractLocation location) {
+        if (!location.isOnPlanet()) {
+            return;
+        }
+        Planet currentPlanet = location.getPlanet();
+        LocalDate today = campaign.getLocalDate();
+
+        Set<Person> personnel = new HashSet<>();
+        for (Person person : location.getPersonnelAtLocation()) {
+            if (!person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
+                personnel.add(person);
+            }
+        }
+
+        inoculatePersonnel(today, personnel, currentPlanet);
+    }
+
     private static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
           Collection<Person> allPersonnel,
           Map<String, Set<Person>> civilianPersonnelInNeedOfCanonInoculation,

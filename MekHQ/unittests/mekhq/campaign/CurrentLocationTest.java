@@ -205,8 +205,8 @@ public class CurrentLocationTest {
     }
 
     /**
-     * Tests for {@link AbstractLocation#applyRechargeForHours(Campaign, java.time.LocalDate, boolean, double)} via
-     * virtual dispatch on {@link CurrentLocation}.
+     * Tests for {@link AbstractLocation#applyRechargeForHours(Campaign, java.time.LocalDate, boolean, double, boolean)}
+     * via virtual dispatch on {@link CurrentLocation}.
      */
     @Nested
     class RechargeAccumulation {
@@ -223,8 +223,8 @@ public class CurrentLocationTest {
         @Test
         void rechargeAccumulatesAcrossMultipleCalls() {
             CurrentLocation loc = new CurrentLocation(system, 0.0);
-            loc.applyRechargeForHours(campaign, today, false, 24.0);
-            loc.applyRechargeForHours(campaign, today, false, 24.0);
+            loc.applyRechargeForHours(campaign, today, false, 24.0, false);
+            loc.applyRechargeForHours(campaign, today, false, 24.0, false);
             assertEquals(48.0, loc.getRechargeTime(), 1e-9);
         }
 
@@ -233,7 +233,7 @@ public class CurrentLocationTest {
             CurrentLocation loc = new CurrentLocation(system, 0.0);
             // neededRechargeTime = 20, give 24 hours → fully charged
             when(system.getRechargeTime(today, false)).thenReturn(20.0);
-            loc.applyRechargeForHours(campaign, today, false, 24.0);
+            loc.applyRechargeForHours(campaign, today, false, 24.0, false);
             // Two reports: spending hours + fully charged
             verify(campaign, times(2)).addReport(eq(GENERAL), anyString());
         }
