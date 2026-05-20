@@ -1045,7 +1045,7 @@ public class Person {
     }
 
     /**
-     * Retrieves the portrait image for a given entity, with optional scaling and fallback behavior.
+     * Retrieves the portrait image for a given entity, with optional fallback behavior.
      *
      * <p>If the portrait is absent or matches a default/placeholder filename, and {@code useOriginFactionBackup} is
      * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
