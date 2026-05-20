@@ -608,6 +608,13 @@ public final class FinancesTab extends CampaignGuiTab {
         sb.append("    Overhead............. ")
               .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString()))
               .append('\n');
+        Money rentals = r.getRentals();
+        if (!rentals.isZero()) {
+            sb.append("    ")
+                  .append(resourceMap.getString("rentalFacilities.text"))
+                  .append(String.format(formatted, rentals.toAmountAndSymbolString()))
+                  .append('\n');
+        }
         if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
                   .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString()))
