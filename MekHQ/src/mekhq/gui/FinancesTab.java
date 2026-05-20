@@ -610,7 +610,8 @@ public final class FinancesTab extends CampaignGuiTab {
               .append('\n');
         Money rentals = r.getRentals();
         if (!rentals.isZero()) {
-            sb.append("    Rental Facilities.... ")
+            sb.append("    ")
+                  .append(resourceMap.getString("rentalFacilities.text"))
                   .append(String.format(formatted, rentals.toAmountAndSymbolString()))
                   .append('\n');
         }

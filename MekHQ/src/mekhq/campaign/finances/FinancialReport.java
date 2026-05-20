@@ -157,7 +157,9 @@ public class FinancialReport {
         return mek;
     }
 
-    public Money getRentals() {return rentals;}
+    public Money getRentals() {
+        return rentals;
+    }
 
     public static FinancialReport calculate(Campaign campaign) {
         FinancialReport r = new FinancialReport();
