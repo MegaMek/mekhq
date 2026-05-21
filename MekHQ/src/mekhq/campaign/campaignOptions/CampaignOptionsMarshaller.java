@@ -1154,6 +1154,10 @@ public class CampaignOptionsMarshaller {
               "useAdvancedBuildingGunEmplacements",
               campaignOptions.isUseAdvancedBuildingGunEmplacements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alliedFacilityModifierDieSize",
+              campaignOptions.getAlliedFacilityModifierDieSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyFacilityModifierDieSize",
+              campaignOptions.getEnemyFacilityModifierDieSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", campaignOptions.getScenarioModBV());

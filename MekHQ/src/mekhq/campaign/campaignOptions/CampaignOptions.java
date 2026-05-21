@@ -667,6 +667,8 @@ public class CampaignOptions {
     private int fixedMapChance;
     private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
+    private int alliedFacilityModifierDieSize;
+    private int enemyFacilityModifierDieSize;
     private int scenarioModMax;
     private int scenarioModChance;
     private int scenarioModBV;
@@ -1341,6 +1343,8 @@ public class CampaignOptions {
         setFixedMapChance(25);
         setUseAdvancedBuildingGunEmplacements(false);
         setSpaUpgradeIntensity(0);
+        setAlliedFacilityModifierDieSize(2);
+        setEnemyFacilityModifierDieSize(2);
         regionalMekVariations = false;
         attachedPlayerCamouflage = true;
         playerControlsAttachedUnits = false;
@@ -5232,6 +5236,22 @@ public class CampaignOptions {
 
     public void setSpaUpgradeIntensity(final int spaUpgradeIntensity) {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
+    }
+
+    public int getAlliedFacilityModifierDieSize() {
+        return alliedFacilityModifierDieSize;
+    }
+
+    public void setAlliedFacilityModifierDieSize(final int alliedFacilityModifierDieSize) {
+        this.alliedFacilityModifierDieSize = alliedFacilityModifierDieSize;
+    }
+
+    public int getEnemyFacilityModifierDieSize() {
+        return enemyFacilityModifierDieSize;
+    }
+
+    public void setEnemyFacilityModifierDieSize(final int enemyFacilityModifierDieSize) {
+        this.enemyFacilityModifierDieSize = enemyFacilityModifierDieSize;
     }
 
     public int getScenarioModMax() {

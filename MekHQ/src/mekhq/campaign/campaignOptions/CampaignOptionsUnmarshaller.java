@@ -916,6 +916,10 @@ public class CampaignOptionsUnmarshaller {
                   campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
                         nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
+            case "alliedFacilityModifierDieSize" ->
+                  campaignOptions.setAlliedFacilityModifierDieSize(parseInt(nodeContents));
+            case "enemyFacilityModifierDieSize" ->
+                  campaignOptions.setEnemyFacilityModifierDieSize(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));
             case "scenarioModBV" -> campaignOptions.setScenarioModBV(parseInt(nodeContents));
