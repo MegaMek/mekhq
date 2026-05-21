@@ -32,8 +32,11 @@
  */
 package mekhq.campaign.stratCon;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -44,7 +47,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -54,12 +59,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
-import mekhq.campaign.CurrentLocation;
+import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
@@ -68,21 +72,183 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
-
-import megamek.common.options.OptionsConstants;
-import megamek.common.units.Entity;
-import megamek.common.units.UnitType;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link StratConRulesManager}
  */
 class StratConRulesManagerTest {
+
+    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
+          StratConTrackState track, List<String> objectiveScenarios) throws Exception {
+        Method method = StratConContractInitializer.class.getDeclaredMethod("initializeObjectiveScenarios",
+              Campaign.class,
+              AtBContract.class,
+              StratConTrackState.class,
+              int.class,
+              List.class,
+              List.class);
+        method.setAccessible(true);
+        method.invoke(null, campaign, contract, track, 1, objectiveScenarios, null);
+    }
+
+    @Test
+    void addStrategicObjective_updatesLookupAfterCacheWasBuilt() {
+        StratConTrackState track = new StratConTrackState();
+        StratConCoords coords = new StratConCoords(2, 6);
+
+        assertTrue(track.getObjectivesByCoords().isEmpty());
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveCoords(coords);
+        objective.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+
+        track.addStrategicObjective(objective);
+
+        assertSame(objective, track.getObjectivesByCoords().get(coords));
+    }
+
+    @Test
+    void addStrategicObjective_doesNotCacheCoordinateLessObjectives() {
+        StratConTrackState track = new StratConTrackState();
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+
+        track.addStrategicObjective(objective);
+
+        assertFalse(track.getObjectivesByCoords().containsKey(null));
+
+        StratConStrategicObjective laterObjective = new StratConStrategicObjective();
+        laterObjective.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+
+        track.addStrategicObjective(laterObjective);
+
+        assertFalse(track.getObjectivesByCoords().containsKey(null));
+    }
+
+    @Test
+    void initializeObjectiveScenarios_skipsMissingTemplateWithoutAddingObjective() throws Exception {
+        Campaign campaign = mock(Campaign.class);
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = new StratConTrackState();
+        track.setWidth(1);
+        track.setHeight(1);
+
+        initializeObjectiveScenarios(campaign, contract, track, List.of("missing-objective-template.xml"));
+
+        assertTrue(track.getScenarios().isEmpty());
+        assertTrue(track.getStrategicObjectives().isEmpty());
+    }
+
+    @Test
+    void initializeObjectiveScenarios_doesNotAddObjectiveWhenScenarioGenerationFails() throws Exception {
+        Campaign campaign = mock(Campaign.class);
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = new StratConTrackState();
+        track.setWidth(1);
+        track.setHeight(1);
+        ScenarioTemplate template = mock(ScenarioTemplate.class);
+        StratConFacility facility = new StratConFacility();
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = Mockito.mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConFacilityFactory> facilityFactory = Mockito.mockStatic(StratConFacilityFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = Mockito.mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            scenarioFactory.when(() -> StratConScenarioFactory.getSpecificScenario("objective-template.xml"))
+                  .thenReturn(template);
+            when(template.isFacilityScenario()).thenReturn(true);
+            when(template.isHostileFacility()).thenReturn(true);
+            facilityFactory.when(StratConFacilityFactory::getRandomHostileFacility).thenReturn(facility);
+            rulesManager.when(() -> StratConRulesManager.generateScenario(any(Campaign.class),
+                        any(AtBContract.class),
+                        any(StratConTrackState.class),
+                        any(),
+                        any(StratConCoords.class),
+                        any(ScenarioTemplate.class),
+                        any()))
+                  .thenReturn(null);
+
+            initializeObjectiveScenarios(campaign, contract, track, List.of("objective-template.xml"));
+        }
+
+        assertTrue(track.getScenarios().isEmpty());
+        assertTrue(track.getFacilities().isEmpty());
+        assertTrue(track.getStrategicObjectives().isEmpty());
+    }
+
+    @Test
+    void processIgnoredStratConScenario_failsObjectiveBeforeScenarioRemoval() {
+        StratConTrackState track = new StratConTrackState();
+        StratConCoords coords = new StratConCoords(2, 6);
+
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getId()).thenReturn(231);
+        when(backingScenario.getForceIDs()).thenReturn(new ArrayList<>());
+
+        StratConScenario scenario = new StratConScenario();
+        scenario.setCoords(coords);
+        scenario.setBackingScenario(backingScenario);
+        track.addScenario(scenario);
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveCoords(coords);
+        objective.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+        objective.setDesiredObjectiveCount(1);
+        track.addStrategicObjective(objective);
+
+        StratConRulesManager.processIgnoredStratConScenario(scenario, track, new StratConCampaignState());
+
+        assertFalse(track.getScenarios().containsKey(coords));
+        assertSame(objective, track.getObjectivesByCoords().get(coords));
+        assertEquals(StratConStrategicObjective.OBJECTIVE_FAILED, objective.getCurrentObjectiveCount());
+    }
+
+    @Test
+    void setupScenario_existingFacilitySkipsGenerationWhenFacilityTemplateMissing() {
+        Campaign campaign = mock(Campaign.class);
+        AtBContract contract = mock(AtBContract.class);
+        StratConTrackState track = new StratConTrackState();
+        StratConCoords coords = new StratConCoords(2, 6);
+
+        StratConFacility facility = new StratConFacility();
+        facility.setOwner(ScenarioForceTemplate.ForceAlignment.Allied);
+        track.addFacility(coords, facility);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = Mockito.mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = Mockito.mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            scenarioFactory.when(() -> StratConScenarioFactory.getFacilityScenario(true)).thenReturn(null);
+
+            StratConScenario scenario = StratConRulesManager.setupScenario(coords,
+                  null,
+                  campaign,
+                  contract,
+                  track,
+                  null,
+                  false,
+                  null);
+
+            assertNull(scenario);
+            rulesManager.verify(() -> StratConRulesManager.generateScenario(any(Campaign.class),
+                  any(AtBContract.class),
+                  any(StratConTrackState.class),
+                  any(),
+                  any(StratConCoords.class),
+                  any(ScenarioTemplate.class),
+                  any()), never());
+        }
+    }
 
     /**
      * Creates the common mock infrastructure needed for deployForceToCoords tests.

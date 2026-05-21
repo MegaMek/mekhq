@@ -38,6 +38,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPan
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
@@ -78,8 +79,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 /**
  * The {@code MarketsTab} class represents the campaign options tab related to market settings. This tab provides
@@ -762,17 +761,15 @@ public class MarketsTab {
         // Contents
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.text"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
         btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.tooltip"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
+        btnContractEquipment.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractEquipment"));
 
         btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.text"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
         btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.tooltip"));
-        spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
+        btnContractPersonnel.addMouseListener(createTipPanelUpdater(contractMarketHeader, "ContractPersonnel"));
 
         ButtonGroup contractGroup = new ButtonGroup();
         contractGroup.add(btnContractEquipment);

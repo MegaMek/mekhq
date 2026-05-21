@@ -412,6 +412,7 @@ public class Person implements ILocation {
     private boolean salvageSupervisor;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
+    private boolean blockMaternityLeave;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -644,6 +645,7 @@ public class Person implements ILocation {
         }
         underProtection = false;
         neverAssignMaintenanceAutomatically = false;
+        blockMaternityLeave = false;
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -3177,6 +3179,14 @@ public class Person implements ILocation {
         this.neverAssignMaintenanceAutomatically = neverAssignMaintenanceAutomatically;
     }
 
+    public boolean isBlockMaternityLeave() {
+        return blockMaternityLeave;
+    }
+
+    public void setBlockMaternityLeave(final boolean blockMaternityLeave) {
+        this.blockMaternityLeave = blockMaternityLeave;
+    }
+
     public boolean isEmployed() {
         return status != PersonnelStatus.CAMP_FOLLOWER;
     }
@@ -3787,6 +3797,10 @@ public class Person implements ILocation {
                   indent,
                   "neverAssignMaintenanceAutomatically",
                   neverAssignMaintenanceAutomatically);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "blockMaternityLeave",
+                  blockMaternityLeave);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
@@ -4416,6 +4430,8 @@ public class Person implements ILocation {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
                     person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("blockMaternityLeave")) {
+                    person.setBlockMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -7140,6 +7156,28 @@ public class Person implements ILocation {
         }
 
         return atowAttributes.getAttributeCap(phenotype, options, attribute);
+    }
+
+    /**
+     * Retrieves the modifier value for a specified skill attribute.
+     *
+     * @param attribute the skill attribute for which the modifier is to be calculated;
+     *                  if the attribute is null or represents "none", a warning is logged and the method returns 0
+     * @return the calculated modifier value for the provided skill attribute, or 0 if the attribute is null or "none"
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
+    public int getAttributeModifier(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            LOGGER.warn("(getAttributeModifier) SkillAttribute is null or NONE.");
+            return 0;
+        }
+
+        return atowAttributes.getAttributeModifier(attribute,
+              getActiveInjuryEffects(),
+              options,
+              ageForAttributeModifiers);
     }
 
     /**

@@ -73,6 +73,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.CampaignEventProcessor;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.camOpsReputation.ReputationController;
@@ -82,13 +83,11 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.storyArc.StoryArc;
@@ -101,6 +100,7 @@ import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
@@ -308,7 +308,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
             // region progress 3
             setProgress(3);
-            Systems.setInstance(Systems.loadDefault());
+            Systems.initializeDefaultSystems();
             // endregion Progress 3
 
             // region progress 4

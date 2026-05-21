@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
@@ -155,6 +154,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.PlanetarySystemCampaignXmlIO;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -192,11 +192,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Document xmlDoc;
 
         try {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
+            xmlDoc = MHQXMLUtility.parseDocument(is);
         } catch (Exception ex) {
             LOGGER.error("", ex);
             throw new CampaignXmlParseException(ex);
@@ -258,6 +254,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           version));
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
+                } else if (xn.equalsIgnoreCase(PlanetarySystemCampaignXmlIO.XML_TAG)) {
+                    processPlanetarySystemOverrides(campaign, wn);
                 }
             }
             // If it's a text node or attribute or whatever at this level,
@@ -787,6 +785,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     LOGGER.warn("Tech {} {} {} (fixed)", tech.getFullName(), reason, unitDesc);
                 }
             }
+        }
+    }
+
+    private static void processPlanetarySystemOverrides(Campaign campaign, Node parentNode)
+          throws CampaignXmlParseException {
+        try {
+            campaign.setPlanetarySystemOverrides(PlanetarySystemCampaignXmlIO.parse(parentNode));
+        } catch (IOException ex) {
+            throw new CampaignXmlParseException(ex);
         }
     }
 

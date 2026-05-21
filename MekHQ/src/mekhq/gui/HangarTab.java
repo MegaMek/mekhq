@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -74,7 +76,10 @@ import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
@@ -108,6 +113,7 @@ public final class HangarTab extends CampaignGuiTab {
     private JComboBox<String> choiceUnit;
     private JComboBox<String> choiceUnitView;
     private JCheckBox chkHideMothballed;
+    private JButton btnAssignTechs;
     private JScrollPane scrollUnitView;
 
     private UnitTableModel unitModel;
@@ -204,6 +210,18 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
 
+        btnAssignTechs = new RoundedJButton(resourceMap.getString("btnAssignTechs.text"));
+        btnAssignTechs.setToolTipText(resourceMap.getString("btnAssignTechs.toolTipText"));
+        btnAssignTechs.addActionListener(ev -> quickAssignTechs());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(btnAssignTechs, gridBagConstraints);
+
         unitModel = new UnitTableModel(getCampaign());
         unitTable = new JTable(unitModel);
         unitTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -267,6 +285,22 @@ public final class HangarTab extends CampaignGuiTab {
         add(splitUnit, gridBagConstraints);
 
         UnitTableMouseAdapter.connect(getCampaignGui(), unitTable, unitModel, splitUnit);
+    }
+
+    private void quickAssignTechs() {
+        boolean wasConfirmedOverall;
+
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_ASSIGN_TECHS)) {
+            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(getCampaign(),
+                  CONFIRMATION_ASSIGN_TECHS);
+            wasConfirmedOverall = confirmation.wasConfirmed();
+        } else {
+            wasConfirmedOverall = true;
+        }
+
+        if (wasConfirmedOverall) {
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+        }
     }
 
     /**
