@@ -2523,8 +2523,9 @@ public class Person {
             return;
         }
 
+        boolean isIgnoreSPAEligibility = !campaignOptions.isAwardRelevantVeterancySPAs();
         SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true, true);
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true);
         if (spaGained == null) {
             return;
         } else {
@@ -7076,8 +7077,9 @@ public class Person {
     /**
      * Retrieves the modifier value for a specified skill attribute.
      *
-     * @param attribute the skill attribute for which the modifier is to be calculated;
-     *                  if the attribute is null or represents "none", a warning is logged and the method returns 0
+     * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
+     *                  represents "none", a warning is logged and the method returns 0
+     *
      * @return the calculated modifier value for the provided skill attribute, or 0 if the attribute is null or "none"
      *
      * @author Illiani
