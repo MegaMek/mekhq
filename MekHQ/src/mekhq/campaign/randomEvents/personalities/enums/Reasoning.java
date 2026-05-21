@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -194,18 +194,27 @@ public enum Reasoning {
     }
 
     /**
+     * @deprecated use {@link #getExamResults(int)} instead.
+     *
+     */
+    @Deprecated(since = "0.51.00", forRemoval = true)
+    public String getExamResults() {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
+    }
+
+    /**
      * Retrieves the formatted exam results text.
      *
-     * <p>Calculates the result percentage based on the current {@code level} relative to {@code GENIUS.level},
-     * and uses this value to format the exam results text from the resource bundle.</p>
+     * <p>Uses the supplied result percentage (that was calculated earlier using {@link #getExamScore()} ) to format
+     * the exam results text from the resource bundle.</p>
      *
-     * @return the formatted exam results string with the calculated percentage inserted.
+     * @return the formatted exam results string with the supplied result percentage inserted.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getExamResults() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
+    public String getExamResults(final int examScore) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", examScore);
     }
 
     /**

@@ -51,6 +51,9 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.text.AttributeSet;
+import java.util.List;
+
 public class AttributesTest {
     @Test
     public void testDefaultConstructor() {
@@ -269,5 +272,27 @@ public class AttributesTest {
                 assertEquals(expected, newValue);
             }
         }
+    }
+
+    @Test
+    public void testGetAdjustedAttributeScore_MinimumScore_Edge() {
+        Attributes attributes = new Attributes();
+        PersonnelOptions personnelOptions = new PersonnelOptions();
+        attributes.setAttributeScore(Phenotype.GENERAL, personnelOptions, SkillAttribute.EDGE, 0);
+
+        int actualScore = attributes.getAdjustedAttributeScore(SkillAttribute.EDGE, List.of(), personnelOptions,
+              21);
+        assertEquals(MINIMUM_EDGE_SCORE, actualScore);
+    }
+
+    @Test
+    public void testGetAdjustedAttributeScore_MinimumScore_NotEdge() {
+        Attributes attributes = new Attributes();
+        PersonnelOptions personnelOptions = new PersonnelOptions();
+        attributes.setAttributeScore(Phenotype.GENERAL, personnelOptions, BODY, 0);
+
+        int actualScore = attributes.getAdjustedAttributeScore(SkillAttribute.BODY, List.of(), personnelOptions,
+              21);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, actualScore);
     }
 }

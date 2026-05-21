@@ -46,7 +46,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -192,19 +191,6 @@ public class StratConTrackState {
     public void removeScenario(StratConScenario scenario) {
         scenarios.remove(scenario.getCoords());
         getBackingScenariosMap().remove(scenario.getBackingScenarioID());
-        Map<StratConCoords, StratConStrategicObjective> objectives = getObjectivesByCoords();
-        if (objectives.containsKey(scenario.getCoords())) {
-            StrategicObjectiveType objectiveType = objectives.get(scenario.getCoords()).getObjectiveType();
-
-            switch (objectiveType) {
-                case RequiredScenarioVictory:
-                case SpecificScenarioVictory:
-                    objectives.remove(scenario.getCoords());
-                    break;
-                default:
-                    break;
-            }
-        }
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
@@ -436,7 +422,10 @@ public class StratConTrackState {
         if (specificStrategicObjectives == null) {
             specificStrategicObjectives = new HashMap<>();
             for (StratConStrategicObjective objective : strategicObjectives) {
-                specificStrategicObjectives.put(objective.getObjectiveCoords(), objective);
+                StratConCoords coords = objective.getObjectiveCoords();
+                if (coords != null) {
+                    specificStrategicObjectives.put(coords, objective);
+                }
             }
         }
 
@@ -554,10 +543,17 @@ public class StratConTrackState {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStrategicObjectives(List<StratConStrategicObjective> strategicObjectives) {
         this.strategicObjectives = strategicObjectives;
+        specificStrategicObjectives = null;
     }
 
     public void addStrategicObjective(StratConStrategicObjective strategicObjective) {
         getStrategicObjectives().add(strategicObjective);
+        if (specificStrategicObjectives != null) {
+            StratConCoords coords = strategicObjective.getObjectiveCoords();
+            if (coords != null) {
+                specificStrategicObjectives.put(coords, strategicObjective);
+            }
+        }
     }
 
     public int getTemperature() {

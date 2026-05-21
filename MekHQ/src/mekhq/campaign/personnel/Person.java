@@ -407,6 +407,7 @@ public class Person {
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
     private boolean coverIllicitMedicalExpenses;
+    private boolean blockMaternityLeave;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
     @Deprecated(since = "0.50.10", forRemoval = true)
@@ -641,6 +642,7 @@ public class Person {
         underProtection = false;
         neverAssignMaintenanceAutomatically = false;
         coverIllicitMedicalExpenses = true;
+        blockMaternityLeave = false;
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -2523,8 +2525,9 @@ public class Person {
             return;
         }
 
+        boolean isIgnoreSPAEligibility = !campaignOptions.isAwardRelevantVeterancySPAs();
         SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true, true);
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true);
         if (spaGained == null) {
             return;
         } else {
@@ -3132,6 +3135,14 @@ public class Person {
 
     public void setCoverIllicitMedicalExpenses(final boolean coverIllicitMedicalExpenses) {
         this.coverIllicitMedicalExpenses = coverIllicitMedicalExpenses;
+    }
+
+    public boolean isBlockMaternityLeave() {
+        return blockMaternityLeave;
+    }
+
+    public void setBlockMaternityLeave(final boolean blockMaternityLeave) {
+        this.blockMaternityLeave = blockMaternityLeave;
     }
 
     public boolean isEmployed() {
@@ -3752,6 +3763,10 @@ public class Person {
                   indent,
                   "coverIllicitMedicalExpenses",
                   coverIllicitMedicalExpenses);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "blockMaternityLeave",
+                  blockMaternityLeave);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
@@ -4381,6 +4396,8 @@ public class Person {
                     person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("coverIllicitMedicalExpenses")) {
                     person.setCoverIllicitMedicalExpenses(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("blockMaternityLeave")) {
+                    person.setBlockMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
                     boolean marriageable = Boolean.parseBoolean(wn2.getTextContent().trim());
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -7071,6 +7088,29 @@ public class Person {
         }
 
         return atowAttributes.getAttributeCap(phenotype, options, attribute);
+    }
+
+    /**
+     * Retrieves the modifier value for a specified skill attribute.
+     *
+     * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
+     *                  represents "none", a warning is logged and the method returns 0
+     *
+     * @return the calculated modifier value for the provided skill attribute, or 0 if the attribute is null or "none"
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
+    public int getAttributeModifier(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            LOGGER.warn("(getAttributeModifier) SkillAttribute is null or NONE.");
+            return 0;
+        }
+
+        return atowAttributes.getAttributeModifier(attribute,
+              getActiveInjuryEffects(),
+              options,
+              ageForAttributeModifiers);
     }
 
     /**

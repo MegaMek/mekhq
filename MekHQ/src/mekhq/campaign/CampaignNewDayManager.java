@@ -1576,7 +1576,7 @@ public class CampaignNewDayManager {
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
             int totalProstheticCount = getTotalProstheticCount(person);
 
-            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
+            Money cost = Money.of(PersonnelOptions.MEDICINE_COST * totalProstheticCount);
             if (!payForMedicine(person, cost)) {
                 checkForDiscontinuationSyndrome(person,
                       isUseAdvancedMedical,
@@ -1629,10 +1629,9 @@ public class CampaignNewDayManager {
             }
         }
 
+        // Must be before MADNESS_CLINICAL_PARANOIA && MADNESS_HYSTERIA
         boolean resetClinicalParanoia = true; // See comment at end of method
         if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
-            resetClinicalParanoia = false;
-
             Money cost = getMedicalCostFromSPAXPCost(MADNESS_CLINICAL_PARANOIA);
 
             if (!payForMedicine(person, cost)) {
@@ -1643,6 +1642,8 @@ public class CampaignNewDayManager {
                 if (!report.isBlank()) {
                     campaign.addReport(MEDICAL, report);
                 }
+
+                resetClinicalParanoia = false;
             }
         }
 
@@ -1697,8 +1698,6 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(MADNESS_HYSTERIA)) {
-            resetClinicalParanoia = false;
-
             Money cost = getMedicalCostFromSPAXPCost(MADNESS_HYSTERIA);
 
             if (!payForMedicine(person, cost)) {
@@ -1712,6 +1711,8 @@ public class CampaignNewDayManager {
                 if (!report.isBlank()) {
                     campaign.addReport(MEDICAL, report);
                 }
+
+                resetClinicalParanoia = false;
             }
         }
 
@@ -1757,7 +1758,7 @@ public class CampaignNewDayManager {
      *
      * <p>
      *     Cost is derived from the XP cost of the Flaw divided by 100 (rounded normally). It has a minimum value of
-     *     {@link PersonnelOptions#PAINKILLER_COST}.
+     *     {@link PersonnelOptions#MEDICINE_COST}.
      * </p>
      *
      * @param spaKey the key representing a special ability, used to fetch its associated cost multiplier.
@@ -1772,11 +1773,9 @@ public class CampaignNewDayManager {
 
         SpecialAbility specialAbility = specialAbilityMap.get(spaKey);
 
-        double multiplier = specialAbility == null ? 1.0 : specialAbility.getCost() / 100.0;
-        int cost = (int) round(PersonnelOptions.PAINKILLER_COST * multiplier);
-
-        // The cost of Flaws is always negative, so we need to invert the sign
-        cost = max(-cost, PersonnelOptions.PAINKILLER_COST);
+        int xpCost = specialAbility == null ? 0 : specialAbility.getCost();
+        int roundedCostUnits = max(1, (int) round(Math.abs(xpCost) / 100.0));
+        int cost = PersonnelOptions.MEDICINE_COST * roundedCostUnits;
 
         return Money.of(cost);
     }
