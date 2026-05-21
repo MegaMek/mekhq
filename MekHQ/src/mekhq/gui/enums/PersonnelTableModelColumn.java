@@ -49,6 +49,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -882,46 +883,76 @@ public enum PersonnelTableModelColumn {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);
                     yield (entity == null) ? "-" : entity.getDisplayName();
-                }
+                } else {
+                    Unit unit = person.getUnit();
+                    if (unit != null) {
+                        String name = unit.getName();
+                        Entity entity = unit.getEntity();
+                        String role = null;
 
-                Unit unit = person.getUnit();
-                if (unit != null) {
-                    String name = unit.getName();
-                    if (unit.getEntity() instanceof Tank) {
-                        name += unit.isDriver(person) ? " [Driver]" : " [Gunner]";
-                    } else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-                        if (unit.isNavigator(person)) {name += " [Navigator]";} else if (unit.isDriver(person)) {
-                            name += " [Pilot]";
-                        } else if (unit.isGunner(person)) {
-                            name += " [Gunner]";
-                        } else {name += " [Crew]";}
-                    }
-                    yield name;
-                }
-
-                if (!person.getTechUnits().isEmpty()) {
-                    Unit refitUnit = person.getTechUnits().stream()
-                                           .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
-                                           .findFirst().orElse(null);
-                    String refitString = refitUnit != null ? "<b>Refitting</b> " + refitUnit.getName() : "";
-
-                    if (person.getTechUnits().size() == 1) {
-                        unit = person.getTechUnits().getFirst();
-                        if (unit != null) {
-                            yield "<html>" + ReportingUtilities.separateIf(refitString, ", ",
-                                  unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") + "</html>";
+                        if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof Tank) {
+                            if (unit.isNavigator(person)) {
+                                role = "Navigator";
+                            } else if (unit.isDriver(person)) {
+                                role = (entity instanceof Tank) ? "Driver" : "Pilot";
+                            } else if (unit.isGunner(person)) {
+                                role = "Gunner";
+                            } else if (unit.isCommander(person)
+                                             || ((entity instanceof Tank) && unit.isTechOfficer(person))) {
+                                role = "Commander";
+                            } else {
+                                role = "Crew";
+                            }
+                        } else if (entity instanceof Mek && unit.getFullCrewSize() > 1) {
+                            if (unit.isDriver(person)) {
+                                role = "Pilot";
+                            } else if (unit.isGunner(person)) {
+                                role = "Gunner";
+                            } else if (unit.isTechOfficer(person)) {
+                                role = "Tech Officer";
+                            } else if (unit.isCommander(person)) {
+                                role = "Commander";
+                            }
                         }
-                    } else {
-                        yield "<html>" +
-                                    ReportingUtilities.separateIf(refitString, ", ",
-                                          person.getTechUnits().size() +
-                                                " units (" +
-                                                person.getMaintenanceTimeUsing() +
-                                                "m)") +
-                                    "</html>";
+
+                        if (role != null) {
+                            name += " [" + role + "]";
+                        }
+
+                        yield name;
+                    }
+
+                    // Check for tech units
+                    if (!person.getTechUnits().isEmpty()) {
+                        Unit refitUnit = person.getTechUnits()
+                                               .stream()
+                                               .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
+                                               .findFirst()
+                                               .orElse(null);
+                        String refitString = null != refitUnit ? "<b>Refitting</b> " + refitUnit.getName() : "";
+                        if (person.getTechUnits().size() == 1) {
+                            unit = person.getTechUnits().getFirst();
+                            if (unit != null) {
+                                yield "<html>" +
+                                            ReportingUtilities.separateIf(refitString,
+                                                  ", ",
+                                                  unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") +
+                                            "</html>";
+                            }
+                        } else {
+                            yield "<html>" +
+                                        ReportingUtilities.separateIf(refitString,
+                                              ", ",
+                                              person.getTechUnits().size() +
+                                                    " units (" +
+                                                    person.getMaintenanceTimeUsing() +
+                                                    "m)") +
+                                        "</html>";
+                        }
                     }
                 }
 
+                // Final fallback return of nothing
                 yield "-";
             }
             case UNLUCKY -> Integer.toString(person.getUnlucky());
@@ -932,8 +963,6 @@ public enum PersonnelTableModelColumn {
             case WORK_MINUTES -> person.isTechExpanded() ? String.valueOf(person.getMinutesLeft()) : "0";
             case XP -> Integer.toString(person.getXP());
             case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
-
-            default -> "UNIMPLEMENTED";
         };
     }
 
@@ -982,24 +1011,14 @@ public enum PersonnelTableModelColumn {
 
     private static @NonNull BiFunction<String, String, String> getGunneryPilotingValue(
           Function<String, String> skillValue) {
-        final BiFunction<String, String, String> gunPilot = (gunSkill, pilotSkill) ->
-                                                                  skillValue.apply(gunSkill) +
-                                                                        '/' +
-                                                                        skillValue.apply(pilotSkill);
-        return gunPilot;
+        return (gunSkill, pilotSkill) -> skillValue.apply(gunSkill) + '/' + skillValue.apply(pilotSkill);
     }
 
     private static @NonNull Function<String, String> getSkillValue(Person person,
           SkillModifierData skillModifierData) {
-        final Function<String, String> skillVal = skillName ->
-                                                        person.hasSkill(skillName)
-                                                              ?
-                                                              Integer.toString(person.getSkill(skillName)
-                                                                                     .getFinalSkillValue(
-                                                                                           skillModifierData))
-                                                              :
-                                                              "-";
-        return skillVal;
+        return skillName -> person.hasSkill(skillName) ?
+                                  Integer.toString(person.getSkill(skillName).getFinalSkillValue(skillModifierData)) :
+                                  "-";
     }
 
     /**
