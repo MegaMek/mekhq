@@ -406,6 +406,7 @@ public class Person {
     private boolean salvageSupervisor;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
+    private boolean coverIllicitMedicalExpenses;
     private boolean blockMaternityLeave;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
@@ -640,6 +641,7 @@ public class Person {
         }
         underProtection = false;
         neverAssignMaintenanceAutomatically = false;
+        coverIllicitMedicalExpenses = true;
         blockMaternityLeave = false;
 
         // region Flags
@@ -3127,6 +3129,14 @@ public class Person {
         this.neverAssignMaintenanceAutomatically = neverAssignMaintenanceAutomatically;
     }
 
+    public boolean isCoverIllicitMedicalExpenses() {
+        return coverIllicitMedicalExpenses;
+    }
+
+    public void setCoverIllicitMedicalExpenses(final boolean coverIllicitMedicalExpenses) {
+        this.coverIllicitMedicalExpenses = coverIllicitMedicalExpenses;
+    }
+
     public boolean isBlockMaternityLeave() {
         return blockMaternityLeave;
     }
@@ -3749,6 +3759,10 @@ public class Person {
                   indent,
                   "neverAssignMaintenanceAutomatically",
                   neverAssignMaintenanceAutomatically);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "coverIllicitMedicalExpenses",
+                  coverIllicitMedicalExpenses);
             MHQXMLUtility.writeSimpleXMLTag(pw,
                   indent,
                   "blockMaternityLeave",
@@ -4380,6 +4394,8 @@ public class Person {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
                     person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("coverIllicitMedicalExpenses")) {
+                    person.setCoverIllicitMedicalExpenses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("blockMaternityLeave")) {
                     person.setBlockMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10

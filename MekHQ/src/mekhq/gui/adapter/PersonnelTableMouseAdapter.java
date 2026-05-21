@@ -3963,6 +3963,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }));
         menu.add(cbMenuItem);
 
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("coverIllicitMedicalExpenses.text"));
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("coverIllicitMedicalExpenses.toolTipText"),
+              100));
+        cbMenuItem.setName("coverIllicitMedicalExpenses");
+        cbMenuItem.setSelected(selected.length == 1 && person.isCoverIllicitMedicalExpenses());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setCoverIllicitMedicalExpenses(!selectedPerson.isCoverIllicitMedicalExpenses());
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
+        menu.add(cbMenuItem);
+
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         // endregion Flags Menu
 
