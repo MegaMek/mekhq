@@ -921,20 +921,20 @@ public enum PersonnelTableModelColumn {
                             unit = person.getTechUnits().getFirst();
                             if (unit != null) {
                                 yield "<html>" +
-                                             ReportingUtilities.separateIf(refitString,
-                                                   ", ",
-                                                   unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") +
-                                             "</html>";
+                                            ReportingUtilities.separateIf(refitString,
+                                                  ", ",
+                                                  unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") +
+                                            "</html>";
                             }
                         } else {
                             yield "<html>" +
-                                         ReportingUtilities.separateIf(refitString,
-                                               ", ",
-                                               person.getTechUnits().size() +
-                                                     " units (" +
-                                                     person.getMaintenanceTimeUsing() +
-                                                     "m)") +
-                                         "</html>";
+                                        ReportingUtilities.separateIf(refitString,
+                                              ", ",
+                                              person.getTechUnits().size() +
+                                                    " units (" +
+                                                    person.getMaintenanceTimeUsing() +
+                                                    "m)") +
+                                        "</html>";
                         }
                     }
                 }
@@ -950,31 +950,19 @@ public enum PersonnelTableModelColumn {
             case WORK_MINUTES -> person.isTechExpanded() ? String.valueOf(person.getMinutesLeft()) : "0";
             case XP -> Integer.toString(person.getXP());
             case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
-
-            default -> "UNIMPLEMENTED";
         };
     }
 
     private static @NonNull BiFunction<String, String, String> getGunneryPilotingValue(
           Function<String, String> skillValue) {
-        final BiFunction<String, String, String> gunPilot = (gunSkill, pilotSkill) ->
-                                                                  skillValue.apply(gunSkill) +
-                                                                        '/' +
-                                                                        skillValue.apply(pilotSkill);
-        return gunPilot;
+        return (gunSkill, pilotSkill) -> skillValue.apply(gunSkill) + '/' + skillValue.apply(pilotSkill);
     }
 
     private static @NonNull Function<String, String> getSkillValue(Person person,
           SkillModifierData skillModifierData) {
-        final Function<String, String> skillVal = skillName ->
-                                                        person.hasSkill(skillName)
-                                                              ?
-                                                              Integer.toString(person.getSkill(skillName)
-                                                                                     .getFinalSkillValue(
-                                                                                           skillModifierData))
-                                                              :
-                                                              "-";
-        return skillVal;
+        return skillName -> person.hasSkill(skillName) ?
+                                  Integer.toString(person.getSkill(skillName).getFinalSkillValue(skillModifierData)) :
+                                  "-";
     }
 
     /**
