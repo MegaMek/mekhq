@@ -70,7 +70,6 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuri
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -597,7 +596,7 @@ public class CurrentLocation {
                 if (wn2.getNodeName().equalsIgnoreCase("currentPlanetId") ||
                           wn2.getNodeName().equalsIgnoreCase("currentPlanetName") ||
                           wn2.getNodeName().equalsIgnoreCase("currentSystemId")) {
-                    PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
+                    PlanetarySystem p = c.getSystemById(wn2.getTextContent());
                     if (null == p) {
                         // Whoops, we can't find your planet man, back to Earth
                         logger.error("Couldn't find planet named {}", wn2.getTextContent());

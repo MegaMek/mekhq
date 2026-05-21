@@ -238,6 +238,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionStratConBatchallBreachConfirmation;
     private JCheckBox optionStratConDeployConfirmation;
     private JCheckBox optionAbandonUnitsConfirmation;
+    private JCheckBox optionAssignTechsConfirmation;
 
     // endregion Nag Tab
 
@@ -1283,6 +1284,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionAbandonUnitsConfirmation.toolTipText"));
         optionAbandonUnitsConfirmation.setName("optionAbandonUnitsConfirmation");
 
+        optionAssignTechsConfirmation = new JCheckBox(resources.getString(
+              "optionAssignTechsConfirmation.text"));
+        optionAssignTechsConfirmation.setToolTipText(resources.getString(
+              "optionAssignTechsConfirmation.toolTipText"));
+        optionAssignTechsConfirmation.setName("optionAssignTechsConfirmation");
+
 
         // Layout the UI
         final JPanel panel = new JPanel();
@@ -1319,7 +1326,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionBeginTransitConfirmation)
                                       .addComponent(optionStratConBatchallBreachConfirmation)
                                       .addComponent(optionStratConDeployConfirmation)
-                                      .addComponent(optionAbandonUnitsConfirmation));
+                                      .addComponent(optionAbandonUnitsConfirmation)
+                                      .addComponent(optionAssignTechsConfirmation));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionUnmaintainedUnitsNag)
@@ -1348,7 +1356,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionBeginTransitConfirmation)
                                         .addComponent(optionStratConBatchallBreachConfirmation)
                                         .addComponent(optionStratConDeployConfirmation)
-                                        .addComponent(optionAbandonUnitsConfirmation));
+                                        .addComponent(optionAbandonUnitsConfirmation)
+                                        .addComponent(optionAssignTechsConfirmation));
 
         return panel;
     }
@@ -1712,6 +1721,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS,
                     optionAbandonUnitsConfirmation.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_ASSIGN_TECHS,
+                    optionAssignTechsConfirmation.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1908,6 +1920,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY));
         optionAbandonUnitsConfirmation.setSelected(options
                                                          .getNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS));
+        optionAssignTechsConfirmation.setSelected(options
+                                                         .getNagDialogIgnore(MHQConstants.CONFIRMATION_ASSIGN_TECHS));
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(options.getStartGameDelay());
         spnStartGameClientDelay.setValue(options.getStartGameClientDelay());

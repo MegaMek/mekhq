@@ -56,7 +56,9 @@ public enum PersonnelTabView {
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText"),
     FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
     DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
-    FLAGS("PersonnelTabView.FLAGS.text", "PersonnelTabView.FLAGS.toolTipText"),
+    FLAGS_A("PersonnelTabView.FLAGS_A.text", "PersonnelTabView.FLAGS_A.toolTipText"),
+    FLAGS_B("PersonnelTabView.FLAGS_B.text", "PersonnelTabView.FLAGS_B.toolTipText"),
+    FLAGS_C("PersonnelTabView.FLAGS_C.text", "PersonnelTabView.FLAGS_C.toolTipText"),
     TRANSPORT("PersonnelTabView.TRANSPORT.text", "PersonnelTabView.TRANSPORT.toolTipText"),
     EDUCATION("PersonnelTabView.EDUCATION.text", "PersonnelTabView.EDUCATION.toolTipText"),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
@@ -146,10 +148,6 @@ public enum PersonnelTabView {
 
     public boolean isDates() {
         return this == DATES;
-    }
-
-    public boolean isFlags() {
-        return this == FLAGS;
     }
 
     public boolean isTransport() {

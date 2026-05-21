@@ -1236,10 +1236,30 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(scenario, null);
     }
 
+    /**
+     * Handles salvage assignment prompts for the supplied scenario before it is started or auto-resolved.
+     *
+     * <p>If the scenario's mission allows salvage, this method first displays the salvage formation picker. If the
+     * player cancels that picker or confirms it without selecting any salvage formations, processing should stop. When
+     * salvage formations are selected, the salvage tech picker is displayed next.</p>
+     *
+     * @param scenario the scenario whose salvage formations and salvage techs should be assigned
+     *
+     * @return {@code true} if the caller should stop initializing the scenario; {@code false} if there is no salvage
+     *       opportunity, or if all required salvage assignment prompts were confirmed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private boolean handleSalvageAssignments(Scenario scenario) {
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
             if (!displaySalvageFormationPicker(scenario)) {
+                return true;
+            }
+
+            // If we didn't pick any salvage units, there's no point assigning techs
+            if (scenario.getSalvageFormations().isEmpty()) {
                 return true;
             }
 
