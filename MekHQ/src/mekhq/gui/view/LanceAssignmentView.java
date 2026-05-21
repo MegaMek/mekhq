@@ -36,8 +36,10 @@ package mekhq.gui.view;
 import static megamek.client.ui.WrapLayout.wordWrap;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -58,7 +60,6 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -69,6 +70,9 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  * @author Neoancient
  */
 public class LanceAssignmentView extends JPanel {
+    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
+    private static final int ASSIGNMENT_TABLE_ROW_HEIGHT = 24;
+
     private final Campaign campaign;
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
           MekHQ.getMHQOptions().getLocale());
@@ -88,6 +92,7 @@ public class LanceAssignmentView extends JPanel {
 
     private void initComponents() {
         cbContract = new JComboBox<>();
+        styleCompactComponent(cbContract);
         cbContract.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
@@ -131,6 +136,7 @@ public class LanceAssignmentView extends JPanel {
         tblRequiredLances.setIntercellSpacing(new Dimension(0, 0));
         tblRequiredLances.setShowGrid(false);
         tblRequiredLances.setFillsViewportHeight(true);
+        styleAssignmentTable(tblRequiredLances);
 
         lanceAssignmentModel = new LanceAssignmentTableModel(campaign);
         tblAssignments = new JTable(lanceAssignmentModel);
@@ -205,21 +211,26 @@ public class LanceAssignmentView extends JPanel {
         tblAssignments.setIntercellSpacing(new Dimension(0, 0));
         tblAssignments.setShowGrid(false);
         tblAssignments.setFillsViewportHeight(true);
+        styleAssignmentTable(tblAssignments);
 
+        JPanel deploymentSummaryPanel = createBriefingSectionPanel(
+              resourceMap.getString("briefingTab.assignments.coverage.title"));
         lblDeploymentSummary = new JLabel();
-                lblDeploymentSummary.setBorder(RoundedLineBorder.createRoundedLineBorder(
-              resourceMap.getString("briefingTab.assignments.coverage.title")));
-        add(lblDeploymentSummary, BorderLayout.PAGE_START);
+        styleCompactComponent(lblDeploymentSummary);
+        deploymentSummaryPanel.add(lblDeploymentSummary, BorderLayout.CENTER);
+        add(deploymentSummaryPanel, BorderLayout.PAGE_START);
 
-        panRequiredLances = new JPanel(new BorderLayout());
-                panRequiredLances.setBorder(RoundedLineBorder.createRoundedLineBorder(
-              resourceMap.getString("briefingTab.assignments.requirements.title")));
-        panRequiredLances.add(new FastJScrollPane(tblRequiredLances), BorderLayout.CENTER);
+        panRequiredLances = createBriefingSectionPanel(resourceMap.getString(
+              "briefingTab.assignments.requirements.title"));
+        JScrollPane requiredLancesScrollPane = new FastJScrollPane(tblRequiredLances);
+        requiredLancesScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        panRequiredLances.add(requiredLancesScrollPane, BorderLayout.CENTER);
 
-        JPanel panAssignments = new JPanel(new BorderLayout());
-                panAssignments.setBorder(RoundedLineBorder.createRoundedLineBorder(
-              resourceMap.getString("briefingTab.assignments.current.title")));
-        panAssignments.add(new FastJScrollPane(tblAssignments), BorderLayout.CENTER);
+        JPanel panAssignments = createBriefingSectionPanel(resourceMap.getString(
+              "briefingTab.assignments.current.title"));
+        JScrollPane assignmentsScrollPane = new FastJScrollPane(tblAssignments);
+        assignmentsScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        panAssignments.add(assignmentsScrollPane, BorderLayout.CENTER);
 
         JSplitPane splitAssignments = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panRequiredLances, panAssignments);
         splitAssignments.setOneTouchExpandable(true);
@@ -230,9 +241,50 @@ public class LanceAssignmentView extends JPanel {
         tblAssignments.getModel().addTableModelListener(assignmentTableListener);
     }
 
+    private void styleAssignmentTable(JTable table) {
+        table.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        table.setRowHeight(Math.max(table.getRowHeight(), ASSIGNMENT_TABLE_ROW_HEIGHT));
+        if (table.getTableHeader() != null) {
+            table.getTableHeader().putClientProperty(FLATLAF_STYLE_CLASS, "small");
+            table.getTableHeader().setReorderingAllowed(false);
+        }
+    }
+
+    private void styleCompactComponent(JComponent component) {
+        component.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+    }
+
+    private JPanel createBriefingSectionPanel(String title) {
+        JPanel panel = new JPanel(new BorderLayout(0, 6));
+        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        return panel;
+    }
+
+    private JLabel createBriefingSectionHeader(String title) {
+        JLabel header = new JLabel(title);
+        styleCompactComponent(header);
+        header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 1.0f));
+        header.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
+              BorderFactory.createEmptyBorder(2, 2, 4, 0)));
+        return header;
+    }
+
+    private Color getSubtleBorderColor() {
+        Color color = UIManager.getColor("Component.borderColor");
+        if (color == null) {
+            color = UIManager.getColor("Separator.foreground");
+        }
+        if (color == null) {
+            color = UIManager.getColor("controlShadow");
+        }
+        return (color == null) ? Color.GRAY : color;
+    }
+
     private JComboBox<CombatRole> getCbRole() {
         JComboBox<CombatRole> cbRole = new JComboBox<>(CombatRole.values());
         cbRole.setName("cbRole");
+        styleCompactComponent(cbRole);
         cbRole.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,

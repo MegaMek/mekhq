@@ -39,6 +39,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
+import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -58,6 +59,7 @@ import megamek.client.ui.util.UIUtil;
  */
 public class RoundedLineBorder extends AbstractBorder {
     private static final int PADDING = 5;
+    private static final int SUBTLE_PADDING = 4;
 
     private final Color color;
     private final int thickness;
@@ -94,6 +96,31 @@ public class RoundedLineBorder extends AbstractBorder {
     public static TitledBorder createRoundedLineBorder(String borderTitle) {
         return BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
               String.format("<html><b>%s</b></html>", borderTitle));
+    }
+
+    /** Creates a compact 1px rounded border. */
+    public static CompoundBorder createSubtleRoundedLineBorder() {
+        Border rounded = new RoundedLineBorder(getSubtleBorderColor(), 1, 10);
+        Border padding = BorderFactory.createEmptyBorder(SUBTLE_PADDING,
+              SUBTLE_PADDING,
+              SUBTLE_PADDING,
+              SUBTLE_PADDING);
+
+        return BorderFactory.createCompoundBorder(rounded, padding);
+    }
+
+    /** Creates a titled compact 1px rounded border. */
+    public static TitledBorder createSubtleRoundedLineBorder(String borderTitle) {
+        return BorderFactory.createTitledBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
+              String.format("<html><b>%s</b></html>", borderTitle));
+    }
+
+    private static Color getSubtleBorderColor() {
+        Color color = UIManager.getColor("Component.borderColor");
+        if (color == null) {
+            color = UIManager.getColor("Separator.foreground");
+        }
+        return (color == null) ? UIUtil.uiIndependentGray() : color;
     }
 
     /**

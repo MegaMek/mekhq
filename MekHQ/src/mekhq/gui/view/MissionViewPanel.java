@@ -35,16 +35,21 @@ package mekhq.gui.view;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
@@ -54,7 +59,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
@@ -65,6 +69,8 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
+    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
+
     private final Mission mission;
     protected CampaignGUI gui;
 
@@ -110,15 +116,16 @@ public class MissionViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
+        JPanel statsSection = createBriefingSectionPanel(mission.getName());
         pnlStats = new JPanel();
         txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
 
-        pnlStats.setMaximumSize(UIUtil.scaleForGUI(200, Integer.MAX_VALUE));
+        statsSection.setMaximumSize(UIUtil.scaleForGUI(200, Integer.MAX_VALUE));
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
         fillStats();
+        statsSection.add(pnlStats, BorderLayout.CENTER);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -128,7 +135,34 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(pnlStats, gridBagConstraints);
+        add(statsSection, gridBagConstraints);
+    }
+
+    private JPanel createBriefingSectionPanel(String title) {
+        JPanel panel = new JPanel(new BorderLayout(0, 6));
+        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        return panel;
+    }
+
+    private JLabel createBriefingSectionHeader(String title) {
+        JLabel header = new JLabel(title);
+        header.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 1.0f));
+        header.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
+              BorderFactory.createEmptyBorder(2, 2, 4, 0)));
+        return header;
+    }
+
+    private Color getSubtleBorderColor() {
+        Color color = UIManager.getColor("Component.borderColor");
+        if (color == null) {
+            color = UIManager.getColor("Separator.foreground");
+        }
+        if (color == null) {
+            color = UIManager.getColor("controlShadow");
+        }
+        return (color == null) ? Color.GRAY : color;
     }
 
     private void fillStats() {

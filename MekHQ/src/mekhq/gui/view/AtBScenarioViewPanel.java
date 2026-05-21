@@ -37,7 +37,10 @@ import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
 import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 import static megamek.common.units.Entity.getEntityMajorTypeName;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -81,12 +84,13 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
+    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
+
     private final AtBScenario scenario;
     private final Campaign campaign;
     private final List<String> attachedAllyStub;
@@ -173,6 +177,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
+        JPanel statsSection = createBriefingSectionPanel(scenario.getName());
         panStats = new JPanel();
         txtDesc = new JTextArea();
         playerForceTree = new JTree();
@@ -184,8 +189,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         int y = 0;
 
         panStats.setName("pnlStats");
-        panStats.setBorder(RoundedLineBorder.createRoundedLineBorder(scenario.getName()));
         fillStats();
+        statsSection.add(panStats, BorderLayout.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -194,17 +199,18 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(panStats, gridBagConstraints);
+        add(statsSection, gridBagConstraints);
 
         if ((scenario.getReport() != null) && !scenario.getReport().isBlank()) {
+            JPanel reportSection = createBriefingSectionPanel("After-Action Report");
             JTextArea txtReport = new JTextArea();
             txtReport.setName("txtReport");
             txtReport.setText(scenario.getReport());
             txtReport.setEditable(false);
             txtReport.setLineWrap(true);
             txtReport.setWrapStyleWord(true);
-            txtReport.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("After-Action Report"),
-                  BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            txtReport.setBorder(BorderFactory.createEmptyBorder());
+            reportSection.add(txtReport, BorderLayout.CENTER);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -213,8 +219,35 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtReport, gridBagConstraints);
+            add(reportSection, gridBagConstraints);
         }
+    }
+
+    private JPanel createBriefingSectionPanel(String title) {
+        JPanel panel = new JPanel(new BorderLayout(0, 6));
+        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        return panel;
+    }
+
+    private JLabel createBriefingSectionHeader(String title) {
+        JLabel header = new JLabel(title);
+        header.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 1.0f));
+        header.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
+              BorderFactory.createEmptyBorder(2, 2, 4, 0)));
+        return header;
+    }
+
+    private Color getSubtleBorderColor() {
+        Color color = UIManager.getColor("Component.borderColor");
+        if (color == null) {
+            color = UIManager.getColor("Separator.foreground");
+        }
+        if (color == null) {
+            color = UIManager.getColor("controlShadow");
+        }
+        return (color == null) ? Color.GRAY : color;
     }
 
     private void fillStats() {

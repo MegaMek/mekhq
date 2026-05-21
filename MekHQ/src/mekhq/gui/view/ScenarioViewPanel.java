@@ -33,7 +33,9 @@
 package mekhq.gui.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -51,6 +53,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -70,7 +73,6 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -79,6 +81,7 @@ import mekhq.gui.utilities.MarkdownRenderer;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ScenarioViewPanel extends JScrollablePanel {
+    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
 
     private final Scenario scenario;
     private final Campaign campaign;
@@ -194,18 +197,45 @@ public class ScenarioViewPanel extends JScrollablePanel {
         }
     }
 
+    private JPanel createBriefingSectionPanel(String title) {
+        JPanel panel = new JPanel(new BorderLayout(0, 6));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        return panel;
+    }
+
+    private JLabel createBriefingSectionHeader(String title) {
+        JLabel header = new JLabel(title);
+        header.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 1.0f));
+        header.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
+              BorderFactory.createEmptyBorder(2, 2, 4, 0)));
+        return header;
+    }
+
+    private Color getSubtleBorderColor() {
+        Color color = UIManager.getColor("Component.borderColor");
+        if (color == null) {
+            color = UIManager.getColor("Separator.foreground");
+        }
+        if (color == null) {
+            color = UIManager.getColor("controlShadow");
+        }
+        return (color == null) ? Color.GRAY : color;
+    }
+
     private void fillBasicInfo() {
 
-        pnlInfo = new JPanel(new BorderLayout());
+        pnlInfo = createBriefingSectionPanel(scenario.getName());
         pnlInfo.setName("pnlStats");
-        pnlInfo.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              RoundedLineBorder.createRoundedLineBorder(scenario.getName())));
+        JPanel infoBody = new JPanel(new BorderLayout());
+        pnlInfo.add(infoBody, BorderLayout.CENTER);
 
         JLabel lblStatus = new JLabel("<html><b>" + scenario.getStatus() + "</b></html>");
         lblStatus.setToolTipText(scenario.getStatus().getToolTipText());
 
-        pnlInfo.add(lblStatus, BorderLayout.PAGE_START);
+        infoBody.add(lblStatus, BorderLayout.PAGE_START);
 
         if (null != scenario.getDescription() && !scenario.getDescription().isEmpty()) {
             JTextPane txtDesc = new JTextPane();
@@ -213,15 +243,12 @@ public class ScenarioViewPanel extends JScrollablePanel {
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
-            pnlInfo.add(txtDesc, BorderLayout.CENTER);
+            infoBody.add(txtDesc, BorderLayout.CENTER);
         }
     }
 
     private void fillForces() {
-        pnlForces = new JPanel(new BorderLayout());
-        pnlForces.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlForces.title"))));
+        pnlForces = createBriefingSectionPanel(resourceMap.getString("pnlForces.title"));
 
         JTree forceTree = new JTree();
         forceTree.setModel(forceModel);
@@ -230,11 +257,10 @@ public class ScenarioViewPanel extends JScrollablePanel {
         forceTree.setRootVisible(false);
         pnlForces.add(forceTree, BorderLayout.CENTER);
 
-        pnlOtherForces = new JPanel();
-        pnlOtherForces.setLayout(new BoxLayout(pnlOtherForces, BoxLayout.PAGE_AXIS));
-        pnlOtherForces.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlOtherForces.title"))));
+        pnlOtherForces = createBriefingSectionPanel(resourceMap.getString("pnlOtherForces.title"));
+        JPanel otherForcesBody = new JPanel();
+        otherForcesBody.setLayout(new BoxLayout(otherForcesBody, BoxLayout.PAGE_AXIS));
+        pnlOtherForces.add(otherForcesBody, BorderLayout.CENTER);
 
         for (BotForceStub stub : botStubs) {
             if (null == stub) {
@@ -251,16 +277,13 @@ public class ScenarioViewPanel extends JScrollablePanel {
             JPanel pnlTree = new JPanel(new BorderLayout());
             pnlTree.add(tree, BorderLayout.CENTER);
             pnlTree.setAlignmentX(Component.LEFT_ALIGNMENT);
-            pnlOtherForces.add(pnlTree);
+            otherForcesBody.add(pnlTree);
         }
 
     }
 
     private void fillReport() {
-        pnlReport = new JPanel(new BorderLayout());
-        pnlReport.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlReport.title"))));
+        pnlReport = createBriefingSectionPanel(resourceMap.getString("pnlReport.title"));
         JTextPane txtReport = new JTextPane();
         txtReport.setName("txtReport");
         txtReport.setEditable(false);
@@ -270,22 +293,30 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     private void fillLoot() {
-        pnlLoot = new JPanel();
-        pnlLoot.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlLoot.title"))));
-        pnlLoot.setLayout(new BoxLayout(pnlLoot, BoxLayout.PAGE_AXIS));
+        pnlLoot = createBriefingSectionPanel(resourceMap.getString("pnlLoot.title"));
+        JPanel lootBody = new JPanel();
+        lootBody.setLayout(new BoxLayout(lootBody, BoxLayout.PAGE_AXIS));
+        pnlLoot.add(lootBody, BorderLayout.CENTER);
         for (Loot loot : scenario.getLoot()) {
-            pnlLoot.add(new JLabel(loot.getShortDescription()));
+            lootBody.add(new JLabel(loot.getShortDescription()));
         }
     }
 
     private void fillDeployment() {
 
         pnlDeployment = new JPanel(new GridBagLayout());
-        pnlDeployment.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlDeployment.title"))));
+        pnlDeployment.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+
+        GridBagConstraints headerGbc = new GridBagConstraints();
+        headerGbc.gridx = 0;
+        headerGbc.gridy = 0;
+        headerGbc.gridwidth = 2;
+        headerGbc.weightx = 1.0;
+        headerGbc.insets = new Insets(0, 0, 4, 0);
+        headerGbc.fill = GridBagConstraints.HORIZONTAL;
+        headerGbc.anchor = GridBagConstraints.NORTHWEST;
+        pnlDeployment.add(createBriefingSectionHeader(resourceMap.getString("pnlDeployment.title")),
+              headerGbc);
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
@@ -350,10 +381,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private void fillObjectives() {
 
-        pnlObjectives = new JPanel(new BorderLayout());
-        pnlObjectives.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlObjectives.title"))));
+        pnlObjectives = createBriefingSectionPanel(resourceMap.getString("pnlObjectives.title"));
 
         StringBuilder objectiveBuilder = new StringBuilder();
 
@@ -417,9 +445,17 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillMapData() {
 
         pnlMap = new JPanel(new GridBagLayout());
-        pnlMap.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(resourceMap.getString("pnlMap.title"))));
+        pnlMap.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+
+        GridBagConstraints headerGbc = new GridBagConstraints();
+        headerGbc.gridx = 0;
+        headerGbc.gridy = 0;
+        headerGbc.gridwidth = 2;
+        headerGbc.weightx = 1.0;
+        headerGbc.insets = new Insets(0, 0, 4, 0);
+        headerGbc.fill = GridBagConstraints.HORIZONTAL;
+        headerGbc.anchor = GridBagConstraints.NORTHWEST;
+        pnlMap.add(createBriefingSectionHeader(resourceMap.getString("pnlMap.title")), headerGbc);
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
