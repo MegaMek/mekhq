@@ -723,6 +723,9 @@ public enum PersonnelTableModelColumn {
                                 role = (entity instanceof Tank) ? "Driver" : "Pilot";
                             } else if (unit.isGunner(person)) {
                                 role = "Gunner";
+                            } else if (unit.isCommander(person)
+                                    || ((entity instanceof Tank) && unit.isTechOfficer(person))) {
+                                role = "Commander";
                             } else {
                                 role = "Crew";
                             }
