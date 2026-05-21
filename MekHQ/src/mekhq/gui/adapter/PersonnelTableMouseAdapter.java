@@ -1784,7 +1784,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RANDOM_BLOODNAME: {
                 final boolean ignoreDice = (data.length > 1) && Boolean.parseBoolean(data[1]);
                 for (final Person person : people) {
-                    getCampaign().checkBloodnameAdd(person, ignoreDice);
+                    boolean effectiveIgnoreDice = ignoreDice;
+                    if (!person.getBloodname().isEmpty() && !ignoreDice) {
+                        int confirm = JOptionPane.showConfirmDialog(
+                              gui.getFrame(),
+                              person.getFullTitle() + " already has the bloodname " + person.getBloodname()
+                                    + "\nDo you wish to remove that bloodname and generate a new one?",
+                              "Already Has Bloodname",
+                              JOptionPane.YES_NO_OPTION,
+                              JOptionPane.QUESTION_MESSAGE);
+                        if (confirm == JOptionPane.NO_OPTION) {
+                            continue;
+                        }
+                        effectiveIgnoreDice = true;
+                    }
+                    getCampaign().checkBloodnameAdd(person, effectiveIgnoreDice);
                 }
                 break;
             }

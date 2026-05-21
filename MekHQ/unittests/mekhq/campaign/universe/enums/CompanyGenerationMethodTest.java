@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,6 +45,7 @@ import java.util.ResourceBundle;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGenerators.AtBCompanyGenerator;
@@ -96,7 +97,7 @@ class CompanyGenerationMethodTest {
     @Test
     void testGetGenerator() {
         final Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getPersonnelGenerator(any(), any())).thenCallRealMethod();
+        when(mockCampaign.getPersonnelGenerator(any(), any())).thenReturn(mock(AbstractPersonnelGenerator.class));
         when(mockCampaign.getRandomSkillPreferences()).thenReturn(mock(RandomSkillPreferences.class));
 
         final CompanyGenerationOptions mockOptions = mock(CompanyGenerationOptions.class);
