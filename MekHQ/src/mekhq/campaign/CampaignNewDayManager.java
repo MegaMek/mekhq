@@ -1589,11 +1589,16 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            checkForDiscontinuationSyndrome(person,
-                  isUseAdvancedMedical,
-                  isUseAltAdvancedMedical,
-                  isUseFatigue,
-                  fatigueRate);
+            boolean isCampaignSubsidizedDrugAbuse = person.isCoverIllicitMedicalExpenses();
+
+            Money cost = getMedicalCostFromSPAXPCost(COMPULSION_ADDICTION);
+            if (!isCampaignSubsidizedDrugAbuse || !payForMedicine(person, cost)) {
+                checkForDiscontinuationSyndrome(person,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      isUseFatigue,
+                      fatigueRate);
+            }
         }
 
         if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
