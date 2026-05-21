@@ -75,7 +75,7 @@ public class StratConFacility implements Cloneable {
     private FacilityType facilityType;
     private String userDescription;
     private boolean visible;
-    private boolean isAvailable;
+    private boolean isAvailable = true;
     private int aggroRating;
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
