@@ -77,6 +77,7 @@ import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -418,6 +419,8 @@ public class Campaign implements ITechManager, ILocation {
     private Systems systemsInstance;
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
+    private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
+    private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -6595,6 +6598,8 @@ public class Campaign implements ITechManager, ILocation {
         getGameOptions().writeToXML(writer, indent);
         // endregion Options
 
+        PlanetarySystemCampaignXmlIO.writeToXML(writer, indent, getPlanetarySystemOverrides());
+
         // Lists of objects:
         units.writeToXML(writer, indent, "units"); // Units
 
@@ -6833,6 +6838,53 @@ public class Campaign implements ITechManager, ILocation {
             systems.add(this.systemsInstance.getSystems().get(key));
         }
         return systems;
+    }
+
+    public Collection<PlanetarySystem> getPlanetarySystemOverrides() {
+        return Collections.unmodifiableCollection(planetarySystemOverrides.values());
+    }
+
+    public void setPlanetarySystemOverrides(Collection<PlanetarySystem> overrides) throws IOException {
+        planetarySystemOverrides.clear();
+        if (overrides != null) {
+            for (PlanetarySystem override : overrides) {
+                addPlanetarySystemOverride(override);
+            }
+        }
+        refreshPlanetarySystemOverlay();
+    }
+
+    public PlanetarySystem putPlanetarySystemOverride(PlanetarySystem system) throws IOException {
+        if ((system == null) || (system.getId() == null) || system.getId().isBlank()) {
+            throw new IOException("Cannot save planetary system edits without a system id.");
+        }
+        PlanetarySystem savedSystem = PlanetarySystemYamlIO.copy(system);
+        planetarySystemOverrides.put(savedSystem.getId(), savedSystem);
+        refreshPlanetarySystemOverlay();
+        return savedSystem;
+    }
+
+    public boolean removePlanetarySystemOverride(String systemId) {
+        if ((systemId == null) || systemId.isBlank()) {
+            return false;
+        }
+        boolean removed = planetarySystemOverrides.remove(systemId) != null;
+        refreshPlanetarySystemOverlay();
+        return removed;
+    }
+
+    public boolean hasPlanetarySystemOverride(String systemId) {
+        return (systemId != null) && planetarySystemOverrides.containsKey(systemId);
+    }
+
+    public void refreshPlanetarySystemOverlay() {
+        systemsInstance = Systems.activateCampaignSystems(planetarySystemOverrides.values());
+    }
+
+    private void addPlanetarySystemOverride(PlanetarySystem system) {
+        if ((system != null) && (system.getId() != null) && !system.getId().isBlank()) {
+            planetarySystemOverrides.put(system.getId(), system);
+        }
     }
 
     public PlanetarySystem getSystemById(String id) {
@@ -8389,7 +8441,8 @@ public class Campaign implements ITechManager, ILocation {
                  VEHICLE_CREW_NAVAL,
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> unit.canTakeMoreVesselCrew(); // ??
+            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter)) &&
+                                      unit.canTakeMoreVesselCrew();
             default -> false;
         };
     }
