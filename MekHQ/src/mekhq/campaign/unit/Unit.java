@@ -6145,6 +6145,10 @@ public class Unit implements ITechnology {
     }
 
     public void clearCrew() {
+        clearCrew(true);
+    }
+
+    public void clearCrew(boolean isRemoveTech) {
         if (isDeployed()) {
             return;
         }
@@ -6153,10 +6157,12 @@ public class Unit implements ITechnology {
             remove(person, true);
         }
 
-        removeTech();
+        if (isRemoveTech) {
+            removeTech();
 
-        if (getEngineer() != null) {
-            remove(getEngineer(), true);
+            if (getEngineer() != null) {
+                remove(getEngineer(), true);
+            }
         }
     }
 
