@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
@@ -117,6 +118,7 @@ public enum PersonnelTableModelColumn {
     VESSEL("PersonnelTableModelColumn.VESSEL.text"),
     PROTOMEK("PersonnelTableModelColumn.PROTOMEK.text"),
     BATTLE_ARMOUR("PersonnelTableModelColumn.BATTLE_ARMOUR.text"),
+    AGGREGATE_COMBAT("PersonnelTableModelColumn.AGGREGATE_COMBAT.text"),
     SMALL_ARMS("PersonnelTableModelColumn.SMALL_ARMS.text"),
     ANTI_MEK("PersonnelTableModelColumn.ANTI_MEK.text"),
     ARTILLERY("PersonnelTableModelColumn.ARTILLERY.text"),
@@ -662,6 +664,26 @@ public enum PersonnelTableModelColumn {
             case ACADEMY_DURATION -> currentAcademy == null ? "" : String.valueOf(person.getEduEducationTime());
             case ADMINISTRATION -> skillValue.apply(SkillType.S_ADMIN);
             case AGE, BIRTHDAY -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfBirth());
+            case AGGREGATE_COMBAT -> {
+                Unit unit = person.getUnit();
+                if (unit != null && unit.getEntity() != null) {
+                    Entity entity = unit.getEntity();
+
+                    yield skillValue.apply(SkillType.getGunnerySkillFor(entity)) + "/" +
+                                skillValue.apply(SkillType.getDrivingSkillFor(entity));
+                }
+
+                PersonnelRole primaryProfession = person.getPrimaryRole();
+                PersonnelRole secondaryProfession = person.getSecondaryRole();
+                PersonnelRole profession = primaryProfession.isCombat() ? primaryProfession : secondaryProfession;
+
+                yield getAggregateSkillDisplay(person,
+                      profession,
+                      gunneryPilotingValue,
+                      skillValue,
+                      campaignOptions,
+                      skillModifierData);
+            }
             case AGGRESSION -> {
                 Aggression trait = person.getAggression();
                 String sign = trait.isTraitPositive() ? "+" : "-";
@@ -796,25 +818,16 @@ public enum PersonnelTableModelColumn {
             case RETIREMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
             case SALARY -> person.getSalary(campaign).toAmountAndSymbolString();
             case SALVAGE_SUPERVISOR -> resources.getString(person.isSalvageSupervisor() ? "Yes.text" : "No.text");
-            case SCOUTING -> {
-                String sName = ScoutingSkills.getBestScoutingSkill(person);
-                yield sName == null ?
-                            "-" :
-                            Integer.toString(person.getSkill(sName).getFinalSkillValue(skillModifierData));
-            }
+            case SCOUTING -> getAggregateSmallArmsOrScouting(ScoutingSkills.getBestScoutingSkill(person),
+                  person, skillModifierData);
             case SECOND_IN_COMMAND -> resources.getString(person.isSecondInCommand() ? "Yes.text" : "No.text");
             case SHIP_TRANSPORT -> person.getUnit() != null && person.getUnit().getTransportShipAssignment() != null
                                          ? person.getUnit().getTransportShipAssignment().getTransportShip().getName()
                                          : "-";
             case SKILL_LEVEL -> "<html>" + SkillType.getColoredExperienceLevelName(
                   person.getExperienceLevel(campaign, false, true)) + "</html>";
-            case SMALL_ARMS -> {
-                String sName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
-                      campaignOptions.isUseSmallArmsOnly());
-                yield sName == null ?
-                            "-" :
-                            Integer.toString(person.getSkill(sName).getFinalSkillValue(skillModifierData));
-            }
+            case SMALL_ARMS -> getAggregateSmallArmsOrScouting(InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+                  campaignOptions.isUseSmallArmsOnly()), person, skillModifierData);
             case SOCIAL -> {
                 Social trait = person.getSocial();
                 String sign = trait.isTraitPositive() ? "+" : "-";
@@ -922,6 +935,49 @@ public enum PersonnelTableModelColumn {
 
             default -> "UNIMPLEMENTED";
         };
+    }
+
+    private static String getAggregateSkillDisplay(Person person, PersonnelRole primaryProfession,
+          BiFunction<String, String, String> gunneryPilotingValue, Function<String, String> skillValue,
+          CampaignOptions campaignOptions, SkillModifierData skillModifierData) {
+        return switch (primaryProfession) {
+            case PersonnelRole.LAM_PILOT -> {
+                String mekSkills = gunneryPilotingValue.apply(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                String aeroSkills = gunneryPilotingValue.apply(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+                yield mekSkills + " / " + aeroSkills;
+            }
+            case PersonnelRole.MEKWARRIOR -> gunneryPilotingValue.apply(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+            case PersonnelRole.VEHICLE_CREW_VTOL ->
+                  gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_VTOL);
+            case PersonnelRole.VEHICLE_CREW_NAVAL ->
+                  gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_NVEE);
+            case PersonnelRole.VEHICLE_CREW_GROUND ->
+                  gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE);
+            case PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT ->
+                  gunneryPilotingValue.apply(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case PersonnelRole.VESSEL_PILOT, PersonnelRole.VESSEL_GUNNER ->
+                  gunneryPilotingValue.apply(SkillType.S_GUN_SPACE,
+                        SkillType.S_PILOT_SPACE);
+            case PersonnelRole.AEROSPACE_PILOT ->
+                  gunneryPilotingValue.apply(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case PersonnelRole.BATTLE_ARMOUR -> skillValue.apply(SkillType.S_GUN_BA);
+            case PersonnelRole.SOLDIER -> {
+                String smallArms = getAggregateSmallArmsOrScouting(InfantryGunnerySkills.getBestInfantryGunnerySkill(
+                      person,
+                      campaignOptions.isUseSmallArmsOnly()), person, skillModifierData);
+                String antiMek = skillValue.apply(SkillType.S_ANTI_MEK);
+                yield smallArms + "/" + antiMek;
+            }
+            case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
+            default -> "-/-";
+        };
+    }
+
+    private static @NonNull String getAggregateSmallArmsOrScouting(String skillName, Person person,
+          SkillModifierData skillModifierData) {
+        return skillName == null ?
+                     "-" :
+                     Integer.toString(person.getSkill(skillName).getFinalSkillValue(skillModifierData));
     }
 
     private static @NonNull BiFunction<String, String, String> getGunneryPilotingValue(
@@ -1111,8 +1167,8 @@ public enum PersonnelTableModelColumn {
                      FIRST_NAME,
                      LAST_NAME,
                      PERSONNEL_ROLE,
-                     AGGREGATE_GUNNERY,
-                     AGGREGATE_PILOTING,
+                     AGGREGATE_COMBAT,
+                     ARTILLERY,
                      SCOUTING,
                      LEADERSHIP,
                      TACTICS,
