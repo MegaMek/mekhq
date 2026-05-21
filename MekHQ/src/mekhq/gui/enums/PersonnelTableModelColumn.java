@@ -37,6 +37,8 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffective
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.ResourceBundle;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
@@ -71,7 +73,6 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
@@ -628,7 +629,11 @@ public enum PersonnelTableModelColumn {
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        String sign;
+        return getDisplayString(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
+    }
+
+    private String getDisplayString(Campaign campaign, PersonnelMarket personnelMarket, Person person,
+          boolean loadAssignmentFromMarket, boolean groupByUnit) {
 
         final boolean isClanCampaign = campaign.isClanCampaign();
         final LocalDate today = campaign.getLocalDate();
@@ -644,525 +649,301 @@ public enum PersonnelTableModelColumn {
         final Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
               person.getEduAcademyNameInSet());
 
-        SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects, isClanCampaign, today, true);
-        switch (this) {
-            case PERSON:
-                return "";
-            case RANK:
-                return person.makeHTMLRank();
-            case FIRST_NAME:
-                return person.getFirstName();
-            case LAST_NAME:
-                return person.getLastName();
-            case PRE_NOMINAL:
-                return person.getPreNominal();
-            case GIVEN_NAME:
-                return person.getGivenName();
-            case SURNAME: {
-                final String surname = person.getSurname();
-                if (StringUtility.isNullOrBlank(surname)) {
-                    return "";
-                } else if (!groupByUnit) {
-                    return surname;
-                } else {
-                    // If we're grouping by unit, determine the number of persons under their
-                    // command.
-                    final Unit unit = person.getUnit();
+        final SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgeEffects,
+              isClanCampaign,
+              today,
+              true);
 
-                    // If the personnel does not have a unit, return their name
-                    if (unit == null) {
-                        return surname;
-                    }
+        final Function<String, String> skillValue = getSkillValue(person, skillModifierData);
+        final BiFunction<String, String, String> gunneryPilotingValue = getGunneryPilotingValue(skillValue);
 
-                    // The crew size is the number of personnel under their charge, excluding
-                    // themselves, of course
-                    final int crewSize = unit.getCrew().size() - 1;
-                    if (crewSize <= 0) {
-                        // If there is only one crew member, just return their name
-                        return surname;
-                    }
-
-                    return surname +
-                                 " (+" +
-                                 crewSize +
-                                 resources.getString(unit.usesSoldiers() ?
-                                                           "PersonnelTableModelColumn.SURNAME.Soldiers.text" :
-                                                           "PersonnelTableModelColumn.SURNAME.Crew.text");
-                }
+        return switch (this) {
+            case ACADEMY -> currentAcademy == null ? "" : currentAcademy.getName();
+            case ACADEMY_DURATION -> currentAcademy == null ? "" : String.valueOf(person.getEduEducationTime());
+            case ADMINISTRATION -> skillValue.apply(SkillType.S_ADMIN);
+            case AGE, BIRTHDAY -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfBirth());
+            case AGGRESSION -> {
+                Aggression trait = person.getAggression();
+                String sign = trait.isTraitPositive() ? "+" : "-";
+                yield trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
             }
-            case BLOODNAME:
-                return person.getBloodname();
-            case POST_NOMINAL:
-                return person.getPostNominal();
-            case CALLSIGN:
-                return person.getCallsign();
-            case AGE: //Age's cell value must return birthday to allow sorting
-            case BIRTHDAY:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfBirth());
-            case PERSONNEL_STATUS:
-                return person.getStatus().toString();
-            case GENDER:
-                return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
-            case SKILL_LEVEL:
-                return "<html>" +
-                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false, true)) +
-                             "</html>";
-            case PERSONNEL_ROLE:
-                return person.getFormatedRoleDescriptions(today);
-            case UNIT_ASSIGNMENT: {
-                if (loadAssignmentFromMarket) {
-                    final Entity entity = personnelMarket.getAttachedEntity(person);
-                    return (entity == null) ? "-" : entity.getDisplayName();
-                } else {
-                    Unit unit = person.getUnit();
-                    if (unit != null) {
-                        String name = unit.getName();
-                        if (unit.getEntity() instanceof Tank) {
-                            if (unit.isDriver(person)) {
-                                name = name + " [Driver]";
-                            } else {
-                                name = name + " [Gunner]";
-                            }
-                        } else if ((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship)) {
-                            if (unit.isNavigator(person)) {
-                                name = name + " [Navigator]";
-                            } else if (unit.isDriver(person)) {
-                                name = name + " [Pilot]";
-                            } else if (unit.isGunner(person)) {
-                                name = name + " [Gunner]";
-                            } else {
-                                name = name + " [Crew]";
-                            }
-                        }
-
-                        return name;
-                    }
-
-                    // Check for tech units
-                    if (!person.getTechUnits().isEmpty()) {
-                        Unit refitUnit = person.getTechUnits()
-                                               .stream()
-                                               .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
-                                               .findFirst()
-                                               .orElse(null);
-                        String refitString = null != refitUnit ? "<b>Refitting</b> " + refitUnit.getName() : "";
-                        if (person.getTechUnits().size() == 1) {
-                            unit = person.getTechUnits().getFirst();
-                            if (unit != null) {
-                                return "<html>" +
-                                             ReportingUtilities.separateIf(refitString,
-                                                   ", ",
-                                                   unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") +
-                                             "</html>";
-                            }
-                        } else {
-                            return "<html>" +
-                                         ReportingUtilities.separateIf(refitString,
-                                               ", ",
-                                               person.getTechUnits().size() +
-                                                     " units (" +
-                                                     person.getMaintenanceTimeUsing() +
-                                                     "m)") +
-                                         "</html>";
-                        }
-                    }
-                }
-
-                // Final fallback return of nothing
-                return "-";
+            case AMBITION -> {
+                Ambition trait = person.getAmbition();
+                String sign = trait.isTraitPositive() ? "+" : "-";
+                yield trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
             }
-            case SHIP_TRANSPORT:
-                if (person.getUnit() != null) {
-                    if (person.getUnit().getTransportShipAssignment() != null) {
-                        return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
-                    }
-                }
-                return "-";
-
-            case TACTICAL_TRANSPORT:
-                if (person.getUnit() != null) {
-                    if (person.getUnit().getTacticalTransportAssignment() != null) {
-                        return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
-                    }
-                }
-                return "-";
-
-            case FORCE:
-                final Formation formation = campaign.getFormationFor(person);
-                return (formation == null) ? "-" : formation.getName();
-            case DEPLOYED:
-                final Unit unit = person.getUnit();
+            case ANTI_MEK -> skillValue.apply(SkillType.S_ANTI_MEK);
+            case APPRAISAL -> skillValue.apply(SkillType.S_APPRAISAL);
+            case AEROSPACE -> gunneryPilotingValue.apply(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case ARTILLERY -> skillValue.apply(SkillType.S_ARTILLERY);
+            case ASTECH -> skillValue.apply(SkillType.S_ASTECH);
+            case BATTLE_ARMOUR -> skillValue.apply(SkillType.S_GUN_BA);
+            case BLOODMARK -> Integer.toString(person.getBloodmark());
+            case BLOODNAME -> person.getBloodname();
+            case BODY -> getAttributeScoreDisplay(person, SkillAttribute.BODY);
+            case CALLSIGN -> person.getCallsign();
+            case CHARISMA -> getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
+            case CLAN_PERSONNEL -> resources.getString(person.isClanPersonnel() ? "Yes.text" : "No.text");
+            case COMMANDER -> resources.getString(person.isCommander() ? "Yes.text" : "No.text");
+            case CONNECTIONS -> person.getBurnedConnectionsEndDate() != null
+                                      ?
+                                      "<html><b><font color='gray'>" +
+                                            person.getAdjustedConnections(true) +
+                                      "</font></b></html>"
+                                      :
+                                      Integer.toString(person.getAdjustedConnections(true));
+            case CONVENTIONAL_AIRCRAFT -> gunneryPilotingValue.apply(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case COURSE ->
+                  currentAcademy == null ? "" : currentAcademy.getQualifications().get(person.getEduCourseIndex());
+            case CURRENT_EDUCATION -> currentAcademy == null ? "" :
+                                            EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(
+                                                  person))).toString();
+            case DEATH_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfDeath());
+            case DEPLOYED -> {
+                Unit unit = person.getUnit();
                 if (unit == null || !unit.isDeployed()) {
-                    return "-";
-                } else {
-                    Scenario scenario = campaign.getScenario(unit.getScenarioId());
-
-                    if (scenario == null) {
-                        LOGGER.warn("Unable to retrieve scenario for unit {} (Removing scenario assignment).",
-                              unit.getName());
-                        unit.setScenarioId(Scenario.S_DEFAULT_ID);
-                        return "-";
-                    }
-
-                    return scenario.getName();
+                    yield "-";
                 }
-            case MEK:
-                return (person.hasSkill(SkillType.S_GUN_MEK) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_MEK)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_MEK) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_MEK)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case GROUND_VEHICLE:
-                return (person.hasSkill(SkillType.S_GUN_VEE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_GVEE) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case NAVAL_VEHICLE:
-                return (person.hasSkill(SkillType.S_GUN_VEE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_NVEE) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case VTOL:
-                return (person.hasSkill(SkillType.S_GUN_VEE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_VEE)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_VTOL) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case AEROSPACE:
-                return (person.hasSkill(SkillType.S_GUN_AERO) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_AERO)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_AERO) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_AERO)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case CONVENTIONAL_AIRCRAFT:
-                return (person.hasSkill(SkillType.S_GUN_JET) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_JET)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_JET) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_JET)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case VESSEL:
-                return (person.hasSkill(SkillType.S_GUN_SPACE) ?
-                              Integer.toString(person.getSkill(SkillType.S_GUN_SPACE)
-                                               .getFinalSkillValue(skillModifierData)) :
-                              "-") +
-                             '/' +
-                             (person.hasSkill(SkillType.S_PILOT_SPACE) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE)
-                                                     .getFinalSkillValue(skillModifierData)) :
-                                    "-");
-            case PROTOMEK:
-                return person.hasSkill(SkillType.S_GUN_PROTO) ?
-                             Integer.toString(person.getSkill(SkillType.S_GUN_PROTO)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case BATTLE_ARMOUR:
-                return person.hasSkill(SkillType.S_GUN_BA) ?
-                             Integer.toString(person.getSkill(SkillType.S_GUN_BA)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case ANTI_MEK:
-                return person.hasSkill(SkillType.S_ANTI_MEK) ?
-                             Integer.toString(person.getSkill(SkillType.S_ANTI_MEK)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case SMALL_ARMS:
-                String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
-                      campaignOptions.isUseSmallArmsOnly());
-                return skillName == null ? "-" :
-                             Integer.toString(person.getSkill(skillName).getFinalSkillValue(skillModifierData));
-            case ARTILLERY:
-                return person.hasSkill(SkillType.S_ARTILLERY) ?
-                             Integer.toString(person.getSkill(SkillType.S_ARTILLERY)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case NAVIGATION:
-                return person.hasSkill(SkillType.S_NAVIGATION) ?
-                             Integer.toString(person.getSkill(SkillType.S_NAVIGATION)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TACTICS:
-                return person.hasSkill(SkillType.S_TACTICS) ?
-                             Integer.toString(person.getSkill(SkillType.S_TACTICS)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case STRATEGY:
-                return person.hasSkill(SkillType.S_STRATEGY) ?
-                             Integer.toString(person.getSkill(SkillType.S_STRATEGY)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case LEADERSHIP:
-                return person.hasSkill(SkillType.S_LEADER) ?
-                             Integer.toString(person.getSkill(SkillType.S_LEADER)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case SCOUTING:
-                String scoutingSkillName = ScoutingSkills.getBestScoutingSkill(person);
-                return scoutingSkillName == null ? "-" :
-                             Integer.toString(person.getSkill(scoutingSkillName)
-                                              .getFinalSkillValue(skillModifierData));
-            case ASTECH:
-                return person.hasSkill(SkillType.S_ASTECH) ?
-                             Integer.toString(person.getSkill(SkillType.S_ASTECH)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TECH_MEK:
-                return person.hasSkill(SkillType.S_TECH_MEK) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_MEK)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TECH_AERO:
-                return person.hasSkill(SkillType.S_TECH_AERO) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_AERO)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TECH_MECHANIC:
-                return person.hasSkill(SkillType.S_TECH_MECHANIC) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_MECHANIC)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TECH_BA:
-                return person.hasSkill(SkillType.S_TECH_BA) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_BA)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TECH_VESSEL:
-                return person.hasSkill(SkillType.S_TECH_VESSEL) ?
-                             Integer.toString(person.getSkill(SkillType.S_TECH_VESSEL)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case ZERO_G:
-                return person.hasSkill(SkillType.S_ZERO_G_OPERATIONS) ?
-                             Integer.toString(person.getSkill(SkillType.S_ZERO_G_OPERATIONS)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TECH_MINUTES:
-                if (person.isTechExpanded()) {
-                    return String.valueOf(person.getDailyAvailableTechTime(isUseTechAdmin));
-                } else {
-                    return "0";
+                Scenario scenario = campaign.getScenario(unit.getScenarioId());
+                if (scenario == null) {
+                    LOGGER.warn("Unable to retrieve scenario for unit {} (Removing scenario assignment).",
+                          unit.getName());
+                    unit.setScenarioId(Scenario.S_DEFAULT_ID);
+                    yield "-";
                 }
-            case WORK_MINUTES:
-                if (person.isTechExpanded()) {
-                    return String.valueOf(person.getMinutesLeft());
-                } else {
-                    return "0";
-                }
-            case MEDTECH:
-                return person.hasSkill(SkillType.S_MEDTECH) ?
-                             Integer.toString(person.getSkill(SkillType.S_MEDTECH)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case MEDICAL:
-                return person.hasSkill(SkillType.S_SURGERY) ?
-                             Integer.toString(person.getSkill(SkillType.S_SURGERY)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case MEDICAL_CAPACITY:
-                if (person.isDoctor()) {
-                    return String.valueOf(person.getDoctorMedicalCapacity(isUseMedicalAdmin, baseBedCapacity));
-                } else {
-                    return "0";
-                }
-            case APPRAISAL:
-                return person.hasSkill(SkillType.S_APPRAISAL) ?
-                             Integer.toString(person.getSkill(SkillType.S_APPRAISAL)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case TRAINING:
-                return person.hasSkill(SkillType.S_TRAINING) ?
-                             Integer.toString(person.getSkill(SkillType.S_TRAINING)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case ADMINISTRATION:
-                return person.hasSkill(SkillType.S_ADMIN) ?
-                             Integer.toString(person.getSkill(SkillType.S_ADMIN)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case NEGOTIATION:
-                return person.hasSkill(SkillType.S_NEGOTIATION) ?
-                             Integer.toString(person.getSkill(SkillType.S_NEGOTIATION)
-                                              .getFinalSkillValue(skillModifierData)) :
-                             "-";
-            case INJURIES:
-                if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-                    return Integer.toString(person.getInjuries().size());
-                } else {
-                    return Integer.toString(person.getHits());
-                }
-            case KILLS:
-                return Integer.toString(campaign.getKillsFor(person.getId()).size());
-            case SALARY:
-                return person.getSalary(campaign).toAmountAndSymbolString();
-            case XP:
-                return Integer.toString(person.getXP());
-            case ORIGIN_FACTION:
-                return person.getOriginFaction().getFullName(campaign.getGameYear());
-            case ORIGIN_PLANET:
-                final Planet originPlanet = person.getOriginPlanet();
-                return (originPlanet == null) ? "" : originPlanet.getName(campaign.getLocalDate());
-            case RECRUITMENT_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
-            case LAST_RANK_CHANGE_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
-            case DUE_DATE:
-                return person.getDueDateAsString(campaign);
-            case RETIREMENT_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
-            case DEATH_DATE:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfDeath());
-            case COMMANDER:
-                return resources.getString(person.isCommander() ? "Yes.text" : "No.text");
-            case FOUNDER:
-                return resources.getString(person.isFounder() ? "Yes.text" : "No.text");
-            case CLAN_PERSONNEL:
-                return resources.getString(person.isClanPersonnel() ? "Yes.text" : "No.text");
-            case MARRIAGEABLE:
-                return resources.getString(person.getGenealogy().hasSpouse() ?
-                                                 "NA.text" :
-                                                 (person.isMarriageable() ? "Yes.text" : "No.text"));
-            case DIVORCEABLE:
-                return resources.getString(person.getGenealogy().hasSpouse() ?
-                                                 (person.isDivorceable() ? "Yes.text" : "No.text") :
-                                                 "NA.text");
-            case TRYING_TO_CONCEIVE:
-                return resources.getString(person.getGender().isFemale() ?
-                                                 (person.isTryingToConceive() ? "Yes.text" : "No.text") :
-                                                 "NA.text");
-            case IMMORTAL:
-                return resources.getString(person.getStatus().isDead() ?
-                                                 "NA.text" :
-                                                 (person.isImmortal() ? "Yes.text" : "No.text"));
-            case EMPLOYED:
-                return resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
-            case HIDE_PERSONALITY:
-                return resources.getString(person.isHidePersonality() ? "Yes.text" : "No.text");
-            case NEVER_ASSIGN_AUTO_MAINTENANCE:
-                return resources.getString(person.isNeverAssignMaintenanceAutomatically() ? "Yes.text" : "No.text");
-            case PREFERS_MEN:
-                return resources.getString(person.isPrefersMen() ? "Yes.text" : "No.text");
-            case PREFERS_WOMEN:
-                return resources.getString(person.isPrefersWomen() ? "Yes.text" : "No.text");
-            case QUICK_TRAIN_IGNORE:
-                return resources.getString(person.isQuickTrainIgnore() ? "Yes.text" : "No.text");
-            case SALVAGE_SUPERVISOR:
-                return resources.getString(person.isSalvageSupervisor() ? "Yes.text" : "No.text");
-            case SECOND_IN_COMMAND:
-                return resources.getString(person.isSecondInCommand() ? "Yes.text" : "No.text");
-            case UNDER_PROTECTION:
-                return resources.getString(person.isUnderProtection() ? "Yes.text" : "No.text");
-            case TOUGHNESS:
-                return Integer.toString(person.getAdjustedToughness());
-            case CONNECTIONS:
-                if (person.getBurnedConnectionsEndDate() != null) {
-                    return "<html><b><font color='gray'>" +
-                                 person.getAdjustedConnections(true) +
-                                 "</font></b></html>";
-                } else {
-                    return Integer.toString(person.getAdjustedConnections(true));
-                }
-            case WEALTH:
-                return Integer.toString(person.getWealth());
-            case EXTRA_INCOME:
-                return Integer.toString(person.getExtraIncomeTraitLevel());
-            case REPUTATION:
-                return Integer.toString(adjustedReputation);
-            case UNLUCKY:
-                return Integer.toString(person.getUnlucky());
-            case BLOODMARK:
-                return Integer.toString(person.getBloodmark());
-            case FATIGUE:
-                return Integer.toString(getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
-                      person.isClanPersonnel(),
-                      person.getSkillLevel(campaign, false, true)));
-            case SPA_COUNT:
-                return Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
-            case IMPLANT_COUNT:
-                return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
-            case LOYALTY:
-                return String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
-                      campaignOptions.isUseAlternativeAdvancedMedical()));
-            case HIGHEST_EDUCATION:
-                return person.getEduHighestEducation().toString();
-            case CURRENT_EDUCATION:
-                return currentAcademy == null ? "" :
-                             EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person)))
-                             .toString();
-            case ACADEMY:
-                return currentAcademy == null ? "" : currentAcademy.getName();
-            case COURSE:
-                return currentAcademy == null ? "" : currentAcademy.getQualifications().get(person.getEduCourseIndex());
-            case ACADEMY_DURATION:
-                return currentAcademy == null ? "" : String.valueOf(person.getEduEducationTime());
-            case AGGRESSION:
-                Aggression aggression = person.getAggression();
-                sign = aggression.isTraitPositive() ? "+" : "-";
-
-                return aggression + " (" + (aggression.isTraitMajor() ? sign + sign : sign) + ')';
-            case AMBITION:
-                Ambition ambition = person.getAmbition();
-                sign = ambition.isTraitPositive() ? "+" : "-";
-
-                return ambition + " (" + (ambition.isTraitMajor() ? sign + sign : sign) + ')';
-            case GREED:
-                Greed greed = person.getGreed();
-                sign = greed.isTraitPositive() ? "+" : "-";
-
-                return greed + " (" + (greed.isTraitMajor() ? sign + sign : sign) + ')';
-            case SOCIAL:
-                Social social = person.getSocial();
-                sign = social.isTraitPositive() ? "+" : "-";
-
-                return social + " (" + (social.isTraitMajor() ? sign + sign : sign) + ')';
-            case REASONING:
-                Reasoning reasoning = person.getReasoning();
-                return reasoning.getLabel();
-            case STRENGTH:
-                return getAttributeScoreDisplay(person, SkillAttribute.STRENGTH);
-            case BODY:
-                return getAttributeScoreDisplay(person, SkillAttribute.BODY);
-            case REFLEXES:
-                return getAttributeScoreDisplay(person, SkillAttribute.REFLEXES);
-            case DEXTERITY:
-                return getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
-            case INTELLIGENCE:
-                return getAttributeScoreDisplay(person, SkillAttribute.INTELLIGENCE);
-            case WILLPOWER:
-                return getAttributeScoreDisplay(person, SkillAttribute.WILLPOWER);
-            case CHARISMA:
-                return getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
-            case EDGE:
+                yield scenario.getName();
+            }
+            case DEXTERITY -> getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
+            case DIVORCEABLE -> resources.getString(person.getGenealogy().hasSpouse()
+                                                          ?
+                                                          (person.isDivorceable() ? "Yes.text" : "No.text") :
+                                                          "NA.text");
+            case DUE_DATE -> person.getDueDateAsString(campaign);
+            case EDGE -> {
                 int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
                 int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
-                return currentAttributeValue + " / " + attributeCap;
-            default:
-                return "UNIMPLEMENTED";
-        }
+                yield currentAttributeValue + " / " + attributeCap;
+            }
+            case EMPLOYED -> resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
+            case EXTRA_INCOME -> Integer.toString(person.getExtraIncomeTraitLevel());
+            case FATIGUE -> Integer.toString(getEffectiveFatigue(person.getAdjustedFatigue(),
+                  person.getPermanentFatigue(), person.isClanPersonnel(),
+                  person.getSkillLevel(campaign, false, true)));
+            case FIRST_NAME -> person.getFirstName();
+            case FORCE -> {
+                final Formation formation = campaign.getFormationFor(person);
+                yield (formation == null) ? "-" : formation.getName();
+            }
+            case FOUNDER -> resources.getString(person.isFounder() ? "Yes.text" : "No.text");
+            case GENDER -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
+            case GIVEN_NAME -> person.getGivenName();
+            case GREED -> {
+                Greed trait = person.getGreed();
+                String sign = trait.isTraitPositive() ? "+" : "-";
+                yield trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
+            }
+            case GROUND_VEHICLE -> gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE);
+            case HIDE_PERSONALITY -> resources.getString(person.isHidePersonality() ? "Yes.text" : "No.text");
+            case HIGHEST_EDUCATION -> person.getEduHighestEducation().toString();
+            case IMMORTAL -> resources.getString(person.getStatus().isDead() ? "NA.text"
+                                                       : (person.isImmortal() ? "Yes.text" : "No.text"));
+            case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
+            case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
+                                   ? Integer.toString(person.getInjuries().size())
+                                   : Integer.toString(person.getHits());
+            case INTELLIGENCE -> getAttributeScoreDisplay(person, SkillAttribute.INTELLIGENCE);
+            case KILLS -> Integer.toString(campaign.getKillsFor(person.getId()).size());
+            case LAST_NAME -> person.getLastName();
+            case LAST_RANK_CHANGE_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
+            case LEADERSHIP -> skillValue.apply(SkillType.S_LEADER);
+            case LOYALTY -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
+                  campaignOptions.isUseAlternativeAdvancedMedical()));
+            case MARRIAGEABLE -> resources.getString(person.getGenealogy().hasSpouse() ? "NA.text"
+                                                           : (person.isMarriageable() ? "Yes.text" : "No.text"));
+            case MEDICAL -> skillValue.apply(SkillType.S_SURGERY);
+            case MEDICAL_CAPACITY -> person.isDoctor()
+                                           ?
+                                           String.valueOf(person.getDoctorMedicalCapacity(isUseMedicalAdmin,
+                                                 baseBedCapacity))
+                                           :
+                                           "0";
+            case MEDTECH -> skillValue.apply(SkillType.S_MEDTECH);
+            case MEK -> gunneryPilotingValue.apply(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+            case NAVAL_VEHICLE -> gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_NVEE);
+            case NAVIGATION -> skillValue.apply(SkillType.S_NAVIGATION);
+            case NEGOTIATION -> skillValue.apply(SkillType.S_NEGOTIATION);
+            case NEVER_ASSIGN_AUTO_MAINTENANCE ->
+                  resources.getString(person.isNeverAssignMaintenanceAutomatically() ? "Yes.text" : "No.text");
+            case ORIGIN_FACTION -> person.getOriginFaction().getFullName(campaign.getGameYear());
+            case ORIGIN_PLANET -> {
+                final Planet originPlanet = person.getOriginPlanet();
+                yield (originPlanet == null) ? "" : originPlanet.getName(campaign.getLocalDate());
+            }
+            case PERSON -> "";
+            case PERSONNEL_ROLE -> person.getFormatedRoleDescriptions(today);
+            case PERSONNEL_STATUS -> person.getStatus().toString();
+            case POST_NOMINAL -> person.getPostNominal();
+            case PRE_NOMINAL -> person.getPreNominal();
+            case PREFERS_MEN -> resources.getString(person.isPrefersMen() ? "Yes.text" : "No.text");
+            case PREFERS_WOMEN -> resources.getString(person.isPrefersWomen() ? "Yes.text" : "No.text");
+            case PROTOMEK -> skillValue.apply(SkillType.S_GUN_PROTO);
+            case QUICK_TRAIN_IGNORE -> resources.getString(person.isQuickTrainIgnore() ? "Yes.text" : "No.text");
+            case RANK -> person.makeHTMLRank();
+            case REASONING -> person.getReasoning().getLabel();
+            case RECRUITMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
+            case REFLEXES -> getAttributeScoreDisplay(person, SkillAttribute.REFLEXES);
+            case REPUTATION -> Integer.toString(adjustedReputation);
+            case RETIREMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
+            case SALARY -> person.getSalary(campaign).toAmountAndSymbolString();
+            case SALVAGE_SUPERVISOR -> resources.getString(person.isSalvageSupervisor() ? "Yes.text" : "No.text");
+            case SCOUTING -> {
+                String sName = ScoutingSkills.getBestScoutingSkill(person);
+                yield sName == null ?
+                            "-" :
+                            Integer.toString(person.getSkill(sName).getFinalSkillValue(skillModifierData));
+            }
+            case SECOND_IN_COMMAND -> resources.getString(person.isSecondInCommand() ? "Yes.text" : "No.text");
+            case SHIP_TRANSPORT -> person.getUnit() != null && person.getUnit().getTransportShipAssignment() != null
+                                         ? person.getUnit().getTransportShipAssignment().getTransportShip().getName()
+                                         : "-";
+            case SKILL_LEVEL -> "<html>" + SkillType.getColoredExperienceLevelName(
+                  person.getExperienceLevel(campaign, false, true)) + "</html>";
+            case SMALL_ARMS -> {
+                String sName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+                      campaignOptions.isUseSmallArmsOnly());
+                yield sName == null ?
+                            "-" :
+                            Integer.toString(person.getSkill(sName).getFinalSkillValue(skillModifierData));
+            }
+            case SOCIAL -> {
+                Social trait = person.getSocial();
+                String sign = trait.isTraitPositive() ? "+" : "-";
+                yield trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
+            }
+            case SPA_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
+            case STRATEGY -> skillValue.apply(SkillType.S_STRATEGY);
+            case STRENGTH -> getAttributeScoreDisplay(person, SkillAttribute.STRENGTH);
+            case SURNAME -> {
+                final String surname = person.getSurname();
+                if (StringUtility.isNullOrBlank(surname)) {
+                    yield "";
+                } else if (!groupByUnit) {
+                    yield surname;
+                } else {
+                    final Unit unit = person.getUnit();
+                    if (unit == null) {
+                        yield surname;
+                    }
+                    final int crewSize = unit.getCrew().size() - 1;
+                    if (crewSize <= 0) {
+                        yield surname;
+                    }
+                    yield surname + " (+" + crewSize +
+                                resources.getString(unit.usesSoldiers()
+                                                          ? "PersonnelTableModelColumn.SURNAME.Soldiers.text"
+                                                          : "PersonnelTableModelColumn.SURNAME.Crew.text");
+                }
+            }
+            case TACTICAL_TRANSPORT ->
+                  person.getUnit() != null && person.getUnit().getTacticalTransportAssignment() != null
+                        ? person.getUnit().getTacticalTransportAssignment().getTransport().getName()
+                        : "-";
+            case TACTICS -> skillValue.apply(SkillType.S_TACTICS);
+            case TECH_AERO -> skillValue.apply(SkillType.S_TECH_AERO);
+            case TECH_BA -> skillValue.apply(SkillType.S_TECH_BA);
+            case TECH_MEK -> skillValue.apply(SkillType.S_TECH_MEK);
+            case TECH_MECHANIC -> skillValue.apply(SkillType.S_TECH_MECHANIC);
+            case TECH_MINUTES ->
+                  person.isTechExpanded() ? String.valueOf(person.getDailyAvailableTechTime(isUseTechAdmin)) : "0";
+            case TECH_VESSEL -> skillValue.apply(SkillType.S_TECH_VESSEL);
+            case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
+            case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
+            case TRYING_TO_CONCEIVE -> resources.getString(person.getGender().isFemale()
+                                                                 ?
+                                                                 (person.isTryingToConceive() ?
+                                                                  "Yes.text" :
+                                                                  "No.text") :
+                                                                 "NA.text");
+            case UNDER_PROTECTION -> resources.getString(person.isUnderProtection() ? "Yes.text" : "No.text");
+            case UNIT_ASSIGNMENT -> {
+                if (loadAssignmentFromMarket) {
+                    final Entity entity = personnelMarket.getAttachedEntity(person);
+                    yield (entity == null) ? "-" : entity.getDisplayName();
+                }
+
+                Unit unit = person.getUnit();
+                if (unit != null) {
+                    String name = unit.getName();
+                    if (unit.getEntity() instanceof Tank) {
+                        name += unit.isDriver(person) ? " [Driver]" : " [Gunner]";
+                    } else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+                        if (unit.isNavigator(person)) {name += " [Navigator]";} else if (unit.isDriver(person)) {
+                            name += " [Pilot]";
+                        } else if (unit.isGunner(person)) {
+                            name += " [Gunner]";
+                        } else {name += " [Crew]";}
+                    }
+                    yield name;
+                }
+
+                if (!person.getTechUnits().isEmpty()) {
+                    Unit refitUnit = person.getTechUnits().stream()
+                                           .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
+                                           .findFirst().orElse(null);
+                    String refitString = refitUnit != null ? "<b>Refitting</b> " + refitUnit.getName() : "";
+
+                    if (person.getTechUnits().size() == 1) {
+                        unit = person.getTechUnits().getFirst();
+                        if (unit != null) {
+                            yield "<html>" + ReportingUtilities.separateIf(refitString, ", ",
+                                  unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") + "</html>";
+                        }
+                    } else {
+                        yield "<html>" +
+                                    ReportingUtilities.separateIf(refitString, ", ",
+                                          person.getTechUnits().size() +
+                                                " units (" +
+                                                person.getMaintenanceTimeUsing() +
+                                                "m)") +
+                                    "</html>";
+                    }
+                }
+
+                yield "-";
+            }
+            case UNLUCKY -> Integer.toString(person.getUnlucky());
+            case VESSEL -> gunneryPilotingValue.apply(SkillType.S_GUN_SPACE, SkillType.S_PILOT_SPACE);
+            case VTOL -> gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_VTOL);
+            case WEALTH -> Integer.toString(person.getWealth());
+            case WILLPOWER -> getAttributeScoreDisplay(person, SkillAttribute.WILLPOWER);
+            case WORK_MINUTES -> person.isTechExpanded() ? String.valueOf(person.getMinutesLeft()) : "0";
+            case XP -> Integer.toString(person.getXP());
+            case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
+
+            default -> "UNIMPLEMENTED";
+        };
+    }
+
+    private static @NonNull BiFunction<String, String, String> getGunneryPilotingValue(
+          Function<String, String> skillValue) {
+        final BiFunction<String, String, String> gunPilot = (gunSkill, pilotSkill) ->
+                                                                  skillValue.apply(gunSkill) +
+                                                                        '/' +
+                                                                        skillValue.apply(pilotSkill);
+        return gunPilot;
+    }
+
+    private static @NonNull Function<String, String> getSkillValue(Person person,
+          SkillModifierData skillModifierData) {
+        final Function<String, String> skillVal = skillName ->
+                                                        person.hasSkill(skillName)
+                                                              ?
+                                                              Integer.toString(person.getSkill(skillName)
+                                                                                     .getFinalSkillValue(
+                                                                                           skillModifierData))
+                                                              :
+                                                              "-";
+        return skillVal;
     }
 
     /**
@@ -1171,6 +952,7 @@ public enum PersonnelTableModelColumn {
      *
      * @param person    the person whose attribute scores are being represented
      * @param attribute the specific skill attribute being evaluated
+     *
      * @return a string in the format "currentScore / attributeCap (+/- modifier)"
      *
      * @author Illiani
@@ -1322,6 +1104,19 @@ public enum PersonnelTableModelColumn {
                      DEPLOYED,
                      INJURIES,
                      XP -> true;
+                default -> false;
+            };
+            case COMBAT -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     PERSONNEL_ROLE,
+                     AGGREGATE_GUNNERY,
+                     AGGREGATE_PILOTING,
+                     SCOUTING,
+                     LEADERSHIP,
+                     TACTICS,
+                     STRATEGY -> true;
                 default -> false;
             };
             case GUNNERY_PILOT_SKILLS -> switch (this) {
