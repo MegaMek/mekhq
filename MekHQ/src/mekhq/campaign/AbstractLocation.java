@@ -233,6 +233,10 @@ public abstract class AbstractLocation implements ILocation {
         return locationNode;
     }
 
+    public boolean computeIsUseCommandCircuit(Campaign campaign) {
+        return computeIsUseCommandCircuit(campaign, campaign.getCampaignOptions());
+    }
+
     protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
         return FactionStandingUtilities.isUseCommandCircuit(
               campaign.isOverridingCommandCircuitRequirements(),
@@ -242,7 +246,7 @@ public abstract class AbstractLocation implements ILocation {
               campaign.getFutureAtBContracts());
     }
 
-    protected double getRechargeTime() {
+    public double getRechargeTime() {
         return 0.0;
     }
 

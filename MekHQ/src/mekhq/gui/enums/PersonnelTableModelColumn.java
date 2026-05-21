@@ -52,9 +52,14 @@ import megamek.common.units.Tank;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -75,6 +80,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
@@ -189,7 +195,13 @@ public enum PersonnelTableModelColumn {
     CHARISMA("PersonnelTableModelColumn.CHARISMA.text"),
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SHIP_TRANSPORT("PersonnelTableModelColumn.SHIP_TRANSPORT.text"),
-    TACTICAL_TRANSPORT("PersonnelTableModelColumn.TACTICAL_TRANSPORT.text");
+    TACTICAL_TRANSPORT("PersonnelTableModelColumn.TACTICAL_TRANSPORT.text"),
+    LOCATION_SYSTEM("PersonnelTableModelColumn.LOCATION_SYSTEM.text"),
+    LOCATION_PLANET("PersonnelTableModelColumn.LOCATION_PLANET.text"),
+    LOCATION_NAME("PersonnelTableModelColumn.LOCATION_NAME.text"),
+    DESTINATION_SYSTEM("PersonnelTableModelColumn.DESTINATION_SYSTEM.text"),
+    DESTINATION_PLANET("PersonnelTableModelColumn.DESTINATION_PLANET.text"),
+    DESTINATION_NAME("PersonnelTableModelColumn.DESTINATION_NAME.text");
 
     // endregion Enum Declarations
 
@@ -1153,6 +1165,119 @@ public enum PersonnelTableModelColumn {
                 currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
                 attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
                 return currentAttributeValue + " / " + attributeCap;
+            case LOCATION_SYSTEM: {
+                LocationNode node = person.getLocationNode();
+                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                if (loc != null) {
+                    var system = loc.getCurrentSystem();
+                    return system != null ? system.getPrintableName(today) : "-";
+                }
+                return "-";
+            }
+            case LOCATION_PLANET: {
+                LocationNode node = person.getLocationNode();
+                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                if (loc != null) {
+                    Planet planet = loc.getPlanet();
+                    return planet != null ? planet.getPrintableName(today) : "-";
+                }
+                return "-";
+            }
+            case LOCATION_NAME: {
+                LocationNode node = person.getLocationNode();
+                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                boolean isTraveling = loc instanceof CurrentLocation cl
+                                            && cl.getJumpPath() != null && cl.getJumpPath().size() > 0;
+                if (node != null) {
+                    LocationNode parent = node.getParent();
+                    while (parent != null) {
+                        if (parent.getLocatable() == campaign.getMainForcePersonnel()) {
+                            return campaign.getName();
+                        }
+                        if (!isTraveling && parent.getLocatable() instanceof AcademyCampusLocation campus) {
+                            return campus.getAcademyName();
+                        }
+                        parent = parent.getParent();
+                    }
+                }
+                if (isTraveling) {
+                    CurrentLocation cl = (CurrentLocation) loc;
+                    JumpPath path = cl.getJumpPath();
+                    PlanetarySystem sys = cl.getCurrentSystem();
+                    if (path.size() > 1 && cl.isAtJumpPoint()) {
+                        double neededHours = sys.getRechargeTime(today, cl.computeIsUseCommandCircuit(campaign));
+                        double remainingHours = neededHours - cl.getRechargeTime();
+                        if (remainingHours > 0) {
+                            int days = (int) Math.ceil(remainingHours / 24.0);
+                            return String.format(
+                                  resources.getString(
+                                        "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text"),
+                                  days);
+                        }
+                        return resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
+                    } else if (path.size() == 1) {
+                        int days = (int) Math.ceil(cl.getTransitTime());
+                        return String.format(
+                              resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text"),
+                              days);
+                    } else {
+                        double daysToJP = sys.getTimeToJumpPoint(1.0) - cl.getTransitTime();
+                        int days = (int) Math.ceil(daysToJP);
+                        return String.format(
+                              resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text"),
+                              days);
+                    }
+                }
+                return "-";
+            }
+            case DESTINATION_SYSTEM: {
+                LocationNode node = person.getLocationNode();
+                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                if (loc instanceof CurrentLocation cl
+                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                    var dest = cl.getJumpPath().getLastSystem();
+                    return dest != null ? dest.getPrintableName(today) : "-";
+                }
+                return "-";
+            }
+            case DESTINATION_PLANET: {
+                LocationNode node = person.getLocationNode();
+                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                if (loc instanceof CurrentLocation cl
+                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                    var dest = cl.getJumpPath().getLastSystem();
+                    if (dest != null) {
+                        Planet planet = dest.getPrimaryPlanet();
+                        return planet != null ? planet.getPrintableName(today) : "-";
+                    }
+                }
+                return "-";
+            }
+            case DESTINATION_NAME: {
+                LocationNode node = person.getLocationNode();
+                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                if (loc instanceof CurrentLocation cl
+                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                    var destination = cl.getJumpPath().getLastSystem();
+                    LocationNode clNode = cl.getLocationNode();
+                    if (clNode != null) {
+                        LocationNode parent = clNode.getParent();
+                        while (parent != null) {
+                            if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
+                                LocationNode fixedLocNode = parent.getParent();
+                                if (fixedLocNode != null
+                                          && fixedLocNode.getLocatable() instanceof AbstractLocation campusLoc
+                                          && campusLoc.getCurrentSystem() == destination) {
+                                    return campus.getAcademyName();
+                                }
+                                return campaign.getName();
+                            }
+                            parent = parent.getParent();
+                        }
+                    }
+                }
+                return "-";
+            }
             default:
                 return "UNIMPLEMENTED";
         }
@@ -1247,6 +1372,8 @@ public enum PersonnelTableModelColumn {
             case LAST_NAME, SURNAME, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
             case PERSONNEL_ROLE -> 150;
             case FORCE -> 100;
+            case LOCATION_SYSTEM, LOCATION_PLANET, DESTINATION_SYSTEM, DESTINATION_PLANET -> 100;
+            case LOCATION_NAME, DESTINATION_NAME -> 150;
             default -> 20;
         };
     }
@@ -1268,7 +1395,13 @@ public enum PersonnelTableModelColumn {
                  PERSONNEL_ROLE,
                  UNIT_ASSIGNMENT,
                  FORCE,
-                 DEPLOYED -> SwingConstants.LEFT;
+                 DEPLOYED,
+                 LOCATION_SYSTEM,
+                 LOCATION_PLANET,
+                 LOCATION_NAME,
+                 DESTINATION_SYSTEM,
+                 DESTINATION_PLANET,
+                 DESTINATION_NAME -> SwingConstants.LEFT;
             case SALARY -> SwingConstants.RIGHT;
             default -> SwingConstants.CENTER;
         };
@@ -1443,6 +1576,19 @@ public enum PersonnelTableModelColumn {
                      ACADEMY,
                      COURSE,
                      ACADEMY_DURATION -> true;
+                default -> false;
+            };
+            case LOCATION -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     PERSONNEL_ROLE,
+                     LOCATION_SYSTEM,
+                     LOCATION_PLANET,
+                     LOCATION_NAME,
+                     DESTINATION_SYSTEM,
+                     DESTINATION_PLANET,
+                     DESTINATION_NAME -> true;
                 default -> false;
             };
             case OTHER -> switch (this) {

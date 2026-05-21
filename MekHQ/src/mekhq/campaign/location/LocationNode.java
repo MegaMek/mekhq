@@ -73,6 +73,18 @@ public class LocationNode {
         return null;
     }
 
+    public mekhq.campaign.AbstractLocation getNearestAbstractLocation() {
+        if (locatable instanceof mekhq.campaign.AbstractLocation loc) {
+            return loc;
+        }
+
+        if (parent != null) {
+            return parent.getNearestAbstractLocation();
+        }
+
+        return null;
+    }
+
     public LocationNode getParent() {
         return parent;
     }

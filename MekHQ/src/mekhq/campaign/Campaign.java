@@ -2453,6 +2453,7 @@ public class Campaign implements ITechManager, ILocation {
      */
     public void importPerson(Person person) {
         humanResources.importPerson(person);
+        person.setParent(mainForcePersonnel);
     }
 
     public @Nullable Person getPerson(final UUID id) {

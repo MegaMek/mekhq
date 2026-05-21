@@ -135,7 +135,7 @@ public class CurrentLocation extends AbstractLocation {
     }
 
     @Override
-    protected double getRechargeTime() {
+    public double getRechargeTime() {
         return rechargeTime;
     }
 
