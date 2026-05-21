@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -241,6 +241,53 @@ public class SocioIndustrialData {
         return sophisticationToTechRating.get(tech);
     }
 
+    public static SocioIndustrialData parse(String text) {
+        if (text == null) {
+            return new SocioIndustrialData();
+        }
+        String[] socio = text.split(SEPARATOR);
+        SocioIndustrialData result = new SocioIndustrialData();
+        if (socio.length >= 5) {
+            result.tech = getSophisticationFromString(socio[0]);
+            result.industry = getRatingFromString(socio[1]);
+            result.rawMaterials = getRatingFromString(socio[2]);
+            result.output = getRatingFromString(socio[3]);
+            result.agriculture = getRatingFromString(socio[4]);
+        }
+        return result;
+    }
+
+    private static PlanetarySophistication getSophisticationFromString(String sophistication) {
+        if (sophistication == null) {
+            return PlanetarySophistication.C;
+        }
+        String normalizedSophistication = sophistication.trim().toUpperCase(Locale.ROOT);
+        try {
+            return PlanetarySophistication.valueOf(normalizedSophistication);
+        } catch (IllegalArgumentException e) {
+            return switch (normalizedSophistication) {
+                case "ADV" -> PlanetarySophistication.ADVANCED;
+                case "R", "X" -> PlanetarySophistication.REGRESSED;
+                default -> PlanetarySophistication.C;
+            };
+        }
+    }
+
+    private static PlanetaryRating getRatingFromString(String rating) {
+        if (rating == null) {
+            return PlanetaryRating.C;
+        }
+        String normalizedRating = rating.trim().toUpperCase(Locale.ROOT);
+        try {
+            return PlanetaryRating.valueOf(normalizedRating);
+        } catch (IllegalArgumentException e) {
+            if ("X".equals(normalizedRating)) {
+                return PlanetaryRating.F;
+            }
+            return PlanetaryRating.C;
+        }
+    }
+
     /**
      * This class is used to deserialize the SICs codes (e.g. "D-C-B-A-D") from a String into a SocioIndustrialData
      * object.
@@ -255,52 +302,10 @@ public class SocioIndustrialData {
             super(vc);
         }
 
-        private PlanetarySophistication getSophisticationFromString(String sophistication) {
-            if (sophistication == null) {
-                return PlanetarySophistication.C;
-            }
-            try {
-                return PlanetarySophistication.fromName(sophistication.toUpperCase(Locale.ROOT));
-            } catch (IllegalArgumentException e) {
-                // If the rating is not valid, return a default value but first let's evaluate 
-                // some special cases to be retro compatible with the old codes
-                return switch (sophistication.toUpperCase(Locale.ROOT)) {
-                    case "ADV" -> PlanetarySophistication.ADVANCED;
-                    case "R", "X" -> PlanetarySophistication.REGRESSED;
-                    default -> PlanetarySophistication.C;
-                };
-            }
-        }
-
-        private PlanetaryRating getRatingFromString(String rating) {
-            if (rating == null) {
-                return PlanetaryRating.C;
-            }
-            try {
-                return PlanetaryRating.fromName(rating.toUpperCase(Locale.ROOT));
-            } catch (IllegalArgumentException e) {
-                // If the rating is not valid, return a default value but first let's evaluate 
-                // some special cases to be retrocompatible with the old codes
-                if (rating.toUpperCase(Locale.ROOT).equals("X")) {
-                    return PlanetaryRating.F;
-                }
-                return PlanetaryRating.C;
-            }
-        }
-
         @Override
         public SocioIndustrialData deserialize(final JsonParser jsonParser, final DeserializationContext context) {
             try {
-                String[] socio = jsonParser.getText().split(SEPARATOR);
-                SocioIndustrialData result = new SocioIndustrialData();
-                if (socio.length >= 5) {
-                    result.tech = getSophisticationFromString(socio[0]);
-                    result.industry = getRatingFromString(socio[1]);
-                    result.rawMaterials = getRatingFromString(socio[2]);
-                    result.output = getRatingFromString(socio[3]);
-                    result.agriculture = getRatingFromString(socio[4]);
-                }
-                return result;
+                return SocioIndustrialData.parse(jsonParser.getText());
             } catch (Exception e) {
                 LOGGER.error(e, "Unable to deserialize SocioIndustrialData: {}", e.getMessage());
                 return null;
