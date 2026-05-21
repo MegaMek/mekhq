@@ -354,6 +354,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "awardVeterancySPAs" -> campaignOptions.setAwardVeterancySPAs(parseBoolean(
                   nodeContents));
+            case "awardRelevantVeterancySPAs" -> campaignOptions.setAwardRelevantVeterancySPAs(parseBoolean(
+                  nodeContents));
             case "rewardComingOfAgeAbilities" -> campaignOptions.setRewardComingOfAgeAbilities(parseBoolean(
                   nodeContents));
             case "rewardComingOfAgeRPSkills" -> campaignOptions.setRewardComingOfAgeRPSkills(parseBoolean(
@@ -673,6 +675,7 @@ public class CampaignOptionsUnmarshaller {
             case "serviceContractModifier" -> campaignOptions.setServiceContractModifier(parseInt(nodeContents));
             case "payBonusDefault" -> campaignOptions.setPayBonusDefault(parseBoolean(nodeContents));
             case "payBonusDefaultThreshold" -> campaignOptions.setPayBonusDefaultThreshold(parseInt(nodeContents));
+            case "includeCivilians" -> campaignOptions.setIncludeCivilians(parseBoolean(nodeContents));
             case "useCustomRetirementModifiers" -> campaignOptions.setUseCustomRetirementModifiers(parseBoolean(
                   nodeContents));
             case "useFatigueModifiers" -> campaignOptions.setUseFatigueModifiers(parseBoolean(nodeContents));

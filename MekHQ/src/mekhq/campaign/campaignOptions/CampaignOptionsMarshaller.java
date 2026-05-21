@@ -313,6 +313,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAwardVeterancySPAs());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "awardRelevantVeterancySPAs",
+              campaignOptions.isAwardRelevantVeterancySPAs());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "rewardComingOfAgeAbilities",
               campaignOptions.isRewardComingOfAgeAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -548,6 +552,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "payBonusDefaultThreshold",
               campaignOptions.getPayBonusDefaultThreshold());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "includeCivilians",
+              campaignOptions.isIncludeCivilians());
 
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

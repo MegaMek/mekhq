@@ -242,6 +242,7 @@ public class CampaignOptions {
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
     private boolean awardVeterancySPAs;
+    private boolean awardRelevantVeterancySPAs;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -444,6 +445,7 @@ public class CampaignOptions {
     private int serviceContractModifier;
     private boolean payBonusDefault;
     private int payBonusDefaultThreshold;
+    private boolean includeCivilians;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -1109,6 +1111,7 @@ public class CampaignOptions {
         setServiceContractModifier(3);
         setPayBonusDefault(false);
         setPayBonusDefaultThreshold(3);
+        setIncludeCivilians(false);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -1811,6 +1814,14 @@ public class CampaignOptions {
 
     public void setAwardVeterancySPAs(final boolean awardVeterancySPAs) {
         this.awardVeterancySPAs = awardVeterancySPAs;
+    }
+
+    public boolean isAwardRelevantVeterancySPAs() {
+        return awardRelevantVeterancySPAs;
+    }
+
+    public void setAwardRelevantVeterancySPAs(final boolean awardRelevantVeterancySPAs) {
+        this.awardRelevantVeterancySPAs = awardRelevantVeterancySPAs;
     }
 
     public boolean isRewardComingOfAgeAbilities() {
@@ -2566,6 +2577,14 @@ public class CampaignOptions {
 
     public void setPayBonusDefaultThreshold(final int payBonusDefaultThreshold) {
         this.payBonusDefaultThreshold = payBonusDefaultThreshold;
+    }
+
+    public boolean isIncludeCivilians() {
+        return includeCivilians;
+    }
+
+    public void setIncludeCivilians(final boolean includeCivilians) {
+        this.includeCivilians = includeCivilians;
     }
     // endregion Retirement
 
