@@ -62,7 +62,7 @@ public enum GlossaryEntry {
     ATOW_TRAITS("ATOW_TRAITS", new Version("0.50.06")),
     ATTRIBUTE_SCORES("ATTRIBUTE_SCORES", new Version("0.50.06")),
     AUTOINFIRMARY("AUTOINFIRMARY", new Version("0.50.06")),
-    BLOODMARK("BLOODMARK", new Version("0.50.07")),
+    BLOODMARK("BLOODMARK", new Version("0.51.00")),
     CAPITAL_SYSTEMS("CAPITAL_SYSTEMS", new Version("0.50.06")),
     CHALLENGE_SKULLS("CHALLENGE_SKULLS", new Version("0.50.11")),
     CHANGING_FILTERS_HANGAR("CHANGING_FILTERS_HANGAR", new Version("0.50.06")),
