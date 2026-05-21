@@ -81,6 +81,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * @author Neoancient
@@ -174,7 +175,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         panStats = new JPanel();
         txtDesc = new JTextArea();
-        JTextArea txtReport = new JTextArea();
         playerForceTree = new JTree();
 
         setLayout(new GridBagLayout());
@@ -184,34 +184,37 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         int y = 0;
 
         panStats.setName("pnlStats");
-        panStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
+        panStats.setBorder(RoundedLineBorder.createRoundedLineBorder(scenario.getName()));
         fillStats();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(panStats, gridBagConstraints);
 
-        txtReport.setName("txtReport");
-        txtReport.setText(scenario.getReport());
-        txtReport.setEditable(false);
-        txtReport.setLineWrap(true);
-        txtReport.setWrapStyleWord(true);
-        txtReport.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("After-Action Report"),
-              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(txtReport, gridBagConstraints);
+        if ((scenario.getReport() != null) && !scenario.getReport().isBlank()) {
+            JTextArea txtReport = new JTextArea();
+            txtReport.setName("txtReport");
+            txtReport.setText(scenario.getReport());
+            txtReport.setEditable(false);
+            txtReport.setLineWrap(true);
+            txtReport.setWrapStyleWord(true);
+            txtReport.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("After-Action Report"),
+                  BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtReport, gridBagConstraints);
+        }
     }
 
     private void fillStats() {

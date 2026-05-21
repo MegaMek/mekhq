@@ -70,6 +70,7 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -199,7 +200,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlInfo.setName("pnlStats");
         pnlInfo.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createEmptyBorder(0, 0, 10, 0),
-              BorderFactory.createTitledBorder(scenario.getName())));
+              RoundedLineBorder.createRoundedLineBorder(scenario.getName())));
 
         JLabel lblStatus = new JLabel("<html><b>" + scenario.getStatus() + "</b></html>");
         lblStatus.setToolTipText(scenario.getStatus().getToolTipText());

@@ -38,6 +38,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -98,9 +99,12 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
     public int getColumnWidth(int c) {
         return switch (c) {
-            case COL_NAME -> 100;
-            case COL_STATUS -> 50;
-            default -> 20;
+            case COL_NAME -> 210;
+            case COL_STATUS -> 140;
+            case COL_DATE -> 110;
+            case COL_ASSIGN -> 120;
+            case COL_SECTOR -> 170;
+            default -> 80;
         };
     }
 
@@ -281,7 +285,16 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (table.getModel() instanceof ScenarioTableModel model) {
                 Scenario scenario = model.getScenario(table.convertRowIndexToModel(row));
-                setToolTipText(model.getScenarioToolTip(scenario));
+                int modelColumn = table.convertColumnIndexToModel(column);
+                String valueText = ReportingUtilities.stripHtmlTags(Objects.toString(value, ""));
+                String toolTipText = model.getColumnName(modelColumn) + ": " + valueText;
+                if (modelColumn == COL_STATUS) {
+                    String scenarioToolTip = ReportingUtilities.stripHtmlTags(model.getScenarioToolTip(scenario));
+                    if ((scenarioToolTip != null) && !scenarioToolTip.isBlank()) {
+                        toolTipText += " - " + scenarioToolTip;
+                    }
+                }
+                setToolTipText(toolTipText);
                 Font tableFont = table.getFont();
                 setFont(model.isPriorityScenario(scenario) ? tableFont.deriveFont(Font.BOLD) : tableFont);
             }

@@ -58,19 +58,15 @@ import java.time.LocalDate;
 import java.util.*;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -176,6 +172,9 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final int ASSIGNMENTS_TAB_INDEX = 1;
     private static final int HISTORY_TAB_INDEX = 2;
 
+    private static final double CONTRACT_AND_QUEUE_COLUMNS_WEIGHT = 0.60;
+    private static final double CONTRACT_COLUMN_WEIGHT = 27.0 / 60.0;
+
     private LanceAssignmentView panLanceAssignment;
     private JTabbedPane briefingTabs;
     private JTable scenarioTable;
@@ -186,8 +185,6 @@ public final class BriefingTab extends CampaignGuiTab {
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
     private JScrollPane scrollHistoryScenarioView;
-    private JLabel lblOverviewDeploymentSummary;
-    private JTextPane txtSelectedScenarioReadiness;
     private RoundedJButton btnAddScenario;
     private RoundedJButton btnEditMission;
     private RoundedJButton btnCompleteMission;
@@ -412,9 +409,23 @@ public final class BriefingTab extends CampaignGuiTab {
         panScenarioButtons.add(btnClearAssignedUnits);
 
         JPanel panSelectedScenarioReadiness = createSelectedScenarioReadinessPanel();
-        JPanel panScenarioControls = new JPanel(new BorderLayout(0, 5));
-        panScenarioControls.add(panSelectedScenarioReadiness, BorderLayout.CENTER);
-        panScenarioControls.add(panScenarioButtons, BorderLayout.PAGE_END);
+        JPanel panScenarioControls = new JPanel(new GridBagLayout());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        panScenarioControls.add(panSelectedScenarioReadiness, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 0, 0, 0);
+        gridBagConstraints.weightx = 1.0;
+        panScenarioControls.add(panScenarioButtons, gridBagConstraints);
 
         JPanel panScenarioQueue = createScenarioQueuePanel(scenarioTable,
               resourceMap.getString("briefingTab.scenarios.title"),
@@ -422,7 +433,7 @@ public final class BriefingTab extends CampaignGuiTab {
               panScenarioControls);
 
         scrollScenarioView = new FastJScrollPane();
-        scrollScenarioView.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        scrollScenarioView.setBorder(BorderFactory.createEmptyBorder());
         scrollScenarioView.setViewportView(null);
         scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         gridBagConstraints = new GridBagConstraints();
@@ -447,15 +458,26 @@ public final class BriefingTab extends CampaignGuiTab {
         JSplitPane splitMissionAndScenarioQueue = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollMissionView,
               panScenarioQueue);
         splitMissionAndScenarioQueue.setOneTouchExpandable(true);
-        splitMissionAndScenarioQueue.setResizeWeight(0.45);
+        splitMissionAndScenarioQueue.setResizeWeight(CONTRACT_COLUMN_WEIGHT);
         splitMissionAndScenarioQueue.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
               ev -> refreshScenarioView());
 
         JSplitPane splitOverview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitMissionAndScenarioQueue,
               panScenario);
         splitOverview.setOneTouchExpandable(true);
-        splitOverview.setResizeWeight(0.62);
+        splitOverview.setResizeWeight(CONTRACT_AND_QUEUE_COLUMNS_WEIGHT);
         splitOverview.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
+        splitOverview.addComponentListener(new java.awt.event.ComponentAdapter() {
+            private boolean dividerLocationsInitialized;
+
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                if (!dividerLocationsInitialized && (splitOverview.getWidth() > 0)) {
+                    dividerLocationsInitialized = true;
+                    applyOverviewColumnLayout(splitOverview, splitMissionAndScenarioQueue);
+                }
+            }
+        });
 
         JSplitPane splitHistory = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panHistoryScenarioQueue,
               scrollHistoryScenarioView);
@@ -476,10 +498,15 @@ public final class BriefingTab extends CampaignGuiTab {
         add(pnlTutorial, BorderLayout.SOUTH);
     }
 
+    private void applyOverviewColumnLayout(JSplitPane splitOverview, JSplitPane splitMissionAndScenarioQueue) {
+        splitOverview.setDividerLocation(CONTRACT_AND_QUEUE_COLUMNS_WEIGHT);
+        SwingUtilities.invokeLater(() -> splitMissionAndScenarioQueue.setDividerLocation(CONTRACT_COLUMN_WEIGHT));
+    }
+
     private JTable createScenarioTable(ScenarioTableModel model, boolean primaryTable) {
         JTable table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         TableRowSorter<ScenarioTableModel> scenarioSorter = new TableRowSorter<>(model);
         scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
@@ -534,15 +561,13 @@ public final class BriefingTab extends CampaignGuiTab {
         queuePanel.add(filterPanel, BorderLayout.PAGE_START);
 
         JScrollPane tableScrollPane = new FastJScrollPane(table);
+        tableScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         if (detailPanel == null) {
             queuePanel.add(tableScrollPane, BorderLayout.CENTER);
         } else {
-            tableScrollPane.setPreferredSize(new Dimension(300,
-                  (table.getRowHeight() * 7) + table.getTableHeader().getPreferredSize().height + 8));
-
             JPanel queueContent = new JPanel(new BorderLayout(0, 5));
-            queueContent.add(tableScrollPane, BorderLayout.PAGE_START);
-            queueContent.add(detailPanel, BorderLayout.CENTER);
+            queueContent.add(tableScrollPane, BorderLayout.CENTER);
+            queueContent.add(detailPanel, BorderLayout.PAGE_END);
             queuePanel.add(queueContent, BorderLayout.CENTER);
         }
 
@@ -550,28 +575,10 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private JPanel createSelectedScenarioReadinessPanel() {
-        JPanel readinessPanel = new JPanel(new BorderLayout(0, 5));
+        JPanel readinessPanel = new JPanel(new BorderLayout());
         readinessPanel.setBorder(RoundedLineBorder.createRoundedLineBorder(
               resourceMap.getString("briefingTab.selectedScenario.title")));
-        readinessPanel.setMinimumSize(new Dimension(300, 160));
-
-        txtSelectedScenarioReadiness = new JTextPane();
-        txtSelectedScenarioReadiness.setName("txtSelectedScenarioReadiness");
-        txtSelectedScenarioReadiness.setContentType("text/html");
-        txtSelectedScenarioReadiness.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        txtSelectedScenarioReadiness.setEditable(false);
-        txtSelectedScenarioReadiness.setFocusable(false);
-        txtSelectedScenarioReadiness.setOpaque(false);
-        txtSelectedScenarioReadiness.setBorder(BorderFactory.createEmptyBorder());
-        txtSelectedScenarioReadiness.setText(resourceMap.getString("briefingTab.selectedScenario.none"));
-
-        lblOverviewDeploymentSummary = new JLabel();
-        lblOverviewDeploymentSummary.setVerticalAlignment(SwingConstants.TOP);
-
-        JPanel summaryPanel = new JPanel(new BorderLayout());
-        summaryPanel.add(txtSelectedScenarioReadiness, BorderLayout.CENTER);
-        summaryPanel.add(lblOverviewDeploymentSummary, BorderLayout.PAGE_END);
-        readinessPanel.add(summaryPanel, BorderLayout.CENTER);
+        readinessPanel.setMinimumSize(new Dimension(300, 90));
 
         btnDeploySelectedScenario = new RoundedJButton(
               resourceMap.getString("briefingTab.selectedScenario.button.deploy"));
@@ -600,7 +607,7 @@ public final class BriefingTab extends CampaignGuiTab {
         buttonPanel.add(btnOpenAreaOfOperations);
         buttonPanel.add(btnOpenAssignments);
         buttonPanel.add(btnOpenToe);
-        readinessPanel.add(buttonPanel, BorderLayout.PAGE_END);
+        readinessPanel.add(buttonPanel, BorderLayout.CENTER);
 
         refreshSelectedScenarioReadiness(null);
         return readinessPanel;
@@ -658,57 +665,8 @@ public final class BriefingTab extends CampaignGuiTab {
         };
     }
 
-    private void refreshOverviewDeploymentSummary() {
-        if (lblOverviewDeploymentSummary == null) {
-            return;
-        }
-
-        lblOverviewDeploymentSummary.setVisible(getCampaignOptions().isUseStratCon());
-        if (!getCampaignOptions().isUseStratCon()) {
-            return;
-        }
-
-        final Mission mission = comboMission.getSelectedItem();
-        if (!(mission instanceof AtBContract contract)) {
-            lblOverviewDeploymentSummary.setForeground(UIManager.getColor("Label.foreground"));
-            lblOverviewDeploymentSummary.setText(resourceMap.getString("briefingTab.deploymentSummary.unavailable"));
-            return;
-        }
-
-        int assignedCombatElements = getAssignedCombatElements(contract);
-        int requiredCombatElements = contract.getRequiredCombatElements();
-        boolean hasShortfall = assignedCombatElements < requiredCombatElements;
-        lblOverviewDeploymentSummary.setForeground(hasShortfall ?
-                                                         MekHQ.getMHQOptions().getBelowContractMinimumForeground() :
-                                                         UIManager.getColor("Label.foreground"));
-        String resourceKey = hasShortfall ?
-                                   "briefingTab.deploymentSummary.shortfall" :
-                                   "briefingTab.deploymentSummary.ready";
-        lblOverviewDeploymentSummary.setText(String.format(resourceMap.getString(resourceKey),
-              assignedCombatElements,
-              requiredCombatElements));
-    }
-
-    private int getAssignedCombatElements(AtBContract contract) {
-        int assignedCombatElements = 0;
-        for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
-            AtBContract assignedContract = combatTeam.getContract(getCampaign());
-            CombatRole role = combatTeam.getRole();
-            boolean isRoleSuitable = (contract.getContractType().isCadreDuty() && role.isCadre()) || role.isCombatRole();
-            if (contract.equals(assignedContract) && isRoleSuitable && combatTeam.isEligible(getCampaign())) {
-                assignedCombatElements += combatTeam.getSize(getCampaign());
-            }
-        }
-        return assignedCombatElements;
-    }
-
     private void refreshSelectedScenarioReadiness(@Nullable Scenario scenario) {
-        if (txtSelectedScenarioReadiness == null) {
-            return;
-        }
-
         if (scenario == null) {
-            txtSelectedScenarioReadiness.setText(resourceMap.getString("briefingTab.selectedScenario.none"));
             btnDeploySelectedScenario.setEnabled(false);
             btnOpenAreaOfOperations.setEnabled(false);
             btnOpenAssignments.setEnabled(getCampaignOptions().isUseStratCon());
@@ -717,17 +675,6 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         boolean stratConScenario = isStratConScenario(scenario);
-        boolean hasAssignedForces = !scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
-        boolean canStartScenario = !getCampaign().checkLinkedScenario(scenario.getId()) &&
-                                         scenario.canStartScenario(getCampaign());
-
-                txtSelectedScenarioReadiness.setText(String.format(
-              resourceMap.getString("briefingTab.selectedScenario.summary"),
-              escapeHtml(scenario.getName()),
-              getAssignedForcesSummary(scenario),
-              getScenarioReadinessStatus(hasAssignedForces, canStartScenario),
-              getScenarioNextStep(stratConScenario, hasAssignedForces)));
-
         btnDeploySelectedScenario.setEnabled(stratConScenario &&
                                                    (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab));
         btnOpenAreaOfOperations.setEnabled(stratConScenario &&
@@ -742,56 +689,6 @@ public final class BriefingTab extends CampaignGuiTab {
         return (scenario instanceof AtBDynamicScenario) &&
                      (mission instanceof AtBContract contract) &&
                      (contract.getStratconCampaignState() != null);
-    }
-
-    private String getAssignedForcesSummary(Scenario scenario) {
-        List<String> assignedForceNames = new ArrayList<>();
-        for (int forceId : scenario.getForceIDs()) {
-            Formation formation = getCampaign().getFormation(forceId);
-            if (formation != null) {
-                assignedForceNames.add(escapeHtml(formation.getFullName()));
-            }
-        }
-
-        for (UUID unitId : scenario.getIndividualUnitIDs()) {
-            Unit unit = getCampaign().getUnit(unitId);
-            if (unit != null) {
-                assignedForceNames.add(escapeHtml(unit.getName()));
-            }
-        }
-
-        if (assignedForceNames.isEmpty()) {
-            return resourceMap.getString("briefingTab.selectedScenario.assigned.none");
-        }
-
-        int visibleForceCount = Math.min(assignedForceNames.size(), 2);
-        String visibleForces = String.join(", ", assignedForceNames.subList(0, visibleForceCount));
-        if (assignedForceNames.size() > visibleForceCount) {
-            return String.format(resourceMap.getString("briefingTab.selectedScenario.assigned.more"),
-                  visibleForces,
-                  assignedForceNames.size() - visibleForceCount);
-        }
-        return visibleForces;
-    }
-
-    private String getScenarioReadinessStatus(boolean hasAssignedForces, boolean canStartScenario) {
-        if (!hasAssignedForces) {
-            return resourceMap.getString("briefingTab.selectedScenario.status.needsForce");
-        }
-        return resourceMap.getString(canStartScenario ?
-                                           "briefingTab.selectedScenario.status.ready" :
-                                           "briefingTab.selectedScenario.status.blocked");
-    }
-
-    private String getScenarioNextStep(boolean stratConScenario, boolean hasAssignedForces) {
-        if (stratConScenario) {
-            return resourceMap.getString(hasAssignedForces ?
-                                               "briefingTab.selectedScenario.next.stratConAssigned" :
-                                               "briefingTab.selectedScenario.next.stratConUnassigned");
-        }
-        return resourceMap.getString(hasAssignedForces ?
-                                           "briefingTab.selectedScenario.next.standardAssigned" :
-                                           "briefingTab.selectedScenario.next.standardUnassigned");
     }
 
     private void deploySelectedScenario() {
@@ -817,16 +714,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void openToeTab() {
         getCampaignGui().setSelectedTab(MHQTabType.TOE);
-    }
-
-    private String escapeHtml(String text) {
-        if (text == null) {
-            return "";
-        }
-        return text.replace("&", "&amp;")
-              .replace("<", "&lt;")
-              .replace(">", "&gt;")
-              .replace("\"", "&quot;");
     }
 
     private void addMission() {
@@ -2445,7 +2332,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public void refreshLanceAssignments() {
         panLanceAssignment.refresh();
-        refreshOverviewDeploymentSummary();
         refreshSelectedScenarioReadiness(getSelectedScenario());
     }
 
@@ -2482,7 +2368,6 @@ public final class BriefingTab extends CampaignGuiTab {
                                                     getCampaign().isGM() &&
                                                     getCampaignOptions().isUseStratCon());
         }
-        refreshOverviewDeploymentSummary();
         refreshScenarioTableData();
     }
 
@@ -2519,7 +2404,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scenarioTable.setFillsViewportHeight(true);
         historyScenarioTable.setFillsViewportHeight(true);
-        refreshOverviewDeploymentSummary();
         refreshScenarioView();
         refreshHistoryScenarioView();
     }
@@ -2637,7 +2521,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if (!useStratCon && (briefingTabs.getSelectedIndex() == ASSIGNMENTS_TAB_INDEX)) {
             briefingTabs.setSelectedIndex(OVERVIEW_TAB_INDEX);
         }
-        refreshOverviewDeploymentSummary();
     }
 
     @Subscribe

@@ -125,7 +125,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
@@ -554,6 +554,8 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel txtSharePct = new JLabel();
         JLabel lblCargoRequirement = new JLabel();
         JLabel txtCargoRequirement = new JLabel();
+        JLabel lblDeploymentCoverage = new JLabel();
+        JLabel txtDeploymentCoverage = new JLabel();
         JLabel lblScore = new JLabel();
         JLabel txtScore = new JLabel();
         JLabel lblSupportPoints = new JLabel();
@@ -966,6 +968,38 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtCargoRequirement, gridBagConstraints);
+
+            if (contract.isActiveOn(campaign.getLocalDate())) {
+                String deploymentCoverageTooltip = wordWrap(resourceMap.getString("txtDeploymentCoverage.tooltip"));
+                lblDeploymentCoverage.setName("lblDeploymentCoverage");
+                lblDeploymentCoverage.setText(resourceMap.getString("lblDeploymentCoverage.text"));
+                lblDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblDeploymentCoverage, gridBagConstraints);
+
+                int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, contract);
+                int requiredCombatElements = contract.getRequiredCombatElements();
+                txtDeploymentCoverage.setName("txtDeploymentCoverage");
+                txtDeploymentCoverage.setText(assignedCombatElements + " / " + requiredCombatElements);
+                txtDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
+                if (assignedCombatElements < requiredCombatElements) {
+                    txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+                } else {
+                    txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getFontColorPositive());
+                }
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = y++;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(txtDeploymentCoverage, gridBagConstraints);
+            }
 
             lblScore.setName("lblScore");
             lblScore.setText(resourceMap.getString("lblScore.text"));

@@ -65,6 +65,22 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
                                      CADRE.toString() };
     }
 
+    static int getAssignedCombatElementCount(Campaign campaign, AtBContract contract) {
+        int assignedCombatElements = 0;
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            if (!contract.equals(combatTeam.getContract(campaign))) {
+                continue;
+            }
+
+            CombatRole role = combatTeam.getRole();
+            boolean isRoleSuitable = (contract.getContractType().isCadreDuty() && role.isCadre()) || role.isCombatRole();
+            if (isRoleSuitable && combatTeam.isEligible(campaign)) {
+                assignedCombatElements += combatTeam.getSize(campaign);
+            }
+        }
+        return assignedCombatElements;
+    }
+
     @Override
     public int getColumnCount() {
         return COL_NUM;
@@ -113,20 +129,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         AtBContract contract = getRow(row);
 
         if (column == COL_TOTAL) {
-            int t = 0;
-            for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
-                AtBContract assignedContract = combatTeam.getContract(campaign);
-                if (assignedContract != null) {
-                    boolean isCadreDuty = assignedContract.getContractType().isCadreDuty();
-                    CombatRole role = combatTeam.getRole();
-                    boolean isRoleSuitable = (isCadreDuty && role.isCadre()) || role.isCombatRole();
-                    boolean isDeploymentEligible = combatTeam.isEligible(campaign);
-
-                    if ((data.get(row).equals(assignedContract)) && isRoleSuitable && isDeploymentEligible) {
-                        t += combatTeam.getSize(campaign);
-                    }
-                }
-            }
+            int t = getAssignedCombatElementCount(campaign, contract);
             if (t < contract.getRequiredCombatElements()) {
                 return t + "/" + contract.getRequiredCombatElements();
             }
