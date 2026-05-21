@@ -242,6 +242,7 @@ public class CampaignOptions {
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
     private boolean awardVeterancySPAs;
+    private boolean awardRelevantVeterancySPAs;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -1807,6 +1808,14 @@ public class CampaignOptions {
 
     public void setAwardVeterancySPAs(final boolean awardVeterancySPAs) {
         this.awardVeterancySPAs = awardVeterancySPAs;
+    }
+
+    public boolean isAwardRelevantVeterancySPAs() {
+        return awardRelevantVeterancySPAs;
+    }
+
+    public void setAwardRelevantVeterancySPAs(final boolean awardRelevantVeterancySPAs) {
+        this.awardRelevantVeterancySPAs = awardRelevantVeterancySPAs;
     }
 
     public boolean isRewardComingOfAgeAbilities() {

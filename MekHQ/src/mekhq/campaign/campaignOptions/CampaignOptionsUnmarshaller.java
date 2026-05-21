@@ -350,6 +350,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "awardVeterancySPAs" -> campaignOptions.setAwardVeterancySPAs(parseBoolean(
                   nodeContents));
+            case "awardRelevantVeterancySPAs" -> campaignOptions.setAwardRelevantVeterancySPAs(parseBoolean(
+                  nodeContents));
             case "rewardComingOfAgeAbilities" -> campaignOptions.setRewardComingOfAgeAbilities(parseBoolean(
                   nodeContents));
             case "rewardComingOfAgeRPSkills" -> campaignOptions.setRewardComingOfAgeRPSkills(parseBoolean(

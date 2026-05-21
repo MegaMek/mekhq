@@ -3919,6 +3919,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                   .forEach(p -> p.setNeverAssignMaintenanceAutomatically(!p.isNeverAssignMaintenanceAutomatically())));
         menu.add(cbMenuItem);
 
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("blockMaternityLeave.text"));
+        cbMenuItem.setToolTipText(wordWrap(resources.getString("blockMaternityLeave.toolTipText")));
+        cbMenuItem.setName("blockMaternityLeave");
+        cbMenuItem.setSelected(selected.length == 1 && person.isBlockMaternityLeave());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected)
+                                                  .forEach(p -> p.setBlockMaternityLeave(!p.isBlockMaternityLeave())));
+        menu.add(cbMenuItem);
+
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
         cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
         cbMenuItem.setName("miPrefersMen");
@@ -3951,6 +3959,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         cbMenuItem.setSelected(selected.length == 1 && person.isHidePersonality());
         cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
             selectedPerson.setHidePersonality(!selectedPerson.isHidePersonality());
+            MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+        }));
+        menu.add(cbMenuItem);
+
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("coverIllicitMedicalExpenses.text"));
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("coverIllicitMedicalExpenses.toolTipText"),
+              100));
+        cbMenuItem.setName("coverIllicitMedicalExpenses");
+        cbMenuItem.setSelected(selected.length == 1 && person.isCoverIllicitMedicalExpenses());
+        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
+            selectedPerson.setCoverIllicitMedicalExpenses(!selectedPerson.isCoverIllicitMedicalExpenses());
             MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
         }));
         menu.add(cbMenuItem);
