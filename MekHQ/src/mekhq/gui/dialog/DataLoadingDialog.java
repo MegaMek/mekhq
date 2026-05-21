@@ -308,7 +308,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
             // region progress 3
             setProgress(3);
-            Systems.setInstance(Systems.loadDefault());
+            Systems.initializeDefaultSystems();
             // endregion Progress 3
 
             // region progress 4

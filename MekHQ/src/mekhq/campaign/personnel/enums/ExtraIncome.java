@@ -296,11 +296,9 @@ public enum ExtraIncome {
 
         String transactionMessage = getFormattedTextAt(RESOURCE_BUNDLE, transactionMessageKey, personTitle);
 
-        if (financialChange.isPositiveOrZero()) {
-            finances.credit(TransactionType.WEALTH, today, financialChange, transactionMessage);
-        } else {
-            finances.debit(TransactionType.WEALTH, today, financialChange, transactionMessage);
-        }
+        // We always use credit here as negative extra income returns a negative value. If we debited that value we'd
+        // actually be adding funds to the campaign.
+        finances.credit(TransactionType.WEALTH, today, financialChange, transactionMessage);
 
         campaignReport = getFormattedTextAt(
               RESOURCE_BUNDLE,
