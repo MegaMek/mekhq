@@ -75,6 +75,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
@@ -2595,43 +2596,175 @@ public class StratConRulesManager {
     }
 
     /**
-     * Applies scenario modifiers from the current track to the given scenario.
+     * Applies scenario modifiers provided by facilities on the track.
+     *
+     * <p>If the scenario is located directly on a facility, that facility's local or shared modifiers are applied and
+     * no additional modifier is rolled for facilities with the same ownership alignment. The method may then roll once
+     * for an available allied facility and once for an available enemy facility, allowing remote facilities to
+     * contribute shared modifiers to the scenario.</p>
+     *
+     * <p>Facilities that provide modifiers are marked unavailable by
+     * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean)} and will not be selected again until
+     * made available elsewhere.</p>
+     *
+     * @param scenario the scenario receiving facility-provided modifiers
+     * @param track    the track containing facilities that may influence the scenario
+     * @param coords   the coordinates where the scenario is being generated
      */
     private static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
           StratConCoords coords) {
-        // loop through all the facilities on the track
-        // if a facility has been revealed, then it has a 100% chance to apply its
-        // effect
-        // if a facility has not been revealed, then it has an x% chance to apply its
-        // effect
-        // where x is the current "aggro rating"
-        // if a facility is on the scenario coordinates, then it applies the local
-        // effects
-        for (StratConCoords facilityCoords : track.getFacilities().keySet()) {
-            boolean scenarioAtFacility = facilityCoords.equals(coords);
-            StratConFacility facility = track.getFacilities().get(facilityCoords);
-            List<String> modifierIDs = new ArrayList<>();
+        Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
 
-            if (scenarioAtFacility) {
-                modifierIDs = facility.getLocalModifiers();
-            } else if (facility.isVisible() || (randomInt(100) <= 75)) {
-                modifierIDs = facility.getSharedModifiers();
+        boolean rollForAllied = true;
+        boolean rollForEnemy = true;
+
+        StratConFacility localFacility = allFacilities.get(coords);
+        boolean scenarioAtFacility = localFacility != null;
+        if (scenarioAtFacility) {
+            final boolean isLocalFacility = true;
+            getFacilityModifiers(scenario, localFacility, isLocalFacility);
+
+            if (localFacility.isOwnerAlliedToPlayer()) {
+                rollForAllied = false;
+            } else {
+                rollForEnemy = false;
             }
+        }
 
-            for (String modifierID : modifierIDs) {
-                AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
-                if (modifier == null) {
-                    LOGGER.error("Modifier {} not found for facility {}",
-                          modifierID,
-                          facility.getFormattedDisplayableName());
-                    continue;
+        Map<StratConCoords, StratConFacility> availableAlliedFacilities = new HashMap<>();
+        Map<StratConCoords, StratConFacility> availableEnemyFacilities = new HashMap<>();
+        filterAvailableFacilities(allFacilities, availableAlliedFacilities, availableEnemyFacilities);
+
+        if (rollForAllied && !availableAlliedFacilities.isEmpty()) {
+            int alliedFacilityModifierChance = 2; // TODO make a campaign option
+            rollForFacilityModifier(scenario, alliedFacilityModifierChance, availableAlliedFacilities);
+        }
+
+        if (rollForEnemy && !availableEnemyFacilities.isEmpty()) {
+            int availableEnemyFacilityModifierChance = 2; // TODO make a campaign option
+            rollForFacilityModifier(scenario, availableEnemyFacilityModifierChance, availableEnemyFacilities);
+        }
+    }
+
+    /**
+     * Rolls to determine whether one of the supplied facilities contributes modifiers to the scenario.
+     *
+     * <p>A chance value of {@code 0} always fails, a value of {@code 1} always succeeds, and any higher value gives a
+     * {@code 1 / facilityModifierChance} chance of success. On success, one facility is selected at random from
+     * {@code availableFacilities} and its shared modifiers are applied as remote facility effects.</p>
+     *
+     * @param scenario               the scenario receiving the facility modifiers
+     * @param facilityModifierChance the roll chance denominator; {@code 0} disables the roll, {@code 1} guarantees
+     *                               success, and values greater than {@code 1} succeed when a random roll returns
+     *                               {@code 0}
+     * @param availableFacilities    facilities eligible to provide remote shared modifiers
+     */
+    private static void rollForFacilityModifier(StratConScenario scenario, int facilityModifierChance,
+          Map<StratConCoords, StratConFacility> availableFacilities) {
+        boolean autoFailRoll = facilityModifierChance == 0;
+        boolean autoSuccess = facilityModifierChance == 1;
+        if (!autoFailRoll && (autoSuccess || randomInt(facilityModifierChance) == 0)) {
+            if (!availableFacilities.isEmpty()) {
+                final StratConFacility randomFacility = ObjectUtility.getRandomItem(availableFacilities.values());
+                final boolean isLocalFacility = false;
+                getFacilityModifiers(scenario, randomFacility, isLocalFacility);
+            }
+        }
+    }
+
+    /**
+     * Applies the relevant modifiers from a facility to the provided scenario.
+     *
+     * <p>Local modifiers are used when the scenario occurs directly at the facility. If the scenario occurs directly
+     * at the facility, and the facility has not local modifiers, its shared modifiers are applied.</p>
+     *
+     * <p>Otherwise, if the scenario does not occur at the facility, its shared modifiers are applied.</p>
+     *
+     * <p>Then, the facility is marked as unavailable.</p>
+     *
+     * @param scenario the scenario receiving the modifiers
+     * @param facility the facility providing modifier effects
+     * @param isLocal  {@code true} if the scenario occurs at the facility location; {@code false} if the facility is
+     *                 being used remotely for shared modifiers
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static void getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
+          boolean isLocal) {
+        List<String> relevantModifiers = new ArrayList<>();
+        List<String> localModifiers = facility.getLocalModifiers();
+        List<String> globalModifiers = facility.getSharedModifiers();
+
+        if (!localModifiers.isEmpty() && isLocal) {
+            relevantModifiers.addAll(localModifiers);
+        } else {
+            relevantModifiers.addAll(globalModifiers);
+        }
+
+        for (String modifierID : relevantModifiers) {
+            applyModifierToScenario(scenario, facility, modifierID);
+        }
+
+        facility.setIsAvailable(false);
+    }
+
+    /**
+     * Resolves a scenario modifier by identifier and applies it to the scenario.
+     *
+     * <p>The modifier briefing text is prefixed with the facility display name to indicate the source of the effect
+     * before being attached to the backing scenario.</p>
+     *
+     * <p>If the modifier identifier cannot be resolved, an error is logged and no modifier is applied.</p>
+     *
+     * @param scenario   the scenario receiving the modifier
+     * @param facility   the facility responsible for the modifier effect
+     * @param modifierID the identifier of the modifier to resolve and apply
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static void applyModifierToScenario(StratConScenario scenario, StratConFacility facility,
+          String modifierID) {
+        AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
+        if (modifier == null) {
+            LOGGER.error("Modifier {} not found for facility {}",
+                  modifierID,
+                  facility.getFormattedDisplayableName());
+            return;
+        }
+
+        modifier.setAdditionalBriefingText('(' +
+                                                 facility.getDisplayableName() +
+                                                 ") " +
+                                                 modifier.getAdditionalBriefingText());
+        scenario.getBackingScenario().addScenarioModifier(modifier);
+    }
+
+    /**
+     * Creates a map containing only facilities that are currently available for use.
+     *
+     * <p>Facilities marked as unavailable are excluded from the returned maps. The filtered maps preserve the
+     * original coordinate-to-facility associations.</p>
+     *
+     * @param allFacilities             the complete map of facilities indexed by their coordinates
+     * @param availableAlliedFacilities an array of all allied facilities that are available
+     * @param availableEnemyFacilities  an array of all enemy facilities that are available
+     */
+    private static void filterAvailableFacilities(
+          Map<StratConCoords, StratConFacility> allFacilities,
+          Map<StratConCoords, StratConFacility> availableAlliedFacilities,
+          Map<StratConCoords, StratConFacility> availableEnemyFacilities) {
+        for (Entry<StratConCoords, StratConFacility> facilityEntry : allFacilities.entrySet()) {
+            StratConFacility facility = facilityEntry.getValue();
+            StratConCoords facilityCoords = facilityEntry.getKey();
+
+            if (facility.isAvailable()) {
+                if (facility.isOwnerAlliedToPlayer()) {
+                    availableAlliedFacilities.put(facilityCoords, facility);
+                } else {
+                    availableEnemyFacilities.put(facilityCoords, facility);
                 }
-
-                modifier.setAdditionalBriefingText('(' +
-                                                         facility.getDisplayableName() +
-                                                         ") " +
-                                                         modifier.getAdditionalBriefingText());
-                scenario.getBackingScenario().addScenarioModifier(modifier);
             }
         }
     }
