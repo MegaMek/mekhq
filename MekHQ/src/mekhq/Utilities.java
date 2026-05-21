@@ -37,7 +37,6 @@ import static java.lang.Math.max;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
@@ -964,13 +963,25 @@ public class Utilities {
     /**
      * Calculates the age based on the experience level and clan status.
      *
-     * <p>This method computes the age of a character by rolling a given number of exploding d6 depending on the
-     * specified experience level. It starts with a base age and adds results of the rolls. If the character is
-     * classified as 'Clan', the dice rolls are halved (rounded up). Additionally, for all experience levels other than
-     * {@code EXP_NONE}, the final result is clamped to a minimum of 16.</p>
+     * <p>This method computes the age of a character by rolling a number of exploding d6 dice determined by
+     * the experience level, adding the results to a base age. The number of dice rolled and starting conditions vary by
+     * level:</p>
+     * <ul>
+     *   <li>All levels except {@code EXP_NONE}: rolls {@code (2 * experienceLevel) + 1} dice and starts
+     *       with a base age of {@code 14}.</li>
+     *   <li>{@code EXP_NONE}: rolls {@code (EXP_ELITE * 2) + 1} dice but starts with a base age of
+     *       {@code 0}, using only the raw dice sum as the result.</li>
+     * </ul>
      *
-     * <p>An exploding die roll occurs if the roll is 6. In such cases, another die is rolled, and the result is
-     * added to the previous roll (minus one).</p>
+     * <p>Each die may explode: if a d6 rolls {@code 6}, one additional d6 is rolled and
+     * {@code (additionalRoll - 1)} is added, giving an effective single-die range of {@code 1–11}.</p>
+     *
+     * <p>If {@code isClan} is {@code true} and the experience level is not {@code EXP_NONE}, each
+     * individual die result (after any explosion) is halved and rounded up before being added to the
+     * running total.</p>
+     *
+     * <p>For all experience levels except {@code EXP_NONE}, the final age is clamped to a minimum
+     * of {@code 16}.</p>
      *
      * <p>The calculated average age for each experience level is shown below (rounded to one decimal):</p>
      *
@@ -988,45 +999,50 @@ public class Utilities {
      *   </tr>
      *   <tr>
      *     <td>EXP_ULTRA_GREEN</td>
-     *     <td>17.3</td>
-     *     <td>16.0</td>
+     *     <td>21.8</td>
+     *     <td>18.9</td>
      *   </tr>
      *   <tr>
      *     <td>EXP_GREEN</td>
-     *     <td>19.9</td>
-     *     <td>18.3</td>
-     *   </tr>
-     *   <tr>
-     *     <td>EXP_REGULAR</td>
      *     <td>27.8</td>
      *     <td>22.8</td>
      *   </tr>
      *   <tr>
-     *     <td>EXP_VETERAN</td>
+     *     <td>EXP_REGULAR</td>
      *     <td>35.6</td>
      *     <td>27.3</td>
      *   </tr>
      *   <tr>
-     *     <td>EXP_ELITE</td>
+     *     <td>EXP_VETERAN</td>
      *     <td>43.4</td>
      *     <td>31.7</td>
      *   </tr>
      *   <tr>
-     *     <td>EXP_HEROIC</td>
+     *     <td>EXP_ELITE</td>
      *     <td>51.3</td>
      *     <td>36.3</td>
      *   </tr>
      *   <tr>
-     *     <td>EXP_LEGENDARY</td>
+     *     <td>EXP_HEROIC</td>
      *     <td>59.1</td>
      *     <td>40.7</td>
      *   </tr>
+     *   <tr>
+     *     <td>EXP_LEGENDARY</td>
+     *     <td>66.9</td>
+     *     <td>45.2</td>
+     *   </tr>
      * </table>
      *
+     * <p><strong>Note:</strong> {@code EXP_NONE} produces identical averages for Clan and non-Clan
+     * characters because the Clan halving modifier is not applied at that experience level.</p>
+     *
      * @param experienceLevel The experience level of the character. Must be one of the constants defined in
-     *                        {@code SkillType}.
-     * @param isClan          {@code true} if the character is part of a Clan, in which case dice rolls are halved
-     *                        (rounded up), {@code false} otherwise.
+     *                        {@code SkillType}. Values above {@code EXP_LEGENDARY} are clamped to
+     *                        {@code EXP_LEGENDARY}.
+     * @param isClan          {@code true} if the character is part of a Clan, halving each die result (rounded up)
+     *                        before adding it to the age total; does not apply when {@code experienceLevel} is
+     *                        {@code EXP_NONE}. {@code false} otherwise.
      *
      * @return The calculated age of the character based on the input parameters.
      */
@@ -1035,7 +1051,8 @@ public class Utilities {
             experienceLevel = EXP_LEGENDARY;
         }
 
-        int baseAge = 16;
+        final int MINIMUM_DIE_COUNT = 2;
+        int baseAge = 16 - MINIMUM_DIE_COUNT;
 
         if (experienceLevel == EXP_NONE) {
             baseAge = 0; // only use the result of the dice roll
@@ -1044,15 +1061,14 @@ public class Utilities {
         int age = baseAge;
 
         // How many dice to roll
-        int diceCount = switch (experienceLevel) {
-            case EXP_NONE, EXP_ELITE -> 7;
-            case EXP_GREEN, EXP_ULTRA_GREEN -> 1;
-            case EXP_REGULAR -> 3;
-            case EXP_VETERAN -> 5;
-            case EXP_HEROIC -> 9;
-            case EXP_LEGENDARY -> 11;
-            default -> 0;
-        };
+        final int DIE_MULTIPLIER = 2;
+        int diceCount = MINIMUM_DIE_COUNT;
+
+        if (experienceLevel == EXP_NONE) {
+            diceCount = (EXP_ELITE * DIE_MULTIPLIER) + 1;
+        } else if (experienceLevel != EXP_ULTRA_GREEN) {
+            diceCount = (experienceLevel * DIE_MULTIPLIER) + 1;
+        }
 
         // Handle exploding dice
         for (int i = 0; i < diceCount; i++) {
@@ -1067,11 +1083,6 @@ public class Utilities {
             }
 
             age += roll;
-        }
-
-        // Handle Ultra-Green special case
-        if (experienceLevel == EXP_ULTRA_GREEN) {
-            age -= 3;
         }
 
         // Clamp age, if necessary
