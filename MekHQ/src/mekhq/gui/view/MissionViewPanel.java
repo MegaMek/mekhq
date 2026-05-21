@@ -219,20 +219,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtType, gridBagConstraints);
         }
 
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(false);
-        txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(mission.getDescription()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtDesc, gridBagConstraints);
+        addDescriptionPane(mission.getDescription(), 3);
     }
 
     private void fillStatsContract() {
@@ -527,20 +514,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
         i++;
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(false);
-        txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = i;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtDesc, gridBagConstraints);
+        addDescriptionPane(contract.getDescription(), i);
 
     }
 
@@ -1041,13 +1015,22 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtSupport, gridBagConstraints);
         }
 
+        addDescriptionPane(contract.getDescription(), y);
+    }
+
+    private void addDescriptionPane(String description, int gridY) {
+        if ((description == null) || description.isBlank()) {
+            return;
+        }
+
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
-        gridBagConstraints = new GridBagConstraints();
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(description));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;

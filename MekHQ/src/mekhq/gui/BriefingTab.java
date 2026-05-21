@@ -52,16 +52,20 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
@@ -183,7 +187,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private JScrollPane scrollScenarioView;
     private JScrollPane scrollHistoryScenarioView;
     private JLabel lblOverviewDeploymentSummary;
-    private JLabel lblSelectedScenarioReadiness;
+    private JTextPane txtSelectedScenarioReadiness;
     private RoundedJButton btnAddScenario;
     private RoundedJButton btnEditMission;
     private RoundedJButton btnCompleteMission;
@@ -260,29 +264,31 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
         panMission.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
 
         comboMission = new MMComboBox<>("comboMission");
         comboMission.addActionListener(ev -> changeMission());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
         panMission.add(comboMission, gridBagConstraints);
 
-        JPanel panMissionButtons = new JPanel(new GridLayout(2, 3));
+        JPanel panMissionButtons = new JPanel(new GridLayout(1, 0, 5, 0));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
@@ -319,7 +325,7 @@ public final class BriefingTab extends CampaignGuiTab {
         panMissionButtons.add(btnGMGenerateScenarios);
 
         scrollMissionView = new FastJScrollPane();
-        scrollMissionView.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        scrollMissionView.setBorder(BorderFactory.createEmptyBorder());
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
         scrollMissionView.setMinimumSize(new Dimension(220, 160));
@@ -335,11 +341,6 @@ public final class BriefingTab extends CampaignGuiTab {
               ScenarioQueueFilter.ASSIGNED,
               ScenarioQueueFilter.UNASSIGNED
         });
-          JPanel panSelectedScenarioReadiness = createSelectedScenarioReadinessPanel();
-        JPanel panScenarioQueue = createScenarioQueuePanel(scenarioTable,
-              resourceMap.getString("briefingTab.scenarios.title"),
-              activeScenarioFilter,
-              panSelectedScenarioReadiness);
 
         historyScenarioModel = new ScenarioTableModel(getCampaign());
         historyScenarioTable = createScenarioTable(historyScenarioModel, false);
@@ -358,14 +359,6 @@ public final class BriefingTab extends CampaignGuiTab {
         JPanel panScenarioButtons = new JPanel(new GridLayout(3, 3, 5, 5));
         panScenarioButtons.setBorder(RoundedLineBorder.createRoundedLineBorder(
               resourceMap.getString("briefingTab.scenarioActions.title")));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panScenario.add(panScenarioButtons, gridBagConstraints);
 
         btnStartGame = new RoundedJButton(resourceMap.getString("btnStartGame.text"));
         btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText"));
@@ -418,18 +411,15 @@ public final class BriefingTab extends CampaignGuiTab {
         panScenarioButtons.add(btnAutoResolveScenario);
         panScenarioButtons.add(btnClearAssignedUnits);
 
-        lblOverviewDeploymentSummary = new JLabel();
-        lblOverviewDeploymentSummary.setBorder(RoundedLineBorder.createRoundedLineBorder(
-              resourceMap.getString("briefingTab.deploymentSummary.title")));
-        lblOverviewDeploymentSummary.setMinimumSize(new Dimension(350, 44));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panScenario.add(lblOverviewDeploymentSummary, gridBagConstraints);
+        JPanel panSelectedScenarioReadiness = createSelectedScenarioReadinessPanel();
+        JPanel panScenarioControls = new JPanel(new BorderLayout(0, 5));
+        panScenarioControls.add(panSelectedScenarioReadiness, BorderLayout.CENTER);
+        panScenarioControls.add(panScenarioButtons, BorderLayout.PAGE_END);
+
+        JPanel panScenarioQueue = createScenarioQueuePanel(scenarioTable,
+              resourceMap.getString("briefingTab.scenarios.title"),
+              activeScenarioFilter,
+              panScenarioControls);
 
         scrollScenarioView = new FastJScrollPane();
         scrollScenarioView.setBorder(RoundedLineBorder.createRoundedLineBorder());
@@ -437,7 +427,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
@@ -565,9 +555,23 @@ public final class BriefingTab extends CampaignGuiTab {
               resourceMap.getString("briefingTab.selectedScenario.title")));
         readinessPanel.setMinimumSize(new Dimension(300, 160));
 
-        lblSelectedScenarioReadiness = new JLabel(resourceMap.getString("briefingTab.selectedScenario.none"));
-        lblSelectedScenarioReadiness.setVerticalAlignment(SwingConstants.TOP);
-        readinessPanel.add(lblSelectedScenarioReadiness, BorderLayout.CENTER);
+        txtSelectedScenarioReadiness = new JTextPane();
+        txtSelectedScenarioReadiness.setName("txtSelectedScenarioReadiness");
+        txtSelectedScenarioReadiness.setContentType("text/html");
+        txtSelectedScenarioReadiness.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        txtSelectedScenarioReadiness.setEditable(false);
+        txtSelectedScenarioReadiness.setFocusable(false);
+        txtSelectedScenarioReadiness.setOpaque(false);
+        txtSelectedScenarioReadiness.setBorder(BorderFactory.createEmptyBorder());
+        txtSelectedScenarioReadiness.setText(resourceMap.getString("briefingTab.selectedScenario.none"));
+
+        lblOverviewDeploymentSummary = new JLabel();
+        lblOverviewDeploymentSummary.setVerticalAlignment(SwingConstants.TOP);
+
+        JPanel summaryPanel = new JPanel(new BorderLayout());
+        summaryPanel.add(txtSelectedScenarioReadiness, BorderLayout.CENTER);
+        summaryPanel.add(lblOverviewDeploymentSummary, BorderLayout.PAGE_END);
+        readinessPanel.add(summaryPanel, BorderLayout.CENTER);
 
         btnDeploySelectedScenario = new RoundedJButton(
               resourceMap.getString("briefingTab.selectedScenario.button.deploy"));
@@ -699,12 +703,12 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void refreshSelectedScenarioReadiness(@Nullable Scenario scenario) {
-        if (lblSelectedScenarioReadiness == null) {
+        if (txtSelectedScenarioReadiness == null) {
             return;
         }
 
         if (scenario == null) {
-            lblSelectedScenarioReadiness.setText(resourceMap.getString("briefingTab.selectedScenario.none"));
+            txtSelectedScenarioReadiness.setText(resourceMap.getString("briefingTab.selectedScenario.none"));
             btnDeploySelectedScenario.setEnabled(false);
             btnOpenAreaOfOperations.setEnabled(false);
             btnOpenAssignments.setEnabled(getCampaignOptions().isUseStratCon());
@@ -717,7 +721,7 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean canStartScenario = !getCampaign().checkLinkedScenario(scenario.getId()) &&
                                          scenario.canStartScenario(getCampaign());
 
-        lblSelectedScenarioReadiness.setText(String.format(
+                txtSelectedScenarioReadiness.setText(String.format(
               resourceMap.getString("briefingTab.selectedScenario.summary"),
               escapeHtml(scenario.getName()),
               getAssignedForcesSummary(scenario),
