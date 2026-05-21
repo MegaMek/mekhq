@@ -2548,7 +2548,11 @@ public class StratConRulesManager {
 
         // do any facility or global modifiers
         if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
-            applyFacilityModifiers(scenario, track, coords);
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            int alliedFacilityModifierChance = campaignOptions.getAlliedFacilityModifierDieSize();
+            int enemyFacilityModifierChance = campaignOptions.getEnemyFacilityModifierDieSize();
+
+            applyFacilityModifiers(scenario, track, coords, alliedFacilityModifierChance, enemyFacilityModifierChance);
         }
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
@@ -2607,12 +2611,14 @@ public class StratConRulesManager {
      * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean)} and will not be selected again until
      * made available elsewhere.</p>
      *
-     * @param scenario the scenario receiving facility-provided modifiers
-     * @param track    the track containing facilities that may influence the scenario
-     * @param coords   the coordinates where the scenario is being generated
+     * @param scenario                     the scenario receiving facility-provided modifiers
+     * @param track                        the track containing facilities that may influence the scenario
+     * @param coords                       the coordinates where the scenario is being generated
+     * @param alliedFacilityModifierChance the 1-in-n chance an allied facility will add a modifier
+     * @param enemyFacilityModifierChance  the 1-in-n chance an enemy facility will add a modifier
      */
     private static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
-          StratConCoords coords) {
+          StratConCoords coords, int alliedFacilityModifierChance, int enemyFacilityModifierChance) {
         Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
 
         boolean rollForAllied = true;
@@ -2636,13 +2642,11 @@ public class StratConRulesManager {
         filterAvailableFacilities(allFacilities, availableAlliedFacilities, availableEnemyFacilities);
 
         if (rollForAllied && !availableAlliedFacilities.isEmpty()) {
-            int alliedFacilityModifierChance = 2; // TODO make a campaign option
             rollForFacilityModifier(scenario, alliedFacilityModifierChance, availableAlliedFacilities);
         }
 
         if (rollForEnemy && !availableEnemyFacilities.isEmpty()) {
-            int availableEnemyFacilityModifierChance = 2; // TODO make a campaign option
-            rollForFacilityModifier(scenario, availableEnemyFacilityModifierChance, availableEnemyFacilities);
+            rollForFacilityModifier(scenario, enemyFacilityModifierChance, availableEnemyFacilities);
         }
     }
 
