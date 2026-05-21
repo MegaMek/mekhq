@@ -445,6 +445,7 @@ public class CampaignOptions {
     private int serviceContractModifier;
     private boolean payBonusDefault;
     private int payBonusDefaultThreshold;
+    private boolean includeCivilians;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -1109,6 +1110,7 @@ public class CampaignOptions {
         setServiceContractModifier(3);
         setPayBonusDefault(false);
         setPayBonusDefaultThreshold(3);
+        setIncludeCivilians(false);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -2573,6 +2575,14 @@ public class CampaignOptions {
 
     public void setPayBonusDefaultThreshold(final int payBonusDefaultThreshold) {
         this.payBonusDefaultThreshold = payBonusDefaultThreshold;
+    }
+
+    public boolean isIncludeCivilians() {
+        return includeCivilians;
+    }
+
+    public void setIncludeCivilians(final boolean includeCivilians) {
+        this.includeCivilians = includeCivilians;
     }
     // endregion Retirement
 

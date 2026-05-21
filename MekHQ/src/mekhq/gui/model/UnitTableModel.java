@@ -486,7 +486,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     final Person p = u.getCommander();
                     if (p != null) {
                         setText(p.getFullDesc(getCampaign()));
-                        setImage(p.getPortrait().getImage(54));
+                        setImage(p.getPortraitImageIconWithFallback(true, 54).getImage());
                     } else {
                         clearImage();
                     }
@@ -521,7 +521,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     final Person p = u.getTech();
                     if (p != null) {
                         setText(p.getFullDesc(getCampaign()));
-                        setImage(p.getPortrait().getImage(54));
+                        setImage(p.getPortraitImageIconWithFallback(true, 54).getImage());
                     } else {
                         clearImage();
                     }
