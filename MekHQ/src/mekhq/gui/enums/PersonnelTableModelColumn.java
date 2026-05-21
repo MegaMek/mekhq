@@ -47,6 +47,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -717,22 +718,36 @@ public enum PersonnelTableModelColumn {
                     Unit unit = person.getUnit();
                     if (unit != null) {
                         String name = unit.getName();
-                        if (unit.getEntity() instanceof Tank) {
-                            if (unit.isDriver(person)) {
-                                name = name + " [Driver]";
-                            } else {
-                                name = name + " [Gunner]";
-                            }
-                        } else if ((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship)) {
+                        Entity entity = unit.getEntity();
+                        String role = null;
+
+                        if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof Tank) {
                             if (unit.isNavigator(person)) {
-                                name = name + " [Navigator]";
+                                role = "Navigator";
                             } else if (unit.isDriver(person)) {
-                                name = name + " [Pilot]";
+                                role = (entity instanceof Tank) ? "Driver" : "Pilot";
                             } else if (unit.isGunner(person)) {
-                                name = name + " [Gunner]";
+                                role = "Gunner";
+                            } else if (unit.isCommander(person)
+                                    || ((entity instanceof Tank) && unit.isTechOfficer(person))) {
+                                role = "Commander";
                             } else {
-                                name = name + " [Crew]";
+                                role = "Crew";
                             }
+                        } else if (entity instanceof Mek && unit.getFullCrewSize() > 1) {
+                            if (unit.isDriver(person)) {
+                                role = "Pilot";
+                            } else if (unit.isGunner(person)) {
+                                role = "Gunner";
+                            } else if (unit.isTechOfficer(person)) {
+                                role = "Tech Officer";
+                            } else if (unit.isCommander(person)) {
+                                role = "Commander";
+                            }
+                        }
+
+                        if (role != null) {
+                            name += " [" + role + "]";
                         }
 
                         return name;
