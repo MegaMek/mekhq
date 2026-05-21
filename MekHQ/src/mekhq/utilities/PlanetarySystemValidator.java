@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -9,8 +9,8 @@
  * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  * A copy of the GPL should have been included with this project;
@@ -30,37 +30,34 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe;
+package mekhq.utilities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
- * This is an object for landMasses of a planet
+ * Editor-facing validation facade for planetary system data.
  *
- * @author Aaron Gullickson (aarongullickson at gmail.com)
+ * <p>It currently delegates to {@link SystemValidator} so the editor, data loading checks, and standalone validation
+ * tests stay aligned. Add editor-only warnings here if future UI rules should not become loader errors.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class LandMass {
+public class PlanetarySystemValidator {
 
-    @JsonProperty("name")
-    private SourceableValue<String> name;
-    @JsonProperty("capital")
-    private SourceableValue<String> capital;
+    private final SystemValidator systemValidator;
 
-    public SourceableValue<String> getSourcedName() {
-        return name;
+    public PlanetarySystemValidator() {
+        this(new SystemValidator());
     }
 
-    public void setSourcedName(SourceableValue<String> name) {
-        this.name = name;
+    PlanetarySystemValidator(SystemValidator systemValidator) {
+        this.systemValidator = systemValidator;
     }
 
-    public SourceableValue<String> getSourcedCapital() {
-        return capital;
+    public ValidationResult validate(PlanetarySystem system) {
+        return validate(system, "edited planetary system");
     }
 
-    public void setSourcedCapital(SourceableValue<String> capital) {
-        this.capital = capital;
+    public ValidationResult validate(PlanetarySystem system, String sourceName) {
+        return systemValidator.validate(system, sourceName);
     }
 }
+
