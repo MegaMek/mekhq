@@ -59,6 +59,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.AcademyCampusLocation;
@@ -736,6 +737,9 @@ public enum PersonnelTableModelColumn {
                     if (clNode != null) {
                         LocationNode parent = clNode.getParent();
                         while (parent != null) {
+                            if (parent.getLocatable() instanceof AbstractBase base) {
+                                yield base.getDisplayName();
+                            }
                             if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
                                 LocationNode fixedLocNode = parent.getParent();
                                 if (fixedLocNode != null
@@ -827,6 +831,9 @@ public enum PersonnelTableModelColumn {
                     while (parent != null) {
                         if (parent.getLocatable() == campaign.getMainForcePersonnel()) {
                             yield campaign.getName();
+                        }
+                        if (!isTraveling && parent.getLocatable() instanceof AbstractBase base) {
+                            yield base.getDisplayName();
                         }
                         if (!isTraveling && parent.getLocatable() instanceof AcademyCampusLocation campus) {
                             yield campus.getAcademyName();

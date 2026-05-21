@@ -41,7 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.ReportingUtilities;
 
@@ -93,7 +96,8 @@ public enum PersonnelStatus {
     BACKGROUND_CHARACTER(NotificationSeverity.WARNING, false, false),
     IMPRISONED(NotificationSeverity.NEGATIVE, false, false),
     DISHONORABLY_DISCHARGED(NotificationSeverity.NEGATIVE, false, false),
-    CAMP_FOLLOWER(NotificationSeverity.WARNING, true, false);
+    CAMP_FOLLOWER(NotificationSeverity.WARNING, true, false),
+    AWAY_FROM_MAIN_FORCE(NotificationSeverity.WARNING, false, false);
 
     /**
      * Represents the severity levels of a status.
@@ -551,6 +555,50 @@ public enum PersonnelStatus {
      */
     public boolean isCampFollower() {
         return this == CAMP_FOLLOWER;
+    }
+
+    /**
+     * Checks if the character has the {@link #AWAY_FROM_MAIN_FORCE} personnel status.
+     *
+     * @return {@code true} if the character has the {@link #AWAY_FROM_MAIN_FORCE} personnel status {@code false}
+     *       otherwise.
+     */
+    public boolean isAwayFromMainForce() {
+        return this == AWAY_FROM_MAIN_FORCE;
+    }
+
+    /**
+     * Determines whether the given person is currently away from the main force based on their position in the
+     * location tree.
+     *
+     * <p>A person is considered away from the main force if they are not {@link #isAbsent() absent} and their
+     * location chain reaches an {@link AbstractLocation} (e.g., a {@link mekhq.campaign.FixedLocation}) before
+     * reaching the campaign root. Persons parented under the campaign's main-force node are considered present.</p>
+     *
+     * @param campaign the active campaign
+     * @param person   the person to check
+     * @return {@code true} if the person is away from the main force and not absent; {@code false} otherwise
+     */
+    public static boolean computeIsAwayFromMainForce(Campaign campaign, Person person) {
+        if (person.getStatus().isAbsent()) {
+            return false;
+        }
+        LocationNode node = person.getLocationNode();
+        if (node == null) {
+            return false;
+        }
+        LocationNode parent = node.getParent();
+        while (parent != null) {
+            ILocation locatable = parent.getLocatable();
+            if (locatable == campaign) {
+                return false;
+            }
+            if (locatable instanceof AbstractLocation) {
+                return true;
+            }
+            parent = parent.getParent();
+        }
+        return false;
     }
 
     /**

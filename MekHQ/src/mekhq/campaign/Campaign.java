@@ -129,6 +129,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
@@ -382,6 +383,7 @@ public class Campaign implements ITechManager, ILocation {
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
+    private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
     private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
@@ -1749,6 +1751,24 @@ public class Campaign implements ITechManager, ILocation {
 
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
+    }
+
+    public void addPlayerBase(PlayerBase base) {
+        if (base == null) {
+            return;
+        }
+        playerBases.add(base);
+    }
+
+    public void removePlayerBase(PlayerBase base) {
+        if (base == null) {
+            return;
+        }
+        playerBases.remove(base);
+    }
+
+    public Set<PlayerBase> getPlayerBases() {
+        return Collections.unmodifiableSet(playerBases);
     }
 
     public Personnel getMainForcePersonnel() {
@@ -5505,6 +5525,11 @@ public class Campaign implements ITechManager, ILocation {
             loc.writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "playerBases");
+        for (PlayerBase base : playerBases) {
+            base.writeToXML(writer, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "playerBases");
         locationNode.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         MHQXMLUtility.writeSimpleXMLTag(writer,

@@ -99,6 +99,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
@@ -346,6 +347,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     processFinances(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("locations")) {
                     processLocations(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("playerBases")) {
+                    processPlayerBaseNodes(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("location")) {
                     // legacy single-location format: read and treat as the sole active location
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(workingNode, campaign));
@@ -1386,6 +1389,22 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 first = false;
             } else {
                 campaign.addLocation(loc);
+            }
+        }
+    }
+
+    private static void processPlayerBaseNodes(Campaign campaign, Node wn) {
+        NodeList nl = wn.getChildNodes();
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if (wn2.getNodeName().equalsIgnoreCase("playerBase")) {
+                PlayerBase base = PlayerBase.generateInstanceFromXML(wn2, campaign);
+                if (base != null) {
+                    campaign.addPlayerBase(base);
+                }
             }
         }
     }

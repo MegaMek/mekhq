@@ -54,6 +54,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.enums.PersonnelTabView;
@@ -192,6 +193,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                                                     person.getPermanentFatigue(),
                                                     person.isClanPersonnel(),
                                                     person.getSkillLevel(campaign, false, true)) >= 5));
+            boolean personIsAwayFromMainForce = PersonnelStatus.computeIsAwayFromMainForce(campaign, person);
 
             // Collect all applicable color reasons for tooltip
             List<String> colorReasonKeys = new ArrayList<>();
@@ -208,6 +210,9 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 } else if (person.isDeployed()) {
                     setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                     setBackground(MekHQ.getMHQOptions().getDeployedBackground());
+                } else if (personIsAwayFromMainForce) {
+                    setForeground(MekHQ.getMHQOptions().getAwayFromMainForceForeground());
+                    setBackground(MekHQ.getMHQOptions().getAwayFromMainForceBackground());
                 } else if (personIsDamaged) {
                     setForeground(MekHQ.getMHQOptions().getInjuredForeground());
                     setBackground(MekHQ.getMHQOptions().getInjuredBackground());

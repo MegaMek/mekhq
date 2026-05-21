@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -61,9 +62,9 @@ public class LocationNode {
         return locatable;
     }
 
-    public CurrentLocation getCurrentLocation() {
-        if (locatable instanceof CurrentLocation currentLocation) {
-            return currentLocation;
+    public mekhq.campaign.AbstractLocation getCurrentLocation() {
+        if (locatable instanceof mekhq.campaign.AbstractLocation abstractLocation) {
+            return abstractLocation;
         }
 
         if (parent != null) {
@@ -74,15 +75,7 @@ public class LocationNode {
     }
 
     public mekhq.campaign.AbstractLocation getNearestAbstractLocation() {
-        if (locatable instanceof mekhq.campaign.AbstractLocation loc) {
-            return loc;
-        }
-
-        if (parent != null) {
-            return parent.getNearestAbstractLocation();
-        }
-
-        return null;
+        return getCurrentLocation();
     }
 
     public LocationNode getParent() {
@@ -117,10 +110,14 @@ public class LocationNode {
     public void writeToXML(PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "locationNodeChildren");
         for (LocationNode child : children) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+            ILocation locatable = child.getLocatable();
+            if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
+            } else if (locatable instanceof CurrentLocation currentLoc) {
+                currentLoc.writeToXML(pw, indent);
+            } else if (locatable instanceof Person p) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
             }
-            // Future: Person, Unit, and Part children serialized here
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
@@ -168,8 +165,22 @@ public class LocationNode {
                         }
                     }
                 }
+            } else if (wn.getNodeName().equalsIgnoreCase("location")) {
+                CurrentLocation travelLoc = CurrentLocation.generateInstanceFromXML(wn, campaign);
+                if (travelLoc != null) {
+                    LocationManager.setLocation(travelLoc, parent);
+                    campaign.addLocation(travelLoc);
+                }
+            } else if (wn.getNodeName().equalsIgnoreCase("personId")) {
+                try {
+                    Person person = campaign.getPerson(java.util.UUID.fromString(wn.getTextContent().trim()));
+                    if (person != null) {
+                        LocationManager.setLocation(person, parent);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    logger.warn("Invalid personId in locationNodeChildren: {}", wn.getTextContent());
+                }
             } else {
-                // Person, Unit, and Part reconnection will be added here
                 logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
             }
         }
