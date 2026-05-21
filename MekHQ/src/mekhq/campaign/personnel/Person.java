@@ -5067,15 +5067,53 @@ public class Person {
         return getId().hashCode();
     }
 
+    /**
+     * Returns the {@link SkillLevel} for this person's primary or secondary role, including injury effects.
+     *
+     * <p>Convenience overload of {@link #getSkillLevel(Campaign, boolean, boolean)} with
+     * {@code excludeInjuryEffects = false}.</p>
+     *
+     * @param campaign  the campaign context
+     * @param secondary {@code true} to evaluate the secondary role; {@code false} for the primary role
+     *
+     * @return the {@link SkillLevel} corresponding to this person's experience in the given role
+     */
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
         return getSkillLevel(campaign, secondary, false);
     }
 
+    /**
+     * Returns the {@link SkillLevel} for this person's primary or secondary role.
+     *
+     * <p>Delegates to {@link #getExperienceLevel(Campaign, boolean, boolean)} and maps the result to the
+     * corresponding {@link SkillLevel} constant.</p>
+     *
+     * @param campaign             the campaign context
+     * @param secondary            {@code true} to evaluate the secondary role; {@code false} for the primary role
+     * @param excludeInjuryEffects {@code true} to exclude injury modifiers from the calculation
+     *
+     * @return the {@link SkillLevel} corresponding to this person's experience in the given role
+     */
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary,
           final boolean excludeInjuryEffects) {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
     }
 
+    /**
+     * Returns the {@link SkillLevel} for this person's primary or secondary role without a full {@link Campaign}
+     * reference.
+     *
+     * <p>Equivalent to {@link #getSkillLevel(Campaign, boolean, boolean)} but accepts explicit options and date
+     * parameters, useful when a {@link Campaign} instance is not available.</p>
+     *
+     * @param campaignOptions      the campaign options controlling skill calculations
+     * @param isClanCampaign       {@code true} if the campaign uses Clan rules
+     * @param today                the current in-game date, used for aging and other time-sensitive modifiers
+     * @param secondary            {@code true} to evaluate the secondary role; {@code false} for the primary role
+     * @param excludeInjuryEffects {@code true} to exclude injury modifiers from the calculation
+     *
+     * @return the {@link SkillLevel} corresponding to this person's experience in the given role
+     */
     public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
           final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
@@ -5511,6 +5549,15 @@ public class Person {
         return getSkillLevelOrNegative(skillName, skillModifierData);
     }
 
+    /**
+     * Returns the experience level for the specified skill using pre-built modifier data, or {@code -1} if the skill is
+     * not present.
+     *
+     * @param skillName        the name of the skill to query
+     * @param skillModifierData pre-computed modifier data to apply to the skill level
+     *
+     * @return the experience level of the skill, or {@code -1} if the skill is not found
+     */
     public int getSkillLevelOrNegative(final String skillName, SkillModifierData skillModifierData) {
         if (hasSkill(skillName)) {
             return getSkill(skillName).getExperienceLevel(skillModifierData);
