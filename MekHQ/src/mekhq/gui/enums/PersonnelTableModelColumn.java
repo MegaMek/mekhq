@@ -1106,19 +1106,6 @@ public enum PersonnelTableModelColumn {
                      XP -> true;
                 default -> false;
             };
-            case COMBAT -> switch (this) {
-                case RANK,
-                     FIRST_NAME,
-                     LAST_NAME,
-                     PERSONNEL_ROLE,
-                     AGGREGATE_GUNNERY,
-                     AGGREGATE_PILOTING,
-                     SCOUTING,
-                     LEADERSHIP,
-                     TACTICS,
-                     STRATEGY -> true;
-                default -> false;
-            };
             case GUNNERY_PILOT_SKILLS -> switch (this) {
                 case RANK,
                      FIRST_NAME,
