@@ -2666,13 +2666,19 @@ public class StratConRulesManager {
     private static void rollForFacilityModifier(StratConScenario scenario, int facilityModifierChance,
           Map<StratConCoords, StratConFacility> availableFacilities) {
         boolean autoFailRoll = facilityModifierChance == 0;
+        if (autoFailRoll) {
+            return;
+        }
+
         boolean autoSuccess = facilityModifierChance == 1;
-        if (!autoFailRoll && (autoSuccess || randomInt(facilityModifierChance) == 0)) {
-            if (!availableFacilities.isEmpty()) {
-                final StratConFacility randomFacility = ObjectUtility.getRandomItem(availableFacilities.values());
-                final boolean isLocalFacility = false;
-                getFacilityModifiers(scenario, randomFacility, isLocalFacility);
+        if (autoSuccess || randomInt(facilityModifierChance) == 0) {
+            final StratConFacility randomFacility = ObjectUtility.getRandomItem(availableFacilities.values());
+            if (randomFacility == null) {
+                return;
             }
+
+            final boolean isLocalFacility = false;
+            getFacilityModifiers(scenario, randomFacility, isLocalFacility);
         }
     }
 
