@@ -1640,7 +1640,7 @@ public class HumanResources {
 
         // Assign a random portrait after we generate a new person
         if (campaignOptions.isUsePortraitForRole(primaryRole)) {
-            if (!campaignOptions.isNoRandomPortraitsForChildren() || !person.isChild(currentDay, true)) {
+            if (!campaignOptions.isNoRandomPortraitsForChildren() || !person.isChild(currentDay, false)) {
                 assignRandomPortraitFor(campaignOptions, person);
             }
         }
