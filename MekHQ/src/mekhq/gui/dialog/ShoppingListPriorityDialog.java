@@ -66,9 +66,16 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
- * Dialog for reviewing the campaign shopping list and changing procurement priority.
+ * Dialog for reviewing the campaign shopping list and adjusting procurement priority.
  *
- * <p>Priority is represented by row order: items nearer the top are attempted first.</p>
+ * <p>The dialog displays the current {@link ShoppingList} in a table and provides controls for moving the selected
+ * item to the top, up one position, down one position, or to the bottom of the list. Row order shows procurement
+ * priority: items nearer the top are attempted first.</p>
+ *
+ * <p>Changes are applied directly to the campaign's shopping list as items are moved.</p>
+ *
+ * @author Illiani
+ * @since 0.51.0
  */
 public class ShoppingListPriorityDialog extends JDialog {
     private static Campaign campaign;
@@ -83,10 +90,20 @@ public class ShoppingListPriorityDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ShoppingListPriorityDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ShoppingListPriorityDialog";
 
+    /**
+     * Creates and displays a modal shopping list priority dialog for the supplied campaign.
+     *
+     * @param owner    the parent frame used for modality and positioning
+     * @param campaign the campaign whose shopping list is displayed and reordered
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     public ShoppingListPriorityDialog(Frame owner, Campaign campaign) {
         super(owner);
 
-        this.campaign = campaign;
+        // needs to be static to expose it to the table
+        ShoppingListPriorityDialog.campaign = campaign;
         this.shoppingList = campaign.getShoppingList();
         this.tableModel = new ShoppingListTableModel(shoppingList);
         this.shoppingTable = new JTable(tableModel);
@@ -94,6 +111,15 @@ public class ShoppingListPriorityDialog extends JDialog {
         initialize();
     }
 
+    /**
+     * Initializes the dialog layout, table behavior, renderers, column widths, action panel, preferences, and window
+     * placement.
+     *
+     * <p>This method also displays the dialog once initialization is complete.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private void initialize() {
         setLayout(new BorderLayout());
 
@@ -125,6 +151,14 @@ public class ShoppingListPriorityDialog extends JDialog {
         setVisible(true); // Should always be last
     }
 
+    /**
+     * Creates the panel containing the shopping list priority controls and close button.
+     *
+     * @return a centered button panel wired to the dialog's row movement actions
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
@@ -156,6 +190,14 @@ public class ShoppingListPriorityDialog extends JDialog {
         return buttonPanel;
     }
 
+    /**
+     * Moves the currently selected shopping list item to the highest priority position.
+     *
+     * <p>If no row is selected, this method does nothing.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private void moveSelectedItemToTop() {
         int selectedRow = getSelectedModelRow();
         if (selectedRow < 0) {
@@ -168,6 +210,14 @@ public class ShoppingListPriorityDialog extends JDialog {
         }
     }
 
+    /**
+     * Moves the currently selected shopping list item up by one priority position.
+     *
+     * <p>If no row is selected, or the selected item is already first, this method does nothing.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private void moveSelectedItemUp() {
         int selectedRow = getSelectedModelRow();
         if (selectedRow < 0) {
@@ -180,6 +230,14 @@ public class ShoppingListPriorityDialog extends JDialog {
         }
     }
 
+    /**
+     * Moves the currently selected shopping list item down by one priority position.
+     *
+     * <p>If no row is selected, or the selected item is already last, this method does nothing.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private void moveSelectedItemDown() {
         int selectedRow = getSelectedModelRow();
         if (selectedRow < 0) {
@@ -192,6 +250,14 @@ public class ShoppingListPriorityDialog extends JDialog {
         }
     }
 
+    /**
+     * Moves the currently selected shopping list item to the lowest priority position.
+     *
+     * <p>If no row is selected, this method does nothing.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private void moveSelectedItemToBottom() {
         int selectedRow = getSelectedModelRow();
         if (selectedRow < 0) {
@@ -205,6 +271,14 @@ public class ShoppingListPriorityDialog extends JDialog {
         }
     }
 
+    /**
+     * Gets the currently selected row index in model coordinates.
+     *
+     * @return the selected model row, or {@code -1} if no row is selected
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private int getSelectedModelRow() {
         int selectedViewRow = shoppingTable.getSelectedRow();
         if (selectedViewRow < 0) {
@@ -214,6 +288,16 @@ public class ShoppingListPriorityDialog extends JDialog {
         return shoppingTable.convertRowIndexToModel(selectedViewRow);
     }
 
+    /**
+     * Selects and scrolls to the supplied model row.
+     *
+     * <p>If the supplied row is outside the table model bounds, this method does nothing.</p>
+     *
+     * @param modelRow the row index in model coordinates to select
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private void selectRow(int modelRow) {
         if (modelRow < 0 || modelRow >= tableModel.getRowCount()) {
             return;
@@ -224,6 +308,15 @@ public class ShoppingListPriorityDialog extends JDialog {
         shoppingTable.scrollRectToVisible(shoppingTable.getCellRect(viewRow, 0, true));
     }
 
+    /**
+     * Table model for displaying shopping list acquisition work and calculated procurement information.
+     *
+     * <p>The model exposes display columns for priority, item name, item type, cost, total cost, acquisition target,
+     * queued quantity, and next attempt timing.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private static class ShoppingListTableModel extends AbstractTableModel {
         private static final int COL_PRIORITY = 0;
         private static final int COL_NAME = 1;
@@ -237,6 +330,14 @@ public class ShoppingListPriorityDialog extends JDialog {
 
         private final ShoppingList shoppingList;
 
+        /**
+         * Creates a table model backed by the supplied shopping list.
+         *
+         * @param shoppingList the shopping list to display
+         *
+         * @author Illiani
+         * @since 0.51.0
+         */
         private ShoppingListTableModel(ShoppingList shoppingList) {
             this.shoppingList = shoppingList;
         }
@@ -320,12 +421,23 @@ public class ShoppingListPriorityDialog extends JDialog {
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            return switch (columnIndex) {
-                case COL_PRIORITY -> Integer.class;
-                default -> String.class;
-            };
+            if (columnIndex == COL_PRIORITY) {
+                return Integer.class;
+            } else {
+                return String.class;
+            }
         }
 
+        /**
+         * Gets the preferred display width for the supplied model column.
+         *
+         * @param column the column index in model coordinates
+         *
+         * @return the preferred column width, in pixels
+         *
+         * @author Illiani
+         * @since 0.51.0
+         */
         public int getColumnWidth(final int column) {
             return switch (column) {
                 case COL_NAME -> 200;
@@ -334,6 +446,16 @@ public class ShoppingListPriorityDialog extends JDialog {
             };
         }
 
+        /**
+         * Gets the horizontal alignment used when rendering cells in the supplied model column.
+         *
+         * @param column the column index in model coordinates
+         *
+         * @return one of the {@link SwingConstants} horizontal alignment constants
+         *
+         * @author Illiani
+         * @since 0.51.0
+         */
         public int getAlignment(final int column) {
             if (column == COL_NAME) {
                 return SwingConstants.LEFT;
@@ -342,6 +464,12 @@ public class ShoppingListPriorityDialog extends JDialog {
             }
         }
 
+        /**
+         * Cell renderer that applies per-column horizontal alignment for shopping list table values.
+         *
+         * @author Illiani
+         * @since 0.51.0
+         */
         public class Renderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(final JTable table, final Object value,
@@ -358,7 +486,13 @@ public class ShoppingListPriorityDialog extends JDialog {
     }
 
     /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     * Registers this dialog with MekHQ window preferences.
+     *
+     * <p>This ensures that size and position preferences are tracked under MekHQ preferences rather than MegaMek
+     * preferences.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
      */
     private void setPreferences() {
         try {
