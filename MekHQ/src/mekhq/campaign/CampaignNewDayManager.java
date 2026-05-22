@@ -173,6 +173,9 @@ import mekhq.campaign.randomEvents.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConFacility;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -1053,23 +1056,39 @@ public class CampaignNewDayManager {
 
             // Early Contract End (StratCon Only)
             StratConCampaignState campaignState = contract.getStratconCampaignState();
-            if (campaignState != null && !contract.getEndingDate().equals(today)) {
-                boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
-                int victoryPoints = contract.getContractScore(isUseMaplessMode);
-                int requiredVictoryPoints = contract.getRequiredVictoryPoints();
-
-                if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
-                    new ImmersiveDialogNotification(campaign,
-                          String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
-                                contract.getHyperlinkedName()), true);
-
-                    // This ensures any outstanding payout is paid out before the contract ends
-                    LocalDate adjustedDate = today.plusDays(1);
-                    int remainingMonths = contract.getMonthsLeft(adjustedDate);
-                    Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
-                    contract.setRoutedPayout(finalPayout);
-                    contract.setEndDate(adjustedDate);
+            if (campaignState != null) {
+                if (isMonday) {
+                    List<StratConTrackState> tracks = campaignState.getTracks();
+                    refreshStratConFacilities(tracks);
                 }
+
+                if (!contract.getEndingDate().equals(today)) {
+                    boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
+                    int victoryPoints = contract.getContractScore(isUseMaplessMode);
+                    int requiredVictoryPoints = contract.getRequiredVictoryPoints();
+
+                    if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
+                        new ImmersiveDialogNotification(campaign,
+                              String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
+                                    contract.getHyperlinkedName()), true);
+
+                        // This ensures any outstanding payout is paid out before the contract ends
+                        LocalDate adjustedDate = today.plusDays(1);
+                        int remainingMonths = contract.getMonthsLeft(adjustedDate);
+                        Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
+                        contract.setRoutedPayout(finalPayout);
+                        contract.setEndDate(adjustedDate);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void refreshStratConFacilities(List<StratConTrackState> tracks) {
+        for (StratConTrackState trackState : tracks) {
+            Map<StratConCoords, StratConFacility> facilities = trackState.getFacilities();
+            for (StratConFacility facility : facilities.values()) {
+                facility.setIsAvailable(true);
             }
         }
     }
@@ -1742,10 +1761,11 @@ public class CampaignNewDayManager {
      * @param campaign The campaign context, needed for reporting skill check results.
      * @param person The person for whom the willpower check is being performed.
      * @param modifier An integer value representing the modification to the willpower check.
+     *
      * @return {@code true} if the willpower check has failed; {@code false} otherwise.
      *
-     * @since 0.51.0
      * @author Illiani
+     * @since 0.51.0
      */
     private static boolean performPersonalityBreakCheck(Campaign campaign, Person person, int modifier) {
         String reason = getTextAt(RESOURCE_BUNDLE, "mentalBreak.check");
@@ -1767,11 +1787,12 @@ public class CampaignNewDayManager {
      * Processes the payment for medicine by debiting the specified cost from the person's finances.
      *
      * @param person the person for whom the payment is being made
-     * @param cost the amount of money to be debited for the medicine
+     * @param cost   the amount of money to be debited for the medicine
+     *
      * @return {@code true} if the payment was successful
      *
-     * @since 0.51.0
      * @author Illiani
+     * @since 0.51.0
      */
     private boolean payForMedicine(Person person, Money cost) {
         return finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
@@ -1782,16 +1803,17 @@ public class CampaignNewDayManager {
      * Calculates the medical cost to ignore a Flaw or negative SPA.
      *
      * <p>
-     *     Cost is derived from the XP cost of the Flaw divided by 100 (rounded normally). It has a minimum value of
-     *     {@link PersonnelOptions#MEDICINE_COST}.
+     * Cost is derived from the XP cost of the Flaw divided by 100 (rounded normally). It has a minimum value of
+     * {@link PersonnelOptions#MEDICINE_COST}.
      * </p>
      *
      * @param spaKey the key representing a special ability, used to fetch its associated cost multiplier.
-     * @return the calculated medical cost, which is derived from the base painkiller cost and adjusted based on the
-     * special ability's cost multiplier. Returns at least the base painkiller cost.
      *
-     * @since 0.51.0
+     * @return the calculated medical cost, which is derived from the base painkiller cost and adjusted based on the
+     *       special ability's cost multiplier. Returns at least the base painkiller cost.
+     *
      * @author Illiani
+     * @since 0.51.0
      */
     private static Money getMedicalCostFromSPAXPCost(String spaKey) {
         Map<String, SpecialAbility> specialAbilityMap = SpecialAbility.getSpecialAbilities();
