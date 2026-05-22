@@ -730,8 +730,9 @@ public class EducationController {
             return;
         }
 
+        PlanetarySystem academySystem = campaign.getSystemById(person.getEduAcademySystem());
         int travelTime = max(2,
-              campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+              academySystem != null ? campaign.getSimplifiedTravelTime(academySystem) : 0);
 
         campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
               person.getHyperlinkedFullTitle(),
