@@ -34,7 +34,6 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
@@ -113,10 +112,10 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        return data.isEmpty() ? "" : getAcquisition(row).map(a -> getValueFor(a, column)).orElse("?");
+        return data.isEmpty() ? "" : getAcquisition(row).map(a -> getValueFor(a, row, column)).orElse("?");
     }
 
-    private Object getValueFor(final IAcquisitionWork shoppingItem, final int column) {
+    private Object getValueFor(final IAcquisitionWork shoppingItem, final int row, final int column) {
         switch (column) {
             case COL_NAME:
                 return shoppingItem.getAcquisitionName();
@@ -148,8 +147,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
                       FORMATTER.format(shoppingItem.getQuantity()),
                       FORMATTER.format(shoppingItem.getTotalQuantity()));
             case COL_PRIORITY:
-                List<IAcquisitionWork> allParts = campaign.getShoppingList().getPartList();
-                return allParts.indexOf(shoppingItem) + 1;
+                return row + 1;
             default:
                 return "?";
 

@@ -78,7 +78,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
  * @since 0.51.0
  */
 public class ShoppingListPriorityDialog extends JDialog {
-    private static Campaign campaign;
+    private final Campaign campaign;
 
     private final ShoppingList shoppingList;
     private final ShoppingListTableModel tableModel;
@@ -103,9 +103,9 @@ public class ShoppingListPriorityDialog extends JDialog {
         super(owner);
 
         // needs to be static to expose it to the table
-        ShoppingListPriorityDialog.campaign = campaign;
+        this.campaign = campaign;
         this.shoppingList = campaign.getShoppingList();
-        this.tableModel = new ShoppingListTableModel(shoppingList);
+        this.tableModel = new ShoppingListTableModel(campaign, shoppingList);
         this.shoppingTable = new JTable(tableModel);
 
         initialize();
@@ -328,17 +328,20 @@ public class ShoppingListPriorityDialog extends JDialog {
         private static final int COL_NEXT = 7;
         private static final int N_COL = 8;
 
+        private final Campaign campaign;
         private final ShoppingList shoppingList;
 
         /**
          * Creates a table model backed by the supplied shopping list.
          *
+         * @param campaign     the campaign context
          * @param shoppingList the shopping list to display
          *
          * @author Illiani
          * @since 0.51.0
          */
-        private ShoppingListTableModel(ShoppingList shoppingList) {
+        private ShoppingListTableModel(Campaign campaign, ShoppingList shoppingList) {
+            this.campaign = campaign;
             this.shoppingList = shoppingList;
         }
 
@@ -478,7 +481,6 @@ public class ShoppingListPriorityDialog extends JDialog {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 final int actualCol = table.convertColumnIndexToModel(column);
-                final int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
                 return this;
             }

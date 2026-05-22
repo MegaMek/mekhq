@@ -655,7 +655,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             new ShoppingListPriorityDialog(this.getFrame(), getCampaign());
             this.refreshProcurementList();
         });
-        btnChangePriority.setEnabled(getCampaign().isProcessProcurement());
+        btnChangePriority.setEnabled(true);
         panProcurementButtons.add(btnChangePriority);
 
         btnPauseProcurement = new RoundedJButton(resourceMap.getString("btnPauseProcurement.text"));
