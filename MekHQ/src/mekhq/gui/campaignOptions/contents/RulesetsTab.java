@@ -122,6 +122,10 @@ public class RulesetsTab {
     private JCheckBox chkAutoConfigMunitions;
 
     private JPanel pnlScenarioModifiers;
+    private JLabel lblEnemyFacilityModifierDieSize;
+    private JSpinner spnEnemyFacilityModifierDieSize;
+    private JLabel lblAlliedFacilityModifierDieSize;
+    private JSpinner spnAlliedFacilityModifierDieSize;
     private JLabel lblScenarioModMax;
     private JSpinner spnScenarioModMax;
     private JLabel lblScenarioModChance;
@@ -239,6 +243,10 @@ public class RulesetsTab {
         chkAutoConfigMunitions = new JCheckBox();
 
         pnlScenarioModifiers = new JPanel();
+        lblEnemyFacilityModifierDieSize = new JLabel();
+        spnEnemyFacilityModifierDieSize = new JSpinner();
+        lblAlliedFacilityModifierDieSize = new JLabel();
+        spnAlliedFacilityModifierDieSize = new JSpinner();
         lblScenarioModMax = new JLabel();
         spnScenarioModMax = new JSpinner();
         lblScenarioModChance = new JLabel();
@@ -539,10 +547,16 @@ public class RulesetsTab {
      */
     private JPanel createUniversalModifiersPanel() {
         //Content
-        lblScenarioModMax = new CampaignOptionsLabel("ScenarioModMax");
+        lblEnemyFacilityModifierDieSize = new CampaignOptionsLabel("EnemyFacilityModifierDieSize");
+        spnEnemyFacilityModifierDieSize = new CampaignOptionsSpinner("EnemyFacilityModifierDieSize",
+              2, 0, 10, 1);
+        lblAlliedFacilityModifierDieSize = new CampaignOptionsLabel("AlliedFacilityModifierDieSize");
+        spnAlliedFacilityModifierDieSize = new CampaignOptionsSpinner("AlliedFacilityModifierDieSize",
+              2, 0, 10, 1);
+        lblScenarioModMax = new CampaignOptionsLabel("ScenarioModMax", getMetadata(new Version(0, 51, 0)));
         spnScenarioModMax = new CampaignOptionsSpinner("ScenarioModMax",
               3, 0, 10, 1);
-        lblScenarioModChance = new CampaignOptionsLabel("ScenarioModChance");
+        lblScenarioModChance = new CampaignOptionsLabel("ScenarioModChance", getMetadata(new Version(0, 51, 0)));
         spnScenarioModChance = new CampaignOptionsSpinner("ScenarioModChance",
               25, 5, 100, 5);
         lblScenarioModBV = new CampaignOptionsLabel("ScenarioModBV");
@@ -557,6 +571,18 @@ public class RulesetsTab {
         layout.gridx = 0;
         layout.gridy = 0;
         layout.gridwidth = 1;
+        panel.add(lblEnemyFacilityModifierDieSize, layout);
+        layout.gridx++;
+        panel.add(spnEnemyFacilityModifierDieSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAlliedFacilityModifierDieSize, layout);
+        layout.gridx++;
+        panel.add(spnAlliedFacilityModifierDieSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblScenarioModMax, layout);
         layout.gridx++;
         panel.add(spnScenarioModMax, layout);
@@ -817,6 +843,14 @@ public class RulesetsTab {
         chkUseNoTornadoes.addMouseListener(createTipPanelUpdater(stratConHeader, "UseNoTornadoes"));
         lblFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         spnFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
+        lblEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "EnemyFacilityModifierDieSize"));
+        spnEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "EnemyFacilityModifierDieSize"));
+        lblAlliedFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "AlliedFacilityModifierDieSize"));
+        spnAlliedFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "AlliedFacilityModifierDieSize"));
         lblScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
         spnScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
         lblScenarioModChance.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModChance"));
@@ -985,6 +1019,8 @@ public class RulesetsTab {
         options.setUseAdvancedBuildingGunEmplacements(chkUseAdvancedBuildingGunEmplacements.isSelected());
         options.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
         options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
+        options.setEnemyFacilityModifierDieSize((int) spnEnemyFacilityModifierDieSize.getValue());
+        options.setAlliedFacilityModifierDieSize((int) spnAlliedFacilityModifierDieSize.getValue());
         options.setScenarioModMax((int) spnScenarioModMax.getValue());
         options.setScenarioModChance((int) spnScenarioModChance.getValue());
         options.setScenarioModBV((int) spnScenarioModBV.getValue());
@@ -1050,6 +1086,8 @@ public class RulesetsTab {
         chkUseAdvancedBuildingGunEmplacements.setSelected(options.isUseAdvancedBuildingGunEmplacements());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
         chkAutoConfigMunitions.setSelected(options.isAutoConfigMunitions());
+        spnEnemyFacilityModifierDieSize.setValue(options.getEnemyFacilityModifierDieSize());
+        spnAlliedFacilityModifierDieSize.setValue(options.getAlliedFacilityModifierDieSize());
         spnScenarioModMax.setValue(options.getScenarioModMax());
         spnScenarioModChance.setValue(options.getScenarioModChance());
         spnScenarioModBV.setValue(options.getScenarioModBV());
