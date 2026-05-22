@@ -141,6 +141,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -466,16 +467,16 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollHistoryScenarioView.setViewportView(null);
         scrollHistoryScenarioView.setMinimumSize(new Dimension(350, 220));
 
-        JSplitPane splitMissionAndScenarioQueue = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-              createBriefingColumnPanel(scrollMissionView, false),
-              createBriefingColumnPanel(panScenarioQueue, true));
+          JSplitPane splitMissionAndScenarioQueue = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+              createBriefingColumnPanel(scrollMissionView),
+              createBriefingColumnPanel(panScenarioQueue));
         styleBriefingSplitPane(splitMissionAndScenarioQueue);
         splitMissionAndScenarioQueue.setResizeWeight(CONTRACT_COLUMN_WEIGHT);
         splitMissionAndScenarioQueue.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
               ev -> refreshScenarioView());
 
         JSplitPane splitOverview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitMissionAndScenarioQueue,
-              createBriefingColumnPanel(panScenario, true));
+              createBriefingColumnPanel(panScenario));
         styleBriefingSplitPane(splitOverview);
         splitOverview.setResizeWeight(CONTRACT_AND_QUEUE_COLUMNS_WEIGHT);
         splitOverview.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
@@ -492,8 +493,8 @@ public final class BriefingTab extends CampaignGuiTab {
         });
 
         JSplitPane splitHistory = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-              createBriefingColumnPanel(panHistoryScenarioQueue, false),
-              createBriefingColumnPanel(scrollHistoryScenarioView, true));
+              createBriefingColumnPanel(panHistoryScenarioQueue),
+              createBriefingColumnPanel(scrollHistoryScenarioView));
         styleBriefingSplitPane(splitHistory);
         splitHistory.setResizeWeight(0.35);
 
@@ -529,23 +530,13 @@ public final class BriefingTab extends CampaignGuiTab {
         splitPane.setBorder(BorderFactory.createEmptyBorder());
     }
 
-    private JPanel createBriefingColumnPanel(JComponent content, boolean hasLeadingSeparator) {
+    private JPanel createBriefingColumnPanel(JComponent content) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(content, BorderLayout.CENTER);
-
-        if (hasLeadingSeparator) {
-            panel.setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(0, 1, 0, 0, getSubtleBorderColor()),
-                  BorderFactory.createEmptyBorder(0,
-                        BRIEFING_COLUMN_PADDING,
-                        0,
-                        BRIEFING_COLUMN_PADDING)));
-        } else {
-            panel.setBorder(BorderFactory.createEmptyBorder(0,
-                  BRIEFING_COLUMN_PADDING,
-                  0,
-                  BRIEFING_COLUMN_PADDING));
-        }
+        panel.setBorder(BorderFactory.createEmptyBorder(0,
+              BRIEFING_COLUMN_PADDING,
+              0,
+              BRIEFING_COLUMN_PADDING));
 
         return panel;
     }
@@ -565,18 +556,24 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private JPanel createBriefingSectionPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        panel.setBorder(createBriefingSectionBorder(title));
         return panel;
     }
 
-    private JLabel createBriefingSectionHeader(String title) {
-        JLabel header = new JLabel(title);
-        styleCompactComponent(header);
-        header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 2.0f));
-        header.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
-              BorderFactory.createEmptyBorder(6, 4, 6, 4)));
-        return header;
+    private javax.swing.border.Border createBriefingSectionBorder(String title) {
+          javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
+              getSubtleBorderColor(),
+              2,
+              10,
+              8);
+        titledBorder.setTitleFont(getBriefingSectionTitleFont());
+        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
+    }
+
+    private Font getBriefingSectionTitleFont() {
+        JLabel title = new JLabel();
+        styleCompactComponent(title);
+        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
     }
 
     private void styleSecondaryButtons(AbstractButton... buttons) {

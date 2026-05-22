@@ -84,6 +84,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * @author Neoancient
@@ -225,18 +226,24 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private JPanel createBriefingSectionPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        panel.setBorder(createBriefingSectionBorder(title));
         return panel;
     }
 
-    private JLabel createBriefingSectionHeader(String title) {
-        JLabel header = new JLabel(title);
-        header.putClientProperty(FLATLAF_STYLE_CLASS, "small");
-          header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 2.0f));
-        header.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
-              BorderFactory.createEmptyBorder(6, 4, 6, 4)));
-        return header;
+    private javax.swing.border.Border createBriefingSectionBorder(String title) {
+          javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
+              getSubtleBorderColor(),
+              2,
+              10,
+              8);
+        titledBorder.setTitleFont(getBriefingSectionTitleFont());
+        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
+    }
+
+    private Font getBriefingSectionTitleFont() {
+        JLabel title = new JLabel();
+        title.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
     }
 
     private Color getSubtleBorderColor() {

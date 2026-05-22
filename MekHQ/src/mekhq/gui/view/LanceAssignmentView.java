@@ -60,6 +60,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
@@ -256,18 +257,24 @@ public class LanceAssignmentView extends JPanel {
 
     private JPanel createBriefingSectionPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        panel.setBorder(createBriefingSectionBorder(title));
         return panel;
     }
 
-    private JLabel createBriefingSectionHeader(String title) {
-        JLabel header = new JLabel(title);
-        styleCompactComponent(header);
-          header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 2.0f));
-        header.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
-              BorderFactory.createEmptyBorder(6, 4, 6, 4)));
-        return header;
+    private javax.swing.border.Border createBriefingSectionBorder(String title) {
+          javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
+              getSubtleBorderColor(),
+              2,
+              10,
+              8);
+        titledBorder.setTitleFont(getBriefingSectionTitleFont());
+        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
+    }
+
+    private Font getBriefingSectionTitleFont() {
+        JLabel title = new JLabel();
+        styleCompactComponent(title);
+        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
     }
 
     private Color getSubtleBorderColor() {

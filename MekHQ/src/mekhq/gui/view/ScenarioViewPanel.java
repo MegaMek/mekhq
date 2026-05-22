@@ -73,6 +73,7 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
@@ -199,19 +200,26 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
     private JPanel createBriefingSectionPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        panel.add(createBriefingSectionHeader(title), BorderLayout.PAGE_START);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              createBriefingSectionBorder(title)));
         return panel;
     }
 
-    private JLabel createBriefingSectionHeader(String title) {
-        JLabel header = new JLabel(title);
-        header.putClientProperty(FLATLAF_STYLE_CLASS, "small");
-            header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 2.0f));
-        header.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
-              BorderFactory.createEmptyBorder(6, 4, 6, 4)));
-        return header;
+    private javax.swing.border.Border createBriefingSectionBorder(String title) {
+          javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
+              getSubtleBorderColor(),
+              2,
+              10,
+              8);
+        titledBorder.setTitleFont(getBriefingSectionTitleFont());
+        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
+    }
+
+    private Font getBriefingSectionTitleFont() {
+        JLabel title = new JLabel();
+        title.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
     }
 
     private Color getSubtleBorderColor() {
@@ -305,22 +313,13 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillDeployment() {
 
         pnlDeployment = new JPanel(new GridBagLayout());
-        pnlDeployment.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-
-        GridBagConstraints headerGbc = new GridBagConstraints();
-        headerGbc.gridx = 0;
-        headerGbc.gridy = 0;
-        headerGbc.gridwidth = 2;
-        headerGbc.weightx = 1.0;
-        headerGbc.insets = new Insets(0, 0, 4, 0);
-        headerGbc.fill = GridBagConstraints.HORIZONTAL;
-        headerGbc.anchor = GridBagConstraints.NORTHWEST;
-        pnlDeployment.add(createBriefingSectionHeader(resourceMap.getString("pnlDeployment.title")),
-              headerGbc);
+          pnlDeployment.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              createBriefingSectionBorder(resourceMap.getString("pnlDeployment.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
-        leftGbc.gridy = 0;
+          leftGbc.gridy = -1;
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
@@ -330,7 +329,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         GridBagConstraints rightGbc = new GridBagConstraints();
         rightGbc.gridx = 1;
-        rightGbc.gridy = 0;
+        rightGbc.gridy = -1;
         rightGbc.gridwidth = 1;
         rightGbc.weightx = 1.0;
         rightGbc.weighty = 0.0;
@@ -445,21 +444,13 @@ public class ScenarioViewPanel extends JScrollablePanel {
     private void fillMapData() {
 
         pnlMap = new JPanel(new GridBagLayout());
-        pnlMap.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-
-        GridBagConstraints headerGbc = new GridBagConstraints();
-        headerGbc.gridx = 0;
-        headerGbc.gridy = 0;
-        headerGbc.gridwidth = 2;
-        headerGbc.weightx = 1.0;
-        headerGbc.insets = new Insets(0, 0, 4, 0);
-        headerGbc.fill = GridBagConstraints.HORIZONTAL;
-        headerGbc.anchor = GridBagConstraints.NORTHWEST;
-        pnlMap.add(createBriefingSectionHeader(resourceMap.getString("pnlMap.title")), headerGbc);
+        pnlMap.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              createBriefingSectionBorder(resourceMap.getString("pnlMap.title"))));
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
-        leftGbc.gridy = 0;
+          leftGbc.gridy = -1;
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
@@ -469,7 +460,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         GridBagConstraints rightGbc = new GridBagConstraints();
         rightGbc.gridx = 1;
-        rightGbc.gridy = 0;
+        rightGbc.gridy = -1;
         rightGbc.gridwidth = 1;
         rightGbc.weightx = 1.0;
         rightGbc.weighty = 0.0;
