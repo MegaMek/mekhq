@@ -263,10 +263,10 @@ public class LanceAssignmentView extends JPanel {
     private JLabel createBriefingSectionHeader(String title) {
         JLabel header = new JLabel(title);
         styleCompactComponent(header);
-        header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 1.0f));
+          header.setFont(header.getFont().deriveFont(Font.BOLD, header.getFont().getSize2D() + 2.0f));
         header.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, 1, 0, getSubtleBorderColor()),
-              BorderFactory.createEmptyBorder(2, 2, 4, 0)));
+              BorderFactory.createEmptyBorder(6, 4, 6, 4)));
         return header;
     }
 
