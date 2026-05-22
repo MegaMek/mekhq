@@ -35,12 +35,14 @@ package mekhq.campaign.camOpsReputation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import megamek.common.bays.*;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 
 public class TransportationRating {
@@ -364,9 +366,15 @@ public class TransportationRating {
               heavyVehicleCount = 0, lightVehicleCount = 0, protoMekCount = 0, battleArmorCount = 0,
               infantryCount = 0;
 
+        boolean excludeNonCombatUnits = !campaign.getCampaignOptions().isRequireSupportForceTransportation();
+        TreeMap<Integer, Formation> formationIds = campaign.getFormationIds();
         // Iterate through each unit in the campaign
         for (Unit unit : campaign.getActiveUnits()) {
             Entity entity = unit.getEntity();
+
+            if (excludeNonCombatUnits && isNonCombatUnit(formationIds, unit)) {
+                continue;
+            }
 
             // Vehicles are handled separately based on their weight
             if (entity.isVehicle()) {
@@ -427,5 +435,30 @@ public class TransportationRating {
 
         // Returns a map with calculated counts for each unit type
         return transportRequirements;
+    }
+
+    /**
+     * Determines if the given unit is a non-combat unit based on its formation.
+     *
+     * @param formationIds A map of formation IDs to their corresponding Formation objects.
+     * @param unit         The unit whose status as a non-combat unit is to be determined.
+     *
+     * @return {@code true} if the unit is part of a non-combat unit or has no valid formation
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static boolean isNonCombatUnit(TreeMap<Integer, Formation> formationIds, Unit unit) {
+        int formationId = unit.getFormationId();
+        if (formationId == Formation.FORMATION_NONE) {
+            return true;
+        }
+
+        Formation formation = formationIds.get(unit.getFormationId());
+        if (formation == null) {
+            return true;
+        }
+
+        return !formation.isCombatTeam();
     }
 }
