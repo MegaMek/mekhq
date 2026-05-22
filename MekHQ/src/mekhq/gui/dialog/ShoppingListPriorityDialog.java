@@ -78,8 +78,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
  * @since 0.51.0
  */
 public class ShoppingListPriorityDialog extends JDialog {
-    private final Campaign campaign;
-
     private final ShoppingList shoppingList;
     private final ShoppingListTableModel tableModel;
     private final JTable shoppingTable;
@@ -103,7 +101,6 @@ public class ShoppingListPriorityDialog extends JDialog {
         super(owner);
 
         // needs to be static to expose it to the table
-        this.campaign = campaign;
         this.shoppingList = campaign.getShoppingList();
         this.tableModel = new ShoppingListTableModel(campaign, shoppingList);
         this.shoppingTable = new JTable(tableModel);
@@ -177,9 +174,7 @@ public class ShoppingListPriorityDialog extends JDialog {
         moveUpButton.addActionListener(evt -> moveSelectedItemUp());
         moveDownButton.addActionListener(evt -> moveSelectedItemDown());
         moveBottomButton.addActionListener(evt -> moveSelectedItemToBottom());
-        closeButton.addActionListener(evt -> {
-            dispose();
-        });
+        closeButton.addActionListener(evt -> dispose());
 
         buttonPanel.add(moveTopButton);
         buttonPanel.add(moveUpButton);
