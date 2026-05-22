@@ -295,6 +295,10 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "useGenderedPortraitsOnly" -> campaignOptions.setUseGenderedPortraitsOnly(parseBoolean(
                   nodeContents));
+            case "childPortraitsWhenComingOfAge" -> campaignOptions.setChildPortraitsWhenComingOfAge(parseBoolean(
+                  nodeContents));
+            case "noRandomPortraitsForChildren" -> campaignOptions.setNoRandomPortraitsForChildren(parseBoolean(
+                  nodeContents));
             case "destroyByMargin" -> campaignOptions.setDestroyByMargin(parseBoolean(nodeContents));
             case "destroyMargin" -> campaignOptions.setDestroyMargin(parseInt(nodeContents));
             case "destroyPartTarget" -> campaignOptions.setDestroyPartTarget(parseInt(nodeContents));

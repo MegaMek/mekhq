@@ -762,9 +762,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns {@code true} if the given {@link java.time.format.DateTimeFormatter} pattern contains
-     * an unquoted day-of-week field token ({@code E}, {@code e}, or {@code c}). Single-quoted
-     * literal segments are skipped, and {@code ''} is treated as a literal single quote.
+     * Returns {@code true} if the given {@link java.time.format.DateTimeFormatter} pattern contains an unquoted
+     * day-of-week field token ({@code E}, {@code e}, or {@code c}). Single-quoted literal segments are skipped, and
+     * {@code ''} is treated as a literal single quote.
      */
     private static boolean patternHasWeekdayField(String pattern) {
         boolean inQuote = false;
