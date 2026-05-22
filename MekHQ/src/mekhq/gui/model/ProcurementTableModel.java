@@ -34,6 +34,7 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
@@ -69,7 +70,8 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public static final int COL_TARGET = 4;
     public static final int COL_NEXT = 5;
     public static final int COL_QUEUE = 6;
-    public static final int N_COL = 7;
+    public static final int COL_PRIORITY = 7;
+    public static final int N_COL = 8;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -145,6 +147,9 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
                 return String.format("%s [+%s]",
                       FORMATTER.format(shoppingItem.getQuantity()),
                       FORMATTER.format(shoppingItem.getTotalQuantity()));
+            case COL_PRIORITY:
+                List<IAcquisitionWork> allParts = campaign.getShoppingList().getPartList();
+                return allParts.indexOf(shoppingItem) + 1;
             default:
                 return "?";
 
@@ -171,7 +176,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public int getAlignment(final int column) {
         return switch (column) {
             case COL_COST, COL_TOTAL_COST, COL_QUEUE -> SwingConstants.RIGHT;
-            case COL_TARGET, COL_NEXT, COL_TYPE -> SwingConstants.CENTER;
+            case COL_TARGET, COL_NEXT, COL_TYPE, COL_PRIORITY -> SwingConstants.CENTER;
             default -> SwingConstants.LEFT;
         };
     }
