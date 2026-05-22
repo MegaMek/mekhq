@@ -916,8 +916,8 @@ public class HumanResources {
      * Returns {@code true} when campaign options select the legacy (deprecated) personnel market.
      *
      * <p>The market style named {@code PERSONNEL_MARKET_DISABLED} disables the <em>new</em> market
-     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate
-     * makes the intent explicit at every call site.</p>
+     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
+     * explicit at every call site.</p>
      */
     private static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
         return options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED;
@@ -1068,8 +1068,8 @@ public class HumanResources {
     }
 
     /**
-     * @deprecated Use {@link #getPersonnelGenerator(AbstractFactionSelector, AbstractPlanetSelector)} instead.
-     *             The {@code campaignOptions} parameter was never used.
+     * @deprecated Use {@link #getPersonnelGenerator(AbstractFactionSelector, AbstractPlanetSelector)} instead. The
+     *       {@code campaignOptions} parameter was never used.
      */
     @Deprecated(since = "0.50.07")
     public AbstractPersonnelGenerator getPersonnelGenerator(CampaignOptions campaignOptions,
@@ -1190,7 +1190,8 @@ public class HumanResources {
         return senior;
     }
 
-    public @Nullable Person getSeniorMedicalPerson(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public @Nullable Person getSeniorMedicalPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return getSeniorMedicalPerson(getDoctors(), campaignOptions, isClanCampaign, today);
     }
 
@@ -1216,7 +1217,8 @@ public class HumanResources {
      *
      * @return the {@link Person} who is second-in-command, or {@code null}
      */
-    public @Nullable Person getSecondInCommand(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public @Nullable Person getSecondInCommand(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return findTopCommanders(campaignOptions, isClanCampaign, today)[1];
     }
 
@@ -1257,7 +1259,8 @@ public class HumanResources {
                     continue;
                 }
 
-                if (!person.equals(commander) && person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, commander)) {
+                if (!person.equals(commander) &&
+                          person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, commander)) {
                     Person previousCommander = commander;
                     commander = person;
 
@@ -1265,7 +1268,11 @@ public class HumanResources {
                         if (secondInCommand == null) {
                             secondInCommand = previousCommander;
                         } else if (!previousCommander.equals(secondInCommand)
-                                         && previousCommander.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, secondInCommand)) {
+                                         &&
+                                         previousCommander.outRanksUsingSkillTiebreaker(campaignOptions,
+                                               isClanCampaign,
+                                               today,
+                                               secondInCommand)) {
                             secondInCommand = previousCommander;
                         }
                     }
@@ -1283,7 +1290,11 @@ public class HumanResources {
                     continue;
                 }
 
-                if (!person.equals(secondInCommand) && person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, secondInCommand)) {
+                if (!person.equals(secondInCommand) &&
+                          person.outRanksUsingSkillTiebreaker(campaignOptions,
+                                isClanCampaign,
+                                today,
+                                secondInCommand)) {
                     secondInCommand = person;
                 }
             }
@@ -1324,14 +1335,14 @@ public class HumanResources {
     /**
      * Retrieves a list of active technicians.
      *
-     * @param people       the collection of people to search
-     * @param units        the collection of units (for self-crewed engineers)
+     * @param people          the collection of people to search
+     * @param units           the collection of units (for self-crewed engineers)
      * @param campaignOptions the campaign options
      * @param isClanCampaign  whether this is a Clan campaign
      * @param today           the current in-game date
-     * @param noZeroMinute if {@code true}, excludes technicians with no remaining available minutes
-     * @param eliteFirst   if {@code true}, sorts the list to place the most skilled technicians at the top
-     * @param expanded     if {@code true}, includes technicians with expanded roles
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     * @param eliteFirst      if {@code true}, sorts the list to place the most skilled technicians at the top
+     * @param expanded        if {@code true}, includes technicians with expanded roles
      *
      * @return a list of active technicians sorted appropriately
      */
@@ -1439,7 +1450,8 @@ public class HumanResources {
         return procurementCharacter;
     }
 
-    public @Nullable Person getLogisticsPerson(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public @Nullable Person getLogisticsPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return getLogisticsPerson(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
     }
 
@@ -1517,7 +1529,8 @@ public class HumanResources {
         return logisticsPersonnel;
     }
 
-    public List<Person> getLogisticsPersonnel(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public List<Person> getLogisticsPersonnel(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return getLogisticsPersonnel(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
     }
 
@@ -1625,8 +1638,11 @@ public class HumanResources {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
+        // Assign a random portrait after we generate a new person
         if (campaignOptions.isUsePortraitForRole(primaryRole)) {
-            assignRandomPortraitFor(campaignOptions, person);
+            if (!campaignOptions.isNoRandomPortraitsForChildren() || !person.isChild(currentDay, true)) {
+                assignRandomPortraitFor(campaignOptions, person);
+            }
         }
 
         if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
@@ -1912,12 +1928,12 @@ public class HumanResources {
                                   "" :
                                   ' ' +
                                         String.format(resources.getString("personnelRecruitmentFormerSurname.text") +
-                                                            ' ', formerSurname);
+                                                      ' ', formerSurname);
             String add = !prisonerStatus.isFree() ?
                                (' ' +
                                       resources.getString(prisonerStatus.isBondsman() ?
-                                                                "personnelRecruitmentBondsman.text" :
-                                                                "personnelRecruitmentPrisoner.text")) :
+                                                          "personnelRecruitmentBondsman.text" :
+                                                          "personnelRecruitmentPrisoner.text")) :
                                "";
             campaign.addReport(DailyReportType.PERSONNEL,
                   String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
@@ -2233,8 +2249,8 @@ public class HumanResources {
 
 
     /**
-     * Returns the person from {@code people} best suited to the given role, ranked by primary skill
-     * then secondary skill as a tiebreaker.
+     * Returns the person from {@code people} best suited to the given role, ranked by primary skill then secondary
+     * skill as a tiebreaker.
      *
      * @param people          the collection of people to search
      * @param role            the required personnel role (primary or secondary)
@@ -2294,7 +2310,13 @@ public class HumanResources {
 
     public Person findBestInRole(PersonnelRole role, String primary, @Nullable String secondary,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
-        return findBestInRole(getActivePersonnel(false, false), role, primary, secondary, campaignOptions, isClanCampaign, today);
+        return findBestInRole(getActivePersonnel(false, false),
+              role,
+              primary,
+              secondary,
+              campaignOptions,
+              isClanCampaign,
+              today);
     }
 
     public Person findBestInRole(PersonnelRole role, String skill,
