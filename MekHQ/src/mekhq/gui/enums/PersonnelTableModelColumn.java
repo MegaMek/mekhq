@@ -739,7 +739,7 @@ public enum PersonnelTableModelColumn {
                 // Honors the same isUseExtendedTOEForceName toggle the cell renderer reads, so the
                 // sort key / filter dropdown / grouped-view label shows the same breadcrumb users
                 // see in the Personnel and Hangar table's Formation column.
-                yield formation.getDisplayPath(" / ", campaignOptions.isUseExtendedTOEForceName());
+                yield formation.getDisplayPath(" / ", campaign.getCampaignOptions().isUseExtendedTOEForceName());
             }
             case FOUNDER -> resources.getString(person.isFounder() ? "Yes.text" : "No.text");
             case GENDER -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());

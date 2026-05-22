@@ -161,7 +161,9 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
             Formation formation = unit.getCampaign().getFormation(unit.getFormationId());
-            if ((null != person) && (null != formation) && (person.getId().equals(formation.getFormationCommanderID()))) {
+            if ((null != person) &&
+                      (null != formation) &&
+                      (person.getId().equals(formation.getFormationCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");
@@ -213,7 +215,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 return new ImageIcon(((Unit) node).getImage(this));
             } else {
                 final Person person = ((Unit) node).getCommander();
-                return (person == null) ? null : person.getPortrait().getImageIcon(58);
+                return (person == null) ? null : person.getPortraitImageIconWithFallback(true, 58);
             }
         } else if (node instanceof Formation) {
             return ((Formation) node).getFormationIcon().getImageIcon(58);
