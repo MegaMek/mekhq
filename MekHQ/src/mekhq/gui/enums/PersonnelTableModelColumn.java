@@ -170,6 +170,8 @@ public enum PersonnelTableModelColumn {
     SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
     UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
+    COVER_MEDICAL_EXPENSES("PersonnelTableModelColumn.COVER_MEDICAL_EXPENSES.text"),
+    BLOCK_MATERNITY_LEAVE("PersonnelTableModelColumn.BLOCK_MATERNITY_LEAVE.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -866,6 +868,9 @@ public enum PersonnelTableModelColumn {
                                                                   "No.text") :
                                                                  "NA.text");
             case UNDER_PROTECTION -> resources.getString(person.isUnderProtection() ? "Yes.text" : "No.text");
+            case COVER_MEDICAL_EXPENSES ->
+                  resources.getString(person.isCoverIllicitMedicalExpenses() ? "Yes.text" : "No.text");
+            case BLOCK_MATERNITY_LEAVE -> resources.getString(person.isBlockMaternityLeave() ? "Yes.text" : "No.text");
             case UNIT_ASSIGNMENT -> {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);
@@ -1231,11 +1236,10 @@ public enum PersonnelTableModelColumn {
                      FIRST_NAME,
                      LAST_NAME,
                      COMMANDER,
+                     SECOND_IN_COMMAND,
                      FOUNDER,
                      CLAN_PERSONNEL,
-                     MARRIAGEABLE,
-                     DIVORCEABLE,
-                     TRYING_TO_CONCEIVE,
+                     UNDER_PROTECTION,
                      IMMORTAL -> true;
                 default -> false;
             };
@@ -1244,13 +1248,12 @@ public enum PersonnelTableModelColumn {
                 case RANK,
                      FIRST_NAME,
                      LAST_NAME,
-                     MARRIAGEABLE,
-                     NEVER_ASSIGN_AUTO_MAINTENANCE,
+                     DIVORCEABLE,
                      PREFERS_MEN,
                      PREFERS_WOMEN,
-                     QUICK_TRAIN_IGNORE,
-                     SALVAGE_SUPERVISOR,
-                     SECOND_IN_COMMAND -> true;
+                     COVER_MEDICAL_EXPENSES,
+                     TRYING_TO_CONCEIVE,
+                     BLOCK_MATERNITY_LEAVE -> true;
                 default -> false;
             };
             case FLAGS_C -> switch (this) {
@@ -1258,8 +1261,10 @@ public enum PersonnelTableModelColumn {
                 case RANK,
                      FIRST_NAME,
                      LAST_NAME,
-                     TRYING_TO_CONCEIVE,
-                     UNDER_PROTECTION -> true;
+                     SALVAGE_SUPERVISOR,
+                     QUICK_TRAIN_IGNORE,
+                     NEVER_ASSIGN_AUTO_MAINTENANCE,
+                     HIDE_PERSONALITY -> true;
                 default -> false;
             };
             case PERSONALITY -> switch (this) {
