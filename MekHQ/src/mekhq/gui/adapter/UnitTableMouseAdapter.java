@@ -122,6 +122,7 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -639,13 +640,24 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 if (tech != null) {
                     if ((!selectedUnit.getActiveCrew().isEmpty()) || (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
-                        int result = JOptionPane.showConfirmDialog(
-                              gui.getFrame(),
-                              "Also clear all assignments and designations?",
-                              "Mothball Unit",
-                              JOptionPane.YES_NO_OPTION
-                        );
-                        if (result == JOptionPane.YES_OPTION) {
+                        ImmersiveDialogCore clearAssignments = new ImmersiveDialogCore(selectedUnit.getCampaign(),
+                              null,
+                              null,
+                              getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsCentreMessage.text"),
+                              List.of(
+                                    new ImmersiveDialogCore.ButtonLabelTooltipPair(
+                                          getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsConfirmButton.text"),
+                                          null),
+                                    new ImmersiveDialogCore.ButtonLabelTooltipPair(
+                                          getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsCancelButton.text"),
+                                          null)),
+                              null,
+                              null,
+                              false,
+                              null,
+                              null,
+                              true);
+                        if (clearAssignments.getDialogChoice() == 0) {
                             selectedUnit.clearCrew();
                             selectedUnit.getCampaign().removeUnitFromFormation(selectedUnit);
                         }

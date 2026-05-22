@@ -63,6 +63,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.utilities.ReportingUtilities;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
  *
@@ -70,6 +72,8 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
     private static final MMLogger LOGGER = MMLogger.create(MassMothballDialog.class);
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     // region Variable Declarations
     private final Map<Integer, List<Unit>> unitsByType = new HashMap<>();
@@ -265,7 +269,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             gbc.weighty = 0.1;
             gbc.anchor = GridBagConstraints.CENTER;
             clearDesignationsCheckbox = new JCheckBox();
-            clearDesignationsCheckbox.setText("Clear all assignments and designations?");
+            clearDesignationsCheckbox.setText(getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsDialog.text"));
             contentPanel.add(clearDesignationsCheckbox, gbc);
         }
     }
