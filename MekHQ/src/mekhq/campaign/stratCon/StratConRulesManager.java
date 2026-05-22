@@ -2686,7 +2686,7 @@ public class StratConRulesManager {
      * Applies the relevant modifiers from a facility to the provided scenario.
      *
      * <p>Local modifiers are used when the scenario occurs directly at the facility. If the scenario occurs directly
-     * at the facility, and the facility has not local modifiers, its shared modifiers are applied.</p>
+     * at the facility, and the facility has no local modifiers, its shared modifiers are applied.</p>
      *
      * <p>Otherwise, if the scenario does not occur at the facility, its shared modifiers are applied.</p>
      *
