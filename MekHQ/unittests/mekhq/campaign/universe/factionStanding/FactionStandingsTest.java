@@ -43,6 +43,7 @@ import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_R
 import static mekhq.campaign.universe.factionStanding.FactionStandings.DEFAULT_REGARD_DEGRADATION;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_EXECUTING_PRISONER;
 import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DELTA_REFUSE_BATCHALL;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -56,6 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.TestSystems;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,11 +69,12 @@ class FactionStandingsTest {
 
     @BeforeEach
     void setUp() {
-        try {
+        TestSystems.resetAndGetInstance();
+
+        assertDoesNotThrow(() -> {
             Factions.setInstance(Factions.loadDefault(true));
             factions = Factions.getInstance();
-        } catch (Exception ignored) {
-        }
+        });
 
         // Validate our Faction data, an error here will throw everything off
         assertFalse(factions.getFactions().isEmpty(), "Factions list is empty");
