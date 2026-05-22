@@ -114,6 +114,7 @@ public class CampaignOptions {
 
     // region Variable Declarations
     // region General Tab
+    private boolean requireSupportForceTransportation;
     private int manualUnitRatingModifier;
     private boolean clampReputationPayMultiplier;
     private boolean reduceReputationPerformanceModifier;
@@ -705,6 +706,7 @@ public class CampaignOptions {
 
         // region General Tab
         manualUnitRatingModifier = 0;
+        requireSupportForceTransportation = true;
         clampReputationPayMultiplier = false;
         reduceReputationPerformanceModifier = false;
         reputationPerformanceModifierCutOff = false;
@@ -1378,6 +1380,14 @@ public class CampaignOptions {
 
     public void setManualUnitRatingModifier(final int manualUnitRatingModifier) {
         this.manualUnitRatingModifier = manualUnitRatingModifier;
+    }
+
+    public boolean isRequireSupportForceTransportation() {
+        return requireSupportForceTransportation;
+    }
+
+    public void setRequireSupportForceTransportation(final boolean requireSupportForceTransportation) {
+        this.requireSupportForceTransportation = requireSupportForceTransportation;
     }
 
     public boolean isClampReputationPayMultiplier() {

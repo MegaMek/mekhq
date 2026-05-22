@@ -277,6 +277,9 @@ public class CampaignOptionsUnmarshaller {
             case "manualUnitRatingModifier" -> campaignOptions.setManualUnitRatingModifier(parseInt(nodeContents));
             case "clampReputationPayMultiplier" -> campaignOptions.setClampReputationPayMultiplier(parseBoolean(
                   nodeContents));
+            case "requireSupportForceTransportation" ->
+                  campaignOptions.setRequireSupportForceTransportation(parseBoolean(
+                        nodeContents));
             case "reduceReputationPerformanceModifier" ->
                   campaignOptions.setReduceReputationPerformanceModifier(parseBoolean(
                         nodeContents));
