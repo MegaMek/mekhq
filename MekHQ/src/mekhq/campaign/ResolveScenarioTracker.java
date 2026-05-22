@@ -1972,17 +1972,26 @@ public class ResolveScenarioTracker {
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
-            SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
-                  getActualSalvage(), getSoldSalvage());
+            boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
+            boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
 
-            List<UUID> techUUIDs = scenario.getSalvageTechs();
-            if (campaignOptions.isUseRiskySalvage()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
-                      techUUIDs,
-                      picker.getCountOfSalvageUnits());
+            // There is no point presenting the dialog if there are no techs or teams assigned, or if the player
+            // doesn't control the field
+            boolean showSalvageDialog = control && hasAssignedSalvageForce && hasAssignedSalvageTechs;
+
+            if (showSalvageDialog) {
+                SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
+                      getActualSalvage(), getSoldSalvage());
+
+                List<UUID> techUUIDs = scenario.getSalvageTechs();
+                if (campaignOptions.isUseRiskySalvage()) {
+                    CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
+                          techUUIDs,
+                          picker.getCountOfSalvageUnits());
+                }
+
+                CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
             }
-
-            CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
         } else {
             CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
                   getLeftoverSalvage());

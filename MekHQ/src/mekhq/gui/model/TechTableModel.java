@@ -102,7 +102,7 @@ public class TechTableModel extends DataTableModel<Person> {
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             Person tech = getTechAt(actualRow);
-            setImage(tech.getPortrait().getImage(54));
+            setImage(tech.getPortraitImageIconWithFallback(true, 54).getImage());
             setHtmlText(getTechDescription(tech, getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
             if (isSelected) {
                 highlightBorder();

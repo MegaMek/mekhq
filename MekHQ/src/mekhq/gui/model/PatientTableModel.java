@@ -104,7 +104,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
             final int maximumHeight = UIUtil.scaleForGUI(100);
 
             Person person = getElementAt(index);
-            setImage(person.getPortrait().getImage(UIUtil.scaleForGUI(50)));
+            setImage(person.getPortraitImageIconWithFallback(true, 50).getImage());
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 setHtmlText(getInjuriesDesc(person, (int) round(maximumWidth * 0.75) - 50));
             } else {
