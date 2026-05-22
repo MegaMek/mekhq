@@ -54,6 +54,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -356,12 +357,12 @@ public class HireBulkPersonnelDialog extends JDialog {
 
             // Dependents & 'None' don't have skills
             PersonnelRole selectedRole = selectedItem.getRole();
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
             if (useSkill && !selectedRole.isDependent() && !selectedRole.isNone()) {
                 if (skillLevel.getSelectedItem() != null) {
                     RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
                     boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
-                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
                     overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
                           campaignOptions.isDoctorsUseAdministration(),
                           campaignOptions.isTechsUseAdministration(),
@@ -384,10 +385,15 @@ public class HireBulkPersonnelDialog extends JDialog {
                 }
 
                 // Limit skills by age for children and adolescents
-                if (age < 16) {
+                boolean isUnderSixteen = age < 16;
+                if (isUnderSixteen) {
                     person.removeAllSkills();
                 } else if (age < 18) {
                     person.limitSkills(0);
+                }
+
+                if (isUnderSixteen && campaignOptions.isNoRandomPortraitsForChildren()) {
+                    person.setPortrait(new Portrait());
                 }
             }
 

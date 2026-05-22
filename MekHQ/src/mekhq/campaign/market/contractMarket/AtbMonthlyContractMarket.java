@@ -46,6 +46,8 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.Contract.OH_NONE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -57,8 +59,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Vector;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
@@ -73,11 +77,13 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -89,6 +95,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -164,6 +172,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             if (hasActiveContract) {
                 return;
             }
+
+            // Generates up to 4 'pity contracts', easy contracts designed to get a campaign rolling
+            PityContracts.generatePityContracts(campaign);
 
             Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
             int negotiatorModifier = 0;
@@ -521,16 +532,20 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        contract.setName(String.format("%s - %s - %s %s",
-              contract.getStartDate()
-                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              employer,
-              contract.getSystem().getName(contract.getStartDate()),
-              contract.getContractType()));
+        contract.setName(generateDefaultName(employer, contract));
 
         contract.clanTechSalvageOverride();
 
         return contract;
+    }
+
+    static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract) {
+        return String.format("%s - %s - %s %s",
+              contract.getStartDate()
+                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              employer,
+              contract.getSystem().getName(contract.getStartDate()),
+              contract.getContractType());
     }
 
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {

@@ -35,6 +35,7 @@ package mekhq.campaign;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
@@ -44,6 +45,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
@@ -83,6 +85,7 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -104,6 +107,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
@@ -137,6 +141,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
@@ -156,6 +161,7 @@ import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.skills.AttributeCheckUtility;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
@@ -167,6 +173,9 @@ import mekhq.campaign.randomEvents.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.stratCon.StratConCoords;
+import mekhq.campaign.stratCon.StratConFacility;
+import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -404,6 +413,7 @@ public class CampaignNewDayManager {
 
         // Manage the Markets
         campaign.refreshPersonnelMarkets(false);
+        showRarePersonnelDialog(campaign, false);
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(campaign);
@@ -1046,23 +1056,39 @@ public class CampaignNewDayManager {
 
             // Early Contract End (StratCon Only)
             StratConCampaignState campaignState = contract.getStratconCampaignState();
-            if (campaignState != null && !contract.getEndingDate().equals(today)) {
-                boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
-                int victoryPoints = contract.getContractScore(isUseMaplessMode);
-                int requiredVictoryPoints = contract.getRequiredVictoryPoints();
-
-                if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
-                    new ImmersiveDialogNotification(campaign,
-                          String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
-                                contract.getHyperlinkedName()), true);
-
-                    // This ensures any outstanding payout is paid out before the contract ends
-                    LocalDate adjustedDate = today.plusDays(1);
-                    int remainingMonths = contract.getMonthsLeft(adjustedDate);
-                    Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
-                    contract.setRoutedPayout(finalPayout);
-                    contract.setEndDate(adjustedDate);
+            if (campaignState != null) {
+                if (isMonday) {
+                    List<StratConTrackState> tracks = campaignState.getTracks();
+                    refreshStratConFacilities(tracks);
                 }
+
+                if (!contract.getEndingDate().equals(today)) {
+                    boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
+                    int victoryPoints = contract.getContractScore(isUseMaplessMode);
+                    int requiredVictoryPoints = contract.getRequiredVictoryPoints();
+
+                    if (campaignState.canEndContractEarly() && victoryPoints >= requiredVictoryPoints) {
+                        new ImmersiveDialogNotification(campaign,
+                              String.format(resources.getString("stratCon.earlyContractEnd.objectives"),
+                                    contract.getHyperlinkedName()), true);
+
+                        // This ensures any outstanding payout is paid out before the contract ends
+                        LocalDate adjustedDate = today.plusDays(1);
+                        int remainingMonths = contract.getMonthsLeft(adjustedDate);
+                        Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
+                        contract.setRoutedPayout(finalPayout);
+                        contract.setEndDate(adjustedDate);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void refreshStratConFacilities(List<StratConTrackState> tracks) {
+        for (StratConTrackState trackState : tracks) {
+            Map<StratConCoords, StratConFacility> facilities = trackState.getFacilities();
+            for (StratConFacility facility : facilities.values()) {
+                facility.setIsAvailable(true);
             }
         }
     }
@@ -1490,8 +1516,8 @@ public class CampaignNewDayManager {
                           campaign.getName()));
                 }
             }
-        } else if ((person.getAge(today) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (isBirthday) {
+        } else if (person.getAge(today) == 18 && isBirthday) {
+            if (campaignOptions.isAnnounceChildBirthdays()) {
                 campaign.addReport(PERSONNEL, String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
@@ -1515,6 +1541,14 @@ public class CampaignNewDayManager {
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(campaign.getRandomSkillPreferences());
                 skillGenerator.generateRoleplaySkills(person);
+            }
+
+            boolean isUsePortraitForRole = campaignOptions.isUsePortraitForRole(person.getPrimaryRole());
+            boolean hasDefaultPortrait = person.getPortrait().isDefault();
+            if (campaignOptions.isChildPortraitsWhenComingOfAge() &&
+                      isUsePortraitForRole &&
+                      hasDefaultPortrait) {
+                campaign.assignRandomPortraitFor(person);
             }
 
             // We want the event trigger to fire before the dialog is shown, so that the character will have finished
@@ -1574,9 +1608,8 @@ public class CampaignNewDayManager {
         if (personnelOptions.booleanOption(COMPULSION_PAINKILLER_ADDICTION)) {
             int totalProstheticCount = getTotalProstheticCount(person);
 
-            Money cost = Money.of(PersonnelOptions.PAINKILLER_COST * totalProstheticCount);
-            if (!finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "painkillerAddiction.transaction", person.getFullTitle()))) {
+            Money cost = Money.of(PersonnelOptions.MEDICINE_COST * totalProstheticCount);
+            if (!payForMedicine(person, cost)) {
                 checkForDiscontinuationSyndrome(person,
                       isUseAdvancedMedical,
                       isUseAltAdvancedMedical,
@@ -1586,111 +1619,212 @@ public class CampaignNewDayManager {
         }
 
         if (personnelOptions.booleanOption(COMPULSION_ADDICTION)) {
-            checkForDiscontinuationSyndrome(person,
-                  isUseAdvancedMedical,
-                  isUseAltAdvancedMedical,
-                  isUseFatigue,
-                  fatigueRate);
+            boolean isCampaignSubsidizedDrugAbuse = person.isCoverIllicitMedicalExpenses();
+
+            Money cost = getMedicalCostFromSPAXPCost(COMPULSION_ADDICTION);
+            if (!isCampaignSubsidizedDrugAbuse || !payForMedicine(person, cost)) {
+                checkForDiscontinuationSyndrome(person,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      isUseFatigue,
+                      fatigueRate);
+            }
         }
 
         if (personnelOptions.booleanOption(MADNESS_FLASHBACKS)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            person.processCripplingFlashbacks(campaign,
-                  isUseAdvancedMedical,
-                  isUseAltAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_FLASHBACKS);
+
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_FLASHBACKS);
+
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+
+                person.processCripplingFlashbacks(campaign,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      true,
+                      failedWillpowerCheck);
+            }
         }
 
         if (personnelOptions.booleanOption(MADNESS_SPLIT_PERSONALITY)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processSplitPersonality(true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                campaign.addReport(MEDICAL, report);
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_SPLIT_PERSONALITY);
+
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_SPLIT_PERSONALITY);
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+                String report = person.processSplitPersonality(true,
+                      failedWillpowerCheck);
+                if (!report.isBlank()) {
+                    campaign.addReport(MEDICAL, report);
+                }
             }
         }
 
-        boolean resetClinicalParanoia = true;
+        // Must be before MADNESS_CLINICAL_PARANOIA && MADNESS_HYSTERIA
+        boolean resetClinicalParanoia = true; // See comment at end of method
         if (personnelOptions.booleanOption(MADNESS_CLINICAL_PARANOIA)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processClinicalParanoia(true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                campaign.addReport(MEDICAL, report);
-            }
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_CLINICAL_PARANOIA);
 
-            resetClinicalParanoia = false;
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_CLINICAL_PARANOIA);
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+                String report = person.processClinicalParanoia(true,
+                      failedWillpowerCheck);
+                if (!report.isBlank()) {
+                    campaign.addReport(MEDICAL, report);
+                }
+
+                resetClinicalParanoia = false;
+            }
         }
 
         if (personnelOptions.booleanOption(MADNESS_REGRESSION)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_REGRESSION);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processChildlikeRegression(campaign,
-                  isUseAdvancedMedical,
-                  isUseAltAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                campaign.addReport(MEDICAL, report);
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_REGRESSION);
+
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_REGRESSION);
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+                String report = person.processChildlikeRegression(campaign,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      true,
+                      failedWillpowerCheck);
+                if (!report.isBlank()) {
+                    campaign.addReport(MEDICAL, report);
+                }
             }
         }
 
         if (personnelOptions.booleanOption(MADNESS_CATATONIA)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processCatatonia(campaign,
-                  isUseAdvancedMedical,
-                  isUseAltAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                campaign.addReport(MEDICAL, report);
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_CATATONIA);
+
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_CATATONIA);
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+                String report = person.processCatatonia(campaign,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      true,
+                      failedWillpowerCheck);
+                if (!report.isBlank()) {
+                    campaign.addReport(MEDICAL, report);
+                }
             }
         }
 
         if (personnelOptions.booleanOption(MADNESS_BERSERKER)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_BERSERKER);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processBerserkerFrenzy(campaign,
-                  isUseAdvancedMedical,
-                  true,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                campaign.addReport(MEDICAL, report);
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_BERSERKER);
+
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_BERSERKER);
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+                String report = person.processBerserkerFrenzy(campaign,
+                      isUseAdvancedMedical,
+                      true,
+                      failedWillpowerCheck);
+                if (!report.isBlank()) {
+                    campaign.addReport(MEDICAL, report);
+                }
             }
         }
 
         if (personnelOptions.booleanOption(MADNESS_HYSTERIA)) {
-            int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
-            boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-                  null, modifier);
-            String report = person.processHysteria(campaign,
-                  true,
-                  isUseAdvancedMedical,
-                  isUseAltAdvancedMedical,
-                  failedWillpowerCheck);
-            if (!report.isBlank()) {
-                campaign.addReport(MEDICAL, report);
-            }
+            Money cost = getMedicalCostFromSPAXPCost(MADNESS_HYSTERIA);
 
-            resetClinicalParanoia = false;
+            if (!payForMedicine(person, cost)) {
+                int modifier = getCompulsionCheckModifier(MADNESS_HYSTERIA);
+                boolean failedWillpowerCheck = performPersonalityBreakCheck(campaign, person, modifier);
+                String report = person.processHysteria(campaign,
+                      true,
+                      isUseAdvancedMedical,
+                      isUseAltAdvancedMedical,
+                      failedWillpowerCheck);
+                if (!report.isBlank()) {
+                    campaign.addReport(MEDICAL, report);
+                }
+
+                resetClinicalParanoia = false;
+            }
         }
 
-        // This is necessary to stop a character from getting permanently locked in a paranoia state if the
-        // relevant madness are removed.
+        // This is necessary to stop a character from getting permanently locked in a paranoia state if the relevant
+        // madness is removed.
         if (resetClinicalParanoia) {
             person.setSufferingFromClinicalParanoia(false);
         }
+    }
+
+    /**
+     * Determines if a willpower check has failed for the given person with the specified modifier.
+     *
+     * @param campaign The campaign context, needed for reporting skill check results.
+     * @param person The person for whom the willpower check is being performed.
+     * @param modifier An integer value representing the modification to the willpower check.
+     *
+     * @return {@code true} if the willpower check has failed; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static boolean performPersonalityBreakCheck(Campaign campaign, Person person, int modifier) {
+        String reason = getTextAt(RESOURCE_BUNDLE, "mentalBreak.check");
+        AttributeCheckUtility attributeCheck = new AttributeCheckUtility(reason,
+              person,
+              SkillAttribute.WILLPOWER,
+              null,
+              null,
+              modifier,
+              true,
+              true);
+
+        campaign.addReport(SKILL_CHECKS, attributeCheck.getResultsText());
+
+        return !attributeCheck.isSuccess();
+    }
+
+    /**
+     * Processes the payment for medicine by debiting the specified cost from the person's finances.
+     *
+     * @param person the person for whom the payment is being made
+     * @param cost   the amount of money to be debited for the medicine
+     *
+     * @return {@code true} if the payment was successful
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private boolean payForMedicine(Person person, Money cost) {
+        return finances.debit(TransactionType.MEDICAL_EXPENSES, today, cost,
+              getFormattedTextAt(RESOURCE_BUNDLE, "medicalCosts.transaction", person.getFullTitle()));
+    }
+
+    /**
+     * Calculates the medical cost to ignore a Flaw or negative SPA.
+     *
+     * <p>
+     * Cost is derived from the XP cost of the Flaw divided by 100 (rounded normally). It has a minimum value of
+     * {@link PersonnelOptions#MEDICINE_COST}.
+     * </p>
+     *
+     * @param spaKey the key representing a special ability, used to fetch its associated cost multiplier.
+     *
+     * @return the calculated medical cost, which is derived from the base painkiller cost and adjusted based on the
+     *       special ability's cost multiplier. Returns at least the base painkiller cost.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static Money getMedicalCostFromSPAXPCost(String spaKey) {
+        Map<String, SpecialAbility> specialAbilityMap = SpecialAbility.getSpecialAbilities();
+
+        SpecialAbility specialAbility = specialAbilityMap.get(spaKey);
+
+        int xpCost = specialAbility == null ? 0 : specialAbility.getCost();
+        int roundedCostUnits = max(1, (int) round(Math.abs(xpCost) / 100.0));
+        int cost = PersonnelOptions.MEDICINE_COST * roundedCostUnits;
+
+        return Money.of(cost);
     }
 
     private static int getTotalProstheticCount(Person person) {
@@ -1723,8 +1857,20 @@ public class CampaignNewDayManager {
     private void checkForDiscontinuationSyndrome(Person person, boolean isUseAdvancedMedical,
           boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
-        boolean failedWillpowerCheck = !performQuickAttributeCheck(person, SkillAttribute.WILLPOWER, null,
-              null, modifier);
+
+        String reason = getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check");
+        AttributeCheckUtility attributeCheck = new AttributeCheckUtility(reason,
+              person,
+              SkillAttribute.WILLPOWER,
+              null,
+              null,
+              modifier,
+              true,
+              true);
+
+        campaign.addReport(SKILL_CHECKS, attributeCheck.getResultsText());
+
+        boolean failedWillpowerCheck = attributeCheck.isSuccess();
         person.processDiscontinuationSyndrome(campaign,
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
@@ -2051,6 +2197,38 @@ public class CampaignNewDayManager {
             campaign.setMashTheatreCapacity(mashTheatreCapacity);
         } else {
             campaign.setMashTheatreCapacity(0);
+        }
+    }
+
+    private void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
+        if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
+            return;
+        }
+
+        StringBuilder oocReport = new StringBuilder(
+              campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
+        for (PersonnelRole profession : campaign.getNewPersonnelMarket().getRareProfessions()) {
+            oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+        }
+
+        List<String> buttons = new ArrayList<>();
+        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.later"));
+        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.decline"));
+        if (!isCampaignStart) {
+            buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.immediate"));
+        }
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
+              null,
+              campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
+              buttons,
+              oocReport.toString(),
+              null,
+              true);
+
+        if (dialog.getDialogChoice() == 2) {
+            campaign.getNewPersonnelMarket().showPersonnelMarketDialog();
         }
     }
 }

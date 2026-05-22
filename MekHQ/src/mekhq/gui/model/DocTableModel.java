@@ -125,7 +125,7 @@ public class DocTableModel extends DataTableModel<Person> {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
               boolean hasFocus, int row, int column) {
-            setImage(getDoctorAt(row).getPortrait().getImage(54));
+            setImage(getDoctorAt(row).getPortraitImageIconWithFallback(true, 54).getImage());
             setHtmlText(getValueAt(row, column).toString());
             if (isSelected) {
                 highlightBorder();
