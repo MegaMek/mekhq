@@ -84,6 +84,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -803,7 +804,8 @@ public class EducationController {
         if (!academy.isHomeSchool()) {
             // has the system been depopulated? Nominally similar to destruction, but here
             // we use actual system data, so it's more dynamic.
-            if (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0) {
+            PlanetarySystem academySystem = campaign.getSystemById(person.getEduAcademySystem());
+            if (academySystem != null && academySystem.getPopulation(campaign.getLocalDate()) == 0) {
                 if (checkForAcademyDestruction(campaign, academy, person, resources)) {
                     return;
                 }
@@ -1131,8 +1133,9 @@ public class EducationController {
           ResourceBundle resources) {
         // we assume that if the system's population has been depleted, the academy has
         // been destroyed too.
+        PlanetarySystem academySystem = campaign.getSystemById(person.getEduAcademySystem());
         if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear()) ||
-                  (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
+                  (academySystem != null && academySystem.getPopulation(campaign.getLocalDate()) == 0)) {
 
             // We use the 'use18' clause here because we don't want to upset players by having
             // children killed when their academy is attacked unless the player has explicitly
