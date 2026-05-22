@@ -836,6 +836,7 @@ public class CampaignOptionsUnmarshaller {
             case "contractMaxSalvagePercentage" -> campaignOptions.setContractMaxSalvagePercentage(parseInt(
                   nodeContents));
             case "dropShipBonusPercentage" -> campaignOptions.setDropShipBonusPercentage(parseInt(nodeContents));
+            case "pityContracts" -> campaignOptions.setPityContracts(parseInt(nodeContents));
             case "isUseTwoWayPay" -> campaignOptions.setUseTwoWayPay(parseBoolean(nodeContents));
             case "isUseCamOpsSalvage" -> campaignOptions.setUseCamOpsSalvage(parseBoolean(nodeContents));
             case "isUseRiskySalvage" -> campaignOptions.setUseRiskySalvage(parseBoolean(nodeContents));
