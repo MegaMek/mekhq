@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
@@ -95,6 +94,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.ReputationController;
@@ -148,6 +148,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystemCampaignXmlIO;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -185,11 +186,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Document xmlDoc;
 
         try {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
+            xmlDoc = MHQXMLUtility.parseDocument(is);
         } catch (Exception ex) {
             LOGGER.error("", ex);
             throw new CampaignXmlParseException(ex);
@@ -251,6 +248,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           version));
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
+                } else if (xn.equalsIgnoreCase(PlanetarySystemCampaignXmlIO.XML_TAG)) {
+                    processPlanetarySystemOverrides(campaign, wn);
                 }
             }
             // If it's a text node or attribute or whatever at this level,
@@ -318,9 +317,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(
                           workingNode,
                           version));
+                } else if (nodeName.equalsIgnoreCase("humanResources")) {
+                    campaign.setHumanResources(
+                          mekhq.campaign.HumanResources.loadFromXML(workingNode, campaign, version));
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
+                    // backward compat: old save without <humanResources> wrapper
                     // TODO: Make this depending on campaign options
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
@@ -768,6 +771,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     LOGGER.warn("Tech {} {} {} (fixed)", tech.getFullName(), reason, unitDesc);
                 }
             }
+        }
+    }
+
+    private static void processPlanetarySystemOverrides(Campaign campaign, Node parentNode)
+          throws CampaignXmlParseException {
+        try {
+            campaign.setPlanetarySystemOverrides(PlanetarySystemCampaignXmlIO.parse(parentNode));
+        } catch (IOException ex) {
+            throw new CampaignXmlParseException(ex);
         }
     }
 
@@ -1433,33 +1445,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processPersonnelNodes(Campaign campaign, Node wn, Version version) {
         LOGGER.info("Loading Personnel Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
+        Personnel.loadFromXML(wn, campaign, version);
 
-        // Okay, let's iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                LOGGER.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
-
-                continue;
-            }
-
-            Person p = Person.generateInstanceFromXML(wn2, campaign, version);
-
-            if (p != null) {
-                campaign.importPerson(p);
-
-                // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based
-                performEdgeConversion(campaign, p);
-            }
+        // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
+        for (Person person : campaign.getPersonnel()) {
+            performEdgeConversion(campaign, person);
         }
 
         // this block verifies all in-use academies are valid

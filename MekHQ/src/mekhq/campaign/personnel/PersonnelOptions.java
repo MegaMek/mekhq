@@ -184,7 +184,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final int COMPULSION_CHECK_MODIFIER_SEVERE = 7; // ATOW pg 110
     public static final int COMPULSION_CHECK_MODIFIER_EXTREME = 10; // ATOW pg 110
 
-    public static final int PAINKILLER_COST = 42; // 7 days of codeine, ATOW pg 319
+    public static final int MEDICINE_COST = 42; // 7 days of codeine, ATOW pg 319
 
     // ATOW pg 112 (Reputation, Connections)
     public static final Map<String, int[]> DARK_SECRET_MODIFIERS = Map.of(

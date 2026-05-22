@@ -478,21 +478,23 @@ public abstract class AbstractProcreation {
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
             }
 
-            // Apply postpartum effects
-            if (campaignOptions.isUseAdvancedMedical()) {
-                Injury injury;
-                if (campaignOptions.isUseAlternativeAdvancedMedical() &&
-                          // These injury types don't stack
-                          !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
-                                AlternateInjuries.POSTPARTUM_RECOVERY)) {
-                    injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
+            // Apply postpartum effects (first baby only)
+            if (i == 0) {
+                if (campaignOptions.isUseAdvancedMedical()) {
+                    Injury injury;
+                    if (campaignOptions.isUseAlternativeAdvancedMedical() &&
+                              // These injury types don't stack
+                              !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
+                                    AlternateInjuries.POSTPARTUM_RECOVERY)) {
+                        injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
+                    } else {
+                        injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                    }
+                    mother.addInjury(injury);
                 } else {
-                    injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                    int currentHits = mother.getHits();
+                    mother.setHits(currentHits + 1);
                 }
-                mother.addInjury(injury);
-            } else {
-                int currentHits = mother.getHits();
-                mother.setHits(currentHits + 1);
             }
 
             // Check for hereditary diseases
@@ -709,8 +711,10 @@ public abstract class AbstractProcreation {
                 return;
             }
 
-            if (campaign.getCampaignOptions().isUseMaternityLeave()) {
-                if (!person.isBusy() && (person.getDueDate().minusWeeks(20).isBefore(today))) {
+            if (campaign.getCampaignOptions().isUseMaternityLeave() && !person.isBlockMaternityLeave()) {
+                if (!person.isBusy()
+                          && person.getNonPermanentInjurySeverity() == 0
+                          && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
             }

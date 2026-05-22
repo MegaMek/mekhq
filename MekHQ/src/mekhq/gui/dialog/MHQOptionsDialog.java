@@ -237,7 +237,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionBeginTransitConfirmation;
     private JCheckBox optionStratConBatchallBreachConfirmation;
     private JCheckBox optionStratConDeployConfirmation;
+    private JCheckBox optionResolveScenarioConfirmation;
     private JCheckBox optionAbandonUnitsConfirmation;
+    private JCheckBox optionAssignTechsConfirmation;
     private JCheckBox optionNewLifePathConfirmation;
     private JCheckBox optionRegenPathIdConfirmation;
     private JCheckBox optionUpgradeLifePathsConfirmation;
@@ -975,15 +977,18 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayBattleArmorPoolFill.setName("chkNewDayBattleArmorPoolFill");
 
         chkNewDayVehicleCrewGroundPoolFill = new JCheckBox(resources.getString("chkNewDayVehicleCrewGroundPoolFill.text"));
-        chkNewDayVehicleCrewGroundPoolFill.setToolTipText(resources.getString("chkNewDayVehicleCrewGroundPoolFill.toolTipText"));
+        chkNewDayVehicleCrewGroundPoolFill.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewGroundPoolFill.toolTipText"));
         chkNewDayVehicleCrewGroundPoolFill.setName("chkNewDayVehicleCrewGroundPoolFill");
 
         chkNewDayVehicleCrewVTOLPoolFill = new JCheckBox(resources.getString("chkNewDayVehicleCrewVTOLPoolFill.text"));
-        chkNewDayVehicleCrewVTOLPoolFill.setToolTipText(resources.getString("chkNewDayVehicleCrewVTOLPoolFill.toolTipText"));
+        chkNewDayVehicleCrewVTOLPoolFill.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewVTOLPoolFill.toolTipText"));
         chkNewDayVehicleCrewVTOLPoolFill.setName("chkNewDayVehicleCrewVTOLPoolFill");
 
         chkNewDayVehicleCrewNavalPoolFill = new JCheckBox(resources.getString("chkNewDayVehicleCrewNavalPoolFill.text"));
-        chkNewDayVehicleCrewNavalPoolFill.setToolTipText(resources.getString("chkNewDayVehicleCrewNavalPoolFill.toolTipText"));
+        chkNewDayVehicleCrewNavalPoolFill.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewNavalPoolFill.toolTipText"));
         chkNewDayVehicleCrewNavalPoolFill.setName("chkNewDayVehicleCrewNavalPoolFill");
 
         chkNewDayVesselPilotPoolFill = new JCheckBox(resources.getString("chkNewDayVesselPilotPoolFill.text"));
@@ -1041,7 +1046,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
         lblNewDayFormationIconOperationalStatusStyle.setName("lblNewDayFormationIconOperationalStatusStyle");
 
-        comboNewDayFormationIconOperationalStatusStyle = new MMComboBox<>("comboNewDayFormationIconOperationalStatusStyle",
+        comboNewDayFormationIconOperationalStatusStyle = new MMComboBox<>(
+              "comboNewDayFormationIconOperationalStatusStyle",
               FormationIconOperationalStatusStyle.values());
         comboNewDayFormationIconOperationalStatusStyle.setToolTipText(resources.getString(
               "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
@@ -1280,11 +1286,23 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionStratConDeployConfirmation.toolTipText"));
         optionStratConDeployConfirmation.setName("optionStratConDeployConfirmation");
 
+        optionResolveScenarioConfirmation = new JCheckBox(resources.getString(
+              "optionResolveScenarioConfirmation.text"));
+        optionResolveScenarioConfirmation.setToolTipText(resources.getString(
+              "optionResolveScenarioConfirmation.toolTipText"));
+        optionResolveScenarioConfirmation.setName("optionResolveScenarioConfirmation");
+
         optionAbandonUnitsConfirmation = new JCheckBox(resources.getString(
               "optionAbandonUnitsConfirmation.text"));
         optionAbandonUnitsConfirmation.setToolTipText(resources.getString(
               "optionAbandonUnitsConfirmation.toolTipText"));
         optionAbandonUnitsConfirmation.setName("optionAbandonUnitsConfirmation");
+
+        optionAssignTechsConfirmation = new JCheckBox(resources.getString(
+              "optionAssignTechsConfirmation.text"));
+        optionAssignTechsConfirmation.setToolTipText(resources.getString(
+              "optionAssignTechsConfirmation.toolTipText"));
+        optionAssignTechsConfirmation.setName("optionAssignTechsConfirmation");
 
         optionNewLifePathConfirmation = new JCheckBox(resources.getString(
               "optionNewLifePathConfirmation.text"));
@@ -1340,6 +1358,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionBeginTransitConfirmation)
                                       .addComponent(optionStratConBatchallBreachConfirmation)
                                       .addComponent(optionStratConDeployConfirmation)
+                                      .addComponent(optionResolveScenarioConfirmation)
+                                      .addComponent(optionAbandonUnitsConfirmation)
+                                      .addComponent(optionAssignTechsConfirmation)
                                       .addComponent(optionAbandonUnitsConfirmation)
                                       .addComponent(optionStratConDeployConfirmation)
                                       .addComponent(optionNewLifePathConfirmation)
@@ -1373,6 +1394,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionBeginTransitConfirmation)
                                         .addComponent(optionStratConBatchallBreachConfirmation)
                                         .addComponent(optionStratConDeployConfirmation)
+                                        .addComponent(optionResolveScenarioConfirmation)
+                                        .addComponent(optionAbandonUnitsConfirmation)
+                                        .addComponent(optionAssignTechsConfirmation)
                                         .addComponent(optionAbandonUnitsConfirmation)
                                         .addComponent(optionStratConDeployConfirmation)
                                         .addComponent(optionNewLifePathConfirmation)
@@ -1739,8 +1763,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY,
                     optionStratConDeployConfirmation.isSelected());
         options
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_RESOLVE_SCENARIO,
+                    optionResolveScenarioConfirmation.isSelected());
+        options
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS,
                     optionAbandonUnitsConfirmation.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_ASSIGN_TECHS,
+                    optionAssignTechsConfirmation.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_NEW_LIFE_PATH,
                     optionNewLifePathConfirmation.isSelected());
@@ -1887,7 +1917,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
             chkNewDayFormationIconOperationalStatus.doClick();
         }
         comboNewDayFormationIconOperationalStatusStyle.setSelectedItem(options
-                                                                         .getNewDayFormationIconOperationalStatusStyle());
+                                                                             .getNewDayFormationIconOperationalStatusStyle());
 
         optionPreferGzippedOutput.setSelected(options.getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(options.getWriteCustomsToXML());
@@ -1944,8 +1974,13 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         optionStratConDeployConfirmation.setSelected(options
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY));
+
+        optionResolveScenarioConfirmation.setSelected(options
+                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_RESOLVE_SCENARIO));
         optionAbandonUnitsConfirmation.setSelected(options
                                                          .getNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS));
+        optionAssignTechsConfirmation.setSelected(options
+                                                        .getNagDialogIgnore(MHQConstants.CONFIRMATION_ASSIGN_TECHS));
 
         optionNewLifePathConfirmation.setSelected(MekHQ.getMHQOptions()
                                                         .getNagDialogIgnore(MHQConstants.CONFIRMATION_NEW_LIFE_PATH));

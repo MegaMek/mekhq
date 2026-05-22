@@ -193,6 +193,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
+    private JMenuItem miPlanetarySystemEditor;
 
     private final EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
 
@@ -1415,9 +1416,6 @@ public class CampaignGUI extends JPanel {
         // endregion View Menu
 
         // region Manage Campaign Menu
-        // The Manage Campaign menu uses the following Mnemonic keys as of
-        // 19-March-2020:
-        // A, B, C, G, M, S
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
@@ -1426,6 +1424,13 @@ public class CampaignGUI extends JPanel {
         miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
         miGMToolsDialog.addActionListener(evt -> new GMToolsDialog(getFrame(), this, null).setVisible(true));
         menuManage.add(miGMToolsDialog);
+
+        miPlanetarySystemEditor = new JMenuItem(resourceMap.getString("miPlanetarySystemEditor.text"));
+        miPlanetarySystemEditor.setMnemonic(KeyEvent.VK_P);
+        miPlanetarySystemEditor.setVisible(getCampaign().isGM());
+        miPlanetarySystemEditor.addActionListener(evt -> new PlanetarySystemEditorDialog(getFrame(), getCampaign())
+                                .setVisible(true));
+        menuManage.add(miPlanetarySystemEditor);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
@@ -1772,7 +1777,10 @@ public class CampaignGUI extends JPanel {
 
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
+        btnGMMode.addActionListener(e -> {
+            getCampaign().setGMMode(btnGMMode.isSelected());
+            refreshGMMenuItems();
+        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -3350,6 +3358,12 @@ public class CampaignGUI extends JPanel {
             // FIXME : Localize
             lblPartsAvailabilityRating.setText(String.format("<html><b>Parts Availability Modifier</b>: %d</html>",
                   partsAvailability));
+        }
+    }
+
+    private void refreshGMMenuItems() {
+        if (miPlanetarySystemEditor != null) {
+            miPlanetarySystemEditor.setVisible(getCampaign().isGM());
         }
     }
 

@@ -36,6 +36,7 @@ package mekhq.gui.view;
 import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
 import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 import static megamek.common.units.Entity.getEntityMajorTypeName;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -144,6 +145,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private JTextArea txtDesc;
 
     private final StubTreeModel playerForceModel;
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBScenarioViewPanel";
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
         super();
@@ -440,6 +443,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(txtDesc, gridBagConstraints);
 
         StringBuilder objectiveBuilder = new StringBuilder();
+
+        String disclaimer = getTextAt(RESOURCE_BUNDLE, "AtBScenarioViewPanel.scenarioDescription.disclaimer");
+        objectiveBuilder.append(disclaimer);
+        objectiveBuilder.append("\n\n");
+
         objectiveBuilder.append(scenario.getDeploymentInstructions());
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {

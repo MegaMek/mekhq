@@ -401,4 +401,34 @@ class ExtraIncomeTest {
         assertEquals(campaignFinancesExpected, campaignFinancesAfter);
         assertEquals(personalFinancesExpected, personalFinancesAfter);
     }
+
+    @Test
+    void testProcessExtraIncome_isAdult_isCommander_negativeExtraIncome() {
+        Campaign mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        Finances finances = new Finances();
+
+        when(mockCampaign.getFinances()).thenReturn(finances);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        when(mockFaction.getShortName()).thenReturn("MERC");
+
+        Person person = new Person(mockCampaign);
+        person.setExtraIncomeDirect(NEGATIVE_TEN);
+        person.setDateOfBirth(TODAY.minusYears(30));
+        person.setCommander(true);
+
+        Money campaignFinancesBefore = mockCampaign.getFinances().getBalance();
+        Money personalFinancesBefore = person.getTotalEarnings();
+
+        ExtraIncome.processExtraIncome(finances, person, TODAY, false);
+
+        Money campaignFinancesAfter = mockCampaign.getFinances().getBalance();
+        Money personalFinancesAfter = person.getTotalEarnings();
+
+        Money campaignFinancesExpected = campaignFinancesBefore.plus(NEGATIVE_TEN.getMonthlyIncomeDirect());
+        Money personalFinancesExpected = personalFinancesBefore.plus(Money.of(0));
+
+        assertEquals(campaignFinancesExpected, campaignFinancesAfter);
+        assertEquals(personalFinancesExpected, personalFinancesAfter);
+    }
 }
