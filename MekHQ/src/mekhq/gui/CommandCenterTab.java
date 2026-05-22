@@ -652,7 +652,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         btnChangePriority = new RoundedJButton(resourceMap.getString("btnChangePriority.text"));
         btnChangePriority.addActionListener(evt -> {
-            new ShoppingListPriorityDialog(this.getFrame(), getCampaign().getShoppingList());
+            new ShoppingListPriorityDialog(this.getFrame(), getCampaign());
             this.refreshProcurementList();
         });
         btnChangePriority.setEnabled(getCampaign().isProcessProcurement());

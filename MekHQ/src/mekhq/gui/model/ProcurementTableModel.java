@@ -54,7 +54,7 @@ import mekhq.campaign.work.IAcquisitionWork;
  * and so we have to be more careful in its design
  */
 public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
-    private static final DecimalFormat FORMATTER = new DecimalFormat();
+    public static final DecimalFormat FORMATTER = new DecimalFormat();
 
     static {
         FORMATTER.setMaximumFractionDigits(3);

@@ -32,28 +32,38 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.gui.model.ProcurementTableModel.FORMATTER;
+import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.List;
-import javax.swing.JButton;
+import java.util.stream.IntStream;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
  * Dialog for reviewing the campaign shopping list and changing procurement priority.
@@ -61,6 +71,8 @@ import mekhq.campaign.work.IAcquisitionWork;
  * <p>Priority is represented by row order: items nearer the top are attempted first.</p>
  */
 public class ShoppingListPriorityDialog extends JDialog {
+    private static Campaign campaign;
+
     private final ShoppingList shoppingList;
     private final ShoppingListTableModel tableModel;
     private final JTable shoppingTable;
@@ -71,10 +83,11 @@ public class ShoppingListPriorityDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ShoppingListPriorityDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ShoppingListPriorityDialog";
 
-    public ShoppingListPriorityDialog(Frame owner, ShoppingList shoppingList) {
+    public ShoppingListPriorityDialog(Frame owner, Campaign campaign) {
         super(owner);
 
-        this.shoppingList = shoppingList;
+        this.campaign = campaign;
+        this.shoppingList = campaign.getShoppingList();
         this.tableModel = new ShoppingListTableModel(shoppingList);
         this.shoppingTable = new JTable(tableModel);
 
@@ -87,6 +100,16 @@ public class ShoppingListPriorityDialog extends JDialog {
         shoppingTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         shoppingTable.setAutoCreateRowSorter(false);
         shoppingTable.getTableHeader().setReorderingAllowed(false);
+
+        shoppingTable.setDefaultRenderer(Object.class, tableModel.new Renderer());
+        shoppingTable.setDefaultRenderer(Integer.class, tableModel.new Renderer());
+
+        for (int column = 0; column < shoppingTable.getColumnCount(); column++) {
+            int modelColumn = shoppingTable.convertColumnIndexToModel(column);
+            shoppingTable.getColumnModel()
+                  .getColumn(column)
+                  .setPreferredWidth(tableModel.getColumnWidth(modelColumn));
+        }
 
         add(new JScrollPane(shoppingTable), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
@@ -103,17 +126,17 @@ public class ShoppingListPriorityDialog extends JDialog {
     }
 
     private JPanel createButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        JButton moveTopButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton moveTopButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "shoppingListPriorityDialog.button.moveToTop"));
-        JButton moveUpButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton moveUpButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "shoppingListPriorityDialog.button.moveUp"));
-        JButton moveDownButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton moveDownButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "shoppingListPriorityDialog.button.moveDown"));
-        JButton moveBottomButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton moveBottomButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "shoppingListPriorityDialog.button.moveToBottom"));
-        JButton closeButton = new JButton(getTextAt(RESOURCE_BUNDLE,
+        RoundedJButton closeButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "shoppingListPriorityDialog.button.close"));
 
         moveTopButton.addActionListener(evt -> moveSelectedItemToTop());
@@ -203,11 +226,14 @@ public class ShoppingListPriorityDialog extends JDialog {
 
     private static class ShoppingListTableModel extends AbstractTableModel {
         private static final int COL_PRIORITY = 0;
-        private static final int COL_ITEM = 1;
-        private static final int COL_QUANTITY = 2;
-        private static final int COL_DAYS_TO_WAIT = 3;
-        private static final int COL_COST = 4;
-        private static final int COL_COUNT = 5;
+        private static final int COL_NAME = 1;
+        private static final int COL_TYPE = 2;
+        private static final int COL_COST = 3;
+        private static final int COL_TOTAL_COST = 4;
+        private static final int COL_TARGET = 5;
+        private static final int COL_QUEUE = 6;
+        private static final int COL_NEXT = 7;
+        private static final int N_COL = 8;
 
         private final ShoppingList shoppingList;
 
@@ -222,7 +248,7 @@ public class ShoppingListPriorityDialog extends JDialog {
 
         @Override
         public int getColumnCount() {
-            return COL_COUNT;
+            return N_COL;
         }
 
         @Override
@@ -230,14 +256,20 @@ public class ShoppingListPriorityDialog extends JDialog {
             return switch (column) {
                 case COL_PRIORITY -> getTextAt(RESOURCE_BUNDLE,
                       "shoppingListPriorityDialog.column.priority");
-                case COL_ITEM -> getTextAt(RESOURCE_BUNDLE,
-                      "shoppingListPriorityDialog.column.item");
-                case COL_QUANTITY -> getTextAt(RESOURCE_BUNDLE,
-                      "shoppingListPriorityDialog.column.quantity");
-                case COL_DAYS_TO_WAIT -> getTextAt(RESOURCE_BUNDLE,
-                      "shoppingListPriorityDialog.column.daysToWait");
+                case COL_NAME -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.name");
+                case COL_TYPE -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.type");
                 case COL_COST -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.cost");
+                case COL_TOTAL_COST -> getTextAt(RESOURCE_BUNDLE,
                       "shoppingListPriorityDialog.column.totalCost");
+                case COL_TARGET -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.target");
+                case COL_QUEUE -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.queue");
+                case COL_NEXT -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.next");
                 default -> "";
             };
         }
@@ -248,21 +280,80 @@ public class ShoppingListPriorityDialog extends JDialog {
             IAcquisitionWork item = items.get(rowIndex);
 
             return switch (columnIndex) {
+                case COL_NAME -> item.getAcquisitionName();
+                case COL_TYPE -> switch (item) {
+                    case UnitOrder ignored -> getText("Unit.text");
+                    case Part ignored -> getText("Part.text");
+                    default -> "?";
+                };
+                case COL_COST -> item.getBuyCost().toAmountAndSymbolString();
+                case COL_TOTAL_COST -> item.getTotalBuyCost().toAmountAndSymbolString();
+                case COL_TARGET -> {
+                    final TargetRoll target = campaign.getTargetForAcquisition(item, true);
+
+                    String value = target.getValueAsString();
+
+                    if (IntStream.of(
+                                TargetRoll.IMPOSSIBLE,
+                                TargetRoll.AUTOMATIC_SUCCESS,
+                                TargetRoll.AUTOMATIC_FAIL)
+                              .noneMatch(i -> target.getValue() == i)) {
+                        value += "+";
+                    }
+
+                    yield value;
+                }
+                case COL_NEXT -> {
+                    final int days = item.getDaysToWait();
+
+                    yield "%d %s".formatted(
+                          days,
+                          getText(days == 1 ? "Day.text" : "Days.text"));
+                }
+                case COL_QUEUE -> "%s [+%s]".formatted(
+                      FORMATTER.format(item.getQuantity()),
+                      FORMATTER.format(item.getTotalQuantity()));
                 case COL_PRIORITY -> rowIndex + 1;
-                case COL_ITEM -> item.getAcquisitionName();
-                case COL_QUANTITY -> item.getQuantity();
-                case COL_DAYS_TO_WAIT -> item.getDaysToWait();
-                case COL_COST -> item.getTotalBuyCost().toAmountAndSymbolString();
-                default -> "";
+                default -> "?";
             };
         }
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
             return switch (columnIndex) {
-                case COL_PRIORITY, COL_QUANTITY, COL_DAYS_TO_WAIT -> Integer.class;
+                case COL_PRIORITY -> Integer.class;
                 default -> String.class;
             };
+        }
+
+        public int getColumnWidth(final int column) {
+            return switch (column) {
+                case COL_NAME -> 200;
+                case COL_COST, COL_TOTAL_COST, COL_TARGET, COL_NEXT -> 40;
+                default -> 15;
+            };
+        }
+
+        public int getAlignment(final int column) {
+            if (column == COL_NAME) {
+                return SwingConstants.LEFT;
+            } else {
+                return SwingConstants.CENTER;
+            }
+        }
+
+        public class Renderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(final JTable table, final Object value,
+                  final boolean isSelected,
+                  final boolean hasFocus, final int row, final int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setOpaque(true);
+                final int actualCol = table.convertColumnIndexToModel(column);
+                final int actualRow = table.convertRowIndexToModel(row);
+                setHorizontalAlignment(getAlignment(actualCol));
+                return this;
+            }
         }
     }
 
