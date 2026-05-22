@@ -454,7 +454,7 @@ public class TransportationRating {
             return true;
         }
 
-        Formation formation = formationIds.get(unit.getFormationId());
+        Formation formation = formationIds.get(formationId);
         if (formation == null) {
             return true;
         }
