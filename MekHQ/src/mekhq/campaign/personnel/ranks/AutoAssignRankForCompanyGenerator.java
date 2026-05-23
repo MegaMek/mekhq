@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.ranks;
 import static java.lang.Math.max;
 
 import megamek.codeUtilities.StringUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import mekhq.campaign.personnel.Person;
@@ -43,7 +44,7 @@ import mekhq.campaign.universe.Faction;
 
 /**
  * Assigns ranks to unit crew members based on their role: commander (highest rank), squad leaders (descending from just
- * below commander), and regular crew (lowest available rank).
+ * below commander), and regular crew (next lowest available rank).
  *
  * <p>This is only used by the Company Generator, currently, as it is a very basic implementation. If anyone wants
  * to use it as a base to create a fully fledged autoRanks system, the playerbase would love it.</p>
@@ -59,23 +60,12 @@ public final class AutoAssignRankForCompanyGenerator {
     private static final int COMSTAR_RANK = 4;
 
     private static final int MIN_RANK_INDEX = 0;
-    private static final int NORMAL_RANK_INDEX = 0;
     private static final int COMMANDER_RANK_INDEX = 12;
     private static final int LEADER_RANK_INDEX = COMMANDER_RANK_INDEX - 1;
+    private static final int NORMAL_RANK_INDEX = LEADER_RANK_INDEX;
 
     /**
      * Assigns ranks to all crew members of the given unit based on their role.
-     *
-     * <p>Roles are assigned in the following priority order:
-     * <ol>
-     *   <li><b>Commander</b> – receives {@link #COMMANDER_RANK_INDEX}. If that rank is
-     *       unavailable in the active rank system, the commander is treated as a squad leader.</li>
-     *   <li><b>Squad leaders</b> – the first {@code n} non-commander crew members, where
-     *       {@code n} is determined by {@link #countSquadLeaders(Unit)}. Each receives the
-     *       highest available rank at or below {@link #LEADER_RANK_INDEX}.</li>
-     *   <li><b>Regular crew</b> – all remaining members receive the lowest available rank,
-     *       starting from {@link #NORMAL_RANK_INDEX}.</li>
-     * </ol>
      *
      * <p>Rank lookups are cached where possible to avoid redundant scans across crew members
      * with the same role.
@@ -87,24 +77,29 @@ public final class AutoAssignRankForCompanyGenerator {
      * @since 0.51.0
      */
     public static void assignRanks(Unit unit, Faction faction) {
-        int leaderCount = countSquadLeaders(unit);
-        int nextLeaderRank = LEADER_RANK_INDEX; // Cached so we don't re-scan for every crew member
+        Entity entity = unit.getEntity();
+        boolean isConventionalInfantry = entity != null && unit.getEntity().isConventionalInfantry();
+        int leaderCount = countSquadLeaders(entity);
+
+        int cachedLeaderRank = LEADER_RANK_INDEX; // Cached so we don't re-scan for every crew member
         int cachedNormalRank = NORMAL_RANK_INDEX;
 
         boolean isClan = faction.isClan();
         boolean isComStarOrWoB = faction.isComStarOrWoB();
 
+
         Person unitCommander = unit.getCommander();
-        tryAssignCommanderRank(unitCommander);
+        unitCommander.setRank(COMMANDER_RANK_INDEX);
 
         for (Person person : unit.getCrew()) {
+            // Skip anyone who already has a rank
             if (!hasNoRank(person)) {
                 continue;
             }
 
             // Clan Override
             if (isClan) {
-                if (leaderCount > 0) { // This is a conventional infantry squad
+                if (isConventionalInfantry) { // This is a conventional infantry unit
                     person.setRank(CLAN_RANK);
                 } // No ranks for non-military castes
 
@@ -117,54 +112,59 @@ public final class AutoAssignRankForCompanyGenerator {
                 continue;
             }
 
-            // Normal
-            if (leaderCount <= 0) {
-                // Regular crew member
-                cachedNormalRank = assignNormalRank(person, cachedNormalRank);
+            // Squad leader, or commander if normal assignment failed
+            if (leaderCount > 0) {
+                leaderCount--;
+                cachedLeaderRank = assignNormalRank(person, cachedLeaderRank);
+
+                // If we were successful in assigning a rank, we set up the cachedNormalRank to be the rank below the leader
+                if (!hasNoRank(person)) {
+                    cachedNormalRank = cachedLeaderRank - 1;
+                }
                 continue;
             }
 
-            // Squad leader (or commander whose rank assignment failed)
-            leaderCount--;
-            nextLeaderRank = assignLeaderRank(person, nextLeaderRank);
+
+            cachedLeaderRank = assignNormalRank(person, cachedNormalRank);
         }
     }
 
     /**
      * Returns the number of squad leaders needed (squad count minus the overall commander).
      *
+     * <p>If the unit doesn't use squads, we're going to pick just 1 character to be the unit's sub-commander.</p>
+     *
+     * @param entity the unit whose squad leaders we're counting; may be {@code null}
+     *
      * @author Illiani
      * @since 0.51.0
      */
-    private static int countSquadLeaders(Unit unit) {
-        Entity entity = unit.getEntity();
-        if (entity != null && entity.isConventionalInfantry()) {
-            return max(0, ((ConvInfantry) entity).getSquadCount() - 1);
-        }
-        return 0;
-    }
+    private static int countSquadLeaders(@Nullable Entity entity) {
+        int minimumReturnValue = 1;
 
-    /**
-     * Tries to assign exactly {@link #COMMANDER_RANK_INDEX} to {@code person}.
-     *
-     * <p>Returns {@code true} if the rank system recognized it (i.e., not "None").</p>
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    private static boolean tryAssignCommanderRank(Person person) {
-        person.setRank(COMMANDER_RANK_INDEX);
-        return !hasNoRank(person);
+        if (entity == null) {
+            return minimumReturnValue;
+        }
+
+        if (entity.isConventionalInfantry()) {
+            return max(minimumReturnValue, ((ConvInfantry) entity).getSquadCount() - 1);
+        }
+
+        return minimumReturnValue;
     }
 
     /**
      * Assigns the highest available rank at or below {@code startIndex} and returns the index actually assigned (for
-     * the next leader to start with it).
+     * the next character to start with it).
      *
      * @author Illiani
      * @since 0.51.0
      */
-    private static int assignLeaderRank(Person person, int startIndex) {
+    private static int assignNormalRank(Person person, int startIndex) {
+        if (startIndex <= MIN_RANK_INDEX) {
+            return MIN_RANK_INDEX;
+        }
+
         int rankIndex = startIndex;
         person.setRank(rankIndex);
 
@@ -176,28 +176,7 @@ public final class AutoAssignRankForCompanyGenerator {
             noRank = hasNoRank(person);
         }
 
-        return rankIndex; // next leader starts here too
-    }
-
-    /**
-     * Assigns the lowest available rank at or above {@code cachedIndex}, caching the result so later calls skip
-     * straight to the known-good rank.
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    private static int assignNormalRank(Person person, int cachedIndex) {
-        person.setRank(cachedIndex);
-
-        boolean noRank = hasNoRank(person);
-        while (cachedIndex < COMMANDER_RANK_INDEX && noRank) {
-            cachedIndex++;
-            person.setRank(cachedIndex);
-
-            noRank = hasNoRank(person);
-        }
-
-        return cachedIndex;
+        return rankIndex;
     }
 
     /**
