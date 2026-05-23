@@ -812,11 +812,6 @@ public class Campaign implements ITechManager, ILocation {
         this.campaignStartDate = campaignStartDate;
     }
 
-    public PlanetarySystem getCurrentSystem() {
-        AbstractLocation location = getCurrentLocation();
-        return location != null ? location.getCurrentSystem() : null;
-    }
-
     public boolean isAvoidingEmptySystems() {
         return isAvoidingEmptySystems;
     }
