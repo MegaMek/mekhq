@@ -215,7 +215,7 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
 
                 if (isAutomaticallyAssignRanks) {
                     if (unit != null) {
-                        AutoAssignRankForCompanyGenerator.assignRanks(unit, faction);
+                        AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
                     }
                 }
             } catch (Exception e) {

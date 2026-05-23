@@ -215,7 +215,7 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
             Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
             if (automaticallyAssignRanks) {
                 if (unit != null) {
-                    AutoAssignRankForCompanyGenerator.assignRanks(unit, faction);
+                    AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
                 }
             }
         } catch (Exception e) {

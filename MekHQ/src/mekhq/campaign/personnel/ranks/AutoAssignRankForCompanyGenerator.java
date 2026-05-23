@@ -34,10 +34,16 @@ package mekhq.campaign.personnel.ranks;
 
 import static java.lang.Math.max;
 
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+
 import megamek.codeUtilities.StringUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -76,7 +82,7 @@ public final class AutoAssignRankForCompanyGenerator {
      * @author Illiani
      * @since 0.51.0
      */
-    public static void assignRanks(Unit unit, Faction faction) {
+    public static void assignRanks(Campaign campaign, Unit unit, Faction faction) {
         Entity entity = unit.getEntity();
         boolean isConventionalInfantry = entity != null && unit.getEntity().isConventionalInfantry();
         int leaderCount = countSquadLeaders(entity);
@@ -84,21 +90,22 @@ public final class AutoAssignRankForCompanyGenerator {
         int cachedLeaderRank = LEADER_RANK_INDEX; // Cached so we don't re-scan for every crew member
         int cachedNormalRank = NORMAL_RANK_INDEX;
 
-        boolean isClan = faction.isClan();
-        boolean isComStarOrWoB = faction.isComStarOrWoB();
-
+        List<Person> crew = unit.getCrew();
+        crew = sortCrew(campaign, crew);
 
         Person unitCommander = unit.getCommander();
         unitCommander.setRank(COMMANDER_RANK_INDEX);
 
-        for (Person person : unit.getCrew()) {
+        boolean factionIsClan = faction.isClan();
+        boolean factionIsComStarOrWoB = faction.isComStarOrWoB();
+        for (Person person : crew) {
             // Skip anyone who already has a rank
             if (!hasNoRank(person)) {
                 continue;
             }
 
             // Clan Override
-            if (isClan) {
+            if (factionIsClan) {
                 if (isConventionalInfantry) { // This is a conventional infantry unit
                     person.setRank(CLAN_RANK);
                 } // No ranks for non-military castes
@@ -107,7 +114,7 @@ public final class AutoAssignRankForCompanyGenerator {
             }
 
             // ComStar Override
-            if (isComStarOrWoB) {
+            if (factionIsComStarOrWoB) {
                 person.setRank(COMSTAR_RANK); // Everyone is an acolyte
                 continue;
             }
@@ -127,6 +134,19 @@ public final class AutoAssignRankForCompanyGenerator {
 
             cachedLeaderRank = assignNormalRank(person, cachedNormalRank);
         }
+    }
+
+    private static List<Person> sortCrew(Campaign campaign, List<Person> crew) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean campaignIsClan = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+
+        crew.sort(Comparator.comparing(
+              person -> person.getExperienceLevel(campaignOptions, campaignIsClan, today, false, true)
+        ));
+
+        // Sorter is going to sort 0 -> n, so we need to reverse it
+        return crew.reversed();
     }
 
     /**

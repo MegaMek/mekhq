@@ -216,7 +216,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
                 if (isAutomaticallyAssignRanks) {
                     if (unit != null) {
-                        AutoAssignRankForCompanyGenerator.assignRanks(unit, faction);
+                        AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
                     }
                 }
             } catch (Exception e) {
