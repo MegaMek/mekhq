@@ -273,7 +273,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             switch (personnelColumn) {
                 case PERSON:
                     setText(person.getFullDesc(getCampaign()));
-                    setImage(person.getPortrait().getImage(54));
+                    setImage(person.getPortraitImageIconWithFallback(true, 54).getImage());
                     break;
                 case UNIT_ASSIGNMENT:
                     if (loadAssignmentFromMarket) {
