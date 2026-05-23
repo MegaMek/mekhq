@@ -374,7 +374,7 @@ public abstract class AbstractMarriage {
             }
         }
 
-        if (!isInterUnit && campaign.getLocation().isOnPlanet()) {
+        if (!isInterUnit && campaign.getCurrentLocation().isOnPlanet()) {
             List<Gender> possibleGenders = new ArrayList<>();
             if (prefersMen) {
                 possibleGenders.add(Gender.MALE);

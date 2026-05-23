@@ -425,8 +425,8 @@ public class Maintenance {
         }
 
         if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
-                Planet planet = campaign.getLocation().getPlanet();
+            if (campaign.getCurrentLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
+                Planet planet = campaign.getCurrentLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
                 int temperature = planet.getTemperature(campaign.getLocalDate());

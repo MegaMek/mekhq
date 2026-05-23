@@ -74,7 +74,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         // Act
         Money expected = Money.zero();
@@ -97,7 +97,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         when(mockCampaign.getPersonnel()).thenReturn(new ArrayList<>());
 
@@ -122,7 +122,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -156,7 +156,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -189,7 +189,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -222,7 +222,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -256,7 +256,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -289,7 +289,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -322,7 +322,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -357,7 +357,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -391,7 +391,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -425,7 +425,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -460,7 +460,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -494,7 +494,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -528,7 +528,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -588,7 +588,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -644,7 +644,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -701,7 +701,7 @@ public class AccountantTest {
 
         CurrentLocation location = new CurrentLocation();
         location.setTransitTime(1);
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);
@@ -759,7 +759,7 @@ public class AccountantTest {
         Accountant accountant = new Accountant(mockCampaign);
 
         CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getLocation()).thenReturn(location);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
         Faction faction = new Faction();
         when(mockCampaign.getFaction()).thenReturn(faction);

@@ -405,7 +405,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private JComboBox<ProstheticType> createTreatmentComboBox(List<ProstheticType> options) {
         Faction campaignFaction = campaign.getFaction();
         int currentYear = campaign.getGameYear();
-        boolean isOnPlanet = campaign.getLocation().isOnPlanet();
+        boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
         boolean isUseKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
 
         JComboBox<ProstheticType> comboBox = new JComboBox<>();
@@ -514,7 +514,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                   surgeryLevelNeeded));
 
             if (isUseLocalSurgeon) {
-                if (campaign.getLocation().isOnPlanet()) {
+                if (campaign.getCurrentLocation().isOnPlanet()) {
                     summary.add(getTextAt(RESOURCE_BUNDLE,
                           "AdvancedReplacementLimbDialog.status.localSurgeon"));
                 } else {
@@ -663,7 +663,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 }
             }
 
-            if (!selected.isAvailableInCurrentLocation(campaign.getLocation(), campaign.getLocalDate())) {
+            if (!selected.isAvailableInCurrentLocation(campaign.getCurrentLocation(), campaign.getLocalDate())) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
                       "AdvancedReplacementLimbDialog.exclusions.tech", warningColor, CLOSING_SPAN_TAG);
             }
@@ -1208,7 +1208,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
         Map<BodyLocation, ProstheticType> selections = new HashMap<>();
-        boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        boolean isPlanetside = campaign.getCurrentLocation().isOnPlanet();
         Faction campaignFaction = campaign.getFaction();
         int currentYear = campaign.getGameYear();
         for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry :
