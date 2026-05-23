@@ -166,7 +166,6 @@ import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -2542,6 +2541,10 @@ public class Campaign implements ITechManager {
         return humanResources.getPatientsAssignedToDoctors();
     }
 
+    public List<Person> getPatientsWithNonPermanentInjuries() {
+        return humanResources.getPatientsWithNonPermanentInjuries();
+    }
+
     /**
      * List of all units that can show up in the repair bay.
      */
@@ -2860,7 +2863,12 @@ public class Campaign implements ITechManager {
      * @return The person in the designated role with the most experience.
      */
     public Person findBestInRole(PersonnelRole role, String primary, @Nullable String secondary) {
-        return humanResources.findBestInRole(role, primary, secondary, getCampaignOptions(), isClanCampaign(), getLocalDate());
+        return humanResources.findBestInRole(role,
+              primary,
+              secondary,
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate());
     }
 
     public Person findBestInRole(PersonnelRole role, String skill) {
@@ -2887,15 +2895,27 @@ public class Campaign implements ITechManager {
     }
 
     public List<Person> getTechs(final boolean noZeroMinute) {
-        return humanResources.getTechs(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute);
+        return humanResources.getTechs(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute);
     }
 
     public List<Person> getTechsExpanded() {
-        return humanResources.getTechsExpanded(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate());
+        return humanResources.getTechsExpanded(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate());
     }
 
     public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
-        return humanResources.getTechs(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute, eliteFirst);
+        return humanResources.getTechs(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute,
+              eliteFirst);
     }
 
     /**
@@ -2908,7 +2928,13 @@ public class Campaign implements ITechManager {
      * @return A list of active technicians sorted appropriately.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        return humanResources.getTechsExpanded(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute, eliteFirst, expanded);
+        return humanResources.getTechsExpanded(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute,
+              eliteFirst,
+              expanded);
     }
 
     public List<Person> getAdmins() {

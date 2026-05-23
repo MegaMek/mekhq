@@ -1621,6 +1621,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       getCampaign(),
                       selectedPerson);
                 editPersonnelInjuriesDialog.setVisible(true);
+
+                boolean isUseAdvancedMedical = getCampaignOptions().isUseAdvancedMedical();
+                int healingPeriod = getCampaignOptions().getNaturalHealingWaitingPeriod();
+                
+                selectedPerson.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                      healingPeriod);
+
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
@@ -3888,7 +3895,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("coverIllicitMedicalExpenses.text"));
-        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("coverIllicitMedicalExpenses.toolTipText"),
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString(
+                    "coverIllicitMedicalExpenses.toolTipText"),
               100));
         cbMenuItem.setName("coverIllicitMedicalExpenses");
         cbMenuItem.setSelected(selected.length == 1 && person.isCoverIllicitMedicalExpenses());

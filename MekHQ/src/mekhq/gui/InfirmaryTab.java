@@ -530,13 +530,14 @@ public final class InfirmaryTab extends CampaignGuiTab {
         Person doctor = getSelectedDoctor();
         ArrayList<Person> assigned = new ArrayList<>();
         ArrayList<Person> unassigned = new ArrayList<>();
-        for (Person patient : getCampaign().getPatients()) {
+        for (Person patient : getCampaign().getPatientsWithNonPermanentInjuries()) {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
                       (getCampaign().getPerson(patient.getDoctorId()) != null) &&
                       !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActiveFlexible()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
+
             if (patient.getDoctorId() == null) {
                 unassigned.add(patient);
             } else if ((doctor != null) && patient.getDoctorId().equals(doctor.getId())) {
