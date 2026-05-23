@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,7 +53,7 @@ public class DeploymentShortfallNagLogic {
      * @return {@code true} if there are unmet deployment requirements; otherwise, {@code false}.
      */
     public static boolean hasDeploymentShortfall(Campaign campaign) {
-        if (!campaign.getLocation().isOnPlanet()) {
+        if (!campaign.getCurrentLocation().isOnPlanet()) {
             return false;
         }
 

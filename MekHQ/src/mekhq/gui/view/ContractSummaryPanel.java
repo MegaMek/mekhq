@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -292,10 +292,10 @@ public class ContractSummaryPanel extends JPanel {
                         campaign.getFactionStandings(), List.of(atBContract));
 
             int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getLocation().getTransitTime(), isUseCommandCircuit));
+                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId()) &&
-                      campaign.getLocation().isOnPlanet()) {
+                      campaign.getCurrentLocation().isOnPlanet()) {
                 days = 0;
                 jumps = 0;
             }
