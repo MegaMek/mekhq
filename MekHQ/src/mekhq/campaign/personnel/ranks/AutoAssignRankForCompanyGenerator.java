@@ -49,11 +49,16 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
 /**
- * Assigns ranks to unit crew members based on their role: commander (highest rank), squad leaders (descending from just
- * below commander), and regular crew (next lowest available rank).
+ * Utility class responsible for automatically assigning ranks to the crew of a given {@link Unit} based on faction
+ * rules, unit type, and individual experience levels.
  *
- * <p>This is only used by the Company Generator, currently, as it is a very basic implementation. If anyone wants
- * to use it as a base to create a fully fledged autoRanks system, the playerbase would love it.</p>
+ * <p>Rank assignment follows a hierarchy: the unit commander receives the highest
+ * rank index, squad leaders (if applicable) receive an intermediate rank, and remaining crew members are assigned the
+ * next available rank below the leaders. Clan and ComStar/Word of Blake factions use simplified, flat rank assignments
+ * rather than the standard graduated system.</p>
+ *
+ * <p>Only personnel who do not already hold a rank are affected; existing ranks
+ * are always preserved.</p>
  *
  * @author Illiani
  * @since 0.51.0
@@ -67,17 +72,32 @@ public final class AutoAssignRankForCompanyGenerator {
 
     private static final int MIN_RANK_INDEX = 0;
     private static final int COMMANDER_RANK_INDEX = 12;
-    private static final int LEADER_RANK_INDEX = COMMANDER_RANK_INDEX - 1;
-    private static final int NORMAL_RANK_INDEX = LEADER_RANK_INDEX;
+    private static final int LEADER_STARTING_RANK_INDEX = COMMANDER_RANK_INDEX - 1;
+    private static final int NORMAL_STARTING_RANK_INDEX = LEADER_STARTING_RANK_INDEX;
 
     /**
-     * Assigns ranks to all crew members of the given unit based on their role.
+     * Assigns ranks to all unranked crew members of the given {@link Unit}, respecting faction-specific rules and
+     * distributing ranks by experience level.
      *
-     * <p>Rank lookups are cached where possible to avoid redundant scans across crew members
-     * with the same role.
+     * <p>The assignment process proceeds as follows:</p>
+     * <ol>
+     *   <li>The crew is sorted in descending order of experience so that more
+     *       experienced personnel receive higher ranks.</li>
+     *   <li>The unit commander is always assigned {@link #COMMANDER_RANK_INDEX}.</li>
+     *   <li>For Clan factions, conventional infantry members receive
+     *       {@link #CLAN_RANK}; non-military-caste members receive no rank.</li>
+     *   <li>For ComStar and Word of Blake factions, every crew member receives
+     *       {@link #COMSTAR_RANK} (Acolyte).</li>
+     *   <li>For all other factions, a number of crew members equal to the squad
+     *       leader count receive a leader-level rank, and the remaining crew
+     *       receive the next rank below.</li>
+     * </ol>
      *
-     * @param unit    the unit whose crew will have ranks assigned; must not be {@code null}
-     * @param faction the faction we're using to generate ranks
+     * <p>Personnel who already hold a rank are skipped entirely.</p>
+     *
+     * @param campaign the active {@link Campaign}, used to retrieve campaign options and determine experience levels
+     * @param unit     the {@link Unit} whose crew will be ranked
+     * @param faction  the {@link Faction} governing the unit, used to apply faction-specific rank rules
      *
      * @author Illiani
      * @since 0.51.0
@@ -87,8 +107,8 @@ public final class AutoAssignRankForCompanyGenerator {
         boolean isConventionalInfantry = entity != null && unit.getEntity().isConventionalInfantry();
         int leaderCount = countSquadLeaders(entity);
 
-        int cachedLeaderRank = LEADER_RANK_INDEX; // Cached so we don't re-scan for every crew member
-        int cachedNormalRank = NORMAL_RANK_INDEX;
+        int cachedLeaderRank = LEADER_STARTING_RANK_INDEX; // Cached so we don't re-scan for every crew member
+        int cachedNormalRank = NORMAL_STARTING_RANK_INDEX;
 
         List<Person> crew = unit.getCrew();
         crew = sortCrew(campaign, crew);
@@ -131,11 +151,25 @@ public final class AutoAssignRankForCompanyGenerator {
                 continue;
             }
 
-
+            // Everyone else
             cachedLeaderRank = assignNormalRank(person, cachedNormalRank);
         }
     }
 
+    /**
+     * Sorts the provided crew list in descending order of experience level, so that the most experienced personnel
+     * appear first and receive the highest available ranks.
+     *
+     * @param campaign the active {@link Campaign}, used to access {@link CampaignOptions} and the current date for
+     *                 experience-level calculations
+     * @param crew     the list of {@link Person} objects to sort; the original list is not mutated — a new reversed
+     *                 list is returned
+     *
+     * @return a new {@link List} containing the same crew members ordered from most experienced to least experienced
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private static List<Person> sortCrew(Campaign campaign, List<Person> crew) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean campaignIsClan = campaign.isClanCampaign();
@@ -150,11 +184,15 @@ public final class AutoAssignRankForCompanyGenerator {
     }
 
     /**
-     * Returns the number of squad leaders needed (squad count minus the overall commander).
+     * Determines the number of squad leader slots available for the given {@link Entity}.
      *
-     * <p>If the unit doesn't use squads, we're going to pick just 1 character to be the unit's sub-commander.</p>
+     * <p>For conventional infantry, the number of leaders is one fewer than the squad count (the platoon commander
+     * occupies the top slot separately). All other entity types, and a {@code null} entity, yield a minimum of
+     * {@code 1} leader slot.</p>
      *
-     * @param entity the unit whose squad leaders we're counting; may be {@code null}
+     * @param entity the {@link Entity} to inspect, or {@code null} if no entity is associated with the unit
+     *
+     * @return the number of squad leader rank slots to fill; always at least {@code 1}
      *
      * @author Illiani
      * @since 0.51.0
@@ -174,8 +212,21 @@ public final class AutoAssignRankForCompanyGenerator {
     }
 
     /**
-     * Assigns the highest available rank at or below {@code startIndex} and returns the index actually assigned (for
-     * the next character to start with it).
+     * Attempts to assign the highest valid rank at or below {@code startIndex} to the given {@link Person}.
+     *
+     * <p>Beginning at {@code startIndex}, the method decrements the candidate rank index until it finds a rank that
+     * resolves to a non-empty, non-placeholder name, or until {@link #MIN_RANK_INDEX} is reached. This handles gaps in
+     * rank tables where certain indices map to missing or blank entries.</p>
+     *
+     * <p>If {@code startIndex} is already at or below {@link #MIN_RANK_INDEX}, no assignment is attempted and
+     * {@link #MIN_RANK_INDEX} is returned immediately.</p>
+     *
+     * @param person     the {@link Person} to receive the rank assignment
+     * @param startIndex the highest rank index to try first; the method will walk downward from this value if
+     *                   necessary
+     *
+     * @return the rank index that was ultimately set on the person, or {@link #MIN_RANK_INDEX} if no valid rank could
+     *       be found
      *
      * @author Illiani
      * @since 0.51.0
@@ -200,10 +251,14 @@ public final class AutoAssignRankForCompanyGenerator {
     }
 
     /**
-     * Checks whether a character has no named rank.
+     * Returns {@code true} if the given {@link Person} currently holds no meaningful rank.
      *
-     * <p>A rank is considered 'named' if it isn't {@code null}, blank, or equal to {@link #NO_RANK} or
-     * {@link #MISSING_RANK}</p>
+     * <p>A person is considered unranked when their rank name is {@code null}, blank, equal to {@link #NO_RANK}
+     * ({@code "None"}), or equal to {@link #MISSING_RANK} ({@code "-"}), all compared case-insensitively.</p>
+     *
+     * @param person the {@link Person} whose rank is to be checked
+     *
+     * @return {@code true} if the person has no meaningful rank; {@code false} otherwise
      *
      * @author Illiani
      * @since 0.51.0
