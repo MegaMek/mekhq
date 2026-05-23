@@ -496,16 +496,23 @@ public class AtBContract extends Contract {
         moraleMod = 0;
     }
 
+    private void updateEnemy(Campaign campaign, LocalDate today) {
+        updateEnemy(campaign, today, null);
+    }
 
     /**
      * Updates the enemy faction and enemy bot name for this contract.
      *
      * @param campaign The current campaign.
      * @param today    The current LocalDate object.
+     * @param enemyCode {@code Nullable} the code for the new faction, if {@code null} an appropriate random
+     *                                    faction will be used
      */
-    private void updateEnemy(Campaign campaign, LocalDate today) {
-        String enemyCode = RandomFactionGenerator.getInstance()
-                                 .getEnemy(Factions.getInstance().getFaction(employerCode), false, true);
+    public void updateEnemy(Campaign campaign, LocalDate today, @Nullable String enemyCode) {
+        if (enemyCode == null) {
+            Faction employer = getEmployerFaction();
+            enemyCode = RandomFactionGenerator.getInstance().getEnemy(employer, false, true);
+        }
         setEnemyCode(enemyCode);
 
         Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
@@ -1380,7 +1387,7 @@ public class AtBContract extends Contract {
     public String getEnemyName(int year) {
         Faction faction = Factions.getInstance().getFaction(enemyCode);
 
-        if (faction.isMercenary()) {
+        if (faction.isMercenary() || faction.isPirate()) {
             if (Objects.equals(enemyBotName, "Enemy")) {
                 return BackgroundsController.randomMercenaryCompanyNameGenerator(null);
             } else {

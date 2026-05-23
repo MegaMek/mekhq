@@ -465,7 +465,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblUnit = new JLabel();
             if (null != p) {
                 lblPerson.setText(getForceSummary(p, unit));
-                lblPerson.setIcon(p.getPortrait().getImageIcon());
+                lblPerson.setIcon(p.getPortraitImageIconWithFallback(true, 54));
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
             }

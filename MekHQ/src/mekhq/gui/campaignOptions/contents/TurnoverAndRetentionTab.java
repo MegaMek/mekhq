@@ -47,6 +47,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -104,6 +105,7 @@ public class TurnoverAndRetentionTab {
     private JCheckBox chkPayBonusDefault;
     private JLabel lblPayBonusDefaultThreshold;
     private JSpinner spnPayBonusDefaultThreshold;
+    private JCheckBox chkIncludeCivilians;
 
     private JPanel pnlModifiers;
     private JCheckBox chkUseCustomRetirementModifiers;
@@ -224,6 +226,7 @@ public class TurnoverAndRetentionTab {
         chkPayBonusDefault = new JCheckBox();
         lblPayBonusDefaultThreshold = new JLabel();
         spnPayBonusDefaultThreshold = new JSpinner();
+        chkIncludeCivilians = new JCheckBox();
 
         pnlModifiers = new JPanel();
         chkUseCustomRetirementModifiers = new JCheckBox();
@@ -392,7 +395,7 @@ public class TurnoverAndRetentionTab {
         // Header
         turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab",
               getImageDirectory() + "logo_duchy_of_andurien.png",
-              true, true, 4);
+              true, true, 5);
 
         // Contents
         chkUseRandomRetirement = new CampaignOptionsCheckBox("UseRandomRetirement");
@@ -499,6 +502,9 @@ public class TurnoverAndRetentionTab {
               3, 0, 12, 1);
         spnPayBonusDefaultThreshold.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefaultThreshold"));
 
+        chkIncludeCivilians = new CampaignOptionsCheckBox("IncludeCivilians", getMetadata(new Version(0, 51, 0), CampaignOptionFlag.IMPORTANT));
+        chkIncludeCivilians.addMouseListener(createTipPanelUpdater(turnoverHeader, "IncludeCivilians"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SettingsPanel", true,
               "SettingsPanel");
@@ -558,6 +564,11 @@ public class TurnoverAndRetentionTab {
         panel.add(lblPayBonusDefaultThreshold, layout);
         layout.gridx++;
         panel.add(spnPayBonusDefaultThreshold, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 2;
+        panel.add(chkIncludeCivilians, layout);
 
         return panel;
     }
@@ -897,6 +908,7 @@ public class TurnoverAndRetentionTab {
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
         chkPayBonusDefault.setSelected(options.isPayBonusDefault());
         spnPayBonusDefaultThreshold.setValue(options.getPayBonusDefaultThreshold());
+        chkIncludeCivilians.setSelected(options.isIncludeCivilians());
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
         chkUseFatigueModifiers.setSelected(options.isUseFatigueModifiers());
         chkUseSkillModifiers.setSelected(options.isUseSkillModifiers());
@@ -955,6 +967,7 @@ public class TurnoverAndRetentionTab {
         options.setServiceContractModifier((int) spnServiceContractModifier.getValue());
         options.setPayBonusDefault(chkPayBonusDefault.isSelected());
         options.setPayBonusDefaultThreshold((int) spnPayBonusDefaultThreshold.getValue());
+        options.setIncludeCivilians(chkIncludeCivilians.isSelected());
         options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
         options.setUseFatigueModifiers(chkUseFatigueModifiers.isSelected());
         options.setUseSkillModifiers(chkUseSkillModifiers.isSelected());
