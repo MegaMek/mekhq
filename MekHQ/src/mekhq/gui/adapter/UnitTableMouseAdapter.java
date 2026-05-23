@@ -122,7 +122,6 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -640,24 +639,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 if (tech != null) {
                     if ((!selectedUnit.getActiveCrew().isEmpty()) || (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
-                        ImmersiveDialogCore clearAssignments = new ImmersiveDialogCore(selectedUnit.getCampaign(),
+                        ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
+                              tech,
                               null,
-                              null,
-                              getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsCentreMessage.text"),
+                              getFormattedTextAt(RESOURCE_BUNDLE, "mothballUnit.clearDesignationsICMessage.text"),
                               List.of(
-                                    new ImmersiveDialogCore.ButtonLabelTooltipPair(
-                                          getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsConfirmButton.text"),
-                                          null),
-                                    new ImmersiveDialogCore.ButtonLabelTooltipPair(
-                                          getFormattedTextAt(RESOURCE_BUNDLE,"mothballUnit.clearDesignationsCancelButton.text"),
-                                          null)),
+                                    getFormattedTextAt(RESOURCE_BUNDLE, "mothballUnit.clearDesignationsCancelButton.text"),
+                                    getFormattedTextAt(RESOURCE_BUNDLE, "mothballUnit.clearDesignationsConfirmButton.text")),
+                              getFormattedTextAt(RESOURCE_BUNDLE, "mothballUnit.clearDesignationsOOCMessage.text"),
                               null,
-                              null,
-                              false,
-                              null,
-                              null,
-                              true);
-                        if (clearAssignments.getDialogChoice() == 0) {
+                              false);
+                        if (clearAssignments.getDialogChoice() == 1) {
                             selectedUnit.clearCrew();
                             selectedUnit.getCampaign().removeUnitFromFormation(selectedUnit);
                         }
