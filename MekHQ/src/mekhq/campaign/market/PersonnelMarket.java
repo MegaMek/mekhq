@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 Dylan Myers <dylan at dylanspcs.com>. All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
