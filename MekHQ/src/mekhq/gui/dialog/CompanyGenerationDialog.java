@@ -239,39 +239,54 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             }
         }
 
+        final Faction faction = options.isUseSpecifiedFactionToAssignRanks()
+                                      ? options.getSpecifiedFaction()
+                                      : campaign.getFaction();
+        final boolean isAutomaticallyAssignRanks = options.isAutomaticallyAssignRanks();
+
         if (campaignOptions.isUseFatigue()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.fatigue"),
                   true);
-            FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+            FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
+                  faction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseMASHTheatres()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.mash"),
                   true);
-            MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+            MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
+                  faction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.security"),
                   true);
-            PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+            PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
+                  faction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.salvage"),
                   true);
-            SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+            SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
+                  faction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseStratCon()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.stratCon"),
                   true);
-            StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+            StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
+                  faction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseAdvancedScouting() && campaignOptions.isUseStratCon()) {

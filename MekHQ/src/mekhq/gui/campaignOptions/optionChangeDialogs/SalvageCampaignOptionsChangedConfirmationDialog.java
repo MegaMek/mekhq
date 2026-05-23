@@ -63,7 +63,10 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -179,7 +182,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "SalvageCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnits(campaign);
+            processFreeUnits(campaign, campaign.getFaction(), true);
             dispose();
         });
 
@@ -190,7 +193,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
         return pnlButtons;
     }
 
-    public static void processFreeUnits(Campaign campaign) {
+    public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
         int truckCount = campaign.getFaction().getFormationBaseSize();
         if (campaign.isClanCampaign()) {
             truckCount *= 2; // 2 vehicles per point
@@ -210,7 +213,12 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
                 if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                     quality = UnitOrder.getRandomUnitQuality(0);
                 }
-                campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+                if (isAutomaticallyAssignRanks) {
+                    if (unit != null) {
+                        AutoAssignRankForCompanyGenerator.assignRanks(unit, faction);
+                    }
+                }
             } catch (Exception e) {
                 LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
                       mekSummary.getSourceFile(),
