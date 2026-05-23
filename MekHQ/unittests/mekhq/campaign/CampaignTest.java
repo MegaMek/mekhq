@@ -990,7 +990,7 @@ public class CampaignTest {
             void setLocation_null_currentLocationBecomesNull() {
                 campaign.setLocation(null);
 
-                assertNull(campaign.getLocation());
+                assertNull(campaign.getCurrentLocation());
             }
 
             @Test
@@ -1000,7 +1000,7 @@ public class CampaignTest {
 
                 campaign.setLocation(newLocation);
 
-                assertSame(newLocation, campaign.getLocation());
+                assertSame(newLocation, campaign.getCurrentLocation());
             }
         }
 
