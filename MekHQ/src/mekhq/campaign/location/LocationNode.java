@@ -39,6 +39,7 @@ import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
@@ -61,8 +62,8 @@ public class LocationNode {
         return locatable;
     }
 
-    public mekhq.campaign.AbstractLocation getCurrentLocation() {
-        if (locatable instanceof mekhq.campaign.AbstractLocation abstractLocation) {
+    public AbstractLocation getCurrentLocation() {
+        if (locatable instanceof AbstractLocation abstractLocation) {
             return abstractLocation;
         }
 

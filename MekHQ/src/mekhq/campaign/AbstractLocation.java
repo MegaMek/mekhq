@@ -93,26 +93,32 @@ public abstract class AbstractLocation implements ILocation {
         locationNode = new LocationNode(this);
     }
 
+    @Override
     public boolean isOnPlanet() {
         return true;
     }
 
+    @Override
     public boolean isAtJumpPoint() {
         return false;
     }
 
+    @Override
     public boolean isInTransit() {
         return false;
     }
 
+    @Override
     public double getPercentageTransit() {
         return 1.0;
     }
 
+    @Override
     public boolean isJumpZenith() {
         return false;
     }
 
+    @Override
     public double getTransitTime() {
         return 0.0;
     }
@@ -125,12 +131,15 @@ public abstract class AbstractLocation implements ILocation {
 
     public void setRecharged(Campaign campaign) {}
 
+    @Override
     public JumpPath getJumpPath() {
         return null;
     }
 
+    @Override
     public void setJumpPath(JumpPath path) {}
 
+    @Override
     public PlanetarySystem getCurrentSystem() {
         return currentSystem;
     }
@@ -139,6 +148,7 @@ public abstract class AbstractLocation implements ILocation {
      * @return the current planet location. This is currently the primary planet of the system, but in the future this
      *       will not be the case.
      */
+    @Override
     public Planet getPlanet() {
         return getCurrentSystem().getPrimaryPlanet();
     }
@@ -229,6 +239,7 @@ public abstract class AbstractLocation implements ILocation {
         return report.toString();
     }
 
+    @Override
     public LocationNode getLocationNode() {
         return locationNode;
     }

@@ -65,6 +65,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
@@ -708,6 +709,20 @@ public abstract class AbstractCompanyGenerator {
 
                     if (getOptions().isSimulateRandomProcreation()) {
                         campaign.getProcreation().processNewWeek(campaign, date, tracker.getPerson());
+                    }
+                }
+            }
+            //remove any post-partum injuries/hits that may have been applied due to giving birth
+            for (final CompanyGenerationPersonTracker tracker : trackers) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                Person person = tracker.getPerson();
+                if (person.needsFixing()) {
+                    if (campaignOptions.isUseAdvancedMedical()) {
+                        person.clearInjuriesExcludingProsthetics(campaign.getLocalDate());
+                    } else {
+                        while (person.needsFixing()) {
+                            person.heal();
+                        }
                     }
                 }
             }

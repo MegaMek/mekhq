@@ -240,6 +240,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
+    public static final String CONFIRMATION_RESOLVE_SCENARIO = "confirmationResolveScenario";
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";

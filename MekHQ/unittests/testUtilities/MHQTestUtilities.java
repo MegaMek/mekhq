@@ -134,7 +134,7 @@ public final class MHQTestUtilities {
             Ranks.initializeRankSystems();
             rankSystemsInitialized = true;
         }
-        return new Campaign(buildTestConfigWithSystems(TestSystems.getInstance()));
+        return new Campaign(buildTestConfigWithSystems(TestSystems.resetAndGetInstance()));
     }
 
     public static InputStream ParseBase64XmlFile(String base64) {

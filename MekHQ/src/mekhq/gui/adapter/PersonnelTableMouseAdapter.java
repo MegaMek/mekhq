@@ -80,6 +80,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JCheckBoxMenuItem;
@@ -3825,22 +3827,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         popup.add(menuItem);
 
         // region Flags Menu
-        // This Menu contains the following flags, in the specified order:
-        // 1) Clan Personnel
-        // 2) Commander
-        // 3) Divorceable
-        // 4) Founder
-        // 5) Immortal
-        // 6) Marriageable
-        // 7) Trying To Marry
         menu = new JMenu(resources.getString("specialFlagsMenu.text"));
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miClanPersonnel.text"));
-        cbMenuItem.setToolTipText(resources.getString("miClanPersonnel.toolTipText"));
-        cbMenuItem.setName("miClanPersonnel");
-        cbMenuItem.setSelected(selected.length == 1 && person.isClanPersonnel());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setClanPersonnel(!p.isClanPersonnel())));
-        menu.add(cbMenuItem);
 
         if (oneSelected) {
             final JCheckBoxMenuItem miCommander = new JCheckBoxMenuItem(resources.getString("miCommander.text"));
@@ -3852,14 +3839,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     commander.setCommander(false);
                     getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
                           commander.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(commander);
+                    MekHQ.triggerEvent(new PersonChangedEvent(commander));
                 });
                 if (miCommander.isSelected()) {
                     person.setCommander(true);
                     person.setSecondInCommand(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                           person.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
             });
             menu.add(miCommander);
@@ -3873,112 +3860,47 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     secondInCommand.setSecondInCommand(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
                           secondInCommand.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(secondInCommand);
+                    MekHQ.triggerEvent(new PersonChangedEvent(secondInCommand));
                 });
                 if (miSecondInCommand.isSelected()) {
                     person.setSecondInCommand(true);
                     person.setCommander(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("setAsSecondInCommand.format",
                           person.getHyperlinkedFullTitle()));
-                    getCampaign().personUpdated(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
             });
             menu.add(miSecondInCommand);
         }
 
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));
-        cbMenuItem.setToolTipText(resources.getString("miDivorceable.toolTipText"));
-        cbMenuItem.setName("miDivorceable");
-        cbMenuItem.setSelected(selected.length == 1 && person.isDivorceable());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setDivorceable(!p.isDivorceable())));
-        menu.add(cbMenuItem);
+        addFlagMenuItem(menu, selected, "blockMaternityLeave", null, Person::isBlockMaternityLeave,
+              Person::setBlockMaternityLeave);
+        addFlagMenuItem(menu, selected, "isUnderProtection", null, Person::isUnderProtection,
+              Person::setUnderProtection);
+        addFlagMenuItem(menu, selected, "miClanPersonnel", null, Person::isClanPersonnel, Person::setClanPersonnel);
+        addFlagMenuItem(menu, selected, "miDivorceable", null, Person::isDivorceable, Person::setDivorceable);
+        addFlagMenuItem(menu, selected, "miFounder", null, Person::isFounder, Person::setFounder);
+        addFlagMenuItem(menu, selected, "miHidePersonality", null, Person::isHidePersonality,
+              Person::setHidePersonality);
+        addFlagMenuItem(menu, selected, "miImmortal", null, Person::isImmortal, Person::setImmortal);
+        addFlagMenuItem(menu, selected, "miPrefersMen", null, Person::isPrefersMen, Person::setPrefersMen);
+        addFlagMenuItem(menu, selected, "miPrefersWomen", null, Person::isPrefersWomen, Person::setPrefersWomen);
+        addFlagMenuItem(menu, selected, "miQuickTrainIgnore", null, Person::isQuickTrainIgnore,
+              Person::setQuickTrainIgnore);
+        addFlagMenuItem(menu, selected, "miSalvageSupervisor", null, Person::isSalvageSupervisor,
+              Person::setSalvageSupervisor);
+        addFlagMenuItem(menu, selected, "miTryingToConceive", null, Person::isTryingToConceive,
+              Person::setTryingToConceive);
+        addFlagMenuItem(menu, selected, "neverAssignMaintenanceAutomatically", null,
+              Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miFounder.text"));
-        cbMenuItem.setToolTipText(resources.getString("miFounder.toolTipText"));
-        cbMenuItem.setName("miFounder");
-        cbMenuItem.setSelected(selected.length == 1 && person.isFounder());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setFounder(!p.isFounder())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
-        cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
-        cbMenuItem.setName("miImmortal");
-        cbMenuItem.setSelected(selected.length == 1 && person.isImmortal());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setImmortal(!p.isImmortal())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miQuickTrainIgnore.text"));
-        cbMenuItem.setToolTipText(resources.getString("miQuickTrainIgnore.toolTipText"));
-        cbMenuItem.setName("miQuickTrainIgnore");
-        cbMenuItem.setSelected(selected.length == 1 && person.isQuickTrainIgnore());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setQuickTrainIgnore(!p.isQuickTrainIgnore())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miSalvageSupervisor.text"));
-        cbMenuItem.setToolTipText(resources.getString("miSalvageSupervisor.toolTipText"));
-        cbMenuItem.setName("miSalvageSupervisor");
-        cbMenuItem.setSelected(selected.length == 1 && person.isSalvageSupervisor());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setSalvageSupervisor(!p.isSalvageSupervisor())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("isUnderProtection.text"));
-        cbMenuItem.setToolTipText(resources.getString("isUnderProtection.toolTipText"));
-        cbMenuItem.setName("isUnderProtection");
-        cbMenuItem.setSelected(selected.length == 1 && person.isUnderProtection());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setUnderProtection(!p.isUnderProtection())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("neverAssignMaintenanceAutomatically.text"));
-        cbMenuItem.setToolTipText(wordWrap(resources.getString("neverAssignMaintenanceAutomatically.toolTipText")));
-        cbMenuItem.setName("neverAssignMaintenanceAutomatically");
-        cbMenuItem.setSelected(selected.length == 1 && person.isNeverAssignMaintenanceAutomatically());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setNeverAssignMaintenanceAutomatically(!p.isNeverAssignMaintenanceAutomatically())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("blockMaternityLeave.text"));
-        cbMenuItem.setToolTipText(wordWrap(resources.getString("blockMaternityLeave.toolTipText")));
-        cbMenuItem.setName("blockMaternityLeave");
-        cbMenuItem.setSelected(selected.length == 1 && person.isBlockMaternityLeave());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                  .forEach(p -> p.setBlockMaternityLeave(!p.isBlockMaternityLeave())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersMen.text"));
-        cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersMen.toolTipText")));
-        cbMenuItem.setName("miPrefersMen");
-        cbMenuItem.setSelected(selected.length == 1 && person.isPrefersMen());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setPrefersMen(!p.isPrefersMen())));
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miPrefersWomen.text"));
-        cbMenuItem.setToolTipText(wordWrap(resources.getString("miPrefersWomen.toolTipText")));
-        cbMenuItem.setName("miPrefersWomen");
-        cbMenuItem.setSelected(selected.length == 1 && person.isPrefersWomen());
-        cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(p -> p.setPrefersWomen(!p.isPrefersWomen())));
-        menu.add(cbMenuItem);
-
-        if (Stream.of(selected).allMatch(p -> p.getGender().isFemale())) {
-            cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
-            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miTryingToConceive.toolTipText"),
-                  100));
-            cbMenuItem.setName("miTryingToConceive");
-            cbMenuItem.setSelected(selected.length == 1 && person.isTryingToConceive());
-            cbMenuItem.addActionListener(evt -> Stream.of(selected)
-                                                      .forEach(p -> p.setTryingToConceive(!p.isTryingToConceive())));
-            menu.add(cbMenuItem);
-        }
-
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("miHidePersonality.text"));
-        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miHidePersonality.toolTipText"),
+        cbMenuItem = new JCheckBoxMenuItem(resources.getString("coverIllicitMedicalExpenses.text"));
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("coverIllicitMedicalExpenses.toolTipText"),
               100));
-        cbMenuItem.setName("miHidePersonality");
-        cbMenuItem.setSelected(selected.length == 1 && person.isHidePersonality());
+        cbMenuItem.setName("coverIllicitMedicalExpenses");
+        cbMenuItem.setSelected(selected.length == 1 && person.isCoverIllicitMedicalExpenses());
         cbMenuItem.addActionListener(evt -> Stream.of(selected).forEach(selectedPerson -> {
-            selectedPerson.setHidePersonality(!selectedPerson.isHidePersonality());
+            selectedPerson.setCoverIllicitMedicalExpenses(!selectedPerson.isCoverIllicitMedicalExpenses());
             MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
         }));
         menu.add(cbMenuItem);
@@ -4436,6 +4358,56 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    /**
+     * Creates a {@link JCheckBoxMenuItem} for a boolean {@link Person} flag and adds it to the given menu.
+     *
+     * <p>Handles eligibility counting, majority-rule selection state, action listener wiring, and PersonChangedEvent
+     * firing automatically.</p>
+     *
+     * @param menu        the menu to add the item to
+     * @param selected    the currently selected persons
+     * @param resourceKey the resource bundle key for the menu item text
+     * @param tooltipKey  the resource bundle key for the tooltip ({@code null} if same as resourceKey +
+     *                    ".toolTipText")
+     * @param getter      a method reference to the boolean getter, e.g. {@code Person::isImmortal}
+     * @param setter      a {@link BiConsumer} setting the new value, e.g. {@code (p, v) -> p.setImmortal(v)}
+     *
+     * @author Illiani
+     * @since 0.50.00
+     */
+    private void addFlagMenuItem(JMenu menu, Person[] selected, String resourceKey, String tooltipKey,
+          Predicate<Person> getter, BiConsumer<Person, Boolean> setter) {
+        JCheckBoxMenuItem item = new JCheckBoxMenuItem(resources.getString(resourceKey + ".text"));
+        item.setToolTipText(resources.getString(tooltipKey != null ? tooltipKey : resourceKey + ".toolTipText"));
+        item.setName(resourceKey);
+
+        long eligibleCount = Stream.of(selected).filter(getter).count();
+        boolean flagEnabled = isFlagEnabled(eligibleCount, selected.length);
+
+        item.setSelected(flagEnabled);
+        item.addActionListener(evt -> Stream.of(selected).forEach(person -> {
+            setter.accept(person, !flagEnabled);
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+        }));
+
+        menu.add(item);
+    }
+
+    /**
+     * Determines if a flag is enabled based on the eligible and selected count values.
+     *
+     * @param eligibleCount the count of eligible items, represented as a long value
+     * @param selectedCount the count of selected items, represented as an integer value
+     *
+     * @return {@code true} if the eligible count multiplied by 2 is greater than or equal to the selected count
+     *
+     * @author Illiani
+     * @since 0.51.00
+     */
+    private static boolean isFlagEnabled(long eligibleCount, int selectedCount) {
+        return (eligibleCount * 2) >= selectedCount;
     }
 
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
