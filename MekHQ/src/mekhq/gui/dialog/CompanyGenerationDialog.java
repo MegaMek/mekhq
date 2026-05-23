@@ -70,7 +70,6 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
@@ -230,9 +229,6 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             }
 
             if (combatants > 0) {
-                new ImmersiveDialogNotification(campaign,
-                      resources.getString("CompanyGenerationDialog.campaignOptions.altAdvancedMedical"),
-                      true);
                 for (int i = 0; i < combatants; i++) {
                     generateSparePersonnel(options);
                 }
@@ -240,37 +236,22 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
 
         if (campaignOptions.isUseFatigue()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.fatigue"),
-                  true);
             FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
         }
 
         if (campaignOptions.isUseMASHTheatres()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.mash"),
-                  true);
             MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
         }
 
         if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.security"),
-                  true);
             PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.salvage"),
-                  true);
             SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
         }
 
         if (campaignOptions.isUseStratCon()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.stratCon"),
-                  true);
             StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
         }
 
