@@ -261,6 +261,11 @@ public class BaseSettingsDialog extends JDialog {
         combo.setEditable(true);
 
         JTextField editorField = new JTextField();
+        // Must be declared before the editor and document listener so both closures share it.
+        // setItem sets this flag before calling editorField.setText() to prevent the document
+        // listener from re-triggering filterModel.setFilter() while the document lock is held,
+        // which would cause "Attempt to mutate in notification" (IllegalStateException).
+        boolean[] updating = { false };
         combo.setEditor(new ComboBoxEditor() {
             @Override
             public Component getEditorComponent() {
@@ -270,12 +275,24 @@ public class BaseSettingsDialog extends JDialog {
             @Override
             @SuppressWarnings("unchecked")
             public void setItem(Object anObject) {
-                if (anObject == null) {
-                    editorField.setText("");
-                } else if (anObject instanceof String s) {
-                    editorField.setText(s);
-                } else {
-                    editorField.setText(displayName.apply((T) anObject));
+                // If updating is already true, onTextChanged is running (we're inside a document
+                // notification). The document write lock is held — any setText() call here would
+                // throw "Attempt to mutate in notification". The user's typed text is already
+                // correct, so there is nothing to update.
+                if (updating[0]) {
+                    return;
+                }
+                updating[0] = true;
+                try {
+                    if (anObject == null) {
+                        editorField.setText("");
+                    } else if (anObject instanceof String s) {
+                        editorField.setText(s);
+                    } else {
+                        editorField.setText(displayName.apply((T) anObject));
+                    }
+                } finally {
+                    updating[0] = false;
                 }
             }
 
@@ -313,7 +330,6 @@ public class BaseSettingsDialog extends JDialog {
             }
         });
 
-        boolean[] updating = { false };
         editorField.getDocument().addDocumentListener(new DocumentListener() {
             private void onTextChanged() {
                 if (updating[0]) {

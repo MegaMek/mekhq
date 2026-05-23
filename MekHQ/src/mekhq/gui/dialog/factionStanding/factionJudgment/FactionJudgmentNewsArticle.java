@@ -154,7 +154,7 @@ public class FactionJudgmentNewsArticle {
         String dialogKey = getDialogKey(judgmentType, judgmentLookupName, censuringFaction);
 
         LocalDate today = campaign.getLocalDate();
-        mekhq.campaign.AbstractLocation location = campaign.getLocation();
+        mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
 
         String locationName;
         if (useFactionCapitalAsLocation) {

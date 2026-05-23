@@ -163,6 +163,7 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
@@ -815,7 +816,7 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public PlanetarySystem getCurrentSystem() {
-        AbstractLocation location = getLocation();
+        AbstractLocation location = getCurrentLocation();
         return location != null ? location.getCurrentSystem() : null;
     }
 
@@ -1857,7 +1858,7 @@ public class Campaign implements ITechManager, ILocation {
      */
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
         setLocation(new CurrentLocation(planetarySystem, 0.0));
-        MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
+        MekHQ.triggerEvent(new LocationChangedEvent(getCurrentLocation(), false));
 
         if (getAutomatedMothballUnits().isEmpty()) {
             performAutomatedActivation(this);
@@ -4006,6 +4007,15 @@ public class Campaign implements ITechManager, ILocation {
      * @return a <code>String</code> of the report that summarizes the outcome of the attempt to fix the part
      */
     public String fixPart(IPartWork partWork, Person tech) {
+        // Enforce location constraint: tech must be at the same location as the repair target.
+        ILocation repairTarget = (partWork instanceof Part p && p.getUnit() != null)
+                                       ? p.getUnit() : (ILocation) partWork;
+        if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+            String report = tech.getFullName() + " cannot repair " + partWork.getPartName()
+                                  + " — not at the same location.";
+            addReport(TECHNICAL, report);
+            return report;
+        }
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
         String action = getAction(partWork);

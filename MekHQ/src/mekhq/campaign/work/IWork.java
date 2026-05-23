@@ -35,9 +35,10 @@ package mekhq.campaign.work;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.personnel.Person;
 
-public interface IWork {
+public interface IWork extends ILocation {
     boolean needsFixing();
 
     /**

@@ -39,16 +39,21 @@ import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Warehouse;
+import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
- * Utility for moving groups of people to a destination {@link ILocation} via a shared
- * {@link CurrentLocation} travel node.
+ * Utility for moving groups of {@link ILocation} items (persons, units, parts) to a destination
+ * via a shared {@link CurrentLocation} travel node.
  *
- * <p>People departing from the same system are batched into a single {@code CurrentLocation}
- * so that they travel together. People already in the destination system are reparented
+ * <p>Items departing from the same system are batched into a single {@code CurrentLocation}
+ * so that they travel together. Items already in the destination system are reparented
  * directly without creating a travel node.</p>
  */
 public final class LocationDispatch {
@@ -69,6 +74,12 @@ public final class LocationDispatch {
           ILocation destination,
           Campaign campaign) {
 
+        // Persons who have arrived go into basePersonnel; travel nodes go directly under the base
+        // so they can carry units and parts alongside people in the future.
+        ILocation arrivalDestination = (destination instanceof AbstractBase base)
+                                             ? base.getBasePersonnel()
+                                             : destination;
+
         PlanetarySystem destSystem = destination.getCurrentSystem();
 
         Map<PlanetarySystem, List<Person>> bySystem = people.stream()
@@ -82,24 +93,151 @@ public final class LocationDispatch {
             List<Person> group = entry.getValue();
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
-                group.forEach(p -> p.setParent(destination));
+                group.forEach(p -> p.setParent(arrivalDestination));
                 continue;
             }
 
             JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
             if (path == null || path.isEmpty()) {
-                group.forEach(p -> p.setParent(destination));
+                group.forEach(p -> p.setParent(arrivalDestination));
                 continue;
             }
 
-            double startTransit = campaign.getLocation() != null
-                  ? campaign.getLocation().getTransitTime()
+            double startTransit = campaign.getCurrentLocation() != null
+                                        ? campaign.getCurrentLocation().getTransitTime()
                   : fromSystem.getTimeToJumpPoint(1.0);
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
             travelLoc.setJumpPath(path);
             travelLoc.setParent(destination);
             group.forEach(p -> p.setParent(travelLoc));
+            campaign.addLocation(travelLoc);
+        }
+    }
+
+    /**
+     * Dispatches {@code units} to {@code destination}, grouping by departure system so that units leaving from the same
+     * system share one {@link CurrentLocation} for the journey.
+     *
+     * <p>The hangar data structure is updated immediately at dispatch time — units are removed from
+     * the campaign hangar and added to the arrival hangar (base or campaign) right away. The {@link LocationNode} tree,
+     * however, reflects the journey: cross-system dispatches create a shared {@code CurrentLocation} travel node (child
+     * of {@code destination}) so that the unit's location columns show in-transit status until the jump path completes.
+     * Same-system dispatches (or dispatches with no calculable path) skip the travel node and land the unit
+     * immediately.</p>
+     *
+     * @param units       the units to dispatch; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
+     */
+    public static void dispatchUnitsToLocation(Collection<Unit> units,
+          ILocation destination,
+          Campaign campaign) {
+
+        Hangar arrivalHangar = (destination instanceof AbstractBase base)
+                                     ? base.getBaseHangar()
+                                     : campaign.getHangar();
+
+        PlanetarySystem destSystem = destination.getCurrentSystem();
+
+        Map<PlanetarySystem, List<Unit>> bySystem = units.stream()
+                                                          .collect(Collectors.groupingBy(u -> {
+                                                              PlanetarySystem sys = u.getCurrentSystem();
+                                                              return sys != null ? sys : campaign.getCurrentSystem();
+                                                          }));
+
+        for (Map.Entry<PlanetarySystem, List<Unit>> entry : bySystem.entrySet()) {
+            PlanetarySystem fromSystem = entry.getKey();
+            List<Unit> group = entry.getValue();
+
+            // Move data structure immediately so hangar filters stay correct.
+            for (Unit unit : group) {
+                campaign.getHangar().removeUnit(unit.getId());
+                arrivalHangar.addUnit(unit);
+            }
+
+            if (destSystem == null || fromSystem.equals(destSystem)) {
+                group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                continue;
+            }
+
+            JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
+            if (path == null || path.isEmpty()) {
+                group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                continue;
+            }
+
+            double startTransit = campaign.getCurrentLocation() != null
+                                        ? campaign.getCurrentLocation().getTransitTime()
+                                        : fromSystem.getTimeToJumpPoint(1.0);
+
+            CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
+            travelLoc.setJumpPath(path);
+            travelLoc.setParent(destination);
+            group.forEach(u -> LocationNode.LocationManager.setLocation(u, travelLoc));
+            campaign.addLocation(travelLoc);
+        }
+    }
+
+    /**
+     * Dispatches spare {@code parts} to {@code destination}, grouping by departure system so that parts leaving from
+     * the same system share one {@link CurrentLocation} for the journey.
+     *
+     * <p>The warehouse data structure is updated immediately at dispatch time — parts are removed
+     * from the campaign warehouse and added to the arrival warehouse right away. The {@link LocationNode} tree reflects
+     * the journey: cross-system dispatches create a shared {@code CurrentLocation} travel node (child of
+     * {@code destination}) so that location columns show in-transit status. Same-system dispatches skip the travel
+     * node.</p>
+     *
+     * @param parts       the parts to dispatch; should all be spare parts; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
+     */
+    public static void dispatchPartsToLocation(Collection<Part> parts,
+          ILocation destination,
+          Campaign campaign) {
+
+        Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
+                                           ? base.getBaseWarehouse()
+                                           : campaign.getWarehouse();
+
+        PlanetarySystem destSystem = destination.getCurrentSystem();
+
+        Map<PlanetarySystem, List<Part>> bySystem = parts.stream()
+                                                          .collect(Collectors.groupingBy(p -> {
+                                                              PlanetarySystem sys = p.getCurrentSystem();
+                                                              return sys != null ? sys : campaign.getCurrentSystem();
+                                                          }));
+
+        for (Map.Entry<PlanetarySystem, List<Part>> entry : bySystem.entrySet()) {
+            PlanetarySystem fromSystem = entry.getKey();
+            List<Part> group = entry.getValue();
+
+            // Move data structure immediately so warehouse filters stay correct.
+            for (Part part : group) {
+                campaign.getWarehouse().removePart(part);
+                arrivalWarehouse.addPart(part);
+            }
+
+            if (destSystem == null || fromSystem.equals(destSystem)) {
+                group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
+                continue;
+            }
+
+            JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
+            if (path == null || path.isEmpty()) {
+                group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
+                continue;
+            }
+
+            double startTransit = campaign.getCurrentLocation() != null
+                                        ? campaign.getCurrentLocation().getTransitTime()
+                                        : fromSystem.getTimeToJumpPoint(1.0);
+
+            CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
+            travelLoc.setJumpPath(path);
+            travelLoc.setParent(destination);
+            group.forEach(p -> LocationNode.LocationManager.setLocation(p, travelLoc));
             campaign.addLocation(travelLoc);
         }
     }

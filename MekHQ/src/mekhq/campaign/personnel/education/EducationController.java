@@ -342,8 +342,8 @@ public class EducationController {
                                               ? campaign.calculateJumpPath(campaign.getCurrentSystem(), targetSystem)
                                               : null;
                 if (outboundPath != null && !outboundPath.isEmpty()) {
-                    double startTransit = campaign.getLocation() != null
-                                                ? campaign.getLocation().getTransitTime()
+                    double startTransit = campaign.getCurrentLocation() != null
+                                                ? campaign.getCurrentLocation().getTransitTime()
                                                 : 0.0;
                     CurrentLocation travelLoc = new CurrentLocation(
                           campaign.getCurrentSystem(), startTransit);
@@ -656,7 +656,7 @@ public class EducationController {
     private static void journeyToAcademy(Campaign campaign, Person person, ResourceBundle resources) {
         person.incrementEduDaysOfTravel();
 
-        AbstractLocation travelLoc = person.getLocation();
+        AbstractLocation travelLoc = person.getCurrentLocation();
 
         if (!(travelLoc instanceof CurrentLocation currentLoc)) {
             if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
@@ -856,7 +856,7 @@ public class EducationController {
     private static void processJourneyHome(Campaign campaign, Person person) {
         person.incrementEduDaysOfTravel();
 
-        AbstractLocation travelLoc = person.getLocation();
+        AbstractLocation travelLoc = person.getCurrentLocation();
 
         if (!(travelLoc instanceof CurrentLocation currentLoc)) {
             int travelTime = max(2,

@@ -41,7 +41,6 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -113,11 +112,8 @@ public class LocationNode {
             ILocation locatable = child.getLocatable();
             if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
-            } else if (locatable instanceof CurrentLocation currentLoc) {
-                currentLoc.writeToXML(pw, indent);
-            } else if (locatable instanceof Person p) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
             }
+            // Person, Unit, and Part children are written by each ILocation's own writeToXML.
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
@@ -164,21 +160,6 @@ public class LocationNode {
                             }
                         }
                     }
-                }
-            } else if (wn.getNodeName().equalsIgnoreCase("location")) {
-                CurrentLocation travelLoc = CurrentLocation.generateInstanceFromXML(wn, campaign);
-                if (travelLoc != null) {
-                    LocationManager.setLocation(travelLoc, parent);
-                    campaign.addLocation(travelLoc);
-                }
-            } else if (wn.getNodeName().equalsIgnoreCase("personId")) {
-                try {
-                    Person person = campaign.getPerson(java.util.UUID.fromString(wn.getTextContent().trim()));
-                    if (person != null) {
-                        LocationManager.setLocation(person, parent);
-                    }
-                } catch (IllegalArgumentException ex) {
-                    logger.warn("Invalid personId in locationNodeChildren: {}", wn.getTextContent());
                 }
             } else {
                 logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());

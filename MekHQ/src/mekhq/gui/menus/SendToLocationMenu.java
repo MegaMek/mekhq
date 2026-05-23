@@ -32,12 +32,12 @@
  */
 package mekhq.gui.menus;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -46,43 +46,54 @@ import javax.swing.JMenuItem;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationDispatch;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.BaseSettingsDialog;
 
 /**
- * Context menu that lets the player send selected personnel to a known {@link ILocation}.
+ * Context menu that lets the player send selected {@link ILocation} items (persons, units, or
+ * spare parts) to a known destination {@link ILocation}.
  *
  * <p>The menu lists the campaign's Main Force and all registered {@link PlayerBase} instances.
- * The destination that all selected people currently share (if any) is excluded. Bases are
+ * The destination that all selected items currently share (if any) is excluded. Bases are
  * grouped into nested sub-menus based on their {@code displayType} field, with "/" acting as
  * a folder separator.</p>
  *
  * <p>A "New Base..." item at the bottom opens {@link BaseSettingsDialog}.</p>
+ *
+ * <p>The caller provides a {@code dispatcher} callback that is invoked with the chosen
+ * destination — this class contains no dispatch logic itself and can therefore be reused for
+ * any type of {@link ILocation} item.</p>
  */
 public class SendToLocationMenu extends JScrollableMenu {
 
-    public SendToLocationMenu(Campaign campaign, JFrame frame, Person... people) {
+    /**
+     * @param campaign   the active campaign
+     * @param frame      parent frame for any dialogs
+     * @param items      the {@link ILocation} objects to dispatch (persons, units, or parts)
+     * @param dispatcher callback invoked with the chosen destination when the user clicks an entry
+     */
+    public SendToLocationMenu(Campaign campaign, JFrame frame,
+          List<? extends ILocation> items,
+          Consumer<ILocation> dispatcher) {
         super("SendToLocationMenu");
-        initialize(campaign, frame, people);
+        initialize(campaign, frame, items, dispatcher);
     }
 
-    private void initialize(Campaign campaign, JFrame frame, Person... people) {
-        if (people.length == 0) {
+    private void initialize(Campaign campaign, JFrame frame,
+          List<? extends ILocation> items,
+          Consumer<ILocation> dispatcher) {
+        if (items.isEmpty()) {
             return;
         }
 
         setText("Send To...");
 
-        List<Person> peopleList = Arrays.asList(people);
-
-        // Determine the ILocation parent all selected people share (if any), to exclude it
-        Set<ILocation> currentLocations = Arrays.stream(people)
-              .map(p -> {
-                  var node = p.getLocationNode();
+        // Determine the ILocation parent all selected items share (if any), to exclude it
+        Set<ILocation> currentLocations = items.stream()
+              .map(item -> {
+                  var node = item.getLocationNode();
                   if (node == null || node.getParent() == null) {
                       return null;
                   }
@@ -97,26 +108,28 @@ public class SendToLocationMenu extends JScrollableMenu {
         // Main Force entry (= the campaign itself)
         if (!Objects.equals(sharedCurrent, campaign)) {
             JMenuItem mainForce = new JMenuItem("Main Force");
-            mainForce.addActionListener(e ->
-                  LocationDispatch.dispatchToLocation(peopleList, campaign, campaign));
+            mainForce.addActionListener(e -> dispatcher.accept(campaign));
             add(mainForce);
         }
 
         // One entry per player base, nested by display type
         Map<String, JMenu> pathToMenu = new HashMap<>();
         for (PlayerBase base : campaign.getPlayerBases()) {
-            if (Objects.equals(sharedCurrent, base)) {
+            if (Objects.equals(sharedCurrent, base)
+                  || Objects.equals(sharedCurrent, base.getBasePersonnel())
+                  || Objects.equals(sharedCurrent, base.getBaseWarehouse())
+                  || Objects.equals(sharedCurrent, base.getBaseHangar())) {
                 continue;
             }
-            addBaseItem(this, base, peopleList, campaign, pathToMenu);
+            addBaseItem(this, base, dispatcher, pathToMenu);
         }
 
         addSeparator();
 
         JMenuItem newBase = new JMenuItem("New Base...");
         newBase.addActionListener(e -> {
-            PlanetarySystem contextSystem = people.length > 0 ? people[0].getCurrentSystem() : null;
-            Planet contextPlanet = people.length > 0 ? people[0].getPlanet() : null;
+            PlanetarySystem contextSystem = items.get(0).getCurrentSystem();
+            Planet contextPlanet = items.get(0).getPlanet();
             if (contextSystem == null) {
                 contextSystem = campaign.getCurrentSystem();
                 contextPlanet = campaign.getPlanet();
@@ -124,14 +137,14 @@ public class SendToLocationMenu extends JScrollableMenu {
             BaseSettingsDialog dlg = new BaseSettingsDialog(frame, campaign,
                   contextSystem, contextPlanet);
             dlg.setVisible(true);
-            dlg.getResult().ifPresent(base ->
-                  LocationDispatch.dispatchToLocation(peopleList, base, campaign));
+            dlg.getResult().ifPresent(dispatcher::accept);
         });
         add(newBase);
     }
 
-    private static void addBaseItem(JMenu root, PlayerBase base, List<Person> people,
-          Campaign campaign, Map<String, JMenu> pathToMenu) {
+    private static void addBaseItem(JMenu root, PlayerBase base,
+          Consumer<ILocation> dispatcher,
+          Map<String, JMenu> pathToMenu) {
         String displayType = base.getDisplayType();
         JMenu parent;
 
@@ -158,8 +171,7 @@ public class SendToLocationMenu extends JScrollableMenu {
         }
 
         JMenuItem item = new JMenuItem(base.getDisplayName());
-        item.addActionListener(e ->
-              LocationDispatch.dispatchToLocation(people, base, campaign));
+        item.addActionListener(e -> dispatcher.accept(base));
         parent.add(item);
     }
 }

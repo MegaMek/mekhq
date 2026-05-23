@@ -79,6 +79,8 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
@@ -782,6 +784,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
+                // Tech must be at the same location as the unit being repaired
+                ILocation repairTarget = (unit != null) ? unit
+                      : (part instanceof Part p && p.getUnit() != null) ? p.getUnit() : (ILocation) part;
+                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    return false;
+                }
                 if ((unit != null) && unit.isSelfCrewed()) {
                     if (!tech.getPrimaryRole().isVesselCrew()) {
                         return false;

@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -45,14 +46,27 @@ import java.util.stream.Stream;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Represents a hangar which contains zero or more units.
  */
-public class Hangar {
+public class Hangar implements ILocation {
+    private final LocationNode locationNode = new LocationNode(this);
     private final Map<UUID, Unit> units = new LinkedHashMap<>();
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public Set<Unit> getUnitsAtLocation() {
+        return Set.copyOf(units.values());
+    }
 
     /**
      * Adds a unit to the hangar.

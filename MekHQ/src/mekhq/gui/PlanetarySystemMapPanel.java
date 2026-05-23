@@ -206,7 +206,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 // where is the JumpShip
                 int jumpshipX = zenithX + jumpPointImgWidth + 8;
                 int jumpshipY = zenithY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
-                if (!PlanetarySystemMapPanel.this.campaign.getLocation().isJumpZenith()) {
+                if (!PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isJumpZenith()) {
                     jumpshipX = nadirX + jumpPointImgWidth + 8;
                     jumpshipY = nadirY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
                 }
@@ -272,21 +272,21 @@ public class PlanetarySystemMapPanel extends JPanel {
                         int radius = diameter / 2;
 
                         // check for current location - we assume you are on primary planet for now
-                        if (PlanetarySystemMapPanel.this.campaign.getLocation().getCurrentSystem().equals(system)
+                        if (PlanetarySystemMapPanel.this.campaign.getCurrentLocation().getCurrentSystem().equals(system)
                                   && i == system.getPrimaryPlanetPosition()) {
                             updateShipImages();
 
-                            JumpPath jp = PlanetarySystemMapPanel.this.campaign.getLocation().getJumpPath();
+                            JumpPath jp = PlanetarySystemMapPanel.this.campaign.getCurrentLocation().getJumpPath();
                             int lineX1 = x;
                             int lineY1 = y - radius;
                             int lineX2 = jumpshipX + shipImgSize;
                             int lineY2 = jumpshipY + shipImgSize;
-                            if (!PlanetarySystemMapPanel.this.campaign.getLocation().isJumpZenith()) {
+                            if (!PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isJumpZenith()) {
                                 lineY2 = jumpshipY - shipImgSize;
                             }
                             if (null != jp
                                       &&
-                                      (!PlanetarySystemMapPanel.this.campaign.getLocation().isAtJumpPoint() ||
+                                      (!PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isAtJumpPoint() ||
                                              jp.getLastSystem().equals(system))) {
                                 // the unit has a flight plan in this system so draw the line
                                 // in transit so draw a path
@@ -296,7 +296,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                                 g2.setStroke(dashed);
                                 g2.drawLine(lineX1, lineY1, lineX2, lineY2);
                             }
-                            if (PlanetarySystemMapPanel.this.campaign.getLocation().isAtJumpPoint()) {
+                            if (PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isAtJumpPoint()) {
                                 // draw a ring around jumpship
                                 drawRing(g2, jumpshipX + (shipImgSize / 2), jumpshipY + (shipImgSize / 2),
                                       shipImgSize / 2, Color.ORANGE);
@@ -304,7 +304,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                                     drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
                                           shipImgSize);
                                 }
-                            } else if (PlanetarySystemMapPanel.this.campaign.getLocation().isOnPlanet()) {
+                            } else if (PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
                                 if (null != imgDropshipFleet) {
                                     g2.drawImage(imgDropshipFleet, x - radius - shipImgSize, y - radius - shipImgSize,
@@ -321,16 +321,16 @@ public class PlanetarySystemMapPanel extends JPanel {
                                     int lengthY = lineY1 - lineY2;
                                     double rotationRequired = getFlightRotation(lengthX, lengthY,
                                           null != jp && jp.getLastSystem().equals(system),
-                                          PlanetarySystemMapPanel.this.campaign.getLocation().isJumpZenith());
+                                          PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isJumpZenith());
                                     int partialX = lineX2
                                                          +
                                                          (int) Math.round(lengthX *
-                                                                                PlanetarySystemMapPanel.this.campaign.getLocation()
+                                                                                PlanetarySystemMapPanel.this.campaign.getCurrentLocation()
                                                                                       .getPercentageTransit());
                                     int partialY = lineY2
                                                          +
                                                          (int) Math.round(lengthY *
-                                                                                PlanetarySystemMapPanel.this.campaign.getLocation()
+                                                                                PlanetarySystemMapPanel.this.campaign.getCurrentLocation()
                                                                                       .getPercentageTransit());
                                     drawRing(g2, partialX, partialY, shipImgSize / 2, Color.ORANGE);
                                     drawRotatedImage(g2, imgDropshipFleet, rotationRequired,

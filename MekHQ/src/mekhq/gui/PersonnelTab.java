@@ -84,6 +84,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.view.PersonViewPanel;
@@ -411,7 +412,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     /**
-     * Refreshes personnel table model.
+     * Refreshes the personnel table model, applying the currently-selected location filter.
      */
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
@@ -422,11 +423,22 @@ public final class PersonnelTab extends CampaignGuiTab {
                 selectedUUID = p.getId();
             }
         }
-        personModel.refreshData();
-        // try to put the focus back on same person if they are still available
+
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+
+        List<Person> people;
+        if (locationFilter.isAll()) {
+            people = new ArrayList<>(getCampaign().getPersonnel());
+        } else if (locationFilter.isMainForce()) {
+            people = new ArrayList<>(getCampaign().getMainForcePersonnel().getPersonnelAtLocation());
+        } else {
+            people = new ArrayList<>(locationFilter.getBase().getPersonnelAtLocation());
+        }
+        personModel.setData(people);
+
         for (int row = 0; row < personnelTable.getRowCount(); row++) {
             Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-            if (p.getId().equals(selectedUUID)) {
+            if (p != null && p.getId().equals(selectedUUID)) {
                 personnelTable.setRowSelectionInterval(row, row);
                 refreshPersonnelView();
                 break;

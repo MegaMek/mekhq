@@ -40,6 +40,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
@@ -58,6 +59,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
@@ -70,6 +72,8 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -94,6 +98,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -541,6 +546,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
+                // Tech must be at the same location as the repair target
+                ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
+                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    return false;
+                }
                 if (!tech.isRightTechTypeFor(part) && !btnShowAllTechsWarehouse.isSelected()) {
                     return false;
                 }
@@ -633,7 +643,20 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
-        partsModel.setData(getCampaign().getWarehouse().getSpareParts());
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+
+        List<Part> parts;
+        if (locationFilter.isAll()) {
+            parts = new ArrayList<>(getCampaign().getWarehouse().getSpareParts());
+            for (PlayerBase base : getCampaign().getPlayerBases()) {
+                parts.addAll(base.getBaseWarehouse().getSpareParts());
+            }
+        } else if (locationFilter.isMainForce()) {
+            parts = getCampaign().getWarehouse().getSpareParts();
+        } else {
+            parts = locationFilter.getBase().getBaseWarehouse().getSpareParts();
+        }
+        partsModel.setData(parts);
         getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
         // zero

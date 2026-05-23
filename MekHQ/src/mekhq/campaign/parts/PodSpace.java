@@ -47,6 +47,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -91,6 +92,12 @@ public class PodSpace implements IPartWork {
                 this.location = -1;
             }
         }
+    }
+
+    /** Delegates location to the owning unit; pod spaces have no independent location. */
+    @Override
+    public LocationNode getLocationNode() {
+        return unit != null ? unit.getLocationNode() : null;
     }
 
     @Override

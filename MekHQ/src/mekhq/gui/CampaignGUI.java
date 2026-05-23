@@ -94,6 +94,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
@@ -153,6 +154,7 @@ import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
 import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -200,6 +202,7 @@ public class CampaignGUI extends JPanel {
     private JPanel statusPanel;
     private JLabel lblLocation;
     private JLabel lblFunds;
+    private JComboBox<LocationFilterItem> choiceActiveLocation;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblTempSoldiers;
@@ -1567,6 +1570,10 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
+        statusPanel.add(new JLabel(resourceMap.getString("lblActiveLocation.text")));
+        choiceActiveLocation = new JComboBox<>(buildActiveLocationModel());
+        choiceActiveLocation.addActionListener(ev -> refreshLocationFilteredTabs());
+        statusPanel.add(choiceActiveLocation);
         statusPanel.add(lblFunds);
         statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
@@ -1602,7 +1609,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
-        lblLocation = new JLabel(getCampaign().getLocation()
+        lblLocation = new JLabel(getCampaign().getCurrentLocation()
                                        .getReport(getCampaign().getLocalDate(),
                                              isUseCommandCircuit,
                                              getCampaign().getTransportCostCalculation(EXP_REGULAR)));
@@ -3181,6 +3188,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshAllTabs() {
+        refreshActiveLocation();
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             ((CampaignGuiTab) tabMain.getComponentAt(i)).refreshAll();
         }
@@ -3211,6 +3219,75 @@ public class CampaignGUI extends JPanel {
 
     public void refreshCalendar() {
         getFrame().setTitle(getCampaign().getTitle());
+    }
+
+    /**
+     * Returns the currently selected {@link LocationFilterItem}, defaulting to {@link LocationFilterItem#ALL} when the
+     * combo has not yet been initialized.
+     */
+    public LocationFilterItem getActiveLocation() {
+        if (choiceActiveLocation == null) {
+            return LocationFilterItem.ALL;
+        }
+        LocationFilterItem item = (LocationFilterItem) choiceActiveLocation.getSelectedItem();
+        return item != null ? item : LocationFilterItem.ALL;
+    }
+
+    /**
+     * Rebuilds the Active Location dropdown to reflect the current set of player bases. Always shows ALL and MAIN_FORCE
+     * sentinels plus every {@link PlayerBase} regardless of whether it has any units, parts, or personnel.
+     */
+    public void refreshActiveLocation() {
+        LocationFilterItem previous = getActiveLocation();
+        choiceActiveLocation.removeActionListener(choiceActiveLocation.getActionListeners()[0]);
+        choiceActiveLocation.setModel(buildActiveLocationModel());
+
+        // Restore previous selection by sentinel identity or base UUID
+        if (!previous.isAll()) {
+            DefaultComboBoxModel<LocationFilterItem> model =
+                  (DefaultComboBoxModel<LocationFilterItem>) choiceActiveLocation.getModel();
+            for (int i = 0; i < model.getSize(); i++) {
+                LocationFilterItem item = model.getElementAt(i);
+                if (previous.isMainForce() && item.isMainForce()) {
+                    choiceActiveLocation.setSelectedIndex(i);
+                    break;
+                }
+                if (!previous.isMainForce() && !item.isAll() && !item.isMainForce()
+                          && previous.getBase() != null && item.getBase() != null
+                          && previous.getBase().getId().equals(item.getBase().getId())) {
+                    choiceActiveLocation.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
+        choiceActiveLocation.addActionListener(ev -> refreshLocationFilteredTabs());
+    }
+
+    private DefaultComboBoxModel<LocationFilterItem> buildActiveLocationModel() {
+        DefaultComboBoxModel<LocationFilterItem> model = new DefaultComboBoxModel<>();
+        model.addElement(LocationFilterItem.ALL);
+        model.addElement(LocationFilterItem.MAIN_FORCE);
+        for (PlayerBase base : getCampaign().getPlayerBases()) {
+            model.addElement(LocationFilterItem.forBase(base));
+        }
+        return model;
+    }
+
+    /** Refreshes the three location-filtered tabs when the Active Location selection changes. */
+    private void refreshLocationFilteredTabs() {
+        HangarTab ht = (HangarTab) getTab(MHQTabType.HANGAR);
+        if (ht != null) {
+            ht.refreshUnitList();
+        }
+        PersonnelTab pt = getPersonnelTab();
+        if (pt != null) {
+            pt.refreshPersonnelList();
+        }
+        WarehouseTab wt = getWarehouseTab();
+        if (wt != null) {
+            wt.refreshPartsList();
+        }
     }
 
     /**
@@ -3366,7 +3443,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
-        lblLocation.setText(getCampaign().getLocation()
+        lblLocation.setText(getCampaign().getCurrentLocation()
                                   .getReport(getCampaign().getLocalDate(),
                                         isUseCommandCircuit,
                                         getCampaign().getTransportCostCalculation(EXP_REGULAR)));

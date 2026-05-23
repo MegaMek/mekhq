@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -65,6 +66,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -120,6 +122,8 @@ public abstract class Part implements IPartWork, ITechnology {
                                                                     AvailabilityValue.C,
                                                                     AvailabilityValue.C)
                                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private final LocationNode locationNode = new LocationNode(this);
 
     protected String name;
     protected int id;
@@ -378,6 +382,16 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public void setOmniPodded(boolean omniPod) {
         this.omniPodded = omniPod;
+    }
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public Set<Part> getPartsAtLocation() {
+        return Set.of(this);
     }
 
     @Override

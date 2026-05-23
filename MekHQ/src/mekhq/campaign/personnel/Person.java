@@ -2656,7 +2656,7 @@ public class Person implements ILocation {
      *
      * <p>This value is a snapshot recorded at enrollment or journey-start and may not reflect the
      * actual remaining travel time. The person's {@link AbstractLocation} (accessible via
-     * {@link #getLocation()}) holds the authoritative travel state including the live
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
      * {@link mekhq.campaign.JumpPath}.</p>
      */
     public int getEduJourneyTime() {
@@ -2672,7 +2672,7 @@ public class Person implements ILocation {
      *
      * <p>This counter is incremented each day during JOURNEY_TO_CAMPUS and JOURNEY_FROM_CAMPUS
      * stages as a rough progress indicator. The person's {@link AbstractLocation} (accessible via
-     * {@link #getLocation()}) holds the authoritative travel state including the live
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
      * {@link mekhq.campaign.JumpPath}.</p>
      */
     public int getEduDaysOfTravel() {

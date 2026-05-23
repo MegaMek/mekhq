@@ -68,7 +68,6 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Canonica
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getNewDiseaseOutbreaks;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.AttributeCheckUtility.performQuickAttributeCheck;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -116,6 +115,8 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -383,7 +384,7 @@ public class CampaignNewDayManager {
         for (AbstractLocation loc : new ArrayList<>(campaign.getLocations())) {
             loc.newDay(campaign, loc != updatedLocation);
         }
-        updatedLocation = campaign.getLocation();
+        updatedLocation = campaign.getCurrentLocation();
 
 
         updateFacilities();
@@ -1195,7 +1196,7 @@ public class CampaignNewDayManager {
                 // If we're in transit and we don't allow deliveries while in transit the part will remain fixed with
                 // a delivery time of 1 day until we arrive at our destination.
                 if (campaignOptions.isNoDeliveriesInTransit() &&
-                          !campaign.getLocation().isOnPlanet() &&
+                          !campaign.getCurrentLocation().isOnPlanet() &&
                           newDaysToArrival <= 0) {
                     return;
                 }
@@ -1224,6 +1225,17 @@ public class CampaignNewDayManager {
             }
 
             if (null != tech) {
+                // If the tech has moved to a different location since the assignment was made,
+                // cancel it and notify the player rather than silently failing.
+                ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
+                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    campaign.addReport(TECHNICAL, String.format(
+                          "%s cannot continue working on %s — they are no longer at the same location. Assignment cancelled.",
+                          tech.getHyperlinkedFullTitle(),
+                          part.getName()));
+                    part.cancelAssignment(true);
+                    continue;
+                }
                 if (null != tech.getSkillForWorkingOn(part)) {
                     try {
                         campaign.fixPart(part, tech);
@@ -1270,7 +1282,8 @@ public class CampaignNewDayManager {
                 campaign.workOnMothballingOrActivation(unit);
             }
             if (!unit.isPresent()) {
-                unit.checkArrival(!campaign.getLocation().isOnPlanet() && campaignOptions.isNoDeliveriesInTransit());
+                unit.checkArrival(!campaign.getCurrentLocation().isOnPlanet() &&
+                                        campaignOptions.isNoDeliveriesInTransit());
 
                 // Has unit just been delivered?
                 if (unit.isPresent()) {

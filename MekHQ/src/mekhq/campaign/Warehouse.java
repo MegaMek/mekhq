@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -49,6 +50,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartNewEvent;
 import mekhq.campaign.events.parts.PartRemovedEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -57,10 +60,21 @@ import mekhq.utilities.MHQXMLUtility;
 /**
  * Stores parts for a Campaign.
  */
-public class Warehouse {
+public class Warehouse implements ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Warehouse.class);
 
+    private final LocationNode locationNode = new LocationNode(this);
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public Set<Part> getPartsAtLocation() {
+        return Set.copyOf(parts.values());
+    }
 
     /**
      * Adds a part to the warehouse.

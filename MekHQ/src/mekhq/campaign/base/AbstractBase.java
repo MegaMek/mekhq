@@ -39,6 +39,9 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.Personnel;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.utilities.MHQXMLUtility;
@@ -59,6 +62,9 @@ public abstract class AbstractBase implements ILocation {
     private String displayType;
     private String planetId;
     private final LocationNode locationNode;
+    private final Personnel basePersonnel = new Personnel();
+    private final Warehouse baseWarehouse = new Warehouse();
+    private final Hangar baseHangar = new Hangar();
 
     /**
      * Creates a new base anchored under {@code parentLocation}.
@@ -69,6 +75,9 @@ public abstract class AbstractBase implements ILocation {
         Objects.requireNonNull(parentLocation, "parentLocation must not be null");
         this.id = UUID.randomUUID();
         this.locationNode = new LocationNode(this);
+        LocationNode.LocationManager.setLocation(basePersonnel, this);
+        LocationNode.LocationManager.setLocation(baseWarehouse, this);
+        LocationNode.LocationManager.setLocation(baseHangar, this);
         this.setParent(parentLocation);
     }
 
@@ -76,11 +85,29 @@ public abstract class AbstractBase implements ILocation {
     protected AbstractBase() {
         this.id = UUID.randomUUID();
         this.locationNode = new LocationNode(this);
+        LocationNode.LocationManager.setLocation(basePersonnel, this);
+        LocationNode.LocationManager.setLocation(baseWarehouse, this);
+        LocationNode.LocationManager.setLocation(baseHangar, this);
     }
 
     @Override
     public LocationNode getLocationNode() {
         return locationNode;
+    }
+
+    /** Returns the {@link Personnel} node that holds persons who have arrived at this base. */
+    public Personnel getBasePersonnel() {
+        return basePersonnel;
+    }
+
+    /** Returns the {@link Warehouse} that holds spare parts stored at this base. */
+    public Warehouse getBaseWarehouse() {
+        return baseWarehouse;
+    }
+
+    /** Returns the {@link Hangar} that holds units stationed at this base. */
+    public Hangar getBaseHangar() {
+        return baseHangar;
     }
 
     public UUID getId() {
@@ -114,7 +141,7 @@ public abstract class AbstractBase implements ILocation {
     /**
      * Returns the immediate parent of this base in the location tree, or {@code null} if unparented.
      */
-    public @Nullable ILocation getParentLocation() {
+    public @Nullable ILocation getParent() {
         LocationNode parent = locationNode.getParent();
         return parent != null ? parent.getLocatable() : null;
     }
@@ -172,9 +199,10 @@ public abstract class AbstractBase implements ILocation {
      *
      * @return the deserialized base, or {@code null} if the node name is unrecognized
      */
-    public static @Nullable AbstractBase generateInstanceFromXML(Node wn, Campaign campaign) {
+    public static @Nullable AbstractBase generateInstanceFromXML(Node wn, Campaign campaign,
+          megamek.Version version) {
         return switch (wn.getNodeName().toLowerCase()) {
-            case "playerbase" -> PlayerBase.generateInstanceFromXML(wn, campaign);
+            case "playerbase" -> PlayerBase.generateInstanceFromXML(wn, campaign, version);
             default -> {
                 logger.warn("Unrecognized base node '{}' — skipping", wn.getNodeName());
                 yield null;

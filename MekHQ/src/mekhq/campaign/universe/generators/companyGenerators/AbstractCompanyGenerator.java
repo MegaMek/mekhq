@@ -1600,7 +1600,7 @@ public abstract class AbstractCompanyGenerator {
         }
 
         if (getOptions().isStartCourseToContractPlanet()) {
-            campaign.getLocation().setJumpPath(contract.getJumpPath(campaign));
+            campaign.getCurrentLocation().setJumpPath(contract.getJumpPath(campaign));
         }
     }
     // endregion Contract

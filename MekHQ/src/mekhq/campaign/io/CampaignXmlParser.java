@@ -348,7 +348,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("locations")) {
                     processLocations(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("playerBases")) {
-                    processPlayerBaseNodes(campaign, workingNode);
+                    processPlayerBaseNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("location")) {
                     // legacy single-location format: read and treat as the sole active location
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(workingNode, campaign));
@@ -525,6 +525,37 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         });
 
         LOGGER.info("[Campaign Load] Pilot references fixed in {}ms", System.currentTimeMillis() - timestamp);
+        timestamp = System.currentTimeMillis();
+
+        // Fix campaign references for units in base hangars.
+        // These units are NOT in campaign.getHangar(), so the loop above skips them.
+        // They need setCampaign() and fixReferences() just like main-force units.
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            base.getBaseHangar().forEachUnit(unit -> {
+                unit.setCampaign(campaign);
+                unit.fixReferences(campaign);
+
+                if (unit.getRefit() != null) {
+                    unit.getRefit().fixReferences(campaign);
+                    unit.getRefit().reCalc();
+                    if (!unit.getRefit().isCustomJob() && !unit.getRefit().kitFound()) {
+                        campaign.getShoppingList().addShoppingItemWithoutChecking(unit.getRefit());
+                    }
+                }
+
+                if ((unit.getFormationId() > 0) && (campaign.getFormation(unit.getFormationId()) == null)) {
+                    unit.setFormationId(FORMATION_NONE);
+                }
+
+                final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
+                final EquipmentUnscramblerResult result = unscrambler.unscramble();
+                if (!result.succeeded()) {
+                    LOGGER.warn(result.getMessage());
+                }
+            });
+        }
+
+        LOGGER.info("[Campaign Load] Base hangar references fixed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
         boolean skipAllDeprecationChecks = false;
@@ -1393,7 +1424,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
-    private static void processPlayerBaseNodes(Campaign campaign, Node wn) {
+    private static void processPlayerBaseNodes(Campaign campaign, Node wn, Version version) {
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -1401,9 +1432,21 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
             if (wn2.getNodeName().equalsIgnoreCase("playerBase")) {
-                PlayerBase base = PlayerBase.generateInstanceFromXML(wn2, campaign);
+                PlayerBase base = PlayerBase.generateInstanceFromXML(wn2, campaign, version);
                 if (base != null) {
                     campaign.addPlayerBase(base);
+                    for (UUID personId : base.drainPendingPersonIds()) {
+                        Person person = campaign.getPerson(personId);
+                        if (person != null) {
+                            person.setParent(base.getBasePersonnel());
+                        }
+                    }
+                    for (mekhq.campaign.parts.Part part : base.drainPendingBaseWarehouseParts()) {
+                        LocationNode.LocationManager.setLocation(part, base.getBaseWarehouse());
+                    }
+                    for (mekhq.campaign.unit.Unit unit : base.drainPendingBaseHangarUnits()) {
+                        LocationNode.LocationManager.setLocation(unit, base.getBaseHangar());
+                    }
                 }
             }
         }
@@ -1599,20 +1642,43 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * Reconnects persons to their location nodes after a save/load.
+     * Reconnects persons, units, and parts to their travel {@link CurrentLocation} nodes after a
+     * save/load.
      *
-     * <p>During save, each {@link CurrentLocation} (traveling persons) and each
-     * {@link AcademyCampusLocation} (persons already at campus) writes the UUIDs of its direct {@link Person} children.
-     * On load those parent links are lost. This pass restores them.</p>
+     * <p>During save, each {@link CurrentLocation} writes the UUIDs/IDs of its direct children
+     * ({@link Person}, {@link Unit}, {@link Part}). On load those parent links are lost because
+     * the {@link mekhq.campaign.location.LocationNode} tree is not serialized directly. This pass
+     * restores them by looking each item up in the campaign's data structures and re-parenting it
+     * under the correct travel node.</p>
+     *
+     * <p>Units and parts in transit have already been placed in their destination hangar/warehouse
+     * data structure at dispatch time, so the lookup searches base hangars/warehouses as well as
+     * the campaign's main collections.</p>
      */
     private static void reconnectPersonsToTravelLocations(Campaign campaign) {
         for (AbstractLocation loc : campaign.getLocations()) {
-            // Persons traveling to/from campus — parented under a CurrentLocation
             if (loc instanceof CurrentLocation currentLoc) {
+                // Persons traveling — parented under a CurrentLocation
                 for (UUID personId : currentLoc.drainPendingPersonIds()) {
                     Person person = campaign.getPerson(personId);
                     if (person != null) {
                         person.setParent(currentLoc);
+                    }
+                }
+
+                // Units in transit — in base hangar data structure, but LocationNode under CurrentLocation
+                for (UUID unitId : currentLoc.drainPendingUnitIds()) {
+                    Unit unit = findUnitAnywhere(campaign, unitId);
+                    if (unit != null) {
+                        LocationNode.LocationManager.setLocation(unit, currentLoc);
+                    }
+                }
+
+                // Parts in transit — in base warehouse data structure, but LocationNode under CurrentLocation
+                for (int partId : currentLoc.drainPendingPartIds()) {
+                    Part part = findPartAnywhere(campaign, partId);
+                    if (part != null) {
+                        LocationNode.LocationManager.setLocation(part, currentLoc);
                     }
                 }
             }
@@ -1632,6 +1698,36 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
             }
         }
+    }
+
+    /** Searches campaign hangar then all base hangars for a unit by UUID. */
+    private static Unit findUnitAnywhere(Campaign campaign, UUID unitId) {
+        Unit unit = campaign.getHangar().getUnit(unitId);
+        if (unit != null) {
+            return unit;
+        }
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            unit = base.getBaseHangar().getUnit(unitId);
+            if (unit != null) {
+                return unit;
+            }
+        }
+        return null;
+    }
+
+    /** Searches campaign warehouse then all base warehouses for a part by ID. */
+    private static Part findPartAnywhere(Campaign campaign, int partId) {
+        Part part = campaign.getWarehouse().getPart(partId);
+        if (part != null) {
+            return part;
+        }
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            part = base.getBaseWarehouse().getPart(partId);
+            if (part != null) {
+                return part;
+            }
+        }
+        return null;
     }
 
     /**
