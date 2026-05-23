@@ -100,7 +100,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
-import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
@@ -412,6 +411,7 @@ public class Person implements ILocation {
     private boolean salvageSupervisor;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
+    private boolean coverIllicitMedicalExpenses;
     private boolean blockMaternityLeave;
     // this is a flag used in determine whether a person is a potential marriage candidate provided that they are not
     // married, are old enough, etc.
@@ -645,6 +645,7 @@ public class Person implements ILocation {
         }
         underProtection = false;
         neverAssignMaintenanceAutomatically = false;
+        coverIllicitMedicalExpenses = true;
         blockMaternityLeave = false;
 
         // region Flags
@@ -1052,33 +1053,70 @@ public class Person implements ILocation {
     }
 
     /**
-     * Retrieves the portrait image for a given entity. If the provided condition enables the use of an origin faction
-     * backup and the portrait image is unavailable or matches default filenames, a fallback image is retrieved based on
-     * the origin faction's logo.
+     * Retrieves the portrait image for a given entity, with optional fallback behavior.
      *
-     * @param useOriginFactionBackup a boolean flag indicating whether to use the origin faction backup for the portrait
-     *                               image if the primary portrait is unavailable or invalid
+     * <p>If the portrait is absent or matches a default/placeholder filename, and {@code useOriginFactionBackup} is
+     * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
+     * absent and no faction backup is requested, an empty {@link ImageIcon} is returned.</p>
      *
-     * @return the portrait image for the entity; if a fallback is required based on the condition, the fallback image
-     *       generated from the origin faction's logo is returned
+     * <p><b>Warning:</b> Do not attempt to manually scale the {@link ImageIcon} returned by this method, it will be
+     * very blurry. Instead, use {@link #getPortraitImageIconWithFallback(boolean, Integer)}.</p>
+     *
+     * @param useOriginFactionBackup if {@code true}, returns the origin faction's logo as a fallback when the portrait
+     *                               is absent or set to a default/placeholder
+     *
+     * @return the entity's portrait icon; a faction fallback icon if the portrait is default/absent and
+     *       {@code useOriginFactionBackup} is {@code true}; or an empty {@link ImageIcon} if the portrait is absent and
+     *       no fallback is requested
      *
      * @author Illiani
      * @since 0.50.10
      */
     public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup) {
-        if (useOriginFactionBackup) {
-            if (portrait == null) {
-                return getFallbackPortrait();
-            }
+        return getPortraitImageIconWithFallback(useOriginFactionBackup, null);
+    }
 
-            String portraitFilename = portrait.getFilename();
-            if (portraitFilename.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                      portraitFilename.equalsIgnoreCase(NO_PORTRAIT_NAME)) {
-                return getFallbackPortrait();
-            }
+    /**
+     * Retrieves the portrait image for a given entity, with optional scaling and fallback behavior.
+     *
+     * <p>If the portrait is absent or matches a default/placeholder filename, and {@code useOriginFactionBackup} is
+     * {@code true}, a fallback image derived from the origin faction's logo is returned instead. If the portrait is
+     * absent and no faction backup is requested, an empty {@link ImageIcon} is returned.</p>
+     *
+     * @param useOriginFactionBackup if {@code true}, returns the origin faction's logo as a fallback when the portrait
+     *                               is absent or set to a default/placeholder
+     * @param targetPixelWidth       the desired width in pixels to scale the image to, or {@code null} to return the
+     *                               image sized based on {@link Portrait#DEFAULT_IMAGE_WIDTH}.
+     *
+     * @return the entity's portrait icon, scaled to {@code targetPixelWidth} if specified; a faction fallback icon if
+     *       the portrait is default/absent and {@code useOriginFactionBackup} is {@code true}; or an empty
+     *       {@link ImageIcon} if the portrait is absent and no fallback is requested
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup,
+          @Nullable Integer targetPixelWidth) {
+        final boolean isPortraitNull = portrait == null;
+        final String portraitFileName = isPortraitNull ? NO_PORTRAIT_NAME : portrait.getFilename();
+
+        final boolean isDefaultPortrait = isPortraitNull ||
+                                                portraitFileName.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                                                portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
+
+        if (isDefaultPortrait && useOriginFactionBackup) {
+            return targetPixelWidth == null ?
+                         getFallbackPortrait(DEFAULT_IMAGE_WIDTH) :
+                         getFallbackPortrait(targetPixelWidth);
         }
 
-        return (portrait == null) ? new ImageIcon() : portrait.getImageIcon();
+        if (isPortraitNull) {
+            return new ImageIcon();
+        }
+
+        return targetPixelWidth == null ?
+                     portrait.getImageIcon(DEFAULT_IMAGE_WIDTH) :
+                     portrait.getImageIcon(targetPixelWidth);
     }
 
     /**
@@ -1093,9 +1131,14 @@ public class Person implements ILocation {
      * @since 0.50.10
      */
     private ImageIcon getFallbackPortrait() {
-        ImageIcon fallbackImage = Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
-        return ImageUtilities.scaleImageIcon(fallbackImage, DEFAULT_IMAGE_WIDTH, true);
+        return Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
     }
+
+    private ImageIcon getFallbackPortrait(int targetPixelWidth) {
+        return Factions.getFactionLogoWithScaling(birthday.getYear(), originFaction.getShortName(),
+              targetPixelWidth);
+    }
+
 
     public void setPortrait(final Portrait portrait) {
         this.portrait = Objects.requireNonNull(portrait, "Illegal assignment: cannot have a null Portrait");
@@ -2528,8 +2571,9 @@ public class Person implements ILocation {
             return;
         }
 
+        boolean isIgnoreSPAEligibility = !campaignOptions.isAwardRelevantVeterancySPAs();
         SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, true, true);
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true);
         if (spaGained == null) {
             return;
         } else {
@@ -3179,6 +3223,14 @@ public class Person implements ILocation {
         this.neverAssignMaintenanceAutomatically = neverAssignMaintenanceAutomatically;
     }
 
+    public boolean isCoverIllicitMedicalExpenses() {
+        return coverIllicitMedicalExpenses;
+    }
+
+    public void setCoverIllicitMedicalExpenses(final boolean coverIllicitMedicalExpenses) {
+        this.coverIllicitMedicalExpenses = coverIllicitMedicalExpenses;
+    }
+
     public boolean isBlockMaternityLeave() {
         return blockMaternityLeave;
     }
@@ -3797,6 +3849,10 @@ public class Person implements ILocation {
                   indent,
                   "neverAssignMaintenanceAutomatically",
                   neverAssignMaintenanceAutomatically);
+            MHQXMLUtility.writeSimpleXMLTag(pw,
+                  indent,
+                  "coverIllicitMedicalExpenses",
+                  coverIllicitMedicalExpenses);
             MHQXMLUtility.writeSimpleXMLTag(pw,
                   indent,
                   "blockMaternityLeave",
@@ -4430,6 +4486,8 @@ public class Person implements ILocation {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
                     person.setNeverAssignMaintenanceAutomatically(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("coverIllicitMedicalExpenses")) {
+                    person.setCoverIllicitMedicalExpenses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("blockMaternityLeave")) {
                     person.setBlockMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageable")) { // Legacy: <50.10
@@ -5118,15 +5176,53 @@ public class Person implements ILocation {
         return getId().hashCode();
     }
 
+    /**
+     * Returns the {@link SkillLevel} for this person's primary or secondary role, including injury effects.
+     *
+     * <p>Convenience overload of {@link #getSkillLevel(Campaign, boolean, boolean)} with
+     * {@code excludeInjuryEffects = false}.</p>
+     *
+     * @param campaign  the campaign context
+     * @param secondary {@code true} to evaluate the secondary role; {@code false} for the primary role
+     *
+     * @return the {@link SkillLevel} corresponding to this person's experience in the given role
+     */
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
         return getSkillLevel(campaign, secondary, false);
     }
 
+    /**
+     * Returns the {@link SkillLevel} for this person's primary or secondary role.
+     *
+     * <p>Delegates to {@link #getExperienceLevel(Campaign, boolean, boolean)} and maps the result to the
+     * corresponding {@link SkillLevel} constant.</p>
+     *
+     * @param campaign             the campaign context
+     * @param secondary            {@code true} to evaluate the secondary role; {@code false} for the primary role
+     * @param excludeInjuryEffects {@code true} to exclude injury modifiers from the calculation
+     *
+     * @return the {@link SkillLevel} corresponding to this person's experience in the given role
+     */
     public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary,
           final boolean excludeInjuryEffects) {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary, excludeInjuryEffects) + 1];
     }
 
+    /**
+     * Returns the {@link SkillLevel} for this person's primary or secondary role without a full {@link Campaign}
+     * reference.
+     *
+     * <p>Equivalent to {@link #getSkillLevel(Campaign, boolean, boolean)} but accepts explicit options and date
+     * parameters, useful when a {@link Campaign} instance is not available.</p>
+     *
+     * @param campaignOptions      the campaign options controlling skill calculations
+     * @param isClanCampaign       {@code true} if the campaign uses Clan rules
+     * @param today                the current in-game date, used for aging and other time-sensitive modifiers
+     * @param secondary            {@code true} to evaluate the secondary role; {@code false} for the primary role
+     * @param excludeInjuryEffects {@code true} to exclude injury modifiers from the calculation
+     *
+     * @return the {@link SkillLevel} corresponding to this person's experience in the given role
+     */
     public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
           final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
         return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
@@ -5562,6 +5658,15 @@ public class Person implements ILocation {
         return getSkillLevelOrNegative(skillName, skillModifierData);
     }
 
+    /**
+     * Returns the experience level for the specified skill using pre-built modifier data, or {@code -1} if the skill is
+     * not present.
+     *
+     * @param skillName        the name of the skill to query
+     * @param skillModifierData pre-computed modifier data to apply to the skill level
+     *
+     * @return the experience level of the skill, or {@code -1} if the skill is not found
+     */
     public int getSkillLevelOrNegative(final String skillName, SkillModifierData skillModifierData) {
         if (hasSkill(skillName)) {
             return getSkill(skillName).getExperienceLevel(skillModifierData);
@@ -7161,8 +7266,9 @@ public class Person implements ILocation {
     /**
      * Retrieves the modifier value for a specified skill attribute.
      *
-     * @param attribute the skill attribute for which the modifier is to be calculated;
-     *                  if the attribute is null or represents "none", a warning is logged and the method returns 0
+     * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
+     *                  represents "none", a warning is logged and the method returns 0
+     *
      * @return the calculated modifier value for the provided skill attribute, or 0 if the attribute is null or "none"
      *
      * @author Illiani

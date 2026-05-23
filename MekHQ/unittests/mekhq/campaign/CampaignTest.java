@@ -104,7 +104,7 @@ public class CampaignTest {
     @BeforeEach
     public void before() {
         // Reset TestSystems
-        systems = TestSystems.getInstance();
+        systems = TestSystems.resetAndGetInstance();
     }
 
     @Test

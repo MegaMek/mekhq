@@ -57,7 +57,7 @@ public interface ILocation {
      *
      * @return {@link AbstractLocation}, or {@code null} if it doesn't have a {@code AbstractLocation}
      */
-    default AbstractLocation getLocation() {
+    default AbstractLocation getCurrentLocation() {
         return hasLocationNode() ? getLocationNode().getCurrentLocation() : null;
     }
 
@@ -67,7 +67,7 @@ public interface ILocation {
      * @return {@code true} if this location has a location, otherwise {@code false}
      */
     default boolean hasLocation() {
-        return getLocation() != null;
+        return getCurrentLocation() != null;
     }
 
     /**
@@ -81,7 +81,7 @@ public interface ILocation {
             return false;
         }
 
-        return getLocation().isOnPlanet();
+        return getCurrentLocation().isOnPlanet();
     }
 
     /**
@@ -95,7 +95,7 @@ public interface ILocation {
             return false;
         }
 
-        return getLocation().isAtJumpPoint();
+        return getCurrentLocation().isAtJumpPoint();
     }
 
     /**
@@ -109,7 +109,7 @@ public interface ILocation {
             return 0.0;
         }
 
-        return getLocation().getPercentageTransit();
+        return getCurrentLocation().getPercentageTransit();
     }
 
     /**
@@ -123,7 +123,7 @@ public interface ILocation {
             return false;
         }
 
-        return getLocation().isInTransit();
+        return getCurrentLocation().isInTransit();
     }
 
     /**
@@ -137,7 +137,7 @@ public interface ILocation {
             return null;
         }
 
-        return getLocation().getCurrentSystem();
+        return getCurrentLocation().getCurrentSystem();
     }
 
     /**
@@ -151,7 +151,7 @@ public interface ILocation {
             return null;
         }
 
-        return getLocation().getPlanet();
+        return getCurrentLocation().getPlanet();
     }
 
     /**
@@ -165,7 +165,7 @@ public interface ILocation {
             return 0.0;
         }
 
-        return getLocation().getTransitTime();
+        return getCurrentLocation().getTransitTime();
     }
 
     /**
@@ -179,7 +179,7 @@ public interface ILocation {
             return false;
         }
 
-        return getLocation().isJumpZenith();
+        return getCurrentLocation().isJumpZenith();
     }
 
     /**
@@ -193,7 +193,7 @@ public interface ILocation {
             return null;
         }
 
-        return getLocation().getJumpPath();
+        return getCurrentLocation().getJumpPath();
     }
 
     /**
@@ -204,7 +204,7 @@ public interface ILocation {
      */
     default void setJumpPath(JumpPath jumpPath) {
         if (hasLocation()) {
-            getLocation().setJumpPath(jumpPath);
+            getCurrentLocation().setJumpPath(jumpPath);
         }
     }
 

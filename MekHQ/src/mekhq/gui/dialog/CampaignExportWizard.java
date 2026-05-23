@@ -40,16 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
@@ -534,7 +525,7 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.setFaction(sourceCampaign.getFaction());
             destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
-            destinationCampaign.setLocation(sourceCampaign.getLocation());
+            destinationCampaign.setLocation(sourceCampaign.getCurrentLocation());
         }
 
         if (chkExportContractOffers.isSelected()) {

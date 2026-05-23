@@ -773,9 +773,9 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     /**
-     * Returns {@code true} if the given {@link java.time.format.DateTimeFormatter} pattern contains
-     * an unquoted day-of-week field token ({@code E}, {@code e}, or {@code c}). Single-quoted
-     * literal segments are skipped, and {@code ''} is treated as a literal single quote.
+     * Returns {@code true} if the given {@link java.time.format.DateTimeFormatter} pattern contains an unquoted
+     * day-of-week field token ({@code E}, {@code e}, or {@code c}). Single-quoted literal segments are skipped, and
+     * {@code ''} is treated as a literal single quote.
      */
     private static boolean patternHasWeekdayField(String pattern) {
         boolean inQuote = false;
@@ -813,7 +813,7 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public PlanetarySystem getCurrentSystem() {
-        AbstractLocation location = getLocation();
+        AbstractLocation location = getCurrentLocation();
         return location != null ? location.getCurrentSystem() : null;
     }
 
@@ -1837,7 +1837,7 @@ public class Campaign implements ITechManager, ILocation {
      */
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
         setLocation(new CurrentLocation(planetarySystem, 0.0));
-        MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
+        MekHQ.triggerEvent(new LocationChangedEvent(getCurrentLocation(), false));
 
         if (getAutomatedMothballUnits().isEmpty()) {
             performAutomatedActivation(this);
@@ -8428,6 +8428,7 @@ public class Campaign implements ITechManager, ILocation {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
+
         getContractMarket().generateContractOffers(this, newCampaign); // TODO : AbstractContractMarket : Remove
     }
 
