@@ -198,7 +198,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public String getAvailabilityMessage() {
-        mekhq.campaign.AbstractLocation location = getCampaign().getLocation();
+        mekhq.campaign.AbstractLocation location = getCampaign().getCurrentLocation();
         String color;
         String closingBrace = CLOSING_SPAN_TAG;
 
@@ -372,7 +372,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     private double getFactionStandingsRecruitmentModifier() {
         FactionStandings factionStandings = getCampaign().getFactionStandings();
 
-        mekhq.campaign.AbstractLocation location = getCampaign().getLocation();
+        mekhq.campaign.AbstractLocation location = getCampaign().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         double multiplier = 0;
 
@@ -398,7 +398,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @since 0.50.06
      */
     public int getSystemStatusRecruitmentMultiplier() {
-        mekhq.campaign.AbstractLocation location = getCampaign().getLocation();
+        mekhq.campaign.AbstractLocation location = getCampaign().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 
         LocalDate today = getCampaign().getLocalDate();

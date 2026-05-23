@@ -64,8 +64,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
-import megamek.client.ui.CopySystemDataAction;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.CopySystemDataAction;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
@@ -1602,7 +1602,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
-        lblLocation = new JLabel(getCampaign().getLocation()
+        lblLocation = new JLabel(getCampaign().getCurrentLocation()
                                        .getReport(getCampaign().getLocalDate(),
                                              isUseCommandCircuit,
                                              getCampaign().getTransportCostCalculation(EXP_REGULAR)));
@@ -3366,7 +3366,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
                     getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
 
-        lblLocation.setText(getCampaign().getLocation()
+        lblLocation.setText(getCampaign().getCurrentLocation()
                                   .getReport(getCampaign().getLocalDate(),
                                         isUseCommandCircuit,
                                         getCampaign().getTransportCostCalculation(EXP_REGULAR)));

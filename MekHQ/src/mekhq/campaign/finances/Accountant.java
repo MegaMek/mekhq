@@ -161,7 +161,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        mekhq.campaign.AbstractLocation location = campaign.getLocation();
+        mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
         boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 

@@ -145,11 +145,11 @@ public class PersonnelMarket {
      *                 current planetary system, date, settings, factions, and more.
      */
     public void generatePersonnelForDay(Campaign campaign) {
-        PlanetarySystem location = campaign.getLocation().getCurrentSystem();
+        PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
         LocalDate today = campaign.getLocalDate();
 
         // Determine conditions
-        boolean isOnPlanet = campaign.getLocation().isOnPlanet();
+        boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
         boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly();
         boolean isHiringHall = location.isHiringHall(today);
         boolean isCapital = location.getFactionSet(today)

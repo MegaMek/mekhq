@@ -68,7 +68,7 @@ public class UnableToAffordJumpNagLogic {
      * </p>
      */
     public static Money getNextJumpCost(Campaign campaign) {
-        mekhq.campaign.AbstractLocation location = campaign.getLocation();
+        mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
 
         if (jumpPath == null) {
