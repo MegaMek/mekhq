@@ -381,7 +381,6 @@ public class Campaign implements ITechManager, ILocation {
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
-    private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
