@@ -217,12 +217,13 @@ public class Fatigue {
         int fatigueThreshold = campaignOptions.getFatigueLeaveThreshold();
         boolean isFatigued = effectiveFatigue >= fatigueThreshold;
         boolean isCampFollower = person.getStatus().isCampFollower();
+        boolean isFree = !person.isBusy();
 
         int nonPermanentInjuryCount = person.getNonPermanentInjuries().size();
         int hits = person.getHits();
         boolean isInjured = nonPermanentInjuryCount > 0 || hits > 0;
 
-        if (isFatigued && !isInjured && !isCampFollower) {
+        if (isFatigued && isFree && !isInjured && !isCampFollower) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }
