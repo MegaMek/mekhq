@@ -7069,6 +7069,35 @@ public class Campaign implements ITechManager {
 
 
     /**
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
+     * If the pool already has fewer than needed, no change is made.
+     */
+    public void releaseSurplusAsTechPool() {
+        humanResources.releaseSurplusAsTechPool(this);
+    }
+
+    /**
+     * Releases surplus Medics from the pool, keeping only what is currently needed.
+     * If the pool already has fewer than needed, no change is made.
+     */
+    public void releaseSurplusMedicPool() {
+        humanResources.releaseSurplusMedicPool(this);
+    }
+
+    /**
+     * Releases surplus temp crew for a specific blob crew role.
+     *
+     * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
+     * emptied.</p>
+     *
+     * @param role the personnel role to trim
+     */
+    public void releaseSurplusBlobCrewForRole(PersonnelRole role) {
+        humanResources.releaseSurplusBlobCrewForRole(this, role);
+    }
+
+    /**
      * Clears blob crew for a specific personnel role from units and empties the campaign pool. Should be called when a
      * specific blob crew option is disabled.
      *

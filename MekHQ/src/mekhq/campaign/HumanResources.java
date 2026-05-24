@@ -893,6 +893,57 @@ public class HumanResources {
         }
     }
 
+    /**
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
+     * If the pool is at or below the required amount, no change is made.
+     *
+     * @param campaign the campaign
+     */
+    public void releaseSurplusAsTechPool(Campaign campaign) {
+        int surplus = Math.max(0, -getAsTechNeed(campaign.getCampaignOptions()));
+        if (surplus > 0) {
+            decreaseAsTechPool(campaign, surplus);
+        }
+    }
+
+    /**
+     * Releases surplus Medics from the pool, keeping only what is currently needed.
+     * If the pool is at or below the required amount, no change is made.
+     *
+     * @param campaign the campaign
+     */
+    public void releaseSurplusMedicPool(Campaign campaign) {
+        int surplus = Math.max(0, -getMedicsNeed());
+        if (surplus > 0) {
+            decreaseMedicPool(campaign, surplus);
+        }
+    }
+
+    /**
+     * Releases surplus temp crew for a specific blob crew role.
+     *
+     * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
+     * emptied.</p>
+     *
+     * @param campaign the campaign
+     * @param role     the personnel role to trim
+     */
+    public void releaseSurplusBlobCrewForRole(Campaign campaign, PersonnelRole role) {
+        for (Unit unit : campaign.getUnits()) {
+            int currentTemp = unit.getTempCrewByPersonnelRole(role);
+            if (currentTemp > 0) {
+                int realCrew = unit.getActiveCrew().size();
+                int fullCrew = unit.getFullCrewSize();
+                int excess = Math.max(0, (realCrew + currentTemp) - fullCrew);
+                if (excess > 0) {
+                    unit.setTempCrew(role, currentTemp - excess);
+                }
+            }
+        }
+        emptyTempCrewPoolForRole(campaign, role);
+    }
+
 
     @Deprecated(since = "0.50.06")
     public PersonnelMarket getPersonnelMarket() {
