@@ -67,8 +67,8 @@ import javax.swing.JTabbedPane;
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -710,7 +710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final CurrentLocation location = campaign.getCurrentLocation();
+        final AbstractLocation location = campaign.getCurrentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();

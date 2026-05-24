@@ -1949,7 +1949,7 @@ public class HumanResources {
                         add));
         }
 
-        CurrentLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (location.isOnPlanet()) {
             Planet planet = location.getPlanet();
             String planetId = planet.getId();
@@ -2164,7 +2164,7 @@ public class HumanResources {
 
             if (experienceLevel >= 0) {
                 AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-                specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+                specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
                 specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
             }
 
