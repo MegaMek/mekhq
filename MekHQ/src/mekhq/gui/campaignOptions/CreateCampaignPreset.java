@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -680,11 +680,11 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getComboFaction().setSelectedItem(new FactionDisplay(faction, getDate()));
         getComboStartingSystem().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
                                                        ?
-                                                       getCampaign().getLocation().getCurrentSystem() :
+                                                       getCampaign().getCurrentLocation().getCurrentSystem() :
                                                        getPreset().getPlanet().getParentSystem());
         getComboStartingPlanet().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
                                                        ?
-                                                       getCampaign().getLocation()
+                                                       getCampaign().getCurrentLocation()
                                                              .getCurrentSystem()
                                                              .getPrimaryPlanet() :
                                                        getPreset().getPlanet());
