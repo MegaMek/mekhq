@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import AbstractLocation;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -132,7 +133,7 @@ public class FactionJudgmentDialog {
         String factionName = getFactionName(judgingFaction, campaign.getGameYear());
 
         LocalDate today = campaign.getLocalDate();
-        mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         boolean isPlanetside = location.isOnPlanet();
         String locationName = isPlanetside
                                     ? location.getPlanet().getName(today)

@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import AbstractLocation;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -161,7 +162,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 
@@ -264,7 +265,7 @@ public record Accountant(Campaign campaign) {
      * @author Illiani
      * @since 0.50.07
      */
-    private double setFactionStandingBarrackCostMultiplier(mekhq.campaign.AbstractLocation location) {
+    private double setFactionStandingBarrackCostMultiplier(AbstractLocation location) {
         FactionStandings factionStandings = campaign.getFactionStandings();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 

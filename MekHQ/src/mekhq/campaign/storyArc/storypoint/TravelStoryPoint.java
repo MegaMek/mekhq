@@ -35,6 +35,7 @@ package mekhq.campaign.storyArc.storypoint;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import AbstractLocation;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -109,7 +110,7 @@ public class TravelStoryPoint extends StoryPoint {
             // if we don't have a valid destination, then complete the story point
             complete();
         } else if (autoStart) {
-            mekhq.campaign.AbstractLocation location = getStoryArc().getCampaign().getCurrentLocation();
+            AbstractLocation location = getStoryArc().getCampaign().getCurrentLocation();
             JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(),
                   getDestination());
             getStoryArc().getCampaign().getCurrentLocation().setJumpPath(path);

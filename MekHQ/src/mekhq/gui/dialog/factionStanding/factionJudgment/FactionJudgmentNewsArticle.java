@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 
+import AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -154,7 +155,7 @@ public class FactionJudgmentNewsArticle {
         String dialogKey = getDialogKey(judgmentType, judgmentLookupName, censuringFaction);
 
         LocalDate today = campaign.getLocalDate();
-        mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
 
         String locationName;
         if (useFactionCapitalAsLocation) {

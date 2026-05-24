@@ -64,6 +64,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import AbstractLocation;
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -709,7 +710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final mekhq.campaign.AbstractLocation location = campaign.getCurrentLocation();
+        final AbstractLocation location = campaign.getCurrentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();
