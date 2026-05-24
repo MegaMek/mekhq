@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -220,7 +220,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         //the actual map
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // let's go ahead and zoom in on the current location
-        panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
+        panMap.setSelectedSystem(getCampaign().getCurrentLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab");
@@ -295,7 +295,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
         int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
-              getCampaign().getLocation().getTransitTime(), isUseCommandCircuits));
+              getCampaign().getCurrentLocation().getTransitTime(), isUseCommandCircuits));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
         Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
@@ -307,7 +307,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             getCampaign().addReport(GENERAL, jumpReport);
         }
 
-        getCampaign().getLocation().setJumpPath(panMap.getJumpPath());
+        getCampaign().getCurrentLocation().setJumpPath(panMap.getJumpPath());
 
         refreshPlanetView();
         getCampaignGui().refreshLocation();

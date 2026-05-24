@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -69,7 +69,7 @@ public class UnableToAffordJumpNagLogic {
      * </p>
      */
     public static Money getNextJumpCost(Campaign campaign) {
-        CurrentLocation location = campaign.getLocation();
+        CurrentLocation location = campaign.getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
 
         if (jumpPath == null) {

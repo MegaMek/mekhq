@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -710,7 +710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final CurrentLocation location = campaign.getLocation();
+        final CurrentLocation location = campaign.getCurrentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();
