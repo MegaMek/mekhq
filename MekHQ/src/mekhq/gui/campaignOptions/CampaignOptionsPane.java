@@ -41,7 +41,6 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.UTILITY;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.CAMPAIGN_UPGRADE;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
@@ -53,15 +52,18 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.swing.JFrame;
+import javax.swing.JSplitPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import megamek.common.annotations.Nullable;
@@ -81,7 +83,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.*;
@@ -106,15 +107,31 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
  *   <li>Allows scalability for future addition of new campaign settings.</li>
  * </ul>
  */
-public class CampaignOptionsPane extends AbstractMHQTabbedPane {
+public class CampaignOptionsPane extends JPanel {
     private static final int SCROLL_SPEED = 16;
     private static final int HEADER_FONT_SIZE = 5;
+    private static final int NAVIGATION_WIDTH = 240;
 
+    private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final CampaignOptionsDialogMode mode;
+    private final List<CampaignOptionsRoute> navigationTargets = new ArrayList<>();
+      private final Map<String, Supplier<Component>> directPageFactories = new HashMap<>();
+      private final Map<String, Component> directPageCache = new HashMap<>();
+    private final Map<String, Integer> topLevelTabIndexes = new HashMap<>();
+
+    private JTabbedPane legacyTabbedPane;
+    private CampaignOptionsContentHost activeContentHost;
+    private CampaignOptionsNavigationPanel navigationPanel;
+    private boolean isSyncingNavigationSelection;
+    private boolean suppressRouteRegistration;
 
     private GeneralTab generalTab;
+    private JTabbedPane humanResourcesParentTab;
+    private JTabbedPane advancementParentTab;
+    private JTabbedPane equipmentAndSuppliesParentTab;
+    private JTabbedPane strategicOperationsParentTab;
     private PersonnelTab personnelTab;
     private BiographyTab biographyTab;
     private RelationshipsTab relationshipsTab;
@@ -140,7 +157,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @param mode     the {@link CampaignOptionsDialogMode} for configuring the pane's behavior
      */
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign, CampaignOptionsDialogMode mode) {
-        super(frame, ResourceBundle.getBundle(getCampaignOptionsResourceBundle()), "campaignOptionsDialog");
+        super(new BorderLayout());
+        setName("campaignOptionsDialog");
+        this.frame = frame;
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.mode = mode;
@@ -154,56 +173,383 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * Initializes the campaign options pane by creating all parent tabs and adding sub-tabs for various campaign
      * settings categories. Dynamically adjusts tab fonts and layout based on UI scaling settings.
      */
-    @Override
     protected void initialize() {
-        double uiScale = 1;
-        try {
-            uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
-        } catch (Exception ignored) {
-        }
+        legacyTabbedPane = new JTabbedPane();
+        legacyTabbedPane.setName("campaignOptionsLegacyTabbedPane");
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-                    round(HEADER_FONT_SIZE * uiScale), getTextAt(getCampaignOptionsResourceBundle(), "generalPanel.title")),
-              createGeneralTab(mode));
+            JPanel generalPage = createGeneralTab(mode);
+            registerDirectPage("general", () -> generalPage);
+            registerDirectPage("human-resources.personnel.general", this::createPersonnelGeneralTab);
+            registerDirectPage("human-resources.personnel.awards", this::createPersonnelAwardsTab);
+            registerDirectPage("human-resources.personnel.medical", this::createPersonnelMedicalTab);
+            registerDirectPage("human-resources.personnel.information", this::createPersonnelInformationTab);
+            registerDirectPage("human-resources.personnel.prisoners-and-civilians",
+                  this::createPersonnelPrisonersAndDependentsTab);
+            registerDirectPage("human-resources.biography.general", this::createBiographyGeneralTab);
+            registerDirectPage("human-resources.biography.backgrounds", this::createBiographyBackgroundsTab);
+            registerDirectPage("human-resources.biography.death", this::createBiographyDeathTab);
+            registerDirectPage("human-resources.biography.education", this::createBiographyEducationTab);
+            registerDirectPage("human-resources.biography.name-and-portraits",
+                  this::createBiographyNameAndPortraitGenerationTab);
+            registerDirectPage("human-resources.biography.rank", this::createBiographyRankTab);
+        addLazyLegacyTab("humanResourcesParentTab");
+        addLazyLegacyTab("advancementParentTab");
+        addLazyLegacyTab("logisticsAndMaintenanceParentTab");
+        addLazyLegacyTab("strategicOperationsParentTab");
+        registerRoutes();
 
-        JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab();
-        createTab("humanResourcesParentTab", humanResourcesParentTab);
+        legacyTabbedPane.addChangeListener(evt -> selectTopLevelRoute(legacyTabbedPane.getSelectedIndex()));
 
-        JTabbedPane advancementParentTab = createAdvancementParentTab();
-        createTab("advancementParentTab", advancementParentTab);
-
-        JTabbedPane equipmentAndSuppliesParentTab = createEquipmentAndSuppliesParentTab();
-        createTab("logisticsAndMaintenanceParentTab", equipmentAndSuppliesParentTab);
-
-        JTabbedPane strategicOperationsParentTab = createStrategicOperationsParentTab();
-        createTab("strategicOperationsParentTab", strategicOperationsParentTab);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+              createNavigationPanel(),
+              createContentHost(generalPage));
+        splitPane.setName("campaignOptionsSplitPane");
+        splitPane.setResizeWeight(0.0);
+        splitPane.setDividerLocation(NAVIGATION_WIDTH);
+        add(splitPane, BorderLayout.CENTER);
+        navigationPanel.selectRoute(navigationTargets.get(0));
     }
 
     /**
-     * Adds a new tab to the pane. Wrapper method for adding a resource-labeled tab containing a {@link JScrollPane} to
-     * the campaign options pane. Dynamically adjusts font size for consistent scaling across all UI elements.
+     * Adds a new tab to the legacy tab pane. This keeps the old content available while the route-based shell is built
+     * out incrementally.
      *
      * @param resourceName the resource string key to locate the tab title
-     * @param tab          the {@link JTabbedPane} to add as content for the tab
+     * @param component    the component to add as tab content
      */
-    private void createTab(String resourceName, JTabbedPane tab) {
-        JScrollPane tabScrollPane = new JScrollPane(tab);
+    private void addLegacyTab(String resourceName, Component component) {
+        legacyTabbedPane.addTab(getTopLevelTabTitle(resourceName), component);
+        topLevelTabIndexes.put(resourceName, legacyTabbedPane.getTabCount() - 1);
+    }
 
-        // Increase scroll speed
-        tabScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
-        tabScrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_SPEED);
+    private CampaignOptionsNavigationPanel createNavigationPanel() {
+        navigationPanel = new CampaignOptionsNavigationPanel(navigationTargets, this::selectedNavigationTarget);
+        return navigationPanel;
+    }
 
-        // Dynamically adjust font size based on the GUI scale
+      private CampaignOptionsContentHost createContentHost(Component initialContent) {
+            activeContentHost = new CampaignOptionsContentHost(initialContent);
+        return activeContentHost;
+    }
+
+    private void addLazyLegacyTab(String resourceName) {
+        JPanel placeholder = new JPanel(new BorderLayout());
+        placeholder.setName("pnl" + resourceName + "Placeholder");
+        addLegacyTab(resourceName, placeholder);
+    }
+    private void registerRoutes() {
+        registerStaticRoute("general", "generalPanel");
+
+        registerStaticRoute("human-resources", "humanResourcesParentTab");
+        registerStaticRoute("human-resources.personnel", "humanResourcesParentTab", "personnelContentTabs");
+        registerStaticRoute("human-resources.personnel.general", "humanResourcesParentTab", "personnelContentTabs",
+              "personnelGeneralTab");
+        registerStaticRoute("human-resources.personnel.awards", "humanResourcesParentTab", "personnelContentTabs",
+              "awardsTab");
+        registerStaticRoute("human-resources.personnel.medical", "humanResourcesParentTab", "personnelContentTabs",
+              "medicalTab");
+        registerStaticRoute("human-resources.personnel.information", "humanResourcesParentTab", "personnelContentTabs",
+              "personnelInformationTab");
+        registerStaticRoute("human-resources.personnel.prisoners-and-civilians",
+              "humanResourcesParentTab", "personnelContentTabs", "prisonersAndDependentsTab");
+        registerStaticRoute("human-resources.biography", "humanResourcesParentTab", "biographyContentTabs");
+        registerStaticRoute("human-resources.biography.general", "humanResourcesParentTab", "biographyContentTabs",
+              "biographyGeneralTab");
+        registerStaticRoute("human-resources.biography.backgrounds", "humanResourcesParentTab", "biographyContentTabs",
+              "backgroundsTab");
+        registerStaticRoute("human-resources.biography.death", "humanResourcesParentTab", "biographyContentTabs",
+              "deathTab");
+        registerStaticRoute("human-resources.biography.education", "humanResourcesParentTab", "biographyContentTabs",
+              "educationTab");
+        registerStaticRoute("human-resources.biography.name-and-portraits", "humanResourcesParentTab",
+              "biographyContentTabs", "nameAndPortraitGenerationTab");
+        registerStaticRoute("human-resources.biography.rank", "humanResourcesParentTab", "biographyContentTabs",
+              "rankTab");
+        registerStaticRoute("human-resources.relationships", "humanResourcesParentTab", "relationshipsContentTabs");
+        registerStaticRoute("human-resources.relationships.marriage", "humanResourcesParentTab",
+              "relationshipsContentTabs", "marriageTab");
+        registerStaticRoute("human-resources.relationships.divorce", "humanResourcesParentTab",
+              "relationshipsContentTabs", "divorceTab");
+        registerStaticRoute("human-resources.relationships.procreation", "humanResourcesParentTab",
+              "relationshipsContentTabs", "procreationTab");
+        registerStaticRoute("human-resources.salaries", "humanResourcesParentTab", "salariesContentTabs");
+        registerStaticRoute("human-resources.salaries.combat", "humanResourcesParentTab", "salariesContentTabs",
+              "0combatSalariesTab");
+        registerStaticRoute("human-resources.salaries.support", "humanResourcesParentTab", "salariesContentTabs",
+              "1supportSalariesTab");
+        registerStaticRoute("human-resources.salaries.civilian", "humanResourcesParentTab", "salariesContentTabs",
+              "2civilianSalariesTab");
+        registerStaticRoute("human-resources.turnover-and-retention", "humanResourcesParentTab",
+              "turnoverAndRetentionContentTabs");
+        registerStaticRoute("human-resources.turnover-and-retention.turnover", "humanResourcesParentTab",
+              "turnoverAndRetentionContentTabs", "turnoverTab");
+        registerStaticRoute("human-resources.turnover-and-retention.fatigue", "humanResourcesParentTab",
+              "turnoverAndRetentionContentTabs", "fatigueTab");
+
+        registerStaticRoute("advancement", "advancementParentTab");
+        registerStaticRoute("advancement.awards-and-randomization", "advancementParentTab",
+              "awardsAndRandomizationContentTabs");
+        registerStaticRoute("advancement.awards-and-randomization.randomization", "advancementParentTab",
+              "awardsAndRandomizationContentTabs", "0randomizationTab");
+        registerStaticRoute("advancement.awards-and-randomization.xp-awards", "advancementParentTab",
+              "awardsAndRandomizationContentTabs", "1xpAwardsTab");
+        registerStaticRoute("advancement.awards-and-randomization.recruitment-bonuses", "advancementParentTab",
+              "awardsAndRandomizationContentTabs", "2recruitmentBonusesTab");
+        registerStaticRoute("advancement.skills", "advancementParentTab", "skillsContentTabs");
+        registerStaticRoute("advancement.skills.gunnery", "advancementParentTab", "skillsContentTabs",
+              "0gunnerySkillsTab");
+        registerStaticRoute("advancement.skills.piloting", "advancementParentTab", "skillsContentTabs",
+              "1pilotingSkillsTab");
+        registerStaticRoute("advancement.skills.support", "advancementParentTab", "skillsContentTabs",
+              "2supportSkillsTab");
+        registerStaticRoute("advancement.skills.utility", "advancementParentTab", "skillsContentTabs",
+              "3utilitySkillsTab");
+        registerStaticRoute("advancement.skills.roleplay", "advancementParentTab", "skillsContentTabs",
+              "4roleplaySkillsTab");
+        registerStaticRoute("advancement.abilities", "advancementParentTab", "abilityContentTabs");
+        registerStaticRoute("advancement.abilities.combat", "advancementParentTab", "abilityContentTabs",
+              "0combatAbilitiesTab");
+        registerStaticRoute("advancement.abilities.maneuvering", "advancementParentTab", "abilityContentTabs",
+              "1maneuveringAbilitiesTab");
+        registerStaticRoute("advancement.abilities.utility", "advancementParentTab", "abilityContentTabs",
+              "2utilityAbilitiesTab");
+        registerStaticRoute("advancement.abilities.character-flaws", "advancementParentTab", "abilityContentTabs",
+              "3characterFlawsTab");
+        registerStaticRoute("advancement.abilities.character-creation-only", "advancementParentTab",
+              "abilityContentTabs", "4characterCreationOnlyTab");
+
+        registerStaticRoute("logistics", "logisticsAndMaintenanceParentTab");
+        registerStaticRoute("logistics.repairs-and-maintenance", "logisticsAndMaintenanceParentTab",
+              "repairsAndMaintenanceContentTabs");
+        registerStaticRoute("logistics.repairs-and-maintenance.repairs", "logisticsAndMaintenanceParentTab",
+              "repairsAndMaintenanceContentTabs", "repairTab");
+        registerStaticRoute("logistics.repairs-and-maintenance.maintenance", "logisticsAndMaintenanceParentTab",
+              "repairsAndMaintenanceContentTabs", "maintenanceTab");
+        registerStaticRoute("logistics.supplies-and-acquisition", "logisticsAndMaintenanceParentTab",
+              "suppliesAndAcquisitionContentTabs");
+        registerStaticRoute("logistics.supplies-and-acquisition.acquisition", "logisticsAndMaintenanceParentTab",
+              "suppliesAndAcquisitionContentTabs", "acquisitionTab");
+        registerStaticRoute("logistics.supplies-and-acquisition.planetary-acquisition",
+              "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs", "planetaryAcquisitionTab");
+        registerStaticRoute("logistics.supplies-and-acquisition.tech-limits", "logisticsAndMaintenanceParentTab",
+              "suppliesAndAcquisitionContentTabs", "techLimitsTab");
+
+        registerStaticRoute("operations", "strategicOperationsParentTab");
+        registerStaticRoute("operations.finances", "strategicOperationsParentTab", "financesContentTabs");
+        registerStaticRoute("operations.finances.general", "strategicOperationsParentTab", "financesContentTabs",
+              "financesGeneralTab");
+        registerStaticRoute("operations.finances.price-multipliers", "strategicOperationsParentTab",
+              "financesContentTabs", "priceMultipliersTab");
+        registerStaticRoute("operations.markets", "strategicOperationsParentTab", "marketsContentTabs");
+        registerStaticRoute("operations.markets.personnel", "strategicOperationsParentTab", "marketsContentTabs",
+              "personnelMarketTab");
+        registerStaticRoute("operations.markets.units", "strategicOperationsParentTab", "marketsContentTabs",
+              "unitMarketTab");
+        registerStaticRoute("operations.markets.contracts", "strategicOperationsParentTab", "marketsContentTabs",
+              "contractMarketTab");
+        registerStaticRoute("operations.systems", "strategicOperationsParentTab", "systemsContentTabs");
+        registerStaticRoute("operations.systems.reputation", "strategicOperationsParentTab", "systemsContentTabs",
+              "reputationTab");
+        registerStaticRoute("operations.systems.faction-standing", "strategicOperationsParentTab",
+              "systemsContentTabs", "factionStandingTab");
+        registerStaticRoute("operations.systems.a-time-of-war", "strategicOperationsParentTab", "systemsContentTabs",
+              "atowTab");
+        registerStaticRoute("operations.rulesets", "strategicOperationsParentTab", "rulesetsContentTabs");
+        registerStaticRoute("operations.rulesets.stratcon", "strategicOperationsParentTab", "rulesetsContentTabs",
+              "stratConGeneralTab");
+
+    }
+
+    private String getTopLevelTabTitle(String resourceName) {
         double uiScale = 1;
         try {
             uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
         } catch (Exception ignored) {
         }
 
-        if (mode != CAMPAIGN_UPGRADE && mode != STARTUP_ABRIDGED) {
-            addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-                  round(HEADER_FONT_SIZE * uiScale),
-                  getTextAt(getCampaignOptionsResourceBundle(), resourceName + ".title")), tabScrollPane);
+        return String.format("<html><font size=%s><b>%s</b></font></html>",
+              round(HEADER_FONT_SIZE * uiScale),
+              getTextAt(getCampaignOptionsResourceBundle(), resourceName + ".title"));
+    }
+
+    private void selectedNavigationTarget(CampaignOptionsRoute route) {
+        isSyncingNavigationSelection = true;
+        try {
+            selectRoute(route);
+            resetContentScrollPosition();
+        } finally {
+            isSyncingNavigationSelection = false;
+        }
+    }
+
+    private void resetContentScrollPosition() {
+        if (activeContentHost != null) {
+            activeContentHost.resetScrollPosition();
+        }
+    }
+
+    private void selectTopLevelRoute(int tabIndex) {
+        if (isSyncingNavigationSelection) {
+            return;
+        }
+
+        for (CampaignOptionsRoute route : navigationTargets) {
+            if (isTopLevelRouteFor(route, tabIndex)) {
+                ensureSectionLoaded(route.getTopLevelResourceName());
+                navigationPanel.selectRoute(route);
+                return;
+            }
+        }
+    }
+
+    private void selectRoute(CampaignOptionsRoute route) {
+            if (showDirectRoute(route)) {
+                  return;
+            }
+
+        List<String> titleResourceNames = route.getTitleResourceNames();
+        if (titleResourceNames.isEmpty()) {
+            return;
+        }
+
+            activeContentHost.setContent(legacyTabbedPane);
+        ensureSectionLoaded(route.getTopLevelResourceName());
+        Component selectedComponent = selectTab(legacyTabbedPane, titleResourceNames.get(0));
+        for (int index = 1; index < titleResourceNames.size(); index++) {
+            if (!(selectedComponent instanceof JTabbedPane tabbedPane)) {
+                return;
+            }
+
+            selectedComponent = selectTab(tabbedPane, titleResourceNames.get(index));
+        }
+    }
+
+      private boolean showDirectRoute(CampaignOptionsRoute route) {
+            Supplier<Component> directPageFactory = directPageFactories.get(route.getId());
+            if (directPageFactory == null) {
+                  return false;
+            }
+
+            Component directPage = directPageCache.computeIfAbsent(route.getId(), ignored -> directPageFactory.get());
+            activeContentHost.setContent(directPage);
+            return true;
+      }
+
+    private Component selectTab(JTabbedPane tabbedPane, String titleResourceName) {
+        int tabIndex = getTabIndex(tabbedPane, titleResourceName);
+        if (tabIndex >= 0 && tabbedPane.getSelectedIndex() != tabIndex) {
+            tabbedPane.setSelectedIndex(tabIndex);
+        }
+
+        return tabbedPane.getSelectedComponent();
+    }
+
+    private int getTabIndex(JTabbedPane tabbedPane, String titleResourceName) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleResourceName + ".title");
+        for (int index = 0; index < tabbedPane.getTabCount(); index++) {
+            String tabTitle = tabbedPane.getTitleAt(index);
+            if (title.equals(tabTitle) || tabTitle.contains(title)) {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private boolean isTopLevelRouteFor(CampaignOptionsRoute route, int tabIndex) {
+        Integer routeTabIndex = topLevelTabIndexes.get(route.getTopLevelResourceName());
+        return route.isTopLevelRoute() && routeTabIndex != null && routeTabIndex == tabIndex;
+    }
+
+    private void ensureSectionLoaded(String topLevelResourceName) {
+        switch (topLevelResourceName) {
+            case "humanResourcesParentTab" -> {
+                if (humanResourcesParentTab == null) {
+                    humanResourcesParentTab = createSectionContent(this::createHumanResourcesParentTab);
+                    setLegacyTabComponent(topLevelResourceName, humanResourcesParentTab);
+                }
+            }
+            case "advancementParentTab" -> {
+                if (advancementParentTab == null) {
+                    advancementParentTab = createSectionContent(this::createAdvancementParentTab);
+                    setLegacyTabComponent(topLevelResourceName, advancementParentTab);
+                }
+            }
+            case "logisticsAndMaintenanceParentTab" -> {
+                if (equipmentAndSuppliesParentTab == null) {
+                    equipmentAndSuppliesParentTab = createSectionContent(this::createEquipmentAndSuppliesParentTab);
+                    setLegacyTabComponent(topLevelResourceName, equipmentAndSuppliesParentTab);
+                }
+            }
+            case "strategicOperationsParentTab" -> {
+                if (strategicOperationsParentTab == null) {
+                    strategicOperationsParentTab = createSectionContent(this::createStrategicOperationsParentTab);
+                    setLegacyTabComponent(topLevelResourceName, strategicOperationsParentTab);
+                }
+            }
+            default -> {
+                // General is built eagerly.
+            }
+        }
+    }
+
+    private void ensureAllSectionsLoaded() {
+        ensureSectionLoaded("humanResourcesParentTab");
+        ensureSectionLoaded("advancementParentTab");
+        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
+        ensureSectionLoaded("strategicOperationsParentTab");
+    }
+
+    private JTabbedPane createSectionContent(SectionFactory sectionFactory) {
+        suppressRouteRegistration = true;
+        try {
+            return sectionFactory.create();
+        } finally {
+            suppressRouteRegistration = false;
+        }
+    }
+
+    private void setLegacyTabComponent(String resourceName, Component component) {
+        Integer tabIndex = topLevelTabIndexes.get(resourceName);
+        if (tabIndex != null) {
+            legacyTabbedPane.setComponentAt(tabIndex, component);
+        }
+    }
+
+    @FunctionalInterface
+    private interface SectionFactory {
+        JTabbedPane create();
+    }
+
+    private void registerStaticRoute(String id, String... titleResourceNames) {
+        registerRoute(id, titleResourceNames);
+    }
+
+      private void registerDirectPage(String routeId, Supplier<Component> pageFactory) {
+            directPageFactories.put(routeId, pageFactory);
+      }
+
+      private void ensureDirectPagesLoaded() {
+            for (String routeId : directPageFactories.keySet()) {
+                  directPageCache.computeIfAbsent(routeId, id -> directPageFactories.get(id).get());
+            }
+      }
+
+    private void registerRoute(String id, String[] titleResourceNames, TabSelection... selections) {
+        if (suppressRouteRegistration) {
+            return;
+        }
+
+        List<String> path = new ArrayList<>();
+        for (String titleResourceName : titleResourceNames) {
+            path.add(getTextAt(getCampaignOptionsResourceBundle(), titleResourceName + ".title"));
+        }
+
+        navigationTargets.add(new CampaignOptionsRoute(id, path, List.of(titleResourceNames)));
+    }
+
+    private static class TabSelection {
+        private TabSelection(JTabbedPane tabbedPane, String titleResourceName) {
         }
     }
 
@@ -215,23 +561,108 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      *
      * @return a {@link JScrollPane} containing the general tab panel
      */
-    private JScrollPane createGeneralTab(CampaignOptionsDialogMode mode) {
-        generalTab = new GeneralTab(campaign, getFrame(), mode);
+    private JPanel createGeneralTab(CampaignOptionsDialogMode mode) {
+        generalTab = new GeneralTab(campaign, frame, mode);
         JPanel createdGeneralTab = generalTab.createGeneralTab();
         generalTab.loadValuesFromCampaignOptions();
 
-        return new JScrollPane(createdGeneralTab);
+        return createdGeneralTab;
     }
 
-    /**
-     * Creates the "Human Resources" parent tab. This tab organizes related sub-tabs concerning personnel management,
-     * relationships, turnover, and biography options.
-     *
-     * @return a {@link JTabbedPane} containing sub-tabs for the human resources category
-     */
+      private JPanel createPersonnelGeneralTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdPersonnelGeneralTab = personnelTab.createGeneralTab();
+            personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
+
+            return createdPersonnelGeneralTab;
+      }
+
+      private JPanel createPersonnelAwardsTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdPersonnelAwardsTab = personnelTab.createAwardsTab();
+            personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
+
+            return createdPersonnelAwardsTab;
+      }
+
+      private JPanel createPersonnelMedicalTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdPersonnelMedicalTab = personnelTab.createMedicalTab();
+            personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
+
+            return createdPersonnelMedicalTab;
+      }
+
+      private JPanel createPersonnelInformationTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdPersonnelInformationTab = personnelTab.createPersonnelInformationTab();
+            personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
+
+            return createdPersonnelInformationTab;
+      }
+
+      private JPanel createPersonnelPrisonersAndDependentsTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdPersonnelPrisonersAndDependentsTab = personnelTab.createPrisonersAndDependentsTab();
+            personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
+
+            return createdPersonnelPrisonersAndDependentsTab;
+      }
+
+      private JPanel createBiographyGeneralTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdBiographyGeneralTab = biographyTab.createGeneralTab();
+            biographyTab.loadValuesFromCampaignOptions();
+
+            return createdBiographyGeneralTab;
+      }
+
+      private JPanel createBiographyBackgroundsTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdBiographyBackgroundsTab = biographyTab.createBackgroundsTab();
+            biographyTab.loadValuesFromCampaignOptions();
+
+            return createdBiographyBackgroundsTab;
+      }
+
+      private JPanel createBiographyDeathTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdBiographyDeathTab = biographyTab.createDeathTab();
+            biographyTab.loadValuesFromCampaignOptions();
+
+            return createdBiographyDeathTab;
+      }
+
+      private JPanel createBiographyEducationTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdBiographyEducationTab = biographyTab.createEducationTab();
+            biographyTab.loadValuesFromCampaignOptions();
+
+            return createdBiographyEducationTab;
+      }
+
+      private JPanel createBiographyNameAndPortraitGenerationTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdBiographyNameAndPortraitGenerationTab = biographyTab.createNameAndPortraitGenerationTab();
+            biographyTab.loadValuesFromCampaignOptions();
+
+            return createdBiographyNameAndPortraitGenerationTab;
+      }
+
+      private JPanel createBiographyRankTab() {
+            ensureSectionLoaded("humanResourcesParentTab");
+            JPanel createdBiographyRankTab = biographyTab.createRankTab();
+            biographyTab.loadValuesFromCampaignOptions();
+
+            return createdBiographyRankTab;
+      }
+
     private JTabbedPane createHumanResourcesParentTab() {
         // Parent Tab
         JTabbedPane humanResourcesParentTab = new JTabbedPane();
+        registerRoute("human-resources",
+              new String[] { "humanResourcesParentTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"));
 
         // Personnel
         personnelTab = new PersonnelTab(campaignOptions);
@@ -246,7 +677,35 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               personnelTab.createPrisonersAndDependentsTab(),
               "medicalTab", personnelTab.createMedicalTab()));
         personnelTab.loadValuesFromCampaignOptions(campaign.getVersion());
-
+        registerRoute("human-resources.personnel",
+              new String[] { "humanResourcesParentTab", "personnelContentTabs" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "personnelContentTabs"));
+        registerRoute("human-resources.personnel.general",
+              new String[] { "humanResourcesParentTab", "personnelContentTabs", "personnelGeneralTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "personnelContentTabs"),
+              new TabSelection(personnelContentTabs, "personnelGeneralTab"));
+        registerRoute("human-resources.personnel.awards",
+              new String[] { "humanResourcesParentTab", "personnelContentTabs", "awardsTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "personnelContentTabs"),
+              new TabSelection(personnelContentTabs, "awardsTab"));
+        registerRoute("human-resources.personnel.medical",
+              new String[] { "humanResourcesParentTab", "personnelContentTabs", "medicalTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "personnelContentTabs"),
+              new TabSelection(personnelContentTabs, "medicalTab"));
+        registerRoute("human-resources.personnel.information",
+              new String[] { "humanResourcesParentTab", "personnelContentTabs", "personnelInformationTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "personnelContentTabs"),
+              new TabSelection(personnelContentTabs, "personnelInformationTab"));
+        registerRoute("human-resources.personnel.prisoners-and-civilians",
+              new String[] { "humanResourcesParentTab", "personnelContentTabs", "prisonersAndDependentsTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "personnelContentTabs"),
+              new TabSelection(personnelContentTabs, "prisonersAndDependentsTab"));
         // Biography
         biographyTab = new BiographyTab(campaign, generalTab);
 
@@ -263,6 +722,40 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "rankTab",
               biographyTab.createRankTab()));
         biographyTab.loadValuesFromCampaignOptions();
+        registerRoute("human-resources.biography",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"));
+        registerRoute("human-resources.biography.general",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs", "biographyGeneralTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"),
+              new TabSelection(biographyContentTabs, "biographyGeneralTab"));
+        registerRoute("human-resources.biography.backgrounds",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs", "backgroundsTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"),
+              new TabSelection(biographyContentTabs, "backgroundsTab"));
+        registerRoute("human-resources.biography.death",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs", "deathTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"),
+              new TabSelection(biographyContentTabs, "deathTab"));
+        registerRoute("human-resources.biography.education",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs", "educationTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"),
+              new TabSelection(biographyContentTabs, "educationTab"));
+        registerRoute("human-resources.biography.name-and-portraits",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs", "nameAndPortraitGenerationTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"),
+              new TabSelection(biographyContentTabs, "nameAndPortraitGenerationTab"));
+        registerRoute("human-resources.biography.rank",
+              new String[] { "humanResourcesParentTab", "biographyContentTabs", "rankTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "biographyContentTabs"),
+              new TabSelection(biographyContentTabs, "rankTab"));
 
         // Relationships
         relationshipsTab = new RelationshipsTab(campaignOptions);
@@ -274,6 +767,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "procreationTab",
               relationshipsTab.createProcreationTab()));
         relationshipsTab.loadValuesFromCampaignOptions();
+        registerRoute("human-resources.relationships",
+              new String[] { "humanResourcesParentTab", "relationshipsContentTabs" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "relationshipsContentTabs"));
+        registerRoute("human-resources.relationships.marriage",
+              new String[] { "humanResourcesParentTab", "relationshipsContentTabs", "marriageTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "relationshipsContentTabs"),
+              new TabSelection(relationshipsContentTabs, "marriageTab"));
+        registerRoute("human-resources.relationships.divorce",
+              new String[] { "humanResourcesParentTab", "relationshipsContentTabs", "divorceTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "relationshipsContentTabs"),
+              new TabSelection(relationshipsContentTabs, "divorceTab"));
+        registerRoute("human-resources.relationships.procreation",
+              new String[] { "humanResourcesParentTab", "relationshipsContentTabs", "procreationTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "relationshipsContentTabs"),
+              new TabSelection(relationshipsContentTabs, "procreationTab"));
 
         // Personnel
         salariesTab = new SalariesTab(campaignOptions);
@@ -285,6 +797,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "2civilianSalariesTab",
               salariesTab.createSalariesTab(PersonnelRoleSubType.CIVILIAN)));
         salariesTab.loadValuesFromCampaignOptions();
+        registerRoute("human-resources.salaries",
+              new String[] { "humanResourcesParentTab", "salariesContentTabs" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "salariesContentTabs"));
+        registerRoute("human-resources.salaries.combat",
+              new String[] { "humanResourcesParentTab", "salariesContentTabs", "0combatSalariesTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "salariesContentTabs"),
+              new TabSelection(salariesContentTabs, "0combatSalariesTab"));
+        registerRoute("human-resources.salaries.support",
+              new String[] { "humanResourcesParentTab", "salariesContentTabs", "1supportSalariesTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "salariesContentTabs"),
+              new TabSelection(salariesContentTabs, "1supportSalariesTab"));
+        registerRoute("human-resources.salaries.civilian",
+              new String[] { "humanResourcesParentTab", "salariesContentTabs", "2civilianSalariesTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "salariesContentTabs"),
+              new TabSelection(salariesContentTabs, "2civilianSalariesTab"));
 
         // Turnover and Retention
         turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions);
@@ -294,6 +825,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "fatigueTab",
               turnoverAndRetentionTab.createFatigueTab()));
         turnoverAndRetentionTab.loadValuesFromCampaignOptions();
+        registerRoute("human-resources.turnover-and-retention",
+              new String[] { "humanResourcesParentTab", "turnoverAndRetentionContentTabs" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "turnoverAndRetentionContentTabs"));
+        registerRoute("human-resources.turnover-and-retention.turnover",
+              new String[] { "humanResourcesParentTab", "turnoverAndRetentionContentTabs", "turnoverTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "turnoverAndRetentionContentTabs"),
+              new TabSelection(turnoverAndRetentionContentTabs, "turnoverTab"));
+        registerRoute("human-resources.turnover-and-retention.fatigue",
+              new String[] { "humanResourcesParentTab", "turnoverAndRetentionContentTabs", "fatigueTab" },
+              new TabSelection(legacyTabbedPane, "humanResourcesParentTab"),
+              new TabSelection(humanResourcesParentTab, "turnoverAndRetentionContentTabs"),
+              new TabSelection(turnoverAndRetentionContentTabs, "fatigueTab"));
 
         // Add Tabs
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
@@ -310,12 +855,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               4,
               getTextAt(getCampaignOptionsResourceBundle(), "salariesContentTabs.title")), salariesContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-                    4, getTextAt(getCampaignOptionsResourceBundle(), "humanResourcesParentTab.title")),
-              humanResourcesParentTab);
-
         return humanResourcesParentTab;
-    }
+      }
 
     /**
      * Creates the "Advancement" parent tab. This tab organizes related sub-tabs for awards, skill randomization,
@@ -326,6 +867,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JTabbedPane createAdvancementParentTab() {
         // Parent Tab
         JTabbedPane advancementParentTab = new JTabbedPane();
+        registerRoute("advancement",
+              new String[] { "advancementParentTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"));
 
         // Advancement
         advancementTab = new AdvancementTab(campaign);
@@ -337,6 +881,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "2recruitmentBonusesTab",
               advancementTab.recruitmentBonusesTab()));
         advancementTab.loadValuesFromCampaignOptions();
+        registerRoute("advancement.awards-and-randomization",
+              new String[] { "advancementParentTab", "awardsAndRandomizationContentTabs" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "awardsAndRandomizationContentTabs"));
+        registerRoute("advancement.awards-and-randomization.randomization",
+              new String[] { "advancementParentTab", "awardsAndRandomizationContentTabs", "0randomizationTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "awardsAndRandomizationContentTabs"),
+              new TabSelection(awardsAndRandomizationContentTabs, "0randomizationTab"));
+        registerRoute("advancement.awards-and-randomization.xp-awards",
+              new String[] { "advancementParentTab", "awardsAndRandomizationContentTabs", "1xpAwardsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "awardsAndRandomizationContentTabs"),
+              new TabSelection(awardsAndRandomizationContentTabs, "1xpAwardsTab"));
+        registerRoute("advancement.awards-and-randomization.recruitment-bonuses",
+              new String[] { "advancementParentTab", "awardsAndRandomizationContentTabs", "2recruitmentBonusesTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "awardsAndRandomizationContentTabs"),
+              new TabSelection(awardsAndRandomizationContentTabs, "2recruitmentBonusesTab"));
 
         // Skills
         skillsTab = new SkillsTab(campaignOptions);
@@ -352,6 +915,35 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "4roleplaySkillsTab",
               skillsTab.createSkillsTab(ROLEPLAY_GENERAL)));
         skillsTab.loadValuesFromCampaignOptions();
+        registerRoute("advancement.skills",
+              new String[] { "advancementParentTab", "skillsContentTabs" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "skillsContentTabs"));
+        registerRoute("advancement.skills.gunnery",
+              new String[] { "advancementParentTab", "skillsContentTabs", "0gunnerySkillsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "skillsContentTabs"),
+              new TabSelection(skillsContentTabs, "0gunnerySkillsTab"));
+        registerRoute("advancement.skills.piloting",
+              new String[] { "advancementParentTab", "skillsContentTabs", "1pilotingSkillsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "skillsContentTabs"),
+              new TabSelection(skillsContentTabs, "1pilotingSkillsTab"));
+        registerRoute("advancement.skills.support",
+              new String[] { "advancementParentTab", "skillsContentTabs", "2supportSkillsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "skillsContentTabs"),
+              new TabSelection(skillsContentTabs, "2supportSkillsTab"));
+        registerRoute("advancement.skills.utility",
+              new String[] { "advancementParentTab", "skillsContentTabs", "3utilitySkillsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "skillsContentTabs"),
+              new TabSelection(skillsContentTabs, "3utilitySkillsTab"));
+        registerRoute("advancement.skills.roleplay",
+              new String[] { "advancementParentTab", "skillsContentTabs", "4roleplaySkillsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "skillsContentTabs"),
+              new TabSelection(skillsContentTabs, "4roleplaySkillsTab"));
 
         // SPAs
         abilitiesTab = new AbilitiesTab();
@@ -367,6 +959,35 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "4characterCreationOnlyTab",
               abilitiesTab.createAbilitiesTab(CHARACTER_CREATION_ONLY)));
         // the loading of values from the campaign is built into the AbilitiesTab class so not called here.
+        registerRoute("advancement.abilities",
+              new String[] { "advancementParentTab", "abilityContentTabs" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "abilityContentTabs"));
+        registerRoute("advancement.abilities.combat",
+              new String[] { "advancementParentTab", "abilityContentTabs", "0combatAbilitiesTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "abilityContentTabs"),
+              new TabSelection(abilityContentTabs, "0combatAbilitiesTab"));
+        registerRoute("advancement.abilities.maneuvering",
+              new String[] { "advancementParentTab", "abilityContentTabs", "1maneuveringAbilitiesTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "abilityContentTabs"),
+              new TabSelection(abilityContentTabs, "1maneuveringAbilitiesTab"));
+        registerRoute("advancement.abilities.utility",
+              new String[] { "advancementParentTab", "abilityContentTabs", "2utilityAbilitiesTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "abilityContentTabs"),
+              new TabSelection(abilityContentTabs, "2utilityAbilitiesTab"));
+        registerRoute("advancement.abilities.character-flaws",
+              new String[] { "advancementParentTab", "abilityContentTabs", "3characterFlawsTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "abilityContentTabs"),
+              new TabSelection(abilityContentTabs, "3characterFlawsTab"));
+        registerRoute("advancement.abilities.character-creation-only",
+              new String[] { "advancementParentTab", "abilityContentTabs", "4characterCreationOnlyTab" },
+              new TabSelection(legacyTabbedPane, "advancementParentTab"),
+              new TabSelection(advancementParentTab, "abilityContentTabs"),
+              new TabSelection(abilityContentTabs, "4characterCreationOnlyTab"));
 
         // Add Tabs
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
@@ -377,11 +998,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4, getTextAt(getCampaignOptionsResourceBundle(), "abilityContentTabs.title")), abilityContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-              4, getTextAt(getCampaignOptionsResourceBundle(), "advancementParentTab.title")), advancementParentTab);
-
         return advancementParentTab;
-    }
+      }
 
     /**
      * Creates the "Logistics and Maintenance" parent tab. This tab organizes related sub-tabs for equipment
@@ -392,6 +1010,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JTabbedPane createEquipmentAndSuppliesParentTab() {
         // Parent Tab
         JTabbedPane equipmentAndSuppliesParentTab = new JTabbedPane();
+        registerRoute("logistics",
+              new String[] { "logisticsAndMaintenanceParentTab" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"));
 
         // Repair and Maintenance
         repairAndMaintenanceTab = new RepairAndMaintenanceTab(campaignOptions);
@@ -401,6 +1022,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "maintenanceTab",
               repairAndMaintenanceTab.createMaintenanceTab()));
         repairAndMaintenanceTab.loadValuesFromCampaignOptions();
+        registerRoute("logistics.repairs-and-maintenance",
+              new String[] { "logisticsAndMaintenanceParentTab", "repairsAndMaintenanceContentTabs" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "repairsAndMaintenanceContentTabs"));
+        registerRoute("logistics.repairs-and-maintenance.repairs",
+              new String[] { "logisticsAndMaintenanceParentTab", "repairsAndMaintenanceContentTabs", "repairTab" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "repairsAndMaintenanceContentTabs"),
+              new TabSelection(repairsAndMaintenanceContentTabs, "repairTab"));
+        registerRoute("logistics.repairs-and-maintenance.maintenance",
+              new String[] { "logisticsAndMaintenanceParentTab", "repairsAndMaintenanceContentTabs", "maintenanceTab" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "repairsAndMaintenanceContentTabs"),
+              new TabSelection(repairsAndMaintenanceContentTabs, "maintenanceTab"));
 
         // Supplies and Acquisition
         equipmentAndSuppliesTab = new EquipmentAndSuppliesTab(campaignOptions);
@@ -412,6 +1047,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "techLimitsTab",
               equipmentAndSuppliesTab.createTechLimitsTab()));
         equipmentAndSuppliesTab.loadValuesFromCampaignOptions();
+        registerRoute("logistics.supplies-and-acquisition",
+              new String[] { "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "suppliesAndAcquisitionContentTabs"));
+        registerRoute("logistics.supplies-and-acquisition.acquisition",
+              new String[] { "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs", "acquisitionTab" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "suppliesAndAcquisitionContentTabs"),
+              new TabSelection(suppliesAndAcquisitionContentTabs, "acquisitionTab"));
+        registerRoute("logistics.supplies-and-acquisition.planetary-acquisition",
+              new String[] { "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs",
+                         "planetaryAcquisitionTab" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "suppliesAndAcquisitionContentTabs"),
+              new TabSelection(suppliesAndAcquisitionContentTabs, "planetaryAcquisitionTab"));
+        registerRoute("logistics.supplies-and-acquisition.tech-limits",
+              new String[] { "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs", "techLimitsTab" },
+              new TabSelection(legacyTabbedPane, "logisticsAndMaintenanceParentTab"),
+              new TabSelection(equipmentAndSuppliesParentTab, "suppliesAndAcquisitionContentTabs"),
+              new TabSelection(suppliesAndAcquisitionContentTabs, "techLimitsTab"));
 
         // Add tabs
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
@@ -421,12 +1076,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     4, getTextAt(getCampaignOptionsResourceBundle(), "repairsAndMaintenanceContentTabs.title")),
               repairsAndMaintenanceContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-                    4, getTextAt(getCampaignOptionsResourceBundle(), "logisticsAndMaintenanceParentTab.title")),
-              equipmentAndSuppliesParentTab);
-
         return equipmentAndSuppliesParentTab;
-    }
+      }
 
     /**
      * Creates the "Strategic Operations" parent tab. This tab organizes related sub-tabs for finances, market
@@ -437,6 +1088,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JTabbedPane createStrategicOperationsParentTab() {
         // Parent Tab
         JTabbedPane strategicOperationsParentTab = new JTabbedPane();
+        registerRoute("operations",
+              new String[] { "strategicOperationsParentTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"));
 
         // Finances
         financesTab = new FinancesTab(campaign);
@@ -446,6 +1100,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "priceMultipliersTab",
               financesTab.createPriceMultipliersTab()));
         financesTab.loadValuesFromCampaignOptions();
+        registerRoute("operations.finances",
+              new String[] { "strategicOperationsParentTab", "financesContentTabs" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "financesContentTabs"));
+        registerRoute("operations.finances.general",
+              new String[] { "strategicOperationsParentTab", "financesContentTabs", "financesGeneralTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "financesContentTabs"),
+              new TabSelection(financesContentTabs, "financesGeneralTab"));
+        registerRoute("operations.finances.price-multipliers",
+              new String[] { "strategicOperationsParentTab", "financesContentTabs", "priceMultipliersTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "financesContentTabs"),
+              new TabSelection(financesContentTabs, "priceMultipliersTab"));
 
         // Markets
         marketsTab = new MarketsTab(campaign);
@@ -457,6 +1125,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "contractMarketTab",
               marketsTab.createContractMarketTab()));
         marketsTab.loadValuesFromCampaignOptions();
+        registerRoute("operations.markets",
+              new String[] { "strategicOperationsParentTab", "marketsContentTabs" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "marketsContentTabs"));
+        registerRoute("operations.markets.personnel",
+              new String[] { "strategicOperationsParentTab", "marketsContentTabs", "personnelMarketTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "marketsContentTabs"),
+              new TabSelection(marketsContentTabs, "personnelMarketTab"));
+        registerRoute("operations.markets.units",
+              new String[] { "strategicOperationsParentTab", "marketsContentTabs", "unitMarketTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "marketsContentTabs"),
+              new TabSelection(marketsContentTabs, "unitMarketTab"));
+        registerRoute("operations.markets.contracts",
+              new String[] { "strategicOperationsParentTab", "marketsContentTabs", "contractMarketTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "marketsContentTabs"),
+              new TabSelection(marketsContentTabs, "contractMarketTab"));
 
         // Systems
         systemsTab = new SystemsTab(campaign);
@@ -466,12 +1153,40 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "factionStandingTab", systemsTab.createFactionStandingTab(),
               "atowTab", systemsTab.createATOWTab()));
         systemsTab.loadValuesFromCampaignOptions();
+        registerRoute("operations.systems",
+              new String[] { "strategicOperationsParentTab", "systemsContentTabs" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "systemsContentTabs"));
+        registerRoute("operations.systems.reputation",
+              new String[] { "strategicOperationsParentTab", "systemsContentTabs", "reputationTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "systemsContentTabs"),
+              new TabSelection(systemsContentTabs, "reputationTab"));
+        registerRoute("operations.systems.faction-standing",
+              new String[] { "strategicOperationsParentTab", "systemsContentTabs", "factionStandingTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "systemsContentTabs"),
+              new TabSelection(systemsContentTabs, "factionStandingTab"));
+        registerRoute("operations.systems.a-time-of-war",
+              new String[] { "strategicOperationsParentTab", "systemsContentTabs", "atowTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "systemsContentTabs"),
+              new TabSelection(systemsContentTabs, "atowTab"));
 
         // Rulesets
         rulesetsTab = new RulesetsTab(campaignOptions);
 
         JTabbedPane rulesetsContentTabs = createSubTabs(Map.of("stratConGeneralTab",
               rulesetsTab.createStratConTab()));
+        registerRoute("operations.rulesets",
+              new String[] { "strategicOperationsParentTab", "rulesetsContentTabs" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "rulesetsContentTabs"));
+        registerRoute("operations.rulesets.stratcon",
+              new String[] { "strategicOperationsParentTab", "rulesetsContentTabs", "stratConGeneralTab" },
+              new TabSelection(legacyTabbedPane, "strategicOperationsParentTab"),
+              new TabSelection(strategicOperationsParentTab, "rulesetsContentTabs"),
+              new TabSelection(rulesetsContentTabs, "stratConGeneralTab"));
 
         // Enable the below section and remove the above in the event we have Legacy Options. In 50.10 all legacy
         // options (at that time) were removed, so this section got commented out.
@@ -492,12 +1207,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
               4, getTextAt(getCampaignOptionsResourceBundle(), "rulesetsContentTabs.title")), rulesetsContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-                    4, getTextAt(getCampaignOptionsResourceBundle(), "strategicOperationsParentTab.title")),
-              strategicOperationsParentTab);
-
         return strategicOperationsParentTab;
-    }
+      }
 
     /**
      * Applies the currently configured campaign options to the active {@link Campaign}. This method processes all tabs
@@ -511,6 +1222,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, CampaignOptionsDialogMode mode,
           boolean isSaveAction) {
         boolean isStartUp = mode == STARTUP || mode == STARTUP_ABRIDGED;
+
+        if (preset != null || isSaveAction) {
+            ensureAllSectionsLoaded();
+        }
 
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
@@ -531,26 +1246,34 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         generalTab.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
 
         // Human Resources
-        personnelTab.applyCampaignOptionsToCampaign(campaign, options);
-        biographyTab.applyCampaignOptionsToCampaign(options);
-        relationshipsTab.applyCampaignOptionsToCampaign(options);
-        salariesTab.applyCampaignOptionsToCampaign(options);
-        turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
+        if (humanResourcesParentTab != null) {
+            personnelTab.applyCampaignOptionsToCampaign(campaign, options);
+            biographyTab.applyCampaignOptionsToCampaign(options);
+            relationshipsTab.applyCampaignOptionsToCampaign(options);
+            salariesTab.applyCampaignOptionsToCampaign(options);
+            turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
+        }
 
         // Advancement
-        advancementTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
-        skillsTab.applyCampaignOptionsToCampaign(options, presetSkills);
-        abilitiesTab.applyCampaignOptionsToCampaign(preset);
+        if (advancementParentTab != null) {
+            advancementTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            skillsTab.applyCampaignOptionsToCampaign(options, presetSkills);
+            abilitiesTab.applyCampaignOptionsToCampaign(preset);
+        }
 
         // Logistics
-        equipmentAndSuppliesTab.applyCampaignOptionsToCampaign(options);
-        repairAndMaintenanceTab.applyCampaignOptionsToCampaign(options);
+        if (equipmentAndSuppliesParentTab != null) {
+            equipmentAndSuppliesTab.applyCampaignOptionsToCampaign(options);
+            repairAndMaintenanceTab.applyCampaignOptionsToCampaign(options);
+        }
 
         // Operations
-        financesTab.applyCampaignOptionsToCampaign(options);
-        marketsTab.applyCampaignOptionsToCampaign(options);
-        rulesetsTab.applyCampaignOptionsToCampaign(options);
-        systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+        if (strategicOperationsParentTab != null) {
+            financesTab.applyCampaignOptionsToCampaign(options);
+            marketsTab.applyCampaignOptionsToCampaign(options);
+            rulesetsTab.applyCampaignOptionsToCampaign(options);
+            systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+        }
 
         // Tidy up
         if (preset == null) {
@@ -569,7 +1292,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
         triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
     }
-
     /**
      * Compares a previously-recorded {@link CampaignOptionsFreebieTracker} snapshot against a new snapshot and triggers
      * any one-time handlers required when critical campaign options are enabled.
@@ -628,70 +1350,70 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (String report : reports) {
                 if (report != null && !report.isBlank()) {
                     campaign.addReport(POLITICS, report);
-                }
-            }
-        }
+    }
+    }
+    }
 
         boolean newIsAwardVeterancySPAs = newOptions.awardVeterancySPAs();
         if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
             new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();
         if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsTrackPrisoners = newOptions.trackPrisoners();
         if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
             new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseFatigue = newOptions.useFatigue();
         if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
             new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseAdvancedSalvage = newOptions.useAdvancedSalvage();
         if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
             new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseStratCon = newOptions.useStratCon();
         if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
             new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseMapless = newOptions.useMapless();
         if (!isStartUp && newIsUseMapless && !oldIsUseMapless) { // Has tracking changed?
             new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseAdvancedScouting = newOptions.useAdvancedScouting() && newIsUseStratCon;
         if (!isStartUp && newIsUseAdvancedScouting && !oldIsUseAdvancedScouting) { // Has tracking changed?
             new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseAltAdvancedMedical = newOptions.useAltAdvancedMedical();
         if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
             new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsUseDiseases = newIsUseAltAdvancedMedical && newOptions.useDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
             inoculateAllCharacters(campaign);
-        }
+    }
 
         boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel();
         if (!isStartUp && newUseNormalizedContractPayModel && !oldUseNormalizedContractPayModel) {
             new NormalizedContractPayCampaignOptionsChangedConfirmationDialog(campaign);
-        }
+    }
 
         boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay();
         if (!isStartUp && newIsDiminishReturnsContractPay && !oldIsDiminishReturnsContractPay) {
             new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
-        }
     }
+      }
 
     /**
      * Inoculates all campaign personnel for their current planet and origin planet.
@@ -759,7 +1481,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         }
     }
-
     /**
      * Use {@link #applyPreset(CampaignPreset, boolean)} instead
      */
@@ -781,6 +1502,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             return;
         }
 
+        ensureAllSectionsLoaded();
+      ensureDirectPagesLoaded();
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
 
         LocalDate presetDate = campaign.getLocalDate();
