@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MekHQ Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,7 +16,7 @@
  * A copy of the GPL should have been included with this project;
  * if not, see <https://www.gnu.org/licenses/>.
  *
- * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * NOTICE: The MekHQ organization is a non-profit group of volunteers
  * creating free software for the BattleTech community.
  *
  * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
@@ -78,9 +78,7 @@ public class AddSupportUnitsToTOE {
 
         FormationType type = supportTOEFormationTypes.getType();
         String label = supportTOEFormationTypes.getLabel();
-        Formation subFormation = createSubFormation(label, type, units);
-
-        campaign.addFormation(subFormation, hqFormation);
+        createSubFormation(campaign, label, type, units, hqFormation);
     }
 
     /**
@@ -90,25 +88,29 @@ public class AddSupportUnitsToTOE {
      * {@link FormationType}. Each unit's ID is then registered with the formation. The formation type is largely
      * presentational for support formations and does not affect gameplay calculations.</p>
      *
-     * @param label the display name for the new formation
-     * @param type  the {@link FormationType} to assign to the formation
-     * @param units the list of {@link Unit} objects whose IDs will be added to the formation; must not be {@code null},
-     *              but may be empty
+     * @param campaign    the campaign context, used to register the units with the formation
+     * @param label       the display name for the new formation
+     * @param type        the {@link FormationType} to assign to the formation
+     * @param units       the list of {@link Unit} objects whose IDs will be added to the formation; must not be
+     *                    {@code null}, but may be empty
+     * @param hqFormation the HQ {@link Formation} to attach the new formation to; must not be {@code null}
      *
      * @return a fully populated, non-{@code null} {@link Formation} ready to be registered with the campaign
      *
      * @author Illiani
      * @since 0.51.0
      */
-    private static @NonNull Formation createSubFormation(String label, FormationType type, List<Unit> units) {
+    private static void createSubFormation(Campaign campaign, String label, FormationType type,
+          List<Unit> units, Formation hqFormation) {
         Formation subFormation = new Formation(label);
         subFormation.setFormationType(type, true); // Largely irrelevant
 
+        int subFormationId = subFormation.getId();
         for (Unit unit : units) {
-            subFormation.addUnit(unit.getId());
+            campaign.addUnitToFormation(unit, subFormationId);
         }
 
-        return subFormation;
+        campaign.addFormation(subFormation, hqFormation);
     }
 
     /**
