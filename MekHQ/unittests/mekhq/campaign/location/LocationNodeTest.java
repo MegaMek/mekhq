@@ -130,7 +130,7 @@ public class LocationNodeTest {
         }
     }
 
-    /** Tests for {@link LocationNode#getCurrentLocation()}. */
+    /** Tests for {@link LocationNode#getNearestAbstractLocation()}. */
     @Nested
     class GetCurrentLocation {
 
@@ -146,7 +146,7 @@ public class LocationNodeTest {
         @Test
         void returnsItselfWhenLocatableIsCurrentLocation() {
             LocationNode node = currentLocation.getLocationNode();
-            assertSame(currentLocation, node.getCurrentLocation());
+            assertSame(currentLocation, node.getNearestAbstractLocation());
         }
 
         @Test
@@ -156,7 +156,7 @@ public class LocationNodeTest {
             LocationNode child = new LocationNode(childLocatable);
             LocationManager.setLocation(child, currentLocation.getLocationNode());
 
-            assertSame(currentLocation, child.getCurrentLocation());
+            assertSame(currentLocation, child.getNearestAbstractLocation());
         }
 
         @Test
@@ -164,7 +164,7 @@ public class LocationNodeTest {
             // plain AbstractLocation — not a CurrentLocation
             ILocation plainLoc = mock(ILocation.class);
             LocationNode node = new LocationNode(plainLoc);
-            assertNull(node.getCurrentLocation());
+            assertNull(node.getNearestAbstractLocation());
         }
 
         @Test
@@ -177,7 +177,7 @@ public class LocationNodeTest {
             LocationManager.setLocation(mid, currentLocation.getLocationNode());
             LocationManager.setLocation(leaf, mid);
 
-            assertSame(currentLocation, leaf.getCurrentLocation());
+            assertSame(currentLocation, leaf.getNearestAbstractLocation());
         }
     }
 

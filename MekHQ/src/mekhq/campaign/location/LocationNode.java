@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -65,22 +66,9 @@ public class LocationNode {
     }
 
     @Nullable
-    public AbstractLocation getCurrentLocation() {
+    public AbstractLocation getNearestAbstractLocation() {
         if (locatable instanceof AbstractLocation abstractLocation) {
             return abstractLocation;
-        }
-
-        if (parent != null) {
-            return parent.getCurrentLocation();
-        }
-
-        return null;
-    }
-
-    //TODO RENAME ME
-    public mekhq.campaign.AbstractLocation getNearestAbstractLocation() {
-        if (locatable instanceof mekhq.campaign.AbstractLocation loc) {
-            return loc;
         }
 
         if (parent != null) {
