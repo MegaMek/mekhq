@@ -293,8 +293,26 @@ public class PrisonerEventManager {
         }
 
         // Does the minor event escalate into a major event?
-        processWarning((int) round(totalPrisoners * overflowPercentage));
-        return List.of(true, false);
+        eventRoll = randomInt(50);
+        boolean majorEvent = minorEvent &&
+                                   (totalPrisoners > MINIMUM_PRISONER_COUNT) &&
+                                   (eventRoll < overflowPercentage || eventRoll == 0);
+
+        // If there is no event, throw up a warning and give the player an opportunity to do
+        // something about the situation.
+        if (!minorEvent) {
+            if (overflowPercentage > 0 && !isHeadless) {
+                processWarning((int) round(totalPrisoners * overflowPercentage));
+            }
+
+            return List.of(false, false);
+        }
+
+        // Random Event
+        if (!isHeadless) {
+            processRandomEvent(majorEvent);
+        }
+        return List.of(true, majorEvent);
     }
 
     /**
