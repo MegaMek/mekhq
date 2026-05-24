@@ -36,6 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.universe.companyGeneration.SupportTOEFormationTypes.SECURITY_FORMATION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -49,6 +50,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -67,6 +70,7 @@ import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.companyGeneration.AddSupportUnitsToTOE;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -207,6 +211,7 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
             return;
         }
 
+        List<Unit> units = new ArrayList<>();
         try {
             PartQuality quality = PartQuality.QUALITY_D;
             if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
@@ -216,12 +221,18 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
             if (automaticallyAssignRanks) {
                 if (unit != null) {
                     AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
+
+                    units.add(unit);
                 }
             }
         } catch (Exception e) {
             LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
                   mekSummary.getSourceFile(),
                   mekSummary.getEntryName());
+        }
+
+        if (!units.isEmpty()) {
+            AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, SECURITY_FORMATION);
         }
     }
 }
