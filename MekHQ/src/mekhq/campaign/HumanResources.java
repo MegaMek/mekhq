@@ -1942,7 +1942,7 @@ public class HumanResources {
                         add));
         }
 
-        CurrentLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (location.isOnPlanet()) {
             Planet planet = location.getPlanet();
             String planetId = planet.getId();
