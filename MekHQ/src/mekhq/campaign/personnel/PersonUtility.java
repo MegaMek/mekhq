@@ -45,7 +45,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 
@@ -75,7 +74,7 @@ public class PersonUtility {
         int skillLevelValue = skillLevel.getExperienceLevel();
         if (skillLevelValue > 0) {
             AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+            specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
             specialAbilityGenerator.generateSpecialAbilities(campaign, person, skillLevelValue);
         }
     }

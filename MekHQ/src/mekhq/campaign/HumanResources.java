@@ -2157,7 +2157,7 @@ public class HumanResources {
 
             if (experienceLevel >= 0) {
                 AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-                specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+                specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
                 specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
             }
 
