@@ -74,6 +74,10 @@ public class AddSupportUnitsToTOE {
      */
     public static void addSupportUnitsToTOE(Campaign campaign, List<Unit> units,
           SupportTOEFormationTypes supportTOEFormationTypes) {
+        if (units.isEmpty()) {
+            return;
+        }
+
         Formation hqFormation = getHqFormation(campaign);
 
         FormationType type = supportTOEFormationTypes.getType();
