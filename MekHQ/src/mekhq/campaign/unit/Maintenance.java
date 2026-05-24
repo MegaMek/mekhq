@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -425,8 +425,8 @@ public class Maintenance {
         }
 
         if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
-                Planet planet = campaign.getLocation().getPlanet();
+            if (campaign.getCurrentLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
+                Planet planet = campaign.getCurrentLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
                 int temperature = planet.getTemperature(campaign.getLocalDate());

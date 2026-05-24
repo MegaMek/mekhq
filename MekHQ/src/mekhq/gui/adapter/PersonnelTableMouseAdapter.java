@@ -39,6 +39,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
@@ -1633,7 +1634,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
-                Inoculations.triggerDiseaseSpreadMessages(getCampaign(), !getCampaign().getLocation().isOnPlanet(),
+                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
+                      !getCampaign().getCurrentLocation().isOnPlanet(),
                       Set.of(disease.getSimpleName()));
                 for (Person person : people) {
                     Inoculations.applyDisease(getCampaign(), person, disease);
@@ -2257,7 +2259,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         popup.add(menu);
 
         if (!StaticChecks.areAnyFree(selected)) {
-            if (getCampaign().getLocation().isOnPlanet()) {
+            if (getCampaign().getCurrentLocation().isOnPlanet()) {
                 popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
             } else {
@@ -2443,7 +2445,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(resources.getString("performAdvancedSurgery.text"));
             menuItem.addActionListener(ev -> {
                 for (Person selectedPerson : getSelectedPeople()) {
-                    new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson, false);
+                    if (selectedPerson.getStatus().isDead()) {
+                        String report = getFormattedText(
+                              "performAdvancedSurgery.report.characterDead",
+                              selectedPerson.getHyperlinkedFullTitle());
+                        getCampaign().addReport(MEDICAL, report);
+                    } else {
+                        new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson, false);
+                    }
                 }
             });
             popup.add(menuItem);
@@ -3888,7 +3897,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("coverIllicitMedicalExpenses.text"));
-        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("coverIllicitMedicalExpenses.toolTipText"),
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString(
+                    "coverIllicitMedicalExpenses.toolTipText"),
               100));
         cbMenuItem.setName("coverIllicitMedicalExpenses");
         cbMenuItem.setSelected(selected.length == 1 && person.isCoverIllicitMedicalExpenses());
