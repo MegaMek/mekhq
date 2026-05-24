@@ -56,12 +56,12 @@ public enum SupportTOEFormationTypes {
         this.type = type;
     }
 
-    private final static String RESOURCE_BUNDLE = "mekhq.resources.SupportTOEFormationTypes";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SupportTOEFormationTypes";
 
     private String generateLabel() {
-        final String RESOURCE_KEY = "SupportTOEFormationTypes." + lookupName + ".label";
+        final String resourceKey = "SupportTOEFormationTypes." + lookupName + ".label";
 
-        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        return getTextAt(RESOURCE_BUNDLE, resourceKey);
     }
 
     public String getLabel() {
