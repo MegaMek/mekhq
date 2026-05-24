@@ -298,23 +298,10 @@ public class LanceAssignmentView extends JPanel {
             return;
         }
 
-        List<String> shortfalls = new ArrayList<>();
-        for (int row = 0; row < requiredLancesModel.getRowCount(); row++) {
-            List<String> contractShortfalls = new ArrayList<>();
-            for (int column = RequiredLancesTableModel.COL_TOTAL; column < RequiredLancesTableModel.COL_NUM; column++) {
-                Object value = requiredLancesModel.getValueAt(row, column);
-                if ((value instanceof String text) && text.contains("/")) {
-                    contractShortfalls.add(requiredLancesModel.getColumnName(column) + ' ' + text);
-                }
-            }
-
-            if (!contractShortfalls.isEmpty()) {
-                shortfalls.add(escapeHtml((String) requiredLancesModel.getValueAt(row,
-                      RequiredLancesTableModel.COL_CONTRACT)) +
-                                     ": " +
-                                     escapeHtml(String.join(", ", contractShortfalls)));
-            }
-        }
+        List<String> shortfalls = requiredLancesModel.getDeploymentShortfallSummaries()
+                                      .stream()
+                                      .map(this::escapeHtml)
+                                      .toList();
 
         if (shortfalls.isEmpty()) {
             lblDeploymentSummary.setForeground(null);

@@ -425,7 +425,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
 
-        y = addForceTrees(gridBagConstraints, y);
+        y = addForceTrees(y);
 
         if (!scenario.getLoot().isEmpty()) {
             gridBagConstraints.gridx = 0;
@@ -452,12 +452,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
     }
 
-    private int addForceTrees(GridBagConstraints gridBagConstraints, int row) {
+    private int addForceTrees(int row) {
         playerForceTree.setModel(playerForceModel);
         playerForceTree.setCellRenderer(new ForceStubRenderer());
         playerForceTree.setRowHeight(50);
         playerForceTree.setRootVisible(false);
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = row++;
         gridBagConstraints.gridwidth = 3;
@@ -503,9 +503,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
             if (!(isTrueBlindDrop && (team != 1))) {
                 boolean hideInformation = isCurrent && isBlindDrop && (team != 1);
-                for (String entityString : allEntries) {
+                for (int unitIndex = 0; unitIndex < allEntries.size(); unitIndex++) {
+                    String entityString = allEntries.get(unitIndex);
                     if (hideInformation) {
-                        int unitIndex = allEntries.indexOf(entityString);
                         Entity entity = scenario.getBotForce(botIndex).getFullEntityList(campaign).get(unitIndex);
 
                         if (entity == null) {

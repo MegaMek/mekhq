@@ -195,10 +195,10 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
             if (stratconScenario != null) {
                 // Determine attributes of the scenario
-                boolean isStrategic = isStrategicScenario(scenario);
-                boolean isTurningPoint = isTurningPointScenario(scenario);
-                boolean isCrisis = isCrisisScenario(scenario);
-                boolean isDual = isDualScenario(scenario);
+                boolean isStrategic = stratconScenario.isStrategicObjective();
+                boolean isTurningPoint = stratconScenario.isTurningPoint();
+                boolean isCrisis = scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial();
+                boolean isDual = scenario.getStratConScenarioType().isOfficialChallenge();
 
                 // Set the opening span color based on scenario type (Strategic, Crisis, or Turning Point)
                 String openingSpan = "";

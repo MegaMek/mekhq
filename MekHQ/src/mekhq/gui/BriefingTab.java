@@ -1929,7 +1929,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // Autoconfigure munitions for all non-player forces once more, using finalized
             // forces
             if (getCampaignOptions().isAutoConfigMunitions()) {
-              autoconfigureBotMunitions(atBScenario, chosen);
+                autoconfigureBotMunitions(atBScenario, chosen);
             }
             configureBotAi(atBScenario);
         }

@@ -39,6 +39,7 @@ import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.SwingConstants;
 
 import mekhq.campaign.Campaign;
@@ -79,6 +80,62 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             }
         }
         return assignedCombatElements;
+    }
+
+    List<String> getDeploymentShortfallSummaries() {
+        List<String> shortfalls = new ArrayList<>();
+        for (AtBContract contract : data) {
+            List<String> contractShortfalls = new ArrayList<>();
+
+            int assignedCombatElements = getAssignedCombatElementCount(campaign, contract);
+            int requiredCombatElements = contract.getRequiredCombatElements();
+            if (assignedCombatElements < requiredCombatElements) {
+                contractShortfalls.add(columnNames[COL_TOTAL] + ' ' + assignedCombatElements + '/' +
+                                            requiredCombatElements);
+            }
+
+            CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+            int requiredRoleColumn = getColumnForRole(requiredRole);
+            if (requiredRoleColumn >= 0) {
+                int assignedRoleElements = getAssignedCombatRoleCount(contract, requiredRole);
+                int requiredRoleElements = Math.max(requiredCombatElements / 2, 1);
+                if (assignedRoleElements < requiredRoleElements) {
+                    contractShortfalls.add(columnNames[requiredRoleColumn] + ' ' + assignedRoleElements + '/' +
+                                                requiredRoleElements);
+                }
+            }
+
+            if (!contractShortfalls.isEmpty()) {
+                shortfalls.add(contract.getName() + ": " + String.join(", ", contractShortfalls));
+            }
+        }
+        return shortfalls;
+    }
+
+    private int getAssignedCombatRoleCount(AtBContract contract, CombatRole requiredRole) {
+        int assignedCombatElements = 0;
+        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+            if (contract.equals(combatTeam.getContract(campaign)) &&
+                      (combatTeam.getRole() == requiredRole) &&
+                      combatTeam.isEligible(campaign)) {
+                assignedCombatElements += combatTeam.getSize(campaign);
+            }
+        }
+        return assignedCombatElements;
+    }
+
+    private int getColumnForRole(CombatRole role) {
+        if (role == null) {
+            return -1;
+        }
+
+        return switch (role) {
+            case MANEUVER -> COL_FIGHT;
+            case FRONTLINE -> COL_DEFEND;
+            case PATROL -> COL_SCOUT;
+            case CADRE -> COL_TRAINING;
+            default -> -1;
+        };
     }
 
     @Override
@@ -137,23 +194,10 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         }
 
         CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
-        CombatRole columnRole = switch (column) {
-            case COL_FIGHT -> MANEUVER;
-            case COL_DEFEND -> FRONTLINE;
-            case COL_SCOUT -> PATROL;
-            case COL_TRAINING -> CADRE;
-            default -> null;
-        };
+        int requiredRoleColumn = getColumnForRole(requiredRole);
 
-        if (columnRole != null && requiredRole == columnRole) {
-            int t = 0;
-            for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
-                if (data.get(row).equals(combatTeam.getContract(campaign)) &&
-                          (combatTeam.getRole() == requiredRole) &&
-                          combatTeam.isEligible(campaign)) {
-                    t += combatTeam.getSize(campaign);
-                }
-            }
+        if (column == requiredRoleColumn) {
+            int t = getAssignedCombatRoleCount(contract, requiredRole);
             int required = Math.max(contract.getRequiredCombatElements() / 2, 1);
             if (t < required) {
                 return t + "/" + required;

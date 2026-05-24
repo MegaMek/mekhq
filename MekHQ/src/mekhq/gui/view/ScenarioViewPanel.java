@@ -284,7 +284,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
-                leftGbc.gridy = 0;
+        leftGbc.gridy = 0;
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
