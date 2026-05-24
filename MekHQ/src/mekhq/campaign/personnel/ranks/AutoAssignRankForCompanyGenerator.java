@@ -81,16 +81,14 @@ public final class AutoAssignRankForCompanyGenerator {
      *
      * <p>The assignment process proceeds as follows:</p>
      * <ol>
-     *   <li>The crew is sorted in descending order of experience so that more
-     *       experienced personnel receive higher ranks.</li>
+     *   <li>The crew is sorted in descending order of experience so that more experienced personnel receive higher
+     *   ranks.</li>
      *   <li>The unit commander is always assigned {@link #COMMANDER_RANK_INDEX}.</li>
-     *   <li>For Clan factions, conventional infantry members receive
-     *       {@link #CLAN_RANK}; non-military-caste members receive no rank.</li>
-     *   <li>For ComStar and Word of Blake factions, every crew member receives
-     *       {@link #COMSTAR_RANK} (Acolyte).</li>
-     *   <li>For all other factions, a number of crew members equal to the squad
-     *       leader count receive a leader-level rank, and the remaining crew
-     *       receive the next rank below.</li>
+     *   <li>For Clan factions, conventional infantry members receive {@link #CLAN_RANK}; non-military-caste members
+     *   receive no rank.</li>
+     *   <li>For ComStar and Word of Blake factions, every crew member receives {@link #COMSTAR_RANK} (Acolyte).</li>
+     *   <li>For all other factions, a number of crew members equal to the squad leader count (or 1, if not a
+     *   conventional infantry unit) receive a leader-level rank, and the remaining crew receive the next rank below.</li>
      * </ol>
      *
      * <p>Personnel who already hold a rank are skipped entirely.</p>
@@ -113,11 +111,20 @@ public final class AutoAssignRankForCompanyGenerator {
         List<Person> crew = unit.getCrew();
         crew = sortCrew(campaign, crew);
 
-        Person unitCommander = unit.getCommander();
-        unitCommander.setRank(COMMANDER_RANK_INDEX);
-
         boolean factionIsClan = faction.isClan();
         boolean factionIsComStarOrWoB = faction.isComStarOrWoB();
+
+        if (!factionIsClan && !factionIsComStarOrWoB) {
+            Person unitCommander = unit.getCommander();
+            if ((unitCommander == null) && !crew.isEmpty()) {
+                unitCommander = crew.getFirst();
+            }
+
+            if (unitCommander != null) {
+                unitCommander.setRank(COMMANDER_RANK_INDEX);
+            }
+        }
+
         for (Person person : crew) {
             // Skip anyone who already has a rank
             if (!hasNoRank(person)) {
