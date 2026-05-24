@@ -164,7 +164,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -269,7 +269,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -377,7 +377,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -485,7 +485,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -606,7 +606,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -754,7 +754,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -862,7 +862,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -962,7 +962,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1070,7 +1070,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1173,7 +1173,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1281,7 +1281,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1389,7 +1389,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1497,7 +1497,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1604,7 +1604,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1713,7 +1713,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1821,7 +1821,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1930,7 +1930,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(currentLocation);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);

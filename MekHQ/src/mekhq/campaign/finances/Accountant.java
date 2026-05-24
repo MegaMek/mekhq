@@ -162,7 +162,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        CurrentLocation location = campaign.getLocation();
+        CurrentLocation location = campaign.getCurrentLocation();
         boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 
