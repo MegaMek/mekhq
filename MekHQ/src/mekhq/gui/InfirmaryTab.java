@@ -32,6 +32,9 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -161,7 +164,14 @@ public final class InfirmaryTab extends CampaignGuiTab {
         btnAdvancedSurgery.setEnabled(false);
         btnAdvancedSurgery.addActionListener(ev -> {
             for (Person person : getAllSelectedPatients()) {
-                new AdvancedReplacementLimbDialog(getCampaign(), person, false);
+                if (person.getStatus().isDead()) {
+                    String report = getFormattedText(
+                          "performAdvancedSurgery.report.characterDead",
+                          person.getHyperlinkedFullTitle());
+                    getCampaign().addReport(MEDICAL, report);
+                } else {
+                    new AdvancedReplacementLimbDialog(getCampaign(), person, false);
+                }
             }
         });
 

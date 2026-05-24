@@ -1737,7 +1737,7 @@ public class Campaign implements ITechManager {
      */
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
         setLocation(new CurrentLocation(planetarySystem, 0.0));
-        MekHQ.triggerEvent(new LocationChangedEvent(getLocation(), false));
+        MekHQ.triggerEvent(new LocationChangedEvent(getCurrentLocation(), false));
 
         if (getAutomatedMothballUnits().isEmpty()) {
             performAutomatedActivation(this);
@@ -1748,7 +1748,7 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public CurrentLocation getLocation() {
+    public CurrentLocation getCurrentLocation() {
         return location;
     }
 

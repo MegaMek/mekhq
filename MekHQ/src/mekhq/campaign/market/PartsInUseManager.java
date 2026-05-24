@@ -454,21 +454,26 @@ public class PartsInUseManager {
      * <ul>
      *     <li>Current inventory: parts in storage, in transfer, and planned acquisitions</li>
      *     <li>Required stock: the requested stock percentage applied to the part's usage count</li>
+     *     <li>Ammo storage adjustment: for ammo the amount in the inventory is the number of shots, so this needs to
+     *     be converted to its tonnage to determine the amount to buy.</li>
      *     <li>Bundle adjustment: for bundled items (e.g., armor sold in 5-ton blocks), the quantity is adjusted
      *         based on tonnage per item</li>
      * </ul>
      *
-     * @param PartInUse the {@link PartInUse} instance to calculate stock requirements for
+     * @param partInUse the {@link PartInUse} instance to calculate stock requirements for
      *
      * @return the number of units to purchase, or {@code 0} if no additional stock is needed
      */
-    private int findStockUpAmount(PartInUse PartInUse) {
-        int inventory = PartInUse.getStoreCount() + PartInUse.getTransferCount() + PartInUse.getPlannedCount();
-        int needed = (int) Math.ceil(PartInUse.getRequestedStock() / 100.0 * PartInUse.getUseCount());
+    private int findStockUpAmount(PartInUse partInUse) {
+        int inventory = partInUse.getStoreCount() + partInUse.getTransferCount() + partInUse.getPlannedCount();
+        if (partInUse.getPartToBuy() instanceof AmmoStorage) {
+            inventory = (int) Math.ceil((float) inventory * partInUse.getTonnagePerItem());
+        }
+        int needed = (int) Math.ceil(partInUse.getRequestedStock() / 100.0 * partInUse.getUseCount());
         int toBuy = needed - inventory;
 
-        if (PartInUse.getIsBundle()) {
-            toBuy = (int) Math.ceil((float) toBuy * PartInUse.getTonnagePerItem() / 5);
+        if (partInUse.getIsBundle()) {
+            toBuy = (int) Math.ceil((float) toBuy * partInUse.getTonnagePerItem() / 5);
             // special case for armor only, as it's bought in 5 ton blocks. Armor is the
             // only kind of item that's assigned isBundle()
         }
