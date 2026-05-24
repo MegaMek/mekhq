@@ -48,7 +48,10 @@ import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -189,9 +192,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return getReplacementPart();
         }
 
+        // Search only the warehouse co-located with this part's unit so that spares at other
+        // locations (e.g. a different base, or main force) cannot be consumed by a repair here.
+        Warehouse localWarehouse = LocationUtils.getEffectiveWarehouse(getUnit(), campaign);
+
         // don't just return with the first part if it is damaged
-        return campaign.getWarehouse()
-                     .streamSpareParts()
+        return localWarehouse.streamSpareParts()
                      .filter(MissingPart::isAvailableAsReplacement)
                      .filter(p -> !p.isUsedForRefitPlanning() || !refit)
                      .reduce(null, (bestPart, part) -> {
@@ -479,7 +485,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (replacement.getQuantity() > 1) {
                 Part actualReplacement = replacement.clone();
                 actualReplacement.setReservedBy(getTech());
-                campaign.getQuartermaster().addPart(actualReplacement, 0, false);
+                // Add the split-off clone to the same warehouse the original spare is in,
+                // not necessarily the main campaign warehouse.
+                Warehouse localWarehouse = LocationUtils.getEffectiveWarehouse(getUnit(), campaign);
+                localWarehouse.addPart(actualReplacement, true);
+                // Keep the locationNode in sync so setQuantity() later finds the right warehouse.
+                LocationNode.LocationManager.setLocation(actualReplacement, localWarehouse);
                 setReplacementPart(actualReplacement);
                 replacement.changeQuantity(-1);
             } else {
@@ -496,9 +507,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (replacement != null) {
                 replacement.setReservedBy(null);
 
-                // Only return the replacement part to the campaign if we have one
+                // Return the reservation back to the warehouse it came from (the unit's
+                // effective warehouse), not unconditionally to the main campaign warehouse.
                 if (replacement.getQuantity() > 0) {
-                    campaign.getQuartermaster().addPart(replacement, 0, false);
+                    Warehouse localWarehouse = LocationUtils.getEffectiveWarehouse(getUnit(), campaign);
+                    localWarehouse.addPart(replacement, true);
                 }
             }
         }

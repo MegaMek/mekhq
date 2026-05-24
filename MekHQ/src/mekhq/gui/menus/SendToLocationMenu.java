@@ -32,13 +32,13 @@
  */
 package mekhq.gui.menus;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -90,23 +90,24 @@ public class SendToLocationMenu extends JScrollableMenu {
 
         setText("Send To...");
 
-        // Determine the ILocation parent all selected items share (if any), to exclude it
-        Set<ILocation> currentLocations = items.stream()
-              .map(item -> {
-                  var node = item.getLocationNode();
-                  if (node == null || node.getParent() == null) {
-                      return null;
-                  }
-                  return node.getParent().getLocatable();
-              })
-              .collect(Collectors.toSet());
+        // Determine the ILocation parent all selected items share (if any), to exclude it.
+        // ILocation subtypes like Personnel extend LinkedHashMap, so Objects.equals() would
+        // compare map contents rather than identity — two empty Personnel objects would falsely
+        // match, hiding every base from the menu. Use an identity-keyed set instead.
+        Set<ILocation> currentLocations = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (ILocation item : items) {
+            var node = item.getLocationNode();
+            currentLocations.add((node == null || node.getParent() == null)
+                                       ? null
+                                       : node.getParent().getLocatable());
+        }
 
         ILocation sharedCurrent = currentLocations.size() == 1
               ? currentLocations.iterator().next()
               : null;
 
         // Main Force entry (= the campaign itself)
-        if (!Objects.equals(sharedCurrent, campaign)) {
+        if (sharedCurrent != campaign) {
             JMenuItem mainForce = new JMenuItem("Main Force");
             mainForce.addActionListener(e -> dispatcher.accept(campaign));
             add(mainForce);
@@ -115,10 +116,11 @@ public class SendToLocationMenu extends JScrollableMenu {
         // One entry per player base, nested by display type
         Map<String, JMenu> pathToMenu = new HashMap<>();
         for (PlayerBase base : campaign.getPlayerBases()) {
-            if (Objects.equals(sharedCurrent, base)
-                  || Objects.equals(sharedCurrent, base.getBasePersonnel())
-                  || Objects.equals(sharedCurrent, base.getBaseWarehouse())
-                  || Objects.equals(sharedCurrent, base.getBaseHangar())) {
+            // Use == (identity) — equals() on Personnel compares map contents, not object identity
+            if (sharedCurrent == base
+                  || sharedCurrent == base.getBasePersonnel()
+                  || sharedCurrent == base.getBaseWarehouse()
+                  || sharedCurrent == base.getBaseHangar()) {
                 continue;
             }
             addBaseItem(this, base, dispatcher, pathToMenu);

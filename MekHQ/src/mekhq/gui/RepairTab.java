@@ -67,6 +67,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -87,6 +88,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
@@ -97,6 +99,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -851,8 +854,29 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshServicedUnitList() {
         UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
 
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+        List<Unit> candidates;
+        if (locationFilter.isAll()) {
+            candidates = new ArrayList<>(getCampaign().getHangar().getUnits());
+            for (PlayerBase base : getCampaign().getPlayerBases()) {
+                candidates.addAll(base.getBaseHangar().getUnits());
+            }
+        } else if (locationFilter.isMainForce()) {
+            candidates = new ArrayList<>(getCampaign().getHangar().getUnits());
+        } else {
+            candidates = new ArrayList<>(locationFilter.getBase().getBaseHangar().getUnits());
+        }
+
+        List<Unit> serviceable = new ArrayList<>();
+        for (Unit u : candidates) {
+            if (u.isAvailable() && u.isServiceable()
+                      && !StratConRulesManager.isUnitDeployedToStratCon(u)) {
+                serviceable.add(u);
+            }
+        }
+
         ignoreUnitTable = true;
-        servicedUnitModel.setData(getCampaign().getServiceableUnits());
+        servicedUnitModel.setData(serviceable);
         ignoreUnitTable = false;
 
         if (!focusOnUnit(uuid)) {

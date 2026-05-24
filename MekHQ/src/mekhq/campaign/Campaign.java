@@ -2155,7 +2155,17 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public Unit getUnit(UUID id) {
-        return getHangar().getUnit(id);
+        Unit unit = getHangar().getUnit(id);
+        if (unit != null) {
+            return unit;
+        }
+        for (PlayerBase base : playerBases) {
+            unit = base.getBaseHangar().getUnit(id);
+            if (unit != null) {
+                return unit;
+            }
+        }
+        return null;
     }
 
     // region Personnel
@@ -3976,11 +3986,23 @@ public class Campaign implements ITechManager, ILocation {
     public Part fixWarehousePart(Part part, Person tech) {
         // get a new cloned part to work with and decrement original
         Part repairable = part.clone();
+        // Capture the original's effective warehouse before decrementing, since
+        // decrementing to zero would remove the original and clear its locationNode.
+        Warehouse targetWarehouse = LocationUtils.getEffectiveWarehouse(part, this);
         part.changeQuantity(-1);
 
         fixPart(repairable, tech);
         if (!(repairable instanceof OmniPod)) {
-            getQuartermaster().addPart(repairable, 0, false);
+            if (targetWarehouse == getWarehouse()) {
+                // Main-force spare: use the Quartermaster for full processing.
+                getQuartermaster().addPart(repairable, 0, false);
+            } else {
+                // Base spare: add directly to the base warehouse and wire the locationNode.
+                repairable.setDaysToArrival(0);
+                repairable.postProcessCampaignAddition();
+                targetWarehouse.addPart(repairable, true);
+                LocationNode.LocationManager.setLocation(repairable, targetWarehouse);
+            }
         }
 
         // If there is at least one remaining unit of the part

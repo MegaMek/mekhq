@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
@@ -57,6 +58,7 @@ import mekhq.campaign.universe.PlanetarySystem;
  * directly without creating a travel node.</p>
  */
 public final class LocationDispatch {
+    private static final MMLogger LOGGER = MMLogger.create(LocationDispatch.class);
 
     private LocationDispatch() {}
 
@@ -109,7 +111,11 @@ public final class LocationDispatch {
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
             travelLoc.setJumpPath(path);
-            travelLoc.setParent(destination);
+            if (!travelLoc.setParent(destination)) {
+                LOGGER.warn("dispatchToLocation: setParent failed for travelLoc → {}; "
+                      + "persons may display as Main Force after save/load",
+                      destination.getClass().getSimpleName());
+            }
             group.forEach(p -> p.setParent(travelLoc));
             campaign.addLocation(travelLoc);
         }
@@ -173,7 +179,11 @@ public final class LocationDispatch {
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
             travelLoc.setJumpPath(path);
-            travelLoc.setParent(destination);
+            if (!travelLoc.setParent(destination)) {
+                LOGGER.warn("dispatchUnitsToLocation: setParent failed for travelLoc → {}; "
+                      + "units may display as Main Force after save/load",
+                      destination.getClass().getSimpleName());
+            }
             group.forEach(u -> LocationNode.LocationManager.setLocation(u, travelLoc));
             campaign.addLocation(travelLoc);
         }
@@ -236,7 +246,11 @@ public final class LocationDispatch {
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
             travelLoc.setJumpPath(path);
-            travelLoc.setParent(destination);
+            if (!travelLoc.setParent(destination)) {
+                LOGGER.warn("dispatchPartsToLocation: setParent failed for travelLoc → {}; "
+                      + "parts may display as Main Force after save/load",
+                      destination.getClass().getSimpleName());
+            }
             group.forEach(p -> LocationNode.LocationManager.setLocation(p, travelLoc));
             campaign.addLocation(travelLoc);
         }

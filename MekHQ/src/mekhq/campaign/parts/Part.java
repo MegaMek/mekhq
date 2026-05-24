@@ -65,6 +65,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -1472,10 +1473,17 @@ public abstract class Part implements IPartWork, ITechnology {
     public void setQuantity(int number) {
         quantity = Math.max(number, 0);
         if (quantity == 0) {
+            // Determine which warehouse actually holds this part.
+            // Dispatched spare parts have their locationNode parent set to a Warehouse node;
+            // main-force parts have no such parent, so fall back to the campaign's main warehouse.
+            LocationNode parentNode = locationNode.getParent();
+            Warehouse owningWarehouse = (parentNode != null && parentNode.getLocatable() instanceof Warehouse w)
+                                              ? w
+                                              : campaign.getWarehouse();
             for (Part childPart : childParts) {
-                campaign.getWarehouse().removePart(childPart);
+                owningWarehouse.removePart(childPart);
             }
-            campaign.getWarehouse().removePart(this);
+            owningWarehouse.removePart(this);
         }
     }
 

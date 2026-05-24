@@ -36,6 +36,8 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -297,8 +299,22 @@ public class BaseSettingsDialog extends JDialog {
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public Object getItem() {
-                return editorField.getText();
+                // When focus leaves an editable combo, Swing calls getItem() and compares the
+                // result with the currently selected object. If they differ it calls
+                // setSelectedItem(getItem()), replacing a real T in the model with a plain
+                // String — which then breaks any instanceof T check in action listeners.
+                // Return the real selected item whenever the editor text matches its display
+                // name, so Swing sees no change and leaves the model alone.
+                String text = editorField.getText();
+                Object current = combo.getModel().getSelectedItem();
+                if (current != null && !(current instanceof String)) {
+                    if (displayName.apply((T) current).equals(text)) {
+                        return current;
+                    }
+                }
+                return text;
             }
 
             @Override
@@ -327,6 +343,41 @@ public class BaseSettingsDialog extends JDialog {
                     setText(displayName.apply((T) value));
                 }
                 return this;
+            }
+        });
+
+        // When the editor loses focus, restore the text to the selected item's display name
+        // (if one is selected). This handles the case where the user typed a partial search,
+        // did not pick from the popup, and clicked away — the editor snaps back to the real
+        // selection so the combo always looks consistent.
+        editorField.addFocusListener(new FocusAdapter() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public void focusLost(FocusEvent e) {
+                if (e.isTemporary()) {
+                    return; // popup opening/closing — do not interfere
+                }
+                Object current = combo.getModel().getSelectedItem();
+                if (current != null && !(current instanceof String)) {
+                    String expected = displayName.apply((T) current);
+                    if (!expected.equals(editorField.getText())) {
+                        updating[0] = true;
+                        try {
+                            editorField.setText(expected);
+                        } finally {
+                            updating[0] = false;
+                        }
+                    }
+                } else if (current == null) {
+                    if (!editorField.getText().isEmpty()) {
+                        updating[0] = true;
+                        try {
+                            editorField.setText("");
+                        } finally {
+                            updating[0] = false;
+                        }
+                    }
+                }
             }
         });
 

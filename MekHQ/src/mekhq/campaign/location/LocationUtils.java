@@ -35,7 +35,9 @@ package mekhq.campaign.location;
 import java.util.Objects;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.base.AbstractBase;
 
 /**
@@ -95,6 +97,23 @@ public final class LocationUtils {
             node = node.getParent();
         }
         return null;
+    }
+
+    /**
+     * Returns the {@link Warehouse} appropriate for spare-part lookups and storage at {@code loc}'s effective location.
+     *
+     * <p>If {@code loc} is under an {@link AbstractBase} in the tree, that base's warehouse is returned.
+     * Otherwise, the campaign's main warehouse is returned.  A {@code null} {@code loc} always
+     * returns the campaign's main warehouse.</p>
+     *
+     * @param loc      the location item (unit, part, person, …); may be {@code null}
+     * @param campaign the active campaign; must not be {@code null}
+     *
+     * @return the effective {@link Warehouse}, never {@code null}
+     */
+    public static Warehouse getEffectiveWarehouse(@Nullable ILocation loc, Campaign campaign) {
+        AbstractBase base = findEffectiveBase(loc);
+        return (base != null) ? base.getBaseWarehouse() : campaign.getWarehouse();
     }
 
     /**

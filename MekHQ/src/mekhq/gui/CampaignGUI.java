@@ -3288,6 +3288,10 @@ public class CampaignGUI extends JPanel {
         if (wt != null) {
             wt.refreshPartsList();
         }
+        RepairTab rt = (RepairTab) getTab(MHQTabType.REPAIR_BAY);
+        if (rt != null) {
+            rt.refreshServicedUnitList();
+        }
     }
 
     /**

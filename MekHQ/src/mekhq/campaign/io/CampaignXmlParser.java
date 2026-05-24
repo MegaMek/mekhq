@@ -1658,6 +1658,46 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void reconnectPersonsToTravelLocations(Campaign campaign) {
         for (AbstractLocation loc : campaign.getLocations()) {
             if (loc instanceof CurrentLocation currentLoc) {
+                // Orphaned, non-transiting CurrentLocations are stale transit records.
+                // They appear in <locations> (rather than inside a <playerBase>) because
+                // setParent() failed at dispatch time, leaving their locationNode unparented.
+                // Items that arrived (processPlayerBaseNodes already re-homed them) must NOT
+                // be re-parented here, as that would detach them from their base. Items whose
+                // save pre-dates the arrival-tracking fix fall back to main force so they
+                // remain visible rather than becoming invisible.
+                boolean isOrphaned = currentLoc.getLocationNode().getParent() == null;
+                boolean isActivelyInTransit = currentLoc.getJumpPath() != null
+                                                    && !currentLoc.getJumpPath().isEmpty();
+                if (isOrphaned && !isActivelyInTransit) {
+                    // Drain pending IDs so the loop below is skipped. Any person not already
+                    // re-homed by processPlayerBaseNodes falls back to main force.
+                    for (UUID personId : currentLoc.drainPendingPersonIds()) {
+                        Person person = campaign.getPerson(personId);
+                        if (person != null && person.getLocationNode().getParent() == null) {
+                            person.setParent(campaign.getMainForcePersonnel());
+                            LOGGER.warn("reconnectPersonsToTravelLocations: person {} had no parent "
+                                  + "(orphaned arrived node); re-homed to main force", personId);
+                        }
+                    }
+                    for (UUID unitId : currentLoc.drainPendingUnitIds()) {
+                        Unit unit = findUnitAnywhere(campaign, unitId);
+                        if (unit != null && unit.getLocationNode().getParent() == null) {
+                            LocationNode.LocationManager.setLocation(unit, campaign.getHangar());
+                            LOGGER.warn("reconnectPersonsToTravelLocations: unit {} had no parent "
+                                  + "(orphaned arrived node); re-homed to main hangar", unitId);
+                        }
+                    }
+                    for (int partId : currentLoc.drainPendingPartIds()) {
+                        Part part = findPartAnywhere(campaign, partId);
+                        if (part != null && part.getLocationNode().getParent() == null) {
+                            LocationNode.LocationManager.setLocation(part, campaign.getWarehouse());
+                            LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
+                                  + "(orphaned arrived node); re-homed to main warehouse", partId);
+                        }
+                    }
+                    continue;
+                }
+
                 // Persons traveling — parented under a CurrentLocation
                 for (UUID personId : currentLoc.drainPendingPersonIds()) {
                     Person person = campaign.getPerson(personId);
