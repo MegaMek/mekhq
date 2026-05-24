@@ -1428,7 +1428,7 @@ public class CampaignGUI extends JPanel {
         miPlanetarySystemEditor.setMnemonic(KeyEvent.VK_P);
         miPlanetarySystemEditor.setVisible(getCampaign().isGM());
         miPlanetarySystemEditor.addActionListener(evt -> new PlanetarySystemEditorDialog(getFrame(), getCampaign())
-                                .setVisible(true));
+                                                               .setVisible(true));
         menuManage.add(miPlanetarySystemEditor);
 
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
@@ -3463,7 +3463,8 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleDayEnding(DayEndingEvent dayEndingEvent) {
         if (MekHQ.getMHQOptions().getNewDayAutomaticallyAssignUnmaintainedUnits()) {
-            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+            boolean skipReports = false;
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }
 
         if (triggerDailyNags(getCampaign())) {
