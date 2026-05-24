@@ -37,7 +37,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.SuiteConstants.VERSION;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -4516,7 +4515,7 @@ public class Person {
             selfCorrectEducationCourseIndexes(campaign, person);
 
             // < 0.51.00 compatibility handler
-            if (!VERSION.isHigherThan(new Version("0.51.00"))) { // The extra '0' is necessary to avoid load errors
+            if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 int healingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
                 boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
@@ -4545,7 +4544,7 @@ public class Person {
      * @param naturalHealingWaitingPeriod the waiting period (in days) between healing checks
      *
      * @author Illiani
-     * @since 0.50.0
+     * @since 0.51.0
      */
     public void clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(boolean isUseAdvancedMedical,
           int naturalHealingWaitingPeriod) {

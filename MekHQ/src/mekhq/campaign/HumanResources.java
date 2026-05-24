@@ -367,7 +367,7 @@ public class HumanResources {
     public List<Person> getPatientsWithNonPermanentInjuries() {
         return getPatients()
                      .stream()
-                     .filter(patient -> !patient.getNonPermanentInjuries().isEmpty())
+                     .filter(patient -> !patient.getNonPermanentInjuries().isEmpty() || patient.getHits() > 0)
                      .toList();
     }
 
