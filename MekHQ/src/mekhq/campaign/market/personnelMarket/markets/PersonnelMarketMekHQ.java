@@ -50,10 +50,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import AbstractLocation;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;

@@ -41,8 +41,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import AbstractLocation;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;

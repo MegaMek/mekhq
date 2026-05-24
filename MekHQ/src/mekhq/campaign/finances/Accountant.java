@@ -44,10 +44,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import AbstractLocation;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;

@@ -35,9 +35,9 @@ package mekhq.campaign.storyArc.storypoint;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
-import AbstractLocation;
 import megamek.Version;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.storyArc.StoryPoint;

@@ -55,7 +55,7 @@ import mekhq.campaign.universe.PlanetarySystem;
  * location for every object in it.
  * </p>
  * <p>
- * Documentation & descriptions will omit the usage of {@code LocationNode} whenever possible. Technically, there is a
+ * Documentation and descriptions will omit the usage of {@code LocationNode} whenever possible. Technically, there is a
  * tree of {@code LocationNode} classes, and each {@code LocationNode} has a 1:1 relationship with a {@code ILocation}.
  * It can therefore be thought of as a tree of {@code ILocation} implementations. This avoids needing to clarify every
  * time that it's the {@code ILocation}'s {@code LocationNode}'s relative {@code LocationNode}'s {@code ILocation}.

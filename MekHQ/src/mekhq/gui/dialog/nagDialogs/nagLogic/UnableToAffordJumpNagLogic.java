@@ -34,7 +34,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import java.util.Objects;
 
-import AbstractLocation;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
