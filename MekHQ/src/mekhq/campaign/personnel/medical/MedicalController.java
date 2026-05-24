@@ -156,7 +156,8 @@ public class MedicalController {
                     InjuryUtil.resolveDailyHealing(campaign, patient);
                 }
 
-                patient.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(true, naturalHealingWaitingPeriod);
+                patient.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                      naturalHealingWaitingPeriod);
             } else {
                 if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
                     healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
