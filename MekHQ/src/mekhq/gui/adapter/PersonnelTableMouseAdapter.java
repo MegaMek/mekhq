@@ -1626,6 +1626,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       getCampaign(),
                       selectedPerson);
                 editPersonnelInjuriesDialog.setVisible(true);
+
+                boolean isUseAdvancedMedical = getCampaignOptions().isUseAdvancedMedical();
+                int healingPeriod = getCampaignOptions().getNaturalHealingWaitingPeriod();
+                
+                selectedPerson.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                      healingPeriod);
+
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
