@@ -44,7 +44,7 @@ import mekhq.campaign.unit.Unit;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Utility class responsible for inserting support units into a campaign's TO&E.
+ * Utility class responsible for inserting support units into a campaign's TOE.
  *
  * <p>Support units are grouped into a new sub-{@link Formation} whose label and type are derived from a
  * {@link SupportTOEFormationTypes} descriptor. The sub-formation is attached as a child of the campaign's HQ formation,
