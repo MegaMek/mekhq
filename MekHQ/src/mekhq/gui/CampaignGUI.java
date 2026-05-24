@@ -853,104 +853,15 @@ public class CampaignGUI extends JPanel {
         JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
 
         JMenuItem miTempPoolFullStrength = new JMenuItem(resourceMap.getString("miTempPoolFullStrength.text"));
-        miTempPoolFullStrength.addActionListener(evt -> {
-            getCampaign().resetAsTechPool();
-            getCampaign().resetMedicPool();
-            if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-                getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-                getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
-            }
-        });
+        miTempPoolFullStrength.addActionListener(evt -> bringAllTempCrewsToFullStrength());
         menuTempPool.add(miTempPoolFullStrength);
 
         JMenuItem miTempPoolReleaseAll = new JMenuItem(resourceMap.getString("miTempPoolReleaseAll.text"));
-        miTempPoolReleaseAll.addActionListener(evt -> {
-            getCampaign().emptyAsTechPool();
-            getCampaign().emptyMedicPool();
-            if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.SOLDIER);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-                getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
-            }
-        });
+        miTempPoolReleaseAll.addActionListener(evt -> releaseAllTempCrews());
         menuTempPool.add(miTempPoolReleaseAll);
 
         JMenuItem miTempPoolReleaseSurplus = new JMenuItem(resourceMap.getString("miTempPoolReleaseSurplus.text"));
-        miTempPoolReleaseSurplus.addActionListener(evt -> {
-            getCampaign().releaseSurplusAsTechPool();
-            getCampaign().releaseSurplusMedicPool();
-            if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.SOLDIER);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-            }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-                getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_CREW);
-            }
-        });
+        miTempPoolReleaseSurplus.addActionListener(evt -> releaseSurplusTempCrews());
         menuTempPool.add(miTempPoolReleaseSurplus);
 
         menuTempPool.addSeparator();
@@ -2269,6 +2180,101 @@ public class CampaignGUI extends JPanel {
     private void hireBulkPersonnel() {
         HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hireBulkPersonnelDialog.setVisible(true);
+    }
+
+    private void bringAllTempCrewsToFullStrength() {
+        getCampaign().resetAsTechPool();
+        getCampaign().resetMedicPool();
+        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
+        }
+    }
+
+    private void releaseAllTempCrews() {
+        getCampaign().emptyAsTechPool();
+        getCampaign().emptyMedicPool();
+        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.SOLDIER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        }
+    }
+
+    private void releaseSurplusTempCrews() {
+        getCampaign().releaseSurplusAsTechPool();
+        getCampaign().releaseSurplusMedicPool();
+        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.SOLDIER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        }
     }
 
     public void showContractMarket() {
