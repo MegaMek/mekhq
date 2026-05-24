@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,10 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -179,7 +182,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign);
+            processFreeUnit(campaign, campaign.getFaction(), true);
             dispose();
         });
 
@@ -190,7 +193,7 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         return pnlButtons;
     }
 
-    public static void processFreeUnit(Campaign campaign) {
+    public static void processFreeUnit(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek("MASH Truck (Small)");
         if (mekSummary == null) {
             LOGGER.error("Cannot find entry for {}", "MASH Truck (Small)");
@@ -202,7 +205,13 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
             if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                 quality = UnitOrder.getRandomUnitQuality(0);
             }
-            campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+            Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+
+            if (isAutomaticallyAssignRanks) {
+                if (unit != null) {
+                    AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
+                }
+            }
         } catch (Exception e) {
             LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
                   mekSummary.getSourceFile(),

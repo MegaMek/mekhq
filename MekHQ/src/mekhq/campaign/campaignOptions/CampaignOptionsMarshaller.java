@@ -60,6 +60,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getManualUnitRatingModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clampReputationPayMultiplier",
               campaignOptions.isClampReputationPayMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requireSupportForceTransportation",
+              campaignOptions.isRequireSupportForceTransportation());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "reduceReputationPerformanceModifier",
