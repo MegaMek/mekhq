@@ -58,8 +58,8 @@ import java.util.Set;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -118,7 +118,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void triggerInoculationPrompt(Campaign campaign, boolean isAdHoc) {
-        CurrentLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (!location.isOnPlanet()) {
             new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "Inoculations.inTransit"), true);
             return;
@@ -491,7 +491,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void performDiseaseChecks(Campaign campaign) {
-        CurrentLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         LocalDate today = campaign.getLocalDate();
 
         String planetCode = location.isOnPlanet() ? location.getPlanet().getId() : null;
