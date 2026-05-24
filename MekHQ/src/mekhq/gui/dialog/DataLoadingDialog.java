@@ -418,7 +418,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 showRarePersonnelDialog(campaign, true);
                 ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
-                if (!contractMarketMethod.isNone()) {
+
+                // AtBMonthly initial contract generation is handled using AtB initialization
+                if (!contractMarketMethod.isNone() && !contractMarketMethod.isAtBMonthly()) {
                     campaign.getContractMarket().generateContractOffers(campaign, true);
                 }
                 if (!campaignOptions.getUnitMarketMethod().isNone()) {
