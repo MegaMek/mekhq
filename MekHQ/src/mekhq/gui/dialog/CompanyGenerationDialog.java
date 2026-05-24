@@ -279,7 +279,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);
         }
 
-        AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+        boolean skipReports = true;
+        AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
     }
 
     private void generateSparePersonnel(CompanyGenerationOptions options) {
