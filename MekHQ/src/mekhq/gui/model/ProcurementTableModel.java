@@ -53,7 +53,7 @@ import mekhq.campaign.work.IAcquisitionWork;
  * and so we have to be more careful in its design
  */
 public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
-    private static final DecimalFormat FORMATTER = new DecimalFormat();
+    public static final DecimalFormat FORMATTER = new DecimalFormat();
 
     static {
         FORMATTER.setMaximumFractionDigits(3);
@@ -69,7 +69,8 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public static final int COL_TARGET = 4;
     public static final int COL_NEXT = 5;
     public static final int COL_QUEUE = 6;
-    public static final int N_COL = 7;
+    public static final int COL_PRIORITY = 7;
+    public static final int N_COL = 8;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -111,10 +112,10 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        return data.isEmpty() ? "" : getAcquisition(row).map(a -> getValueFor(a, column)).orElse("?");
+        return data.isEmpty() ? "" : getAcquisition(row).map(a -> getValueFor(a, row, column)).orElse("?");
     }
 
-    private Object getValueFor(final IAcquisitionWork shoppingItem, final int column) {
+    private Object getValueFor(final IAcquisitionWork shoppingItem, final int row, final int column) {
         switch (column) {
             case COL_NAME:
                 return shoppingItem.getAcquisitionName();
@@ -145,6 +146,8 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
                 return String.format("%s [+%s]",
                       FORMATTER.format(shoppingItem.getQuantity()),
                       FORMATTER.format(shoppingItem.getTotalQuantity()));
+            case COL_PRIORITY:
+                return row + 1;
             default:
                 return "?";
 
@@ -171,7 +174,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public int getAlignment(final int column) {
         return switch (column) {
             case COL_COST, COL_TOTAL_COST, COL_QUEUE -> SwingConstants.RIGHT;
-            case COL_TARGET, COL_NEXT, COL_TYPE -> SwingConstants.CENTER;
+            case COL_TARGET, COL_NEXT, COL_TYPE, COL_PRIORITY -> SwingConstants.CENTER;
             default -> SwingConstants.LEFT;
         };
     }

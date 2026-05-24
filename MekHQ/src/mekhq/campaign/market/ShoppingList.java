@@ -130,6 +130,36 @@ public class ShoppingList {
         getShoppingList().add(newWork);
     }
 
+    public boolean moveItem(int fromIndex, int toIndex) {
+        if (fromIndex < 0 ||
+                  fromIndex >= getShoppingList().size() ||
+                  toIndex < 0 ||
+                  toIndex >= getShoppingList().size() ||
+                  fromIndex == toIndex) {
+            return false;
+        }
+
+        IAcquisitionWork shoppingItem = getShoppingList().remove(fromIndex);
+        getShoppingList().add(toIndex, shoppingItem);
+        return true;
+    }
+
+    public boolean moveItemUp(int index) {
+        return moveItem(index, index - 1);
+    }
+
+    public boolean moveItemDown(int index) {
+        return moveItem(index, index + 1);
+    }
+
+    public boolean moveItemToTop(int index) {
+        return moveItem(index, 0);
+    }
+
+    public boolean moveItemToBottom(int index) {
+        return moveItem(index, getShoppingList().size() - 1);
+    }
+
     public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
         // check to see if this is already on the shopping list. If so, then add
         // quantity to the list
