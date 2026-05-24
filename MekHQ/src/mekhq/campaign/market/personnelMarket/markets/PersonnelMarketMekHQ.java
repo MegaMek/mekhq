@@ -53,6 +53,7 @@ import java.util.Set;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -198,7 +199,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public String getAvailabilityMessage() {
-        mekhq.campaign.AbstractLocation location = getCampaign().getCurrentLocation();
+        AbstractLocation location = getCampaign().getCurrentLocation();
         String color;
         String closingBrace = CLOSING_SPAN_TAG;
 
@@ -372,7 +373,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     private double getFactionStandingsRecruitmentModifier() {
         FactionStandings factionStandings = getCampaign().getFactionStandings();
 
-        mekhq.campaign.AbstractLocation location = getCampaign().getCurrentLocation();
+        AbstractLocation location = getCampaign().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         double multiplier = 0;
 
@@ -398,7 +399,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @since 0.50.06
      */
     public int getSystemStatusRecruitmentMultiplier() {
-        mekhq.campaign.AbstractLocation location = getCampaign().getCurrentLocation();
+        AbstractLocation location = getCampaign().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 
         LocalDate today = getCampaign().getLocalDate();

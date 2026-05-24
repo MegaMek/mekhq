@@ -223,7 +223,7 @@ public class CampaignNewDayManager {
     private final Quartermaster quartermaster;
     private final Finances finances;
     private LocalDate today;
-    private mekhq.campaign.AbstractLocation updatedLocation;
+    private AbstractLocation updatedLocation;
 
     public CampaignNewDayManager(Campaign campaign) {
         this.campaign = campaign;

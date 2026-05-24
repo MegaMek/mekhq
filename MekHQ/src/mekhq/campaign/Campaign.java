@@ -538,9 +538,7 @@ public class Campaign implements ITechManager, ILocation {
         this.techFaction = techFaction;
         this.systemsInstance = systemsInstance;
         this.locationNode = new LocationNode(this);
-        if (startLocation != null) {
-            locations.add(startLocation);
-        }
+        setLocation(startLocation);
         this.setParent(startLocation);
         if (startLocation != null) {
             mainForcePersonnel.setParent(this);
@@ -1724,17 +1722,17 @@ public class Campaign implements ITechManager, ILocation {
         return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
     }
 
-    public void setLocation(AbstractLocation l) {
+    public void setLocation(AbstractLocation location) {
         locations.clear();
-        if (l != null) {
-            locations.add(l);
+        if (location != null) {
+            locations.add(location);
         }
-        setParent(l);
+        setParent(location);
     }
 
-    public void addLocation(AbstractLocation l) {
-        if (l != null) {
-            locations.add(l);
+    public void addLocation(AbstractLocation location) {
+        if (location != null) {
+            locations.add(location);
         }
     }
 
@@ -1844,6 +1842,7 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     @Override
+    @Nullable
     public LocationNode getLocationNode() {
         return locationNode;
     }

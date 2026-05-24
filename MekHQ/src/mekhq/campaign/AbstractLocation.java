@@ -56,6 +56,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -77,6 +78,10 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import org.w3c.dom.Node;
 
+/**
+ * Abstract implementation of a specific location. An {@code AbstractLocation} is expected as the
+ * {@link ILocation ILocation locatable} of the root {@link LocationNode} in a {@code LocationNode} tree.
+ */
 public abstract class AbstractLocation implements ILocation {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
@@ -178,25 +183,27 @@ public abstract class AbstractLocation implements ILocation {
         StringBuilder report = new StringBuilder();
         report.append("<html>")
               // First Line
-              .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
+              .append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.inSystem",
+                    currentSystem.getPrintableName(date)))
+              .append(' ');
 
         if (isOnPlanet()) {
-            report.append("on planet ").append(getPlanet().getPrintableName(date));
+            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.onPlanet",
+                  getPlanet().getPrintableName(date)));
         } else if (isAtJumpPoint()) {
-            report.append("at jump point");
+            report.append(getTextAt(RESOURCE_BUNDLE, "getReport.atJumpPoint"));
             if (!Double.isInfinite(currentRechargeTime)) {
-                report.append(" (Jumpship ")
-                      .append(String.format(Locale.ROOT,
-                            "%.0f",
-                            (100.0 * getRechargeTime()) / currentRechargeTime))
-                      .append("% charged)");
+                report.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.jumpShipCharged",
+                      String.format(Locale.ROOT, "%.0f", (100.0 * getRechargeTime()) / currentRechargeTime)));
             }
         } else {
             if ((null != getJumpPath()) && (currentSystem == getJumpPath().getLastSystem())) {
-                report.append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days from planet");
+                report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.daysFromPlanet",
+                      String.format(Locale.ROOT, "%.2f", getTransitTime())));
             } else {
                 double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
-                report.append(String.format(Locale.ROOT, "%.2f", timeToJP)).append(" days from jump point");
+                report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.daysFromJumpPoint",
+                      String.format(Locale.ROOT, "%.2f", timeToJP)));
             }
         }
 
@@ -205,22 +212,23 @@ public abstract class AbstractLocation implements ILocation {
         // Second Line
         boolean hasIncludedCost = false;
         if ((null != getJumpPath()) && !getJumpPath().isEmpty()) {
-            report.append("Traveling to ").append(getJumpPath().getLastSystem().getPrintableName(date)).append(": ");
+            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.travelingTo",
+                  getJumpPath().getLastSystem().getPrintableName(date))).append(' ');
             if (getJumpPath().getJumps() > 0) {
-                report.append(getJumpPath().getJumps())
-                      .append(getJumpPath().getJumps() == 1 ? " jump remaining" : " jumps remaining");
+                report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.jumpsRemaining",
+                      getJumpPath().getJumps()));
 
                 int duration = (int) ceil(getJumpPath().getTotalTime(date, getTransitTime(), isUseCommandCircuit));
                 Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
                       getJumpPath().getJumps());
-                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
-                                                                                                                      "C-Bills");
+                report.append("<br>").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "getReport.estimatedCostRemaining", jumpCost.toAmountString()));
                 hasIncludedCost = true;
             } else {
-                report.append("In destination system");
+                report.append(getTextAt(RESOURCE_BUNDLE, "getReport.inDestinationSystem"));
             }
         } else {
-            report.append("Not traveling");
+            report.append(getTextAt(RESOURCE_BUNDLE, "getReport.notTraveling"));
         }
 
         report.append("<br/>");
@@ -230,9 +238,8 @@ public abstract class AbstractLocation implements ILocation {
             report.append("<br><br>");
         } else {
             Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
-            report.append("Estimated Jump Cost (per week): ")
-                  .append(jumpCost.toAmountString())
-                  .append(" C-Bills<br><br>");
+            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.estimatedCostPerWeek",
+                  jumpCost.toAmountString())).append("<br><br>");
         }
 
         report.append("</html>");
@@ -240,6 +247,7 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     @Override
+    @Nullable
     public LocationNode getLocationNode() {
         return locationNode;
     }
@@ -274,13 +282,12 @@ public abstract class AbstractLocation implements ILocation {
         double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
         if (usedRechargeTime > 0) {
             if (!suppressReports) {
-                campaign.addReport(GENERAL, "JumpShips spent " +
-                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                                  " hours recharging drives");
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
+                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
             }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
             if (getRechargeTime() >= neededRechargeTime && !suppressReports) {
-                campaign.addReport(GENERAL, "JumpShip drives fully charged");
+                campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.recharge.complete"));
             }
         }
         return usedRechargeTime;
