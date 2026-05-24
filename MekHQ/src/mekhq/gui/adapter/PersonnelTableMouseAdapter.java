@@ -988,7 +988,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         // You need to set the prisoner-defector to ACTIVE, otherwise they will be recruited as a
                         // Camp Follower.
-                        person.setStatus(PersonnelStatus.ACTIVE);
+                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
                     }
                 }
                 break;
