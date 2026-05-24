@@ -172,6 +172,8 @@ public enum PersonnelTableModelColumn {
     SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
     UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
+    COVER_MEDICAL_EXPENSES("PersonnelTableModelColumn.COVER_MEDICAL_EXPENSES.text"),
+    BLOCK_MATERNITY_LEAVE("PersonnelTableModelColumn.BLOCK_MATERNITY_LEAVE.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
     WEALTH("PersonnelTableModelColumn.WEALTH.text"),
@@ -630,6 +632,10 @@ public enum PersonnelTableModelColumn {
     }
     // endregion Boolean Comparison Methods
 
+    public String convertBooleanToYesNo(boolean yesNoValue) {
+        return yesNoValue ? "Yes.text" : "No.text";
+    }
+
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
         return getDisplayString(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
@@ -706,8 +712,8 @@ public enum PersonnelTableModelColumn {
             case BODY -> getAttributeScoreDisplay(person, SkillAttribute.BODY);
             case CALLSIGN -> person.getCallsign();
             case CHARISMA -> getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
-            case CLAN_PERSONNEL -> resources.getString(person.isClanPersonnel() ? "Yes.text" : "No.text");
-            case COMMANDER -> resources.getString(person.isCommander() ? "Yes.text" : "No.text");
+            case CLAN_PERSONNEL -> resources.getString(convertBooleanToYesNo(person.isClanPersonnel()));
+            case COMMANDER -> resources.getString(convertBooleanToYesNo(person.isCommander()));
             case CONNECTIONS -> person.getBurnedConnectionsEndDate() != null
                                       ?
                                       "<html><b><font color='gray'>" +
@@ -737,17 +743,15 @@ public enum PersonnelTableModelColumn {
                 yield scenario.getName();
             }
             case DEXTERITY -> getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
-            case DIVORCEABLE -> resources.getString(person.getGenealogy().hasSpouse()
-                                                          ?
-                                                          (person.isDivorceable() ? "Yes.text" : "No.text") :
-                                                          "NA.text");
+            case DIVORCEABLE -> resources.getString(person.getGenealogy().hasSpouse() ?
+                                                          (convertBooleanToYesNo(person.isDivorceable())) : "NA.text");
             case DUE_DATE -> person.getDueDateAsString(campaign);
             case EDGE -> {
                 int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
                 int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
                 yield currentAttributeValue + " / " + attributeCap;
             }
-            case EMPLOYED -> resources.getString(person.isEmployed() ? "Yes.text" : "No.text");
+            case EMPLOYED -> resources.getString(convertBooleanToYesNo(person.isEmployed()));
             case EXTRA_INCOME -> Integer.toString(person.getExtraIncomeTraitLevel());
             case FATIGUE -> Integer.toString(getEffectiveFatigue(person.getAdjustedFatigue(),
                   person.getPermanentFatigue(), person.isClanPersonnel(),
@@ -757,7 +761,7 @@ public enum PersonnelTableModelColumn {
                 final Formation formation = campaign.getFormationFor(person);
                 yield (formation == null) ? "-" : formation.getName();
             }
-            case FOUNDER -> resources.getString(person.isFounder() ? "Yes.text" : "No.text");
+            case FOUNDER -> resources.getString(convertBooleanToYesNo(person.isFounder()));
             case GENDER -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case GIVEN_NAME -> person.getGivenName();
             case GREED -> {
@@ -766,10 +770,10 @@ public enum PersonnelTableModelColumn {
                 yield trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
             }
             case GROUND_VEHICLE -> gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE);
-            case HIDE_PERSONALITY -> resources.getString(person.isHidePersonality() ? "Yes.text" : "No.text");
+            case HIDE_PERSONALITY -> resources.getString(convertBooleanToYesNo(person.isHidePersonality()));
             case HIGHEST_EDUCATION -> person.getEduHighestEducation().toString();
             case IMMORTAL -> resources.getString(person.getStatus().isDead() ? "NA.text"
-                                                       : (person.isImmortal() ? "Yes.text" : "No.text"));
+                                                       : (convertBooleanToYesNo(person.isImmortal())));
             case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
                                    ? Integer.toString(person.getInjuries().size())
@@ -782,7 +786,7 @@ public enum PersonnelTableModelColumn {
             case LOYALTY -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
                   campaignOptions.isUseAlternativeAdvancedMedical()));
             case MARRIAGEABLE -> resources.getString(person.getGenealogy().hasSpouse() ? "NA.text"
-                                                           : (person.isMarriageable() ? "Yes.text" : "No.text"));
+                                                           : (convertBooleanToYesNo(person.isMarriageable())));
             case MEDICAL -> skillValue.apply(SkillType.S_SURGERY);
             case MEDICAL_CAPACITY -> person.isDoctor()
                                            ?
@@ -796,7 +800,7 @@ public enum PersonnelTableModelColumn {
             case NAVIGATION -> skillValue.apply(SkillType.S_NAVIGATION);
             case NEGOTIATION -> skillValue.apply(SkillType.S_NEGOTIATION);
             case NEVER_ASSIGN_AUTO_MAINTENANCE ->
-                  resources.getString(person.isNeverAssignMaintenanceAutomatically() ? "Yes.text" : "No.text");
+                  resources.getString(convertBooleanToYesNo(person.isNeverAssignMaintenanceAutomatically()));
             case ORIGIN_FACTION -> person.getOriginFaction().getFullName(campaign.getGameYear());
             case ORIGIN_PLANET -> {
                 final Planet originPlanet = person.getOriginPlanet();
@@ -807,10 +811,12 @@ public enum PersonnelTableModelColumn {
             case PERSONNEL_STATUS -> person.getStatus().toString();
             case POST_NOMINAL -> person.getPostNominal();
             case PRE_NOMINAL -> person.getPreNominal();
-            case PREFERS_MEN -> resources.getString(person.isPrefersMen() ? "Yes.text" : "No.text");
-            case PREFERS_WOMEN -> resources.getString(person.isPrefersWomen() ? "Yes.text" : "No.text");
+            case PREFERS_MEN -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
+                                                          convertBooleanToYesNo(person.isPrefersMen()));
+            case PREFERS_WOMEN -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
+                                                            convertBooleanToYesNo(person.isPrefersWomen()));
             case PROTOMEK -> skillValue.apply(SkillType.S_GUN_PROTO);
-            case QUICK_TRAIN_IGNORE -> resources.getString(person.isQuickTrainIgnore() ? "Yes.text" : "No.text");
+            case QUICK_TRAIN_IGNORE -> resources.getString(convertBooleanToYesNo(person.isQuickTrainIgnore()));
             case RANK -> person.makeHTMLRank();
             case REASONING -> person.getReasoning().getLabel();
             case RECRUITMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
@@ -872,13 +878,14 @@ public enum PersonnelTableModelColumn {
             case TECH_VESSEL -> skillValue.apply(SkillType.S_TECH_VESSEL);
             case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
             case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
-            case TRYING_TO_CONCEIVE -> resources.getString(person.getGender().isFemale()
-                                                                 ?
-                                                                 (person.isTryingToConceive() ?
-                                                                  "Yes.text" :
-                                                                  "No.text") :
+            case TRYING_TO_CONCEIVE -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
+                                                                 person.getGender().isFemale() ?
+                                                                 (convertBooleanToYesNo(person.isTryingToConceive())) :
                                                                  "NA.text");
-            case UNDER_PROTECTION -> resources.getString(person.isUnderProtection() ? "Yes.text" : "No.text");
+            case UNDER_PROTECTION -> resources.getString(convertBooleanToYesNo(person.isUnderProtection()));
+            case COVER_MEDICAL_EXPENSES ->
+                  resources.getString(convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses()));
+            case BLOCK_MATERNITY_LEAVE -> resources.getString(convertBooleanToYesNo(person.isBlockMaternityLeave()));
             case UNIT_ASSIGNMENT -> {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);
@@ -1300,11 +1307,10 @@ public enum PersonnelTableModelColumn {
                      FIRST_NAME,
                      LAST_NAME,
                      COMMANDER,
+                     SECOND_IN_COMMAND,
                      FOUNDER,
                      CLAN_PERSONNEL,
-                     MARRIAGEABLE,
-                     DIVORCEABLE,
-                     TRYING_TO_CONCEIVE,
+                     UNDER_PROTECTION,
                      IMMORTAL -> true;
                 default -> false;
             };
@@ -1313,13 +1319,12 @@ public enum PersonnelTableModelColumn {
                 case RANK,
                      FIRST_NAME,
                      LAST_NAME,
-                     MARRIAGEABLE,
-                     NEVER_ASSIGN_AUTO_MAINTENANCE,
+                     DIVORCEABLE,
                      PREFERS_MEN,
                      PREFERS_WOMEN,
-                     QUICK_TRAIN_IGNORE,
-                     SALVAGE_SUPERVISOR,
-                     SECOND_IN_COMMAND -> true;
+                     COVER_MEDICAL_EXPENSES,
+                     TRYING_TO_CONCEIVE,
+                     BLOCK_MATERNITY_LEAVE -> true;
                 default -> false;
             };
             case FLAGS_C -> switch (this) {
@@ -1327,8 +1332,10 @@ public enum PersonnelTableModelColumn {
                 case RANK,
                      FIRST_NAME,
                      LAST_NAME,
-                     TRYING_TO_CONCEIVE,
-                     UNDER_PROTECTION -> true;
+                     SALVAGE_SUPERVISOR,
+                     QUICK_TRAIN_IGNORE,
+                     NEVER_ASSIGN_AUTO_MAINTENANCE,
+                     HIDE_PERSONALITY -> true;
                 default -> false;
             };
             case PERSONALITY -> switch (this) {

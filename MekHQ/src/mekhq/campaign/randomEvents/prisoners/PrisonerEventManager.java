@@ -705,8 +705,8 @@ public class PrisonerEventManager {
                                           CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG,
-              crimeMessage);
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key, messageColor, CLOSING_SPAN_TAG,
+              crimeMessage));
     }
 
     /**

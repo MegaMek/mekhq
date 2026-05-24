@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -539,7 +539,7 @@ public class RandomDeath {
      * @return the HPG access multiplier, or 0 if no modifier is required.
      */
     private double getHpgAccessMultiplier() {
-        HPGRating hpgRating = campaign.getLocation().getPlanet().getHPG(campaign.getLocalDate());
+        HPGRating hpgRating = campaign.getCurrentLocation().getPlanet().getHPG(campaign.getLocalDate());
         if (hpgRating != null && hpgRating.compareTo(HPGRating.B) >= 0) {
             return MEDICAL_MULTIPLIER_HPG_ACCESS;
         }

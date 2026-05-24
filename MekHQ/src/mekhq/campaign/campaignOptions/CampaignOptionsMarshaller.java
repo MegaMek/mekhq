@@ -1063,6 +1063,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getDropShipBonusPercentage());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "pityContracts",
+              campaignOptions.getPityContracts());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "isUseTwoWayPay",
               campaignOptions.isUseTwoWayPay());
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -1152,12 +1156,20 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAllowDuplicatePortraits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenderedPortraitsOnly",
               campaignOptions.isUseGenderedPortraitsOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPortraitsWhenComingOfAge",
+              campaignOptions.isChildPortraitsWhenComingOfAge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noRandomPortraitsForChildren",
+              campaignOptions.isNoRandomPortraitsForChildren());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useAdvancedBuildingGunEmplacements",
               campaignOptions.isUseAdvancedBuildingGunEmplacements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alliedFacilityModifierDieSize",
+              campaignOptions.getAlliedFacilityModifierDieSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyFacilityModifierDieSize",
+              campaignOptions.getEnemyFacilityModifierDieSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", campaignOptions.getScenarioModBV());

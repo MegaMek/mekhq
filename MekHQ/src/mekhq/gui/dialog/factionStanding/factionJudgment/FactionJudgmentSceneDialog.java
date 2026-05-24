@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -88,7 +88,7 @@ public class FactionJudgmentSceneDialog {
         LocalDate today = campaign.getLocalDate();
         String factionName = judgingFaction.getFullName(today.getYear());
         String campaignName = campaign.getName();
-        CurrentLocation location = campaign.getLocation();
+        CurrentLocation location = campaign.getCurrentLocation();
         boolean isPlanetside = location.isOnPlanet();
         String locationName = isPlanetside
                                     ? location.getPlanet().getName(today)
