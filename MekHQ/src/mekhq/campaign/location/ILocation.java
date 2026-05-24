@@ -44,6 +44,23 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
+/**
+ * Interface for classes that have a location.
+ * <p>
+ * Classes that implement this interface will have a {@link LocationNode} that lets {@code ILocation} implementations
+ * exist within a parent-child location tree. The root of any given tree should be an {@link AbstractLocation}. This
+ * tree reduces granular location housekeeping - We don't need to update the location of every {@link Person},
+ * {@link Unit}, or {@link Part}, we only need to update the location(s) of their parent. Because
+ * {@link mekhq.campaign.Campaign} implements {@code ILocation}, the entire main force only needs to maintain one
+ * location for every object in it.
+ * </p>
+ * <p>
+ * Documentation & descriptions will omit the usage of {@code LocationNode} whenever possible. Technically, there is a
+ * tree of {@code LocationNode} classes, and each {@code LocationNode} has a 1:1 relationship with a {@code ILocation}.
+ * It can therefore be thought of as a tree of {@code ILocation} implementations. This avoids needing to clarify every
+ * time that it's the {@code ILocation}'s {@code LocationNode}'s relative {@code LocationNode}'s {@code ILocation}.
+ * </p>
+ */
 public interface ILocation {
 
     LocationNode getLocationNode();

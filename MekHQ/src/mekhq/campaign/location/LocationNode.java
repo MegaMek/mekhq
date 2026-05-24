@@ -45,6 +45,9 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * A simple node for forming a tree of {@link ILocation} implementations.
+ */
 public class LocationNode {
     private static final MMLogger logger = MMLogger.create(LocationNode.class);
 

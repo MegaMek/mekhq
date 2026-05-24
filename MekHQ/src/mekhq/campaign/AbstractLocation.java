@@ -76,6 +76,10 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
+/**
+ * Abstract implementation of a specific location. An {@code AbstractLocation} is expected as the
+ * {@link ILocation ILocation locatable} of the root {@link LocationNode} in a {@code LocationNode} tree.
+ */
 public abstract class AbstractLocation implements ILocation {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
