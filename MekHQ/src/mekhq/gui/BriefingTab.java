@@ -604,7 +604,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MMComboBox<ScenarioQueueFilter> comboBox = new MMComboBox<>(name, filters);
         styleCompactComponent(comboBox);
         comboBox.setMaximumRowCount(filters.length);
-        comboBox.addActionListener(ev -> refreshScenarioTableData());
+        comboBox.addActionListener(ev -> refreshScenarioTableData(false));
         return comboBox;
     }
 
@@ -1259,6 +1259,10 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean handleSalvageAssignments(Scenario scenario) {
+        if (!getCampaignOptions().isUseCamOpsSalvage()) {
+            return false;
+        }
+
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
             if (!displaySalvageFormationPicker(scenario)) {
@@ -2417,12 +2421,17 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void refreshScenarioTableData() {
+        refreshScenarioTableData(true);
+    }
+
+    private void refreshScenarioTableData(boolean preserveResolvedSelection) {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL_ACTIVE);
         final Mission mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
-        if ((scenarioSelection >= 0) && (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
+        if (preserveResolvedSelection && (scenarioSelection >= 0) &&
+                  (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
                   isResolvedScenario(visibleScenarios, scenarioSelection)) {
             scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
             return;
