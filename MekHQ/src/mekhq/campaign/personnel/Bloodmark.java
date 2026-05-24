@@ -173,6 +173,10 @@ public class Bloodmark {
             return false;
         }
 
+        if (target.getEduEducationTime() != 0) { // Student Bloodmarks are handled by the education system
+            return false;
+        }
+
         List<LocalDate> bloodhuntSchedule = target.getBloodhuntSchedule();
         if (bloodhuntSchedule.isEmpty()) {
             return false;

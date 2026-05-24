@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -495,7 +495,7 @@ public class FactionBorderTracker {
         invalid |= now.minusDays(dayThreshold).isAfter(lastUpdate)
                          || now.plusDays(dayThreshold).isBefore(lastUpdate);
 
-        PlanetarySystem loc = event.getCampaign().getLocation().getCurrentSystem();
+        PlanetarySystem loc = event.getCampaign().getCurrentLocation().getCurrentSystem();
         if (!regionHex.isCenter(loc.getX(), loc.getY())) {
             invalid |= (distanceThreshold > 0)
                              && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
