@@ -64,6 +64,7 @@ public class LocationNode {
         return locatable;
     }
 
+    @Nullable
     public AbstractLocation getCurrentLocation() {
         if (locatable instanceof AbstractLocation abstractLocation) {
             return abstractLocation;
@@ -76,6 +77,7 @@ public class LocationNode {
         return null;
     }
 
+    @Nullable
     public LocationNode getParent() {
         return parent;
     }

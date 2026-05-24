@@ -1764,6 +1764,7 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     @Override
+    @Nullable
     public LocationNode getLocationNode() {
         return locationNode;
     }

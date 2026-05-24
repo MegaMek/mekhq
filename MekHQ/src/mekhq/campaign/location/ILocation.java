@@ -36,6 +36,7 @@ package mekhq.campaign.location;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.parts.Part;
@@ -63,6 +64,12 @@ import mekhq.campaign.universe.PlanetarySystem;
  */
 public interface ILocation {
 
+    AbstractLocation NO_LOCATION = null;
+    PlanetarySystem NO_PLANETARY_SYSTEM = null;
+    Planet NO_PLANET = null;
+    JumpPath NO_JUMP_PATH = null;
+
+    @Nullable
     LocationNode getLocationNode();
 
     default boolean hasLocationNode() {
@@ -74,8 +81,9 @@ public interface ILocation {
      *
      * @return {@link AbstractLocation}, or {@code null} if it doesn't have a {@code AbstractLocation}
      */
+    @Nullable
     default AbstractLocation getCurrentLocation() {
-        return hasLocationNode() ? getLocationNode().getCurrentLocation() : null;
+        return hasLocationNode() ? getLocationNode().getCurrentLocation() : NO_LOCATION;
     }
 
     /**
@@ -84,7 +92,7 @@ public interface ILocation {
      * @return {@code true} if this location has a location, otherwise {@code false}
      */
     default boolean hasLocation() {
-        return getCurrentLocation() != null;
+        return getCurrentLocation() != NO_LOCATION;
     }
 
     /**
@@ -149,9 +157,10 @@ public interface ILocation {
      *
      * @return the current {@link PlanetarySystem}, or {@code null} if no location exists
      */
+    @Nullable
     default PlanetarySystem getCurrentSystem() {
         if (!hasLocation()) {
-            return null;
+            return NO_PLANETARY_SYSTEM;
         }
 
         return getCurrentLocation().getCurrentSystem();
@@ -163,9 +172,10 @@ public interface ILocation {
      *
      * @return the current {@link Planet}, or {@code null} if no location exists
      */
+    @Nullable
     default Planet getPlanet() {
         if (!hasLocation()) {
-            return null;
+            return NO_PLANET;
         }
 
         return getCurrentLocation().getPlanet();
@@ -205,9 +215,10 @@ public interface ILocation {
      *
      * @return the current {@link JumpPath}, or {@code null} if no location exists
      */
+    @Nullable
     default JumpPath getJumpPath() {
         if (!hasLocation()) {
-            return null;
+            return NO_JUMP_PATH;
         }
 
         return getCurrentLocation().getJumpPath();
