@@ -83,7 +83,7 @@ public interface ILocation {
      */
     @Nullable
     default AbstractLocation getCurrentLocation() {
-        return hasLocationNode() ? getLocationNode().getCurrentLocation() : NO_LOCATION;
+        return hasLocationNode() ? getLocationNode().getNearestAbstractLocation() : NO_LOCATION;
     }
 
     /**

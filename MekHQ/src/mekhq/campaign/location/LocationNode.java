@@ -65,13 +65,13 @@ public class LocationNode {
     }
 
     @Nullable
-    public AbstractLocation getCurrentLocation() {
+    public AbstractLocation getNearestAbstractLocation() {
         if (locatable instanceof AbstractLocation abstractLocation) {
             return abstractLocation;
         }
 
         if (parent != null) {
-            return parent.getCurrentLocation();
+            return parent.getNearestAbstractLocation();
         }
 
         return null;
