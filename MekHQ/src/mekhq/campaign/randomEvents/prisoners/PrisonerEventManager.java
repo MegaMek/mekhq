@@ -274,7 +274,7 @@ public class PrisonerEventManager {
     List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
-        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
+        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity);
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
@@ -293,26 +293,8 @@ public class PrisonerEventManager {
         }
 
         // Does the minor event escalate into a major event?
-        eventRoll = randomInt(50);
-        boolean majorEvent = minorEvent &&
-                                   (totalPrisoners > MINIMUM_PRISONER_COUNT) &&
-                                   (eventRoll < overflowPercentage || eventRoll == 0);
-
-        // If there is no event, throw up a warning and give the player an opportunity to do
-        // something about the situation.
-        if (!minorEvent) {
-            if (overflowPercentage > 0 && !isHeadless) {
-                processWarning((int) round(totalPrisoners * overflowPercentage));
-            }
-
-            return List.of(false, false);
-        }
-
-        // Random Event
-        if (!isHeadless) {
-            processRandomEvent(majorEvent);
-        }
-        return List.of(true, majorEvent);
+        processWarning((int) round(totalPrisoners * overflowPercentage));
+        return List.of(true, false);
     }
 
     /**
