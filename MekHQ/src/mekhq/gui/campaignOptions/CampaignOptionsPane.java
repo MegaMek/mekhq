@@ -600,7 +600,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Store old values for use if we want to trigger certain dialogs
         boolean oldAwardVeterancySPAs = oldOptions.awardVeterancySPAs();
         boolean oldIsTrackFactionStanding = oldOptions.trackFactionStanding();
-        boolean oldIsTrackPrisoners = !oldOptions.trackPrisoners();
+        boolean oldIsTrackPrisoners = oldOptions.trackPrisoners();
         boolean oldIsUseMASHTheatres = oldOptions.useMASHTheatres();
         boolean oldIsUseFatigue = oldOptions.useFatigue();
         boolean oldIsUseAdvancedSalvage = oldOptions.useAdvancedSalvage();
