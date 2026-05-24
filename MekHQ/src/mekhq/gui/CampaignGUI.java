@@ -3232,8 +3232,14 @@ public class CampaignGUI extends JPanel {
      * @param logType the category of daily report the UI should prompt the user to review
      */
     public void checkDailyLogNag(DailyReportType logType) {
+        CommandCenterTab commandCenterTab = getCommandCenterTab();
+        if (commandCenterTab == null) {
+            logger.warn("Command Center tab is unavailable, cannot check for daily log nag");
+            return;
+        }
+
         // If we're already nagging, no need to nag again
-        boolean subTabNagActive = getCommandCenterTab().isLogNagActive(logType);
+        boolean subTabNagActive = commandCenterTab.isLogNagActive(logType);
         int relevantIndex = logType.getTabIndex();
 
         // We're already nagging
@@ -3242,55 +3248,40 @@ public class CampaignGUI extends JPanel {
         }
 
         final int selectedIndex = tabMain.getSelectedIndex();
-        if (selectedIndex < 0 || selectedIndex >= tabMain.getTabCount()) {
-            logger.warn("No tab selected, cannot check for daily log nag");
+        final Component selectedTab = ((selectedIndex >= 0) && (selectedIndex < tabMain.getTabCount())) ?
+                                             tabMain.getComponentAt(selectedIndex) : null;
+
+        EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
+        int logsSelected = tabLogs.getSelectedIndex();
+
+        // If the player is already viewing the correct log tab, no nag needed.
+        if (commandCenterTab.isShowing() && (logsSelected == relevantIndex)) {
             return;
         }
 
-        // If the player is already viewing the correct log tab, no nag needed
-        final Component selectedTab = tabMain.getComponentAt(selectedIndex);
-        if (selectedTab instanceof CommandCenterTab commandCenterTab) {
-            int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
-
-            if (logsSelected == relevantIndex) {
-                return;
-            }
+        // If the Command Center is still attached and not currently selected, color that tab's label.
+        int commandCenterIndex = tabMain.indexOfComponent(commandCenterTab);
+        if ((commandCenterIndex >= 0) && (selectedTab != commandCenterTab)) {
+            tabMain.setBackgroundAt(commandCenterIndex, UIUtil.uiDarkBlue());
+            logNagActive = true;
         }
 
-        // Loop through the tabs until we find the Command Center tab, then color that tab's label.
-        for (int i = 0; i < tabMain.getTabCount(); i++) {
-            Component component = tabMain.getComponentAt(i);
+        if (logsSelected != relevantIndex) {
+            DailyReportLogPanel reportTab = switch (logType) {
+                case GENERAL -> commandCenterTab.getGeneralLog();
+                case BATTLE -> commandCenterTab.getBattleLog();
+                case PERSONNEL -> commandCenterTab.getPersonnelLog();
+                case MEDICAL -> commandCenterTab.getMedicalLog();
+                case FINANCES -> commandCenterTab.getFinancesLog();
+                case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
+                case TECHNICAL -> commandCenterTab.getTechnicalLog();
+                case POLITICS -> commandCenterTab.getPoliticsLog();
+                case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+            };
 
-            if (component instanceof CommandCenterTab commandCenterTab) {
-                // If the player is currently on the Command Center Tab, no need to nag that tab, though we're still
-                // going to nag the sub-tab
-                if (!(selectedTab instanceof CommandCenterTab)) {
-                    tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
-                    logNagActive = true;
-                }
-
-                EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
-                int logsSelected = tabLogs.getSelectedIndex();
-                if (logsSelected != relevantIndex) {
-                    DailyReportLogPanel reportTab = switch (logType) {
-                        case GENERAL -> commandCenterTab.getGeneralLog();
-                        case BATTLE -> commandCenterTab.getBattleLog();
-                        case PERSONNEL -> commandCenterTab.getPersonnelLog();
-                        case MEDICAL -> commandCenterTab.getMedicalLog();
-                        case FINANCES -> commandCenterTab.getFinancesLog();
-                        case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
-                        case TECHNICAL -> commandCenterTab.getTechnicalLog();
-                        case POLITICS -> commandCenterTab.getPoliticsLog();
-                        case SKILL_CHECKS -> commandCenterTab.getSkillLog();
-                    };
-
-                    if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
-                        commandCenterTab.nagLogTab(relevantIndex);
-                        commandCenterTab.setLogNagActive(logType, true);
-                    }
-                }
-
-                break;
+            if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
+                commandCenterTab.nagLogTab(relevantIndex);
+                commandCenterTab.setLogNagActive(logType, true);
             }
         }
     }
