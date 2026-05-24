@@ -511,22 +511,29 @@ public final class FinancesTab extends CampaignGuiTab {
             method will need to be modified to account for additional characters.
     */
     public String formattingFinancialReport(String financialLine, int indentLevel, String printedValue) {
-        //Total length of all characters in report line is 44
-        StringBuilder sb = new StringBuilder(44);
+        //Total length of all characters in report line is 50
+        StringBuilder financialLineFormatter = new StringBuilder(50);
         switch (indentLevel) {
-            case 1 -> sb.append("");
-            case 2 -> sb.append("    ");
-            case 3 -> sb.append("       ");
-            default -> sb.append("");
+            case 1 -> financialLineFormatter.append("");
+            case 2 -> financialLineFormatter.append("    ");
+            case 3 -> financialLineFormatter.append("       ");
+            default -> financialLineFormatter.append("");
         }
-        sb.append(financialLine);
-        sb.repeat(".", (25 - sb.length()));
-        sb.repeat(" ", (19 - printedValue.length()));
-        sb.append(printedValue);
-        sb.append('\n');
+        financialLineFormatter.append(financialLine);
+        financialLineFormatter.repeat(".", (26 - financialLineFormatter.length()));
+        //by default the maximum dollar amount able to be displayed will be 9,999,999,999,999 C-bills
+        //but this try-catch will at least let the crazy person who gets to 10 trillion C-bills not to
+        //have the game crash.
+        try {
+            financialLineFormatter.repeat(" ", (24 - printedValue.length()));
+        } catch (IllegalArgumentException stringTooLong) {
+            financialLineFormatter.repeat(" ", (26 - printedValue.length()));
+        }
+        financialLineFormatter.append(printedValue);
+        financialLineFormatter.append('\n');
 
 
-        return sb.toString();
+        return financialLineFormatter.toString();
     }
 
     public String getFormattedFinancialReport() {

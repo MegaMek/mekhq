@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -110,10 +110,10 @@ public class TravelStoryPoint extends StoryPoint {
             // if we don't have a valid destination, then complete the story point
             complete();
         } else if (autoStart) {
-            CurrentLocation location = getStoryArc().getCampaign().getLocation();
+            CurrentLocation location = getStoryArc().getCampaign().getCurrentLocation();
             JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(),
                   getDestination());
-            getStoryArc().getCampaign().getLocation().setJumpPath(path);
+            getStoryArc().getCampaign().getCurrentLocation().setJumpPath(path);
         }
     }
 
