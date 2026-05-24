@@ -6563,6 +6563,16 @@ public class Unit implements ITechnology {
     }
 
     /**
+     * Returns the set of {@link PersonnelRole}s that currently have at least one temp crew member assigned to this
+     * unit.
+     *
+     * @return an immutable snapshot of the roles with temp crew
+     */
+    public Set<PersonnelRole> getTempCrewRoles() {
+        return Set.copyOf(tempPersonnelRoleMap.keySet());
+    }
+
+    /**
      * Returns true if this unit is using any type of blob crew
      *
      * @return true if unit has any temp crew assigned
