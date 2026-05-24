@@ -4513,7 +4513,12 @@ public class Person {
 
             // Self-correcting Education course index
             selfCorrectEducationCourseIndexes(campaign, person);
-
+        } catch (Exception e) {
+            LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
+            person = null;
+        }
+        
+        if (person != null) {
             // < 0.51.00 compatibility handler
             if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -4525,9 +4530,6 @@ public class Person {
                           healingPeriod);
                 }
             }
-        } catch (Exception e) {
-            LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
-            person = null;
         }
 
         return person;
