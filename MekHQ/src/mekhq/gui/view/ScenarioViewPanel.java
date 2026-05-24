@@ -207,7 +207,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
     }
 
     private javax.swing.border.Border createBriefingSectionBorder(String title) {
-          javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
+        javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
               getSubtleBorderColor(),
               2,
               10,
