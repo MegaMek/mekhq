@@ -153,6 +153,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private int selectedRow = -1;
     private int partId = -1;
     private Person selectedTech;
+    private Person tempTech;
 
     // region Constructors
     public WarehouseTab(CampaignGUI gui, String name) {
@@ -711,6 +712,16 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return null;
         }
         return techsModel.getTechAt(techTable.convertRowIndexToModel(row));
+    }
+
+    @Override
+    public Person getTempTech() {
+        return tempTech;
+    }
+
+    @Override
+    public void setTempTech(Person tempTech) {
+        this.tempTech = tempTech;
     }
 
     @Override
