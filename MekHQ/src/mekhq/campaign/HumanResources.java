@@ -364,6 +364,13 @@ public class HumanResources {
                      .toList();
     }
 
+    public List<Person> getPatientsWithNonPermanentInjuries() {
+        return getPatients()
+                     .stream()
+                     .filter(patient -> !patient.getNonPermanentInjuries().isEmpty() || patient.getHits() > 0)
+                     .toList();
+    }
+
     public int getPatientsFor(Person doctor) {
         int patients = 0;
         for (Person person : getActivePersonnel(true, true)) {
