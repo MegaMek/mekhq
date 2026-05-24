@@ -141,7 +141,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -158,6 +157,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -346,7 +346,7 @@ public final class BriefingTab extends CampaignGuiTab {
               ScenarioQueueFilter.ALL_RESOLVED
         });
 
-        panScenarioActions = createBriefingSectionPanel(
+        panScenarioActions = BriefingStyle.createSectionPanel(
               resourceMap.getString("briefingTab.scenarioActions.title"));
         JPanel panScenarioButtons = new JPanel(new GridLayout(3, 3, 5, 5));
         panScenarioActions.add(panScenarioButtons, BorderLayout.CENTER);
@@ -429,8 +429,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setViewportView(null);
         scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        panLanceAssignment.setMinimumSize(new Dimension(300, 300));
-        panLanceAssignment.setPreferredSize(new Dimension(600, 300));
 
         scenarioWorkTabs = new JTabbedPane();
         styleBriefingTabs(scenarioWorkTabs);
@@ -467,7 +465,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         setLayout(new BorderLayout());
         add(panMission, BorderLayout.NORTH);
-                add(splitOverview, BorderLayout.CENTER);
+        add(splitOverview, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
     }
 
@@ -512,28 +510,6 @@ public final class BriefingTab extends CampaignGuiTab {
         component.putClientProperty(FLATLAF_STYLE_CLASS, "small");
     }
 
-    private JPanel createBriefingSectionPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.setBorder(createBriefingSectionBorder(title));
-        return panel;
-    }
-
-    private javax.swing.border.Border createBriefingSectionBorder(String title) {
-        javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
-              getSubtleBorderColor(),
-              2,
-              10,
-              8);
-        titledBorder.setTitleFont(getBriefingSectionTitleFont());
-        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
-    }
-
-    private Font getBriefingSectionTitleFont() {
-        JLabel title = new JLabel();
-        styleCompactComponent(title);
-        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
-    }
-
     private void styleSecondaryButtons(AbstractButton... buttons) {
         for (AbstractButton button : buttons) {
             styleSecondaryButton(button);
@@ -551,12 +527,12 @@ public final class BriefingTab extends CampaignGuiTab {
         styleBriefingButton(button);
         button.setFont(button.getFont().deriveFont(Font.BOLD));
 
-        Color background = getUIColor("Button.default.background", "Actions.Blue", "Table.selectionBackground");
+        Color background = getUIColor("Button.default.background", "Actions.Blue");
         if (background != null) {
             button.setBackground(background);
         }
 
-        Color foreground = getUIColor("Button.default.foreground", "Table.selectionForeground", "Button.foreground");
+        Color foreground = getUIColor("Button.default.foreground", "Button.foreground");
         if (foreground != null) {
             button.setForeground(foreground);
         }
@@ -582,17 +558,6 @@ public final class BriefingTab extends CampaignGuiTab {
         } else if (btnDeploySelectedScenario.isEnabled()) {
             stylePrimaryButton(btnDeploySelectedScenario);
         }
-    }
-
-    private Color getSubtleBorderColor() {
-        Color color = UIManager.getColor("Component.borderColor");
-        if (color == null) {
-            color = UIManager.getColor("Separator.foreground");
-        }
-        if (color == null) {
-            color = UIManager.getColor("controlShadow");
-        }
-        return (color == null) ? Color.GRAY : color;
     }
 
     private Color getUIColor(String... keys) {
@@ -649,7 +614,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private JPanel createScenarioQueuePanel(JTable table, String title, MMComboBox<ScenarioQueueFilter> filterCombo,
           @Nullable JPanel detailPanel) {
-        JPanel queuePanel = createBriefingSectionPanel(title);
+        JPanel queuePanel = BriefingStyle.createSectionPanel(title);
         queuePanel.setMinimumSize(new Dimension(300, 180));
 
         JPanel queueBody = new JPanel(new BorderLayout(0, 5));
@@ -2457,6 +2422,12 @@ public final class BriefingTab extends CampaignGuiTab {
               ScenarioQueueFilter.ALL_ACTIVE);
         final Mission mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
+        if ((scenarioSelection >= 0) && (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
+                  isResolvedScenario(visibleScenarios, scenarioSelection)) {
+            scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
+            return;
+        }
+
         List<Scenario> filteredScenarios = new ArrayList<>();
 
         for (Scenario scenario : visibleScenarios) {
@@ -2471,12 +2442,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scenarioModel.setData(filteredScenarios);
 
-        boolean scenarioSelected = selectScenarioInTable(scenarioTable, scenarioModel, scenarioSelection);
-        if (!scenarioSelected && (scenarioSelection >= 0) && (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
-                  isResolvedScenario(visibleScenarios, scenarioSelection)) {
-            scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
-            return;
-        }
+        selectScenarioInTable(scenarioTable, scenarioModel, scenarioSelection);
 
         scenarioTable.setFillsViewportHeight(true);
         refreshScenarioView();

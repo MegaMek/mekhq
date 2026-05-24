@@ -99,11 +99,11 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
     public int getColumnWidth(int c) {
         return switch (c) {
-            case COL_NAME -> 210;
+            case COL_NAME -> 150;
             case COL_STATUS -> 140;
-            case COL_DATE -> 110;
-            case COL_ASSIGN -> 120;
-            case COL_SECTOR -> 170;
+            case COL_DATE -> 70;
+            case COL_ASSIGN -> 80;
+            case COL_SECTOR -> 120;
             default -> 80;
         };
     }

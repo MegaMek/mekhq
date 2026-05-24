@@ -36,10 +36,8 @@ package mekhq.gui.view;
 import static megamek.client.ui.WrapLayout.wordWrap;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -60,8 +58,8 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.DataTableModel;
+import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -214,20 +212,20 @@ public class LanceAssignmentView extends JPanel {
         tblAssignments.setFillsViewportHeight(true);
         styleAssignmentTable(tblAssignments);
 
-        JPanel deploymentSummaryPanel = createBriefingSectionPanel(
+                JPanel deploymentSummaryPanel = BriefingStyle.createSectionPanel(
               resourceMap.getString("briefingTab.assignments.coverage.title"));
         lblDeploymentSummary = new JLabel();
         styleCompactComponent(lblDeploymentSummary);
         deploymentSummaryPanel.add(lblDeploymentSummary, BorderLayout.CENTER);
         add(deploymentSummaryPanel, BorderLayout.PAGE_START);
 
-        panRequiredLances = createBriefingSectionPanel(resourceMap.getString(
+                panRequiredLances = BriefingStyle.createSectionPanel(resourceMap.getString(
               "briefingTab.assignments.requirements.title"));
         JScrollPane requiredLancesScrollPane = new FastJScrollPane(tblRequiredLances);
         requiredLancesScrollPane.setBorder(BorderFactory.createEmptyBorder());
         panRequiredLances.add(requiredLancesScrollPane, BorderLayout.CENTER);
 
-        JPanel panAssignments = createBriefingSectionPanel(resourceMap.getString(
+                JPanel panAssignments = BriefingStyle.createSectionPanel(resourceMap.getString(
               "briefingTab.assignments.current.title"));
         JScrollPane assignmentsScrollPane = new FastJScrollPane(tblAssignments);
         assignmentsScrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -253,39 +251,6 @@ public class LanceAssignmentView extends JPanel {
 
     private void styleCompactComponent(JComponent component) {
         component.putClientProperty(FLATLAF_STYLE_CLASS, "small");
-    }
-
-    private JPanel createBriefingSectionPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.setBorder(createBriefingSectionBorder(title));
-        return panel;
-    }
-
-    private javax.swing.border.Border createBriefingSectionBorder(String title) {
-        javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
-              getSubtleBorderColor(),
-              2,
-              10,
-              8);
-        titledBorder.setTitleFont(getBriefingSectionTitleFont());
-        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
-    }
-
-    private Font getBriefingSectionTitleFont() {
-        JLabel title = new JLabel();
-        styleCompactComponent(title);
-        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
-    }
-
-    private Color getSubtleBorderColor() {
-        Color color = UIManager.getColor("Component.borderColor");
-        if (color == null) {
-            color = UIManager.getColor("Separator.foreground");
-        }
-        if (color == null) {
-            color = UIManager.getColor("controlShadow");
-        }
-        return (color == null) ? Color.GRAY : color;
     }
 
     private JComboBox<CombatRole> getCbRole() {

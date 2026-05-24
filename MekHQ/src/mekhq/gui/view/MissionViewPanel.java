@@ -36,20 +36,16 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
@@ -59,8 +55,8 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -70,8 +66,6 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
-    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
-
     private final Mission mission;
     protected CampaignGUI gui;
 
@@ -117,7 +111,7 @@ public class MissionViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
-        JPanel statsSection = createBriefingSectionPanel(mission.getName());
+        JPanel statsSection = BriefingStyle.createSectionPanel(mission.getName());
         pnlStats = new JPanel();
         txtDesc = new JTextPane();
 
@@ -137,39 +131,6 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(statsSection, gridBagConstraints);
-    }
-
-    private JPanel createBriefingSectionPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.setBorder(createBriefingSectionBorder(title));
-        return panel;
-    }
-
-    private javax.swing.border.Border createBriefingSectionBorder(String title) {
-        javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
-              getSubtleBorderColor(),
-              2,
-              10,
-              8);
-        titledBorder.setTitleFont(getBriefingSectionTitleFont());
-        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
-    }
-
-    private Font getBriefingSectionTitleFont() {
-        JLabel title = new JLabel();
-        title.putClientProperty(FLATLAF_STYLE_CLASS, "small");
-        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
-    }
-
-    private Color getSubtleBorderColor() {
-        Color color = UIManager.getColor("Component.borderColor");
-        if (color == null) {
-            color = UIManager.getColor("Separator.foreground");
-        }
-        if (color == null) {
-            color = UIManager.getColor("controlShadow");
-        }
-        return (color == null) ? Color.GRAY : color;
     }
 
     private void fillStats() {

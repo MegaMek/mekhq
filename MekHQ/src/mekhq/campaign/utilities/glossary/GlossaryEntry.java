@@ -148,7 +148,7 @@ public enum GlossaryEntry {
     TEMP_PERSONNEL("TEMP_PERSONNEL", new Version("0.50.06")),
     TOE("TOE", new Version("0.50.06")),
     TRAINING_COMBAT_TEAMS("TRAINING_COMBAT_TEAMS", new Version("0.50.10")),
-    TURNING_POINT("TURNING_POINT", new Version("0.50.06")),
+    TURNING_POINTS("TURNING_POINTS", new Version("0.50.06")),
     TURNOVER("TURNOVER", new Version("0.50.06")),
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO", new Version("0.50.06")),
     VEHICLE_CREWS("VEHICLE_CREWS", new Version("0.50.06")),

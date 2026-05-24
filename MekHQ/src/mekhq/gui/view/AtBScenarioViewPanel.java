@@ -39,9 +39,7 @@ import static megamek.common.units.Entity.getEntityMajorTypeName;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -85,14 +83,12 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.utilities.BriefingStyle;
 
 /**
  * @author Neoancient
  */
 public class AtBScenarioViewPanel extends JScrollablePanel {
-    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
-
     private final AtBScenario scenario;
     private final Campaign campaign;
     private final List<String> attachedAllyStub;
@@ -181,7 +177,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
-        JPanel statsSection = createBriefingSectionPanel(scenario.getName());
+        JPanel statsSection = BriefingStyle.createSectionPanel(scenario.getName());
         panStats = new JPanel();
         txtDesc = new JTextArea();
         playerForceTree = new JTree();
@@ -206,7 +202,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         add(statsSection, gridBagConstraints);
 
         if ((scenario.getReport() != null) && !scenario.getReport().isBlank()) {
-            JPanel reportSection = createBriefingSectionPanel("After-Action Report");
+            JPanel reportSection = BriefingStyle.createSectionPanel("After-Action Report");
             JTextArea txtReport = new JTextArea();
             txtReport.setName("txtReport");
             txtReport.setText(scenario.getReport());
@@ -225,39 +221,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(reportSection, gridBagConstraints);
         }
-    }
-
-    private JPanel createBriefingSectionPanel(String title) {
-        JPanel panel = new JPanel(new BorderLayout(0, 6));
-        panel.setBorder(createBriefingSectionBorder(title));
-        return panel;
-    }
-
-    private javax.swing.border.Border createBriefingSectionBorder(String title) {
-        javax.swing.border.TitledBorder titledBorder = RoundedLineBorder.createRoundedLineBorder(title,
-              getSubtleBorderColor(),
-              2,
-              10,
-              8);
-        titledBorder.setTitleFont(getBriefingSectionTitleFont());
-        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0), titledBorder);
-    }
-
-    private Font getBriefingSectionTitleFont() {
-        JLabel title = new JLabel();
-        title.putClientProperty(FLATLAF_STYLE_CLASS, "small");
-        return title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 2.0f);
-    }
-
-    private Color getSubtleBorderColor() {
-        Color color = UIManager.getColor("Component.borderColor");
-        if (color == null) {
-            color = UIManager.getColor("Separator.foreground");
-        }
-        if (color == null) {
-            color = UIManager.getColor("controlShadow");
-        }
-        return (color == null) ? Color.GRAY : color;
     }
 
     private void fillStats() {
