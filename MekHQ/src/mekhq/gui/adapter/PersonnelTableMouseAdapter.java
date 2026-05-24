@@ -984,6 +984,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Person person : people) {
                     if (person.getPrisonerStatus().isPrisonerDefector()) {
                         person.setPrisonerStatus(getCampaign(), PrisonerStatus.FREE, true);
+
+                        // You need to set the prisoner-defector to ACTIVE, otherwise they will be recruited as a
+                        // Camp Follower.
+                        person.setStatus(PersonnelStatus.ACTIVE);
                     }
                 }
                 break;
@@ -3889,7 +3893,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("coverIllicitMedicalExpenses.text"));
-        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("coverIllicitMedicalExpenses.toolTipText"),
+        cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString(
+                    "coverIllicitMedicalExpenses.toolTipText"),
               100));
         cbMenuItem.setName("coverIllicitMedicalExpenses");
         cbMenuItem.setSelected(selected.length == 1 && person.isCoverIllicitMedicalExpenses());
