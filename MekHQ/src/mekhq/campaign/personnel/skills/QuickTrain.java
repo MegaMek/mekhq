@@ -39,7 +39,6 @@ import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
-import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -78,6 +77,7 @@ public class QuickTrain {
      * @param targetPersonnel      the list of personnel (characters) to be trained
      * @param targetLevel          the minimum skill level to reach in each skill
      * @param campaign             the campaign context providing configuration and reporting support
+     * @param options
      * @param isContinuousTraining if {@code true}, training will be repeated for each person as long as improvements
      *                             are possible and XP is available
      *
@@ -85,7 +85,7 @@ public class QuickTrain {
      * @since 0.50.10
      */
     public static void processQuickTraining(List<Person> targetPersonnel, int targetLevel,
-          Campaign campaign, boolean isContinuousTraining) {
+          Campaign campaign, QuickTrainOptions options, boolean isContinuousTraining) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // Should we train Negotiation for Admins?
         boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
@@ -93,21 +93,21 @@ public class QuickTrain {
         boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
         boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
         // Should we train Artillery on combat personnel characters who already have it?
-        boolean isUseArtillery = campaignOptions.isUseArtillery();
+        boolean isLevelArtillery = options.isLevelArtillery();
         // Should soldiers only train Small Arms?
         boolean isUseSmallArmsOnly = campaignOptions.isUseSmallArmsOnly();
         // Should we train command utility & training skills?
         boolean isUseStratCon = campaignOptions.isUseStratCon();
         // Should we train scouting skills on combat personnel who already have them?
-        boolean isUseAdvancedScouting = isUseStratCon && campaignOptions.isUseAdvancedScouting();
+        boolean isLevelScoutingSkills = isUseStratCon && options.isLevelScoutingSkills();
         // Should we train escape skills on personnel who already have them?
-        boolean isUseEscapeSkills = campaignOptions.isUseFunctionalEscapeArtist();
+        boolean isLevelEscapeSkills = options.isLevelEscapeSkills();
         // Should we train appraisal on procurement personnel?
         boolean isUseAppraisal = campaignOptions.isUseFunctionalAppraisal();
         ProcurementPersonnelPick procurementPersonnel = campaignOptions.getAcquisitionPersonnelCategory();
         // Should we train Leadership?
-        boolean isUseManagementSkill = campaignOptions.isUseRandomRetirement() &&
-                                             campaignOptions.isUseManagementSkill();
+        boolean isLevelLeadership = options.isLevelLeadership();
+        boolean isLevelOtherCommandSkills = options.isLevelOtherCommandSkills();
 
         // Do XP costs need to be adjusted?
         boolean isUseReasoningMultiplier = campaignOptions.isUseReasoningXpMultiplier();
@@ -137,8 +137,9 @@ public class QuickTrain {
             SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign,
                   today, true);
             processSkills(person, isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration,
-                  isUseArtillery, isUseSmallArmsOnly, isUseStratCon, isUseAdvancedScouting, isUseEscapeSkills,
-                  isUseAppraisal, procurementPersonnel, isUseManagementSkill, targetSkills, skillModifierData);
+                  isLevelArtillery, isUseSmallArmsOnly, isUseStratCon, isLevelScoutingSkills, isLevelEscapeSkills,
+                  isUseAppraisal, procurementPersonnel, isLevelLeadership, isLevelOtherCommandSkills, targetSkills,
+                  skillModifierData);
 
             if (targetSkills.isEmpty()) {
                 continue;
@@ -270,19 +271,20 @@ public class QuickTrain {
      *                                   skills for their profession-based picks
      * @param isTechsUseAdministration   {@code true} if technicians should use administration instead of
      *                                   technical-specific skills for their profession-based picks
-     * @param isUseArtillery             {@code true} if artillery skills should be considered when building the target
+     * @param isLevelArtillery           {@code true} if artillery skills should be considered when building the target
      *                                   skill list
      * @param isUseSmallArmsOnly         {@code true} if only small-arms combat skills should be considered for combat
      *                                   roles instead of heavier weapon skills
      * @param isUseStratCon              {@code true} to add StratCon-related skills (training, tactics, leadership,
      *                                   strategy) for combat personnel
-     * @param isUseAdvancedScouting      {@code true} to consider and add the best scouting skill for combat personnel
-     * @param isUseEscapeSkills          {@code true} to consider and add the best escape skill for combat personnel
+     * @param isLevelScoutingSkills      {@code true} to consider and add the best scouting skill for combat personnel
+     * @param isLevelEscapeSkills        {@code true} to consider and add the best escape skill for combat personnel
      * @param isUseAppraisal             {@code true} to consider adding the appraisal skill based on the
      *                                   {@code procurementPersonnel} policy
      * @param procurementPersonnel       the policy that determines which personnel (none, all, support, or logistics)
      *                                   are eligible to receive appraisal training
-     * @param isUseManagementSkill       {@code true} to consider and add the leadership skill
+     * @param isLevelLeadership          {@code true} to consider and add the leadership skill
+     * @param isLevelOtherCommandSkills
      * @param targetSkills               the mutable list of skill IDs to populate and then sort
      * @param skillModifierData          the modifier data used to compute each skill's total effective level when
      *                                   ordering {@code targetSkills}
@@ -291,49 +293,32 @@ public class QuickTrain {
      * @since 0.50.10
      */
     private static void processSkills(Person person, boolean isAdminsHaveNegotiation,
-          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseArtillery,
-          boolean isUseSmallArmsOnly, boolean isUseStratCon, boolean isUseAdvancedScouting, boolean isUseEscapeSkills,
-          boolean isUseAppraisal, ProcurementPersonnelPick procurementPersonnel, boolean isUseManagementSkill,
-          List<String> targetSkills, SkillModifierData skillModifierData) {
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isLevelArtillery,
+          boolean isUseSmallArmsOnly, boolean isUseStratCon, boolean isLevelScoutingSkills, boolean isLevelEscapeSkills,
+          boolean isUseAppraisal, ProcurementPersonnelPick procurementPersonnel, boolean isLevelLeadership,
+          boolean isLevelOtherCommandSkills, List<String> targetSkills, SkillModifierData skillModifierData) {
         Skills personSkills = person.getSkills();
         boolean isCombatPersonnel = person.isCombat();
 
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isUseArtillery, isUseSmallArmsOnly, person, targetSkills,
+              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
               person.getPrimaryRole(), skillModifierData);
         fetchSkillsForProfession(isAdminsHaveNegotiation, isDoctorsUseAdministration,
-              isTechsUseAdministration, isUseArtillery, isUseSmallArmsOnly, person, targetSkills,
+              isTechsUseAdministration, isLevelArtillery, isUseSmallArmsOnly, person, targetSkills,
               person.getSecondaryRole(), skillModifierData);
 
         if (!personSkills.hasSkill(SkillType.S_ARTILLERY)) {
             targetSkills.remove(SkillType.S_ARTILLERY);
         }
 
-        if (isUseStratCon) {
-            if (isCombatPersonnel) {
-                if (shouldAddSkill(personSkills, S_TRAINING, targetSkills)) {
-                    targetSkills.add(S_TRAINING);
-                }
-                if (shouldAddSkill(personSkills, S_TACTICS, targetSkills)) {
-                    targetSkills.add(S_TACTICS);
-                }
-                if (shouldAddSkill(personSkills, S_LEADER, targetSkills)) {
-                    targetSkills.add(S_LEADER);
-                }
-                if (shouldAddSkill(personSkills, S_STRATEGY, targetSkills)) {
-                    targetSkills.add(S_STRATEGY);
-                }
-            }
-        }
-
-        if (isCombatPersonnel && isUseAdvancedScouting) {
+        if (isCombatPersonnel && isLevelScoutingSkills) {
             String bestSkill = ScoutingSkills.getBestScoutingSkill(person);
             if (shouldAddSkill(personSkills, bestSkill, targetSkills)) {
                 targetSkills.add(bestSkill);
             }
         }
 
-        if (isCombatPersonnel && isUseEscapeSkills) {
+        if (isCombatPersonnel && isLevelEscapeSkills) {
             String bestSkill = EscapeSkills.getHighestEscapeSkill(person);
             if (shouldAddSkill(personSkills, bestSkill, targetSkills)) {
                 targetSkills.add(bestSkill);
@@ -363,9 +348,19 @@ public class QuickTrain {
             }
         }
 
-        if (isUseManagementSkill) {
+        if (isLevelLeadership) {
             if (shouldAddSkill(personSkills, S_LEADER, targetSkills)) {
                 targetSkills.add(S_LEADER);
+            }
+        }
+
+        if (isLevelOtherCommandSkills) {
+            if (shouldAddSkill(personSkills, S_TACTICS, targetSkills)) {
+                targetSkills.add(S_TACTICS);
+            }
+
+            if (shouldAddSkill(personSkills, S_TACTICS, targetSkills)) {
+                targetSkills.add(S_STRATEGY);
             }
         }
 

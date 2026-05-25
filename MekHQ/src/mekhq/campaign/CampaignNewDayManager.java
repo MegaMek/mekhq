@@ -907,7 +907,7 @@ public class CampaignNewDayManager {
 
         if (MekHQ.getMHQOptions().getNewMonthQuickTrain()) {
             final int newMonthQuickTrainTargetLevel = 5;
-            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, campaign, true);
+            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, campaign, options, true);
         }
     }
 

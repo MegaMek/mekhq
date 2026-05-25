@@ -226,9 +226,12 @@ public final class PersonnelTab extends CampaignGuiTab {
             QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty(), options);
             if (!dialog.isCancel()) {
                 int targetSkillLevel = dialog.getSpinnerValue();
+                options = dialog.getSelectedOptions();
+
                 QuickTrain.processQuickTraining(selectedPersons,
                       targetSkillLevel,
                       getCampaign(),
+                      options,
                       dialog.isContinuousTraining());
             }
         });

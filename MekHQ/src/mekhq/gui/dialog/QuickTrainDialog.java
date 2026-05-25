@@ -90,6 +90,14 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
         return getDialogChoice() == cancelIndex;
     }
 
+    public QuickTrain.QuickTrainOptions getSelectedOptions() {
+        return new QuickTrain.QuickTrainOptions(chkLevelArtillery.isSelected(),
+              chkLevelScoutingSkills.isSelected(),
+              chkLevelEscapeSkills.isSelected(),
+              chkLevelLeadership.isSelected(),
+              chkLevelOtherCommandSkills.isSelected());
+    }
+
     /**
      * Returns {@code true} if the user has chosen the continuous training option, which instructs the system to keep
      * training selected personnel until stopping criteria are met.
