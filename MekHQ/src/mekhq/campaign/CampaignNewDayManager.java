@@ -69,6 +69,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Canonica
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getNewDiseaseOutbreaks;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
+import static mekhq.campaign.personnel.skills.QuickTrain.QuickTrainOptions.getQuickTrainOptionsForNewDay;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -105,6 +106,7 @@ import javax.swing.JOptionPane;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -905,10 +907,17 @@ public class CampaignNewDayManager {
             new OptimizeInfirmaryAssignments(campaign);
         }
 
+        MHQOptions mekhqOptions = MekHQ.getMHQOptions();
         if (MekHQ.getMHQOptions().getNewMonthQuickTrain()) {
-            final int newMonthQuickTrainTargetLevel = 5;
-            QuickTrain.QuickTrainOptions options = QuickTrain.QuickTrainOptions.buildQuickTrainOptions(campaignOptions);
-            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, campaign, options, true);
+
+            final int newMonthQuickTrainTargetLevel = mekhqOptions.getQuickTrainTarget();
+
+            QuickTrain.QuickTrainOptions quickTrainOptions = getQuickTrainOptionsForNewDay(mekhqOptions);
+            QuickTrain.processQuickTraining(personnel,
+                  newMonthQuickTrainTargetLevel,
+                  campaign,
+                  quickTrainOptions,
+                  true);
         }
     }
 

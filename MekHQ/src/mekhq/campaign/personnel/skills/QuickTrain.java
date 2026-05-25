@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import megamek.logging.MMLogger;
+import mekhq.MHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.PerformanceLogger;
@@ -56,6 +57,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utility class for performing Quick Training on personnel in a campaign.
@@ -494,6 +496,22 @@ public class QuickTrain {
             boolean isLevelLeadership = true;
             boolean isLevelTraining = true;
             boolean isLevelOtherCommandSkills = true;
+
+            return new QuickTrainOptions(isLevelArtillery,
+                  isLevelScoutingSkills,
+                  isLevelEscapeSkills,
+                  isLevelLeadership,
+                  isLevelTraining,
+                  isLevelOtherCommandSkills);
+        }
+
+        public static QuickTrain.@NonNull QuickTrainOptions getQuickTrainOptionsForNewDay(MHQOptions mekhqOptions) {
+            final boolean isLevelArtillery = mekhqOptions.getLevelArtillery();
+            final boolean isLevelScoutingSkills = mekhqOptions.getLevelScouting();
+            final boolean isLevelEscapeSkills = mekhqOptions.getLevelEscape();
+            final boolean isLevelLeadership = mekhqOptions.getLevelLeadership();
+            final boolean isLevelTraining = mekhqOptions.getLevelTraining();
+            final boolean isLevelOtherCommandSkills = mekhqOptions.getLevelOtherCommand();
 
             return new QuickTrainOptions(isLevelArtillery,
                   isLevelScoutingSkills,
