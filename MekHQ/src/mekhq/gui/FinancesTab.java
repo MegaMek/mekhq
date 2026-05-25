@@ -616,12 +616,16 @@ public final class FinancesTab extends CampaignGuiTab {
                       .append('\n');
             }
         }
-        sb.append(formattingFinancialReport(resourceMap.getString("liabilities.text"), 2,
-              String.format(formatted, liabilities.toAmountAndSymbolString())));
+        if (!liabilities.isZero()) {
+            sb.append(formattingFinancialReport(resourceMap.getString("liabilities.text"), 2,
+                  String.format(formatted, liabilities.toAmountAndSymbolString())));
+        }
 
-        sb.append(formattingFinancialReport(resourceMap.getString("loans.text"), 3,
-              String.format(formatted, r.getLoans().toAmountAndSymbolString())));
-        sb.append("\n\n");
+        if (!r.getLoans().isZero()) {
+            sb.append(formattingFinancialReport(resourceMap.getString("loans.text"), 3,
+                  String.format(formatted, r.getLoans().toAmountAndSymbolString())));
+            sb.append("\n\n");
+        }
 
         sb.append(formattingFinancialReport(resourceMap.getString("monthlyProfit.text"), 1,
               String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString())));
@@ -640,11 +644,15 @@ public final class FinancesTab extends CampaignGuiTab {
         sb.append(formattingFinancialReport(resourceMap.getString("salaries.text"), 2,
               String.format(formatted, r.getSalaries().toAmountAndSymbolString())));
 
-        sb.append(formattingFinancialReport(resourceMap.getString("maintenance.text"), 2,
-              String.format(formatted, r.getMaintenance().toAmountAndSymbolString())));
+        if (!r.getMaintenance().isZero()) {
+            sb.append(formattingFinancialReport(resourceMap.getString("maintenance.text"), 2,
+                  String.format(formatted, r.getMaintenance().toAmountAndSymbolString())));
+        }
 
-        sb.append(formattingFinancialReport(resourceMap.getString("overhead.text"), 2,
-              String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())));
+        if (!r.getOverheadCosts().isZero()) {
+            sb.append(formattingFinancialReport(resourceMap.getString("overhead.text"), 2,
+                  String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())));
+        }
 
         Money rentals = r.getRentals();
         if (!rentals.isZero()) {
