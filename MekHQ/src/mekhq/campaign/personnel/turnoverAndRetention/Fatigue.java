@@ -213,8 +213,9 @@ public class Fatigue {
             person.setIsRecoveringFromFatigue(true);
         }
 
-        if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
-                  && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
+        if ((!person.getStatus().isCampFollower()) &&
+                  (campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0) &&
+                  (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }

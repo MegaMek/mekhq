@@ -1301,7 +1301,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             // If we didn't pick any salvage units, there's no point assigning techs
             if (scenario.getSalvageFormations().isEmpty()) {
-                return true;
+                return false;
             }
 
             return !displaySalvageTechPicker(scenario);

@@ -34,8 +34,8 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import java.util.Objects;
 
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 
@@ -69,7 +69,7 @@ public class UnableToAffordJumpNagLogic {
      * </p>
      */
     public static Money getNextJumpCost(Campaign campaign) {
-        CurrentLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
 
         if (jumpPath == null) {

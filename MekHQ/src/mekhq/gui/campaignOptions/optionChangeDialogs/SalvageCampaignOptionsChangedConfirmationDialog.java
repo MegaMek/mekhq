@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,6 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.campaign.universe.companyGeneration.SupportTOEFormationTypes.SALVAGE_FORMATION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -49,6 +50,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -63,7 +66,11 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.companyGeneration.AddSupportUnitsToTOE;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -179,7 +186,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "SalvageCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeUnits(campaign);
+            processFreeUnits(campaign, campaign.getFaction(), true);
             dispose();
         });
 
@@ -190,7 +197,7 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
         return pnlButtons;
     }
 
-    public static void processFreeUnits(Campaign campaign) {
+    public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
         int truckCount = campaign.getFaction().getFormationBaseSize();
         if (campaign.isClanCampaign()) {
             truckCount *= 2; // 2 vehicles per point
@@ -198,6 +205,8 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
 
         // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
         String unitName = "BattleMech Recovery Vehicle";
+
+        List<Unit> units = new ArrayList<>();
         for (int i = 0; i < truckCount; i++) {
             MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
             if (mekSummary == null) {
@@ -210,12 +219,22 @@ public class SalvageCampaignOptionsChangedConfirmationDialog extends JDialog {
                 if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                     quality = UnitOrder.getRandomUnitQuality(0);
                 }
-                campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+                if (isAutomaticallyAssignRanks) {
+                    if (unit != null) {
+                        AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
+                        units.add(unit);
+                    }
+                }
             } catch (Exception e) {
                 LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",
                       mekSummary.getSourceFile(),
                       mekSummary.getEntryName());
             }
+        }
+
+        if (!units.isEmpty()) {
+            AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, SALVAGE_FORMATION);
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@
 package mekhq.campaign.events;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.AbstractLocation;
 
 /**
  * Event for a change of location (planetary system) for the campaign.
@@ -43,7 +43,7 @@ import mekhq.campaign.CurrentLocation;
  */
 public class LocationChangedEvent extends MMEvent {
 
-    private final CurrentLocation location;
+    private final AbstractLocation location;
     private final boolean kfJump;
 
     /**
@@ -53,7 +53,7 @@ public class LocationChangedEvent extends MMEvent {
      * @param kfJump   Whether the jump occurred as a result of moving to the next location in a jump path (as opposed
      *                 to GM set location)
      */
-    public LocationChangedEvent(CurrentLocation location, boolean kfJump) {
+    public LocationChangedEvent(AbstractLocation location, boolean kfJump) {
         this.location = location;
         this.kfJump = kfJump;
     }
@@ -61,7 +61,7 @@ public class LocationChangedEvent extends MMEvent {
     /**
      * @return The campaign's location object.
      */
-    public CurrentLocation getLocation() {
+    public AbstractLocation getLocation() {
         return location;
     }
 

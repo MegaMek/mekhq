@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -88,8 +90,6 @@ import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.view.UnitViewPanel;
-
-import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
 
 /**
  * Displays a table of all units in the force.
@@ -299,7 +299,8 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (wasConfirmedOverall) {
-            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+            boolean skipReports = true;
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }
     }
 

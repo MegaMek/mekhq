@@ -106,15 +106,27 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // units has
         // any crew or a tech
         if (Stream.of(units).anyMatch(unit -> (unit.getTech() != null) || !unit.getCrew().isEmpty())) {
-            final JMenuItem miUnassignCrew = new JMenuItem(resources.getString("miUnassignCrew.text"));
-            miUnassignCrew.setName("miUnassignCrew");
-            miUnassignCrew.addActionListener(evt -> {
-                for (final Unit unit : units) {
-                    unit.clearCrew();
-                }
-            });
-            add(miUnassignCrew);
+            String key = "miUnassignCrew";
+            boolean keepTechs = false;
+            removeCrew(units, key, keepTechs);
         }
+
+        if (Stream.of(units).anyMatch(unit -> !unit.getCrew().isEmpty())) {
+            String key = "miUnassignNonTechCrew";
+            boolean keepTechs = true;
+            removeCrew(units, key, keepTechs);
+        }
+    }
+
+    private void removeCrew(Unit[] units, String key, boolean keepTechs) {
+        final JMenuItem menuItem = new JMenuItem(resources.getString(key + ".text"));
+        menuItem.setName(key);
+        menuItem.addActionListener(evt -> {
+            for (final Unit unit : units) {
+                unit.clearCrew(keepTechs);
+            }
+        });
+        add(menuItem);
     }
 
     private void createPersonAssignmentMenus(final Campaign campaign, final Unit... units) {

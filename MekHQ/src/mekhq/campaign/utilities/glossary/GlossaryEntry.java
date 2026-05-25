@@ -52,9 +52,9 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public enum GlossaryEntry {
-    CANONICAL_DISEASES("CANONICAL_DISEASES", new Version("0.50.11")),
     ADMIN_STRAIN("HR_STRAIN", new Version("0.50.06")),
     ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.11")),
+    AGGREGATE_COMBAT_VIEW("AGGREGATE_COMBAT_VIEW", new Version("0.51.0")),
     AGING("AGING", new Version("0.50.06")),
     ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),
@@ -63,6 +63,7 @@ public enum GlossaryEntry {
     ATTRIBUTE_SCORES("ATTRIBUTE_SCORES", new Version("0.50.06")),
     AUTOINFIRMARY("AUTOINFIRMARY", new Version("0.50.06")),
     BLOODMARK("BLOODMARK", new Version("0.51.00")),
+    CANONICAL_DISEASES("CANONICAL_DISEASES", new Version("0.50.11")),
     CAPITAL_SYSTEMS("CAPITAL_SYSTEMS", new Version("0.50.06")),
     CHALLENGE_SKULLS("CHALLENGE_SKULLS", new Version("0.50.11")),
     CHANGING_FILTERS_HANGAR("CHANGING_FILTERS_HANGAR", new Version("0.50.06")),
