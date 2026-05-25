@@ -1614,7 +1614,10 @@ public class BiographyTab {
 
         Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
-            chkEnabledRandomDeathAgeGroups.get(ageGroup).setSelected(deathAgeGroups.get(ageGroup));
+                  JCheckBox ageGroupCheckBox = chkEnabledRandomDeathAgeGroups.get(ageGroup);
+                  if (ageGroupCheckBox != null) {
+                        ageGroupCheckBox.setSelected(Boolean.TRUE.equals(deathAgeGroups.get(ageGroup)));
+                  }
         }
 
         // Education
@@ -1647,7 +1650,9 @@ public class BiographyTab {
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
-            chkUsePortrait[i].setSelected(usePortraitForRole[i]);
+                  if (chkUsePortrait[i] != null) {
+                        chkUsePortrait[i].setSelected(usePortraitForRole[i]);
+                  }
         }
 
         // Ranks
@@ -1716,8 +1721,10 @@ public class BiographyTab {
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
         options.setRandomDeathMultiplier((double) spnRandomDeathMultiplier.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
-            options.getEnabledRandomDeathAgeGroups()
-                  .put(ageGroup, chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
+                  JCheckBox ageGroupCheckBox = chkEnabledRandomDeathAgeGroups.get(ageGroup);
+                  if (ageGroupCheckBox != null) {
+                        options.getEnabledRandomDeathAgeGroups().put(ageGroup, ageGroupCheckBox.isSelected());
+                  }
         }
 
         // Education
@@ -1748,6 +1755,9 @@ public class BiographyTab {
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
 
         for (int i = 0; i < chkUsePortrait.length; i++) {
+                  if (chkUsePortrait[i] == null) {
+                        continue;
+                  }
             if (i == chkUsePortrait.length - 1) {
                 for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
                     options.setUsePortraitForRole(role.ordinal(), chkUsePortrait[i].isSelected());
