@@ -106,6 +106,7 @@ import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.DiplomacyReport;
 import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.dialog.PartsReportDialog;
+import mekhq.gui.dialog.ShoppingListPriorityDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -169,6 +170,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JTable procurementTable;
     private JLabel procurementTotalCostLabel;
     private ProcurementTableModel procurementModel;
+    private RoundedJButton btnChangePriority;
     private RoundedJButton btnPauseProcurement;
     private RoundedJButton btnResumeProcurement;
     private RoundedJButton btnMRMSDialog;
@@ -647,6 +649,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
+
+        btnChangePriority = new RoundedJButton(resourceMap.getString("btnChangePriority.text"));
+        btnChangePriority.addActionListener(evt -> {
+            new ShoppingListPriorityDialog(this.getFrame(), getCampaign());
+            this.refreshProcurementList();
+        });
+        btnChangePriority.setEnabled(true);
+        panProcurementButtons.add(btnChangePriority);
 
         btnPauseProcurement = new RoundedJButton(resourceMap.getString("btnPauseProcurement.text"));
         btnPauseProcurement.addActionListener(evt -> {
