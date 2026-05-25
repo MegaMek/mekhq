@@ -263,6 +263,30 @@ public class CurrentLocationTest {
         }
 
         @Test
+        void testChargeFully() {
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.chargeFully(campaign);
+                assertEquals(176.0, loc.getRechargeTime());
+                mekHQ.verify(() -> MekHQ.triggerEvent(any()), times(1));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
+            }
+        }
+
+        @Test
+        void testIsRecharging() {
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            when(campaign.isUseCommandCircuit()).thenReturn(false);
+            assertTrue(loc.isRecharging(campaign));
+            when(system.getRechargeTime(today, false)).thenReturn(0.0);
+            assertFalse(loc.isRecharging(campaign));
+        }
+    }
+
+    /** Tests for {@link CurrentLocation#writeToXML(java.io.PrintWriter, int)}. */
+    @Nested
+    class WriteToXml {
+        @Test
         void containsExpectedFields() {
             when(system.getId()).thenReturn("Outreach");
             CurrentLocation loc = new CurrentLocation(system, 5.5);
@@ -303,26 +327,6 @@ public class CurrentLocationTest {
             loc.writeToXML(new PrintWriter(baos, true), 0);
 
             assertFalse(baos.toString().contains("jumpPath"));
-        }
-
-        @Test
-        void testChargeFully() {
-            CurrentLocation loc = new CurrentLocation(system, 0.0);
-            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
-                loc.chargeFully(campaign);
-                assertEquals(176.0, loc.getRechargeTime());
-                mekHQ.verify(() -> MekHQ.triggerEvent(any()), times(1));
-                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
-            }
-        }
-
-        @Test
-        void testIsRecharging() {
-            CurrentLocation loc = new CurrentLocation(system, 0.0);
-            when(campaign.isUseCommandCircuit()).thenReturn(false);
-            assertTrue(loc.isRecharging(campaign));
-            when(system.getRechargeTime(today, false)).thenReturn(0.0);
-            assertFalse(loc.isRecharging(campaign));
         }
     }
 

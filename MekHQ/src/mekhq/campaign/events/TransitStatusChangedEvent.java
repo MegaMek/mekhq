@@ -34,20 +34,20 @@
 package mekhq.campaign.events;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.AbstractLocation;
 
 /**
  * Event for a change of travel status (jumpship charge, in-system travel, jump path updates).
  */
 public class TransitStatusChangedEvent extends MMEvent {
 
-    private final CurrentLocation location;
+    private final AbstractLocation location;
 
-    public TransitStatusChangedEvent(CurrentLocation location) {
+    public TransitStatusChangedEvent(AbstractLocation location) {
         this.location = location;
     }
 
-    public CurrentLocation getLocation() {
+    public AbstractLocation getLocation() {
         return location;
     }
 
