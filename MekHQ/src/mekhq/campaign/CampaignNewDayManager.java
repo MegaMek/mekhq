@@ -105,6 +105,7 @@ import javax.swing.JOptionPane;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -249,52 +250,86 @@ public class CampaignNewDayManager {
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
-        // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill()) {
-            campaign.resetAsTechPool();
+        // Refill Automated Pools, if the options are selected.
+        // When "no release" is also set, only hire to cover shortfalls (skip firing surplus).
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        if (mhqOptions.getNewDayAsTechPoolFill()) {
+            if (mhqOptions.getNewDayAsTechPoolNoRelease()) {
+                campaign.fillAsTechPool();
+            } else {
+                campaign.resetAsTechPool();
+            }
         }
 
-        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
-            campaign.resetMedicPool();
+        if (mhqOptions.getNewDayMedicPoolFill()) {
+            if (mhqOptions.getNewDayMedicPoolNoRelease()) {
+                campaign.fillMedicPool();
+            } else {
+                campaign.resetMedicPool();
+            }
         }
 
-        if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
+        if (mhqOptions.getNewDaySoldierPoolFill()) {
+            if (!mhqOptions.getNewDaySoldierPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.SOLDIER);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+        if (mhqOptions.getNewDayBattleArmorPoolFill()) {
+            if (!mhqOptions.getNewDayBattleArmorPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewGroundPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVehicleCrewVTOLPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewVTOLPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVehicleCrewNavalPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewNavalPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVesselPilotPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+        if (mhqOptions.getNewDayVesselPilotPoolFill()) {
+            if (!mhqOptions.getNewDayVesselPilotPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVesselGunnerPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+        if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
+            if (!mhqOptions.getNewDayVesselGunnerPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+        if (mhqOptions.getNewDayVesselCrewPoolFill()) {
+            if (!mhqOptions.getNewDayVesselCrewPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
         }
 
