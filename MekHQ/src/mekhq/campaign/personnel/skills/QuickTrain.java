@@ -368,7 +368,7 @@ public class QuickTrain {
                 targetSkills.add(S_TACTICS);
             }
 
-            if (shouldAddSkill(personSkills, S_TACTICS, targetSkills)) {
+            if (shouldAddSkill(personSkills, S_STRATEGY, targetSkills)) {
                 targetSkills.add(S_STRATEGY);
             }
         }
