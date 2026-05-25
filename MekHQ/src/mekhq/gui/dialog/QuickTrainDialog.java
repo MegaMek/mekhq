@@ -74,6 +74,8 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
           "QuickTrainDialog.chkLevelEscapeSkills"));
     private static final JCheckBox chkLevelLeadership = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
           "QuickTrainDialog.chkLevelLeadership"));
+    private static final JCheckBox chkLevelTraining = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+          "QuickTrainDialog.chkLevelTraining"));
     private static final JCheckBox chkLevelOtherCommandSkills = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
           "QuickTrainDialog.chkLevelOtherCommandSkills"));
 
@@ -95,6 +97,7 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
               chkLevelScoutingSkills.isSelected(),
               chkLevelEscapeSkills.isSelected(),
               chkLevelLeadership.isSelected(),
+              chkLevelTraining.isSelected(),
               chkLevelOtherCommandSkills.isSelected());
     }
 
