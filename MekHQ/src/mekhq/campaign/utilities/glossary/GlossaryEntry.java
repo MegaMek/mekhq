@@ -123,7 +123,7 @@ public enum GlossaryEntry {
     PRISONER_CAPACITY("PRISONER_CAPACITY", new Version("0.50.06")),
     PROFESSIONS("PROFESSIONS", new Version("0.50.06")),
     PROSTHETICS("PROSTHETICS", new Version("0.50.10")),
-    QUICK_TRAIN("QUICK_TRAIN", new Version("0.50.11")),
+    QUICK_TRAIN("QUICK_TRAIN", new Version("0.51.0")),
     RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", new Version("0.50.06")),
     RELEASE_TYPES("RELEASE_TYPES", new Version("0.50.06")),
     RELEASE_TYPE_DEVELOPMENT("RELEASE_TYPE_DEVELOPMENT", new Version("0.50.06")),
