@@ -57,9 +57,9 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}. Default constraints include:
      * </p>
      * <ul>
-     *   <li> {@code anchor} set to {@link GridBagConstraints#NORTHWEST} </li>
-     *   <li> {@code fill} set to {@link GridBagConstraints#BOTH} </li>
-     *   <li> {@code insets} set to {@code new Insets(5, 5, 5, 5)} </li>
+     *   <li>{@code anchor} set to {@link GridBagConstraints#NORTHWEST}</li>
+     *   <li>{@code fill} set to {@link GridBagConstraints#HORIZONTAL}</li>
+     *   <li>{@code insets} set to {@code new Insets(5, 5, 5, 5)}</li>
      * </ul>
      *
      * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
@@ -78,7 +78,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * values are used:
      * <ul>
      *   <li>Default {@code anchor}: {@link GridBagConstraints#NORTHWEST}</li>
-     *   <li>Default {@code fill}: {@link GridBagConstraints#BOTH}</li>
+     *   <li>Default {@code fill}: {@link GridBagConstraints#HORIZONTAL}</li>
      * </ul>
      * Default {@code insets} are set to {@code new Insets(5, 5, 5, 5)}.
      *
@@ -86,7 +86,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * @param anchor the anchor setting for the {@link GridBagConstraints}, or {@code null} to use the default value
      *               {@link GridBagConstraints#NORTHWEST}
      * @param fill   the fill setting for the {@link GridBagConstraints}, or {@code null} to use the default value
-     *               {@link GridBagConstraints#BOTH}
+     *               {@link GridBagConstraints#HORIZONTAL}
      */
     public CampaignOptionsGridBagConstraints(JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
         super();
@@ -96,7 +96,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
 
         // Assign anchor and fill, using defaults if not provided
         this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
-        this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.BOTH);
+        this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.HORIZONTAL);
 
         // Set default insets
         this.insets = new Insets(5, 5, 5, 5);

@@ -47,7 +47,8 @@ class CampaignOptionsRoute {
         this.id = id;
         this.path = List.copyOf(path);
         this.titleResourceNames = List.copyOf(titleResourceNames);
-        this.searchableText = String.join(" ", path).toLowerCase();
+        this.searchableText = normalizeSearchText(String.join(" ", path) + " " + id + " "
+                                                         + String.join(" ", titleResourceNames));
     }
 
     String getId() {
@@ -71,7 +72,21 @@ class CampaignOptionsRoute {
     }
 
     boolean matches(String normalizedFilter) {
-        return searchableText.contains(normalizedFilter);
+        if (normalizedFilter.isBlank()) {
+            return true;
+        }
+
+        for (String token : normalizedFilter.split("\\s+")) {
+            if (!token.isBlank() && !searchableText.contains(token)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static String normalizeSearchText(String text) {
+        return text.toLowerCase().replaceAll("[^a-z0-9]+", " ").trim();
     }
 
     @Override

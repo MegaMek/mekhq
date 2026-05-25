@@ -37,14 +37,17 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -61,7 +64,9 @@ class CampaignOptionsNavigationPanel extends JPanel {
     private final List<CampaignOptionsRoute> routes;
     private final Consumer<CampaignOptionsRoute> routeSelectionListener;
     private final JTextField filterField;
+    private final JLabel filterStatusLabel;
     private final JTree navigationTree;
+    private CampaignOptionsRoute currentRoute;
     private boolean isSyncingSelection;
 
     CampaignOptionsNavigationPanel(List<CampaignOptionsRoute> routes,
@@ -99,6 +104,11 @@ class CampaignOptionsNavigationPanel extends JPanel {
             }
         });
 
+        filterStatusLabel = new JLabel();
+        filterStatusLabel.setName("lblCampaignOptionsFilterStatus");
+        filterStatusLabel.setHorizontalAlignment(SwingConstants.LEADING);
+        filterStatusLabel.setVisible(false);
+
         navigationTree = new JTree();
         navigationTree.setName("campaignOptionsNavigationTree");
         navigationTree.setRootVisible(false);
@@ -111,13 +121,19 @@ class CampaignOptionsNavigationPanel extends JPanel {
         navigationScrollPane.setName("campaignOptionsNavigationScrollPane");
         navigationScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
-        add(filterField, BorderLayout.NORTH);
+        JPanel filterPanel = new JPanel(new BorderLayout(0, 4));
+        filterPanel.setName("campaignOptionsFilterPanel");
+        filterPanel.add(filterField, BorderLayout.NORTH);
+        filterPanel.add(filterStatusLabel, BorderLayout.SOUTH);
+
+        add(filterPanel, BorderLayout.NORTH);
         add(navigationScrollPane, BorderLayout.CENTER);
 
         buildNavigationTree("");
     }
 
     void selectRoute(CampaignOptionsRoute route) {
+        currentRoute = route;
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) navigationTree.getModel().getRoot();
         DefaultMutableTreeNode routeNode = findNavigationNode(root, route);
         if (routeNode == null) {
@@ -142,6 +158,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
 
         CampaignOptionsRoute selectedRoute = getSelectedRoute();
         if (selectedRoute != null) {
+            currentRoute = selectedRoute;
             routeSelectionListener.accept(selectedRoute);
         }
     }
@@ -151,14 +168,17 @@ class CampaignOptionsNavigationPanel extends JPanel {
     }
 
     private void buildNavigationTree(String filterText) {
-        String normalizedFilter = filterText == null ? "" : filterText.trim().toLowerCase();
-        CampaignOptionsRoute selectedRoute = getSelectedRoute();
+        String normalizedFilter = filterText == null ? "" : CampaignOptionsRoute.normalizeSearchText(filterText);
+        List<CampaignOptionsRoute> matchingRoutes = getMatchingRoutes(normalizedFilter);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(new NavigationTreeNode("CampaignOptionsRoot", null));
 
-        for (CampaignOptionsRoute route : routes) {
-            if (normalizedFilter.isBlank() || route.matches(normalizedFilter)) {
-                addNavigationTarget(root, route);
-            }
+        for (CampaignOptionsRoute route : matchingRoutes) {
+            addNavigationTarget(root, route);
+        }
+
+        if (!normalizedFilter.isBlank() && matchingRoutes.isEmpty()) {
+            root.add(new DefaultMutableTreeNode(new NavigationTreeNode(
+                  getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsFilter.noMatches"), null)));
         }
 
         navigationTree.setModel(new DefaultTreeModel(root));
@@ -167,9 +187,47 @@ class CampaignOptionsNavigationPanel extends JPanel {
             navigationTree.expandRow(row);
         }
 
-        if (selectedRoute != null) {
-            selectRoute(selectedRoute);
+        updateFilterStatus(normalizedFilter, matchingRoutes.size());
+
+        if (currentRoute != null) {
+            selectRoute(currentRoute);
         }
+
+        if (currentRoute != null && findNavigationNode(root, currentRoute) == null) {
+            navigationTree.clearSelection();
+        }
+    }
+
+    private List<CampaignOptionsRoute> getMatchingRoutes(String normalizedFilter) {
+        if (normalizedFilter.isBlank()) {
+            return routes;
+        }
+
+        List<CampaignOptionsRoute> matchingRoutes = new ArrayList<>();
+        for (CampaignOptionsRoute route : routes) {
+            if (route.matches(normalizedFilter)) {
+                matchingRoutes.add(route);
+            }
+        }
+
+        return matchingRoutes;
+    }
+
+    private void updateFilterStatus(String normalizedFilter, int matchCount) {
+        if (normalizedFilter.isBlank()) {
+            filterStatusLabel.setVisible(false);
+            filterStatusLabel.setText("");
+            return;
+        }
+
+        if (matchCount == 0) {
+            filterStatusLabel.setText(getTextAt(getCampaignOptionsResourceBundle(),
+                  "campaignOptionsFilter.noMatches"));
+        } else {
+            filterStatusLabel.setText(String.format(getTextAt(getCampaignOptionsResourceBundle(),
+                  "campaignOptionsFilter.matches"), matchCount));
+        }
+        filterStatusLabel.setVisible(true);
     }
 
     private void addNavigationTarget(DefaultMutableTreeNode root, CampaignOptionsRoute route) {

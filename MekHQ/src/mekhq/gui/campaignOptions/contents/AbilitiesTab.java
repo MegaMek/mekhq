@@ -48,6 +48,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,11 +85,7 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 public class AbilitiesTab {
     private ArrayList<String> level3Abilities;
     private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
-    private JPanel combatTab;
-    private JPanel maneuveringTab;
-    private JPanel utilityTab;
-    private JPanel characterFlawsTab;
-    private JPanel characterCreationOnlyTab;
+    private Map<AbilityCategory, JPanel> createdCategoryTabs;
 
     /**
      * Constructor for the {@code AbilitiesTab} class. Initializes the tab by creating containers for ability categories
@@ -106,11 +103,7 @@ public class AbilitiesTab {
     private void initialize() {
         allAbilityInfo = new HashMap<>();
         level3Abilities = new ArrayList<>();
-        combatTab = new JPanel();
-        maneuveringTab = new JPanel();
-        utilityTab = new JPanel();
-        characterFlawsTab = new JPanel();
-        characterCreationOnlyTab = new JPanel();
+        createdCategoryTabs = new EnumMap<>(AbilityCategory.class);
         buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
     }
 
@@ -156,31 +149,32 @@ public class AbilitiesTab {
             buildAbilityInfo(missingAbilities, false);
         }
 
-        // Clear and update tabs in-place
-        refreshAll();
+        refreshCreatedTabs();
     }
 
     /**
-     * Refreshes and updates all tabs related to abilities by clearing their contents and reloading the data.
+     * Refreshes and updates created tabs related to abilities by clearing their contents and reloading the data.
      */
-    private void refreshAll() {
-        refreshTabContents(combatTab, COMBAT_ABILITY);
-        refreshTabContents(maneuveringTab, MANEUVERING_ABILITY);
-        refreshTabContents(utilityTab, UTILITY_ABILITY);
-        refreshTabContents(characterFlawsTab, CHARACTER_FLAW);
-        refreshTabContents(characterCreationOnlyTab, CHARACTER_CREATION_ONLY);
+    private void refreshCreatedTabs() {
+        for (AbilityCategory category : new ArrayList<>(createdCategoryTabs.keySet())) {
+            refreshTabContents(category);
+        }
     }
 
     /**
      * Updates the contents of a specific ability category tab by rebuilding its layout and content based on the
      * category.
      *
-     * @param tab      The {@code JPanel} representing the tab to be refreshed.
      * @param category The ability category associated with the tab.
      */
-    private void refreshTabContents(JPanel tab, AbilityCategory category) {
+    private void refreshTabContents(AbilityCategory category) {
+        JPanel tab = createdCategoryTabs.get(category);
+        if (tab == null) {
+            return;
+        }
+
         tab.removeAll();
-        JPanel newContents = createAbilitiesTab(category);
+        JPanel newContents = createAbilitiesPage(category);
 
         // Add new content to the same panel
         tab.setLayout(new BorderLayout());
@@ -222,6 +216,15 @@ public class AbilitiesTab {
      * @return A {@code JPanel} representing the generated abilities tab.
      */
     public JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
+        JPanel tab = createdCategoryTabs.computeIfAbsent(abilityCategory, category -> new JPanel(new BorderLayout()));
+        if (tab.getComponentCount() == 0) {
+            refreshTabContents(abilityCategory);
+        }
+
+        return tab;
+    }
+
+    private JPanel createAbilitiesPage(AbilityCategory abilityCategory) {
         // Header
         CampaignOptionsHeaderPanel headerPanel = switch (abilityCategory) {
             case COMBAT_ABILITY -> new CampaignOptionsHeaderPanel("CombatAbilitiesTab",
@@ -293,30 +296,7 @@ public class AbilitiesTab {
         }
 
         // Create Parent Panel and return
-        JPanel parentPanel = createParentPanel(panel, "AbilitiesTab" + COMBAT_ABILITY.name());
-
-        return switch (abilityCategory) {
-            case COMBAT_ABILITY -> {
-                combatTab = parentPanel;
-                yield combatTab;
-            }
-            case MANEUVERING_ABILITY -> {
-                maneuveringTab = parentPanel;
-                yield maneuveringTab;
-            }
-            case UTILITY_ABILITY -> {
-                utilityTab = parentPanel;
-                yield utilityTab;
-            }
-            case CHARACTER_FLAW -> {
-                characterFlawsTab = parentPanel;
-                yield characterFlawsTab;
-            }
-            case CHARACTER_CREATION_ONLY -> {
-                characterCreationOnlyTab = parentPanel;
-                yield characterCreationOnlyTab;
-            }
-        };
+        return createParentPanel(panel, "AbilitiesTab" + abilityCategory.name());
     }
 
     /**
@@ -339,7 +319,11 @@ public class AbilitiesTab {
             }
         }
 
-        refreshAll();
+        if (abilityCategory == null) {
+            refreshCreatedTabs();
+        } else {
+            refreshTabContents(abilityCategory);
+        }
     }
 
     /**

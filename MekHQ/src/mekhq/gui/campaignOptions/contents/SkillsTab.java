@@ -47,8 +47,11 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,10 +95,13 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class SkillsTab {
     private final CampaignOptions campaignOptions;
 
+    private Map<String, SkillConfiguration> skillConfigurations;
+    private Map<SkillSubType, JPanel> createdCategoryTabs;
     private Map<String, JSpinner> allTargetNumbers;
     private Map<String, List<JLabel>> allSkillLevels;
     private Map<String, List<JSpinner>> allSkillCosts;
     private Map<String, List<JComboBox<SkillLevel>>> allSkillMilestones;
+    private int edgeCost;
     private int storedTargetNumber = 0;
     private List<Integer> storedValuesSpinners = new ArrayList<>();
     private List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
@@ -118,6 +124,7 @@ public class SkillsTab {
     public SkillsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
         initialize();
+        loadValuesFromCampaignOptions();
     }
 
     /**
@@ -133,10 +140,13 @@ public class SkillsTab {
      * for tracking target numbers, costs, and milestones for every skill.
      */
     private void initializeGeneral() {
+        skillConfigurations = new HashMap<>();
+        createdCategoryTabs = new EnumMap<>(SkillSubType.class);
         allTargetNumbers = new HashMap<>();
         allSkillLevels = new HashMap<>();
         allSkillCosts = new HashMap<>();
         allSkillMilestones = new HashMap<>();
+        edgeCost = campaignOptions.getEdgeCost();
         storedTargetNumber = 0;
         storedValuesSpinners = new ArrayList<>();
         storedValuesComboBoxes = new ArrayList<>();
@@ -164,6 +174,15 @@ public class SkillsTab {
      *       category.
      */
     public JPanel createSkillsTab(SkillSubType category) {
+        JPanel tab = createdCategoryTabs.computeIfAbsent(category, categoryKey -> new JPanel(new BorderLayout()));
+        if (tab.getComponentCount() == 0) {
+            tab.add(createSkillsPage(category), BorderLayout.CENTER);
+        }
+
+        return tab;
+    }
+
+    private JPanel createSkillsPage(SkillSubType category) {
         // Header
         CampaignOptionsHeaderPanel headerPanel;
         String panelName;
@@ -430,6 +449,7 @@ public class SkillsTab {
         allSkillLevels.put(skill.getName(), skillLevels);
         allSkillCosts.put(skill.getName(), skillCosts);
         allSkillMilestones.put(skill.getName(), skillMilestones);
+        updateSkillControlsFromDraft(skill.getName());
 
         RoundedJButton copyButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
         copyButton.addActionListener(e -> {
@@ -580,56 +600,57 @@ public class SkillsTab {
             options = this.campaignOptions;
         }
 
+        Map<String, SkillType> skillValues = presetSkillValues == null ? Map.of() : presetSkillValues;
         String[] skills = SkillType.getSkillList(); // default skills
 
         for (String skillName : skills) {
             // Fetch the skill, either from presetSkillValues or default
-            SkillType skill = presetSkillValues.getOrDefault(skillName, SkillType.getType(skillName));
-
-            // Skip outdated or missing skills
-            if (allTargetNumbers.get(skillName) == null) {
+            SkillType skill = skillValues.getOrDefault(skillName, SkillType.getType(skillName));
+            if (skill == null) {
                 LOGGER.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
                 continue;
             }
 
-            // Update Target Number
-            JSpinner spinner = allTargetNumbers.get(skillName);
-            spinner.setValue(skill.getTarget());
+            skillConfigurations.put(skillName, new SkillConfiguration(skill));
+            updateSkillControlsFromDraft(skillName);
+        }
 
-            // Costs
-            List<JSpinner> skillCosts = allSkillCosts.get(skillName);
-            Integer[] costs = skill.getCosts();
-            if (costs != null && skillCosts != null) {
-                for (int i = 0; i < Math.min(costs.length, skillCosts.size()); i++) {
-                    skillCosts.get(i).setValue(costs[i]);
-                }
-            }
+        edgeCost = options.getEdgeCost();
+        if (spnEdgeCost != null) {
+            spnEdgeCost.setValue(edgeCost);
+        }
+    }
 
-            // Milestones
-            List<JComboBox<SkillLevel>> milestones = allSkillMilestones.get(skillName);
-            if (milestones != null) {
-                int greenIndex = skill.getGreenLevel();
-                int regularIndex = skill.getRegularLevel();
-                int veteranIndex = skill.getVeteranLevel();
-                int eliteIndex = skill.getEliteLevel();
-                int heroicIndex = skill.getHeroicLevel();
-                int legendaryIndex = skill.getLegendaryLevel();
+    private void updateSkillControlsFromDraft(String skillName) {
+        SkillConfiguration skillConfiguration = skillConfigurations.get(skillName);
+        if (skillConfiguration == null) {
+            return;
+        }
 
-                for (int i = 0; i < milestones.size(); i++) {
-                    SkillLevel levelToSet = determineMilestoneLevel(i,
-                          greenIndex,
-                          regularIndex,
-                          veteranIndex,
-                          eliteIndex,
-                          heroicIndex,
-                          legendaryIndex);
-                    milestones.get(i).setSelectedItem(levelToSet);
-                }
+        JSpinner targetNumber = allTargetNumbers.get(skillName);
+        if (targetNumber != null) {
+            targetNumber.setValue(skillConfiguration.targetNumber);
+        }
+
+        List<JSpinner> skillCosts = allSkillCosts.get(skillName);
+        if (skillCosts != null) {
+            for (int i = 0; i < Math.min(skillConfiguration.costs.length, skillCosts.size()); i++) {
+                skillCosts.get(i).setValue(skillConfiguration.costs[i]);
             }
         }
 
-        // Edge Costs
-        spnEdgeCost.setValue(options.getEdgeCost());
+        List<JComboBox<SkillLevel>> milestones = allSkillMilestones.get(skillName);
+        if (milestones != null) {
+            for (int i = 0; i < milestones.size(); i++) {
+                milestones.get(i).setSelectedItem(determineMilestoneLevel(i,
+                      skillConfiguration.greenLevel,
+                      skillConfiguration.regularLevel,
+                      skillConfiguration.veteranLevel,
+                      skillConfiguration.eliteLevel,
+                      skillConfiguration.heroicLevel,
+                      skillConfiguration.legendaryLevel));
+            }
+        }
     }
 
     /**
@@ -691,6 +712,8 @@ public class SkillsTab {
             options = this.campaignOptions;
         }
 
+        updateDraftFromCreatedControls();
+
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
             if (presetSkills != null) {
@@ -702,100 +725,111 @@ public class SkillsTab {
                 continue;
             }
 
-            // Update Target Number
-            updateTargetNumber(type);
-
-            // Update Skill Costs
-            updateSkillCosts(skillName);
-
-            // Update Skill Milestones
-            updateSkillMilestones(type);
+            SkillType configuredType = type;
+            SkillConfiguration skillConfiguration = skillConfigurations.computeIfAbsent(skillName,
+                ignored -> new SkillConfiguration(configuredType));
+            skillConfiguration.applyTo(type);
         }
 
         // Edge Costs
-        options.setEdgeCost((int) spnEdgeCost.getValue());
+        options.setEdgeCost(edgeCost);
     }
 
-    /**
-     * Updates the target number for a given skill in the campaign based on the corresponding user input from the
-     * SkillsTab UI.
-     * <p>
-     * The target number determines the difficulty level for the specified skill in the campaign. This value is fetched
-     * from the associated spinner component in the UI and is applied to the given {@link SkillType}.
-     * </p>
-     *
-     * @param type the {@link SkillType} object representing the skill whose target number needs to be updated.
-     */
-    private void updateTargetNumber(SkillType type) {
-        int targetNumber = (int) allTargetNumbers.get(type.getName()).getValue();
-        type.setTarget(targetNumber);
-    }
+    private void updateDraftFromCreatedControls() {
+        if (spnEdgeCost != null) {
+            edgeCost = (int) spnEdgeCost.getValue();
+        }
 
-    /**
-     * Updates the costs associated with a given skill based on the user input from the SkillsTab UI.
-     * <p>
-     * For each level of the specified skill, the cost values are retrieved from the corresponding spinner components in
-     * the UI and stored in the campaign's configuration. The costs represent the resource requirements for acquiring
-     * the skill at various levels.
-     * </p>
-     *
-     * @param skillName the name of the skill whose cost values are to be updated.
-     */
-    private void updateSkillCosts(String skillName) {
-        List<JSpinner> costs = allSkillCosts.get(skillName);
+        for (String skillName : allTargetNumbers.keySet()) {
+            SkillConfiguration skillConfiguration = skillConfigurations.get(skillName);
+            if (skillConfiguration == null) {
+                continue;
+            }
 
-        for (int level = 0; level < costs.size(); level++) {
-            int cost = (int) costs.get(level).getValue();
-            SkillType.setCost(skillName, cost, level);
+            JSpinner targetNumber = allTargetNumbers.get(skillName);
+            if (targetNumber != null) {
+                skillConfiguration.targetNumber = (int) targetNumber.getValue();
+            }
+
+            List<JSpinner> skillCosts = allSkillCosts.get(skillName);
+            if (skillCosts != null) {
+                for (int i = 0; i < Math.min(skillConfiguration.costs.length, skillCosts.size()); i++) {
+                    skillConfiguration.costs[i] = (int) skillCosts.get(i).getValue();
+                }
+            }
+
+            List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(skillName);
+            if (skillMilestones != null) {
+                updateDraftMilestones(skillConfiguration, skillMilestones);
+            }
         }
     }
 
-    /**
-     * Updates the skill milestones for a given skill in the campaign based on user input from the SkillsTab UI.
-     * <p>
-     * Milestones represent the thresholds required to reach certain skill levels (e.g., Green, Regular, Veteran,
-     * Elite). The method processes these values from the associated combo boxes in the UI and applies them to the
-     * provided {@link SkillType}.
-     * <p>
-     * The method ensures logical milestone progression and assigns default values if necessary.
-     * </p>
-     *
-     * @param type the {@link SkillType} object representing the skill whose milestones are to be updated.
-     */
-    private void updateSkillMilestones(SkillType type) {
-        List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type.getName());
+    private void updateDraftMilestones(SkillConfiguration skillConfiguration,
+          List<JComboBox<SkillLevel>> skillMilestones) {
+        skillConfiguration.greenLevel = skillMilestones.size() - 6;
+        skillConfiguration.regularLevel = skillMilestones.size() - 5;
+        skillConfiguration.veteranLevel = skillMilestones.size() - 4;
+        skillConfiguration.eliteLevel = skillMilestones.size() - 3;
+        skillConfiguration.heroicLevel = skillMilestones.size() - 2;
+        skillConfiguration.legendaryLevel = skillMilestones.size() - 1;
 
-        // These allow us to ensure the full array of milestones has been assigned
-        type.setGreenLevel(skillMilestones.size() - 6);
-        type.setRegularLevel(skillMilestones.size() - 5);
-        type.setVeteranLevel(skillMilestones.size() - 4);
-        type.setEliteLevel(skillMilestones.size() - 3);
-        type.setHeroicLevel(skillMilestones.size() - 2);
-        type.setLegendaryLevel(skillMilestones.size() - 1);
-
-        // Then we overwrite those insurance values with the actual values
         SkillLevel lastAssignment = ULTRA_GREEN;
         for (int i = 0; i < skillMilestones.size(); i++) {
-
-            JComboBox<SkillLevel> milestoneCombo = skillMilestones.get(i);
-            SkillLevel selectedSkillLevel = (SkillLevel) milestoneCombo.getSelectedItem();
+            SkillLevel selectedSkillLevel = (SkillLevel) skillMilestones.get(i).getSelectedItem();
 
             if (selectedSkillLevel != lastAssignment) {
                 lastAssignment = selectedSkillLevel;
 
                 if (selectedSkillLevel != null) {
                     switch (selectedSkillLevel) {
-                        case GREEN -> type.setGreenLevel(i);
-                        case REGULAR -> type.setRegularLevel(i);
-                        case VETERAN -> type.setVeteranLevel(i);
-                        case ELITE -> type.setEliteLevel(i);
-                        case HEROIC -> type.setHeroicLevel(i);
-                        case LEGENDARY -> type.setLegendaryLevel(i);
+                        case GREEN -> skillConfiguration.greenLevel = i;
+                        case REGULAR -> skillConfiguration.regularLevel = i;
+                        case VETERAN -> skillConfiguration.veteranLevel = i;
+                        case ELITE -> skillConfiguration.eliteLevel = i;
+                        case HEROIC -> skillConfiguration.heroicLevel = i;
+                        case LEGENDARY -> skillConfiguration.legendaryLevel = i;
                         default -> {
                         }
                     }
                 }
             }
+        }
+    }
+
+    private static class SkillConfiguration {
+        private int targetNumber;
+        private Integer[] costs;
+        private int greenLevel;
+        private int regularLevel;
+        private int veteranLevel;
+        private int eliteLevel;
+        private int heroicLevel;
+        private int legendaryLevel;
+
+        private SkillConfiguration(SkillType skillType) {
+            targetNumber = skillType.getTarget();
+            costs = Arrays.copyOf(skillType.getCosts(), skillType.getCosts().length);
+            greenLevel = skillType.getGreenLevel();
+            regularLevel = skillType.getRegularLevel();
+            veteranLevel = skillType.getVeteranLevel();
+            eliteLevel = skillType.getEliteLevel();
+            heroicLevel = skillType.getHeroicLevel();
+            legendaryLevel = skillType.getLegendaryLevel();
+        }
+
+        private void applyTo(SkillType skillType) {
+            skillType.setTarget(targetNumber);
+            Integer[] targetCosts = skillType.getCosts();
+            for (int i = 0; i < Math.min(costs.length, targetCosts.length); i++) {
+                targetCosts[i] = costs[i];
+            }
+            skillType.setGreenLevel(greenLevel);
+            skillType.setRegularLevel(regularLevel);
+            skillType.setVeteranLevel(veteranLevel);
+            skillType.setEliteLevel(eliteLevel);
+            skillType.setHeroicLevel(heroicLevel);
+            skillType.setLegendaryLevel(legendaryLevel);
         }
     }
 }

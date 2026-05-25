@@ -65,8 +65,6 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
@@ -113,8 +111,6 @@ public class CampaignOptionsPane extends JPanel {
     private static final int SCROLL_SPEED = 16;
     private static final int HEADER_FONT_SIZE = 5;
     private static final int NAVIGATION_WIDTH = 240;
-      private static final int DIRECT_PAGE_WARM_UP_INITIAL_DELAY = 100;
-      private static final int DIRECT_PAGE_WARM_UP_DELAY = 75;
 
     private final JFrame frame;
     private final Campaign campaign;
@@ -260,7 +256,6 @@ public class CampaignOptionsPane extends JPanel {
         splitPane.setDividerLocation(NAVIGATION_WIDTH);
         add(splitPane, BorderLayout.CENTER);
         navigationPanel.selectRoute(navigationTargets.get(0));
-                  warmUpDirectPages();
     }
 
     /**
@@ -497,8 +492,13 @@ public class CampaignOptionsPane extends JPanel {
                   return false;
             }
 
-            activeContentHost.setContent(directPage);
+            activeContentHost.setContent(directPage, getQuoteResourceName(route));
             return true;
+      }
+
+      private String getQuoteResourceName(CampaignOptionsRoute route) {
+            List<String> titleResourceNames = route.getTitleResourceNames();
+            return titleResourceNames.get(titleResourceNames.size() - 1);
       }
 
       private Component getDirectPage(String routeId) {
@@ -634,32 +634,16 @@ public class CampaignOptionsPane extends JPanel {
       private void ensureDirectPagesLoaded(String routeIdPrefix) {
             for (CampaignOptionsRoute route : navigationTargets) {
                   String routeId = route.getId();
-                  if (routeId.startsWith(routeIdPrefix) && directPageFactories.containsKey(routeId)) {
+                  if (routeId.startsWith(routeIdPrefix) && directPageFactories.containsKey(routeId) &&
+                              shouldPreloadDirectPage(routeId)) {
                         getDirectPage(routeId);
                   }
             }
       }
 
-      private void warmUpDirectPages() {
-            SwingUtilities.invokeLater(() -> {
-                  List<String> directRouteIds = navigationTargets.stream()
-                        .map(CampaignOptionsRoute::getId)
-                        .filter(directPageFactories::containsKey)
-                        .toList();
-                  Timer warmUpTimer = new Timer(DIRECT_PAGE_WARM_UP_DELAY, null);
-                  warmUpTimer.addActionListener(evt -> {
-                        for (String routeId : directRouteIds) {
-                              if (!directPageCache.containsKey(routeId)) {
-                                    getDirectPage(routeId);
-                                    return;
-                              }
-                        }
-
-                        warmUpTimer.stop();
-                  });
-                  warmUpTimer.setInitialDelay(DIRECT_PAGE_WARM_UP_INITIAL_DELAY);
-                  warmUpTimer.start();
-            });
+      private boolean shouldPreloadDirectPage(String routeId) {
+            return !routeId.startsWith("advancement.abilities.") &&
+                         !routeId.startsWith("advancement.skills.");
       }
 
     private void registerRoute(String id, String[] titleResourceNames, TabSelection... selections) {
@@ -901,91 +885,53 @@ public class CampaignOptionsPane extends JPanel {
       }
 
       private JPanel createAdvancementGunnerySkillsTab() {
-            ensureAdvancementSkillsDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.skills.gunnery");
+            ensureSectionLoaded("advancementParentTab");
+            return skillsTab.createSkillsTab(COMBAT_GUNNERY);
       }
 
       private JPanel createAdvancementPilotingSkillsTab() {
-            ensureAdvancementSkillsDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.skills.piloting");
+            ensureSectionLoaded("advancementParentTab");
+            return skillsTab.createSkillsTab(COMBAT_PILOTING);
       }
 
       private JPanel createAdvancementSupportSkillsTab() {
-            ensureAdvancementSkillsDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.skills.support");
+            ensureSectionLoaded("advancementParentTab");
+            return skillsTab.createSkillsTab(SUPPORT);
       }
 
       private JPanel createAdvancementUtilitySkillsTab() {
-            ensureAdvancementSkillsDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.skills.utility");
+            ensureSectionLoaded("advancementParentTab");
+            return skillsTab.createSkillsTab(UTILITY);
       }
 
       private JPanel createAdvancementRoleplaySkillsTab() {
-            ensureAdvancementSkillsDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.skills.roleplay");
-      }
-
-      private void ensureAdvancementSkillsDirectPagesCreated() {
             ensureSectionLoaded("advancementParentTab");
-            if (directPageCache.containsKey("advancement.skills.gunnery") &&
-                          directPageCache.containsKey("advancement.skills.piloting") &&
-                          directPageCache.containsKey("advancement.skills.support") &&
-                          directPageCache.containsKey("advancement.skills.utility") &&
-                          directPageCache.containsKey("advancement.skills.roleplay")) {
-                  return;
-            }
-
-            directPageCache.put("advancement.skills.gunnery", skillsTab.createSkillsTab(COMBAT_GUNNERY));
-            directPageCache.put("advancement.skills.piloting", skillsTab.createSkillsTab(COMBAT_PILOTING));
-            directPageCache.put("advancement.skills.support", skillsTab.createSkillsTab(SUPPORT));
-            directPageCache.put("advancement.skills.utility", skillsTab.createSkillsTab(UTILITY));
-            directPageCache.put("advancement.skills.roleplay", skillsTab.createSkillsTab(ROLEPLAY_GENERAL));
-            skillsTab.loadValuesFromCampaignOptions();
+            return skillsTab.createSkillsTab(ROLEPLAY_GENERAL);
       }
 
       private JPanel createAdvancementCombatAbilitiesTab() {
-            ensureAdvancementAbilitiesDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.abilities.combat");
+            ensureSectionLoaded("advancementParentTab");
+            return abilitiesTab.createAbilitiesTab(COMBAT_ABILITY);
       }
 
       private JPanel createAdvancementManeuveringAbilitiesTab() {
-            ensureAdvancementAbilitiesDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.abilities.maneuvering");
+            ensureSectionLoaded("advancementParentTab");
+            return abilitiesTab.createAbilitiesTab(MANEUVERING_ABILITY);
       }
 
       private JPanel createAdvancementUtilityAbilitiesTab() {
-            ensureAdvancementAbilitiesDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.abilities.utility");
+            ensureSectionLoaded("advancementParentTab");
+            return abilitiesTab.createAbilitiesTab(UTILITY_ABILITY);
       }
 
       private JPanel createAdvancementCharacterFlawsTab() {
-            ensureAdvancementAbilitiesDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.abilities.character-flaws");
+            ensureSectionLoaded("advancementParentTab");
+            return abilitiesTab.createAbilitiesTab(CHARACTER_FLAW);
       }
 
       private JPanel createAdvancementCharacterCreationOnlyTab() {
-            ensureAdvancementAbilitiesDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.abilities.character-creation-only");
-      }
-
-      private void ensureAdvancementAbilitiesDirectPagesCreated() {
             ensureSectionLoaded("advancementParentTab");
-            if (directPageCache.containsKey("advancement.abilities.combat") &&
-                          directPageCache.containsKey("advancement.abilities.maneuvering") &&
-                          directPageCache.containsKey("advancement.abilities.utility") &&
-                          directPageCache.containsKey("advancement.abilities.character-flaws") &&
-                          directPageCache.containsKey("advancement.abilities.character-creation-only")) {
-                  return;
-            }
-
-            directPageCache.put("advancement.abilities.combat", abilitiesTab.createAbilitiesTab(COMBAT_ABILITY));
-            directPageCache.put("advancement.abilities.maneuvering",
-                  abilitiesTab.createAbilitiesTab(MANEUVERING_ABILITY));
-            directPageCache.put("advancement.abilities.utility", abilitiesTab.createAbilitiesTab(UTILITY_ABILITY));
-            directPageCache.put("advancement.abilities.character-flaws",
-                  abilitiesTab.createAbilitiesTab(CHARACTER_FLAW));
-            directPageCache.put("advancement.abilities.character-creation-only",
-                  abilitiesTab.createAbilitiesTab(CHARACTER_CREATION_ONLY));
+            return abilitiesTab.createAbilitiesTab(CHARACTER_CREATION_ONLY);
       }
 
       private JPanel createLogisticsRepairsTab() {

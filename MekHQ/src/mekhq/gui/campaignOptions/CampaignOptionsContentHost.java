@@ -42,35 +42,60 @@ import javax.swing.Scrollable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import megamek.common.annotations.Nullable;
+
 /**
- * Owns the single central scroll surface for Campaign Options content.
+ * Owns the central Campaign Options content area and sticky contextual help surface.
  */
-class CampaignOptionsContentHost extends JScrollPane {
+class CampaignOptionsContentHost extends JPanel {
     private static final int SCROLL_SPEED = 16;
 
     private final JPanel contentPanel;
+    private final JScrollPane contentScrollPane;
+    private final CampaignOptionsHelpPanel helpPanel;
 
     CampaignOptionsContentHost(Component content) {
-        super(new CampaignOptionsContentPanel(),
+        super(new BorderLayout());
+        setName("campaignOptionsContentHost");
+
+        helpPanel = new CampaignOptionsHelpPanel();
+        CampaignOptionsUtilities.setTipTextConsumer(helpPanel::setHelpText);
+
+        contentPanel = new CampaignOptionsContentPanel();
+        contentPanel.setName("campaignOptionsContentPanel");
+
+        contentScrollPane = new JScrollPane(contentPanel,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        setName("campaignOptionsContentScrollPane");
-        getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
+        contentScrollPane.setName("campaignOptionsContentScrollPane");
+        contentScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
-        contentPanel = (JPanel) getViewport().getView();
-        contentPanel.setName("campaignOptionsContentPanel");
+        add(contentScrollPane, BorderLayout.CENTER);
+        add(helpPanel, BorderLayout.SOUTH);
         setContent(content);
     }
 
     void setContent(Component content) {
+        setContent(content, null);
+    }
+
+    void setContent(Component content, @Nullable String quoteResourceName) {
+        helpPanel.clearHelpText();
         contentPanel.removeAll();
-        contentPanel.add(content, BorderLayout.CENTER);
+        contentPanel.add(CampaignOptionsUtilities.createContentWithQuote(content, quoteResourceName),
+              BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
     void resetScrollPosition() {
-        getVerticalScrollBar().setValue(0);
+        contentScrollPane.getVerticalScrollBar().setValue(0);
+    }
+
+    @Override
+    public void removeNotify() {
+        CampaignOptionsUtilities.setTipTextConsumer(null);
+        super.removeNotify();
     }
 
     private static class CampaignOptionsContentPanel extends JPanel implements Scrollable {
