@@ -61,6 +61,8 @@ import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
 import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -780,12 +782,9 @@ public class HumanResources {
         int need = 0;
         for (Unit unit : campaign.getUnits()) {
             if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-                int totalCurrentCrew = currentCrew + currentTempCrew;
-                if (fullCrew > totalCurrentCrew) {
-                    need += (fullCrew - totalCurrentCrew);
+                int roleSpecificNeed = getRoleSpecificNeeds(unit, role);
+                if (roleSpecificNeed > 0) {
+                    need += roleSpecificNeed;
                 }
             }
         }
@@ -842,8 +841,37 @@ public class HumanResources {
                  VEHICLE_CREW_NAVAL,
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> unit.canTakeMoreVesselCrew();
+            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter))
+                    && unit.canTakeMoreVesselCrew();
             default -> false;
+        };
+    }
+
+    /**
+     * Returns the number of temp crew slots still available for the given role on the given unit. A negative value
+     * means the role is over-allocated. For vessel roles (pilot, gunner, crew), the calculation uses role-specific slot
+     * counts so that each role's budget is tracked independently. For all other roles the unit's total crew size is
+     * used (correct for single-role units such as infantry).
+     *
+     * @param unit the unit
+     * @param role the personnel role
+     *
+     * @return available slots (negative = surplus temp crew)
+     */
+    private int getRoleSpecificNeeds(Unit unit, PersonnelRole role) {
+        return switch (role) {
+            case VESSEL_PILOT -> unit.getTotalDriverNeeds()
+                                       - unit.getDrivers().size()
+                                       - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            case VESSEL_GUNNER -> unit.getTotalGunnerNeeds()
+                                        - unit.getGunners().size()
+                                        - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+            case VESSEL_CREW -> unit.getTotalCrewNeeds()
+                                      - unit.getVesselCrew().size()
+                                      - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+            default -> unit.getFullCrewSize()
+                             - unit.getActiveCrew().size()
+                             - unit.getTempCrewByPersonnelRole(role);
         };
     }
 
@@ -866,16 +894,11 @@ public class HumanResources {
             }
 
             if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-
-                int totalCurrentCrew = currentCrew + unit.getTotalTempCrew();
-                int needed = fullCrew - totalCurrentCrew;
+                int needed = getRoleSpecificNeeds(unit, role);
 
                 if (needed > 0) {
                     int toAssign = Math.min(needed, availablePool);
-                    unit.setTempCrew(role, currentTempCrew + toAssign);
+                    unit.setTempCrew(role, unit.getTempCrewByPersonnelRole(role) + toAssign);
                     availablePool -= toAssign;
                 }
             }
@@ -898,6 +921,55 @@ public class HumanResources {
         if (getTempCrewPool(role) > 0) {
             setTempCrewPool(campaign, role, 0);
         }
+    }
+
+    /**
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
+     * If the pool is at or below the required amount, no change is made.
+     *
+     * @param campaign the campaign
+     */
+    public void releaseSurplusAsTechPool(Campaign campaign) {
+        int surplus = Math.max(0, -getAsTechNeed(campaign.getCampaignOptions()));
+        if (surplus > 0) {
+            decreaseAsTechPool(campaign, surplus);
+        }
+    }
+
+    /**
+     * Releases surplus Medics from the pool, keeping only what is currently needed.
+     * If the pool is at or below the required amount, no change is made.
+     *
+     * @param campaign the campaign
+     */
+    public void releaseSurplusMedicPool(Campaign campaign) {
+        int surplus = Math.max(0, -getMedicsNeed());
+        if (surplus > 0) {
+            decreaseMedicPool(campaign, surplus);
+        }
+    }
+
+    /**
+     * Releases surplus temp crew for a specific blob crew role.
+     *
+     * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
+     * emptied.</p>
+     *
+     * @param campaign the campaign
+     * @param role     the personnel role to trim
+     */
+    public void releaseSurplusBlobCrewForRole(Campaign campaign, PersonnelRole role) {
+        for (Unit unit : campaign.getUnits()) {
+            int currentTemp = unit.getTempCrewByPersonnelRole(role);
+            if (currentTemp > 0) {
+                int excess = Math.max(0, -getRoleSpecificNeeds(unit, role));
+                if (excess > 0) {
+                    unit.setTempCrew(role, currentTemp - excess);
+                }
+            }
+        }
+        emptyTempCrewPoolForRole(campaign, role);
     }
 
 
