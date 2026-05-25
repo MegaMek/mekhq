@@ -964,6 +964,14 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
     }
 
+    public int getQuickTrainTarget() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getInt(MHQConstants.NEW_DAY_QUICK_TRAIN_TARGET, 5);
+    }
+
+    public void setQuickTrainTarget(final int value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putInt(MHQConstants.NEW_DAY_QUICK_TRAIN_TARGET, value);
+    }
+
     public boolean getLevelArtillery() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.NEW_DAY_ARTILLERY, false);
