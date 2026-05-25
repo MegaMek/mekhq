@@ -469,4 +469,33 @@ public class QuickTrain {
         }
         return highestSkillName;
     }
+
+    public record QuickTrainOptions(
+          boolean isLevelArtillery,
+          boolean isLevelScoutingSkills,
+          boolean isLevelEscapeSkills,
+          boolean isLevelLeadership,
+          boolean isLevelOtherCommandSkills
+    ) {
+        // Additional logic to provide defaults for missing properties
+        public static QuickTrainOptions buildQuickTrainOptions(CampaignOptions campaignOptions) {
+            boolean isLevelArtillery = campaignOptions.isUseArtillery();
+
+            boolean isUseStratCon = campaignOptions.isUseStratCon();
+            boolean isLevelScoutingSkills = isUseStratCon && campaignOptions.isUseAdvancedScouting();
+
+            boolean isLevelEscapeSkills = campaignOptions.isUseFunctionalEscapeArtist();
+
+            // These values are purposefully always true, as we always want the options enabled.
+            // We added them here anyway, in case that assumption ever changed.
+            boolean isLevelLeadership = true;
+            boolean isLevelOtherCommandSkills = true;
+
+            return new QuickTrainOptions(isLevelArtillery,
+                  isLevelScoutingSkills,
+                  isLevelEscapeSkills,
+                  isLevelLeadership,
+                  isLevelOtherCommandSkills);
+        }
+    }
 }

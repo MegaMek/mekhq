@@ -221,7 +221,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         btnQuickTrain.setToolTipText(resourceMap.getString("btnQuickTrain.toolTipText"));
         btnQuickTrain.addActionListener(e -> {
             List<Person> selectedPersons = getSelectedPersons();
-            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty());
+            QuickTrain.QuickTrainOptions options = QuickTrain.QuickTrainOptions.buildQuickTrainOptions(
+                  getCampaignOptions());
+            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty(), options);
             if (!dialog.isCancel()) {
                 int targetSkillLevel = dialog.getSpinnerValue();
                 QuickTrain.processQuickTraining(selectedPersons,
