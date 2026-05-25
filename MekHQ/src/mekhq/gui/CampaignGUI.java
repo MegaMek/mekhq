@@ -867,26 +867,26 @@ public class CampaignGUI extends JPanel {
         menuTempPool.add(miTempPoolReleaseSurplus);
 
         menuTempPool.addMenuListener(menuListenerFor(() -> {
-            // For AsTech/Medic: need + pool = what would be needed if there were no temp pool at all.
+            // For Astech/Medic: need + pool = what would be needed if there were no temp pool at all.
             // resetAsTechPool/resetMedicPool is a no-op only when pool == max(0, real need).
-            int asTechPool = getCampaign().getTemporaryAsTechPool();
-            int asTechIdealPool = Math.max(0, getCampaign().getAsTechNeed() + asTechPool);
+            int astechPool = getCampaign().getTemporaryAsTechPool();
+            int astechIdealPool = Math.max(0, getCampaign().getAsTechNeed() + astechPool);
             int medicPool = getCampaign().getTemporaryMedicPool();
             int medicIdealPool = Math.max(0, getCampaign().getMedicsNeed() + medicPool);
 
-            boolean anyNeed = asTechPool != asTechIdealPool
+            boolean anyNeed = astechPool != astechIdealPool
                                     || medicPool != medicIdealPool
                                     || anyBlobRoleHasNeed();
             setMenuItemState(miTempPoolFullStrength, anyNeed,
                   resourceMap.getString("miTempPoolFullStrength.disabledTip"));
 
-            boolean anyPool = asTechPool > 0
+            boolean anyPool = astechPool > 0
                                     || medicPool > 0
                                     || anyBlobRoleHasPool();
             setMenuItemState(miTempPoolReleaseAll, anyPool,
                   resourceMap.getString("miTempPoolReleaseAll.disabledTip"));
 
-            boolean anySurplus = asTechPool > asTechIdealPool
+            boolean anySurplus = astechPool > astechIdealPool
                                        || medicPool > medicIdealPool
                                        || anyBlobRoleHasSurplus();
             setMenuItemState(miTempPoolReleaseSurplus, anySurplus,
@@ -898,12 +898,12 @@ public class CampaignGUI extends JPanel {
         // region Astech Pool
         // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
         // B, E, F, H
-        JMenu menuAsTechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
-        menuAsTechPool.setMnemonic(KeyEvent.VK_A);
+        JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
+        menuAstechPool.setMnemonic(KeyEvent.VK_A);
 
-        JMenuItem miHireAsTechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
-        miHireAsTechs.setMnemonic(KeyEvent.VK_H);
-        miHireAsTechs.addActionListener(evt -> {
+        JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
+        miHireAstechs.setMnemonic(KeyEvent.VK_H);
+        miHireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupHireAstechsNum.text"),
@@ -915,11 +915,11 @@ public class CampaignGUI extends JPanel {
                 getCampaign().increaseAsTechPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuAsTechPool.add(miHireAsTechs);
+        menuAstechPool.add(miHireAstechs);
 
-        JMenuItem miFireAsTechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
-        miFireAsTechs.setMnemonic(KeyEvent.VK_E);
-        miFireAsTechs.addActionListener(evt -> {
+        JMenuItem miFireAstechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
+        miFireAstechs.setMnemonic(KeyEvent.VK_E);
+        miFireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupFireAstechsNum.text"),
@@ -931,33 +931,33 @@ public class CampaignGUI extends JPanel {
                 getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuAsTechPool.add(miFireAsTechs);
+        menuAstechPool.add(miFireAstechs);
 
-        JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
-        miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
-        menuAsTechPool.add(miFullStrengthAsTechs);
+        JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
+        miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().resetAsTechPool());
+        menuAstechPool.add(miFullStrengthAstechs);
 
-        JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
-        miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
-        miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
-        menuAsTechPool.add(miFireAllAsTechs);
+        JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
+        miFireAllAstechs.setMnemonic(KeyEvent.VK_R);
+        miFireAllAstechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
+        menuAstechPool.add(miFireAllAstechs);
 
-        menuAsTechPool.addMenuListener(menuListenerFor(() -> {
+        menuAstechPool.addMenuListener(menuListenerFor(() -> {
             int pool = getCampaign().getTemporaryAsTechPool();
             int need = getCampaign().getAsTechNeed();
             // need + pool = what would be needed if there were no temp pool at all;
             // the action is a no-op only when pool == max(0, that real need)
             int idealPool = Math.max(0, need + pool);
-            setMenuItemState(miFireAsTechs, pool > 0,
+            setMenuItemState(miFireAstechs, pool > 0,
                   resourceMap.getString("miFireAstechs.disabledTip"));
-            setMenuItemState(miFullStrengthAsTechs, pool != idealPool,
+            setMenuItemState(miFullStrengthAstechs, pool != idealPool,
                   resourceMap.getString("miFullStrengthAstechs.disabledTip"));
-            setMenuItemState(miFireAllAsTechs, pool > 0,
+            setMenuItemState(miFireAllAstechs, pool > 0,
                   resourceMap.getString("miFireAllAstechs.disabledTip"));
         }));
 
-        menuTempPool.add(menuAsTechPool);
+        menuTempPool.add(menuAstechPool);
         // endregion Astech Pool
 
         // region Medic Pool
