@@ -32,6 +32,8 @@
  */
 package mekhq.gui.utilities;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -47,11 +49,11 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 public final class BriefingStyle {
     private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
-    private static final int SECTION_CONTENT_GAP = 6;
-    private static final int SECTION_TOP_MARGIN = 4;
-    private static final int SECTION_BORDER_THICKNESS = 2;
-    private static final int SECTION_BORDER_ARC = 10;
-    private static final int SECTION_BORDER_PADDING = 8;
+    private static final int SECTION_CONTENT_GAP = scaleForGUI(6);
+    private static final int SECTION_TOP_MARGIN = scaleForGUI(4);
+    private static final int SECTION_BORDER_THICKNESS = scaleForGUI(2);
+    private static final int SECTION_BORDER_ARC = scaleForGUI(10);
+    private static final int SECTION_BORDER_PADDING = scaleForGUI(8);
 
     private BriefingStyle() {
     }
@@ -84,7 +86,10 @@ public final class BriefingStyle {
         if ((top == 0) && (left == 0) && (bottom == 0) && (right == 0)) {
             return sectionBorder;
         }
-        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(top, left, bottom, right),
+        return BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(scaleForGUI(top),
+                scaleForGUI(left),
+                scaleForGUI(bottom),
+                scaleForGUI(right)),
               sectionBorder);
     }
 
