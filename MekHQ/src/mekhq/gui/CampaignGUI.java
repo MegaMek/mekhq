@@ -867,8 +867,7 @@ public class CampaignGUI extends JPanel {
         menuTempPool.add(miTempPoolReleaseSurplus);
 
         menuTempPool.addMenuListener(menuListenerFor(() -> {
-            // For AsTech/Medic: need + pool = "real need" ignoring the temp pool, because
-            // getAsTechNeed/getMedicsNeed already count the temp pool in the supply.
+            // For AsTech/Medic: need + pool = what would be needed if there were no temp pool at all.
             // resetAsTechPool/resetMedicPool is a no-op only when pool == max(0, real need).
             int asTechPool = getCampaign().getTemporaryAsTechPool();
             int asTechIdealPool = Math.max(0, getCampaign().getAsTechNeed() + asTechPool);
