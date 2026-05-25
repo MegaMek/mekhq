@@ -219,6 +219,9 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
         chkLevelLeadership.setEnabled(trainingOptions.isLevelLeadership());
         addComponent(panel, chkLevelLeadership, constraints, 0, y++, GridBagConstraints.HORIZONTAL);
 
+        chkLevelTraining.setEnabled(trainingOptions.isLevelTraining());
+        addComponent(panel, chkLevelTraining, constraints, 0, y++, GridBagConstraints.HORIZONTAL);
+
         chkLevelOtherCommandSkills.setEnabled(trainingOptions.isLevelOtherCommandSkills());
         addComponent(panel, chkLevelOtherCommandSkills, constraints, 0, y++, GridBagConstraints.HORIZONTAL);
 
