@@ -78,7 +78,7 @@ public class QuickTrain {
      * @param targetPersonnel      the list of personnel (characters) to be trained
      * @param targetLevel          the minimum skill level to reach in each skill
      * @param campaign             the campaign context providing configuration and reporting support
-     * @param options
+     * @param options              A record storing which checkboxes were checked in the Quick Train dialog
      * @param isContinuousTraining if {@code true}, training will be repeated for each person as long as improvements
      *                             are possible and XP is available
      *

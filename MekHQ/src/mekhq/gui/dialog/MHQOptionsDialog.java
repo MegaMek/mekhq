@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -197,6 +198,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
     private JCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
     private JCheckBox chkNewMonthQuickTrain;
+    private JCheckBox chkLevelArtillery;
+    private JCheckBox chkLevelEscapeSkills;
+    private JCheckBox chkLevelScoutingSkills;
+    private JCheckBox chkLevelLeadership;
+    private JCheckBox chkLevelTraining;
+    private JCheckBox isLevelOtherCommandSkills;
     private JCheckBox chkSelfCorrectMaintenance;
     private JCheckBox chkNewDayFormationIconOperationalStatus;
     private MMComboBox<FormationIconOperationalStatusStyle> comboNewDayFormationIconOperationalStatusStyle;
@@ -1016,16 +1023,36 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "chkNewDayAutomaticallyAssignUnmaintainedUnits.toolTipText")));
         chkNewDayAutomaticallyAssignUnmaintainedUnits.setName("chkNewDayAutomaticallyAssignUnmaintainedUnits.text");
 
-        chkNewMonthQuickTrain = new JCheckBox(resources.getString(
-              "chkNewMonthQuickTrain.text"));
-        chkNewMonthQuickTrain.setToolTipText(resources.getString(
-              "chkNewMonthQuickTrain.toolTipText"));
+        chkNewMonthQuickTrain = new JCheckBox(getText("chkNewMonthQuickTrain.text"));
+        chkNewMonthQuickTrain.setToolTipText(getText("chkNewMonthQuickTrain.toolTipText"));
         chkNewMonthQuickTrain.setName("chkNewMonthQuickTrain.text");
 
-        chkSelfCorrectMaintenance = new JCheckBox(resources.getString(
-              "chkSelfCorrectMaintenance.text"));
-        chkSelfCorrectMaintenance.setToolTipText(resources.getString(
-              "chkSelfCorrectMaintenance.toolTipText"));
+        chkLevelArtillery = new JCheckBox(getText("chkLevelArtillery.text"));
+        chkLevelArtillery.setToolTipText(getText("chkLevelArtillery.toolTipText"));
+        chkLevelArtillery.setName("chkLevelArtillery.text");
+
+        chkLevelScoutingSkills = new JCheckBox(getText("chkLevelScoutingSkills.text"));
+        chkLevelScoutingSkills.setToolTipText(getText("chkLevelScoutingSkills.toolTipText"));
+        chkLevelScoutingSkills.setName("chkLevelScoutingSkills.text");
+
+        chkLevelEscapeSkills = new JCheckBox(getText("chkLevelEscapeSkills.text"));
+        chkLevelEscapeSkills.setToolTipText(getText("chkLevelEscapeSkills.toolTipText"));
+        chkLevelEscapeSkills.setName("chkLevelEscapeSkills.text");
+
+        chkLevelLeadership = new JCheckBox(getText("chkLevelLeadership.text"));
+        chkLevelLeadership.setToolTipText(getText("chkLevelLeadership.toolTipText"));
+        chkLevelLeadership.setName("chkLevelLeadership.text");
+
+        chkLevelTraining = new JCheckBox(getText("chkLevelTraining.text"));
+        chkLevelTraining.setToolTipText(getText("chkLevelTraining.toolTipText"));
+        chkLevelTraining.setName("chkLevelTraining.text");
+
+        isLevelOtherCommandSkills = new JCheckBox(getText("isLevelOtherCommandSkills.text"));
+        isLevelOtherCommandSkills.setToolTipText(getText("isLevelOtherCommandSkills.toolTipText"));
+        isLevelOtherCommandSkills.setName("isLevelOtherCommandSkills.text");
+
+        chkSelfCorrectMaintenance = new JCheckBox(getText("chkSelfCorrectMaintenance.text"));
+        chkSelfCorrectMaintenance.setToolTipText(resources.getString("chkSelfCorrectMaintenance.toolTipText"));
         chkSelfCorrectMaintenance.setName("chkSelfCorrectMaintenance.text");
 
         chkNewDayFormationIconOperationalStatus = new JCheckBox(resources.getString(
@@ -1091,6 +1118,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
                                       .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
                                       .addComponent(chkNewMonthQuickTrain)
+                                      .addComponent(chkLevelArtillery)
+                                      .addComponent(chkLevelScoutingSkills)
+                                      .addComponent(chkLevelEscapeSkills)
+                                      .addComponent(chkLevelLeadership)
+                                      .addComponent(chkLevelTraining)
+                                      .addComponent(isLevelOtherCommandSkills)
                                       .addComponent(chkSelfCorrectMaintenance)
                                       .addComponent(chkNewDayFormationIconOperationalStatus)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -1115,6 +1148,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
                                         .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
                                         .addComponent(chkNewMonthQuickTrain)
+                                        .addComponent(chkLevelArtillery)
+                                        .addComponent(chkLevelScoutingSkills)
+                                        .addComponent(chkLevelEscapeSkills)
+                                        .addComponent(chkLevelLeadership)
+                                        .addComponent(chkLevelTraining)
+                                        .addComponent(isLevelOtherCommandSkills)
                                         .addComponent(chkSelfCorrectMaintenance)
                                         .addComponent(chkNewDayFormationIconOperationalStatus)
                                         .addGroup(layout.createSequentialGroup()
@@ -1662,6 +1701,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options
               .setNewDayAutomaticallyAssignUnmaintainedUnits(chkNewDayAutomaticallyAssignUnmaintainedUnits.isSelected());
         options.setNewMonthQuickTrain(chkNewMonthQuickTrain.isSelected());
+        options.setLevelArtillery(chkLevelArtillery.isSelected());
+        options.setLevelScouting(chkLevelScoutingSkills.isSelected());
+        options.setLevelEscape(chkLevelEscapeSkills.isSelected());
+        options.setLevelLeadership(chkLevelLeadership.isSelected());
+        options.setLevelTraining(chkLevelTraining.isSelected());
+        options.setLevelOtherCommand(isLevelOtherCommandSkills.isSelected());
         options.setSelfCorrectMaintenance(chkSelfCorrectMaintenance.isSelected());
         options.setNewDayFormationIconOperationalStatus(chkNewDayFormationIconOperationalStatus.isSelected());
         options
@@ -1871,6 +1916,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayAutomaticallyAssignUnmaintainedUnits.setSelected(options
                                                                         .getNewDayAutomaticallyAssignUnmaintainedUnits());
         chkNewMonthQuickTrain.setSelected(options.getNewMonthQuickTrain());
+        chkLevelArtillery.setSelected(options.getLevelArtillery());
+        chkLevelScoutingSkills.setSelected(options.getLevelScouting());
+        chkLevelEscapeSkills.setSelected(options.getLevelEscape());
+        chkLevelLeadership.setSelected(options.getLevelLeadership());
+        chkLevelTraining.setSelected(options.getLevelTraining());
+        isLevelOtherCommandSkills.setSelected(options.getLevelOtherCommand());
         chkSelfCorrectMaintenance.setSelected(options.getSelfCorrectMaintenance());
         if (chkNewDayFormationIconOperationalStatus.isSelected() !=
                   options.getNewDayFormationIconOperationalStatus()) {

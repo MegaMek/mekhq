@@ -185,6 +185,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
+    public static final String NEW_DAY_ARTILLERY = "NewDayArtillery";
+    public static final String NEW_DAY_SCOUTING = "NewDayScouting";
+    public static final String NEW_DAY_ESCAPE = "NewDayEscape";
+    public static final String NEW_DAY_LEADERSHIP = "NewDayLeadership";
+    public static final String NEW_DAY_TRAINING = "NewDayTraining";
+    public static final String NEW_DAY_OTHER_COMMAND = "NewDayOtherCommand";
     public static final String SELF_CORRECT_MAINTENANCE = "SelfCorrectMaintenance";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayFormationIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayFormationIconOperationalStatusStyle";

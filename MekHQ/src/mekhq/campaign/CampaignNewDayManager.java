@@ -912,7 +912,6 @@ public class CampaignNewDayManager {
         }
     }
 
-
     /**
      * Checks if the commander has any burned contacts, and if so, generates and records a report.
      *
