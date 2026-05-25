@@ -5416,6 +5416,13 @@ public class Campaign implements ITechManager, ILocation {
         if (getCampaignOptions() != null) {
             CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
+
+        // We've had instances where game options isn't loaded correctly from player campaigns, potentially due to
+        // age. This safeguards.
+        if (gameOptions == null) {
+            gameOptions = new GameOptions();
+        }
+
         getGameOptions().writeToXML(writer, indent);
         // endregion Options
 
