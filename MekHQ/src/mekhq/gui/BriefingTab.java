@@ -111,6 +111,7 @@ import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
@@ -997,7 +998,8 @@ public final class BriefingTab extends CampaignGuiTab {
               scenario.getSalvageFormations());
 
         SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
-              scenario.getSalvageFormations());
+              scenario.getSalvageFormations(), getBattlefieldControlType(scenario));
+
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageFormations();
@@ -1034,6 +1036,20 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         return forcePicker.wasConfirmed();
+    }
+
+    private static @Nullable ScenarioTemplate.BattlefieldControlType getBattlefieldControlType(Scenario scenario) {
+        if (scenario instanceof AtBDynamicScenario dynamicScenario) {
+            ScenarioTemplate template = dynamicScenario.getTemplate();
+
+            if (template != null) {
+                return template.getBattlefieldControl();
+            }
+
+            return ScenarioTemplate.BattlefieldControlType.VICTOR;
+        }
+
+        return null;
     }
 
 
@@ -1097,7 +1113,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
-              getCampaign().isClanCampaign());
+              getCampaign().isClanCampaign(), getBattlefieldControlType(scenario));
         boolean wasConfirmed = techPicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageTechs();
