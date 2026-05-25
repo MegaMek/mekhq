@@ -186,26 +186,29 @@ public class LanceAssignmentView extends JPanel {
             }
         }
 
-        RowFilter<LanceAssignmentTableModel, Integer> laFilter = new RowFilter<>() {
+        RowFilter<LanceAssignmentTableModel, Integer> lanceAssignmentFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends LanceAssignmentTableModel, ? extends Integer> entry) {
                 CombatTeam combatTeam = entry.getModel().getRow(entry.getIdentifier());
                 return combatTeam.isEligible(campaign);
             }
         };
-        final NaturalOrderComparator noc = new NaturalOrderComparator();
-        TableRowSorter<LanceAssignmentTableModel> laSorter = new TableRowSorter<>(lanceAssignmentModel);
-        laSorter.setRowFilter(laFilter);
-        laSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
-        laSorter.setComparator(LanceAssignmentTableModel.COL_CONTRACT,
-              (c1, c2) -> noc.compare((c1 == null) ? "" : ((AtBContract) c1).getName(),
-                                        (c2 == null) ? "" : ((AtBContract) c2).getName()));
-        laSorter.setComparator(LanceAssignmentTableModel.COL_ROLE,
-              (r1, r2) -> noc.compare(r1.toString(), r2.toString()));
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+        TableRowSorter<LanceAssignmentTableModel> lanceAssignmentSorter = new TableRowSorter<>(
+              lanceAssignmentModel);
+        lanceAssignmentSorter.setRowFilter(lanceAssignmentFilter);
+        lanceAssignmentSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
+        lanceAssignmentSorter.setComparator(LanceAssignmentTableModel.COL_CONTRACT,
+              (firstContract, secondContract) -> naturalOrderComparator.compare(
+                    (firstContract == null) ? "" : ((AtBContract) firstContract).getName(),
+                    (secondContract == null) ? "" : ((AtBContract) secondContract).getName()));
+        lanceAssignmentSorter.setComparator(LanceAssignmentTableModel.COL_ROLE,
+              (firstRole, secondRole) -> naturalOrderComparator.compare(firstRole.toString(),
+                    secondRole.toString()));
         List<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(LanceAssignmentTableModel.COL_FORCE, SortOrder.ASCENDING));
-        laSorter.setSortKeys(sortKeys);
-        tblAssignments.setRowSorter(laSorter);
+        lanceAssignmentSorter.setSortKeys(sortKeys);
+        tblAssignments.setRowSorter(lanceAssignmentSorter);
 
         tblAssignments.setIntercellSpacing(new Dimension(0, 0));
         tblAssignments.setShowGrid(false);

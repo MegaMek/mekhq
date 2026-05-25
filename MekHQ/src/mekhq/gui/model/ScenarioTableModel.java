@@ -32,6 +32,7 @@
  */
 package mekhq.gui.model;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -73,6 +74,15 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
           MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
+    private record ScenarioClassification(boolean hasStratConScenario, boolean strategic, boolean turningPoint,
+          boolean crisis, boolean dual) {
+        private static final ScenarioClassification NONE = new ScenarioClassification(false, false, false, false, false);
+
+        private boolean isPriority() {
+            return strategic || turningPoint || crisis || dual;
+        }
+    }
+
     //region Constructors
     public ScenarioTableModel(Campaign c) {
         data = new ArrayList<>();
@@ -99,12 +109,12 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
     public int getColumnWidth(int c) {
         return switch (c) {
-            case COL_NAME -> 150;
-            case COL_STATUS -> 140;
-            case COL_DATE -> 70;
-            case COL_ASSIGN -> 80;
-            case COL_SECTOR -> 120;
-            default -> 80;
+            case COL_NAME -> scaleForGUI(150);
+            case COL_STATUS -> scaleForGUI(140);
+            case COL_DATE -> scaleForGUI(70);
+            case COL_ASSIGN -> scaleForGUI(80);
+            case COL_SECTOR -> scaleForGUI(120);
+            default -> scaleForGUI(80);
         };
     }
 
@@ -121,27 +131,23 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
     }
 
     public boolean isPriorityScenario(Scenario scenario) {
-        return isCrisisScenario(scenario) || isStrategicScenario(scenario) || isTurningPointScenario(scenario) ||
-                     isDualScenario(scenario);
+        return getScenarioClassification(scenario).isPriority();
     }
 
     public boolean isCrisisScenario(Scenario scenario) {
-        return (getStratConScenario(scenario) != null) &&
-                     (scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial());
+        return getScenarioClassification(scenario).crisis();
     }
 
     public boolean isStrategicScenario(Scenario scenario) {
-        StratConScenario stratconScenario = getStratConScenario(scenario);
-        return (stratconScenario != null) && stratconScenario.isStrategicObjective();
+        return getScenarioClassification(scenario).strategic();
     }
 
     public boolean isTurningPointScenario(Scenario scenario) {
-        StratConScenario stratconScenario = getStratConScenario(scenario);
-        return (stratconScenario != null) && stratconScenario.isTurningPoint();
+        return getScenarioClassification(scenario).turningPoint();
     }
 
     public boolean isDualScenario(Scenario scenario) {
-        return (getStratConScenario(scenario) != null) && scenario.getStratConScenarioType().isOfficialChallenge();
+        return getScenarioClassification(scenario).dual();
     }
 
     public String getScenarioToolTip(Scenario scenario) {
@@ -151,19 +157,70 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
         ArrayList<String> details = new ArrayList<>();
         details.add(scenario.getStatus().getToolTipText());
-        if (isStrategicScenario(scenario)) {
+        ScenarioClassification classification = getScenarioClassification(scenario);
+        if (classification.strategic()) {
             details.add(resources.getString("col_status.strategic"));
         }
-        if (isTurningPointScenario(scenario)) {
+        if (classification.turningPoint()) {
             details.add(resources.getString("col_status.turningPoint"));
         }
-        if (isCrisisScenario(scenario)) {
+        if (classification.crisis()) {
             details.add(resources.getString("col_status.crisis"));
         }
-        if (isDualScenario(scenario)) {
+        if (classification.dual()) {
             details.add(resources.getString("col_status.dual"));
         }
         return String.join(" ", details);
+    }
+
+    private ScenarioClassification getScenarioClassification(Scenario scenario) {
+        StratConScenario stratconScenario = getStratConScenario(scenario);
+        if (stratconScenario == null) {
+            return ScenarioClassification.NONE;
+        }
+
+        return new ScenarioClassification(true,
+              stratconScenario.isStrategicObjective(),
+              stratconScenario.isTurningPoint(),
+              scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial(),
+              scenario.getStratConScenarioType().isOfficialChallenge());
+    }
+
+    private String getScenarioSeverityText(ScenarioClassification classification) {
+        if (classification.strategic()) {
+            return resources.getString("col_status.strategic");
+        } else if (classification.turningPoint()) {
+            return resources.getString("col_status.turningPoint");
+        } else if (classification.crisis()) {
+            return resources.getString("col_status.crisis");
+        } else if (classification.dual()) {
+            return resources.getString("col_status.dual");
+        } else {
+            return "";
+        }
+    }
+
+    private String getScenarioStatusText(Scenario scenario) {
+        ScenarioClassification classification = getScenarioClassification(scenario);
+        if (!classification.hasStratConScenario()) {
+            return scenario.getStatus().toString();
+        }
+
+        String openingSpan = "";
+        if (classification.crisis() || classification.strategic() || classification.dual()) {
+            openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
+        } else if (classification.turningPoint()) {
+            openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+        }
+
+        String closingSpan = openingSpan.isEmpty() ? "" : CLOSING_SPAN_TAG;
+        return String.format(
+              "<html>%s%s<b> %s</b>%s</html>",
+              scenario.getStatus().toString(),
+              openingSpan,
+              getScenarioSeverityText(classification),
+              closingSpan
+        );
     }
 
     private StratConScenario getStratConScenario(Scenario scenario) {
@@ -191,51 +248,7 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
         if (col == COL_NAME) {
             return scenario.getName();
         } else if (col == COL_STATUS) {
-            StratConScenario stratconScenario = getStratConScenario(scenario);
-
-            if (stratconScenario != null) {
-                // Determine attributes of the scenario
-                boolean isStrategic = stratconScenario.isStrategicObjective();
-                boolean isTurningPoint = stratconScenario.isTurningPoint();
-                boolean isCrisis = scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial();
-                boolean isDual = scenario.getStratConScenarioType().isOfficialChallenge();
-
-                // Set the opening span color based on scenario type (Strategic, Crisis, or Turning Point)
-                String openingSpan = "";
-                if (isCrisis || isStrategic || isDual) {
-                    openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
-                } else if (isTurningPoint) {
-                    openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
-                }
-
-                // Generate an appropriate label
-                String scenarioSeverityText;
-                if (isStrategic) {
-                    scenarioSeverityText = resources.getString("col_status.strategic");
-                } else if (isTurningPoint) {
-                    scenarioSeverityText = resources.getString("col_status.turningPoint");
-                } else if (isCrisis) {
-                    scenarioSeverityText = resources.getString("col_status.crisis");
-                } else if (isDual) {
-                    scenarioSeverityText = resources.getString("col_status.dual");
-                } else {
-                    scenarioSeverityText = "";
-                }
-
-                // Add closing span tag if there is an opening span
-                String closingSpan = openingSpan.isEmpty() ? "" : CLOSING_SPAN_TAG;
-
-                // Wrap in HTML and include bold formatting for accessibility
-                return String.format(
-                      "<html>%s%s<b> %s</b>%s</html>",
-                      scenario.getStatus().toString(),
-                      openingSpan,
-                      scenarioSeverityText,
-                      closingSpan
-                );
-            }
-
-            return scenario.getStatus().toString();
+            return getScenarioStatusText(scenario);
         } else if (col == COL_DATE) {
             if (scenario.getDate() == null) {
                 return "-";
