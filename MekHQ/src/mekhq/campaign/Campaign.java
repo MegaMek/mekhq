@@ -4337,13 +4337,14 @@ public class Campaign implements ITechManager, ILocation {
     /**
      * Refreshes the personnel markets based on the current market style and the current date.
      *
-     * @param isCampaignStart {@code true} if campaign method is being called at the start of the campaign
+     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
+     *                               start
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets(boolean isCampaignStart) {
-        humanResources.refreshPersonnelMarkets(this, isCampaignStart);
+    public void refreshPersonnelMarkets(boolean bypassDateRestrictions) {
+        humanResources.refreshPersonnelMarkets(this, bypassDateRestrictions);
     }
 
     public int getInitiativeBonus() {

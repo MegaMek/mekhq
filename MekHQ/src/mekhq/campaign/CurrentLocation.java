@@ -34,6 +34,7 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 
@@ -295,6 +296,12 @@ public class CurrentLocation extends AbstractLocation {
             }
 
             testForEarlyArrival(campaign);
+
+            // We've just stopped traveling, so we should see if there are any local applicants.
+            if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
+                campaign.refreshPersonnelMarkets(true);
+                CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+            }
         }
     }
 

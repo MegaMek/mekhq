@@ -2202,7 +2202,7 @@ public class CampaignNewDayManager {
         }
     }
 
-    private void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
+    public static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
         if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
             return;
         }
