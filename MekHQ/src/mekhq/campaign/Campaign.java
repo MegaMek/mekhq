@@ -70,6 +70,7 @@ import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.io.IOException;
@@ -460,8 +461,11 @@ public class Campaign implements ITechManager, ILocation {
         COMMAND, LOGISTICS, TRANSPORT, HR
     }
 
+    @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     private HumanResources humanResources = new HumanResources();
 
@@ -5419,9 +5423,11 @@ public class Campaign implements ITechManager, ILocation {
 
         // We've had instances where game options isn't loaded correctly from player campaigns, potentially due to
         // age. This safeguards.
-        if (gameOptions == null) {
+        if (true) {
             gameOptions = new GameOptions();
-            LOGGER.error("null gameOptions, resetting to default.");
+            LOGGER.errorDialog(new NullPointerException(),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.body"),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.title"));
         }
 
         getGameOptions().writeToXML(writer, indent);
