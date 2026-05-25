@@ -37,7 +37,6 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
@@ -137,7 +136,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -156,6 +154,7 @@ import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.view.CurrentLocationPanel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -200,7 +199,6 @@ public class CampaignGUI extends JPanel {
 
     /* Components for the status panel */
     private JPanel statusPanel;
-    private JLabel lblLocation;
     private JLabel lblFunds;
     private JComboBox<LocationFilterItem> choiceActiveLocation;
     private JLabel lblTempAsTechs;
@@ -227,6 +225,7 @@ public class CampaignGUI extends JPanel {
 
     /* for the top button panel */
     private JPanel pnlTop;
+    private CurrentLocationPanel pnlLocation;
     private final RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(resourceMap.getString(
           "btnAdvanceMultipleDays.text"));
     private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
@@ -239,8 +238,6 @@ public class CampaignGUI extends JPanel {
     private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
-    private final RoundedJButton btnPersonnelMarket =
-          new RoundedJButton(resourceMap.getString("btnPersonnelMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
     private final RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
 
@@ -361,7 +358,6 @@ public class CampaignGUI extends JPanel {
 
         refreshCalendar();
         refreshFunds();
-        refreshLocation();
         refreshTempAsTechs();
         refreshTempMedics();
         refreshTempSoldiers();
@@ -764,7 +760,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
         miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
-        miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
         menuMarket.add(miPersonnelMarket);
 
         JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
@@ -852,6 +847,23 @@ public class CampaignGUI extends JPanel {
         menuHire.add(menuHireCivilian);
         menuMarket.add(menuHire);
 
+        // region Temp Pool
+        JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
+
+        JMenuItem miTempPoolFullStrength = new JMenuItem(resourceMap.getString("miTempPoolFullStrength.text"));
+        miTempPoolFullStrength.addActionListener(evt -> bringAllTempCrewsToFullStrength());
+        menuTempPool.add(miTempPoolFullStrength);
+
+        JMenuItem miTempPoolReleaseAll = new JMenuItem(resourceMap.getString("miTempPoolReleaseAll.text"));
+        miTempPoolReleaseAll.addActionListener(evt -> releaseAllTempCrews());
+        menuTempPool.add(miTempPoolReleaseAll);
+
+        JMenuItem miTempPoolReleaseSurplus = new JMenuItem(resourceMap.getString("miTempPoolReleaseSurplus.text"));
+        miTempPoolReleaseSurplus.addActionListener(evt -> releaseSurplusTempCrews());
+        menuTempPool.add(miTempPoolReleaseSurplus);
+
+        menuTempPool.addSeparator();
+
         // region Astech Pool
         // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
         // B, E, F, H
@@ -899,7 +911,7 @@ public class CampaignGUI extends JPanel {
         miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
         miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
         menuAsTechPool.add(miFireAllAsTechs);
-        menuMarket.add(menuAsTechPool);
+        menuTempPool.add(menuAsTechPool);
         // endregion Astech Pool
 
         // region Medic Pool
@@ -949,7 +961,7 @@ public class CampaignGUI extends JPanel {
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
         menuMedicPool.add(miFireAllMedics);
-        menuMarket.add(menuMedicPool);
+        menuTempPool.add(menuMedicPool);
         // endregion Medic Pool
 
         // region Soldier Pool
@@ -1001,7 +1013,7 @@ public class CampaignGUI extends JPanel {
         miFireAllSoldiers.setMnemonic(KeyEvent.VK_R);
         miFireAllSoldiers.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.SOLDIER));
         menuSoldierPool.add(miFireAllSoldiers);
-        menuMarket.add(menuSoldierPool);
+        menuTempPool.add(menuSoldierPool);
         // endregion Soldier Pool
 
         // region Battle Armor Pool
@@ -1051,7 +1063,7 @@ public class CampaignGUI extends JPanel {
         miFireAllBattleArmor.setMnemonic(KeyEvent.VK_R);
         miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR));
         menuBattleArmorPool.add(miFireAllBattleArmor);
-        menuMarket.add(menuBattleArmorPool);
+        menuTempPool.add(menuBattleArmorPool);
         // endregion Battle Armor Pool
 
         // region Vehicle Crew Ground Pool
@@ -1102,7 +1114,7 @@ public class CampaignGUI extends JPanel {
         miFireAllVehicleCrewGround.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
               0));
         menuVehicleCrewGroundPool.add(miFireAllVehicleCrewGround);
-        menuMarket.add(menuVehicleCrewGroundPool);
+        menuTempPool.add(menuVehicleCrewGroundPool);
         // endregion Vehicle Crew Ground Pool
 
         // region Vehicle Crew VTOL Pool
@@ -1151,7 +1163,7 @@ public class CampaignGUI extends JPanel {
         miFireAllVehicleCrewVTOL.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL,
               0));
         menuVehicleCrewVTOLPool.add(miFireAllVehicleCrewVTOL);
-        menuMarket.add(menuVehicleCrewVTOLPool);
+        menuTempPool.add(menuVehicleCrewVTOLPool);
         // endregion Vehicle Crew VTOL Pool
 
         // region Vehicle Crew Naval Pool
@@ -1200,7 +1212,7 @@ public class CampaignGUI extends JPanel {
         miFireAllVehicleCrewNaval.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL,
               0));
         menuVehicleCrewNavalPool.add(miFireAllVehicleCrewNaval);
-        menuMarket.add(menuVehicleCrewNavalPool);
+        menuTempPool.add(menuVehicleCrewNavalPool);
         // endregion Vehicle Crew Naval Pool
 
         // region Vessel Pilot Pool
@@ -1247,7 +1259,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFireAllVesselPilot = new JMenuItem(resourceMap.getString("miFireAllVesselPilot.text"));
         miFireAllVesselPilot.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0));
         menuVesselPilotPool.add(miFireAllVesselPilot);
-        menuMarket.add(menuVesselPilotPool);
+        menuTempPool.add(menuVesselPilotPool);
         // endregion Vessel Pilot Pool
 
         // region Vessel Gunner Pool
@@ -1294,7 +1306,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFireAllVesselGunner = new JMenuItem(resourceMap.getString("miFireAllVesselGunner.text"));
         miFireAllVesselGunner.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0));
         menuVesselGunnerPool.add(miFireAllVesselGunner);
-        menuMarket.add(menuVesselGunnerPool);
+        menuTempPool.add(menuVesselGunnerPool);
         // endregion Vessel Gunner Pool
 
         // region Vessel Crew Pool
@@ -1341,8 +1353,11 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFireAllVesselCrew = new JMenuItem(resourceMap.getString("miFireAllVesselCrew.text"));
         miFireAllVesselCrew.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_CREW, 0));
         menuVesselCrewPool.add(miFireAllVesselCrew);
-        menuMarket.add(menuVesselCrewPool);
+        menuTempPool.add(menuVesselCrewPool);
         // endregion Vessel Crew Pool
+
+        menuMarket.add(menuTempPool);
+        // endregion Temp Pool
 
         menuBar.add(menuMarket);
         // endregion Marketplace Menu
@@ -1604,31 +1619,20 @@ public class CampaignGUI extends JPanel {
      * accessible.</p>
      */
     private void initTopButtons() {
-        boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
-                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
-
-        lblLocation = new JLabel(getCampaign().getCurrentLocation()
-                                       .getReport(getCampaign().getLocalDate(),
-                                             isUseCommandCircuit,
-                                             getCampaign().getTransportCostCalculation(EXP_REGULAR)));
-        lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
-
         pnlTop = new JPanel(new GridBagLayout());
         pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
 
+        pnlLocation = new CurrentLocationPanel(getCampaign(), this::hirePersonMarket);
+        pnlLocation.setMinimumSize(new Dimension(320, 60));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
-        pnlTop.add(lblLocation, gridBagConstraints);
-
+        pnlTop.add(pnlLocation, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -1639,7 +1643,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         pnlTop.add(getMarketButtons(), gridBagConstraints);
-
 
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -1663,28 +1666,19 @@ public class CampaignGUI extends JPanel {
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         pnlButton.add(btnContractMarket, gridBagConstraints);
 
-        btnPersonnelMarket.addActionListener(e -> hirePersonMarket());
-        btnPersonnelMarket.setHorizontalTextPosition(SwingConstants.CENTER);
-        btnPersonnelMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnPersonnelMarket, gridBagConstraints);
-
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -1714,17 +1708,10 @@ public class CampaignGUI extends JPanel {
 
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        String labelKey = campaignOptions.getContractMarketMethod().isNone()
-                                ? "manual" : "market";
+        String labelKey = campaignOptions.getContractMarketMethod().isNone() ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
-
-        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
-        labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
-                         ? "manual" : "market";
-        label = resourceMap.getString("btnPersonnelMarket." + labelKey);
-        btnPersonnelMarket.setText(label);
 
         labelKey = getCampaign().getUnitMarket().getMethod().isNone() ? "manual" : "market";
         label = resourceMap.getString("btnUnitMarket." + labelKey);
@@ -2167,6 +2154,101 @@ public class CampaignGUI extends JPanel {
     private void hireBulkPersonnel() {
         HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hireBulkPersonnelDialog.setVisible(true);
+    }
+
+    private void bringAllTempCrewsToFullStrength() {
+        getCampaign().resetAsTechPool();
+        getCampaign().resetMedicPool();
+        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
+        }
+    }
+
+    private void releaseAllTempCrews() {
+        getCampaign().emptyAsTechPool();
+        getCampaign().emptyMedicPool();
+        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.SOLDIER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        }
+    }
+
+    private void releaseSurplusTempCrews() {
+        getCampaign().releaseSurplusAsTechPool();
+        getCampaign().releaseSurplusMedicPool();
+        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.SOLDIER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
+        }
+        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
+            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        }
     }
 
     public void showContractMarket() {
@@ -3124,8 +3206,14 @@ public class CampaignGUI extends JPanel {
      * @param logType the category of daily report the UI should prompt the user to review
      */
     public void checkDailyLogNag(DailyReportType logType) {
+        CommandCenterTab commandCenterTab = getCommandCenterTab();
+        if (commandCenterTab == null) {
+            logger.warn("Command Center tab is unavailable, cannot check for daily log nag");
+            return;
+        }
+
         // If we're already nagging, no need to nag again
-        boolean subTabNagActive = getCommandCenterTab().isLogNagActive(logType);
+        boolean subTabNagActive = commandCenterTab.isLogNagActive(logType);
         int relevantIndex = logType.getTabIndex();
 
         // We're already nagging
@@ -3134,55 +3222,40 @@ public class CampaignGUI extends JPanel {
         }
 
         final int selectedIndex = tabMain.getSelectedIndex();
-        if (selectedIndex < 0 || selectedIndex >= tabMain.getTabCount()) {
-            logger.warn("No tab selected, cannot check for daily log nag");
+        final Component selectedTab = ((selectedIndex >= 0) && (selectedIndex < tabMain.getTabCount())) ?
+                                             tabMain.getComponentAt(selectedIndex) : null;
+
+        EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
+        int logsSelected = tabLogs.getSelectedIndex();
+
+        // If the player is already viewing the correct log tab, no nag needed.
+        if (commandCenterTab.isShowing() && (logsSelected == relevantIndex)) {
             return;
         }
 
-        // If the player is already viewing the correct log tab, no nag needed
-        final Component selectedTab = tabMain.getComponentAt(selectedIndex);
-        if (selectedTab instanceof CommandCenterTab commandCenterTab) {
-            int logsSelected = commandCenterTab.getTabLogs().getSelectedIndex();
-
-            if (logsSelected == relevantIndex) {
-                return;
-            }
+        // If the Command Center is still attached and not currently selected, color that tab's label.
+        int commandCenterIndex = tabMain.indexOfComponent(commandCenterTab);
+        if ((commandCenterIndex >= 0) && (selectedTab != commandCenterTab)) {
+            tabMain.setBackgroundAt(commandCenterIndex, UIUtil.uiDarkBlue());
+            logNagActive = true;
         }
 
-        // Loop through the tabs until we find the Command Center tab, then color that tab's label.
-        for (int i = 0; i < tabMain.getTabCount(); i++) {
-            Component component = tabMain.getComponentAt(i);
+        if (logsSelected != relevantIndex) {
+            DailyReportLogPanel reportTab = switch (logType) {
+                case GENERAL -> commandCenterTab.getGeneralLog();
+                case BATTLE -> commandCenterTab.getBattleLog();
+                case PERSONNEL -> commandCenterTab.getPersonnelLog();
+                case MEDICAL -> commandCenterTab.getMedicalLog();
+                case FINANCES -> commandCenterTab.getFinancesLog();
+                case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
+                case TECHNICAL -> commandCenterTab.getTechnicalLog();
+                case POLITICS -> commandCenterTab.getPoliticsLog();
+                case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+            };
 
-            if (component instanceof CommandCenterTab commandCenterTab) {
-                // If the player is currently on the Command Center Tab, no need to nag that tab, though we're still
-                // going to nag the sub-tab
-                if (!(selectedTab instanceof CommandCenterTab)) {
-                    tabMain.setBackgroundAt(i, UIUtil.uiDarkBlue());
-                    logNagActive = true;
-                }
-
-                EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
-                int logsSelected = tabLogs.getSelectedIndex();
-                if (logsSelected != relevantIndex) {
-                    DailyReportLogPanel reportTab = switch (logType) {
-                        case GENERAL -> commandCenterTab.getGeneralLog();
-                        case BATTLE -> commandCenterTab.getBattleLog();
-                        case PERSONNEL -> commandCenterTab.getPersonnelLog();
-                        case MEDICAL -> commandCenterTab.getMedicalLog();
-                        case FINANCES -> commandCenterTab.getFinancesLog();
-                        case ACQUISITIONS -> commandCenterTab.getAcquisitionsLog();
-                        case TECHNICAL -> commandCenterTab.getTechnicalLog();
-                        case POLITICS -> commandCenterTab.getPoliticsLog();
-                        case SKILL_CHECKS -> commandCenterTab.getSkillLog();
-                    };
-
-                    if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
-                        commandCenterTab.nagLogTab(relevantIndex);
-                        commandCenterTab.setLogNagActive(logType, true);
-                    }
-                }
-
-                break;
+            if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
+                commandCenterTab.nagLogTab(relevantIndex);
+                commandCenterTab.setLogNagActive(logType, true);
             }
         }
     }
@@ -3441,18 +3514,6 @@ public class CampaignGUI extends JPanel {
 
     private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
-    public void refreshLocation() {
-        boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
-                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
-
-        lblLocation.setText(getCampaign().getCurrentLocation()
-                                  .getReport(getCampaign().getLocalDate(),
-                                        isUseCommandCircuit,
-                                        getCampaign().getTransportCostCalculation(EXP_REGULAR)));
-    }
-
     public int getTabIndexByName(String tabTitle) {
         int retVal = -1;
         for (int i = 0; i < tabMain.getTabCount(); i++) {
@@ -3544,7 +3605,8 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleDayEnding(DayEndingEvent dayEndingEvent) {
         if (MekHQ.getMHQOptions().getNewDayAutomaticallyAssignUnmaintainedUnits()) {
-            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+            boolean skipReports = false;
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }
 
         if (triggerDailyNags(getCampaign())) {
@@ -3591,21 +3653,6 @@ public class CampaignGUI extends JPanel {
                                                           turnoverPrompt);
             }
         }
-    }
-
-    /**
-     * Handles changes to the campaign's current location.
-     *
-     * <p>Invokes an update to ensure the location information is current within the user interface and data model.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param locationChangedEvent the event indicating that the campaign location has changed
-     */
-    @Subscribe
-    public void handleLocationChanged(LocationChangedEvent locationChangedEvent) {
-        refreshLocation();
     }
 
     /**
@@ -3766,7 +3813,6 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleNewDay(NewDayEvent newDayEvent) {
         refreshCalendar();
-        refreshLocation();
         refreshFunds();
         refreshPartsAvailability();
         refreshMarketButtonLabels();

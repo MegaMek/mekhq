@@ -41,11 +41,13 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * A simple node for forming a tree of {@link ILocation} implementations.
+ */
 public class LocationNode {
     private static final MMLogger logger = MMLogger.create(LocationNode.class);
 
@@ -62,26 +64,23 @@ public class LocationNode {
         return locatable;
     }
 
-    public AbstractLocation getCurrentLocation() {
+    @Nullable
+    public AbstractLocation getNearestAbstractLocation() {
         if (locatable instanceof AbstractLocation abstractLocation) {
             return abstractLocation;
         }
 
         if (parent != null) {
-            return parent.getCurrentLocation();
+            return parent.getNearestAbstractLocation();
         }
 
         return null;
     }
-
-    public mekhq.campaign.AbstractLocation getNearestAbstractLocation() {
-        return getCurrentLocation();
-    }
-
     public LocationNode getParent() {
         return parent;
     }
 
+    @Nullable
     void setParent(LocationNode parent) {
         this.parent = parent;
     }

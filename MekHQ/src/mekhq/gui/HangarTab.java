@@ -304,7 +304,8 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (wasConfirmedOverall) {
-            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+            boolean skipReports = true;
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }
     }
 

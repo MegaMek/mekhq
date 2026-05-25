@@ -541,9 +541,7 @@ public class Campaign implements ITechManager, ILocation {
         this.techFaction = techFaction;
         this.systemsInstance = systemsInstance;
         this.locationNode = new LocationNode(this);
-        if (startLocation != null) {
-            locations.add(startLocation);
-        }
+        setLocation(startLocation);
         this.setParent(startLocation);
         if (startLocation != null) {
             mainForcePersonnel.setParent(this);
@@ -1727,17 +1725,17 @@ public class Campaign implements ITechManager, ILocation {
         return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
     }
 
-    public void setLocation(AbstractLocation l) {
+    public void setLocation(AbstractLocation location) {
         locations.clear();
-        if (l != null) {
-            locations.add(l);
+        if (location != null) {
+            locations.add(location);
         }
-        setParent(l);
+        setParent(location);
     }
 
-    public void addLocation(AbstractLocation l) {
-        if (l != null) {
-            locations.add(l);
+    public void addLocation(AbstractLocation location) {
+        if (location != null) {
+            locations.add(location);
         }
     }
 
@@ -1865,6 +1863,7 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     @Override
+    @Nullable
     public LocationNode getLocationNode() {
         return locationNode;
     }
@@ -2669,6 +2668,10 @@ public class Campaign implements ITechManager, ILocation {
         return humanResources.getPatientsAssignedToDoctors();
     }
 
+    public List<Person> getPatientsWithNonPermanentInjuries() {
+        return humanResources.getPatientsWithNonPermanentInjuries();
+    }
+
     /**
      * List of all units that can show up in the repair bay.
      */
@@ -2987,7 +2990,12 @@ public class Campaign implements ITechManager, ILocation {
      * @return The person in the designated role with the most experience.
      */
     public Person findBestInRole(PersonnelRole role, String primary, @Nullable String secondary) {
-        return humanResources.findBestInRole(role, primary, secondary, getCampaignOptions(), isClanCampaign(), getLocalDate());
+        return humanResources.findBestInRole(role,
+              primary,
+              secondary,
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate());
     }
 
     public Person findBestInRole(PersonnelRole role, String skill) {
@@ -3014,15 +3022,27 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public List<Person> getTechs(final boolean noZeroMinute) {
-        return humanResources.getTechs(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute);
+        return humanResources.getTechs(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute);
     }
 
     public List<Person> getTechsExpanded() {
-        return humanResources.getTechsExpanded(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate());
+        return humanResources.getTechsExpanded(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate());
     }
 
     public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
-        return humanResources.getTechs(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute, eliteFirst);
+        return humanResources.getTechs(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute,
+              eliteFirst);
     }
 
     /**
@@ -3035,7 +3055,13 @@ public class Campaign implements ITechManager, ILocation {
      * @return A list of active technicians sorted appropriately.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        return humanResources.getTechsExpanded(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute, eliteFirst, expanded);
+        return humanResources.getTechsExpanded(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute,
+              eliteFirst,
+              expanded);
     }
 
     public List<Person> getAdmins() {
@@ -7230,6 +7256,35 @@ public class Campaign implements ITechManager, ILocation {
         fillTempCrewPoolForRole(role);
     }
 
+
+    /**
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
+     * If the pool already has fewer than needed, no change is made.
+     */
+    public void releaseSurplusAsTechPool() {
+        humanResources.releaseSurplusAsTechPool(this);
+    }
+
+    /**
+     * Releases surplus Medics from the pool, keeping only what is currently needed.
+     * If the pool already has fewer than needed, no change is made.
+     */
+    public void releaseSurplusMedicPool() {
+        humanResources.releaseSurplusMedicPool(this);
+    }
+
+    /**
+     * Releases surplus temp crew for a specific blob crew role.
+     *
+     * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
+     * emptied.</p>
+     *
+     * @param role the personnel role to trim
+     */
+    public void releaseSurplusBlobCrewForRole(PersonnelRole role) {
+        humanResources.releaseSurplusBlobCrewForRole(this, role);
+    }
 
     /**
      * Clears blob crew for a specific personnel role from units and empties the campaign pool. Should be called when a

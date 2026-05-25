@@ -6200,7 +6200,33 @@ public class Unit implements ITechnology, ILocation {
         return crew;
     }
 
+    /**
+     * Removes all crew members from this unit, including the assigned technician and engineer.
+     *
+     * <p>This is a convenience overload equivalent to calling {@link #clearCrew(boolean) clearCrew(false)}.</p>
+     *
+     * @author Illiani
+     * @see #clearCrew(boolean)
+     * @since 0.51.0
+     */
     public void clearCrew() {
+        clearCrew(false);
+    }
+
+    /**
+     * Removes all crew members from this unit, optionally retaining the assigned technician and engineer.
+     *
+     * <p>If the unit is currently deployed, this method returns immediately and no changes are made. Otherwise,
+     * every person in the crew roster is removed. When {@code keepTech} is {@code false}, the assigned technician and
+     * engineer are also removed.</p>
+     *
+     * @param keepTech if {@code true}, the assigned technician and engineer are preserved; if {@code false}, they are
+     *                 removed along with the rest of the crew
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public void clearCrew(boolean keepTech) {
         if (isDeployed()) {
             return;
         }
@@ -6209,10 +6235,12 @@ public class Unit implements ITechnology, ILocation {
             remove(person, true);
         }
 
-        removeTech();
+        if (!keepTech) {
+            removeTech();
 
-        if (getEngineer() != null) {
-            remove(getEngineer(), true);
+            if (getEngineer() != null) {
+                remove(getEngineer(), true);
+            }
         }
     }
 
@@ -6588,6 +6616,16 @@ public class Unit implements ITechnology, ILocation {
      */
     public int getTotalTempCrew() {
         return tempPersonnelRoleMap.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * Returns the set of {@link PersonnelRole}s that currently have at least one temp crew member assigned to this
+     * unit.
+     *
+     * @return an immutable snapshot of the roles with temp crew
+     */
+    public Set<PersonnelRole> getTempCrewRoles() {
+        return Set.copyOf(tempPersonnelRoleMap.keySet());
     }
 
     /**

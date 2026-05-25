@@ -56,6 +56,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -77,6 +78,10 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import org.w3c.dom.Node;
 
+/**
+ * Abstract implementation of a specific location. An {@code AbstractLocation} is expected as the
+ * {@link ILocation ILocation locatable} of the root {@link LocationNode} in a {@code LocationNode} tree.
+ */
 public abstract class AbstractLocation implements ILocation {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
@@ -129,7 +134,7 @@ public abstract class AbstractLocation implements ILocation {
         return false;
     }
 
-    public void setRecharged(Campaign campaign) {}
+    public void chargeFully(Campaign campaign) {}
 
     @Override
     public JumpPath getJumpPath() {
@@ -153,93 +158,8 @@ public abstract class AbstractLocation implements ILocation {
         return getCurrentSystem().getPrimaryPlanet();
     }
 
-    /**
-     * Generates a detailed status report for the current location and travel state.
-     *
-     * <p>The report includes:</p>
-     * <ul>
-     *   <li>The current system and position, indicating if on a planet, at a jump point (with recharge status),
-     *       in transit from a planet, or close to a jump point.</li>
-     *   <li>Travel progress, including the destination system, remaining jumps, or if already at the destination.</li>
-     *   <li>The estimated jump cost for the current journey.</li>
-     * </ul>
-     *
-     * <p>The report is formatted as HTML suitable for display in GUI components.</p>
-     *
-     * @param date                the current {@link LocalDate} for context-sensitive names and status
-     * @param isUseCommandCircuit whether the command circuit option is enabled
-     *
-     * @return a formatted HTML string representing the travel and location status report
-     */
-    public String getReport(LocalDate date, boolean isUseCommandCircuit,
-          TransportCostCalculations transportCostCalculations) {
-        double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
-
-        StringBuilder report = new StringBuilder();
-        report.append("<html>")
-              // First Line
-              .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
-
-        if (isOnPlanet()) {
-            report.append("on planet ").append(getPlanet().getPrintableName(date));
-        } else if (isAtJumpPoint()) {
-            report.append("at jump point");
-            if (!Double.isInfinite(currentRechargeTime)) {
-                report.append(" (Jumpship ")
-                      .append(String.format(Locale.ROOT,
-                            "%.0f",
-                            (100.0 * getRechargeTime()) / currentRechargeTime))
-                      .append("% charged)");
-            }
-        } else {
-            if ((null != getJumpPath()) && (currentSystem == getJumpPath().getLastSystem())) {
-                report.append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days from planet");
-            } else {
-                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
-                report.append(String.format(Locale.ROOT, "%.2f", timeToJP)).append(" days from jump point");
-            }
-        }
-
-        report.append("<br/>");
-
-        // Second Line
-        boolean hasIncludedCost = false;
-        if ((null != getJumpPath()) && !getJumpPath().isEmpty()) {
-            report.append("Traveling to ").append(getJumpPath().getLastSystem().getPrintableName(date)).append(": ");
-            if (getJumpPath().getJumps() > 0) {
-                report.append(getJumpPath().getJumps())
-                      .append(getJumpPath().getJumps() == 1 ? " jump remaining" : " jumps remaining");
-
-                int duration = (int) ceil(getJumpPath().getTotalTime(date, getTransitTime(), isUseCommandCircuit));
-                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
-                      getJumpPath().getJumps());
-                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
-                                                                                                                      "C-Bills");
-                hasIncludedCost = true;
-            } else {
-                report.append("In destination system");
-            }
-        } else {
-            report.append("Not traveling");
-        }
-
-        report.append("<br/>");
-
-        // Third Line
-        if (hasIncludedCost) {
-            report.append("<br><br>");
-        } else {
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
-            report.append("Estimated Jump Cost (per week): ")
-                  .append(jumpCost.toAmountString())
-                  .append(" C-Bills<br><br>");
-        }
-
-        report.append("</html>");
-        return report.toString();
-    }
-
     @Override
+    @Nullable
     public LocationNode getLocationNode() {
         return locationNode;
     }
@@ -274,13 +194,12 @@ public abstract class AbstractLocation implements ILocation {
         double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
         if (usedRechargeTime > 0) {
             if (!suppressReports) {
-                campaign.addReport(GENERAL, "JumpShips spent " +
-                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                                  " hours recharging drives");
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
+                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
             }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
             if (getRechargeTime() >= neededRechargeTime && !suppressReports) {
-                campaign.addReport(GENERAL, "JumpShip drives fully charged");
+                campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.recharge.complete"));
             }
         }
         return usedRechargeTime;

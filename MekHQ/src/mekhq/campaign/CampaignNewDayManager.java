@@ -225,7 +225,7 @@ public class CampaignNewDayManager {
     private final Quartermaster quartermaster;
     private final Finances finances;
     private LocalDate today;
-    private mekhq.campaign.AbstractLocation updatedLocation;
+    private AbstractLocation updatedLocation;
 
     public CampaignNewDayManager(Campaign campaign) {
         this.campaign = campaign;
@@ -417,7 +417,9 @@ public class CampaignNewDayManager {
 
         // Manage the Markets
         campaign.refreshPersonnelMarkets(false);
-        showRarePersonnelDialog(campaign, false);
+        if (isFirstOfMonth) {
+            showRarePersonnelDialog(campaign, false);
+        }
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(campaign);
@@ -1775,7 +1777,7 @@ public class CampaignNewDayManager {
      * Determines if a willpower check has failed for the given person with the specified modifier.
      *
      * @param campaign The campaign context, needed for reporting skill check results.
-     * @param person The person for whom the willpower check is being performed.
+     * @param person   The person for whom the willpower check is being performed.
      * @param modifier An integer value representing the modification to the willpower check.
      *
      * @return {@code true} if the willpower check has failed; {@code false} otherwise.
