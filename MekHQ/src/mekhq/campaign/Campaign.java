@@ -5421,6 +5421,7 @@ public class Campaign implements ITechManager, ILocation {
         // age. This safeguards.
         if (gameOptions == null) {
             gameOptions = new GameOptions();
+            LOGGER.error("null gameOptions, resetting to default.");
         }
 
         getGameOptions().writeToXML(writer, indent);
