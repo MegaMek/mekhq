@@ -106,13 +106,14 @@ public record Accountant(Campaign campaign) {
             }
         }
 
-        // And pay our pool
-        salaries = salaries.plus(campaign().getCampaignOptions()
-                                       .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
-                                       .doubleValue() * campaign().getTemporaryAsTechPool());
-        salaries = salaries.plus(campaign().getCampaignOptions()
-                                       .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                       campaign().getTemporaryMedicPool());
+        // Add all temporary personnel (medics, astechs, temp crew)
+        //        salaries = salaries.plus(campaign().getCampaignOptions()
+        //                                       .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
+        //                                       .doubleValue() * campaign().getTemporaryAsTechPool());
+        //        salaries = salaries.plus(campaign().getCampaignOptions()
+        //                                       .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
+        //                                       campaign().getTemporaryMedicPool());
+        salaries = salaries.plus(sumTempCrewPay());
 
         return salaries;
     }
@@ -636,14 +637,28 @@ public record Accountant(Campaign campaign) {
         tempCrewPay += getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool());
         tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign.getTemporaryMedicPool());
 
-        for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
-            tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+        PersonnelRole[] noInfantry = { PersonnelRole.BATTLE_ARMOUR,
+                                       PersonnelRole.VEHICLE_CREW_GROUND,
+                                       PersonnelRole.VEHICLE_CREW_VTOL,
+                                       PersonnelRole.VEHICLE_CREW_NAVAL,
+                                       PersonnelRole.VESSEL_PILOT,
+                                       PersonnelRole.VESSEL_GUNNER,
+                                       PersonnelRole.VESSEL_CREW };
+
+        if (getCampaignOptions().isInfantryDontCount()) {
+            for (PersonnelRole personnelRole : noInfantry) {
+                tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            }
+        } else {
+            for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
+                tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            }
         }
 
         return tempCrewPay;
     }
 
-     private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
+    private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
         return campaign().getCampaignOptions()
                      .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() *
                      tempPersonnelPool;
