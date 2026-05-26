@@ -1180,30 +1180,44 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // fill with temp crew (blob crew)
-            if (oneSelected) {
-                boolean canFillWithTempCrew = canUnitUseTempCrew(unit);
+            if (oneSelected && canUnitUseTempCrew(unit)) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempCrew = unit.getTotalTempCrew();
+                int fullCrew = unit.getFullCrewSize();
 
-                if (canFillWithTempCrew && !unit.getActiveCrew().isEmpty()) {
-                    int currentCrew = unit.getActiveCrew().size();
-                    int currentTempCrew = unit.getTotalTempCrew();
-                    int fullCrew = unit.getFullCrewSize();
-
-                    // Only show if unit can accept more temp crew
-                    if (currentCrew + currentTempCrew < fullCrew) {
-                        menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
-                        menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
-                        menuItem.addActionListener(this);
-                        popup.add(menuItem);
-                    }
-
-                    // Show "Remove temp crew" if unit has any temp crew
-                    if (currentTempCrew > 0) {
-                        menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
-                        menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
-                        menuItem.addActionListener(this);
-                        popup.add(menuItem);
+                // Determine why filling might not be possible
+                String fillDisabledReason = null;
+                if (currentCrew == 0) {
+                    fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.noCommander");
+                } else if (currentCrew + currentTempCrew >= fullCrew) {
+                    fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.atFullStrength");
+                } else {
+                    PersonnelRole crewRole = unit.getDriverRole();
+                    boolean hasPool = crewRole != null
+                          && gui.getCampaign().isBlobCrewEnabled(crewRole)
+                          && gui.getCampaign().getAvailableTempCrewPool(crewRole) > 0;
+                    if (!hasPool) {
+                        fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.noPoolAvailable");
                     }
                 }
+
+                menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
+                menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
+                menuItem.addActionListener(this);
+                if (fillDisabledReason != null) {
+                    menuItem.setEnabled(false);
+                    menuItem.setToolTipText(fillDisabledReason);
+                }
+                popup.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
+                menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
+                menuItem.addActionListener(this);
+                if (currentTempCrew == 0) {
+                    menuItem.setEnabled(false);
+                    menuItem.setToolTipText(resources.getString("tempCrew.removeTempCrew.noTempCrew"));
+                }
+                popup.add(menuItem);
             }
 
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
