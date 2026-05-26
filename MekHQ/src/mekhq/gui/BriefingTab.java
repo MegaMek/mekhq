@@ -1680,10 +1680,17 @@ public final class BriefingTab extends CampaignGuiTab {
      * Resolve the selected scenario by proving a MUL file
      */
     private void resolveScenario() {
+
+
         Scenario scenario = getSelectedScenario();
         if (null == scenario) {
             return;
         }
+
+        if (handleSalvageAssignments(scenario)) {
+            return;
+        }
+
         getCampaign().getApp().resolveScenario(scenario);
     }
 
