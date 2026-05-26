@@ -107,14 +107,14 @@ public class AddSupportUnitsToTOE {
     private static void createSubFormation(Campaign campaign, String label, FormationType type,
           List<Unit> units, Formation hqFormation) {
         Formation subFormation = new Formation(label);
-        subFormation.setFormationType(type, true); // Largely irrelevant
+        campaign.addFormation(subFormation, hqFormation); // needs to be before we add units
+
+        subFormation.setFormationType(type, true); //subtype propagation is largely irrelevant
 
         int subFormationId = subFormation.getId();
         for (Unit unit : units) {
             campaign.addUnitToFormation(unit, subFormationId);
         }
-
-        campaign.addFormation(subFormation, hqFormation);
     }
 
     /**
