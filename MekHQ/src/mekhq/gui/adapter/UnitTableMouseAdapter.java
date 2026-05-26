@@ -43,7 +43,9 @@ import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -637,9 +639,29 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
-                mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                if (tech != null) {
+                    if ((!selectedUnit.getActiveCrew().isEmpty()) || (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
+                        Campaign campaign = gui.getCampaign();
+                        ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
+                              tech,
+                              null,
+                              getFormattedText("mothballUnit.clearDesignationsICMessage.text",
+                                    campaign.getCommanderAddress()),
+                              List.of(
+                                    getText("mothballUnit.clearDesignationsCancelButton.text"),
+                                    getText("mothballUnit.clearDesignationsConfirmButton.text")),
+                              getText("mothballUnit.clearDesignationsOOCMessage.text"),
+                              null,
+                              false);
+                        if (clearAssignments.getDialogChoice() == 1) {
+                            selectedUnit.clearCrew();
+                            campaign.removeUnitFromFormation(selectedUnit);
+                        }
+                    }
+                    MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
+                    mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                }
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
             if (units.length > 1) {
