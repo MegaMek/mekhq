@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
@@ -96,6 +97,7 @@ import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -113,6 +115,7 @@ import mekhq.campaign.events.scenarios.ScenarioRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -826,6 +829,10 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        // Set up some variables we'll be using later
+        NewPersonnelMarket newPersonnelMarket = getCampaign().getNewPersonnelMarket();
+        boolean marketPreviouslyDisabled = !newPersonnelMarket.getAvailabilityMessage().isBlank();
+
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
@@ -942,6 +949,12 @@ public final class BriefingTab extends CampaignGuiTab {
                     getCampaign().addReport(GENERAL, report);
                 }
             }
+        }
+
+        // Refresh personnel market if it was previously disabled
+        if (!isUsingLegacyPersonnelMarket(campaignOptions) && marketPreviouslyDisabled) {
+            getCampaign().refreshPersonnelMarkets(true);
+            CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
         }
 
         // Undeploy forces & units
