@@ -50,7 +50,9 @@ import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -124,29 +126,55 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.contains("FIX")) {
-            if (partWork.checkFixable() == null) {
-                for (IPartWork p : parts) {
-                    if (command.contains("FIX_GM_ACQUIRE")) {
-                        if (p instanceof MissingPart missingPart) {
-                            Part acquisitionPart = missingPart.getAcquisitionPart();
-                            IAcquisitionWork acquisitionWork = acquisitionPart.getAcquisitionWork();
-                            acquisitionWork.find(0, 1.0);
-                            MekHQ.triggerEvent(new AcquisitionEvent(acquisitionWork));
-                        }
-                    }
-
-                    gui.getCampaign()
-                          .addReport(TECHNICAL, String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
-                    if (p.getUnit() != null) {
-                        p.getUnit().refreshPodSpace();
-                    }
-
-                    // PodSpace triggers event for each child part
-                    if (p instanceof Part) {
-                        MekHQ.triggerEvent(new PartChangedEvent((Part) p));
-                    }
+            for (IPartWork p : parts) {
+                if (partWork.checkFixable() == null) {
+                    processGmAcquireNormal(p, command);
                 }
+                processGMAcquireSpecialCases(p, command);
+
+                reportAndTriggerEvent(p);
             }
+        }
+    }
+
+    private static void processGMAcquireSpecialCases(IPartWork p, String command) {
+        if (command.contains("FIX_GM_ACQUIRE")) {
+            if (p instanceof Armor armor) {
+                int needed = armor.getAmountNeeded();
+                int current = armor.getAmount();
+                armor.setAmount(current + needed);
+            }
+
+            if (p instanceof AmmoBin ammoBin) {
+                Part acquisitionPart = ammoBin.getAcquisitionPart();
+                IAcquisitionWork acquisitionWork = acquisitionPart.getAcquisitionWork();
+                acquisitionWork.find(0, 1.0);
+                ammoBin.loadBin();
+            }
+        }
+    }
+
+    private static void processGmAcquireNormal(IPartWork p, String command) {
+        if (command.contains("FIX_GM_ACQUIRE")) {
+            if (p instanceof MissingPart missingPart) {
+                Part acquisitionPart = missingPart.getAcquisitionPart();
+                IAcquisitionWork acquisitionWork = acquisitionPart.getAcquisitionWork();
+                acquisitionWork.find(0, 1.0);
+                MekHQ.triggerEvent(new AcquisitionEvent(acquisitionWork));
+            }
+        }
+    }
+
+    private void reportAndTriggerEvent(IPartWork p) {
+        gui.getCampaign()
+              .addReport(TECHNICAL, String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
+        if (p.getUnit() != null) {
+            p.getUnit().refreshPodSpace();
+        }
+
+        // PodSpace triggers event for each child part
+        if (p instanceof Part) {
+            MekHQ.triggerEvent(new PartChangedEvent((Part) p));
         }
     }
 
@@ -227,7 +255,6 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FIX_GM_ACQUIRE"));
             menuItem.setActionCommand("FIX_GM_ACQUIRE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(isFixable);
             menu.add(menuItem);
 
             popup.add(menu);
