@@ -107,12 +107,6 @@ public record Accountant(Campaign campaign) {
         }
 
         // Add all temporary personnel (medics, astechs, temp crew)
-        //        salaries = salaries.plus(campaign().getCampaignOptions()
-        //                                       .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
-        //                                       .doubleValue() * campaign().getTemporaryAsTechPool());
-        //        salaries = salaries.plus(campaign().getCampaignOptions()
-        //                                       .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-        //                                       campaign().getTemporaryMedicPool());
         salaries = salaries.plus(sumTempCrewPay());
 
         return salaries;
