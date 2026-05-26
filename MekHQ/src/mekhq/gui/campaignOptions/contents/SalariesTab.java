@@ -43,6 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class SalariesTab {
     private final CampaignOptions campaignOptions;
+    private SalariesDraft draft;
+    private boolean combatPageCreated;
+    private boolean supportPageCreated;
+    private boolean civilianPageCreated;
 
     //start Combat Salaries Tab
     private CampaignOptionsHeaderPanel combatSalariesHeader;
@@ -122,6 +127,7 @@ public class SalariesTab {
         this.campaignOptions = campaignOptions;
 
         initialize();
+        loadValuesFromCampaignOptions();
     }
 
     /**
@@ -191,6 +197,8 @@ public class SalariesTab {
         }
 
         pnlSalaryBaseSalaryPanel = createBaseSalariesPanel(type);
+        markPageCreated(type);
+        updateSalariesControlsFromDraft(type);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
@@ -489,30 +497,8 @@ public class SalariesTab {
             options = this.campaignOptions;
         }
 
-        // Salaries
-        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
-        spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
-        spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
-        }
-
-        Money[] baseSalaryTable = options.getRoleBaseSalaries();
-        for (int i = 0; i < spnBaseSalaryCombat.length; i++) {
-            PersonnelRole personnelRole = combatRoles.get(i);
-            int ordinal = personnelRole.ordinal();
-            spnBaseSalaryCombat[i].setValue(baseSalaryTable[ordinal].getAmount().doubleValue());
-        }
-        for (int i = 0; i < spnBaseSalarySupport.length; i++) {
-            PersonnelRole personnelRole = supportRoles.get(i);
-            int ordinal = personnelRole.ordinal();
-            spnBaseSalarySupport[i].setValue(baseSalaryTable[ordinal].getAmount().doubleValue());
-        }
-        for (int i = 0; i < spnBaseSalaryCivilian.length; i++) {
-            PersonnelRole personnelRole = civilianRoles.get(i);
-            int ordinal = personnelRole.ordinal();
-            spnBaseSalaryCivilian[i].setValue(baseSalaryTable[ordinal].getAmount().doubleValue());
-        }
+        draft = new SalariesDraft(options);
+        updateCreatedControlsFromDraft();
     }
 
     /**
@@ -527,34 +513,128 @@ public class SalariesTab {
             options = this.campaignOptions;
         }
 
-        // Salaries
-        options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
-        options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
-        options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
+        updateDraftFromCreatedControls();
+        draft.applyTo(options);
+    }
 
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            options.getSalaryXPMultipliers().put(entry.getKey(), (double) entry.getValue().getValue());
+    private void markPageCreated(PersonnelRoleSubType type) {
+        switch (type) {
+            case COMBAT -> combatPageCreated = true;
+            case SUPPORT -> supportPageCreated = true;
+            case CIVILIAN -> civilianPageCreated = true;
+        }
+    }
+
+    private boolean isPageCreated(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> combatPageCreated;
+            case SUPPORT -> supportPageCreated;
+            case CIVILIAN -> civilianPageCreated;
+        };
+    }
+
+    private List<PersonnelRole> getRoles(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> combatRoles;
+            case SUPPORT -> supportRoles;
+            case CIVILIAN -> civilianRoles;
+        };
+    }
+
+    private JSpinner[] getBaseSalarySpinners(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> spnBaseSalaryCombat;
+            case SUPPORT -> spnBaseSalarySupport;
+            case CIVILIAN -> spnBaseSalaryCivilian;
+        };
+    }
+
+    private void updateCreatedControlsFromDraft() {
+        updateSalariesControlsFromDraft(PersonnelRoleSubType.COMBAT);
+        updateSalariesControlsFromDraft(PersonnelRoleSubType.SUPPORT);
+        updateSalariesControlsFromDraft(PersonnelRoleSubType.CIVILIAN);
+    }
+
+    private void updateSalariesControlsFromDraft(PersonnelRoleSubType type) {
+        if (!isPageCreated(type) || draft == null) {
+            return;
         }
 
-        for (PersonnelRole personnelRole : combatRoles) {
-            int index = combatRoles.indexOf(personnelRole);
-            double newValue = (double) spnBaseSalaryCombat[index].getValue();
-            options.setRoleBaseSalary(personnelRole, newValue);
-        }
-
-        for (PersonnelRole personnelRole : supportRoles) {
-            int index = supportRoles.indexOf(personnelRole);
-            if (index != -1) {
-                double newValue = (double) spnBaseSalarySupport[index].getValue();
-                options.setRoleBaseSalary(personnelRole, newValue);
+        if (type == PersonnelRoleSubType.COMBAT) {
+            chkDisableSecondaryRoleSalary.setSelected(draft.disableSecondaryRoleSalary);
+            spnAntiMekSalary.setValue(draft.salaryAntiMekMultiplier);
+            spnSpecialistInfantrySalary.setValue(draft.salarySpecialistInfantryMultiplier);
+            for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+                entry.getValue().setValue(draft.salaryXpMultipliers.get(entry.getKey()));
             }
         }
 
-        for (PersonnelRole personnelRole : civilianRoles) {
-            int index = civilianRoles.indexOf(personnelRole);
-            if (index != -1) {
-                double newValue = (double) spnBaseSalaryCivilian[index].getValue();
-                options.setRoleBaseSalary(personnelRole, newValue);
+        List<PersonnelRole> roles = getRoles(type);
+        JSpinner[] salarySpinners = getBaseSalarySpinners(type);
+        for (int i = 0; i < salarySpinners.length; i++) {
+            PersonnelRole personnelRole = roles.get(i);
+            salarySpinners[i].setValue(draft.roleBaseSalaries.get(personnelRole));
+        }
+    }
+
+    private void updateDraftFromCreatedControls() {
+        updateDraftFromSalariesControls(PersonnelRoleSubType.COMBAT);
+        updateDraftFromSalariesControls(PersonnelRoleSubType.SUPPORT);
+        updateDraftFromSalariesControls(PersonnelRoleSubType.CIVILIAN);
+    }
+
+    private void updateDraftFromSalariesControls(PersonnelRoleSubType type) {
+        if (!isPageCreated(type)) {
+            return;
+        }
+
+        if (type == PersonnelRoleSubType.COMBAT) {
+            draft.disableSecondaryRoleSalary = chkDisableSecondaryRoleSalary.isSelected();
+            draft.salaryAntiMekMultiplier = (double) spnAntiMekSalary.getValue();
+            draft.salarySpecialistInfantryMultiplier = (double) spnSpecialistInfantrySalary.getValue();
+            for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+                draft.salaryXpMultipliers.put(entry.getKey(), (double) entry.getValue().getValue());
+            }
+        }
+
+        List<PersonnelRole> roles = getRoles(type);
+        JSpinner[] salarySpinners = getBaseSalarySpinners(type);
+        for (int i = 0; i < salarySpinners.length; i++) {
+            draft.roleBaseSalaries.put(roles.get(i), (double) salarySpinners[i].getValue());
+        }
+    }
+
+    private static class SalariesDraft {
+        private boolean disableSecondaryRoleSalary;
+        private double salaryAntiMekMultiplier;
+        private double salarySpecialistInfantryMultiplier;
+        private final Map<SkillLevel, Double> salaryXpMultipliers = new EnumMap<>(SkillLevel.class);
+        private final Map<PersonnelRole, Double> roleBaseSalaries = new EnumMap<>(PersonnelRole.class);
+
+        private SalariesDraft(CampaignOptions options) {
+            disableSecondaryRoleSalary = options.isDisableSecondaryRoleSalary();
+            salaryAntiMekMultiplier = options.getSalaryAntiMekMultiplier();
+            salarySpecialistInfantryMultiplier = options.getSalarySpecialistInfantryMultiplier();
+            salaryXpMultipliers.putAll(options.getSalaryXPMultipliers());
+
+            Money[] baseSalaryTable = options.getRoleBaseSalaries();
+            for (PersonnelRole personnelRole : PersonnelRole.values()) {
+                int ordinal = personnelRole.ordinal();
+                roleBaseSalaries.put(personnelRole, baseSalaryTable[ordinal].getAmount().doubleValue());
+            }
+        }
+
+        private void applyTo(CampaignOptions options) {
+            options.setDisableSecondaryRoleSalary(disableSecondaryRoleSalary);
+            options.setSalaryAntiMekMultiplier(salaryAntiMekMultiplier);
+            options.setSalarySpecialistInfantryMultiplier(salarySpecialistInfantryMultiplier);
+
+            for (final Entry<SkillLevel, Double> entry : salaryXpMultipliers.entrySet()) {
+                options.getSalaryXPMultipliers().put(entry.getKey(), entry.getValue());
+            }
+
+            for (final Entry<PersonnelRole, Double> entry : roleBaseSalaries.entrySet()) {
+                options.setRoleBaseSalary(entry.getKey(), entry.getValue());
             }
         }
     }

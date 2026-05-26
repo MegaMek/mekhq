@@ -43,7 +43,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,6 @@ import java.util.stream.Collectors;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
@@ -242,91 +240,6 @@ public class CampaignOptionsUtilities {
             int x = Math.max(0, (getWidth() - contentWidth) / 2);
             content.setBounds(x, 0, contentWidth, preferredSize.height);
         }
-    }
-
-    /**
-     * Dynamically creates a {@link JTabbedPane} from a map of tab names and panels.
-     *
-     * <p>
-     * This method organizes the tabs in alphabetic order except for tabs whose names contain "GeneralTab", which are
-     * moved to the front as a prioritized tab. Each panel is wrapped in a custom layout that includes additional
-     * components, such as quotes or additional spacing elements, for better visual formatting.
-     * </p>
-     *
-     * <p>
-     * Tabs are localized using the {@link ResourceBundle}, which maps tab names to their corresponding displayed
-     * titles.
-     * </p>
-     *
-     * @param panels a map where the key is the resource name of the tab, and the value is the {@link JPanel} displayed
-     *               as the content of the tab.
-     *
-     * @return a {@link JTabbedPane} containing the organized and formatted tabs.
-     */
-    static JTabbedPane createSubTabs(Map<String, JPanel> panels) {
-        // We use a list here to ensure that the tabs always display in the same order,
-        // and that order might as well be alphabetic.
-        List<String> tabNames = new ArrayList<>(panels.keySet());
-        tabNames.sort(String.CASE_INSENSITIVE_ORDER);
-
-        // This is a special case handler to ensure 'general options' tabs always appear first
-        int indexToMoveToFront = -1;
-        for (int i = 0; i < tabNames.size(); i++) {
-            if (tabNames.get(i).contains("GeneralTab")) {
-                indexToMoveToFront = i;
-                break;
-            }
-        }
-
-        if (indexToMoveToFront != -1) {
-            String tabName = tabNames.remove(indexToMoveToFront);
-            tabNames.addFirst(tabName);
-        }
-
-        JTabbedPane tabbedPane = new JTabbedPane();
-
-        for (String tabName : tabNames) {
-            JPanel mainPanel = panels.get(tabName);
-
-            // Create a panel for the quote
-            JPanel quotePanel = new JPanel(new GridBagLayout());
-            JLabel quote = new JLabel(String.format(
-                  "<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                  UIUtil.scaleForGUI(mainPanel.getPreferredSize().width),
-                  getTextAt(RESOURCE_BUNDLE, tabName + ".border")));
-
-            GridBagConstraints quoteConstraints = new GridBagConstraints();
-            quoteConstraints.gridx = GridBagConstraints.RELATIVE;
-            quoteConstraints.gridy = GridBagConstraints.RELATIVE;
-            quotePanel.add(quote, quoteConstraints);
-
-            // Create a BorderLayout panel for mainPanel
-            JPanel mainPanelHolder = new JPanel(new GridBagLayout());
-            GridBagConstraints mainConstraints = new GridBagConstraints();
-            mainConstraints.gridx = GridBagConstraints.RELATIVE;
-            mainConstraints.gridy = GridBagConstraints.RELATIVE;
-            mainPanelHolder.add(mainPanel, mainConstraints);
-
-            // Reorganize mainPanel to include quotePanel at bottom
-            JPanel contentPanel = new JPanel(new BorderLayout());
-            contentPanel.setName(tabName);
-            contentPanel.add(mainPanelHolder, BorderLayout.CENTER);
-
-            contentPanel.add(quotePanel, BorderLayout.SOUTH);
-
-            // Create a wrapper panel for its easy alignment controls
-            JPanel wrapperPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.anchor = GridBagConstraints.NORTH;
-            gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
-
-            wrapperPanel.add(contentPanel, gbc);
-
-            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, tabName + ".title"), wrapperPanel);
-        }
-
-        return tabbedPane;
     }
 
     /**
