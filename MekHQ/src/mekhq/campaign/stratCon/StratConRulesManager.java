@@ -216,6 +216,10 @@ public class StratConRulesManager {
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
           AtBContract contract, StratConTrackState track, boolean isUseStratConSingles) {
+        // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
+        // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
+        // scheduled.
+
         int scenarioRolls = isUseStratConSingles ? 1 :
                                   // We divide the number of scenario rolls by the number of tracks so that we're not
                                   // unintentionally multiplying Intensity by tracks
@@ -3876,7 +3880,11 @@ public class StratConRulesManager {
                     }
                     weeklyScenarioDates.removeIf(date -> date.equals(today));
 
-                    generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioCount);
+                    // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
+                    // canceled due to impending defeat
+                    if (!contract.getMoraleLevel().isRouted()) {
+                        generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioCount);
+                    }
                 }
             }
         }
