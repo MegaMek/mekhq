@@ -72,6 +72,10 @@ public class SystemsTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
+      private SystemsDraft draft;
+      private boolean reputationPageCreated;
+      private boolean factionStandingPageCreated;
+      private boolean atowPageCreated;
 
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
@@ -125,6 +129,7 @@ public class SystemsTab {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
+            loadValuesFromCampaignOptions();
     }
 
     /**
@@ -144,6 +149,8 @@ public class SystemsTab {
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
         JPanel pnlReputationSanityOptions = createReputationSanityPanel();
+      reputationPageCreated = true;
+      updateReputationControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ReputationTab", true);
@@ -280,6 +287,8 @@ public class SystemsTab {
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
         JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
+      factionStandingPageCreated = true;
+      updateFactionStandingControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingTab", true);
@@ -426,6 +435,8 @@ public class SystemsTab {
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
+      atowPageCreated = true;
+      updateATOWControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ATimeOfWarTab", true);
@@ -548,39 +559,63 @@ public class SystemsTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-        // Reputation
-        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
-
-        chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
-        chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
-        chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
-
-        // Faction Standing
-        chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
-        chkTrackClimateRegardChanges.setSelected(options.isTrackClimateRegardChanges());
-        spnRegardMultiplier.setValue(options.getRegardMultiplier());
-        chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
-        chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
-        chkUseFactionStandingCommandCircuit.setSelected(options.isUseFactionStandingCommandCircuit());
-        chkUseFactionStandingOutlawed.setSelected(options.isUseFactionStandingOutlawed());
-        chkUseFactionStandingBatchallRestrictions.setSelected(options.isUseFactionStandingBatchallRestrictions());
-        chkUseFactionStandingRecruitment.setSelected(options.isUseFactionStandingRecruitment());
-        chkUseFactionStandingBarracksCosts.setSelected(options.isUseFactionStandingBarracksCosts());
-        chkUseFactionStandingUnitMarket.setSelected(options.isUseFactionStandingUnitMarket());
-        chkUseFactionStandingContractPay.setSelected(options.isUseFactionStandingContractPay());
-        chkUseFactionStandingSupportPoints.setSelected(options.isUseFactionStandingSupportPoints());
-
-        // A Time of War
-        chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
-        chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
-        chkDisplayAllAttributes.setSelected(options.isDisplayAllAttributes());
-        chkUseAgeEffects.setSelected(options.isUseAgeEffects());
-        chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
-        chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
-        chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
-        chkUseBetterExtraIncome.setSelected(options.isUseBetterExtraIncome());
-        chkUseSmallArmsOnly.setSelected(options.isUseSmallArmsOnly());
+            draft = new SystemsDraft(options, skillPreferences);
+            updateCreatedControlsFromDraft();
     }
+
+      private void updateCreatedControlsFromDraft() {
+            updateReputationControlsFromDraft();
+            updateFactionStandingControlsFromDraft();
+            updateATOWControlsFromDraft();
+      }
+
+      private void updateReputationControlsFromDraft() {
+            if (!reputationPageCreated || draft == null) {
+                  return;
+            }
+
+            manualUnitRatingModifier.setValue(draft.manualUnitRatingModifier);
+            chkResetCriminalRecord.setSelected(draft.resetCriminalRecord);
+            chkClampReputationPayMultiplier.setSelected(draft.clampReputationPayMultiplier);
+            chkReduceReputationPerformanceModifier.setSelected(draft.reduceReputationPerformanceModifier);
+            chkReputationPerformanceModifierCutOff.setSelected(draft.reputationPerformanceModifierCutOff);
+      }
+
+      private void updateFactionStandingControlsFromDraft() {
+            if (!factionStandingPageCreated || draft == null) {
+                  return;
+            }
+
+            chkTrackFactionStanding.setSelected(draft.trackFactionStanding);
+            chkTrackClimateRegardChanges.setSelected(draft.trackClimateRegardChanges);
+            spnRegardMultiplier.setValue(draft.regardMultiplier);
+            chkUseFactionStandingNegotiation.setSelected(draft.useFactionStandingNegotiation);
+            chkUseFactionStandingResupply.setSelected(draft.useFactionStandingResupply);
+            chkUseFactionStandingCommandCircuit.setSelected(draft.useFactionStandingCommandCircuit);
+            chkUseFactionStandingOutlawed.setSelected(draft.useFactionStandingOutlawed);
+            chkUseFactionStandingBatchallRestrictions.setSelected(draft.useFactionStandingBatchallRestrictions);
+            chkUseFactionStandingRecruitment.setSelected(draft.useFactionStandingRecruitment);
+            chkUseFactionStandingBarracksCosts.setSelected(draft.useFactionStandingBarracksCosts);
+            chkUseFactionStandingUnitMarket.setSelected(draft.useFactionStandingUnitMarket);
+            chkUseFactionStandingContractPay.setSelected(draft.useFactionStandingContractPay);
+            chkUseFactionStandingSupportPoints.setSelected(draft.useFactionStandingSupportPoints);
+      }
+
+      private void updateATOWControlsFromDraft() {
+            if (!atowPageCreated || draft == null) {
+                  return;
+            }
+
+            chkUseAttributes.setSelected(draft.useAttributes);
+            chkRandomizeAttributes.setSelected(draft.randomizeAttributes);
+            chkDisplayAllAttributes.setSelected(draft.displayAllAttributes);
+            chkUseAgeEffects.setSelected(draft.useAgeEffects);
+            chkRandomizeTraits.setSelected(draft.randomizeTraits);
+            chkAllowMonthlyReinvestment.setSelected(draft.allowMonthlyReinvestment);
+            chkAllowMonthlyConnections.setSelected(draft.allowMonthlyConnections);
+            chkUseBetterExtraIncome.setSelected(draft.useBetterExtraIncome);
+            chkUseSmallArmsOnly.setSelected(draft.useSmallArmsOnly);
+      }
 
     /**
      * Applies the currently selected values in the UI controls to modify the campaign's options. If a preset is
@@ -606,43 +641,157 @@ public class SystemsTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-        // Reputation
-        options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+            updateDraftFromCreatedControls();
 
-        if (chkResetCriminalRecord.isSelected()) {
+            if (draft.resetCriminalRecord) {
             campaign.setDateOfLastCrime(null);
             campaign.setCrimeRating(0);
             campaign.setCrimePirateModifier(0);
         }
 
-        options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
-        options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
-        options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
-
-        // Faction Standing
-        options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
-        options.setTrackClimateRegardChanges(chkTrackClimateRegardChanges.isSelected());
-        options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
-        options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
-        options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
-        options.setUseFactionStandingCommandCircuit(chkUseFactionStandingCommandCircuit.isSelected());
-        options.setUseFactionStandingOutlawed(chkUseFactionStandingOutlawed.isSelected());
-        options.setUseFactionStandingBatchallRestrictions(chkUseFactionStandingBatchallRestrictions.isSelected());
-        options.setUseFactionStandingRecruitment(chkUseFactionStandingRecruitment.isSelected());
-        options.setUseFactionStandingBarracksCosts(chkUseFactionStandingBarracksCosts.isSelected());
-        options.setUseFactionStandingUnitMarket(chkUseFactionStandingUnitMarket.isSelected());
-        options.setUseFactionStandingContractPay(chkUseFactionStandingContractPay.isSelected());
-        options.setUseFactionStandingSupportPoints(chkUseFactionStandingSupportPoints.isSelected());
-
-        // A Time of War
-        skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
-        skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
-        options.setDisplayAllAttributes(chkDisplayAllAttributes.isSelected());
-        options.setUseAgeEffects(chkUseAgeEffects.isSelected());
-        skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
-        options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
-        options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
-        options.setUseBetterExtraIncome(chkUseBetterExtraIncome.isSelected());
-        options.setUseSmallArmsOnly(chkUseSmallArmsOnly.isSelected());
+            draft.applyTo(options, skillPreferences);
     }
+
+      private void updateDraftFromCreatedControls() {
+            updateDraftFromReputationControls();
+            updateDraftFromFactionStandingControls();
+            updateDraftFromATOWControls();
+      }
+
+      private void updateDraftFromReputationControls() {
+            if (!reputationPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
+            draft.resetCriminalRecord = chkResetCriminalRecord.isSelected();
+            draft.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
+            draft.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();
+            draft.reputationPerformanceModifierCutOff = chkReputationPerformanceModifierCutOff.isSelected();
+      }
+
+      private void updateDraftFromFactionStandingControls() {
+            if (!factionStandingPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.trackFactionStanding = chkTrackFactionStanding.isSelected();
+            draft.trackClimateRegardChanges = chkTrackClimateRegardChanges.isSelected();
+            draft.regardMultiplier = (double) spnRegardMultiplier.getValue();
+            draft.useFactionStandingNegotiation = chkUseFactionStandingNegotiation.isSelected();
+            draft.useFactionStandingResupply = chkUseFactionStandingResupply.isSelected();
+            draft.useFactionStandingCommandCircuit = chkUseFactionStandingCommandCircuit.isSelected();
+            draft.useFactionStandingOutlawed = chkUseFactionStandingOutlawed.isSelected();
+            draft.useFactionStandingBatchallRestrictions = chkUseFactionStandingBatchallRestrictions.isSelected();
+            draft.useFactionStandingRecruitment = chkUseFactionStandingRecruitment.isSelected();
+            draft.useFactionStandingBarracksCosts = chkUseFactionStandingBarracksCosts.isSelected();
+            draft.useFactionStandingUnitMarket = chkUseFactionStandingUnitMarket.isSelected();
+            draft.useFactionStandingContractPay = chkUseFactionStandingContractPay.isSelected();
+            draft.useFactionStandingSupportPoints = chkUseFactionStandingSupportPoints.isSelected();
+      }
+
+      private void updateDraftFromATOWControls() {
+            if (!atowPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.useAttributes = chkUseAttributes.isSelected();
+            draft.randomizeAttributes = chkRandomizeAttributes.isSelected();
+            draft.displayAllAttributes = chkDisplayAllAttributes.isSelected();
+            draft.useAgeEffects = chkUseAgeEffects.isSelected();
+            draft.randomizeTraits = chkRandomizeTraits.isSelected();
+            draft.allowMonthlyReinvestment = chkAllowMonthlyReinvestment.isSelected();
+            draft.allowMonthlyConnections = chkAllowMonthlyConnections.isSelected();
+            draft.useBetterExtraIncome = chkUseBetterExtraIncome.isSelected();
+            draft.useSmallArmsOnly = chkUseSmallArmsOnly.isSelected();
+      }
+
+      private static class SystemsDraft {
+            private int manualUnitRatingModifier;
+            private boolean resetCriminalRecord;
+            private boolean clampReputationPayMultiplier;
+            private boolean reduceReputationPerformanceModifier;
+            private boolean reputationPerformanceModifierCutOff;
+            private boolean trackFactionStanding;
+            private boolean trackClimateRegardChanges;
+            private double regardMultiplier;
+            private boolean useFactionStandingNegotiation;
+            private boolean useFactionStandingResupply;
+            private boolean useFactionStandingCommandCircuit;
+            private boolean useFactionStandingOutlawed;
+            private boolean useFactionStandingBatchallRestrictions;
+            private boolean useFactionStandingRecruitment;
+            private boolean useFactionStandingBarracksCosts;
+            private boolean useFactionStandingUnitMarket;
+            private boolean useFactionStandingContractPay;
+            private boolean useFactionStandingSupportPoints;
+            private boolean useAttributes;
+            private boolean randomizeAttributes;
+            private boolean displayAllAttributes;
+            private boolean useAgeEffects;
+            private boolean randomizeTraits;
+            private boolean allowMonthlyReinvestment;
+            private boolean allowMonthlyConnections;
+            private boolean useBetterExtraIncome;
+            private boolean useSmallArmsOnly;
+
+            private SystemsDraft(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+                  manualUnitRatingModifier = options.getManualUnitRatingModifier();
+                  resetCriminalRecord = false;
+                  clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
+                  reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
+                  reputationPerformanceModifierCutOff = options.isReputationPerformanceModifierCutOff();
+                  trackFactionStanding = options.isTrackFactionStanding();
+                  trackClimateRegardChanges = options.isTrackClimateRegardChanges();
+                  regardMultiplier = options.getRegardMultiplier();
+                  useFactionStandingNegotiation = options.isUseFactionStandingNegotiation();
+                  useFactionStandingResupply = options.isUseFactionStandingResupply();
+                  useFactionStandingCommandCircuit = options.isUseFactionStandingCommandCircuit();
+                  useFactionStandingOutlawed = options.isUseFactionStandingOutlawed();
+                  useFactionStandingBatchallRestrictions = options.isUseFactionStandingBatchallRestrictions();
+                  useFactionStandingRecruitment = options.isUseFactionStandingRecruitment();
+                  useFactionStandingBarracksCosts = options.isUseFactionStandingBarracksCosts();
+                  useFactionStandingUnitMarket = options.isUseFactionStandingUnitMarket();
+                  useFactionStandingContractPay = options.isUseFactionStandingContractPay();
+                  useFactionStandingSupportPoints = options.isUseFactionStandingSupportPoints();
+                  useAttributes = skillPreferences.isUseAttributes();
+                  randomizeAttributes = skillPreferences.isRandomizeAttributes();
+                  displayAllAttributes = options.isDisplayAllAttributes();
+                  useAgeEffects = options.isUseAgeEffects();
+                  randomizeTraits = skillPreferences.isRandomizeTraits();
+                  allowMonthlyReinvestment = options.isAllowMonthlyReinvestment();
+                  allowMonthlyConnections = options.isAllowMonthlyConnections();
+                  useBetterExtraIncome = options.isUseBetterExtraIncome();
+                  useSmallArmsOnly = options.isUseSmallArmsOnly();
+            }
+
+            private void applyTo(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+                  options.setManualUnitRatingModifier(manualUnitRatingModifier);
+                  options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
+                  options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);
+                  options.setReputationPerformanceModifierCutOff(reputationPerformanceModifierCutOff);
+                  options.setTrackFactionStanding(trackFactionStanding);
+                  options.setTrackClimateRegardChanges(trackClimateRegardChanges);
+                  options.setRegardMultiplier(regardMultiplier);
+                  options.setUseFactionStandingNegotiation(useFactionStandingNegotiation);
+                  options.setUseFactionStandingResupply(useFactionStandingResupply);
+                  options.setUseFactionStandingCommandCircuit(useFactionStandingCommandCircuit);
+                  options.setUseFactionStandingOutlawed(useFactionStandingOutlawed);
+                  options.setUseFactionStandingBatchallRestrictions(useFactionStandingBatchallRestrictions);
+                  options.setUseFactionStandingRecruitment(useFactionStandingRecruitment);
+                  options.setUseFactionStandingBarracksCosts(useFactionStandingBarracksCosts);
+                  options.setUseFactionStandingUnitMarket(useFactionStandingUnitMarket);
+                  options.setUseFactionStandingContractPay(useFactionStandingContractPay);
+                  options.setUseFactionStandingSupportPoints(useFactionStandingSupportPoints);
+                  skillPreferences.setUseAttributes(useAttributes);
+                  skillPreferences.setRandomizeAttributes(randomizeAttributes);
+                  options.setDisplayAllAttributes(displayAllAttributes);
+                  options.setUseAgeEffects(useAgeEffects);
+                  skillPreferences.setRandomizeTraits(randomizeTraits);
+                  options.setAllowMonthlyReinvestment(allowMonthlyReinvestment);
+                  options.setAllowMonthlyConnections(allowMonthlyConnections);
+                  options.setUseBetterExtraIncome(useBetterExtraIncome);
+                  options.setUseSmallArmsOnly(useSmallArmsOnly);
+            }
+      }
 }

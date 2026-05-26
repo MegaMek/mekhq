@@ -643,7 +643,12 @@ public class CampaignOptionsPane extends JPanel {
 
       private boolean shouldPreloadDirectPage(String routeId) {
             return !routeId.startsWith("advancement.abilities.") &&
-                         !routeId.startsWith("advancement.skills.");
+                         !routeId.startsWith("advancement.skills.") &&
+                         !routeId.startsWith("advancement.awards-and-randomization.") &&
+                         !routeId.startsWith("operations.finances.") &&
+                         !routeId.startsWith("operations.markets.") &&
+                         !routeId.startsWith("operations.systems.") &&
+                         !routeId.startsWith("operations.rulesets.");
       }
 
     private void registerRoute(String id, String[] titleResourceNames, TabSelection... selections) {
@@ -854,34 +859,18 @@ public class CampaignOptionsPane extends JPanel {
       }
 
       private JPanel createAdvancementRandomizationTab() {
-            ensureAwardsAndRandomizationDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.awards-and-randomization.randomization");
+            ensureSectionLoaded("advancementParentTab");
+            return advancementTab.skillRandomizationTab();
       }
 
       private JPanel createAdvancementXpAwardsTab() {
-            ensureAwardsAndRandomizationDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.awards-and-randomization.xp-awards");
+            ensureSectionLoaded("advancementParentTab");
+            return advancementTab.xpAwardsTab();
       }
 
       private JPanel createAdvancementRecruitmentBonusesTab() {
-            ensureAwardsAndRandomizationDirectPagesCreated();
-            return (JPanel) directPageCache.get("advancement.awards-and-randomization.recruitment-bonuses");
-      }
-
-      private void ensureAwardsAndRandomizationDirectPagesCreated() {
             ensureSectionLoaded("advancementParentTab");
-            if (directPageCache.containsKey("advancement.awards-and-randomization.randomization") &&
-                          directPageCache.containsKey("advancement.awards-and-randomization.xp-awards") &&
-                          directPageCache.containsKey("advancement.awards-and-randomization.recruitment-bonuses")) {
-                  return;
-            }
-
-            directPageCache.put("advancement.awards-and-randomization.randomization",
-                  advancementTab.skillRandomizationTab());
-            directPageCache.put("advancement.awards-and-randomization.xp-awards", advancementTab.xpAwardsTab());
-            directPageCache.put("advancement.awards-and-randomization.recruitment-bonuses",
-                  advancementTab.recruitmentBonusesTab());
-            advancementTab.loadValuesFromCampaignOptions();
+            return advancementTab.recruitmentBonusesTab();
       }
 
       private JPanel createAdvancementGunnerySkillsTab() {
@@ -991,98 +980,48 @@ public class CampaignOptionsPane extends JPanel {
       }
 
       private JPanel createOperationsFinancesGeneralTab() {
-            ensureOperationsFinancesDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.finances.general");
+            ensureSectionLoaded("strategicOperationsParentTab");
+            return financesTab.createFinancesGeneralOptionsTab();
       }
 
       private JPanel createOperationsPriceMultipliersTab() {
-            ensureOperationsFinancesDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.finances.price-multipliers");
-      }
-
-      private void ensureOperationsFinancesDirectPagesCreated() {
             ensureSectionLoaded("strategicOperationsParentTab");
-            if (directPageCache.containsKey("operations.finances.general") &&
-                          directPageCache.containsKey("operations.finances.price-multipliers")) {
-                  return;
-            }
-
-            directPageCache.put("operations.finances.general", financesTab.createFinancesGeneralOptionsTab());
-            directPageCache.put("operations.finances.price-multipliers", financesTab.createPriceMultipliersTab());
-            financesTab.loadValuesFromCampaignOptions();
+            return financesTab.createPriceMultipliersTab();
       }
 
       private JPanel createOperationsPersonnelMarketTab() {
-            ensureOperationsMarketsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.markets.personnel");
+            ensureSectionLoaded("strategicOperationsParentTab");
+            return marketsTab.createPersonnelMarketTab();
       }
 
       private JPanel createOperationsUnitMarketTab() {
-            ensureOperationsMarketsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.markets.units");
+            ensureSectionLoaded("strategicOperationsParentTab");
+            return marketsTab.createUnitMarketTab();
       }
 
       private JPanel createOperationsContractMarketTab() {
-            ensureOperationsMarketsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.markets.contracts");
-      }
-
-      private void ensureOperationsMarketsDirectPagesCreated() {
             ensureSectionLoaded("strategicOperationsParentTab");
-            if (directPageCache.containsKey("operations.markets.personnel") &&
-                          directPageCache.containsKey("operations.markets.units") &&
-                          directPageCache.containsKey("operations.markets.contracts")) {
-                  return;
-            }
-
-            directPageCache.put("operations.markets.personnel", marketsTab.createPersonnelMarketTab());
-            directPageCache.put("operations.markets.units", marketsTab.createUnitMarketTab());
-            directPageCache.put("operations.markets.contracts", marketsTab.createContractMarketTab());
-            marketsTab.loadValuesFromCampaignOptions();
+            return marketsTab.createContractMarketTab();
       }
 
       private JPanel createOperationsReputationTab() {
-            ensureOperationsSystemsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.systems.reputation");
+            ensureSectionLoaded("strategicOperationsParentTab");
+            return systemsTab.createReputationTab();
       }
 
       private JPanel createOperationsFactionStandingTab() {
-            ensureOperationsSystemsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.systems.faction-standing");
+            ensureSectionLoaded("strategicOperationsParentTab");
+            return systemsTab.createFactionStandingTab();
       }
 
       private JPanel createOperationsATimeOfWarTab() {
-            ensureOperationsSystemsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.systems.a-time-of-war");
-      }
-
-      private void ensureOperationsSystemsDirectPagesCreated() {
             ensureSectionLoaded("strategicOperationsParentTab");
-            if (directPageCache.containsKey("operations.systems.reputation") &&
-                          directPageCache.containsKey("operations.systems.faction-standing") &&
-                          directPageCache.containsKey("operations.systems.a-time-of-war")) {
-                  return;
-            }
-
-            directPageCache.put("operations.systems.reputation", systemsTab.createReputationTab());
-            directPageCache.put("operations.systems.faction-standing", systemsTab.createFactionStandingTab());
-            directPageCache.put("operations.systems.a-time-of-war", systemsTab.createATOWTab());
-            systemsTab.loadValuesFromCampaignOptions();
+            return systemsTab.createATOWTab();
       }
 
       private JPanel createOperationsStratConTab() {
-            ensureOperationsRulesetsDirectPagesCreated();
-            return (JPanel) directPageCache.get("operations.rulesets.stratcon");
-      }
-
-      private void ensureOperationsRulesetsDirectPagesCreated() {
             ensureSectionLoaded("strategicOperationsParentTab");
-            if (directPageCache.containsKey("operations.rulesets.stratcon")) {
-                  return;
-            }
-
-            directPageCache.put("operations.rulesets.stratcon", rulesetsTab.createStratConTab());
-            rulesetsTab.loadValuesFromCampaignOptions();
+            return rulesetsTab.createStratConTab();
       }
 
     private JTabbedPane createHumanResourcesParentTab() {

@@ -41,6 +41,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.GridBagConstraints;
+import java.util.Arrays;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -73,6 +74,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class FinancesTab {
     private final CampaignOptions campaignOptions;
+      private FinancesDraft draft;
+      private boolean generalOptionsPageCreated;
+      private boolean priceMultipliersPageCreated;
 
     //start General Options
     private CampaignOptionsHeaderPanel financesGeneralOptions;
@@ -166,6 +170,7 @@ public class FinancesTab {
         this.campaignOptions = campaign.getCampaignOptions();
 
         initialize();
+            loadValuesFromCampaignOptions();
     }
 
     /**
@@ -265,6 +270,8 @@ public class FinancesTab {
 
         pnlPayments = createPaymentsPanel();
         pnlSales = createSalesPanel();
+      generalOptionsPageCreated = true;
+      updateGeneralControlsFromDraft();
 
         // Layout the Panel
         final JPanel panelTransactions = new CampaignOptionsStandardPanel("FinancesGeneralTabTransactions");
@@ -693,6 +700,8 @@ public class FinancesTab {
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
         pnlUsedPartsMultipliers = createUsedPartsMultiplierPanel();
         pnlOtherMultipliers = createOtherMultipliersPanel();
+      priceMultipliersPageCreated = true;
+      updatePriceMultiplierControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab", true);
@@ -950,49 +959,8 @@ public class FinancesTab {
             options = this.campaignOptions;
         }
 
-        // General Options
-        options.setLoanLimits(useLoanLimitsBox.isSelected());
-        options.setUsePercentageMaintenance(usePercentageMaintenanceBox.isSelected());
-        options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
-        options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
-        options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
-        options.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
-        options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
-        options.setSimulateGrayMonday(chkSimulateGrayMonday.isSelected());
-        options.setPayForParts(payForPartsBox.isSelected());
-        options.setPayForRepairs(payForRepairsBox.isSelected());
-        options.setPayForUnits(payForUnitsBox.isSelected());
-        options.setPayForSalaries(payForSalariesBox.isSelected());
-        options.setPayForOverhead(payForOverheadBox.isSelected());
-        options.setPayForMaintain(payForMaintainBox.isSelected());
-        options.setPayForTransport(payForTransportBox.isSelected());
-        options.setPayForRecruitment(payForRecruitmentBox.isSelected());
-        options.setPayForFood(payForFoodBox.isSelected());
-        options.setPayForHousing(payForHousingBox.isSelected());
-        options.setSellUnits(sellUnitsBox.isSelected());
-        options.setSellParts(sellPartsBox.isSelected());
-        options.setUseTaxes(chkUseTaxes.isSelected());
-        options.setTaxesPercentage((int) spnTaxesPercentage.getValue());
-        options.setUseShareSystem(chkUseShareSystem.isSelected());
-        options.setSharesForAll(chkSharesForAll.isSelected());
-        options.setRentedFacilitiesCostHospitalBeds((int) spnRentedFacilitiesCostHospitalBeds.getValue());
-        options.setRentedFacilitiesCostKitchens((int) spnRentedFacilitiesCostKitchens.getValue());
-        options.setRentedFacilitiesCostHoldingCells((int) spnRentedFacilitiesCostHoldingCells.getValue());
-        options.setRentedFacilitiesCostRepairBays((int) spnRentedFacilitiesCostRepairBays.getValue());
-
-        // Price Multipliers
-        options.setCommonPartPriceMultiplier((double) spnCommonPartPriceMultiplier.getValue());
-        options.setInnerSphereUnitPriceMultiplier((double) spnInnerSphereUnitPriceMultiplier.getValue());
-        options.setInnerSpherePartPriceMultiplier((double) spnInnerSpherePartPriceMultiplier.getValue());
-        options.setClanUnitPriceMultiplier((double) spnClanUnitPriceMultiplier.getValue());
-        options.setClanPartPriceMultiplier((double) spnClanPartPriceMultiplier.getValue());
-        options.setMixedTechUnitPriceMultiplier((double) spnMixedTechUnitPriceMultiplier.getValue());
-        for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
-            options.getUsedPartPriceMultipliers()[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();
-        }
-        options.setDamagedPartsValueMultiplier((double) spnDamagedPartsValueMultiplier.getValue());
-        options.setUnrepairablePartsValueMultiplier((double) spnUnrepairablePartsValueMultiplier.getValue());
-        options.setCancelledOrderRefundMultiplier((double) spnCancelledOrderRefundMultiplier.getValue());
+            updateDraftFromCreatedControls();
+            draft.applyTo(options);
     }
 
     /**
@@ -1021,48 +989,252 @@ public class FinancesTab {
             options = this.campaignOptions;
         }
 
-        // General Options
-        useLoanLimitsBox.setSelected(options.isUseLoanLimits());
-        usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaintenance());
-        useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
-        usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
-        showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
-        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
-        newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
-        chkSimulateGrayMonday.setSelected(options.isSimulateGrayMonday());
-        payForPartsBox.setSelected(options.isPayForParts());
-        payForRepairsBox.setSelected(options.isPayForRepairs());
-        payForUnitsBox.setSelected(options.isPayForUnits());
-        payForSalariesBox.setSelected(options.isPayForSalaries());
-        payForOverheadBox.setSelected(options.isPayForOverhead());
-        payForMaintainBox.setSelected(options.isPayForMaintain());
-        payForTransportBox.setSelected(options.isPayForTransport());
-        payForRecruitmentBox.setSelected(options.isPayForRecruitment());
-        payForFoodBox.setSelected(options.isPayForFood());
-        payForHousingBox.setSelected(options.isPayForHousing());
-        sellUnitsBox.setSelected(options.isSellUnits());
-        sellPartsBox.setSelected(options.isSellParts());
-        chkUseTaxes.setSelected(options.isUseTaxes());
-        spnTaxesPercentage.setValue(options.getTaxesPercentage());
-        chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesForAll.setSelected(options.isSharesForAll());
-        spnRentedFacilitiesCostHospitalBeds.setValue(options.getRentedFacilitiesCostHospitalBeds());
-        spnRentedFacilitiesCostKitchens.setValue(options.getRentedFacilitiesCostKitchens());
-        spnRentedFacilitiesCostHoldingCells.setValue(options.getRentedFacilitiesCostHoldingCells());
-        spnRentedFacilitiesCostRepairBays.setValue(options.getRentedFacilitiesCostRepairBays());
-
-        // Price Multipliers
-        spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
-        spnInnerSphereUnitPriceMultiplier.setValue(options.getInnerSphereUnitPriceMultiplier());
-        spnInnerSpherePartPriceMultiplier.setValue(options.getInnerSpherePartPriceMultiplier());
-        spnClanUnitPriceMultiplier.setValue(options.getClanUnitPriceMultiplier());
-        spnClanPartPriceMultiplier.setValue(options.getClanPartPriceMultiplier());
-        spnMixedTechUnitPriceMultiplier.setValue(options.getMixedTechUnitPriceMultiplier());
-        for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
-            spnUsedPartPriceMultipliers[i].setValue(options.getUsedPartPriceMultipliers()[i]);
-        }
-        spnDamagedPartsValueMultiplier.setValue(options.getDamagedPartsValueMultiplier());
-        spnUnrepairablePartsValueMultiplier.setValue(options.getUnrepairablePartsValueMultiplier());
-        spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
+            draft = new FinancesDraft(options);
+            updateCreatedControlsFromDraft();
     }
+
+      private void updateCreatedControlsFromDraft() {
+            updateGeneralControlsFromDraft();
+            updatePriceMultiplierControlsFromDraft();
+      }
+
+      private void updateGeneralControlsFromDraft() {
+            if (!generalOptionsPageCreated || draft == null) {
+                  return;
+            }
+
+            useLoanLimitsBox.setSelected(draft.useLoanLimits);
+            usePercentageMaintenanceBox.setSelected(draft.usePercentageMaintenance);
+            useExtendedPartsModifierBox.setSelected(draft.useExtendedPartsModifier);
+            usePeacetimeCostBox.setSelected(draft.usePeacetimeCost);
+            showPeacetimeCostBox.setSelected(draft.showPeacetimeCost);
+            comboFinancialYearDuration.setSelectedItem(draft.financialYearDuration);
+            newFinancialYearFinancesToCSVExportBox.setSelected(draft.newFinancialYearFinancesToCSVExport);
+            chkSimulateGrayMonday.setSelected(draft.simulateGrayMonday);
+            payForPartsBox.setSelected(draft.payForParts);
+            payForRepairsBox.setSelected(draft.payForRepairs);
+            payForUnitsBox.setSelected(draft.payForUnits);
+            payForSalariesBox.setSelected(draft.payForSalaries);
+            payForOverheadBox.setSelected(draft.payForOverhead);
+            payForMaintainBox.setSelected(draft.payForMaintain);
+            payForTransportBox.setSelected(draft.payForTransport);
+            payForRecruitmentBox.setSelected(draft.payForRecruitment);
+            payForFoodBox.setSelected(draft.payForFood);
+            payForHousingBox.setSelected(draft.payForHousing);
+            sellUnitsBox.setSelected(draft.sellUnits);
+            sellPartsBox.setSelected(draft.sellParts);
+            chkUseTaxes.setSelected(draft.useTaxes);
+            spnTaxesPercentage.setValue(draft.taxesPercentage);
+            chkUseShareSystem.setSelected(draft.useShareSystem);
+            chkSharesForAll.setSelected(draft.sharesForAll);
+            spnRentedFacilitiesCostHospitalBeds.setValue(draft.rentedFacilitiesCostHospitalBeds);
+            spnRentedFacilitiesCostKitchens.setValue(draft.rentedFacilitiesCostKitchens);
+            spnRentedFacilitiesCostHoldingCells.setValue(draft.rentedFacilitiesCostHoldingCells);
+            spnRentedFacilitiesCostRepairBays.setValue(draft.rentedFacilitiesCostRepairBays);
+      }
+
+      private void updatePriceMultiplierControlsFromDraft() {
+            if (!priceMultipliersPageCreated || draft == null) {
+                  return;
+            }
+
+            spnCommonPartPriceMultiplier.setValue(draft.commonPartPriceMultiplier);
+            spnInnerSphereUnitPriceMultiplier.setValue(draft.innerSphereUnitPriceMultiplier);
+            spnInnerSpherePartPriceMultiplier.setValue(draft.innerSpherePartPriceMultiplier);
+            spnClanUnitPriceMultiplier.setValue(draft.clanUnitPriceMultiplier);
+            spnClanPartPriceMultiplier.setValue(draft.clanPartPriceMultiplier);
+            spnMixedTechUnitPriceMultiplier.setValue(draft.mixedTechUnitPriceMultiplier);
+            for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length, draft.usedPartPriceMultipliers.length); i++) {
+                  spnUsedPartPriceMultipliers[i].setValue(draft.usedPartPriceMultipliers[i]);
+            }
+            spnDamagedPartsValueMultiplier.setValue(draft.damagedPartsValueMultiplier);
+            spnUnrepairablePartsValueMultiplier.setValue(draft.unrepairablePartsValueMultiplier);
+            spnCancelledOrderRefundMultiplier.setValue(draft.cancelledOrderRefundMultiplier);
+      }
+
+      private void updateDraftFromCreatedControls() {
+            updateDraftFromGeneralControls();
+            updateDraftFromPriceMultiplierControls();
+      }
+
+      private void updateDraftFromGeneralControls() {
+            if (!generalOptionsPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.useLoanLimits = useLoanLimitsBox.isSelected();
+            draft.usePercentageMaintenance = usePercentageMaintenanceBox.isSelected();
+            draft.useExtendedPartsModifier = useExtendedPartsModifierBox.isSelected();
+            draft.usePeacetimeCost = usePeacetimeCostBox.isSelected();
+            draft.showPeacetimeCost = showPeacetimeCostBox.isSelected();
+            draft.financialYearDuration = comboFinancialYearDuration.getSelectedItem();
+            draft.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExportBox.isSelected();
+            draft.simulateGrayMonday = chkSimulateGrayMonday.isSelected();
+            draft.payForParts = payForPartsBox.isSelected();
+            draft.payForRepairs = payForRepairsBox.isSelected();
+            draft.payForUnits = payForUnitsBox.isSelected();
+            draft.payForSalaries = payForSalariesBox.isSelected();
+            draft.payForOverhead = payForOverheadBox.isSelected();
+            draft.payForMaintain = payForMaintainBox.isSelected();
+            draft.payForTransport = payForTransportBox.isSelected();
+            draft.payForRecruitment = payForRecruitmentBox.isSelected();
+            draft.payForFood = payForFoodBox.isSelected();
+            draft.payForHousing = payForHousingBox.isSelected();
+            draft.sellUnits = sellUnitsBox.isSelected();
+            draft.sellParts = sellPartsBox.isSelected();
+            draft.useTaxes = chkUseTaxes.isSelected();
+            draft.taxesPercentage = (int) spnTaxesPercentage.getValue();
+            draft.useShareSystem = chkUseShareSystem.isSelected();
+            draft.sharesForAll = chkSharesForAll.isSelected();
+            draft.rentedFacilitiesCostHospitalBeds = (int) spnRentedFacilitiesCostHospitalBeds.getValue();
+            draft.rentedFacilitiesCostKitchens = (int) spnRentedFacilitiesCostKitchens.getValue();
+            draft.rentedFacilitiesCostHoldingCells = (int) spnRentedFacilitiesCostHoldingCells.getValue();
+            draft.rentedFacilitiesCostRepairBays = (int) spnRentedFacilitiesCostRepairBays.getValue();
+      }
+
+      private void updateDraftFromPriceMultiplierControls() {
+            if (!priceMultipliersPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.commonPartPriceMultiplier = (double) spnCommonPartPriceMultiplier.getValue();
+            draft.innerSphereUnitPriceMultiplier = (double) spnInnerSphereUnitPriceMultiplier.getValue();
+            draft.innerSpherePartPriceMultiplier = (double) spnInnerSpherePartPriceMultiplier.getValue();
+            draft.clanUnitPriceMultiplier = (double) spnClanUnitPriceMultiplier.getValue();
+            draft.clanPartPriceMultiplier = (double) spnClanPartPriceMultiplier.getValue();
+            draft.mixedTechUnitPriceMultiplier = (double) spnMixedTechUnitPriceMultiplier.getValue();
+            for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length, draft.usedPartPriceMultipliers.length); i++) {
+                  draft.usedPartPriceMultipliers[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();
+            }
+            draft.damagedPartsValueMultiplier = (double) spnDamagedPartsValueMultiplier.getValue();
+            draft.unrepairablePartsValueMultiplier = (double) spnUnrepairablePartsValueMultiplier.getValue();
+            draft.cancelledOrderRefundMultiplier = (double) spnCancelledOrderRefundMultiplier.getValue();
+      }
+
+      private static class FinancesDraft {
+            private boolean useLoanLimits;
+            private boolean usePercentageMaintenance;
+            private boolean useExtendedPartsModifier;
+            private boolean usePeacetimeCost;
+            private boolean showPeacetimeCost;
+            private FinancialYearDuration financialYearDuration;
+            private boolean newFinancialYearFinancesToCSVExport;
+            private boolean simulateGrayMonday;
+            private boolean payForParts;
+            private boolean payForRepairs;
+            private boolean payForUnits;
+            private boolean payForSalaries;
+            private boolean payForOverhead;
+            private boolean payForMaintain;
+            private boolean payForTransport;
+            private boolean payForRecruitment;
+            private boolean payForFood;
+            private boolean payForHousing;
+            private boolean sellUnits;
+            private boolean sellParts;
+            private boolean useTaxes;
+            private int taxesPercentage;
+            private boolean useShareSystem;
+            private boolean sharesForAll;
+            private int rentedFacilitiesCostHospitalBeds;
+            private int rentedFacilitiesCostKitchens;
+            private int rentedFacilitiesCostHoldingCells;
+            private int rentedFacilitiesCostRepairBays;
+            private double commonPartPriceMultiplier;
+            private double innerSphereUnitPriceMultiplier;
+            private double innerSpherePartPriceMultiplier;
+            private double clanUnitPriceMultiplier;
+            private double clanPartPriceMultiplier;
+            private double mixedTechUnitPriceMultiplier;
+            private double[] usedPartPriceMultipliers;
+            private double damagedPartsValueMultiplier;
+            private double unrepairablePartsValueMultiplier;
+            private double cancelledOrderRefundMultiplier;
+
+            private FinancesDraft(CampaignOptions options) {
+                  useLoanLimits = options.isUseLoanLimits();
+                  usePercentageMaintenance = options.isUsePercentageMaintenance();
+                  useExtendedPartsModifier = options.isUseExtendedPartsModifier();
+                  usePeacetimeCost = options.isUsePeacetimeCost();
+                  showPeacetimeCost = options.isShowPeacetimeCost();
+                  financialYearDuration = options.getFinancialYearDuration();
+                  newFinancialYearFinancesToCSVExport = options.isNewFinancialYearFinancesToCSVExport();
+                  simulateGrayMonday = options.isSimulateGrayMonday();
+                  payForParts = options.isPayForParts();
+                  payForRepairs = options.isPayForRepairs();
+                  payForUnits = options.isPayForUnits();
+                  payForSalaries = options.isPayForSalaries();
+                  payForOverhead = options.isPayForOverhead();
+                  payForMaintain = options.isPayForMaintain();
+                  payForTransport = options.isPayForTransport();
+                  payForRecruitment = options.isPayForRecruitment();
+                  payForFood = options.isPayForFood();
+                  payForHousing = options.isPayForHousing();
+                  sellUnits = options.isSellUnits();
+                  sellParts = options.isSellParts();
+                  useTaxes = options.isUseTaxes();
+                  taxesPercentage = options.getTaxesPercentage();
+                  useShareSystem = options.isUseShareSystem();
+                  sharesForAll = options.isSharesForAll();
+                  rentedFacilitiesCostHospitalBeds = options.getRentedFacilitiesCostHospitalBeds();
+                  rentedFacilitiesCostKitchens = options.getRentedFacilitiesCostKitchens();
+                  rentedFacilitiesCostHoldingCells = options.getRentedFacilitiesCostHoldingCells();
+                  rentedFacilitiesCostRepairBays = options.getRentedFacilitiesCostRepairBays();
+                  commonPartPriceMultiplier = options.getCommonPartPriceMultiplier();
+                  innerSphereUnitPriceMultiplier = options.getInnerSphereUnitPriceMultiplier();
+                  innerSpherePartPriceMultiplier = options.getInnerSpherePartPriceMultiplier();
+                  clanUnitPriceMultiplier = options.getClanUnitPriceMultiplier();
+                  clanPartPriceMultiplier = options.getClanPartPriceMultiplier();
+                  mixedTechUnitPriceMultiplier = options.getMixedTechUnitPriceMultiplier();
+                  usedPartPriceMultipliers = Arrays.copyOf(options.getUsedPartPriceMultipliers(),
+                          options.getUsedPartPriceMultipliers().length);
+                  damagedPartsValueMultiplier = options.getDamagedPartsValueMultiplier();
+                  unrepairablePartsValueMultiplier = options.getUnrepairablePartsValueMultiplier();
+                  cancelledOrderRefundMultiplier = options.getCancelledOrderRefundMultiplier();
+            }
+
+            private void applyTo(CampaignOptions options) {
+                  options.setLoanLimits(useLoanLimits);
+                  options.setUsePercentageMaintenance(usePercentageMaintenance);
+                  options.setUseExtendedPartsModifier(useExtendedPartsModifier);
+                  options.setUsePeacetimeCost(usePeacetimeCost);
+                  options.setShowPeacetimeCost(showPeacetimeCost);
+                  options.setFinancialYearDuration(financialYearDuration);
+                  options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExport);
+                  options.setSimulateGrayMonday(simulateGrayMonday);
+                  options.setPayForParts(payForParts);
+                  options.setPayForRepairs(payForRepairs);
+                  options.setPayForUnits(payForUnits);
+                  options.setPayForSalaries(payForSalaries);
+                  options.setPayForOverhead(payForOverhead);
+                  options.setPayForMaintain(payForMaintain);
+                  options.setPayForTransport(payForTransport);
+                  options.setPayForRecruitment(payForRecruitment);
+                  options.setPayForFood(payForFood);
+                  options.setPayForHousing(payForHousing);
+                  options.setSellUnits(sellUnits);
+                  options.setSellParts(sellParts);
+                  options.setUseTaxes(useTaxes);
+                  options.setTaxesPercentage(taxesPercentage);
+                  options.setUseShareSystem(useShareSystem);
+                  options.setSharesForAll(sharesForAll);
+                  options.setRentedFacilitiesCostHospitalBeds(rentedFacilitiesCostHospitalBeds);
+                  options.setRentedFacilitiesCostKitchens(rentedFacilitiesCostKitchens);
+                  options.setRentedFacilitiesCostHoldingCells(rentedFacilitiesCostHoldingCells);
+                  options.setRentedFacilitiesCostRepairBays(rentedFacilitiesCostRepairBays);
+                  options.setCommonPartPriceMultiplier(commonPartPriceMultiplier);
+                  options.setInnerSphereUnitPriceMultiplier(innerSphereUnitPriceMultiplier);
+                  options.setInnerSpherePartPriceMultiplier(innerSpherePartPriceMultiplier);
+                  options.setClanUnitPriceMultiplier(clanUnitPriceMultiplier);
+                  options.setClanPartPriceMultiplier(clanPartPriceMultiplier);
+                  options.setMixedTechUnitPriceMultiplier(mixedTechUnitPriceMultiplier);
+                  for (int i = 0; i < Math.min(options.getUsedPartPriceMultipliers().length,
+                          usedPartPriceMultipliers.length); i++) {
+                        options.getUsedPartPriceMultipliers()[i] = usedPartPriceMultipliers[i];
+                  }
+                  options.setDamagedPartsValueMultiplier(damagedPartsValueMultiplier);
+                  options.setUnrepairablePartsValueMultiplier(unrepairablePartsValueMultiplier);
+                  options.setCancelledOrderRefundMultiplier(cancelledOrderRefundMultiplier);
+            }
+      }
 }

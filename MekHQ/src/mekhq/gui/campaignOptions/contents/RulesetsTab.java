@@ -88,6 +88,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class RulesetsTab {
     private final CampaignOptions campaignOptions;
+      private RulesetsDraft draft;
+      private boolean stratConPageCreated;
 
     //start Universal Options
     private JLabel lblSkillLevel;
@@ -187,6 +189,7 @@ public class RulesetsTab {
         this.campaignOptions = campaignOptions;
 
         initialize();
+            loadValuesFromCampaignOptions();
     }
 
     /**
@@ -893,6 +896,8 @@ public class RulesetsTab {
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
         chkUseVerboseBidding.addMouseListener(createTipPanelUpdater(stratConHeader, "UseVerboseBidding"));
+      stratConPageCreated = true;
+      updateStratConControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("StratConTab", true);
@@ -1004,48 +1009,8 @@ public class RulesetsTab {
             options = this.campaignOptions;
         }
 
-        // Universal
-        options.setSkillLevel(comboSkillLevel.getSelectedItem());
-        options.setBoardScalingType(comboBoardScalingType.getSelectedItem());
-        options.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
-        options.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
-        options.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
-        options.setAutoGenerateOpForCallSigns(chkAutoGenerateOpForCallSigns.isSelected());
-        options.setMinimumCallsignSkillLevel(comboMinimumCallsignSkillLevel.getSelectedItem());
-        options.setUseDropShips(chkUseDropShips.isSelected());
-        options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
-        options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
-        options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
-        options.setUseAdvancedBuildingGunEmplacements(chkUseAdvancedBuildingGunEmplacements.isSelected());
-        options.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
-        options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
-        options.setEnemyFacilityModifierDieSize((int) spnEnemyFacilityModifierDieSize.getValue());
-        options.setAlliedFacilityModifierDieSize((int) spnAlliedFacilityModifierDieSize.getValue());
-        options.setScenarioModMax((int) spnScenarioModMax.getValue());
-        options.setScenarioModChance((int) spnScenarioModChance.getValue());
-        options.setScenarioModBV((int) spnScenarioModBV.getValue());
-        options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
-        options.setUseLightConditions(chkUseLightConditions.isSelected());
-        options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-        options.setUseNoTornadoes(chkUseNoTornadoes.isSelected());
-        options.setFixedMapChance((int) spnFixedMapChance.getValue());
-        options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
-        options.setMoraleVictoryEffect((int) spnMoraleVictory.getValue());
-        options.setMoraleDecisiveVictoryEffect((int) spnMoraleDecisiveVictory.getValue());
-        options.setMoraleDefeatEffect((int) spnMoraleDefeat.getValue());
-        options.setMoraleDecisiveDefeatEffect((int) spnMoraleDecisiveDefeat.getValue());
-        options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
-        options.setStrategicViewTheme(minimapThemeSelector.getSelectedItem());
-        options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
-        options.setAutoResolveNumberOfScenarios((int) spnAutoResolveNumberOfScenarios.getValue());
-        options.setAutoResolveExperimentalPacarGuiEnabled(chkAutoResolveExperimentalPacarGuiEnabled.isSelected());
-
-        // StratCon
-        options.setStratConPlayType(comboStratConPlayType.getSelectedItem());
-        options.setUseAdvancedScouting(chkUseAdvancedScouting.isSelected());
-        options.setNoSeedForces(chkNoSeedForces.isSelected());
-        options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
-        options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
+            updateDraftFromCreatedControls();
+            draft.applyTo(options);
     }
 
     /**
@@ -1071,47 +1036,229 @@ public class RulesetsTab {
             options = this.campaignOptions;
         }
 
-        // Universal
-        comboSkillLevel.setSelectedItem(options.getSkillLevel());
-        comboBoardScalingType.setSelectedItem(options.getBoardScalingType());
-        spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
-        spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
-        spnOpForLanceTypeVehicles.setValue(options.getOpForLanceTypeVehicles());
-        chkAutoGenerateOpForCallSigns.setSelected(options.isAutoGenerateOpForCallSigns());
-        comboMinimumCallsignSkillLevel.setSelectedItem(options.getMinimumCallsignSkillLevel());
-        chkUseDropShips.setSelected(options.isUseDropShips());
-        chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
-        chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
-        chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
-        chkUseAdvancedBuildingGunEmplacements.setSelected(options.isUseAdvancedBuildingGunEmplacements());
-        spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
-        chkAutoConfigMunitions.setSelected(options.isAutoConfigMunitions());
-        spnEnemyFacilityModifierDieSize.setValue(options.getEnemyFacilityModifierDieSize());
-        spnAlliedFacilityModifierDieSize.setValue(options.getAlliedFacilityModifierDieSize());
-        spnScenarioModMax.setValue(options.getScenarioModMax());
-        spnScenarioModChance.setValue(options.getScenarioModChance());
-        spnScenarioModBV.setValue(options.getScenarioModBV());
-        chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
-        chkUseLightConditions.setSelected(options.isUseLightConditions());
-        chkUsePlanetaryConditions.setSelected(options.isUsePlanetaryConditions());
-        chkUseNoTornadoes.setSelected(options.isUseNoTornadoes());
-        spnFixedMapChance.setValue(options.getFixedMapChance());
-        chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
-        spnMoraleVictory.setValue(options.getMoraleVictoryEffect());
-        spnMoraleDecisiveVictory.setValue(options.getMoraleDecisiveVictoryEffect());
-        spnMoraleDefeat.setValue(options.getMoraleDefeatEffect());
-        spnMoraleDecisiveDefeat.setValue(options.getMoraleDecisiveDefeatEffect());
-        comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
-        minimapThemeSelector.setSelectedItem(options.getStrategicViewTheme().getName());
-        chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
-        chkAutoResolveExperimentalPacarGuiEnabled.setSelected(options.isAutoResolveExperimentalPacarGuiEnabled());
-        spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
-
-        // StratCon
-        comboStratConPlayType.setSelectedItem(options.getStratConPlayType());
-        chkUseAdvancedScouting.setSelected(options.isUseAdvancedScouting());
-        chkNoSeedForces.setSelected(options.isNoSeedForces());
-        chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
-        chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
+            draft = new RulesetsDraft(options);
+            updateCreatedControlsFromDraft();
     }
+
+      private void updateCreatedControlsFromDraft() {
+            updateStratConControlsFromDraft();
+      }
+
+      private void updateStratConControlsFromDraft() {
+            if (!stratConPageCreated || draft == null) {
+                  return;
+            }
+
+            comboSkillLevel.setSelectedItem(draft.skillLevel);
+            comboBoardScalingType.setSelectedItem(draft.boardScalingType);
+            spnOpForLanceTypeMeks.setValue(draft.opForLanceTypeMeks);
+            spnOpForLanceTypeMixed.setValue(draft.opForLanceTypeMixed);
+            spnOpForLanceTypeVehicles.setValue(draft.opForLanceTypeVehicles);
+            chkAutoGenerateOpForCallSigns.setSelected(draft.autoGenerateOpForCallSigns);
+            comboMinimumCallsignSkillLevel.setSelectedItem(draft.minimumCallsignSkillLevel);
+            chkUseDropShips.setSelected(draft.useDropShips);
+            chkRegionalMekVariations.setSelected(draft.regionalMekVariations);
+            chkAttachedPlayerCamouflage.setSelected(draft.attachedPlayerCamouflage);
+            chkPlayerControlsAttachedUnits.setSelected(draft.playerControlsAttachedUnits);
+            chkUseAdvancedBuildingGunEmplacements.setSelected(draft.useAdvancedBuildingGunEmplacements);
+            spnSPAUpgradeIntensity.setValue(draft.spaUpgradeIntensity);
+            chkAutoConfigMunitions.setSelected(draft.autoConfigMunitions);
+            spnEnemyFacilityModifierDieSize.setValue(draft.enemyFacilityModifierDieSize);
+            spnAlliedFacilityModifierDieSize.setValue(draft.alliedFacilityModifierDieSize);
+            spnScenarioModMax.setValue(draft.scenarioModMax);
+            spnScenarioModChance.setValue(draft.scenarioModChance);
+            spnScenarioModBV.setValue(draft.scenarioModBV);
+            chkUseWeatherConditions.setSelected(draft.useWeatherConditions);
+            chkUseLightConditions.setSelected(draft.useLightConditions);
+            chkUsePlanetaryConditions.setSelected(draft.usePlanetaryConditions);
+            chkUseNoTornadoes.setSelected(draft.useNoTornadoes);
+            spnFixedMapChance.setValue(draft.fixedMapChance);
+            chkRestrictPartsByMission.setSelected(draft.restrictPartsByMission);
+            spnMoraleVictory.setValue(draft.moraleVictoryEffect);
+            spnMoraleDecisiveVictory.setValue(draft.moraleDecisiveVictoryEffect);
+            spnMoraleDefeat.setValue(draft.moraleDefeatEffect);
+            spnMoraleDecisiveDefeat.setValue(draft.moraleDecisiveDefeatEffect);
+            comboAutoResolveMethod.setSelectedItem(draft.autoResolveMethod);
+            minimapThemeSelector.setSelectedItem(draft.strategicViewTheme);
+            chkAutoResolveVictoryChanceEnabled.setSelected(draft.autoResolveVictoryChanceEnabled);
+            chkAutoResolveExperimentalPacarGuiEnabled.setSelected(draft.autoResolveExperimentalPacarGuiEnabled);
+            spnAutoResolveNumberOfScenarios.setValue(draft.autoResolveNumberOfScenarios);
+            comboStratConPlayType.setSelectedItem(draft.stratConPlayType);
+            chkUseAdvancedScouting.setSelected(draft.useAdvancedScouting);
+            chkNoSeedForces.setSelected(draft.noSeedForces);
+            chkUseGenericBattleValue.setSelected(draft.useGenericBattleValue);
+            chkUseVerboseBidding.setSelected(draft.useVerboseBidding);
+      }
+
+      private void updateDraftFromCreatedControls() {
+            if (!stratConPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.skillLevel = comboSkillLevel.getSelectedItem();
+            draft.boardScalingType = comboBoardScalingType.getSelectedItem();
+            draft.opForLanceTypeMeks = (int) spnOpForLanceTypeMeks.getValue();
+            draft.opForLanceTypeMixed = (int) spnOpForLanceTypeMixed.getValue();
+            draft.opForLanceTypeVehicles = (int) spnOpForLanceTypeVehicles.getValue();
+            draft.autoGenerateOpForCallSigns = chkAutoGenerateOpForCallSigns.isSelected();
+            draft.minimumCallsignSkillLevel = comboMinimumCallsignSkillLevel.getSelectedItem();
+            draft.useDropShips = chkUseDropShips.isSelected();
+            draft.regionalMekVariations = chkRegionalMekVariations.isSelected();
+            draft.attachedPlayerCamouflage = chkAttachedPlayerCamouflage.isSelected();
+            draft.playerControlsAttachedUnits = chkPlayerControlsAttachedUnits.isSelected();
+            draft.useAdvancedBuildingGunEmplacements = chkUseAdvancedBuildingGunEmplacements.isSelected();
+            draft.spaUpgradeIntensity = (int) spnSPAUpgradeIntensity.getValue();
+            draft.autoConfigMunitions = chkAutoConfigMunitions.isSelected();
+            draft.enemyFacilityModifierDieSize = (int) spnEnemyFacilityModifierDieSize.getValue();
+            draft.alliedFacilityModifierDieSize = (int) spnAlliedFacilityModifierDieSize.getValue();
+            draft.scenarioModMax = (int) spnScenarioModMax.getValue();
+            draft.scenarioModChance = (int) spnScenarioModChance.getValue();
+            draft.scenarioModBV = (int) spnScenarioModBV.getValue();
+            draft.useWeatherConditions = chkUseWeatherConditions.isSelected();
+            draft.useLightConditions = chkUseLightConditions.isSelected();
+            draft.usePlanetaryConditions = chkUsePlanetaryConditions.isSelected();
+            draft.useNoTornadoes = chkUseNoTornadoes.isSelected();
+            draft.fixedMapChance = (int) spnFixedMapChance.getValue();
+            draft.restrictPartsByMission = chkRestrictPartsByMission.isSelected();
+            draft.moraleVictoryEffect = (int) spnMoraleVictory.getValue();
+            draft.moraleDecisiveVictoryEffect = (int) spnMoraleDecisiveVictory.getValue();
+            draft.moraleDefeatEffect = (int) spnMoraleDefeat.getValue();
+            draft.moraleDecisiveDefeatEffect = (int) spnMoraleDecisiveDefeat.getValue();
+            draft.autoResolveMethod = comboAutoResolveMethod.getSelectedItem();
+            draft.strategicViewTheme = minimapThemeSelector.getSelectedItem();
+            draft.autoResolveVictoryChanceEnabled = chkAutoResolveVictoryChanceEnabled.isSelected();
+            draft.autoResolveExperimentalPacarGuiEnabled = chkAutoResolveExperimentalPacarGuiEnabled.isSelected();
+            draft.autoResolveNumberOfScenarios = (int) spnAutoResolveNumberOfScenarios.getValue();
+            draft.stratConPlayType = comboStratConPlayType.getSelectedItem();
+            draft.useAdvancedScouting = chkUseAdvancedScouting.isSelected();
+            draft.noSeedForces = chkNoSeedForces.isSelected();
+            draft.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
+            draft.useVerboseBidding = chkUseVerboseBidding.isSelected();
+      }
+
+      private static class RulesetsDraft {
+            private SkillLevel skillLevel;
+            private BoardScalingType boardScalingType;
+            private int opForLanceTypeMeks;
+            private int opForLanceTypeMixed;
+            private int opForLanceTypeVehicles;
+            private boolean autoGenerateOpForCallSigns;
+            private SkillLevel minimumCallsignSkillLevel;
+            private boolean useDropShips;
+            private boolean regionalMekVariations;
+            private boolean attachedPlayerCamouflage;
+            private boolean playerControlsAttachedUnits;
+            private boolean useAdvancedBuildingGunEmplacements;
+            private int spaUpgradeIntensity;
+            private boolean autoConfigMunitions;
+            private int enemyFacilityModifierDieSize;
+            private int alliedFacilityModifierDieSize;
+            private int scenarioModMax;
+            private int scenarioModChance;
+            private int scenarioModBV;
+            private boolean useWeatherConditions;
+            private boolean useLightConditions;
+            private boolean usePlanetaryConditions;
+            private boolean useNoTornadoes;
+            private int fixedMapChance;
+            private boolean restrictPartsByMission;
+            private int moraleVictoryEffect;
+            private int moraleDecisiveVictoryEffect;
+            private int moraleDefeatEffect;
+            private int moraleDecisiveDefeatEffect;
+            private AutoResolveMethod autoResolveMethod;
+            private String strategicViewTheme;
+            private boolean autoResolveVictoryChanceEnabled;
+            private int autoResolveNumberOfScenarios;
+            private boolean autoResolveExperimentalPacarGuiEnabled;
+            private StratConPlayType stratConPlayType;
+            private boolean useAdvancedScouting;
+            private boolean noSeedForces;
+            private boolean useGenericBattleValue;
+            private boolean useVerboseBidding;
+
+            private RulesetsDraft(CampaignOptions options) {
+                  skillLevel = options.getSkillLevel();
+                  boardScalingType = options.getBoardScalingType();
+                  opForLanceTypeMeks = options.getOpForLanceTypeMeks();
+                  opForLanceTypeMixed = options.getOpForLanceTypeMixed();
+                  opForLanceTypeVehicles = options.getOpForLanceTypeVehicles();
+                  autoGenerateOpForCallSigns = options.isAutoGenerateOpForCallSigns();
+                  minimumCallsignSkillLevel = options.getMinimumCallsignSkillLevel();
+                  useDropShips = options.isUseDropShips();
+                  regionalMekVariations = options.isRegionalMekVariations();
+                  attachedPlayerCamouflage = options.isAttachedPlayerCamouflage();
+                  playerControlsAttachedUnits = options.isPlayerControlsAttachedUnits();
+                  useAdvancedBuildingGunEmplacements = options.isUseAdvancedBuildingGunEmplacements();
+                  spaUpgradeIntensity = options.getSpaUpgradeIntensity();
+                  autoConfigMunitions = options.isAutoConfigMunitions();
+                  enemyFacilityModifierDieSize = options.getEnemyFacilityModifierDieSize();
+                  alliedFacilityModifierDieSize = options.getAlliedFacilityModifierDieSize();
+                  scenarioModMax = options.getScenarioModMax();
+                  scenarioModChance = options.getScenarioModChance();
+                  scenarioModBV = options.getScenarioModBV();
+                  useWeatherConditions = options.isUseWeatherConditions();
+                  useLightConditions = options.isUseLightConditions();
+                  usePlanetaryConditions = options.isUsePlanetaryConditions();
+                  useNoTornadoes = options.isUseNoTornadoes();
+                  fixedMapChance = options.getFixedMapChance();
+                  restrictPartsByMission = options.isRestrictPartsByMission();
+                  moraleVictoryEffect = options.getMoraleVictoryEffect();
+                  moraleDecisiveVictoryEffect = options.getMoraleDecisiveVictoryEffect();
+                  moraleDefeatEffect = options.getMoraleDefeatEffect();
+                  moraleDecisiveDefeatEffect = options.getMoraleDecisiveDefeatEffect();
+                  autoResolveMethod = options.getAutoResolveMethod();
+                  strategicViewTheme = options.getStrategicViewTheme().getName();
+                  autoResolveVictoryChanceEnabled = options.isAutoResolveVictoryChanceEnabled();
+                  autoResolveNumberOfScenarios = options.getAutoResolveNumberOfScenarios();
+                  autoResolveExperimentalPacarGuiEnabled = options.isAutoResolveExperimentalPacarGuiEnabled();
+                  stratConPlayType = options.getStratConPlayType();
+                  useAdvancedScouting = options.isUseAdvancedScouting();
+                  noSeedForces = options.isNoSeedForces();
+                  useGenericBattleValue = options.isUseGenericBattleValue();
+                  useVerboseBidding = options.isUseVerboseBidding();
+            }
+
+            private void applyTo(CampaignOptions options) {
+                  options.setSkillLevel(skillLevel);
+                  options.setBoardScalingType(boardScalingType);
+                  options.setOpForLanceTypeMeks(opForLanceTypeMeks);
+                  options.setOpForLanceTypeMixed(opForLanceTypeMixed);
+                  options.setOpForLanceTypeVehicles(opForLanceTypeVehicles);
+                  options.setAutoGenerateOpForCallSigns(autoGenerateOpForCallSigns);
+                  options.setMinimumCallsignSkillLevel(minimumCallsignSkillLevel);
+                  options.setUseDropShips(useDropShips);
+                  options.setRegionalMekVariations(regionalMekVariations);
+                  options.setAttachedPlayerCamouflage(attachedPlayerCamouflage);
+                  options.setPlayerControlsAttachedUnits(playerControlsAttachedUnits);
+                  options.setUseAdvancedBuildingGunEmplacements(useAdvancedBuildingGunEmplacements);
+                  options.setSpaUpgradeIntensity(spaUpgradeIntensity);
+                  options.setAutoConfigMunitions(autoConfigMunitions);
+                  options.setEnemyFacilityModifierDieSize(enemyFacilityModifierDieSize);
+                  options.setAlliedFacilityModifierDieSize(alliedFacilityModifierDieSize);
+                  options.setScenarioModMax(scenarioModMax);
+                  options.setScenarioModChance(scenarioModChance);
+                  options.setScenarioModBV(scenarioModBV);
+                  options.setUseWeatherConditions(useWeatherConditions);
+                  options.setUseLightConditions(useLightConditions);
+                  options.setUsePlanetaryConditions(usePlanetaryConditions);
+                  options.setUseNoTornadoes(useNoTornadoes);
+                  options.setFixedMapChance(fixedMapChance);
+                  options.setRestrictPartsByMission(restrictPartsByMission);
+                  options.setMoraleVictoryEffect(moraleVictoryEffect);
+                  options.setMoraleDecisiveVictoryEffect(moraleDecisiveVictoryEffect);
+                  options.setMoraleDefeatEffect(moraleDefeatEffect);
+                  options.setMoraleDecisiveDefeatEffect(moraleDecisiveDefeatEffect);
+                  options.setAutoResolveMethod(autoResolveMethod);
+                  options.setStrategicViewTheme(strategicViewTheme);
+                  options.setAutoResolveVictoryChanceEnabled(autoResolveVictoryChanceEnabled);
+                  options.setAutoResolveNumberOfScenarios(autoResolveNumberOfScenarios);
+                  options.setAutoResolveExperimentalPacarGuiEnabled(autoResolveExperimentalPacarGuiEnabled);
+                  options.setStratConPlayType(stratConPlayType);
+                  options.setUseAdvancedScouting(useAdvancedScouting);
+                  options.setNoSeedForces(noSeedForces);
+                  options.setUseGenericBattleValue(useGenericBattleValue);
+                  options.setUseVerboseBidding(useVerboseBidding);
+            }
+      }
 }

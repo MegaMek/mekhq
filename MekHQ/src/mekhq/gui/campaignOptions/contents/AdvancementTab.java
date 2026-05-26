@@ -39,6 +39,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.GridBagConstraints;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JCheckBox;
@@ -71,9 +72,21 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * from the campaign options, and update the options based on user input.</p>
  */
 public class AdvancementTab {
+      private static final int[] EXPERIENCE_LEVELS = new int[] { SkillType.EXP_ULTRA_GREEN,
+                                                                                             SkillType.EXP_GREEN,
+                                                                                             SkillType.EXP_REGULAR,
+                                                                                             SkillType.EXP_VETERAN,
+                                                                                             SkillType.EXP_ELITE,
+                                                                                             SkillType.EXP_HEROIC,
+                                                                                             SkillType.EXP_LEGENDARY };
+
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
+      private AdvancementDraft draft;
+      private boolean xpAwardsPageCreated;
+      private boolean randomizationPageCreated;
+      private boolean recruitmentBonusesPageCreated;
 
     //start XP Awards Tab
     private CampaignOptionsHeaderPanel xpAwardsHeader;
@@ -307,6 +320,8 @@ public class AdvancementTab {
         pnlScenarios = createScenariosPanel();
         pnlAdministrators = createAdministratorsPanel();
         pnlMissions = createMissionsPanel();
+      xpAwardsPageCreated = true;
+      updateXpAwardsControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("XpAwardsTab", true);
@@ -701,6 +716,8 @@ public class AdvancementTab {
         pnlPhenotype = createPhenotypePanel();
         pnlRandomAbilities = createAbilityPanel();
         pnlSkillGroups = createSkillGroupPanel();
+      randomizationPageCreated = true;
+      updateRandomizationControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillRandomizationTab", true);
@@ -1250,6 +1267,8 @@ public class AdvancementTab {
         // Contents
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();
         pnlRecruitmentBonusesSupport = createRecruitmentBonusesSupportPanel();
+      recruitmentBonusesPageCreated = true;
+      updateRecruitmentBonusControlsFromDraft();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesTab", true);
@@ -1382,88 +1401,101 @@ public class AdvancementTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-        //start XP Awards Tab
-        spnXpCostMultiplier.setValue(options.getXpCostMultiplier());
-        spnTaskXP.setValue(options.getTaskXP());
-        spnNTasksXP.setValue(options.getNTasksXP());
-        spnSuccessXP.setValue(options.getSuccessXP());
-        spnMistakeXP.setValue(options.getMistakeXP());
-        spnScenarioXP.setValue(options.getScenarioXP());
-        spnKillXP.setValue(options.getKillXPAward());
-        spnKills.setValue(options.getKillsForXP());
-        spnVocationalXP.setValue(options.getVocationalXP());
-        spnVocationalXPFrequency.setValue(options.getVocationalXPCheckFrequency());
-        spnVocationalXPTargetNumber.setValue(options.getVocationalXPTargetNumber());
-        spnMissionXpFail.setValue(options.getMissionXpFail());
-        spnMissionXpSuccess.setValue(options.getMissionXpSuccess());
-        spnMissionXpOutstandingSuccess.setValue(options.getMissionXpOutstandingSuccess());
-        spnContractNegotiationXP.setValue(options.getContractNegotiationXP());
-        spnAdminWeeklyXP.setValue(options.getAdminXP());
-        spnAdminWeeklyXPPeriod.setValue(options.getAdminXPPeriod());
-
-        //start Skill Randomization Tab
-        chkExtraRandomness.setSelected(skillPreferences.randomizeSkill());
-        final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
-        for (int i = 0; i < phenotypeSpinners.length; i++) {
-            phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
-        }
-
-        spnAbilityUltraGreen.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ULTRA_GREEN));
-        spnAbilityGreen.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_GREEN));
-        spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_REGULAR));
-        spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_VETERAN));
-        spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ELITE));
-        try {
-            spnAbilityHeroic.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_HEROIC));
-            spnAbilityLegendary.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_LEGENDARY));
-        } catch (NullPointerException e) {
-            // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
-        }
-
-        spnCommandSkillsUltraGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ULTRA_GREEN));
-        spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_GREEN));
-        spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_REGULAR));
-        spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_VETERAN));
-        spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ELITE));
-        try {
-            spnCommandSkillsHeroic.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_HEROIC));
-            spnCommandSkillsLegendary.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_LEGENDARY));
-        } catch (NullPointerException e) {
-            // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
-        }
-
-        spnUtilitySkillsUltraGreen.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_ULTRA_GREEN));
-        spnUtilitySkillsGreen.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_GREEN));
-        spnUtilitySkillsReg.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_REGULAR));
-        spnUtilitySkillsVet.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_VETERAN));
-        spnUtilitySkillsElite.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_ELITE));
-        spnUtilitySkillsHeroic.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_HEROIC));
-        spnUtilitySkillsLegendary.setValue(skillPreferences.getUtilitySkillsModifier(SkillType.EXP_LEGENDARY));
-
-        spnRoleplaySkillsModifier.setValue(skillPreferences.getRoleplaySkillModifier());
-        spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
-        spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
-        spnArtyProb.setValue(skillPreferences.getArtilleryProb());
-        spnArtyBonus.setValue(skillPreferences.getArtilleryBonus());
-        spnAntiMekSkill.setValue(skillPreferences.getAntiMekProb());
-        spnSecondProb.setValue(skillPreferences.getSecondSkillProb());
-        spnSecondBonus.setValue(skillPreferences.getSecondSkillBonus());
-
-        //start Recruitment Bonuses Tab
-        final Map<PersonnelRole, Integer> recruitmentBonuses = skillPreferences.getRecruitmentBonuses();
-
-        final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
-        for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
-            PersonnelRole role = combatRoles.get(i);
-            spnRecruitmentBonusCombat[i].setValue(recruitmentBonuses.getOrDefault(role, 0));
-        }
-
-        final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
-        for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
-            PersonnelRole role = supportRoles.get(i);
-            spnRecruitmentBonusSupport[i].setValue(recruitmentBonuses.getOrDefault(role, 0));
-        }
+            draft = new AdvancementDraft(options, skillPreferences);
+            updateCreatedControlsFromDraft();
     }
+
+      private void updateCreatedControlsFromDraft() {
+            updateXpAwardsControlsFromDraft();
+            updateRandomizationControlsFromDraft();
+            updateRecruitmentBonusControlsFromDraft();
+      }
+
+      private void updateXpAwardsControlsFromDraft() {
+            if (!xpAwardsPageCreated || draft == null) {
+                  return;
+            }
+
+            spnXpCostMultiplier.setValue(draft.xpCostMultiplier);
+            spnTaskXP.setValue(draft.taskXP);
+            spnNTasksXP.setValue(draft.nTasksXP);
+            spnSuccessXP.setValue(draft.successXP);
+            spnMistakeXP.setValue(draft.mistakeXP);
+            spnScenarioXP.setValue(draft.scenarioXP);
+            spnKillXP.setValue(draft.killXP);
+            spnKills.setValue(draft.killsForXP);
+            spnVocationalXP.setValue(draft.vocationalXP);
+            spnVocationalXPFrequency.setValue(draft.vocationalXPFrequency);
+            spnVocationalXPTargetNumber.setValue(draft.vocationalXPTargetNumber);
+            spnMissionXpFail.setValue(draft.missionXpFail);
+            spnMissionXpSuccess.setValue(draft.missionXpSuccess);
+            spnMissionXpOutstandingSuccess.setValue(draft.missionXpOutstandingSuccess);
+            spnContractNegotiationXP.setValue(draft.contractNegotiationXP);
+            spnAdminWeeklyXP.setValue(draft.adminWeeklyXP);
+            spnAdminWeeklyXPPeriod.setValue(draft.adminWeeklyXPPeriod);
+      }
+
+      private void updateRandomizationControlsFromDraft() {
+            if (!randomizationPageCreated || draft == null) {
+                  return;
+            }
+
+            chkExtraRandomness.setSelected(draft.randomizeSkill);
+            for (int i = 0; i < Math.min(phenotypeSpinners.length, draft.phenotypeProbabilities.length); i++) {
+                  phenotypeSpinners[i].setValue(draft.phenotypeProbabilities[i]);
+            }
+
+            spnAbilityUltraGreen.setValue(draft.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN]);
+            spnAbilityGreen.setValue(draft.specialAbilityBonus[SkillType.EXP_GREEN]);
+            spnAbilityReg.setValue(draft.specialAbilityBonus[SkillType.EXP_REGULAR]);
+            spnAbilityVet.setValue(draft.specialAbilityBonus[SkillType.EXP_VETERAN]);
+            spnAbilityElite.setValue(draft.specialAbilityBonus[SkillType.EXP_ELITE]);
+            spnAbilityHeroic.setValue(draft.specialAbilityBonus[SkillType.EXP_HEROIC]);
+            spnAbilityLegendary.setValue(draft.specialAbilityBonus[SkillType.EXP_LEGENDARY]);
+
+            spnCommandSkillsUltraGreen.setValue(draft.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN]);
+            spnCommandSkillsGreen.setValue(draft.commandSkillsModifier[SkillType.EXP_GREEN]);
+            spnCommandSkillsReg.setValue(draft.commandSkillsModifier[SkillType.EXP_REGULAR]);
+            spnCommandSkillsVet.setValue(draft.commandSkillsModifier[SkillType.EXP_VETERAN]);
+            spnCommandSkillsElite.setValue(draft.commandSkillsModifier[SkillType.EXP_ELITE]);
+            spnCommandSkillsHeroic.setValue(draft.commandSkillsModifier[SkillType.EXP_HEROIC]);
+            spnCommandSkillsLegendary.setValue(draft.commandSkillsModifier[SkillType.EXP_LEGENDARY]);
+
+            spnUtilitySkillsUltraGreen.setValue(draft.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN]);
+            spnUtilitySkillsGreen.setValue(draft.utilitySkillsModifier[SkillType.EXP_GREEN]);
+            spnUtilitySkillsReg.setValue(draft.utilitySkillsModifier[SkillType.EXP_REGULAR]);
+            spnUtilitySkillsVet.setValue(draft.utilitySkillsModifier[SkillType.EXP_VETERAN]);
+            spnUtilitySkillsElite.setValue(draft.utilitySkillsModifier[SkillType.EXP_ELITE]);
+            spnUtilitySkillsHeroic.setValue(draft.utilitySkillsModifier[SkillType.EXP_HEROIC]);
+            spnUtilitySkillsLegendary.setValue(draft.utilitySkillsModifier[SkillType.EXP_LEGENDARY]);
+
+            spnRoleplaySkillsModifier.setValue(draft.roleplaySkillsModifier);
+            spnCombatSA.setValue(draft.combatSmallArmsBonus);
+            spnSupportSA.setValue(draft.supportSmallArmsBonus);
+            spnArtyProb.setValue(draft.artilleryProb);
+            spnArtyBonus.setValue(draft.artilleryBonus);
+            spnAntiMekSkill.setValue(draft.antiMekProb);
+            spnSecondProb.setValue(draft.secondSkillProb);
+            spnSecondBonus.setValue(draft.secondSkillBonus);
+      }
+
+      private void updateRecruitmentBonusControlsFromDraft() {
+            if (!recruitmentBonusesPageCreated || draft == null) {
+                  return;
+            }
+
+            final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
+            for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
+                  PersonnelRole role = combatRoles.get(i);
+                  spnRecruitmentBonusCombat[i].setValue(draft.recruitmentBonuses.getOrDefault(role, 0));
+            }
+
+            final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
+            for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
+                  PersonnelRole role = supportRoles.get(i);
+                  spnRecruitmentBonusSupport[i].setValue(draft.recruitmentBonuses.getOrDefault(role, 0));
+            }
+      }
 
     /**
      * Applies the current values from the XP Awards and Skill Randomization tabs to the specified
@@ -1486,78 +1518,8 @@ public class AdvancementTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-        //start XP Awards Tab
-        options.setXpCostMultiplier((double) spnXpCostMultiplier.getValue());
-        options.setTaskXP((int) spnTaskXP.getValue());
-        options.setNTasksXP((int) spnNTasksXP.getValue());
-        options.setSuccessXP((int) spnSuccessXP.getValue());
-        options.setMistakeXP((int) spnMistakeXP.getValue());
-        options.setScenarioXP((int) spnScenarioXP.getValue());
-        options.setKillXPAward((int) spnKillXP.getValue());
-        options.setKillsForXP((int) spnKills.getValue());
-        options.setVocationalXP((int) spnVocationalXP.getValue());
-        options.setVocationalXPCheckFrequency((int) spnVocationalXPFrequency.getValue());
-        options.setVocationalXPTargetNumber((int) spnVocationalXPTargetNumber.getValue());
-        options.setMissionXpFail((int) spnMissionXpFail.getValue());
-        options.setMissionXpSuccess((int) spnMissionXpSuccess.getValue());
-        options.setMissionXpOutstandingSuccess((int) spnMissionXpOutstandingSuccess.getValue());
-        options.setContractNegotiationXP((int) spnContractNegotiationXP.getValue());
-        options.setAdminXP((int) spnAdminWeeklyXP.getValue());
-        options.setAdminXPPeriod((int) spnAdminWeeklyXPPeriod.getValue());
-
-        //start Skill Randomization Tab
-        skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
-        for (int i = 0; i < phenotypeSpinners.length; i++) {
-            options.setPhenotypeProbability(i, (int) phenotypeSpinners[i].getValue());
-        }
-
-        skillPreferences.setAntiMekProb((int) spnAntiMekSkill.getValue());
-        skillPreferences.setArtilleryProb((int) spnArtyProb.getValue());
-        skillPreferences.setArtilleryBonus((int) spnArtyBonus.getValue());
-        skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
-        skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
-
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_ULTRA_GREEN, (int) spnCommandSkillsUltraGreen.getValue());
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_GREEN, (int) spnCommandSkillsGreen.getValue());
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_HEROIC, (int) spnCommandSkillsHeroic.getValue());
-        skillPreferences.setCommandSkillsMod(SkillType.EXP_LEGENDARY, (int) spnCommandSkillsLegendary.getValue());
-
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_ULTRA_GREEN, (int) spnUtilitySkillsUltraGreen.getValue());
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_GREEN, (int) spnUtilitySkillsGreen.getValue());
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_REGULAR, (int) spnUtilitySkillsReg.getValue());
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_VETERAN, (int) spnUtilitySkillsVet.getValue());
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_ELITE, (int) spnUtilitySkillsElite.getValue());
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_HEROIC, (int) spnUtilitySkillsHeroic.getValue());
-        skillPreferences.setUtilitySkillsMod(SkillType.EXP_LEGENDARY, (int) spnUtilitySkillsLegendary.getValue());
-
-        skillPreferences.setRoleplaySkillModifier((int) spnRoleplaySkillsModifier.getValue());
-        skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
-        skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
-
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ULTRA_GREEN, (int) spnAbilityUltraGreen.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (int) spnAbilityGreen.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_REGULAR, (int) spnAbilityReg.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_VETERAN, (int) spnAbilityVet.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ELITE, (int) spnAbilityElite.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_HEROIC, (int) spnAbilityHeroic.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_LEGENDARY, (int) spnAbilityLegendary.getValue());
-
-        //start Recruitment Bonuses
-        final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
-        final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
-
-        for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
-            PersonnelRole role = combatRoles.get(i);
-            skillPreferences.addRecruitmentBonus(role, (int) spnRecruitmentBonusCombat[i].getValue());
-        }
-
-        for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
-            PersonnelRole role = supportRoles.get(i);
-            skillPreferences.addRecruitmentBonus(role, (int) spnRecruitmentBonusSupport[i].getValue());
-        }
+            updateDraftFromCreatedControls();
+            draft.applyTo(options, skillPreferences);
 
         // Finishing Touches
         // This must be the last item, after all other tabs, no matter what.
@@ -1565,4 +1527,213 @@ public class AdvancementTab {
             campaign.setRandomSkillPreferences(randomSkillPreferences);
         }
     }
+
+      private void updateDraftFromCreatedControls() {
+            updateDraftFromXpAwardsControls();
+            updateDraftFromRandomizationControls();
+            updateDraftFromRecruitmentBonusControls();
+      }
+
+      private void updateDraftFromXpAwardsControls() {
+            if (!xpAwardsPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.xpCostMultiplier = (double) spnXpCostMultiplier.getValue();
+            draft.taskXP = (int) spnTaskXP.getValue();
+            draft.nTasksXP = (int) spnNTasksXP.getValue();
+            draft.successXP = (int) spnSuccessXP.getValue();
+            draft.mistakeXP = (int) spnMistakeXP.getValue();
+            draft.scenarioXP = (int) spnScenarioXP.getValue();
+            draft.killXP = (int) spnKillXP.getValue();
+            draft.killsForXP = (int) spnKills.getValue();
+            draft.vocationalXP = (int) spnVocationalXP.getValue();
+            draft.vocationalXPFrequency = (int) spnVocationalXPFrequency.getValue();
+            draft.vocationalXPTargetNumber = (int) spnVocationalXPTargetNumber.getValue();
+            draft.missionXpFail = (int) spnMissionXpFail.getValue();
+            draft.missionXpSuccess = (int) spnMissionXpSuccess.getValue();
+            draft.missionXpOutstandingSuccess = (int) spnMissionXpOutstandingSuccess.getValue();
+            draft.contractNegotiationXP = (int) spnContractNegotiationXP.getValue();
+            draft.adminWeeklyXP = (int) spnAdminWeeklyXP.getValue();
+            draft.adminWeeklyXPPeriod = (int) spnAdminWeeklyXPPeriod.getValue();
+      }
+
+      private void updateDraftFromRandomizationControls() {
+            if (!randomizationPageCreated || draft == null) {
+                  return;
+            }
+
+            draft.randomizeSkill = chkExtraRandomness.isSelected();
+            for (int i = 0; i < Math.min(phenotypeSpinners.length, draft.phenotypeProbabilities.length); i++) {
+                  draft.phenotypeProbabilities[i] = (int) phenotypeSpinners[i].getValue();
+            }
+
+            draft.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN] = (int) spnAbilityUltraGreen.getValue();
+            draft.specialAbilityBonus[SkillType.EXP_GREEN] = (int) spnAbilityGreen.getValue();
+            draft.specialAbilityBonus[SkillType.EXP_REGULAR] = (int) spnAbilityReg.getValue();
+            draft.specialAbilityBonus[SkillType.EXP_VETERAN] = (int) spnAbilityVet.getValue();
+            draft.specialAbilityBonus[SkillType.EXP_ELITE] = (int) spnAbilityElite.getValue();
+            draft.specialAbilityBonus[SkillType.EXP_HEROIC] = (int) spnAbilityHeroic.getValue();
+            draft.specialAbilityBonus[SkillType.EXP_LEGENDARY] = (int) spnAbilityLegendary.getValue();
+
+            draft.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnCommandSkillsUltraGreen.getValue();
+            draft.commandSkillsModifier[SkillType.EXP_GREEN] = (int) spnCommandSkillsGreen.getValue();
+            draft.commandSkillsModifier[SkillType.EXP_REGULAR] = (int) spnCommandSkillsReg.getValue();
+            draft.commandSkillsModifier[SkillType.EXP_VETERAN] = (int) spnCommandSkillsVet.getValue();
+            draft.commandSkillsModifier[SkillType.EXP_ELITE] = (int) spnCommandSkillsElite.getValue();
+            draft.commandSkillsModifier[SkillType.EXP_HEROIC] = (int) spnCommandSkillsHeroic.getValue();
+            draft.commandSkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnCommandSkillsLegendary.getValue();
+
+            draft.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnUtilitySkillsUltraGreen.getValue();
+            draft.utilitySkillsModifier[SkillType.EXP_GREEN] = (int) spnUtilitySkillsGreen.getValue();
+            draft.utilitySkillsModifier[SkillType.EXP_REGULAR] = (int) spnUtilitySkillsReg.getValue();
+            draft.utilitySkillsModifier[SkillType.EXP_VETERAN] = (int) spnUtilitySkillsVet.getValue();
+            draft.utilitySkillsModifier[SkillType.EXP_ELITE] = (int) spnUtilitySkillsElite.getValue();
+            draft.utilitySkillsModifier[SkillType.EXP_HEROIC] = (int) spnUtilitySkillsHeroic.getValue();
+            draft.utilitySkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnUtilitySkillsLegendary.getValue();
+
+            draft.roleplaySkillsModifier = (int) spnRoleplaySkillsModifier.getValue();
+            draft.combatSmallArmsBonus = (int) spnCombatSA.getValue();
+            draft.supportSmallArmsBonus = (int) spnSupportSA.getValue();
+            draft.artilleryProb = (int) spnArtyProb.getValue();
+            draft.artilleryBonus = (int) spnArtyBonus.getValue();
+            draft.antiMekProb = (int) spnAntiMekSkill.getValue();
+            draft.secondSkillProb = (int) spnSecondProb.getValue();
+            draft.secondSkillBonus = (int) spnSecondBonus.getValue();
+      }
+
+      private void updateDraftFromRecruitmentBonusControls() {
+            if (!recruitmentBonusesPageCreated || draft == null) {
+                  return;
+            }
+
+            final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
+            final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
+
+            for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
+                  PersonnelRole role = combatRoles.get(i);
+                  draft.recruitmentBonuses.put(role, (int) spnRecruitmentBonusCombat[i].getValue());
+            }
+
+            for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
+                  PersonnelRole role = supportRoles.get(i);
+                  draft.recruitmentBonuses.put(role, (int) spnRecruitmentBonusSupport[i].getValue());
+            }
+      }
+
+      private static class AdvancementDraft {
+            private double xpCostMultiplier;
+            private int taskXP;
+            private int nTasksXP;
+            private int successXP;
+            private int mistakeXP;
+            private int scenarioXP;
+            private int killXP;
+            private int killsForXP;
+            private int vocationalXP;
+            private int vocationalXPFrequency;
+            private int vocationalXPTargetNumber;
+            private int missionXpFail;
+            private int missionXpSuccess;
+            private int missionXpOutstandingSuccess;
+            private int contractNegotiationXP;
+            private int adminWeeklyXP;
+            private int adminWeeklyXPPeriod;
+            private boolean randomizeSkill;
+            private int[] phenotypeProbabilities;
+            private int[] specialAbilityBonus;
+            private int[] commandSkillsModifier;
+            private int[] utilitySkillsModifier;
+            private int roleplaySkillsModifier;
+            private int combatSmallArmsBonus;
+            private int supportSmallArmsBonus;
+            private int artilleryProb;
+            private int artilleryBonus;
+            private int antiMekProb;
+            private int secondSkillProb;
+            private int secondSkillBonus;
+            private Map<PersonnelRole, Integer> recruitmentBonuses;
+
+            private AdvancementDraft(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+                  xpCostMultiplier = options.getXpCostMultiplier();
+                  taskXP = options.getTaskXP();
+                  nTasksXP = options.getNTasksXP();
+                  successXP = options.getSuccessXP();
+                  mistakeXP = options.getMistakeXP();
+                  scenarioXP = options.getScenarioXP();
+                  killXP = options.getKillXPAward();
+                  killsForXP = options.getKillsForXP();
+                  vocationalXP = options.getVocationalXP();
+                  vocationalXPFrequency = options.getVocationalXPCheckFrequency();
+                  vocationalXPTargetNumber = options.getVocationalXPTargetNumber();
+                  missionXpFail = options.getMissionXpFail();
+                  missionXpSuccess = options.getMissionXpSuccess();
+                  missionXpOutstandingSuccess = options.getMissionXpOutstandingSuccess();
+                  contractNegotiationXP = options.getContractNegotiationXP();
+                  adminWeeklyXP = options.getAdminXP();
+                  adminWeeklyXPPeriod = options.getAdminXPPeriod();
+                  randomizeSkill = skillPreferences.randomizeSkill();
+                  phenotypeProbabilities = options.getPhenotypeProbabilities().clone();
+                  specialAbilityBonus = new int[EXPERIENCE_LEVELS.length];
+                  commandSkillsModifier = new int[EXPERIENCE_LEVELS.length];
+                  utilitySkillsModifier = new int[EXPERIENCE_LEVELS.length];
+                  for (int experienceLevel : EXPERIENCE_LEVELS) {
+                        specialAbilityBonus[experienceLevel] = skillPreferences.getSpecialAbilityBonus(experienceLevel);
+                        commandSkillsModifier[experienceLevel] = skillPreferences.getCommandSkillsModifier(experienceLevel);
+                        utilitySkillsModifier[experienceLevel] = skillPreferences.getUtilitySkillsModifier(experienceLevel);
+                  }
+                  roleplaySkillsModifier = skillPreferences.getRoleplaySkillModifier();
+                  combatSmallArmsBonus = skillPreferences.getCombatSmallArmsBonus();
+                  supportSmallArmsBonus = skillPreferences.getSupportSmallArmsBonus();
+                  artilleryProb = skillPreferences.getArtilleryProb();
+                  artilleryBonus = skillPreferences.getArtilleryBonus();
+                  antiMekProb = skillPreferences.getAntiMekProb();
+                  secondSkillProb = skillPreferences.getSecondSkillProb();
+                  secondSkillBonus = skillPreferences.getSecondSkillBonus();
+                  recruitmentBonuses = new HashMap<>(skillPreferences.getRecruitmentBonuses());
+            }
+
+            private void applyTo(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+                  options.setXpCostMultiplier(xpCostMultiplier);
+                  options.setTaskXP(taskXP);
+                  options.setNTasksXP(nTasksXP);
+                  options.setSuccessXP(successXP);
+                  options.setMistakeXP(mistakeXP);
+                  options.setScenarioXP(scenarioXP);
+                  options.setKillXPAward(killXP);
+                  options.setKillsForXP(killsForXP);
+                  options.setVocationalXP(vocationalXP);
+                  options.setVocationalXPCheckFrequency(vocationalXPFrequency);
+                  options.setVocationalXPTargetNumber(vocationalXPTargetNumber);
+                  options.setMissionXpFail(missionXpFail);
+                  options.setMissionXpSuccess(missionXpSuccess);
+                  options.setMissionXpOutstandingSuccess(missionXpOutstandingSuccess);
+                  options.setContractNegotiationXP(contractNegotiationXP);
+                  options.setAdminXP(adminWeeklyXP);
+                  options.setAdminXPPeriod(adminWeeklyXPPeriod);
+
+                  skillPreferences.setRandomizeSkill(randomizeSkill);
+                  for (int i = 0; i < phenotypeProbabilities.length; i++) {
+                        options.setPhenotypeProbability(i, phenotypeProbabilities[i]);
+                  }
+                  skillPreferences.setAntiMekProb(antiMekProb);
+                  skillPreferences.setArtilleryProb(artilleryProb);
+                  skillPreferences.setArtilleryBonus(artilleryBonus);
+                  skillPreferences.setSecondSkillProb(secondSkillProb);
+                  skillPreferences.setSecondSkillBonus(secondSkillBonus);
+
+                  for (int experienceLevel : EXPERIENCE_LEVELS) {
+                        skillPreferences.setCommandSkillsMod(experienceLevel, commandSkillsModifier[experienceLevel]);
+                        skillPreferences.setUtilitySkillsMod(experienceLevel, utilitySkillsModifier[experienceLevel]);
+                        skillPreferences.setSpecialAbilityBonus(experienceLevel, specialAbilityBonus[experienceLevel]);
+                  }
+                  skillPreferences.setRoleplaySkillModifier(roleplaySkillsModifier);
+                  skillPreferences.setCombatSmallArmsBonus(combatSmallArmsBonus);
+                  skillPreferences.setSupportSmallArmsBonus(supportSmallArmsBonus);
+
+                  for (Map.Entry<PersonnelRole, Integer> recruitmentBonus : recruitmentBonuses.entrySet()) {
+                        skillPreferences.addRecruitmentBonus(recruitmentBonus.getKey(), recruitmentBonus.getValue());
+                  }
+            }
+      }
 }
