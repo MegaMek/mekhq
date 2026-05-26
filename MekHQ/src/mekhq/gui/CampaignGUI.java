@@ -711,7 +711,10 @@ public class CampaignGUI extends JPanel {
         miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
         miMHQOptions.setName("miMHQOptions");
         miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        miMHQOptions.addActionListener(evt -> {
+            new MHQOptionsDialog(getFrame()).setVisible(true);
+            getCampaign().setTopUpWeekly(MekHQ.getMHQOptions().getNewDayAutoLogistics());
+        });
         menuFile.add(miMHQOptions);
 
         final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
@@ -3216,7 +3219,7 @@ public class CampaignGUI extends JPanel {
 
         final int selectedIndex = tabMain.getSelectedIndex();
         final Component selectedTab = ((selectedIndex >= 0) && (selectedIndex < tabMain.getTabCount())) ?
-                                             tabMain.getComponentAt(selectedIndex) : null;
+                                            tabMain.getComponentAt(selectedIndex) : null;
 
         EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
         int logsSelected = tabLogs.getSelectedIndex();
