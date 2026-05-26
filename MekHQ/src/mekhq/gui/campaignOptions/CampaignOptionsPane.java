@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -67,8 +67,8 @@ import javax.swing.JTabbedPane;
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -600,7 +600,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Store old values for use if we want to trigger certain dialogs
         boolean oldAwardVeterancySPAs = oldOptions.awardVeterancySPAs();
         boolean oldIsTrackFactionStanding = oldOptions.trackFactionStanding();
-        boolean oldIsTrackPrisoners = !oldOptions.trackPrisoners();
+        boolean oldIsTrackPrisoners = oldOptions.trackPrisoners();
         boolean oldIsUseMASHTheatres = oldOptions.useMASHTheatres();
         boolean oldIsUseFatigue = oldOptions.useFatigue();
         boolean oldIsUseAdvancedSalvage = oldOptions.useAdvancedSalvage();
@@ -710,7 +710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final CurrentLocation location = campaign.getLocation();
+        final AbstractLocation location = campaign.getCurrentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();

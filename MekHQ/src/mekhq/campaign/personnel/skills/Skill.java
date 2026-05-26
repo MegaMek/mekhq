@@ -839,6 +839,12 @@ public class Skill {
             tooltip.append(flavorText).append("<br><br>");
         }
 
+        if (bonus != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.bonus",
+                  (bonus > 0 ? "+" : "") + bonus));
+        }
+
         int spaModifier = getSPAModifiers(skillModifierData.characterOptions(), skillModifierData.adjustedReputation());
         if (spaModifier != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,

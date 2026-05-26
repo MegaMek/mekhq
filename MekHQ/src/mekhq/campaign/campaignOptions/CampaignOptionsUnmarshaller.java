@@ -277,6 +277,9 @@ public class CampaignOptionsUnmarshaller {
             case "manualUnitRatingModifier" -> campaignOptions.setManualUnitRatingModifier(parseInt(nodeContents));
             case "clampReputationPayMultiplier" -> campaignOptions.setClampReputationPayMultiplier(parseBoolean(
                   nodeContents));
+            case "requireSupportForceTransportation" ->
+                  campaignOptions.setRequireSupportForceTransportation(parseBoolean(
+                        nodeContents));
             case "reduceReputationPerformanceModifier" ->
                   campaignOptions.setReduceReputationPerformanceModifier(parseBoolean(
                         nodeContents));
@@ -294,6 +297,10 @@ public class CampaignOptionsUnmarshaller {
             case "allowDuplicatePortraits" -> campaignOptions.setAllowDuplicatePortraits(parseBoolean(
                   nodeContents));
             case "useGenderedPortraitsOnly" -> campaignOptions.setUseGenderedPortraitsOnly(parseBoolean(
+                  nodeContents));
+            case "childPortraitsWhenComingOfAge" -> campaignOptions.setChildPortraitsWhenComingOfAge(parseBoolean(
+                  nodeContents));
+            case "noRandomPortraitsForChildren" -> campaignOptions.setNoRandomPortraitsForChildren(parseBoolean(
                   nodeContents));
             case "destroyByMargin" -> campaignOptions.setDestroyByMargin(parseBoolean(nodeContents));
             case "destroyMargin" -> campaignOptions.setDestroyMargin(parseInt(nodeContents));
@@ -836,6 +843,7 @@ public class CampaignOptionsUnmarshaller {
             case "contractMaxSalvagePercentage" -> campaignOptions.setContractMaxSalvagePercentage(parseInt(
                   nodeContents));
             case "dropShipBonusPercentage" -> campaignOptions.setDropShipBonusPercentage(parseInt(nodeContents));
+            case "pityContracts" -> campaignOptions.setPityContracts(parseInt(nodeContents));
             case "isUseTwoWayPay" -> campaignOptions.setUseTwoWayPay(parseBoolean(nodeContents));
             case "isUseCamOpsSalvage" -> campaignOptions.setUseCamOpsSalvage(parseBoolean(nodeContents));
             case "isUseRiskySalvage" -> campaignOptions.setUseRiskySalvage(parseBoolean(nodeContents));
@@ -917,6 +925,10 @@ public class CampaignOptionsUnmarshaller {
                   campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
                         nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
+            case "alliedFacilityModifierDieSize" ->
+                  campaignOptions.setAlliedFacilityModifierDieSize(parseInt(nodeContents));
+            case "enemyFacilityModifierDieSize" ->
+                  campaignOptions.setEnemyFacilityModifierDieSize(parseInt(nodeContents));
             case "scenarioModMax" -> campaignOptions.setScenarioModMax(parseInt(nodeContents));
             case "scenarioModChance" -> campaignOptions.setScenarioModChance(parseInt(nodeContents));
             case "scenarioModBV" -> campaignOptions.setScenarioModBV(parseInt(nodeContents));

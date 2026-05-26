@@ -4530,8 +4530,47 @@ public class Person {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
+        
+        if (person != null) {
+            // < 0.51.00 compatibility handler
+            if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                int healingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
+                boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+
+                if (isUseAdvancedMedical) {
+                    person.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                          healingPeriod);
+                }
+            }
+        }
 
         return person;
+    }
+
+    /**
+     * In 0.51.0 we introduced a change that removed characters who only have permanent injuries from the assignments.
+     * This method exists to avoid 'ghost patients', patients that take up doctor patient assignments but aren't visible
+     * in the Infirmary UI.
+     *
+     * @param isUseAdvancedMedical        whether Advanced Medical (or Alternate Advanced Medical) are enabled. Used to
+     *                                    facilitate an early exit to avoid unassigning doctors in campaigns that only
+     *                                    use TW-scale 'Hits'.
+     * @param naturalHealingWaitingPeriod the waiting period (in days) between healing checks
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public void clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(boolean isUseAdvancedMedical,
+          int naturalHealingWaitingPeriod) {
+        if (!isUseAdvancedMedical) {
+            return;
+        }
+
+        List<Injury> nonPermanentInjuries = getNonPermanentInjuries();
+        if (nonPermanentInjuries.isEmpty()) {
+            setDoctorId(null, naturalHealingWaitingPeriod);
+        }
     }
 
     /**
@@ -5187,7 +5226,11 @@ public class Person {
      */
     public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
           final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions,
+              isClanCampaign,
+              today,
+              secondary,
+              excludeInjuryEffects) + 1];
     }
 
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
@@ -5624,7 +5667,7 @@ public class Person {
      * Returns the experience level for the specified skill using pre-built modifier data, or {@code -1} if the skill is
      * not present.
      *
-     * @param skillName        the name of the skill to query
+     * @param skillName         the name of the skill to query
      * @param skillModifierData pre-computed modifier data to apply to the skill level
      *
      * @return the experience level of the skill, or {@code -1} if the skill is not found
@@ -7449,6 +7492,12 @@ public class Person {
     public List<Injury> getNonProstheticInjuries() {
         return injuries.stream()
                      .filter(i -> !i.getSubType().isPermanentModification())
+                     .collect(Collectors.toList());
+    }
+
+    public List<Injury> getNonPermanentInjuries() {
+        return injuries.stream()
+                     .filter(i -> !i.isPermanent())
                      .collect(Collectors.toList());
     }
 

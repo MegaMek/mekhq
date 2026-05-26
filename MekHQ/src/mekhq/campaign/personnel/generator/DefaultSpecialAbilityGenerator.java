@@ -49,7 +49,8 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
             singleSpecialAbilityGenerator.setSkillPreferences(getSkillPreferences());
 
             // base number of special abilities is based on a random roll
-            int numAbilities = Utilities.rollSpecialAbilities(getSkillPreferences().getSpecialAbilityBonus(expLvl));
+            int spaBonus = getSkillPreferences().getSpecialAbilityBonus(expLvl);
+            int numAbilities = Utilities.rollSpecialAbilities(spaBonus);
 
             // Then we generate up to that number, stopping if there are no potential
             // abilities to generate

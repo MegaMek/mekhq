@@ -511,86 +511,93 @@ public final class FinancesTab extends CampaignGuiTab {
             method will need to be modified to account for additional characters.
     */
     public String formattingFinancialReport(String financialLine, int indentLevel, String printedValue) {
-        //Total length of all characters in report line is 44
-        StringBuilder sb = new StringBuilder(44);
+        //Total length of all characters in report line is 50
+        StringBuilder financialLineFormatter = new StringBuilder(50);
         switch (indentLevel) {
-            case 1 -> sb.append("");
-            case 2 -> sb.append("    ");
-            case 3 -> sb.append("       ");
-            default -> sb.append("");
+            case 1 -> financialLineFormatter.append("");
+            case 2 -> financialLineFormatter.append("    ");
+            case 3 -> financialLineFormatter.append("       ");
+            default -> financialLineFormatter.append("");
         }
-        sb.append(financialLine);
-        sb.repeat(".", (25 - sb.length()));
-        sb.repeat(" ", (19 - printedValue.length()));
-        sb.append(printedValue);
-        sb.append('\n');
+        financialLineFormatter.append(financialLine);
+        financialLineFormatter.repeat(".", (26 - financialLineFormatter.length()));
+        //by default the maximum dollar amount able to be displayed will be 9,999,999,999,999 C-bills
+        //but this try-catch will at least let the crazy person who gets to 10 trillion C-bills not to
+        //have the game crash.
+        try {
+            financialLineFormatter.repeat(" ", (24 - printedValue.length()));
+        } catch (IllegalArgumentException stringTooLong) {
+            financialLineFormatter.repeat(" ", (26 - printedValue.length()));
+        }
+        financialLineFormatter.append(printedValue);
+        financialLineFormatter.append('\n');
 
 
-        return sb.toString();
+        return financialLineFormatter.toString();
     }
 
     public String getFormattedFinancialReport() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder financialLine = new StringBuilder();
 
-        FinancialReport r = FinancialReport.calculate(getCampaign());
+        FinancialReport report = FinancialReport.calculate(getCampaign());
 
-        Money liabilities = r.getTotalLiabilities();
-        Money assets = r.getTotalAssets();
-        Money netWorth = r.getNetWorth();
+        Money liabilities = report.getTotalLiabilities();
+        Money assets = report.getTotalAssets();
+        Money netWorth = report.getNetWorth();
 
         int longest = Math.max(liabilities.toAmountAndSymbolString().length(),
               assets.toAmountAndSymbolString().length());
         longest = Math.max(netWorth.toAmountAndSymbolString().length(), longest);
         String formatted = "%1$" + longest + 's';
 
-        sb.append(formattingFinancialReport(resourceMap.getString("netWorth.text"), 1,
+        financialLine.append(formattingFinancialReport(resourceMap.getString("netWorth.text"), 1,
               String.format(formatted, netWorth.toAmountAndSymbolString())));
-        sb.append('\n');
+        financialLine.append('\n');
 
-        sb.append(formattingFinancialReport(resourceMap.getString("assets.text"), 2,
+        financialLine.append(formattingFinancialReport(resourceMap.getString("assets.text"), 2,
               String.format(formatted, assets.toAmountAndSymbolString())));
 
-        sb.append(formattingFinancialReport(resourceMap.getString("cash.text"), 3,
-              String.format(formatted, r.getCash().toAmountAndSymbolString())));
+        financialLine.append(formattingFinancialReport(resourceMap.getString("cash.text"), 3,
+              String.format(formatted, report.getCash().toAmountAndSymbolString())));
 
-        if (r.getMekValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("meks.text"), 3,
-                  String.format(formatted, r.getMekValue().toAmountAndSymbolString())));
+        if (report.getMekValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("meks.text"), 3,
+                  String.format(formatted, report.getMekValue().toAmountAndSymbolString())));
         }
 
-        if (r.getVeeValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("vehicles.text"), 3,
-                  String.format(formatted, r.getVeeValue().toAmountAndSymbolString())));
+        if (report.getVeeValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("vehicles.text"), 3,
+                  String.format(formatted, report.getVeeValue().toAmountAndSymbolString())));
         }
 
-        if (r.getBattleArmorValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("battleArmor.text"), 3,
-                  String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())));
+        if (report.getBattleArmorValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("battleArmor.text"), 3,
+                  String.format(formatted, report.getBattleArmorValue().toAmountAndSymbolString())));
         }
 
-        if (r.getInfantryValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("infantry.text"), 3,
-                  String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())));
+        if (report.getInfantryValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("infantry.text"), 3,
+                  String.format(formatted, report.getInfantryValue().toAmountAndSymbolString())));
         }
 
-        if (r.getProtoMekValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("protoMeks.text"), 3,
-                  String.format(formatted, r.getProtoMekValue().toAmountAndSymbolString())));
+        if (report.getProtoMekValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("protoMeks.text"), 3,
+                  String.format(formatted, report.getProtoMekValue().toAmountAndSymbolString())));
         }
 
-        if (r.getSmallCraftValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("smallCraft.text"), 3,
-                  String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())));
+        if (report.getSmallCraftValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("smallCraft.text"), 3,
+                  String.format(formatted, report.getSmallCraftValue().toAmountAndSymbolString())));
         }
 
-        if (r.getLargeCraftValue().isPositive()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("largeCraft.text"), 3,
-                  String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())));
+        if (report.getLargeCraftValue().isPositive()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("largeCraft.text"), 3,
+                  String.format(formatted, report.getLargeCraftValue().toAmountAndSymbolString())));
         }
 
-        sb.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 3,
-              String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())));
-        sb.append('\n');
+        financialLine.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 3,
+              String.format(formatted, report.getSparePartsValue().toAmountAndSymbolString())));
+        financialLine.append('\n');
 
 
         if (!getCampaign().getFinances().getAssets().isEmpty()) {
@@ -603,58 +610,67 @@ public final class FinancesTab extends CampaignGuiTab {
                     assetName.repeat(".", Math.max(0, numPeriods));
                 }
                 assetName.append(" ");
-                sb.append("       ")
+                financialLine.append("       ")
                       .append(assetName)
                       .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))
                       .append('\n');
             }
         }
-        sb.append(formattingFinancialReport(resourceMap.getString("liabilities.text"), 2,
-              String.format(formatted, liabilities.toAmountAndSymbolString())));
+        if (!liabilities.isZero()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("liabilities.text"), 2,
+                  String.format(formatted, liabilities.toAmountAndSymbolString())));
+        }
 
-        sb.append(formattingFinancialReport(resourceMap.getString("loans.text"), 3,
-              String.format(formatted, r.getLoans().toAmountAndSymbolString())));
-        sb.append("\n\n");
+        if (!report.getLoans().isZero()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("loans.text"), 3,
+                  String.format(formatted, report.getLoans().toAmountAndSymbolString())));
+            financialLine.append("\n\n");
+        }
 
-        sb.append(formattingFinancialReport(resourceMap.getString("monthlyProfit.text"), 1,
-              String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString())));
-        sb.append("\n");
+        financialLine.append(formattingFinancialReport(resourceMap.getString("monthlyProfit.text"), 1,
+              String.format(formatted,
+                    report.getMonthlyIncome().minus(report.getMonthlyExpenses()).toAmountAndSymbolString())));
+        financialLine.append("\n");
 
-        sb.append(formattingFinancialReport(resourceMap.getString("monthlyIncome.text"), 1,
-              String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())));
+        financialLine.append(formattingFinancialReport(resourceMap.getString("monthlyIncome.text"), 1,
+              String.format(formatted, report.getMonthlyIncome().toAmountAndSymbolString())));
 
-        sb.append(formattingFinancialReport(resourceMap.getString("contractPayments.text"), 2,
-              String.format(formatted, r.getContracts().toAmountAndSymbolString())));
-        sb.append('\n');
+        financialLine.append(formattingFinancialReport(resourceMap.getString("contractPayments.text"), 2,
+              String.format(formatted, report.getContracts().toAmountAndSymbolString())));
+        financialLine.append('\n');
 
-        sb.append(formattingFinancialReport(resourceMap.getString("monthlyExpenses.text"), 1,
-              String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())));
+        financialLine.append(formattingFinancialReport(resourceMap.getString("monthlyExpenses.text"), 1,
+              String.format(formatted, report.getMonthlyExpenses().toAmountAndSymbolString())));
 
-        sb.append(formattingFinancialReport(resourceMap.getString("salaries.text"), 2,
-              String.format(formatted, r.getSalaries().toAmountAndSymbolString())));
+        financialLine.append(formattingFinancialReport(resourceMap.getString("salaries.text"), 2,
+              String.format(formatted, report.getSalaries().toAmountAndSymbolString())));
 
-        sb.append(formattingFinancialReport(resourceMap.getString("maintenance.text"), 2,
-              String.format(formatted, r.getMaintenance().toAmountAndSymbolString())));
+        if (!report.getMaintenance().isZero()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("maintenance.text"), 2,
+                  String.format(formatted, report.getMaintenance().toAmountAndSymbolString())));
+        }
 
-        sb.append(formattingFinancialReport(resourceMap.getString("overhead.text"), 2,
-              String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())));
+        if (!report.getOverheadCosts().isZero()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("overhead.text"), 2,
+                  String.format(formatted, report.getOverheadCosts().toAmountAndSymbolString())));
+        }
 
-        Money rentals = r.getRentals();
+        Money rentals = report.getRentals();
         if (!rentals.isZero()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("rentalFacilities.text"), 2,
+            financialLine.append(formattingFinancialReport(resourceMap.getString("rentalFacilities.text"), 2,
                   String.format(formatted, rentals.toAmountAndSymbolString())));
         }
 
         if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
-            sb.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 2,
-                  String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())));
-            sb.append(formattingFinancialReport(resourceMap.getString("trainingMunitions.text"), 2,
-                  String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())));
-            sb.append(formattingFinancialReport(resourceMap.getString("fuel.text"), 2,
-                  String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())));
+            financialLine.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 2,
+                  String.format(formatted, report.getMonthlySparePartCosts().toAmountAndSymbolString())));
+            financialLine.append(formattingFinancialReport(resourceMap.getString("trainingMunitions.text"), 2,
+                  String.format(formatted, report.getMonthlyAmmoCosts().toAmountAndSymbolString())));
+            financialLine.append(formattingFinancialReport(resourceMap.getString("fuel.text"), 2,
+                  String.format(formatted, report.getMonthlyFuelCosts().toAmountAndSymbolString())));
         }
 
-        return sb.toString();
+        return financialLine.toString();
     }
 
     ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);

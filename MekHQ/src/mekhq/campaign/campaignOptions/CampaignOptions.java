@@ -34,7 +34,15 @@
 package mekhq.campaign.campaignOptions;
 
 import static megamek.common.TechConstants.getSimpleLevel;
-import static megamek.common.options.OptionsConstants.*;
+import static megamek.common.options.OptionsConstants.ADVANCED_STRATOPS_QUIRKS;
+import static megamek.common.options.OptionsConstants.ALLOWED_CANON_ONLY;
+import static megamek.common.options.OptionsConstants.ALLOWED_TECH_LEVEL;
+import static megamek.common.options.OptionsConstants.EDGE;
+import static megamek.common.options.OptionsConstants.RPG_ARTILLERY_SKILL;
+import static megamek.common.options.OptionsConstants.RPG_COMMAND_INIT;
+import static megamek.common.options.OptionsConstants.RPG_MANEI_DOMINI;
+import static megamek.common.options.OptionsConstants.RPG_PILOT_ADVANTAGES;
+import static megamek.common.options.OptionsConstants.RPG_TOUGHNESS;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
@@ -114,6 +122,7 @@ public class CampaignOptions {
 
     // region Variable Declarations
     // region General Tab
+    private boolean requireSupportForceTransportation;
     private int manualUnitRatingModifier;
     private boolean clampReputationPayMultiplier;
     private boolean reduceReputationPerformanceModifier;
@@ -591,6 +600,8 @@ public class CampaignOptions {
     private boolean assignPortraitOnRoleChange;
     private boolean allowDuplicatePortraits;
     private boolean useGenderedPortraitsOnly;
+    private boolean noRandomPortraitsForChildren;
+    private boolean childPortraitsWhenComingOfAge;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -626,6 +637,7 @@ public class CampaignOptions {
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
     private int dropShipBonusPercentage;
+    private int pityContracts;
     private boolean isUseTwoWayPay;
     private boolean isUseCamOpsSalvage;
     private boolean isUseRiskySalvage;
@@ -668,6 +680,8 @@ public class CampaignOptions {
     private int fixedMapChance;
     private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
+    private int alliedFacilityModifierDieSize;
+    private int enemyFacilityModifierDieSize;
     private int scenarioModMax;
     private int scenarioModChance;
     private int scenarioModBV;
@@ -705,6 +719,7 @@ public class CampaignOptions {
 
         // region General Tab
         manualUnitRatingModifier = 0;
+        requireSupportForceTransportation = true;
         clampReputationPayMultiplier = false;
         reduceReputationPerformanceModifier = false;
         reputationPerformanceModifierCutOff = false;
@@ -1263,6 +1278,8 @@ public class CampaignOptions {
         assignPortraitOnRoleChange = false;
         allowDuplicatePortraits = true;
         useGenderedPortraitsOnly = false;
+        noRandomPortraitsForChildren = true;
+        childPortraitsWhenComingOfAge = true;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -1299,6 +1316,7 @@ public class CampaignOptions {
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
+        setPityContracts(4);
         isUseTwoWayPay = true;
         isUseCamOpsSalvage = false;
         isUseRiskySalvage = false;
@@ -1343,6 +1361,8 @@ public class CampaignOptions {
         setFixedMapChance(25);
         setUseAdvancedBuildingGunEmplacements(false);
         setSpaUpgradeIntensity(0);
+        setAlliedFacilityModifierDieSize(2);
+        setEnemyFacilityModifierDieSize(2);
         regionalMekVariations = false;
         attachedPlayerCamouflage = true;
         playerControlsAttachedUnits = false;
@@ -1378,6 +1398,14 @@ public class CampaignOptions {
 
     public void setManualUnitRatingModifier(final int manualUnitRatingModifier) {
         this.manualUnitRatingModifier = manualUnitRatingModifier;
+    }
+
+    public boolean isRequireSupportForceTransportation() {
+        return requireSupportForceTransportation;
+    }
+
+    public void setRequireSupportForceTransportation(final boolean requireSupportForceTransportation) {
+        this.requireSupportForceTransportation = requireSupportForceTransportation;
     }
 
     public boolean isClampReputationPayMultiplier() {
@@ -4089,6 +4117,14 @@ public class CampaignOptions {
         this.dropShipBonusPercentage = dropShipBonusPercentage;
     }
 
+    public int getPityContracts() {
+        return pityContracts;
+    }
+
+    public void setPityContracts(final int pityContracts) {
+        this.pityContracts = pityContracts;
+    }
+
     public boolean isUseTwoWayPay() {
         return isUseTwoWayPay;
     }
@@ -4392,6 +4428,22 @@ public class CampaignOptions {
 
     public void setUseGenderedPortraitsOnly(final boolean useGenderedPortraitsOnly) {
         this.useGenderedPortraitsOnly = useGenderedPortraitsOnly;
+    }
+
+    public boolean isNoRandomPortraitsForChildren() {
+        return noRandomPortraitsForChildren;
+    }
+
+    public void setNoRandomPortraitsForChildren(final boolean noRandomPortraitsForChildren) {
+        this.noRandomPortraitsForChildren = noRandomPortraitsForChildren;
+    }
+
+    public boolean isChildPortraitsWhenComingOfAge() {
+        return childPortraitsWhenComingOfAge;
+    }
+
+    public void setChildPortraitsWhenComingOfAge(final boolean childPortraitsWhenComingOfAge) {
+        this.childPortraitsWhenComingOfAge = childPortraitsWhenComingOfAge;
     }
 
     public int getVocationalXP() {
@@ -5244,6 +5296,22 @@ public class CampaignOptions {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
     }
 
+    public int getAlliedFacilityModifierDieSize() {
+        return alliedFacilityModifierDieSize;
+    }
+
+    public void setAlliedFacilityModifierDieSize(final int alliedFacilityModifierDieSize) {
+        this.alliedFacilityModifierDieSize = alliedFacilityModifierDieSize;
+    }
+
+    public int getEnemyFacilityModifierDieSize() {
+        return enemyFacilityModifierDieSize;
+    }
+
+    public void setEnemyFacilityModifierDieSize(final int enemyFacilityModifierDieSize) {
+        this.enemyFacilityModifierDieSize = enemyFacilityModifierDieSize;
+    }
+
     public int getScenarioModMax() {
         return scenarioModMax;
     }
@@ -5711,7 +5779,6 @@ public class CampaignOptions {
      */
     public void updateCampaignOptionsFromGameOptions(GameOptions gameOptions) {
         useTactics = gameOptions.getOption(RPG_COMMAND_INIT).booleanValue();
-        useInitiativeBonus = gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).booleanValue();
         useToughness = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
         useArtillery = gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue();
         useAbilities = gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue();
@@ -5735,7 +5802,6 @@ public class CampaignOptions {
      * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
      */
     public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
-        gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
         gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics || useInitiativeBonus);
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);

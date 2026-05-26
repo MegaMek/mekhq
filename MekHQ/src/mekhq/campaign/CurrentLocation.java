@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,47 +33,23 @@
  */
 package mekhq.campaign;
 
-import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
-import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
-import static mekhq.campaign.personnel.medical.BodyLocation.INTERNAL;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.TransportCostCalculations;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
+import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,16 +61,14 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class CurrentLocation {
+public class CurrentLocation extends AbstractLocation {
     private static final MMLogger logger = MMLogger.create(CurrentLocation.class);
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
-
-    private PlanetarySystem currentSystem;
     // keep track of jump path
     private JumpPath jumpPath;
+    // recharge time in hours
     private double rechargeTime;
-    // I would like to keep track of distance, but I ain't too good with physics
+    // transit time in days
     private double transitTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
@@ -103,45 +77,39 @@ public class CurrentLocation {
         this(null, 0d);
     }
 
-    public CurrentLocation(PlanetarySystem system, double time) {
-        this.currentSystem = system;
-        this.transitTime = time;
+    public CurrentLocation(PlanetarySystem system, double transitTime) {
+        super(system);
+        this.transitTime = transitTime;
         this.rechargeTime = 0d;
         this.jumpZenith = true;
     }
 
+    @Override
     public void setTransitTime(double time) {
         transitTime = time;
     }
 
+    @Override
     public boolean isOnPlanet() {
         return transitTime <= 0;
     }
 
+    @Override
     public boolean isAtJumpPoint() {
         return transitTime >= currentSystem.getTimeToJumpPoint(1.0);
     }
 
+    @Override
     public double getPercentageTransit() {
         return 1 - transitTime / currentSystem.getTimeToJumpPoint(1.0);
     }
 
+    @Override
     public boolean isInTransit() {
         return !isOnPlanet() && !isAtJumpPoint();
     }
 
-    public PlanetarySystem getCurrentSystem() {
-        return currentSystem;
-    }
-
-    /**
-     * @return the current planet location. This is currently the primary planet of the system, but in the future this
-     *       will not be the case.
-     */
-    public Planet getPlanet() {
-        return getCurrentSystem().getPrimaryPlanet();
-    }
-
+    @Override
     public double getTransitTime() {
         return transitTime;
     }
@@ -149,8 +117,19 @@ public class CurrentLocation {
     /**
      * @return a <code>boolean</code> indicating whether the JumpShip is at the zenith or not (nadir if false).
      */
+    @Override
     public boolean isJumpZenith() {
         return jumpZenith;
+    }
+
+    @Override
+    public double getRechargeTime() {
+        return rechargeTime;
+    }
+
+    @Override
+    protected void setRechargeTime(double t) {
+        rechargeTime = t;
     }
 
     /**
@@ -172,98 +151,15 @@ public class CurrentLocation {
         return randomInt(2) == 1;
     }
 
-    /**
-     * Generates a detailed status report for the current location and travel state.
-     *
-     * <p>The report includes:</p>
-     * <ul>
-     *   <li>The current system and position, indicating if on a planet, at a jump point (with recharge status),
-     *       in transit from a planet, or close to a jump point.</li>
-     *   <li>Travel progress, including the destination system, remaining jumps, or if already at the destination.</li>
-     *   <li>The estimated jump cost for the current journey.</li>
-     * </ul>
-     *
-     * <p>The report is formatted as HTML suitable for display in GUI components.</p>
-     *
-     * @param date                the current {@link LocalDate} for context-sensitive names and status
-     * @param isUseCommandCircuit whether the command circuit option is enabled
-     *
-     * @return a formatted HTML string representing the travel and location status report
-     */
-    public String getReport(LocalDate date, boolean isUseCommandCircuit,
-          TransportCostCalculations transportCostCalculations) {
-        double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
-
-        StringBuilder report = new StringBuilder();
-        report.append("<html>")
-              // First Line
-              .append("In ").append(currentSystem.getPrintableName(date)).append(' ');
-
-        if (isOnPlanet()) {
-            report.append("on planet ").append(getPlanet().getPrintableName(date));
-        } else if (isAtJumpPoint()) {
-            report.append("at jump point");
-            if (!Double.isInfinite(currentRechargeTime)) {
-                report.append(" (Jumpship ")
-                      .append(String.format(Locale.ROOT,
-                            "%.0f",
-                            (100.0 * rechargeTime) / currentRechargeTime))
-                      .append("% charged)");
-            }
-        } else {
-            if ((null != jumpPath) && (currentSystem == jumpPath.getLastSystem())) {
-                report.append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days from planet");
-            } else {
-                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
-                report.append(String.format(Locale.ROOT, "%.2f", timeToJP)).append(" days from jump point");
-            }
-        }
-
-        report.append("<br/>");
-
-        // Second Line
-        boolean hasIncludedCost = false;
-        if ((null != jumpPath) && !jumpPath.isEmpty()) {
-            report.append("Traveling to ").append(jumpPath.getLastSystem().getPrintableName(date)).append(": ");
-            if (jumpPath.getJumps() > 0) {
-                report.append(jumpPath.getJumps())
-                      .append(jumpPath.getJumps() == 1 ? " jump remaining" : " jumps remaining");
-
-                int duration = (int) ceil(jumpPath.getTotalTime(date, getTransitTime(), isUseCommandCircuit));
-                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
-                      jumpPath.getJumps());
-                report.append("<br>Estimated Jump Cost (Remaining): ").append(jumpCost.toAmountString()).append(" " +
-                                                                                                                      "C-Bills");
-                hasIncludedCost = true;
-            } else {
-                report.append("In destination system");
-            }
-        } else {
-            report.append("Not traveling");
-        }
-
-        report.append("<br/>");
-
-        // Third Line
-        if (hasIncludedCost) {
-            report.append("<br><br>");
-        } else {
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
-            report.append("Estimated Jump Cost (per week): ")
-                  .append(jumpCost.toAmountString())
-                  .append(" C-Bills<br><br>");
-        }
-
-        report.append("</html>");
-        return report.toString();
-    }
-
+    @Override
     public JumpPath getJumpPath() {
         return jumpPath;
     }
 
+    @Override
     public void setJumpPath(JumpPath path) {
         jumpPath = path;
+        MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
     }
 
     /**
@@ -273,43 +169,35 @@ public class CurrentLocation {
      *
      * @return True if the JumpShip has to spend time recharging, otherwise false.
      */
+    @Override
     public boolean isRecharging(Campaign campaign) {
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
-
-        return currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit) > 0;
+        return currentSystem.getRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit()) > 0;
     }
 
     /**
-     * Marks the JumpShip at the current location to be fully charged.
+     * Marks the JumpShip at the current location to be fully charged, GM action.
      *
      * @param campaign The campaign object which owns the JumpShip.
      */
-    public void setRecharged(Campaign campaign) {
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
-
-        rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit);
+    @Override
+    public void chargeFully(Campaign campaign) {
+        rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit());
+        MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
     }
 
     /**
      * Check for a jump path and if found, do whatever needs to be done to move forward
      */
+    @Override
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
-
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         // recharge even if there is no jump path
         // because JumpShips don't go anywhere
         double hours = 24.0;
-        double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
+        double neededRechargeTime = currentSystem.getRechargeTime(today, campaign.isUseCommandCircuit());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
             campaign.addReport(GENERAL, "JumpShips spent " +
@@ -386,6 +274,10 @@ public class CurrentLocation {
             }
         }
 
+        if (wasTraveling || jumpPath != null) {
+            MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
+        }
+
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
         // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
         // units
@@ -400,174 +292,11 @@ public class CurrentLocation {
             }
 
             testForEarlyArrival(campaign);
-        }
-    }
 
-    private void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
-        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(currentSystem.getId(),
-              today, true);
-
-        // Check for bioweapon attacks
-        Set<InjuryType> activeBioweapons = getAllActiveBioweapons(currentSystem.getId(), today, true);
-        for (InjuryType bioweapon : activeBioweapons) {
-            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
-                  campaign.getCommanderAddress());
-            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.outOfCharacter",
-                  currentSystem.getName(today), bioweapon.getSimpleName());
-            if (availableCures.contains(bioweapon)) {
-                bottomMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.available");
-            } else {
-                bottomMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.none");
-            }
-
-            new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorMedicalPerson(),
-                  null,
-                  centerMessage,
-                  null,
-                  bottomMessage,
-                  null,
-                  false,
-                  ImmersiveDialogWidth.LARGE);
-        }
-
-        // Check for active disease outbreaks
-        Set<InjuryType> activeDiseases = getAllActiveDiseases(currentSystem.getId(), today, true);
-        for (InjuryType disease : activeDiseases) {
-            String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter",
-                  campaign.getCommanderAddress());
-            if (availableCures.contains(disease)) {
-                centerMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.available");
-            } else {
-                centerMessage += getTextAt(RESOURCE_BUNDLE,
-                      "disease.outOfCharacter.vaccineStatus.none");
-            }
-
-            new ImmersiveDialogNotification(campaign, centerMessage, true);
-        }
-    }
-
-    /**
-     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
-     *
-     * <p>This method iterates over all active personnel (excluding departed and absent individuals) and checks
-     * whether each person has the {@code FLAW_TRANSIT_DISORIENTATION_SYNDROME} flag enabled. If so, one of two effects
-     * occurs depending on campaign medical rules:</p>
-     *
-     * <ul>
-     *     <li><b>Advanced Medical enabled:</b>
-     *     <ul>
-     *         <li>An appropriate injury is created and added.</li>
-     *         <li>If the Alternative Advanced Medical system is active, the Alternate Injury version is used;
-     *         otherwise the standard injury is used.</li>
-     *     </ul>
-     *     </li>
-     *     <li><b>Advanced Medical disabled:</b>
-     *     <ul>
-     *         <li>The character simply gains +1 hit.</li>
-     *     </ul>
-     *     </li>
-     * </ul>
-     *
-     * <p>If the Fatigue subsystem is enabled, the character also gains fatigue equal to the configured campaign
-     * fatigue rate.</p>
-     *
-     * @param campaign        the current campaign, used for personnel state and injury construction
-     * @param campaignOptions the campaign's ruleset and configuration
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
-        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
-        final boolean useFatigue = campaignOptions.isUseFatigue();
-        final int fatigueRate = campaignOptions.getFatigueRate();
-
-        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
-            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                continue;
-            }
-
-            if (useAdvancedMedical) {
-                Injury injury = createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical);
-                person.addInjury(injury);
-            } else {
-                person.setHits(person.getHits() + 1);
-            }
-
-            if (useFatigue) {
-                person.changeFatigue(fatigueRate);
-            }
-        }
-    }
-
-    /**
-     * Creates the appropriate Transit Disorientation Syndrome injury instance based on the currently active medical
-     * ruleset.
-     *
-     * <p>If the Alternative Advanced Medical system is active, this method uses the {@code AlternateInjuries}
-     * version of the injury definition using a generic location. Otherwise it uses the standard {@code InjuryTypes}
-     * version with an internal location.</p>
-     *
-     * @param campaign              the campaign context needed for injury construction
-     * @param person                the affected character
-     * @param useAltAdvancedMedical whether the Alternative Advanced Medical system is active
-     *
-     * @return an {@link Injury} instance representing Transit Disorientation Syndrome
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static Injury createTransitDisorientationInjury(Campaign campaign, Person person,
-          boolean useAltAdvancedMedical) {
-        return useAltAdvancedMedical
-                     ? AlternateInjuries.TRANSIT_DISORIENTATION_SYNDROME
-                       .newInjury(campaign, person, GENERIC, 1)
-                     : InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME
-                       .newInjury(campaign, person, INTERNAL, 1);
-    }
-
-    /**
-     * Tests for whether the campaign arrived at a contract location before it's due to start.
-     *
-     * <p>This method checks if the campaign has arrived early by comparing the current system with the system of
-     * each future contract. If the campaign has arrived early, it calculates the number of days until the contract's
-     * start date and generates both in-character and out-of-character messages. These messages are then displayed using
-     * an {@link ImmersiveDialogSimple} dialog.</p>
-     *
-     * <p>The first matching contract in the system ends the loop after handling early arrival notifications.</p>
-     *
-     * @param campaign The {@link Campaign} instance containing details of the current campaign, including the current
-     *                 system, future contracts, local date, and related resources needed for messaging.
-     */
-    private void testForEarlyArrival(Campaign campaign) {
-        List<Contract> futureContracts = campaign.getFutureContracts();
-
-        for (Contract contract : futureContracts) {
-            if (Objects.equals(currentSystem, contract.getSystem())) {
-                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
-
-                String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "contract.arrivedEarly.ic." + randomInt(10),
-                      campaign.getCommanderAddress(),
-                      daysTillStart);
-
-                String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "contract.arrivedEarly.ooc");
-
-                new ImmersiveDialogSimple(campaign,
-                      campaign.getSeniorAdminPerson(TRANSPORT),
-                      null,
-                      inCharacterMessage,
-                      null,
-                      outOfCharacterMessage,
-                      null,
-                      false);
-                break;
+            // We've just stopped traveling, so we should see if there are any local applicants.
+            if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
+                campaign.refreshPersonnelMarkets(true);
+                CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
             }
         }
     }
@@ -622,5 +351,13 @@ public class CurrentLocation {
         }
 
         return retVal;
+    }
+
+    public static String getFormattedTextAt(String key, Object... args) {
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
+    }
+
+    public static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 }

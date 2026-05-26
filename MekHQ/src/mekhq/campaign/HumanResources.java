@@ -61,6 +61,8 @@ import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
+import megamek.common.units.ConvFighter;
 import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -361,6 +363,13 @@ public class HumanResources {
         return getPatients()
                      .stream()
                      .filter(patient -> patient.getDoctorId() != null)
+                     .toList();
+    }
+
+    public List<Person> getPatientsWithNonPermanentInjuries() {
+        return getPatients()
+                     .stream()
+                     .filter(patient -> !patient.getNonPermanentInjuries().isEmpty() || patient.getHits() > 0)
                      .toList();
     }
 
@@ -773,12 +782,9 @@ public class HumanResources {
         int need = 0;
         for (Unit unit : campaign.getUnits()) {
             if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-                int totalCurrentCrew = currentCrew + currentTempCrew;
-                if (fullCrew > totalCurrentCrew) {
-                    need += (fullCrew - totalCurrentCrew);
+                int roleSpecificNeed = getRoleSpecificNeeds(unit, role);
+                if (roleSpecificNeed > 0) {
+                    need += roleSpecificNeed;
                 }
             }
         }
@@ -835,8 +841,37 @@ public class HumanResources {
                  VEHICLE_CREW_NAVAL,
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> unit.canTakeMoreVesselCrew();
+            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter))
+                    && unit.canTakeMoreVesselCrew();
             default -> false;
+        };
+    }
+
+    /**
+     * Returns the number of temp crew slots still available for the given role on the given unit. A negative value
+     * means the role is over-allocated. For vessel roles (pilot, gunner, crew), the calculation uses role-specific slot
+     * counts so that each role's budget is tracked independently. For all other roles the unit's total crew size is
+     * used (correct for single-role units such as infantry).
+     *
+     * @param unit the unit
+     * @param role the personnel role
+     *
+     * @return available slots (negative = surplus temp crew)
+     */
+    private int getRoleSpecificNeeds(Unit unit, PersonnelRole role) {
+        return switch (role) {
+            case VESSEL_PILOT -> unit.getTotalDriverNeeds()
+                                       - unit.getDrivers().size()
+                                       - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            case VESSEL_GUNNER -> unit.getTotalGunnerNeeds()
+                                        - unit.getGunners().size()
+                                        - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+            case VESSEL_CREW -> unit.getTotalCrewNeeds()
+                                      - unit.getVesselCrew().size()
+                                      - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+            default -> unit.getFullCrewSize()
+                             - unit.getActiveCrew().size()
+                             - unit.getTempCrewByPersonnelRole(role);
         };
     }
 
@@ -859,16 +894,11 @@ public class HumanResources {
             }
 
             if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-
-                int totalCurrentCrew = currentCrew + unit.getTotalTempCrew();
-                int needed = fullCrew - totalCurrentCrew;
+                int needed = getRoleSpecificNeeds(unit, role);
 
                 if (needed > 0) {
                     int toAssign = Math.min(needed, availablePool);
-                    unit.setTempCrew(role, currentTempCrew + toAssign);
+                    unit.setTempCrew(role, unit.getTempCrewByPersonnelRole(role) + toAssign);
                     availablePool -= toAssign;
                 }
             }
@@ -891,6 +921,55 @@ public class HumanResources {
         if (getTempCrewPool(role) > 0) {
             setTempCrewPool(campaign, role, 0);
         }
+    }
+
+    /**
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
+     * If the pool is at or below the required amount, no change is made.
+     *
+     * @param campaign the campaign
+     */
+    public void releaseSurplusAsTechPool(Campaign campaign) {
+        int surplus = Math.max(0, -getAsTechNeed(campaign.getCampaignOptions()));
+        if (surplus > 0) {
+            decreaseAsTechPool(campaign, surplus);
+        }
+    }
+
+    /**
+     * Releases surplus Medics from the pool, keeping only what is currently needed.
+     * If the pool is at or below the required amount, no change is made.
+     *
+     * @param campaign the campaign
+     */
+    public void releaseSurplusMedicPool(Campaign campaign) {
+        int surplus = Math.max(0, -getMedicsNeed());
+        if (surplus > 0) {
+            decreaseMedicPool(campaign, surplus);
+        }
+    }
+
+    /**
+     * Releases surplus temp crew for a specific blob crew role.
+     *
+     * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
+     * emptied.</p>
+     *
+     * @param campaign the campaign
+     * @param role     the personnel role to trim
+     */
+    public void releaseSurplusBlobCrewForRole(Campaign campaign, PersonnelRole role) {
+        for (Unit unit : campaign.getUnits()) {
+            int currentTemp = unit.getTempCrewByPersonnelRole(role);
+            if (currentTemp > 0) {
+                int excess = Math.max(0, -getRoleSpecificNeeds(unit, role));
+                if (excess > 0) {
+                    unit.setTempCrew(role, currentTemp - excess);
+                }
+            }
+        }
+        emptyTempCrewPoolForRole(campaign, role);
     }
 
 
@@ -916,10 +995,10 @@ public class HumanResources {
      * Returns {@code true} when campaign options select the legacy (deprecated) personnel market.
      *
      * <p>The market style named {@code PERSONNEL_MARKET_DISABLED} disables the <em>new</em> market
-     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate
-     * makes the intent explicit at every call site.</p>
+     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
+     * explicit at every call site.</p>
      */
-    private static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
+    public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
         return options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED;
     }
 
@@ -935,10 +1014,11 @@ public class HumanResources {
     /**
      * Refreshes the personnel markets based on the current market style and the current date.
      *
-     * @param campaign        the campaign
-     * @param isCampaignStart {@code true} if called at the start of the campaign
+     * @param campaign               the campaign
+     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
+     *                               start
      */
-    public void refreshPersonnelMarkets(Campaign campaign, boolean isCampaignStart) {
+    public void refreshPersonnelMarkets(Campaign campaign, boolean bypassDateRestrictions) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
@@ -947,7 +1027,7 @@ public class HumanResources {
                 personnelMarket.generatePersonnelForDay(campaign);
             }
         } else {
-            if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
+            if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
             }
         }
@@ -1068,8 +1148,8 @@ public class HumanResources {
     }
 
     /**
-     * @deprecated Use {@link #getPersonnelGenerator(AbstractFactionSelector, AbstractPlanetSelector)} instead.
-     *             The {@code campaignOptions} parameter was never used.
+     * @deprecated Use {@link #getPersonnelGenerator(AbstractFactionSelector, AbstractPlanetSelector)} instead. The
+     *       {@code campaignOptions} parameter was never used.
      */
     @Deprecated(since = "0.50.07")
     public AbstractPersonnelGenerator getPersonnelGenerator(CampaignOptions campaignOptions,
@@ -1190,7 +1270,8 @@ public class HumanResources {
         return senior;
     }
 
-    public @Nullable Person getSeniorMedicalPerson(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public @Nullable Person getSeniorMedicalPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return getSeniorMedicalPerson(getDoctors(), campaignOptions, isClanCampaign, today);
     }
 
@@ -1216,7 +1297,8 @@ public class HumanResources {
      *
      * @return the {@link Person} who is second-in-command, or {@code null}
      */
-    public @Nullable Person getSecondInCommand(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public @Nullable Person getSecondInCommand(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return findTopCommanders(campaignOptions, isClanCampaign, today)[1];
     }
 
@@ -1257,7 +1339,8 @@ public class HumanResources {
                     continue;
                 }
 
-                if (!person.equals(commander) && person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, commander)) {
+                if (!person.equals(commander) &&
+                          person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, commander)) {
                     Person previousCommander = commander;
                     commander = person;
 
@@ -1265,7 +1348,11 @@ public class HumanResources {
                         if (secondInCommand == null) {
                             secondInCommand = previousCommander;
                         } else if (!previousCommander.equals(secondInCommand)
-                                         && previousCommander.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, secondInCommand)) {
+                                         &&
+                                         previousCommander.outRanksUsingSkillTiebreaker(campaignOptions,
+                                               isClanCampaign,
+                                               today,
+                                               secondInCommand)) {
                             secondInCommand = previousCommander;
                         }
                     }
@@ -1283,7 +1370,11 @@ public class HumanResources {
                     continue;
                 }
 
-                if (!person.equals(secondInCommand) && person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, secondInCommand)) {
+                if (!person.equals(secondInCommand) &&
+                          person.outRanksUsingSkillTiebreaker(campaignOptions,
+                                isClanCampaign,
+                                today,
+                                secondInCommand)) {
                     secondInCommand = person;
                 }
             }
@@ -1324,14 +1415,14 @@ public class HumanResources {
     /**
      * Retrieves a list of active technicians.
      *
-     * @param people       the collection of people to search
-     * @param units        the collection of units (for self-crewed engineers)
+     * @param people          the collection of people to search
+     * @param units           the collection of units (for self-crewed engineers)
      * @param campaignOptions the campaign options
      * @param isClanCampaign  whether this is a Clan campaign
      * @param today           the current in-game date
-     * @param noZeroMinute if {@code true}, excludes technicians with no remaining available minutes
-     * @param eliteFirst   if {@code true}, sorts the list to place the most skilled technicians at the top
-     * @param expanded     if {@code true}, includes technicians with expanded roles
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     * @param eliteFirst      if {@code true}, sorts the list to place the most skilled technicians at the top
+     * @param expanded        if {@code true}, includes technicians with expanded roles
      *
      * @return a list of active technicians sorted appropriately
      */
@@ -1439,7 +1530,8 @@ public class HumanResources {
         return procurementCharacter;
     }
 
-    public @Nullable Person getLogisticsPerson(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public @Nullable Person getLogisticsPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return getLogisticsPerson(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
     }
 
@@ -1517,7 +1609,8 @@ public class HumanResources {
         return logisticsPersonnel;
     }
 
-    public List<Person> getLogisticsPersonnel(CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
+    public List<Person> getLogisticsPersonnel(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
         return getLogisticsPersonnel(getActivePersonnel(false, false), campaignOptions, isClanCampaign, today);
     }
 
@@ -1625,8 +1718,11 @@ public class HumanResources {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
+        // Assign a random portrait after we generate a new person
         if (campaignOptions.isUsePortraitForRole(primaryRole)) {
-            assignRandomPortraitFor(campaignOptions, person);
+            if (!campaignOptions.isNoRandomPortraitsForChildren() || !person.isChild(currentDay, false)) {
+                assignRandomPortraitFor(campaignOptions, person);
+            }
         }
 
         if (campaignOptions.isUseImplants() && campaignOptions.isUseAlternativeAdvancedMedical()) {
@@ -1912,12 +2008,12 @@ public class HumanResources {
                                   "" :
                                   ' ' +
                                         String.format(resources.getString("personnelRecruitmentFormerSurname.text") +
-                                                            ' ', formerSurname);
+                                                      ' ', formerSurname);
             String add = !prisonerStatus.isFree() ?
                                (' ' +
                                       resources.getString(prisonerStatus.isBondsman() ?
-                                                                "personnelRecruitmentBondsman.text" :
-                                                                "personnelRecruitmentPrisoner.text")) :
+                                                          "personnelRecruitmentBondsman.text" :
+                                                          "personnelRecruitmentPrisoner.text")) :
                                "";
             campaign.addReport(DailyReportType.PERSONNEL,
                   String.format(resources.getString("personnelRecruitmentAddedToRoster.text"),
@@ -1926,7 +2022,7 @@ public class HumanResources {
                         add));
         }
 
-        CurrentLocation location = campaign.getLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (location.isOnPlanet()) {
             Planet planet = location.getPlanet();
             String planetId = planet.getId();
@@ -2141,7 +2237,7 @@ public class HumanResources {
 
             if (experienceLevel >= 0) {
                 AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-                specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+                specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
                 specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
             }
 
@@ -2233,8 +2329,8 @@ public class HumanResources {
 
 
     /**
-     * Returns the person from {@code people} best suited to the given role, ranked by primary skill
-     * then secondary skill as a tiebreaker.
+     * Returns the person from {@code people} best suited to the given role, ranked by primary skill then secondary
+     * skill as a tiebreaker.
      *
      * @param people          the collection of people to search
      * @param role            the required personnel role (primary or secondary)
@@ -2294,7 +2390,13 @@ public class HumanResources {
 
     public Person findBestInRole(PersonnelRole role, String primary, @Nullable String secondary,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
-        return findBestInRole(getActivePersonnel(false, false), role, primary, secondary, campaignOptions, isClanCampaign, today);
+        return findBestInRole(getActivePersonnel(false, false),
+              role,
+              primary,
+              secondary,
+              campaignOptions,
+              isClanCampaign,
+              today);
     }
 
     public Person findBestInRole(PersonnelRole role, String skill,
@@ -2409,10 +2511,7 @@ public class HumanResources {
      */
     public static HumanResources loadFromXML(Node wn, Campaign campaign, Version version) {
         LOGGER.info("Loading HumanResources from XML...");
-        HumanResources hr = new HumanResources();
-        // Install hr on campaign immediately so that Personnel.loadFromXML → campaign.importPerson
-        // routes persons into this instance rather than the old empty one that campaign was created with.
-        campaign.setHumanResources(hr);
+        HumanResources hr = campaign.getHumanResources();
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {

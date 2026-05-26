@@ -165,6 +165,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 return;
             }
 
+            // Generates up to 4 'pity contracts', easy contracts designed to get a campaign rolling
+            PityContracts.generatePityContracts(campaign);
+
             Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
             int negotiatorModifier = 0;
             if (negotiator != null) {
@@ -433,7 +436,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
 
-        getContractType(campaign, contract);
+        getContractType(contract);
 
         setEnemyCode(contract);
 
@@ -508,7 +511,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setContractClauses(contract, unitRatingMod, campaign);
+
+        int commanderModifier = getCommanderModifier(campaign);
+        int clauseModifier = commanderModifier + unitRatingMod;
+        setContractClauses(contract, clauseModifier, campaign);
 
         double varianceFactor = ContractUtilities.calculateVarianceFactor();
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
@@ -521,22 +527,26 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        contract.setName(String.format("%s - %s - %s %s",
-              contract.getStartDate()
-                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              employer,
-              contract.getSystem().getName(contract.getStartDate()),
-              contract.getContractType()));
+        contract.setName(generateDefaultName(employer, contract));
 
         contract.clanTechSalvageOverride();
 
         return contract;
     }
 
+    static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract) {
+        return String.format("%s - %s - %s %s",
+              contract.getStartDate()
+                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              employer,
+              contract.getSystem().getName(contract.getStartDate()),
+              contract.getContractType());
+    }
+
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
-        getContractType(campaign, contract);
+        getContractType(contract);
 
         if (contract.getContractType().isPirateHunting()) {
             Faction employer = contract.getEmployerFaction();
@@ -639,22 +649,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     }
 
     /**
-     * Determines and sets the contract type for a new AtB contract through negotiation.
+     * Determines and sets the contract type for a new AtB contract.
      *
-     * <p>This method performs a negotiation skill check using the campaign commander's negotiation skill and
-     * connections. The margin of success from this check, combined with the commander's connections rating, influences
-     * which contract types are available from the employer. The negotiation results are added to the campaign
-     * report.</p>
-     *
-     * @param campaign the current campaign
      * @param contract the AtB contract to assign a type to
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void getContractType(Campaign campaign, AtBContract contract) {
-        Person campaignCommander = campaign.getFlaggedCommander();
+    private void getContractType(AtBContract contract) {
+        // Commander modifier is always 0 here as otherwise is skews AtB's results too much
+        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), 0));
+    }
 
+
+    private static int getCommanderModifier(Campaign campaign) {
+        Person campaignCommander = campaign.getFlaggedCommander();
         int connections = 0;
         int negotiationsMarginOfSuccess = 0;
         if (campaignCommander != null) {
@@ -678,8 +687,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             campaign.addReport(SKILL_CHECKS, checkUtility.getResultsText());
         }
 
-        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
-              negotiationsMarginOfSuccess));
+        return connections + negotiationsMarginOfSuccess;
     }
 
     /**
