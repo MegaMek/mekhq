@@ -5422,9 +5422,10 @@ public class Campaign implements ITechManager, ILocation {
             CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
 
-        // We've had instances where game options isn't loaded correctly from player campaigns, potentially due to
-        // age. This safeguards.
-        if (true) {
+        // We've had instances where game options aren't loaded correctly from player campaigns, potentially due to
+        // age. This safeguards against that occurance, preventing players entering a state where they cannot
+        // continue their campaigns.
+        if (gameOptions == null) {
             gameOptions = new GameOptions();
             LOGGER.errorDialog(new NullPointerException(),
                   getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.body"),
@@ -7114,16 +7115,16 @@ public class Campaign implements ITechManager, ILocation {
 
 
     /**
-     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusAsTechPool() {
         humanResources.releaseSurplusAsTechPool(this);
     }
 
     /**
-     * Releases surplus Medics from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusMedicPool() {
         humanResources.releaseSurplusMedicPool(this);
@@ -7133,8 +7134,7 @@ public class Campaign implements ITechManager, ILocation {
      * Releases surplus temp crew for a specific blob crew role.
      *
      * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
-     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
-     * emptied.</p>
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
      *
      * @param role the personnel role to trim
      */
