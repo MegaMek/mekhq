@@ -6269,6 +6269,8 @@ public class Unit implements ITechnology {
             for (Person p : getCrew()) {
                 remove(p, true);
             }
+            // Release temp crew back to the available pool; MothballInfo already captured them.
+            tempPersonnelRoleMap.clear();
             resetPilotAndEntity();
         } else {
             // start maintenance cycle over again

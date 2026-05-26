@@ -998,7 +998,7 @@ public class HumanResources {
      * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
      * explicit at every call site.</p>
      */
-    private static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
+    public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
         return options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED;
     }
 
@@ -1014,10 +1014,11 @@ public class HumanResources {
     /**
      * Refreshes the personnel markets based on the current market style and the current date.
      *
-     * @param campaign        the campaign
-     * @param isCampaignStart {@code true} if called at the start of the campaign
+     * @param campaign               the campaign
+     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
+     *                               start
      */
-    public void refreshPersonnelMarkets(Campaign campaign, boolean isCampaignStart) {
+    public void refreshPersonnelMarkets(Campaign campaign, boolean bypassDateRestrictions) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
@@ -1026,7 +1027,7 @@ public class HumanResources {
                 personnelMarket.generatePersonnelForDay(campaign);
             }
         } else {
-            if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
+            if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
             }
         }

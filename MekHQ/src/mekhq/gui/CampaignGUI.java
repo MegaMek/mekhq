@@ -37,7 +37,6 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
@@ -138,7 +137,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -156,6 +154,7 @@ import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.view.CurrentLocationPanel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -200,7 +199,6 @@ public class CampaignGUI extends JPanel {
 
     /* Components for the status panel */
     private JPanel statusPanel;
-    private JLabel lblLocation;
     private JLabel lblFunds;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
@@ -226,6 +224,7 @@ public class CampaignGUI extends JPanel {
 
     /* for the top button panel */
     private JPanel pnlTop;
+    private CurrentLocationPanel pnlLocation;
     private final RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(resourceMap.getString(
           "btnAdvanceMultipleDays.text"));
     private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
@@ -238,8 +237,6 @@ public class CampaignGUI extends JPanel {
     private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
-    private final RoundedJButton btnPersonnelMarket =
-          new RoundedJButton(resourceMap.getString("btnPersonnelMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
     private final RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
 
@@ -360,7 +357,6 @@ public class CampaignGUI extends JPanel {
 
         refreshCalendar();
         refreshFunds();
-        refreshLocation();
         refreshTempAsTechs();
         refreshTempMedics();
         refreshTempSoldiers();
@@ -763,7 +759,6 @@ public class CampaignGUI extends JPanel {
         JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
         miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
-        miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
         menuMarket.add(miPersonnelMarket);
 
         JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
@@ -1345,31 +1340,20 @@ public class CampaignGUI extends JPanel {
      * accessible.</p>
      */
     private void initTopButtons() {
-        boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
-                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
-
-        lblLocation = new JLabel(getCampaign().getCurrentLocation()
-                                       .getReport(getCampaign().getLocalDate(),
-                                             isUseCommandCircuit,
-                                             getCampaign().getTransportCostCalculation(EXP_REGULAR)));
-        lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
-
         pnlTop = new JPanel(new GridBagLayout());
         pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
 
+        pnlLocation = new CurrentLocationPanel(getCampaign(), this::hirePersonMarket);
+        pnlLocation.setMinimumSize(new Dimension(320, 60));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
-        pnlTop.add(lblLocation, gridBagConstraints);
-
+        pnlTop.add(pnlLocation, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -1380,7 +1364,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         pnlTop.add(getMarketButtons(), gridBagConstraints);
-
 
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -1404,28 +1387,19 @@ public class CampaignGUI extends JPanel {
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         pnlButton.add(btnContractMarket, gridBagConstraints);
 
-        btnPersonnelMarket.addActionListener(e -> hirePersonMarket());
-        btnPersonnelMarket.setHorizontalTextPosition(SwingConstants.CENTER);
-        btnPersonnelMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnPersonnelMarket, gridBagConstraints);
-
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -1455,17 +1429,10 @@ public class CampaignGUI extends JPanel {
 
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        String labelKey = campaignOptions.getContractMarketMethod().isNone()
-                                ? "manual" : "market";
+        String labelKey = campaignOptions.getContractMarketMethod().isNone() ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
-
-        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
-        labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
-                         ? "manual" : "market";
-        label = resourceMap.getString("btnPersonnelMarket." + labelKey);
-        btnPersonnelMarket.setText(label);
 
         labelKey = getCampaign().getUnitMarket().getMethod().isNone() ? "manual" : "market";
         label = resourceMap.getString("btnUnitMarket." + labelKey);
@@ -3338,18 +3305,6 @@ public class CampaignGUI extends JPanel {
 
     private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
-    public void refreshLocation() {
-        boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
-                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
-
-        lblLocation.setText(getCampaign().getCurrentLocation()
-                                  .getReport(getCampaign().getLocalDate(),
-                                        isUseCommandCircuit,
-                                        getCampaign().getTransportCostCalculation(EXP_REGULAR)));
-    }
-
     public int getTabIndexByName(String tabTitle) {
         int retVal = -1;
         for (int i = 0; i < tabMain.getTabCount(); i++) {
@@ -3489,21 +3444,6 @@ public class CampaignGUI extends JPanel {
                                                           turnoverPrompt);
             }
         }
-    }
-
-    /**
-     * Handles changes to the campaign's current location.
-     *
-     * <p>Invokes an update to ensure the location information is current within the user interface and data model.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param locationChangedEvent the event indicating that the campaign location has changed
-     */
-    @Subscribe
-    public void handleLocationChanged(LocationChangedEvent locationChangedEvent) {
-        refreshLocation();
     }
 
     /**
@@ -3664,7 +3604,6 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleNewDay(NewDayEvent newDayEvent) {
         refreshCalendar();
-        refreshLocation();
         refreshFunds();
         refreshPartsAvailability();
         refreshMarketButtonLabels();

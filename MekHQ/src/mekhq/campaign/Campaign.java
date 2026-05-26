@@ -70,6 +70,7 @@ import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.io.IOException;
@@ -460,8 +461,11 @@ public class Campaign implements ITechManager, ILocation {
         COMMAND, LOGISTICS, TRANSPORT, HR
     }
 
+    @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     private HumanResources humanResources = new HumanResources();
 
@@ -4337,13 +4341,14 @@ public class Campaign implements ITechManager, ILocation {
     /**
      * Refreshes the personnel markets based on the current market style and the current date.
      *
-     * @param isCampaignStart {@code true} if campaign method is being called at the start of the campaign
+     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
+     *                               start
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets(boolean isCampaignStart) {
-        humanResources.refreshPersonnelMarkets(this, isCampaignStart);
+    public void refreshPersonnelMarkets(boolean bypassDateRestrictions) {
+        humanResources.refreshPersonnelMarkets(this, bypassDateRestrictions);
     }
 
     public int getInitiativeBonus() {
@@ -5416,6 +5421,17 @@ public class Campaign implements ITechManager, ILocation {
         if (getCampaignOptions() != null) {
             CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
+
+        // We've had instances where game options aren't loaded correctly from player campaigns, potentially due to
+        // age. This safeguards against that occurance, preventing players entering a state where they cannot
+        // continue their campaigns.
+        if (gameOptions == null) {
+            gameOptions = new GameOptions();
+            LOGGER.errorDialog(new NullPointerException(),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.body"),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.title"));
+        }
+
         getGameOptions().writeToXML(writer, indent);
         // endregion Options
 
@@ -7099,16 +7115,16 @@ public class Campaign implements ITechManager, ILocation {
 
 
     /**
-     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusAsTechPool() {
         humanResources.releaseSurplusAsTechPool(this);
     }
 
     /**
-     * Releases surplus Medics from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusMedicPool() {
         humanResources.releaseSurplusMedicPool(this);
@@ -7118,8 +7134,7 @@ public class Campaign implements ITechManager, ILocation {
      * Releases surplus temp crew for a specific blob crew role.
      *
      * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
-     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
-     * emptied.</p>
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
      *
      * @param role the personnel role to trim
      */

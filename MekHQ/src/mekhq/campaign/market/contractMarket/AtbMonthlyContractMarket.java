@@ -46,8 +46,6 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
-import static mekhq.campaign.mission.Contract.OH_NONE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
@@ -59,10 +57,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
@@ -77,13 +73,11 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -95,8 +89,6 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-
-import javax.swing.table.DefaultTableModel;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -444,7 +436,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setEmployerCode(employer, campaign.getGameYear());
 
-        getContractType(campaign, contract);
+        getContractType(contract);
 
         setEnemyCode(contract);
 
@@ -519,7 +511,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setContractClauses(contract, unitRatingMod, campaign);
+
+        int commanderModifier = getCommanderModifier(campaign);
+        int clauseModifier = commanderModifier + unitRatingMod;
+        setContractClauses(contract, clauseModifier, campaign);
 
         double varianceFactor = ContractUtilities.calculateVarianceFactor();
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
@@ -551,7 +546,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
-        getContractType(campaign, contract);
+        getContractType(contract);
 
         if (contract.getContractType().isPirateHunting()) {
             Faction employer = contract.getEmployerFaction();
@@ -654,22 +649,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     }
 
     /**
-     * Determines and sets the contract type for a new AtB contract through negotiation.
+     * Determines and sets the contract type for a new AtB contract.
      *
-     * <p>This method performs a negotiation skill check using the campaign commander's negotiation skill and
-     * connections. The margin of success from this check, combined with the commander's connections rating, influences
-     * which contract types are available from the employer. The negotiation results are added to the campaign
-     * report.</p>
-     *
-     * @param campaign the current campaign
      * @param contract the AtB contract to assign a type to
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void getContractType(Campaign campaign, AtBContract contract) {
-        Person campaignCommander = campaign.getFlaggedCommander();
+    private void getContractType(AtBContract contract) {
+        // Commander modifier is always 0 here as otherwise is skews AtB's results too much
+        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), 0));
+    }
 
+
+    private static int getCommanderModifier(Campaign campaign) {
+        Person campaignCommander = campaign.getFlaggedCommander();
         int connections = 0;
         int negotiationsMarginOfSuccess = 0;
         if (campaignCommander != null) {
@@ -693,8 +687,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             campaign.addReport(SKILL_CHECKS, checkUtility.getResultsText());
         }
 
-        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), connections,
-              negotiationsMarginOfSuccess));
+        return connections + negotiationsMarginOfSuccess;
     }
 
     /**

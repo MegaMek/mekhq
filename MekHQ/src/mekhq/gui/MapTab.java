@@ -308,9 +308,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         }
 
         getCampaign().getCurrentLocation().setJumpPath(panMap.getJumpPath());
-
         refreshPlanetView();
-        getCampaignGui().refreshLocation();
 
         panMap.setJumpPath(new JumpPath());
         panMap.repaint();

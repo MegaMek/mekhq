@@ -133,7 +133,7 @@ public abstract class AbstractLocation implements ILocation {
         return false;
     }
 
-    public void setRecharged(Campaign campaign) {}
+    public void chargeFully(Campaign campaign) {}
 
     @Override
     public JumpPath getJumpPath() {
@@ -157,94 +157,6 @@ public abstract class AbstractLocation implements ILocation {
         return getCurrentSystem().getPrimaryPlanet();
     }
 
-    /**
-     * Generates a detailed status report for the current location and travel state.
-     *
-     * <p>The report includes:</p>
-     * <ul>
-     *   <li>The current system and position, indicating if on a planet, at a jump point (with recharge status),
-     *       in transit from a planet, or close to a jump point.</li>
-     *   <li>Travel progress, including the destination system, remaining jumps, or if already at the destination.</li>
-     *   <li>The estimated jump cost for the current journey.</li>
-     * </ul>
-     *
-     * <p>The report is formatted as HTML suitable for display in GUI components.</p>
-     *
-     * @param date                the current {@link LocalDate} for context-sensitive names and status
-     * @param isUseCommandCircuit whether the command circuit option is enabled
-     *
-     * @return a formatted HTML string representing the travel and location status report
-     */
-    public String getReport(LocalDate date, boolean isUseCommandCircuit,
-          TransportCostCalculations transportCostCalculations) {
-        double currentRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
-
-        StringBuilder report = new StringBuilder();
-        report.append("<html>")
-              // First Line
-              .append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.inSystem",
-                    currentSystem.getPrintableName(date)))
-              .append(' ');
-
-        if (isOnPlanet()) {
-            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.onPlanet",
-                  getPlanet().getPrintableName(date)));
-        } else if (isAtJumpPoint()) {
-            report.append(getTextAt(RESOURCE_BUNDLE, "getReport.atJumpPoint"));
-            if (!Double.isInfinite(currentRechargeTime)) {
-                report.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.jumpShipCharged",
-                      String.format(Locale.ROOT, "%.0f", (100.0 * getRechargeTime()) / currentRechargeTime)));
-            }
-        } else {
-            if ((null != getJumpPath()) && (currentSystem == getJumpPath().getLastSystem())) {
-                report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.daysFromPlanet",
-                      String.format(Locale.ROOT, "%.2f", getTransitTime())));
-            } else {
-                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
-                report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.daysFromJumpPoint",
-                      String.format(Locale.ROOT, "%.2f", timeToJP)));
-            }
-        }
-
-        report.append("<br/>");
-
-        // Second Line
-        boolean hasIncludedCost = false;
-        if ((null != getJumpPath()) && !getJumpPath().isEmpty()) {
-            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.travelingTo",
-                  getJumpPath().getLastSystem().getPrintableName(date))).append(' ');
-            if (getJumpPath().getJumps() > 0) {
-                report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.jumpsRemaining",
-                      getJumpPath().getJumps()));
-
-                int duration = (int) ceil(getJumpPath().getTotalTime(date, getTransitTime(), isUseCommandCircuit));
-                Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
-                      getJumpPath().getJumps());
-                report.append("<br>").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "getReport.estimatedCostRemaining", jumpCost.toAmountString()));
-                hasIncludedCost = true;
-            } else {
-                report.append(getTextAt(RESOURCE_BUNDLE, "getReport.inDestinationSystem"));
-            }
-        } else {
-            report.append(getTextAt(RESOURCE_BUNDLE, "getReport.notTraveling"));
-        }
-
-        report.append("<br/>");
-
-        // Third Line
-        if (hasIncludedCost) {
-            report.append("<br><br>");
-        } else {
-            Money jumpCost = transportCostCalculations.calculateJumpCostForEntireJourney(7, 0);
-            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "getReport.estimatedCostPerWeek",
-                  jumpCost.toAmountString())).append("<br><br>");
-        }
-
-        report.append("</html>");
-        return report.toString();
-    }
-
     @Override
     @Nullable
     public LocationNode getLocationNode() {
@@ -260,7 +172,7 @@ public abstract class AbstractLocation implements ILocation {
               campaign.getFutureAtBContracts());
     }
 
-    protected double getRechargeTime() {
+    public double getRechargeTime() {
         return 0.0;
     }
 

@@ -34,6 +34,7 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 
@@ -45,9 +46,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -64,8 +66,9 @@ public class CurrentLocation extends AbstractLocation {
 
     // keep track of jump path
     private JumpPath jumpPath;
+    // recharge time in hours
     private double rechargeTime;
-    // I would like to keep track of distance, but I ain't too good with physics
+    // transit time in days
     private double transitTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
@@ -74,9 +77,9 @@ public class CurrentLocation extends AbstractLocation {
         this(null, 0d);
     }
 
-    public CurrentLocation(PlanetarySystem system, double time) {
+    public CurrentLocation(PlanetarySystem system, double transitTime) {
         super(system);
-        this.transitTime = time;
+        this.transitTime = transitTime;
         this.rechargeTime = 0d;
         this.jumpZenith = true;
     }
@@ -120,7 +123,7 @@ public class CurrentLocation extends AbstractLocation {
     }
 
     @Override
-    protected double getRechargeTime() {
+    public double getRechargeTime() {
         return rechargeTime;
     }
 
@@ -156,6 +159,7 @@ public class CurrentLocation extends AbstractLocation {
     @Override
     public void setJumpPath(JumpPath path) {
         jumpPath = path;
+        MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
     }
 
     /**
@@ -167,25 +171,18 @@ public class CurrentLocation extends AbstractLocation {
      */
     @Override
     public boolean isRecharging(Campaign campaign) {
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
-
-        return currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit) > 0;
+        return currentSystem.getRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit()) > 0;
     }
 
     /**
-     * Marks the JumpShip at the current location to be fully charged.
+     * Marks the JumpShip at the current location to be fully charged, GM action.
      *
      * @param campaign The campaign object which owns the JumpShip.
      */
     @Override
-    public void setRecharged(Campaign campaign) {
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
-
-        rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), isUseCommandCircuit);
+    public void chargeFully(Campaign campaign) {
+        rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit());
+        MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
     }
 
     /**
@@ -195,16 +192,12 @@ public class CurrentLocation extends AbstractLocation {
     public void newDay(Campaign campaign) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
-
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(), campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
 
         // recharge even if there is no jump path
         // because JumpShips don't go anywhere
         double hours = 24.0;
-        double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
+        double neededRechargeTime = currentSystem.getRechargeTime(today, campaign.isUseCommandCircuit());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
             campaign.addReport(GENERAL, "JumpShips spent " +
@@ -281,6 +274,10 @@ public class CurrentLocation extends AbstractLocation {
             }
         }
 
+        if (wasTraveling || jumpPath != null) {
+            MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
+        }
+
         // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
         // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
         // units
@@ -295,6 +292,12 @@ public class CurrentLocation extends AbstractLocation {
             }
 
             testForEarlyArrival(campaign);
+
+            // We've just stopped traveling, so we should see if there are any local applicants.
+            if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
+                campaign.refreshPersonnelMarkets(true);
+                CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+            }
         }
     }
 
@@ -348,5 +351,13 @@ public class CurrentLocation extends AbstractLocation {
         }
 
         return retVal;
+    }
+
+    public static String getFormattedTextAt(String key, Object... args) {
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
+    }
+
+    public static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 }

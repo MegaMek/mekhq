@@ -274,7 +274,7 @@ public class PrisonerEventManager {
     List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
-        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
+        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity);
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
