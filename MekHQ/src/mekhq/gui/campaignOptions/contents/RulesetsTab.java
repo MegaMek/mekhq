@@ -119,6 +119,8 @@ public class RulesetsTab {
     private JCheckBox chkUseAdvancedBuildingGunEmplacements;
     private JLabel lblSPAUpgradeIntensity;
     private JSpinner spnSPAUpgradeIntensity;
+    private JLabel lblReinforcementBaseTargetNumber;
+    private JSpinner spnReinforcementBaseTargetNumber;
     private JCheckBox chkAutoConfigMunitions;
 
     private JPanel pnlScenarioModifiers;
@@ -240,6 +242,8 @@ public class RulesetsTab {
 
         lblSPAUpgradeIntensity = new JLabel();
         spnSPAUpgradeIntensity = new JSpinner();
+        lblReinforcementBaseTargetNumber = new JLabel();
+        spnReinforcementBaseTargetNumber = new JSpinner();
         chkAutoConfigMunitions = new JCheckBox();
 
         pnlScenarioModifiers = new JPanel();
@@ -325,6 +329,10 @@ public class RulesetsTab {
         lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity",
               0, -1, 3, 1);
+        lblReinforcementBaseTargetNumber = new CampaignOptionsLabel("ReinforcementBaseTargetNumber",
+              getMetadata(new Version(0, 51, 0)));
+        spnReinforcementBaseTargetNumber = new CampaignOptionsSpinner("ReinforcementBaseTargetNumber",
+              7, -10, 10, 1);
         chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions",
               getMetadata(LEGACY_RULE_BEFORE_METADATA,
                     CampaignOptionFlag.CUSTOM_SYSTEM,
@@ -397,6 +405,12 @@ public class RulesetsTab {
 
         layout.gridy++;
         panel.add(chkUseAdvancedBuildingGunEmplacements, layout);
+
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblReinforcementBaseTargetNumber, layout);
+        layout.gridx++;
+        panel.add(spnReinforcementBaseTargetNumber, layout);
 
         layout.gridy++;
         layout.gridwidth = 1;
@@ -874,6 +888,10 @@ public class RulesetsTab {
               "PlayerControlsAttachedUnits"));
         chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater(stratConHeader,
               "UseAdvancedBuildingGunEmplacements"));
+        lblReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "ReinforcementBaseTargetNumber"));
+        spnReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "ReinforcementBaseTargetNumber"));
         lblSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater(stratConHeader, "SPAUpgradeIntensity"));
         spnSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater(stratConHeader, "SPAUpgradeIntensity"));
         chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
@@ -1017,6 +1035,7 @@ public class RulesetsTab {
         options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
         options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
         options.setUseAdvancedBuildingGunEmplacements(chkUseAdvancedBuildingGunEmplacements.isSelected());
+        options.setReinforcementBaseTargetNumber((int) spnReinforcementBaseTargetNumber.getValue());
         options.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
         options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
         options.setEnemyFacilityModifierDieSize((int) spnEnemyFacilityModifierDieSize.getValue());
@@ -1084,6 +1103,7 @@ public class RulesetsTab {
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
         chkUseAdvancedBuildingGunEmplacements.setSelected(options.isUseAdvancedBuildingGunEmplacements());
+        spnReinforcementBaseTargetNumber.setValue(options.getReinforcementBaseTargetNumber());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
         chkAutoConfigMunitions.setSelected(options.isAutoConfigMunitions());
         spnEnemyFacilityModifierDieSize.setValue(options.getEnemyFacilityModifierDieSize());

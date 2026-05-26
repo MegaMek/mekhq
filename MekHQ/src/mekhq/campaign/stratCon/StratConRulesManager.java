@@ -2227,15 +2227,17 @@ public class StratConRulesManager {
      *             <li>-- If command rights indicate that a liaison is required, the modifier is adjusted.</li>
      * </ol>
      *
-     * @param commandLiaison the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
-     * @param contract       the {@link AtBContract} defining the terms of the contract for this scenario.
+     * @param commandLiaison   the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
+     * @param contract         the {@link AtBContract} defining the terms of the contract for this scenario.
+     * @param baseTargetNumber the starting target number before adjustments
      *
      * @return a {@link TargetRoll} object representing the calculated reinforcement target number, with appropriate
      *       modifiers applied.
      */
-    public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract) {
+    public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract,
+          int baseTargetNumber) {
         // Create Target Roll
-        TargetRoll reinforcementTargetNumber = new TargetRoll(7, "Base Target Number");
+        TargetRoll reinforcementTargetNumber = new TargetRoll(baseTargetNumber, "Base Target Number");
 
         // Base Target Number
         Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;

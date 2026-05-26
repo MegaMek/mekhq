@@ -502,7 +502,7 @@ public class StratConScenarioWizard extends JDialog {
      * Add an "available force list" to the given control
      */
     private JList<Formation> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
-                                                   ScenarioForceTemplate forceTemplate) {
+          ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new FastJScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
@@ -731,11 +731,11 @@ public class StratConScenarioWizard extends JDialog {
         if (isPrimaryForce) {
             String instructions;
             Formation primaryFormation = currentScenario.getBackingScenario()
-                                       .getForces(campaign)
-                                       .getAllSubFormations()
-                                       .stream()
-                                       .findFirst()
-                                       .orElse(null);
+                                               .getForces(campaign)
+                                               .getAllSubFormations()
+                                               .stream()
+                                               .findFirst()
+                                               .orElse(null);
             if (primaryFormation != null) {
                 instructions = MHQInternationalization.getFormattedTextAt(resourcePath,
                       "lblLeadershipCommitForces.text",
@@ -846,8 +846,10 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
+        int baseTargetNumber = campaign.getCampaignOptions().getReinforcementBaseTargetNumber();
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
-              currentCampaignState.getContract());
+              currentCampaignState.getContract(),
+              baseTargetNumber);
         int availableSupportPoints = currentCampaignState.getSupportPoints();
 
         AtBContract contract = currentScenario.getBackingContract(campaign);
@@ -903,7 +905,7 @@ public class StratConScenarioWizard extends JDialog {
                                                  0
                                                  :
                                                  (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) /
-                                                       selectedForceCount;
+                                                 selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
 
                 btnCommitClicked(finalTargetNumber, false, true);
