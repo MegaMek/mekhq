@@ -181,6 +181,16 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_VESSEL_PILOT_POOL_FILL = "newDayVesselPilotPoolFill";
     public static final String NEW_DAY_VESSEL_GUNNER_POOL_FILL = "newDayVesselGunnerPoolFill";
     public static final String NEW_DAY_VESSEL_CREW_POOL_FILL = "newDayVesselCrewPoolFill";
+    public static final String NEW_DAY_AS_TECH_POOL_NO_RELEASE = "newDayAstechPoolNoRelease";
+    public static final String NEW_DAY_MEDIC_POOL_NO_RELEASE = "newDayMedicPoolNoRelease";
+    public static final String NEW_DAY_SOLDIER_POOL_NO_RELEASE = "newDaySoldierPoolNoRelease";
+    public static final String NEW_DAY_BATTLE_ARMOR_POOL_NO_RELEASE = "newDayBattleArmorPoolNoRelease";
+    public static final String NEW_DAY_VEHICLE_CREW_GROUND_POOL_NO_RELEASE = "newDayVehicleCrewGroundPoolNoRelease";
+    public static final String NEW_DAY_VEHICLE_CREW_VTOL_POOL_NO_RELEASE = "newDayVehicleCrewVTOLPoolNoRelease";
+    public static final String NEW_DAY_VEHICLE_CREW_NAVAL_POOL_NO_RELEASE = "newDayVehicleCrewNavalPoolNoRelease";
+    public static final String NEW_DAY_VESSEL_PILOT_POOL_NO_RELEASE = "newDayVesselPilotPoolNoRelease";
+    public static final String NEW_DAY_VESSEL_GUNNER_POOL_NO_RELEASE = "newDayVesselGunnerPoolNoRelease";
+    public static final String NEW_DAY_VESSEL_CREW_POOL_NO_RELEASE = "newDayVesselCrewPoolNoRelease";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
