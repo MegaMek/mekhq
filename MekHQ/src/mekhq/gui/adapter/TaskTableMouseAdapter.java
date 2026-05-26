@@ -33,6 +33,7 @@
 package mekhq.gui.adapter;
 
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.util.Optional;
@@ -45,12 +46,15 @@ import javax.swing.JTable;
 
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
+import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
@@ -61,6 +65,9 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
     private final JTable taskTable;
     private final TaskTableModel taskModel;
+
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.TaskTableMouseAdapter";
     //endregion Variable Declaration
 
     //region Constructors
@@ -119,11 +126,21 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains("FIX")) {
             if (partWork.checkFixable() == null) {
                 for (IPartWork p : parts) {
+                    if (command.contains("FIX_GM_ACQUIRE")) {
+                        if (p instanceof MissingPart missingPart) {
+                            Part acquisitionPart = missingPart.getAcquisitionPart();
+                            IAcquisitionWork acquisitionWork = acquisitionPart.getAcquisitionWork();
+                            acquisitionWork.find(0, 1.0);
+                            MekHQ.triggerEvent(new AcquisitionEvent(acquisitionWork));
+                        }
+                    }
+
                     gui.getCampaign()
                           .addReport(TECHNICAL, String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
                     if (p.getUnit() != null) {
                         p.getUnit().refreshPodSpace();
                     }
+
                     // PodSpace triggers event for each child part
                     if (p instanceof Part) {
                         MekHQ.triggerEvent(new PartChangedEvent((Part) p));
@@ -203,6 +220,12 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             // Auto complete task
             menuItem = new JMenuItem("Complete Task");
             menuItem.setActionCommand("FIX");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(isFixable);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FIX_GM_ACQUIRE"));
+            menuItem.setActionCommand("FIX_GM_ACQUIRE");
             menuItem.addActionListener(this);
             menuItem.setEnabled(isFixable);
             menu.add(menuItem);
