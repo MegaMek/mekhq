@@ -81,6 +81,7 @@ public final class MHQConstants extends SuiteConstants {
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     // endregion Command Center Tab
 

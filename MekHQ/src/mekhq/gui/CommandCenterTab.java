@@ -43,6 +43,7 @@ import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -68,7 +69,6 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import megamek.utilities.ImageUtilities;
-import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignSummary;
@@ -118,6 +118,7 @@ import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -173,7 +174,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private RoundedJButton btnChangePriority;
     private RoundedJButton btnPauseProcurement;
     private RoundedJButton btnResumeProcurement;
-    private RoundedJButton btnMRMSDialog;
     private RoundedJButton btnMRMSInstant;
 
     // available reports
@@ -182,10 +182,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private JLabel lblIcon;
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
     @Deprecated(since = "0.50.10", forRemoval = true)
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
           MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     /**
      * @param gui  a {@link CampaignGUI} object that this tab is a component of
@@ -675,6 +676,17 @@ public final class CommandCenterTab extends CampaignGuiTab {
         });
         btnResumeProcurement.setEnabled(!getCampaign().isProcessProcurement());
         panProcurementButtons.add(btnResumeProcurement);
+
+        btnMRMSInstant = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "CommandCenterTab.button.mrms"));
+        btnMRMSInstant.addActionListener(evt -> {
+            MRMSService.mrmsAllUnits(getCampaign());
+            JOptionPane.showMessageDialog(getCampaignGui().getFrame(),
+                  getTextAt(RESOURCE_BUNDLE, "CommandCenterTab.button.mrms.report"),
+                  getTextAt(RESOURCE_BUNDLE, "CommandCenterTab.button.mrms.title"),
+                  JOptionPane.INFORMATION_MESSAGE);
+        });
+        panProcurementButtons.add(btnMRMSInstant);
+
         /* shopping table */
         procurementTotalCostLabel = new JLabel();
         refreshProcurementTotalCost();
@@ -734,7 +746,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         JScrollPane scrollProcurement = new FastJScrollPane(procurementTable);
         panProcurement = new JPanel(new GridBagLayout());
-        panProcurement.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panProcurement.title")));
+        panProcurement.setBorder(RoundedLineBorder.createRoundedLineBorder());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1142,12 +1154,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementListScheduler.schedule();
         ImageIcon icon = getAndScaleCampaignIcon();
         lblIcon.setIcon(icon);
-    }
-
-    @Subscribe
-    public void handle(MHQOptionsChangedEvent evt) {
-        btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
-        btnMRMSInstant.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
     }
 
     @Subscribe
