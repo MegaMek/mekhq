@@ -711,10 +711,7 @@ public class CampaignGUI extends JPanel {
         miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
         miMHQOptions.setName("miMHQOptions");
         miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.addActionListener(evt -> {
-            new MHQOptionsDialog(getFrame()).setVisible(true);
-            getCampaign().setTopUpWeekly(MekHQ.getMHQOptions().getNewDayAutoLogistics());
-        });
+        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
         menuFile.add(miMHQOptions);
 
         final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));

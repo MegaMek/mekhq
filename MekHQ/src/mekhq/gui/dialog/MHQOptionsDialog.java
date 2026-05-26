@@ -1101,7 +1101,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayMRMS.setName("chkNewDayMRMS");
 
         chkNewDayAutoLogistics = new JCheckBox(getText("chkNewDayAutoLogistics.text"));
-        chkNewDayAutoLogistics.setToolTipText(getText("chkNewDayAutoLogistics.toolTipText"));
+        chkNewDayAutoLogistics.setToolTipText(wordWrap(getText("chkNewDayAutoLogistics.toolTipText")));
         chkNewDayAutoLogistics.setName("chkNewDayAutoLogistics");
 
         chkNewDayOptimizeMedicalAssignments = new JCheckBox(resources.getString(
