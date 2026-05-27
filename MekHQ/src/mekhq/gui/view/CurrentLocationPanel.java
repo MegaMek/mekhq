@@ -167,30 +167,30 @@ public class CurrentLocationPanel extends JPanel {
         float scale = location.isAtJumpPoint() ? 1 : (float) (location.getPercentageTransit() * 1.3 + 0.1);
         imgLocation.setImage(locationImage, scale);
 
-        HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
-        if (hiringHallLevel.isNone()) {
-            btnHiringHall.setText(getTextAt("hiringHall.none"));
+        if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
+            // keep legacy personnel markets always available
+            btnHiringHall.setEnabled(true);
+            btnHiringHall.setText(getTextAt("personnelMarket.legacy"));
         } else {
-            btnHiringHall.setText(getFormattedTextAt("hiringHall.some",
-                  StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+            String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
+            btnHiringHall.setEnabled(availabilityMessage.isBlank());
+
+            HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
+            if (!availabilityMessage.isBlank()) {
+                btnHiringHall.setText(availabilityMessage);
+            } else if (hiringHallLevel.isNone()) {
+                btnHiringHall.setText(getTextAt("hiringHall.none"));
+            } else {
+                btnHiringHall.setText(getFormattedTextAt("hiringHall.some",
+                      StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+            }
         }
         if (location.isOnPlanet()) {
             lblLocationPrimaryInfo.setText(getPlanetaryConditionsInfo());
             lblLocationSecondaryInfo.setText(getSocioIndustrialInfo());
-            btnHiringHall.setVisible(true);
-            if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
-                btnHiringHall.setEnabled(!options.isUsePersonnelHireHiringHallOnly() || system.isHiringHall(date));
-            } else {
-                String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
-                btnHiringHall.setEnabled(availabilityMessage.isBlank());
-                if (!availabilityMessage.isBlank()) {
-                    btnHiringHall.setText(availabilityMessage);
-                }
-            }
         } else {
             lblLocationPrimaryInfo.setText(getCourseInfo());
             lblLocationSecondaryInfo.setText(getJumpCostInfo());
-            btnHiringHall.setVisible(false);
         }
     }
 
