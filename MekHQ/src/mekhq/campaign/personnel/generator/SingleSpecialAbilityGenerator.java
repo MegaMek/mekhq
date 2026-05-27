@@ -104,12 +104,12 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
               useAlternativeWeighting,
               ignoreEligibility,
               isVeterancyAward);
-        if (abilityList.isEmpty()) {
-            return null;
-        }
-
         if (person.isClanPersonnel()) {
             filterOutMeleeSPA(campaign.getLocalDate(), person.getOriginFaction(), abilityList);
+        }
+
+        if (abilityList.isEmpty()) {
+            return null;
         }
 
         final String name = ObjectUtility.getRandomItem(abilityList).getName();
