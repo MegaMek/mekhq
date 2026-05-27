@@ -39,9 +39,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.GridBagConstraints;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -64,31 +62,29 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * The {@code AdvancementTab} class is responsible for rendering and managing two primary tabs in the campaign options
- * interface: the Experience Awards (XP Awards) tab and the Skill Randomization tab. These tabs allow for customization
- * of experience point distribution, randomization preferences, and skill probabilities in the campaign.
+ * The {@code AdvancementTab} class is responsible for rendering and managing
+ * two primary tabs in the campaign options
+ * interface: the Experience Awards (XP Awards) tab and the Skill Randomization
+ * tab. These tabs allow for customization
+ * of experience point distribution, randomization preferences, and skill
+ * probabilities in the campaign.
  *
- * <p>This class provides methods to initialize the UI components, load current settings
- * from the campaign options, and update the options based on user input.</p>
+ * <p>
+ * This class provides methods to initialize the UI components, load current
+ * settings
+ * from the campaign options, and update the options based on user input.
+ * </p>
  */
 public class AdvancementTab {
-      private static final int[] EXPERIENCE_LEVELS = new int[] { SkillType.EXP_ULTRA_GREEN,
-                                                                                             SkillType.EXP_GREEN,
-                                                                                             SkillType.EXP_REGULAR,
-                                                                                             SkillType.EXP_VETERAN,
-                                                                                             SkillType.EXP_ELITE,
-                                                                                             SkillType.EXP_HEROIC,
-                                                                                             SkillType.EXP_LEGENDARY };
-
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
-      private AdvancementOptionsModel model;
-      private boolean xpAwardsPageCreated;
-      private boolean randomizationPageCreated;
-      private boolean recruitmentBonusesPageCreated;
+    private AdvancementOptionsModel model;
+    private boolean xpAwardsPageCreated;
+    private boolean randomizationPageCreated;
+    private boolean recruitmentBonusesPageCreated;
 
-    //start XP Awards Tab
+    // start XP Awards Tab
     private CampaignOptionsHeaderPanel xpAwardsHeader;
     private JLabel lblXpCostMultiplier;
     private JSpinner spnXpCostMultiplier;
@@ -132,9 +128,9 @@ public class AdvancementTab {
     private JSpinner spnAdminWeeklyXP;
     private JLabel lblAdminWeeklyXPPeriod;
     private JSpinner spnAdminWeeklyXPPeriod;
-    //end XP Awards Tab
+    // end XP Awards Tab
 
-    //start Skill Randomization Tab
+    // start Skill Randomization Tab
     private CampaignOptionsHeaderPanel skillRandomizationHeader;
     private JCheckBox chkExtraRandomness;
 
@@ -213,7 +209,7 @@ public class AdvancementTab {
     private JSpinner spnSecondBonus;
     private JLabel lblRoleplaySkillsModifier;
     private JSpinner spnRoleplaySkillsModifier;
-    //end Skill Randomization Tab
+    // end Skill Randomization Tab
 
     private JPanel pnlRecruitmentBonusesCombat;
     private JLabel[] lblRecruitmentBonusCombat;
@@ -222,12 +218,14 @@ public class AdvancementTab {
     private JPanel pnlRecruitmentBonusesSupport;
     private JLabel[] lblRecruitmentBonusSupport;
     private JSpinner[] spnRecruitmentBonusSupport;
-    //end Recruitment Bonus Tab
+    // end Recruitment Bonus Tab
 
     /**
-     * Constructs an {@code AdvancementTab} object for rendering and managing campaign advancement configurations.
+     * Constructs an {@code AdvancementTab} object for rendering and managing
+     * campaign advancement configurations.
      *
-     * @param campaign The {@code Campaign} instance from which the campaign options and random skill preferences are
+     * @param campaign The {@code Campaign} instance from which the campaign options
+     *                 and random skill preferences are
      *                 retrieved.
      */
     public AdvancementTab(Campaign campaign) {
@@ -240,8 +238,10 @@ public class AdvancementTab {
     }
 
     /**
-     * Initializes the UI components for the XP Awards and Skill Randomization tabs. This includes setting up the
-     * labels, panels, and spinners for each of the categories within the respective tabs.
+     * Initializes the UI components for the XP Awards and Skill Randomization tabs.
+     * This includes setting up the
+     * labels, panels, and spinners for each of the categories within the respective
+     * tabs.
      */
     private void initialize() {
         initializeXPAwardsTab();
@@ -249,7 +249,8 @@ public class AdvancementTab {
     }
 
     /**
-     * Initializes the XP Awards tab by setting up the UI components, such as labels, panels, and spinners, for various
+     * Initializes the XP Awards tab by setting up the UI components, such as
+     * labels, panels, and spinners, for various
      * experience-related options within the campaign.
      */
     private void initializeXPAwardsTab() {
@@ -298,20 +299,23 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Experience Awards (XP Awards) tab panel. This tab allows users to configure experience
-     * awards for tasks, scenarios, missions, and administrators, as well as set the overall XP cost multiplier.
+     * Creates and returns the Experience Awards (XP Awards) tab panel. This tab
+     * allows users to configure experience
+     * awards for tasks, scenarios, missions, and administrators, as well as set the
+     * overall XP cost multiplier.
      *
-     * @return A {@code JPanel} containing the configuration options for XP Awards in the campaign.
+     * @return A {@code JPanel} containing the configuration options for XP Awards
+     *         in the campaign.
      */
     public JPanel xpAwardsTab() {
         // Header
         xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab",
-              getImageDirectory() + "logo_clan_steel_viper.png",
-              6);
+                getImageDirectory() + "logo_clan_steel_viper.png",
+                6);
 
         // Contents
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
         spnXpCostMultiplier = new CampaignOptionsSpinner("XpCostMultiplier", 1, 0, 5, 0.05);
         spnXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
@@ -320,8 +324,8 @@ public class AdvancementTab {
         pnlScenarios = createScenariosPanel();
         pnlAdministrators = createAdministratorsPanel();
         pnlMissions = createMissionsPanel();
-      xpAwardsPageCreated = true;
-      updateXpAwardsControlsFromModel();
+        xpAwardsPageCreated = true;
+        updateXpAwardsControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("XpAwardsTab", true);
@@ -358,10 +362,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Tasks panel, which allows users to configure settings for task-related experience awards,
+     * Creates and returns the Tasks panel, which allows users to configure settings
+     * for task-related experience awards,
      * such as successful task completions or mistakes.
      *
-     * @return A {@code JPanel} containing configuration options for task-related experience awards.
+     * @return A {@code JPanel} containing configuration options for task-related
+     *         experience awards.
      */
     private JPanel createTasksPanel() {
         // Contents
@@ -371,20 +377,20 @@ public class AdvancementTab {
         spnTaskXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "TaskXP"));
 
         lblNTasksXP = new CampaignOptionsLabel("NTasksXP",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
-                    CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.RECOMMENDED));
         lblNTasksXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "NTasksXP"));
         spnNTasksXP = new CampaignOptionsSpinner("NTasksXP", 0, 0, 100, 1);
         spnNTasksXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "NTasksXP"));
 
         lblSuccessXP = new CampaignOptionsLabel("SuccessXP",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblSuccessXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "SuccessXP"));
         spnSuccessXP = new CampaignOptionsSpinner("SuccessXP", 0, 0, 20, 1);
         spnSuccessXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "SuccessXP"));
 
         lblMistakeXP = new CampaignOptionsLabel("MistakeXP",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblMistakeXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "MistakeXP"));
         spnMistakeXP = new CampaignOptionsSpinner("MistakeXP", 0, 0, 20, 1);
         spnMistakeXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "MistakeXP"));
@@ -422,10 +428,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Scenarios panel, which allows users to configure settings for experience awards related
+     * Creates and returns the Scenarios panel, which allows users to configure
+     * settings for experience awards related
      * to scenarios, kills, and kill thresholds.
      *
-     * @return A {@code JPanel} containing configuration options for scenario-related experience awards.
+     * @return A {@code JPanel} containing configuration options for
+     *         scenario-related experience awards.
      */
     private JPanel createScenariosPanel() {
         // Contents
@@ -445,7 +453,7 @@ public class AdvancementTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ScenariosPanel", true, "ScenariosPanel",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -470,15 +478,17 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Missions panel, which allows users to configure settings related to mission performance
+     * Creates and returns the Missions panel, which allows users to configure
+     * settings related to mission performance
      * and idle time experience bonuses in the campaign.
      *
-     * @return A {@code JPanel} containing configuration options for mission-related experience settings.
+     * @return A {@code JPanel} containing configuration options for mission-related
+     *         experience settings.
      */
     private JPanel createMissionsPanel() {
         // Contents
         lblVocationalXP = new CampaignOptionsLabel("VocationalXP",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblVocationalXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "VocationalXP"));
         spnVocationalXP = new CampaignOptionsSpinner("VocationalXP", 0, 0, 20, 1);
         spnVocationalXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "VocationalXP"));
@@ -503,10 +513,10 @@ public class AdvancementTab {
 
         lblMissionXpOutstandingSuccess = new CampaignOptionsLabel("MissionXpOutstandingSuccess");
         lblMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater(xpAwardsHeader,
-              "MissionXpOutstandingSuccess"));
+                "MissionXpOutstandingSuccess"));
         spnMissionXpOutstandingSuccess = new CampaignOptionsSpinner("MissionXpOutstandingSuccess", 1, 0, 20, 1);
         spnMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater(xpAwardsHeader,
-              "MissionXpOutstandingSuccess"));
+                "MissionXpOutstandingSuccess"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MissionsPanel", true, "MissionsPanel");
@@ -553,10 +563,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Administrators panel, which allows users to configure settings for contract negotiation
+     * Creates and returns the Administrators panel, which allows users to configure
+     * settings for contract negotiation
      * experience points and weekly experience points for administrators.
      *
-     * @return A {@code JPanel} containing configuration options for administrator experience settings.
+     * @return A {@code JPanel} containing configuration options for administrator
+     *         experience settings.
      */
     private JPanel createAdministratorsPanel() {
         // Contents
@@ -565,21 +577,21 @@ public class AdvancementTab {
         spnAdminWeeklyXP = new CampaignOptionsSpinner("AdminWeeklyXP", 0, 0, 20, 1);
         spnAdminWeeklyXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXP"));
         lblAdminWeeklyXPPeriod = new CampaignOptionsLabel("AdminWeeklyXPPeriod",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXPPeriod"));
         spnAdminWeeklyXPPeriod = new CampaignOptionsSpinner("AdminWeeklyXPPeriod", 1, 1, 52, 1);
         spnAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXPPeriod"));
 
         lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblContractNegotiationXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ContractNegotiationXP"));
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP", 0, 0, 20, 1);
         spnContractNegotiationXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ContractNegotiationXP"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsXpPanel", true, "AdministratorsXpPanel",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
-                    CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.RECOMMENDED));
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
@@ -603,7 +615,8 @@ public class AdvancementTab {
     }
 
     /**
-     * Initializes the Skill Randomization tab by setting up the UI components, including phenotype configurations,
+     * Initializes the Skill Randomization tab by setting up the UI components,
+     * including phenotype configurations,
      * random abilities, skill groups, and other randomization settings.
      */
     private void initializeSkillRandomizationTab() {
@@ -696,28 +709,31 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Skill Randomization tab panel. This tab allows users to configure settings related to
-     * skill randomization, including phenotype probabilities and skill bonuses for different experience levels and
+     * Creates and returns the Skill Randomization tab panel. This tab allows users
+     * to configure settings related to
+     * skill randomization, including phenotype probabilities and skill bonuses for
+     * different experience levels and
      * skill groups.
      *
-     * @return A {@code JPanel} containing the configuration options for skill randomization.
+     * @return A {@code JPanel} containing the configuration options for skill
+     *         randomization.
      */
     public JPanel skillRandomizationTab() {
         // Header
         skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
-              getImageDirectory() + "logo_republic_of_the_sphere.png",
-              11);
+                getImageDirectory() + "logo_republic_of_the_sphere.png",
+                11);
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
 
         pnlPhenotype = createPhenotypePanel();
         pnlRandomAbilities = createAbilityPanel();
         pnlSkillGroups = createSkillGroupPanel();
-      randomizationPageCreated = true;
-      updateRandomizationControlsFromModel();
+        randomizationPageCreated = true;
+        updateRandomizationControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillRandomizationTab", true);
@@ -744,10 +760,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Phenotype panel, which allows users to configure settings for phenotype probabilities in
+     * Creates and returns the Phenotype panel, which allows users to configure
+     * settings for phenotype probabilities in
      * the campaign. Each phenotype is assigned a spinner to adjust its probability.
      *
-     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
+     * @return A {@code JPanel} containing configuration options for phenotype
+     *         probabilities.
      */
     private JPanel createPhenotypePanel() {
         // Contents
@@ -764,12 +782,12 @@ public class AdvancementTab {
         for (int i = 0; i < phenotypes.size(); i++) {
             phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getLabel());
             phenotypeLabels[i].addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                  null,
-                  phenotypes.get(i).getTooltip()));
+                    null,
+                    phenotypes.get(i).getTooltip()));
             phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getLabel(), 0, 0, 100, 1);
             phenotypeSpinners[i].addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                  null,
-                  phenotypes.get(i).getTooltip()));
+                    null,
+                    phenotypes.get(i).getTooltip()));
 
             layout.gridx = 0;
             panel.add(phenotypeLabels[i], layout);
@@ -782,46 +800,48 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Ability panel, which allows users to configure settings for bonuses to special abilities
+     * Creates and returns the Ability panel, which allows users to configure
+     * settings for bonuses to special abilities
      * at different experience levels, such as green, regular, veteran, and elite.
      *
-     * @return A {@code JPanel} containing configuration options for special ability bonuses.
+     * @return A {@code JPanel} containing configuration options for special ability
+     *         bonuses.
      */
     private JPanel createAbilityPanel() {
         // Contents
         lblAbilityUltraGreen = new CampaignOptionsLabel("AbilityUltraGreen",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAbilityUltraGreen = new CampaignOptionsSpinner("AbilityUltraGreen", 0, -12, 12, 1);
 
         lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityGreen"));
         spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen", 0, -12, 12, 1);
 
         lblAbilityReg = new CampaignOptionsLabel("AbilityRegular",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityRegular"));
         spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular", 0, -12, 12, 1);
         spnAbilityReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityRegular"));
 
         lblAbilityVet = new CampaignOptionsLabel("AbilityVeteran",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityVeteran"));
         spnAbilityVet = new CampaignOptionsSpinner("AbilityVeteran", 0, -12, 12, 1);
         spnAbilityVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityVeteran"));
 
         lblAbilityElite = new CampaignOptionsLabel("AbilityElite",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAbilityElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityElite"));
         spnAbilityElite = new CampaignOptionsSpinner("AbilityElite", 0, -12, 12, 1);
         spnAbilityElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityElite"));
 
         lblAbilityHeroic = new CampaignOptionsLabel("AbilityHeroic",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAbilityHeroic = new CampaignOptionsSpinner("AbilityHeroic", 0, -12, 12, 1);
 
         lblAbilityLegendary = new CampaignOptionsLabel("AbilityLegendary",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAbilityLegendary = new CampaignOptionsSpinner("AbilityLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
@@ -874,8 +894,10 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Skill Groups panel, which groups together related panels for configuring various
-     * skill-related options, including tactics, small arms, secondary skills, and artillery.
+     * Creates and returns the Skill Groups panel, which groups together related
+     * panels for configuring various
+     * skill-related options, including tactics, small arms, secondary skills, and
+     * artillery.
      *
      * @return A {@code JPanel} containing grouped configuration options for skills.
      */
@@ -919,51 +941,54 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Command Skills panel, which allows users to configure settings for Command Skill
-     * modifiers for different skill levels, such as green, regular, veteran, and elite.
+     * Creates and returns the Command Skills panel, which allows users to configure
+     * settings for Command Skill
+     * modifiers for different skill levels, such as green, regular, veteran, and
+     * elite.
      *
-     * @return A {@code JPanel} containing configuration options for Command Skill modifiers.
+     * @return A {@code JPanel} containing configuration options for Command Skill
+     *         modifiers.
      */
     private JPanel createCommandSkillsPanel() {
         // Contents
         lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "CommandSkillsUltraGreen"));
+                "CommandSkillsUltraGreen"));
         spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
         spnCommandSkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "CommandSkillsUltraGreen"));
+                "CommandSkillsUltraGreen"));
 
         lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsGreen"));
         spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen", 0, -12, 12, 1);
         spnCommandSkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsGreen"));
 
         lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsRegular"));
         spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular", 0, -12, 12, 1);
         spnCommandSkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsRegular"));
 
         lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsVeteran"));
         spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran", 0, -12, 12, 1);
         spnCommandSkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsVeteran"));
 
         lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblCommandSkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsElite"));
         spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite", 0, -12, 12, 1);
         spnCommandSkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsElite"));
 
         lblCommandSkillsHeroic = new CampaignOptionsLabel("CommandSkillsHeroic",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnCommandSkillsHeroic = new CampaignOptionsSpinner("CommandSkillsHeroic", 0, -12, 12, 1);
 
         lblCommandSkillsLegendary = new CampaignOptionsLabel("CommandSkillsLegendary",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnCommandSkillsLegendary = new CampaignOptionsSpinner("CommandSkillsLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
@@ -1016,51 +1041,54 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Utility Skills panel, which allows users to configure settings for Non-Command Utility
-     * Skill modifiers for different skill levels, such as green, regular, veteran, and elite.
+     * Creates and returns the Utility Skills panel, which allows users to configure
+     * settings for Non-Command Utility
+     * Skill modifiers for different skill levels, such as green, regular, veteran,
+     * and elite.
      *
-     * @return A {@code JPanel} containing configuration options for Utility Skill modifiers.
+     * @return A {@code JPanel} containing configuration options for Utility Skill
+     *         modifiers.
      */
     private JPanel createUtilitySkillsPanel() {
         // Contents
         lblUtilitySkillsUltraGreen = new CampaignOptionsLabel("UtilitySkillsUltraGreen",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "UtilitySkillsUltraGreen"));
+                "UtilitySkillsUltraGreen"));
         spnUtilitySkillsUltraGreen = new CampaignOptionsSpinner("UtilitySkillsUltraGreen", 0, -12, 12, 1);
         spnUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "UtilitySkillsUltraGreen"));
+                "UtilitySkillsUltraGreen"));
 
         lblUtilitySkillsGreen = new CampaignOptionsLabel("UtilitySkillsGreen",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
         spnUtilitySkillsGreen = new CampaignOptionsSpinner("UtilitySkillsGreen", 0, -12, 12, 1);
         spnUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
 
         lblUtilitySkillsReg = new CampaignOptionsLabel("UtilitySkillsRegular",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
         spnUtilitySkillsReg = new CampaignOptionsSpinner("UtilitySkillsRegular", 0, -12, 12, 1);
         spnUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
 
         lblUtilitySkillsVet = new CampaignOptionsLabel("UtilitySkillsVeteran",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
         spnUtilitySkillsVet = new CampaignOptionsSpinner("UtilitySkillsVeteran", 0, -12, 12, 1);
         spnUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
 
         lblUtilitySkillsElite = new CampaignOptionsLabel("UtilitySkillsElite",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
         spnUtilitySkillsElite = new CampaignOptionsSpinner("UtilitySkillsElite", 0, -12, 12, 1);
         spnUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
 
         lblUtilitySkillsHeroic = new CampaignOptionsLabel("UtilitySkillsHeroic",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnUtilitySkillsHeroic = new CampaignOptionsSpinner("UtilitySkillsHeroic", 0, -12, 12, 1);
 
         lblUtilitySkillsLegendary = new CampaignOptionsLabel("UtilitySkillsLegendary",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnUtilitySkillsLegendary = new CampaignOptionsSpinner("UtilitySkillsLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
@@ -1113,10 +1141,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Small Arms panel, which allows users to configure settings for combat and non-combat
+     * Creates and returns the Small Arms panel, which allows users to configure
+     * settings for combat and non-combat
      * small arms bonuses.
      *
-     * @return A {@code JPanel} containing configuration options for small arms skill bonuses.
+     * @return A {@code JPanel} containing configuration options for small arms
+     *         skill bonuses.
      */
     private JPanel createSmallArmsPanel() {
         // Contents
@@ -1150,10 +1180,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Artillery panel, which allows users to configure settings for artillery-specific skills,
+     * Creates and returns the Artillery panel, which allows users to configure
+     * settings for artillery-specific skills,
      * including the chance for an artillery skill and the bonus associated with it.
      *
-     * @return A {@code JPanel} containing configuration options for artillery-related skills.
+     * @return A {@code JPanel} containing configuration options for
+     *         artillery-related skills.
      */
     private JPanel createArtilleryPanel() {
         // Contents
@@ -1187,10 +1219,13 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Secondary Skill panel, which allows users to configure settings related to special
-     * secondary skills such as Anti-Mek, secondary skill probability, and secondary skill bonuses.
+     * Creates and returns the Secondary Skill panel, which allows users to
+     * configure settings related to special
+     * secondary skills such as Anti-Mek, secondary skill probability, and secondary
+     * skill bonuses.
      *
-     * @return A {@code JPanel} containing configuration options for secondary skills.
+     * @return A {@code JPanel} containing configuration options for secondary
+     *         skills.
      */
     private JPanel createSecondarySkillPanel() {
         // Contents
@@ -1210,12 +1245,12 @@ public class AdvancementTab {
         spnSecondBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "SecondarySkillBonus"));
 
         lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "RoleplaySkillsModifier"));
+                "RoleplaySkillsModifier"));
         spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
         spnRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-              "RoleplaySkillsModifier"));
+                "RoleplaySkillsModifier"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel", true, "SecondarySkillPanel");
@@ -1249,26 +1284,30 @@ public class AdvancementTab {
     }
 
     /**
-     * Constructs and returns the panel containing recruitment bonus controls grouped by combat and support roles.
+     * Constructs and returns the panel containing recruitment bonus controls
+     * grouped by combat and support roles.
      *
-     * <p>Includes the header and separately laid-out subpanels for combat and support personnel roles.</p>
+     * <p>
+     * Includes the header and separately laid-out subpanels for combat and support
+     * personnel roles.
+     * </p>
      *
      * @return the fully configured {@link JPanel} for recruitment bonus settings
      */
     public JPanel recruitmentBonusesTab() {
         // Header
-        //start Recruitment Bonus Tab
+        // start Recruitment Bonus Tab
         CampaignOptionsHeaderPanel recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
-              getImageDirectory() + "logo_calderon_protectorate.png",
-              true,
-              false,
-              0);
+                getImageDirectory() + "logo_calderon_protectorate.png",
+                true,
+                false,
+                0);
 
         // Contents
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();
         pnlRecruitmentBonusesSupport = createRecruitmentBonusesSupportPanel();
-      recruitmentBonusesPageCreated = true;
-      updateRecruitmentBonusControlsFromModel();
+        recruitmentBonusesPageCreated = true;
+        updateRecruitmentBonusControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesTab", true);
@@ -1289,13 +1328,19 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and initializes a panel for setting recruitment bonuses for combat personnel roles.
+     * Creates and initializes a panel for setting recruitment bonuses for combat
+     * personnel roles.
      *
-     * <p>This method arranges labels and spinner controls for all combat-specific personnel roles
-     * in a grid layout. Each row contains up to four roles, where each role is represented by a label and a
-     * corresponding numeric spinner control for input.</p>
+     * <p>
+     * This method arranges labels and spinner controls for all combat-specific
+     * personnel roles
+     * in a grid layout. Each row contains up to four roles, where each role is
+     * represented by a label and a
+     * corresponding numeric spinner control for input.
+     * </p>
      *
-     * @return a configured {@link JPanel} specifically for defining recruitment bonuses for combat roles
+     * @return a configured {@link JPanel} specifically for defining recruitment
+     *         bonuses for combat roles
      */
     private JPanel createRecruitmentBonusesCombatPanel() {
         // Contents
@@ -1304,8 +1349,8 @@ public class AdvancementTab {
         spnRecruitmentBonusCombat = new JSpinner[roles.size()];
 
         final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesCombatPanel",
-              true,
-              "RecruitmentBonusesCombatPanel");
+                true,
+                "RecruitmentBonusesCombatPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
 
@@ -1331,13 +1376,19 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and initializes a panel for setting recruitment bonuses for support (non-combat) personnel roles.
+     * Creates and initializes a panel for setting recruitment bonuses for support
+     * (non-combat) personnel roles.
      *
-     * <p>This method arranges labels and spinner controls for all support-specific personnel roles
-     * in a grid layout. Each row contains up to four roles, where each role is represented by a label and a
-     * corresponding numeric spinner control for input.</p>
+     * <p>
+     * This method arranges labels and spinner controls for all support-specific
+     * personnel roles
+     * in a grid layout. Each row contains up to four roles, where each role is
+     * represented by a label and a
+     * corresponding numeric spinner control for input.
+     * </p>
      *
-     * @return a configured {@link JPanel} specifically for defining recruitment bonuses for support roles
+     * @return a configured {@link JPanel} specifically for defining recruitment
+     *         bonuses for support roles
      */
     private JPanel createRecruitmentBonusesSupportPanel() {
         // Contents
@@ -1346,8 +1397,8 @@ public class AdvancementTab {
         spnRecruitmentBonusSupport = new JSpinner[roles.size()];
 
         final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesSupportPanel",
-              true,
-              "RecruitmentBonusesSupportPanel");
+                true,
+                "RecruitmentBonusesSupportPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
 
@@ -1373,7 +1424,8 @@ public class AdvancementTab {
     }
 
     /**
-     * Loads the current values for XP Awards and Skill Randomization settings into the UI components from the campaign
+     * Loads the current values for XP Awards and Skill Randomization settings into
+     * the UI components from the campaign
      * options and random skill preferences.
      */
     public void loadValuesFromCampaignOptions() {
@@ -1381,16 +1433,21 @@ public class AdvancementTab {
     }
 
     /**
-     * Loads the current values for XP Awards and Skill Randomization settings into the UI components from the given
+     * Loads the current values for XP Awards and Skill Randomization settings into
+     * the UI components from the given
      * {@code CampaignOptions} and {@code RandomSkillPreferences} objects.
      *
-     * @param presetCampaignOptions        Optional {@code CampaignOptions} object to load values from; if {@code null},
-     *                                     values are loaded from the current campaign options.
-     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
-     *                                     {@code null}, values are loaded from the current skill preferences.
+     * @param presetCampaignOptions        Optional {@code CampaignOptions} object
+     *                                     to load values from; if {@code null},
+     *                                     values are loaded from the current
+     *                                     campaign options.
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences}
+     *                                     object to load values from; if
+     *                                     {@code null}, values are loaded from the
+     *                                     current skill preferences.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1401,113 +1458,26 @@ public class AdvancementTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-            model = new AdvancementOptionsModel(options, skillPreferences);
-            updateCreatedControlsFromModel();
+        model = new AdvancementOptionsModel(options, skillPreferences);
+        updateCreatedControlsFromModel();
     }
 
-      private void updateCreatedControlsFromModel() {
-            updateXpAwardsControlsFromModel();
-            updateRandomizationControlsFromModel();
-            updateRecruitmentBonusControlsFromModel();
-      }
-
-      private void updateXpAwardsControlsFromModel() {
-            if (!xpAwardsPageCreated || model == null) {
-                  return;
-            }
-
-            spnXpCostMultiplier.setValue(model.xpCostMultiplier);
-            spnTaskXP.setValue(model.taskXP);
-            spnNTasksXP.setValue(model.nTasksXP);
-            spnSuccessXP.setValue(model.successXP);
-            spnMistakeXP.setValue(model.mistakeXP);
-            spnScenarioXP.setValue(model.scenarioXP);
-            spnKillXP.setValue(model.killXP);
-            spnKills.setValue(model.killsForXP);
-            spnVocationalXP.setValue(model.vocationalXP);
-            spnVocationalXPFrequency.setValue(model.vocationalXPFrequency);
-            spnVocationalXPTargetNumber.setValue(model.vocationalXPTargetNumber);
-            spnMissionXpFail.setValue(model.missionXpFail);
-            spnMissionXpSuccess.setValue(model.missionXpSuccess);
-            spnMissionXpOutstandingSuccess.setValue(model.missionXpOutstandingSuccess);
-            spnContractNegotiationXP.setValue(model.contractNegotiationXP);
-            spnAdminWeeklyXP.setValue(model.adminWeeklyXP);
-            spnAdminWeeklyXPPeriod.setValue(model.adminWeeklyXPPeriod);
-      }
-
-      private void updateRandomizationControlsFromModel() {
-            if (!randomizationPageCreated || model == null) {
-                  return;
-            }
-
-            chkExtraRandomness.setSelected(model.randomizeSkill);
-            for (int i = 0; i < Math.min(phenotypeSpinners.length, model.phenotypeProbabilities.length); i++) {
-                  phenotypeSpinners[i].setValue(model.phenotypeProbabilities[i]);
-            }
-
-            spnAbilityUltraGreen.setValue(model.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN]);
-            spnAbilityGreen.setValue(model.specialAbilityBonus[SkillType.EXP_GREEN]);
-            spnAbilityReg.setValue(model.specialAbilityBonus[SkillType.EXP_REGULAR]);
-            spnAbilityVet.setValue(model.specialAbilityBonus[SkillType.EXP_VETERAN]);
-            spnAbilityElite.setValue(model.specialAbilityBonus[SkillType.EXP_ELITE]);
-            spnAbilityHeroic.setValue(model.specialAbilityBonus[SkillType.EXP_HEROIC]);
-            spnAbilityLegendary.setValue(model.specialAbilityBonus[SkillType.EXP_LEGENDARY]);
-
-            spnCommandSkillsUltraGreen.setValue(model.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN]);
-            spnCommandSkillsGreen.setValue(model.commandSkillsModifier[SkillType.EXP_GREEN]);
-            spnCommandSkillsReg.setValue(model.commandSkillsModifier[SkillType.EXP_REGULAR]);
-            spnCommandSkillsVet.setValue(model.commandSkillsModifier[SkillType.EXP_VETERAN]);
-            spnCommandSkillsElite.setValue(model.commandSkillsModifier[SkillType.EXP_ELITE]);
-            spnCommandSkillsHeroic.setValue(model.commandSkillsModifier[SkillType.EXP_HEROIC]);
-            spnCommandSkillsLegendary.setValue(model.commandSkillsModifier[SkillType.EXP_LEGENDARY]);
-
-            spnUtilitySkillsUltraGreen.setValue(model.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN]);
-            spnUtilitySkillsGreen.setValue(model.utilitySkillsModifier[SkillType.EXP_GREEN]);
-            spnUtilitySkillsReg.setValue(model.utilitySkillsModifier[SkillType.EXP_REGULAR]);
-            spnUtilitySkillsVet.setValue(model.utilitySkillsModifier[SkillType.EXP_VETERAN]);
-            spnUtilitySkillsElite.setValue(model.utilitySkillsModifier[SkillType.EXP_ELITE]);
-            spnUtilitySkillsHeroic.setValue(model.utilitySkillsModifier[SkillType.EXP_HEROIC]);
-            spnUtilitySkillsLegendary.setValue(model.utilitySkillsModifier[SkillType.EXP_LEGENDARY]);
-
-            spnRoleplaySkillsModifier.setValue(model.roleplaySkillsModifier);
-            spnCombatSA.setValue(model.combatSmallArmsBonus);
-            spnSupportSA.setValue(model.supportSmallArmsBonus);
-            spnArtyProb.setValue(model.artilleryProb);
-            spnArtyBonus.setValue(model.artilleryBonus);
-            spnAntiMekSkill.setValue(model.antiMekProb);
-            spnSecondProb.setValue(model.secondSkillProb);
-            spnSecondBonus.setValue(model.secondSkillBonus);
-      }
-
-      private void updateRecruitmentBonusControlsFromModel() {
-            if (!recruitmentBonusesPageCreated || model == null) {
-                  return;
-            }
-
-            final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
-            for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
-                  PersonnelRole role = combatRoles.get(i);
-                  spnRecruitmentBonusCombat[i].setValue(model.recruitmentBonuses.getOrDefault(role, 0));
-            }
-
-            final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
-            for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
-                  PersonnelRole role = supportRoles.get(i);
-                  spnRecruitmentBonusSupport[i].setValue(model.recruitmentBonuses.getOrDefault(role, 0));
-            }
-      }
-
     /**
-     * Applies the current values from the XP Awards and Skill Randomization tabs to the specified
+     * Applies the current values from the XP Awards and Skill Randomization tabs to
+     * the specified
      * {@code CampaignOptions} and {@code RandomSkillPreferences}.
      *
-     * @param presetCampaignOptions        Optional {@code CampaignOptions} object to set values to; if {@code null},
-     *                                     values are applied to the current campaign options.
-     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
-     *                                     {@code null}, values are applied to the current skill preferences.
+     * @param presetCampaignOptions        Optional {@code CampaignOptions} object
+     *                                     to set values to; if {@code null},
+     *                                     values are applied to the current
+     *                                     campaign options.
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences}
+     *                                     object to set values to; if
+     *                                     {@code null}, values are applied to the
+     *                                     current skill preferences.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1518,8 +1488,8 @@ public class AdvancementTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-            updateModelFromCreatedControls();
-            model.applyTo(options, skillPreferences);
+        updateModelFromCreatedControls();
+        model.applyTo(options, skillPreferences);
 
         // Finishing Touches
         // This must be the last item, after all other tabs, no matter what.
@@ -1528,212 +1498,189 @@ public class AdvancementTab {
         }
     }
 
-      private void updateModelFromCreatedControls() {
-            updateModelFromXpAwardsControls();
-            updateModelFromRandomizationControls();
-            updateModelFromRecruitmentBonusControls();
-      }
+    private void updateCreatedControlsFromModel() {
+        updateXpAwardsControlsFromModel();
+        updateRandomizationControlsFromModel();
+        updateRecruitmentBonusControlsFromModel();
+    }
 
-      private void updateModelFromXpAwardsControls() {
-            if (!xpAwardsPageCreated || model == null) {
-                  return;
-            }
+    private void updateXpAwardsControlsFromModel() {
+        if (!xpAwardsPageCreated || model == null) {
+            return;
+        }
 
-            model.xpCostMultiplier = (double) spnXpCostMultiplier.getValue();
-            model.taskXP = (int) spnTaskXP.getValue();
-            model.nTasksXP = (int) spnNTasksXP.getValue();
-            model.successXP = (int) spnSuccessXP.getValue();
-            model.mistakeXP = (int) spnMistakeXP.getValue();
-            model.scenarioXP = (int) spnScenarioXP.getValue();
-            model.killXP = (int) spnKillXP.getValue();
-            model.killsForXP = (int) spnKills.getValue();
-            model.vocationalXP = (int) spnVocationalXP.getValue();
-            model.vocationalXPFrequency = (int) spnVocationalXPFrequency.getValue();
-            model.vocationalXPTargetNumber = (int) spnVocationalXPTargetNumber.getValue();
-            model.missionXpFail = (int) spnMissionXpFail.getValue();
-            model.missionXpSuccess = (int) spnMissionXpSuccess.getValue();
-            model.missionXpOutstandingSuccess = (int) spnMissionXpOutstandingSuccess.getValue();
-            model.contractNegotiationXP = (int) spnContractNegotiationXP.getValue();
-            model.adminWeeklyXP = (int) spnAdminWeeklyXP.getValue();
-            model.adminWeeklyXPPeriod = (int) spnAdminWeeklyXPPeriod.getValue();
-      }
+        spnXpCostMultiplier.setValue(model.xpCostMultiplier);
+        spnTaskXP.setValue(model.taskXP);
+        spnNTasksXP.setValue(model.nTasksXP);
+        spnSuccessXP.setValue(model.successXP);
+        spnMistakeXP.setValue(model.mistakeXP);
+        spnScenarioXP.setValue(model.scenarioXP);
+        spnKillXP.setValue(model.killXP);
+        spnKills.setValue(model.killsForXP);
+        spnVocationalXP.setValue(model.vocationalXP);
+        spnVocationalXPFrequency.setValue(model.vocationalXPFrequency);
+        spnVocationalXPTargetNumber.setValue(model.vocationalXPTargetNumber);
+        spnMissionXpFail.setValue(model.missionXpFail);
+        spnMissionXpSuccess.setValue(model.missionXpSuccess);
+        spnMissionXpOutstandingSuccess.setValue(model.missionXpOutstandingSuccess);
+        spnContractNegotiationXP.setValue(model.contractNegotiationXP);
+        spnAdminWeeklyXP.setValue(model.adminWeeklyXP);
+        spnAdminWeeklyXPPeriod.setValue(model.adminWeeklyXPPeriod);
+    }
 
-      private void updateModelFromRandomizationControls() {
-            if (!randomizationPageCreated || model == null) {
-                  return;
-            }
+    private void updateRandomizationControlsFromModel() {
+        if (!randomizationPageCreated || model == null) {
+            return;
+        }
 
-            model.randomizeSkill = chkExtraRandomness.isSelected();
-            for (int i = 0; i < Math.min(phenotypeSpinners.length, model.phenotypeProbabilities.length); i++) {
-                  model.phenotypeProbabilities[i] = (int) phenotypeSpinners[i].getValue();
-            }
+        chkExtraRandomness.setSelected(model.randomizeSkill);
+        for (int i = 0; i < Math.min(phenotypeSpinners.length, model.phenotypeProbabilities.length); i++) {
+            phenotypeSpinners[i].setValue(model.phenotypeProbabilities[i]);
+        }
 
-            model.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN] = (int) spnAbilityUltraGreen.getValue();
-            model.specialAbilityBonus[SkillType.EXP_GREEN] = (int) spnAbilityGreen.getValue();
-            model.specialAbilityBonus[SkillType.EXP_REGULAR] = (int) spnAbilityReg.getValue();
-            model.specialAbilityBonus[SkillType.EXP_VETERAN] = (int) spnAbilityVet.getValue();
-            model.specialAbilityBonus[SkillType.EXP_ELITE] = (int) spnAbilityElite.getValue();
-            model.specialAbilityBonus[SkillType.EXP_HEROIC] = (int) spnAbilityHeroic.getValue();
-            model.specialAbilityBonus[SkillType.EXP_LEGENDARY] = (int) spnAbilityLegendary.getValue();
+        spnAbilityUltraGreen.setValue(model.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN]);
+        spnAbilityGreen.setValue(model.specialAbilityBonus[SkillType.EXP_GREEN]);
+        spnAbilityReg.setValue(model.specialAbilityBonus[SkillType.EXP_REGULAR]);
+        spnAbilityVet.setValue(model.specialAbilityBonus[SkillType.EXP_VETERAN]);
+        spnAbilityElite.setValue(model.specialAbilityBonus[SkillType.EXP_ELITE]);
+        spnAbilityHeroic.setValue(model.specialAbilityBonus[SkillType.EXP_HEROIC]);
+        spnAbilityLegendary.setValue(model.specialAbilityBonus[SkillType.EXP_LEGENDARY]);
 
-            model.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnCommandSkillsUltraGreen.getValue();
-            model.commandSkillsModifier[SkillType.EXP_GREEN] = (int) spnCommandSkillsGreen.getValue();
-            model.commandSkillsModifier[SkillType.EXP_REGULAR] = (int) spnCommandSkillsReg.getValue();
-            model.commandSkillsModifier[SkillType.EXP_VETERAN] = (int) spnCommandSkillsVet.getValue();
-            model.commandSkillsModifier[SkillType.EXP_ELITE] = (int) spnCommandSkillsElite.getValue();
-            model.commandSkillsModifier[SkillType.EXP_HEROIC] = (int) spnCommandSkillsHeroic.getValue();
-            model.commandSkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnCommandSkillsLegendary.getValue();
+        spnCommandSkillsUltraGreen.setValue(model.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN]);
+        spnCommandSkillsGreen.setValue(model.commandSkillsModifier[SkillType.EXP_GREEN]);
+        spnCommandSkillsReg.setValue(model.commandSkillsModifier[SkillType.EXP_REGULAR]);
+        spnCommandSkillsVet.setValue(model.commandSkillsModifier[SkillType.EXP_VETERAN]);
+        spnCommandSkillsElite.setValue(model.commandSkillsModifier[SkillType.EXP_ELITE]);
+        spnCommandSkillsHeroic.setValue(model.commandSkillsModifier[SkillType.EXP_HEROIC]);
+        spnCommandSkillsLegendary.setValue(model.commandSkillsModifier[SkillType.EXP_LEGENDARY]);
 
-            model.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnUtilitySkillsUltraGreen.getValue();
-            model.utilitySkillsModifier[SkillType.EXP_GREEN] = (int) spnUtilitySkillsGreen.getValue();
-            model.utilitySkillsModifier[SkillType.EXP_REGULAR] = (int) spnUtilitySkillsReg.getValue();
-            model.utilitySkillsModifier[SkillType.EXP_VETERAN] = (int) spnUtilitySkillsVet.getValue();
-            model.utilitySkillsModifier[SkillType.EXP_ELITE] = (int) spnUtilitySkillsElite.getValue();
-            model.utilitySkillsModifier[SkillType.EXP_HEROIC] = (int) spnUtilitySkillsHeroic.getValue();
-            model.utilitySkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnUtilitySkillsLegendary.getValue();
+        spnUtilitySkillsUltraGreen.setValue(model.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN]);
+        spnUtilitySkillsGreen.setValue(model.utilitySkillsModifier[SkillType.EXP_GREEN]);
+        spnUtilitySkillsReg.setValue(model.utilitySkillsModifier[SkillType.EXP_REGULAR]);
+        spnUtilitySkillsVet.setValue(model.utilitySkillsModifier[SkillType.EXP_VETERAN]);
+        spnUtilitySkillsElite.setValue(model.utilitySkillsModifier[SkillType.EXP_ELITE]);
+        spnUtilitySkillsHeroic.setValue(model.utilitySkillsModifier[SkillType.EXP_HEROIC]);
+        spnUtilitySkillsLegendary.setValue(model.utilitySkillsModifier[SkillType.EXP_LEGENDARY]);
 
-            model.roleplaySkillsModifier = (int) spnRoleplaySkillsModifier.getValue();
-            model.combatSmallArmsBonus = (int) spnCombatSA.getValue();
-            model.supportSmallArmsBonus = (int) spnSupportSA.getValue();
-            model.artilleryProb = (int) spnArtyProb.getValue();
-            model.artilleryBonus = (int) spnArtyBonus.getValue();
-            model.antiMekProb = (int) spnAntiMekSkill.getValue();
-            model.secondSkillProb = (int) spnSecondProb.getValue();
-            model.secondSkillBonus = (int) spnSecondBonus.getValue();
-      }
+        spnRoleplaySkillsModifier.setValue(model.roleplaySkillsModifier);
+        spnCombatSA.setValue(model.combatSmallArmsBonus);
+        spnSupportSA.setValue(model.supportSmallArmsBonus);
+        spnArtyProb.setValue(model.artilleryProb);
+        spnArtyBonus.setValue(model.artilleryBonus);
+        spnAntiMekSkill.setValue(model.antiMekProb);
+        spnSecondProb.setValue(model.secondSkillProb);
+        spnSecondBonus.setValue(model.secondSkillBonus);
+    }
 
-      private void updateModelFromRecruitmentBonusControls() {
-            if (!recruitmentBonusesPageCreated || model == null) {
-                  return;
-            }
+    private void updateRecruitmentBonusControlsFromModel() {
+        if (!recruitmentBonusesPageCreated || model == null) {
+            return;
+        }
 
-            final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
-            final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
+        final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
+        for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
+            PersonnelRole role = combatRoles.get(i);
+            spnRecruitmentBonusCombat[i].setValue(model.recruitmentBonuses.getOrDefault(role, 0));
+        }
 
-            for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
-                  PersonnelRole role = combatRoles.get(i);
-                  model.recruitmentBonuses.put(role, (int) spnRecruitmentBonusCombat[i].getValue());
-            }
+        final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
+        for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
+            PersonnelRole role = supportRoles.get(i);
+            spnRecruitmentBonusSupport[i].setValue(model.recruitmentBonuses.getOrDefault(role, 0));
+        }
+    }
 
-            for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
-                  PersonnelRole role = supportRoles.get(i);
-                  model.recruitmentBonuses.put(role, (int) spnRecruitmentBonusSupport[i].getValue());
-            }
-      }
+    private void updateModelFromCreatedControls() {
+        updateModelFromXpAwardsControls();
+        updateModelFromRandomizationControls();
+        updateModelFromRecruitmentBonusControls();
+    }
 
-      private static class AdvancementOptionsModel {
-            private double xpCostMultiplier;
-            private int taskXP;
-            private int nTasksXP;
-            private int successXP;
-            private int mistakeXP;
-            private int scenarioXP;
-            private int killXP;
-            private int killsForXP;
-            private int vocationalXP;
-            private int vocationalXPFrequency;
-            private int vocationalXPTargetNumber;
-            private int missionXpFail;
-            private int missionXpSuccess;
-            private int missionXpOutstandingSuccess;
-            private int contractNegotiationXP;
-            private int adminWeeklyXP;
-            private int adminWeeklyXPPeriod;
-            private boolean randomizeSkill;
-            private int[] phenotypeProbabilities;
-            private int[] specialAbilityBonus;
-            private int[] commandSkillsModifier;
-            private int[] utilitySkillsModifier;
-            private int roleplaySkillsModifier;
-            private int combatSmallArmsBonus;
-            private int supportSmallArmsBonus;
-            private int artilleryProb;
-            private int artilleryBonus;
-            private int antiMekProb;
-            private int secondSkillProb;
-            private int secondSkillBonus;
-            private Map<PersonnelRole, Integer> recruitmentBonuses;
+    private void updateModelFromXpAwardsControls() {
+        if (!xpAwardsPageCreated || model == null) {
+            return;
+        }
 
-            private AdvancementOptionsModel(CampaignOptions options, RandomSkillPreferences skillPreferences) {
-                  xpCostMultiplier = options.getXpCostMultiplier();
-                  taskXP = options.getTaskXP();
-                  nTasksXP = options.getNTasksXP();
-                  successXP = options.getSuccessXP();
-                  mistakeXP = options.getMistakeXP();
-                  scenarioXP = options.getScenarioXP();
-                  killXP = options.getKillXPAward();
-                  killsForXP = options.getKillsForXP();
-                  vocationalXP = options.getVocationalXP();
-                  vocationalXPFrequency = options.getVocationalXPCheckFrequency();
-                  vocationalXPTargetNumber = options.getVocationalXPTargetNumber();
-                  missionXpFail = options.getMissionXpFail();
-                  missionXpSuccess = options.getMissionXpSuccess();
-                  missionXpOutstandingSuccess = options.getMissionXpOutstandingSuccess();
-                  contractNegotiationXP = options.getContractNegotiationXP();
-                  adminWeeklyXP = options.getAdminXP();
-                  adminWeeklyXPPeriod = options.getAdminXPPeriod();
-                  randomizeSkill = skillPreferences.randomizeSkill();
-                  phenotypeProbabilities = options.getPhenotypeProbabilities().clone();
-                  specialAbilityBonus = new int[EXPERIENCE_LEVELS.length];
-                  commandSkillsModifier = new int[EXPERIENCE_LEVELS.length];
-                  utilitySkillsModifier = new int[EXPERIENCE_LEVELS.length];
-                  for (int experienceLevel : EXPERIENCE_LEVELS) {
-                        specialAbilityBonus[experienceLevel] = skillPreferences.getSpecialAbilityBonus(experienceLevel);
-                        commandSkillsModifier[experienceLevel] = skillPreferences.getCommandSkillsModifier(experienceLevel);
-                        utilitySkillsModifier[experienceLevel] = skillPreferences.getUtilitySkillsModifier(experienceLevel);
-                  }
-                  roleplaySkillsModifier = skillPreferences.getRoleplaySkillModifier();
-                  combatSmallArmsBonus = skillPreferences.getCombatSmallArmsBonus();
-                  supportSmallArmsBonus = skillPreferences.getSupportSmallArmsBonus();
-                  artilleryProb = skillPreferences.getArtilleryProb();
-                  artilleryBonus = skillPreferences.getArtilleryBonus();
-                  antiMekProb = skillPreferences.getAntiMekProb();
-                  secondSkillProb = skillPreferences.getSecondSkillProb();
-                  secondSkillBonus = skillPreferences.getSecondSkillBonus();
-                  recruitmentBonuses = new HashMap<>(skillPreferences.getRecruitmentBonuses());
-            }
+        model.xpCostMultiplier = (double) spnXpCostMultiplier.getValue();
+        model.taskXP = (int) spnTaskXP.getValue();
+        model.nTasksXP = (int) spnNTasksXP.getValue();
+        model.successXP = (int) spnSuccessXP.getValue();
+        model.mistakeXP = (int) spnMistakeXP.getValue();
+        model.scenarioXP = (int) spnScenarioXP.getValue();
+        model.killXP = (int) spnKillXP.getValue();
+        model.killsForXP = (int) spnKills.getValue();
+        model.vocationalXP = (int) spnVocationalXP.getValue();
+        model.vocationalXPFrequency = (int) spnVocationalXPFrequency.getValue();
+        model.vocationalXPTargetNumber = (int) spnVocationalXPTargetNumber.getValue();
+        model.missionXpFail = (int) spnMissionXpFail.getValue();
+        model.missionXpSuccess = (int) spnMissionXpSuccess.getValue();
+        model.missionXpOutstandingSuccess = (int) spnMissionXpOutstandingSuccess.getValue();
+        model.contractNegotiationXP = (int) spnContractNegotiationXP.getValue();
+        model.adminWeeklyXP = (int) spnAdminWeeklyXP.getValue();
+        model.adminWeeklyXPPeriod = (int) spnAdminWeeklyXPPeriod.getValue();
+    }
 
-            private void applyTo(CampaignOptions options, RandomSkillPreferences skillPreferences) {
-                  options.setXpCostMultiplier(xpCostMultiplier);
-                  options.setTaskXP(taskXP);
-                  options.setNTasksXP(nTasksXP);
-                  options.setSuccessXP(successXP);
-                  options.setMistakeXP(mistakeXP);
-                  options.setScenarioXP(scenarioXP);
-                  options.setKillXPAward(killXP);
-                  options.setKillsForXP(killsForXP);
-                  options.setVocationalXP(vocationalXP);
-                  options.setVocationalXPCheckFrequency(vocationalXPFrequency);
-                  options.setVocationalXPTargetNumber(vocationalXPTargetNumber);
-                  options.setMissionXpFail(missionXpFail);
-                  options.setMissionXpSuccess(missionXpSuccess);
-                  options.setMissionXpOutstandingSuccess(missionXpOutstandingSuccess);
-                  options.setContractNegotiationXP(contractNegotiationXP);
-                  options.setAdminXP(adminWeeklyXP);
-                  options.setAdminXPPeriod(adminWeeklyXPPeriod);
+    private void updateModelFromRandomizationControls() {
+        if (!randomizationPageCreated || model == null) {
+            return;
+        }
 
-                  skillPreferences.setRandomizeSkill(randomizeSkill);
-                  for (int i = 0; i < phenotypeProbabilities.length; i++) {
-                        options.setPhenotypeProbability(i, phenotypeProbabilities[i]);
-                  }
-                  skillPreferences.setAntiMekProb(antiMekProb);
-                  skillPreferences.setArtilleryProb(artilleryProb);
-                  skillPreferences.setArtilleryBonus(artilleryBonus);
-                  skillPreferences.setSecondSkillProb(secondSkillProb);
-                  skillPreferences.setSecondSkillBonus(secondSkillBonus);
+        model.randomizeSkill = chkExtraRandomness.isSelected();
+        for (int i = 0; i < Math.min(phenotypeSpinners.length, model.phenotypeProbabilities.length); i++) {
+            model.phenotypeProbabilities[i] = (int) phenotypeSpinners[i].getValue();
+        }
 
-                  for (int experienceLevel : EXPERIENCE_LEVELS) {
-                        skillPreferences.setCommandSkillsMod(experienceLevel, commandSkillsModifier[experienceLevel]);
-                        skillPreferences.setUtilitySkillsMod(experienceLevel, utilitySkillsModifier[experienceLevel]);
-                        skillPreferences.setSpecialAbilityBonus(experienceLevel, specialAbilityBonus[experienceLevel]);
-                  }
-                  skillPreferences.setRoleplaySkillModifier(roleplaySkillsModifier);
-                  skillPreferences.setCombatSmallArmsBonus(combatSmallArmsBonus);
-                  skillPreferences.setSupportSmallArmsBonus(supportSmallArmsBonus);
+        model.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN] = (int) spnAbilityUltraGreen.getValue();
+        model.specialAbilityBonus[SkillType.EXP_GREEN] = (int) spnAbilityGreen.getValue();
+        model.specialAbilityBonus[SkillType.EXP_REGULAR] = (int) spnAbilityReg.getValue();
+        model.specialAbilityBonus[SkillType.EXP_VETERAN] = (int) spnAbilityVet.getValue();
+        model.specialAbilityBonus[SkillType.EXP_ELITE] = (int) spnAbilityElite.getValue();
+        model.specialAbilityBonus[SkillType.EXP_HEROIC] = (int) spnAbilityHeroic.getValue();
+        model.specialAbilityBonus[SkillType.EXP_LEGENDARY] = (int) spnAbilityLegendary.getValue();
 
-                  for (Map.Entry<PersonnelRole, Integer> recruitmentBonus : recruitmentBonuses.entrySet()) {
-                        skillPreferences.addRecruitmentBonus(recruitmentBonus.getKey(), recruitmentBonus.getValue());
-                  }
-            }
-      }
+        model.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnCommandSkillsUltraGreen.getValue();
+        model.commandSkillsModifier[SkillType.EXP_GREEN] = (int) spnCommandSkillsGreen.getValue();
+        model.commandSkillsModifier[SkillType.EXP_REGULAR] = (int) spnCommandSkillsReg.getValue();
+        model.commandSkillsModifier[SkillType.EXP_VETERAN] = (int) spnCommandSkillsVet.getValue();
+        model.commandSkillsModifier[SkillType.EXP_ELITE] = (int) spnCommandSkillsElite.getValue();
+        model.commandSkillsModifier[SkillType.EXP_HEROIC] = (int) spnCommandSkillsHeroic.getValue();
+        model.commandSkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnCommandSkillsLegendary.getValue();
+
+        model.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnUtilitySkillsUltraGreen.getValue();
+        model.utilitySkillsModifier[SkillType.EXP_GREEN] = (int) spnUtilitySkillsGreen.getValue();
+        model.utilitySkillsModifier[SkillType.EXP_REGULAR] = (int) spnUtilitySkillsReg.getValue();
+        model.utilitySkillsModifier[SkillType.EXP_VETERAN] = (int) spnUtilitySkillsVet.getValue();
+        model.utilitySkillsModifier[SkillType.EXP_ELITE] = (int) spnUtilitySkillsElite.getValue();
+        model.utilitySkillsModifier[SkillType.EXP_HEROIC] = (int) spnUtilitySkillsHeroic.getValue();
+        model.utilitySkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnUtilitySkillsLegendary.getValue();
+
+        model.roleplaySkillsModifier = (int) spnRoleplaySkillsModifier.getValue();
+        model.combatSmallArmsBonus = (int) spnCombatSA.getValue();
+        model.supportSmallArmsBonus = (int) spnSupportSA.getValue();
+        model.artilleryProb = (int) spnArtyProb.getValue();
+        model.artilleryBonus = (int) spnArtyBonus.getValue();
+        model.antiMekProb = (int) spnAntiMekSkill.getValue();
+        model.secondSkillProb = (int) spnSecondProb.getValue();
+        model.secondSkillBonus = (int) spnSecondBonus.getValue();
+    }
+
+    private void updateModelFromRecruitmentBonusControls() {
+        if (!recruitmentBonusesPageCreated || model == null) {
+            return;
+        }
+
+        final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
+        final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
+
+        for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
+            PersonnelRole role = combatRoles.get(i);
+            model.recruitmentBonuses.put(role, (int) spnRecruitmentBonusCombat[i].getValue());
+        }
+
+        for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
+            PersonnelRole role = supportRoles.get(i);
+            model.recruitmentBonuses.put(role, (int) spnRecruitmentBonusSupport[i].getValue());
+        }
+    }
+
 }

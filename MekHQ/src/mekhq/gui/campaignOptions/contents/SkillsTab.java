@@ -50,7 +50,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +62,6 @@ import javax.swing.JSpinner;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -95,13 +93,12 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class SkillsTab {
     private final CampaignOptions campaignOptions;
 
-    private Map<String, SkillConfiguration> skillConfigurations;
+    private SkillsOptionsModel model;
     private Map<SkillSubType, JPanel> createdCategoryTabs;
     private Map<String, JSpinner> allTargetNumbers;
     private Map<String, List<JLabel>> allSkillLevels;
     private Map<String, List<JSpinner>> allSkillCosts;
     private Map<String, List<JComboBox<SkillLevel>>> allSkillMilestones;
-    private int edgeCost;
     private int storedTargetNumber = 0;
     private List<Integer> storedValuesSpinners = new ArrayList<>();
     private List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
@@ -111,8 +108,6 @@ public class SkillsTab {
     private JSpinner spnEdgeCost;
     private JLabel lblAttributeCost;
     private JSpinner spnAttributeCost;
-
-    private static final MMLogger LOGGER = MMLogger.create(SkillsTab.class);
 
     /**
      * Constructs a new `SkillsTab` instance and initializes the necessary data structures for managing skill
@@ -140,13 +135,11 @@ public class SkillsTab {
      * for tracking target numbers, costs, and milestones for every skill.
      */
     private void initializeGeneral() {
-        skillConfigurations = new HashMap<>();
         createdCategoryTabs = new EnumMap<>(SkillSubType.class);
         allTargetNumbers = new HashMap<>();
         allSkillLevels = new HashMap<>();
         allSkillCosts = new HashMap<>();
         allSkillMilestones = new HashMap<>();
-        edgeCost = campaignOptions.getEdgeCost();
         storedTargetNumber = 0;
         storedValuesSpinners = new ArrayList<>();
         storedValuesComboBoxes = new ArrayList<>();
@@ -580,7 +573,7 @@ public class SkillsTab {
      * </p>
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, new HashMap<>());
+        loadValuesFromCampaignOptions(null, Map.of());
     }
 
     /**
@@ -600,29 +593,22 @@ public class SkillsTab {
             options = this.campaignOptions;
         }
 
-        Map<String, SkillType> skillValues = presetSkillValues == null ? Map.of() : presetSkillValues;
-        String[] skills = SkillType.getSkillList(); // default skills
-
-        for (String skillName : skills) {
-            // Fetch the skill, either from presetSkillValues or default
-            SkillType skill = skillValues.getOrDefault(skillName, SkillType.getType(skillName));
-            if (skill == null) {
-                LOGGER.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
-                continue;
-            }
-
-            skillConfigurations.put(skillName, new SkillConfiguration(skill));
+        model = new SkillsOptionsModel(options, presetSkillValues);
+        for (String skillName : SkillType.getSkillList()) {
             updateSkillControlsFromModel(skillName);
         }
 
-        edgeCost = options.getEdgeCost();
         if (spnEdgeCost != null) {
-            spnEdgeCost.setValue(edgeCost);
+            spnEdgeCost.setValue(model.edgeCost);
         }
     }
 
     private void updateSkillControlsFromModel(String skillName) {
-        SkillConfiguration skillConfiguration = skillConfigurations.get(skillName);
+        if (model == null) {
+            return;
+        }
+
+        SkillConfiguration skillConfiguration = model.getSkillConfiguration(skillName);
         if (skillConfiguration == null) {
             return;
         }
@@ -713,35 +699,20 @@ public class SkillsTab {
         }
 
         updateModelFromCreatedControls();
-
-        for (final String skillName : SkillType.getSkillList()) {
-            SkillType type = SkillType.getType(skillName);
-            if (presetSkills != null) {
-                type = presetSkills.get(skillName);
-            }
-
-            if (type == null) {
-                LOGGER.info("(applyCampaignOptionsToCampaign) Skipping outdated or missing skill: {}", skillName);
-                continue;
-            }
-
-            SkillType configuredType = type;
-            SkillConfiguration skillConfiguration = skillConfigurations.computeIfAbsent(skillName,
-                ignored -> new SkillConfiguration(configuredType));
-            skillConfiguration.applyTo(type);
-        }
-
-        // Edge Costs
-        options.setEdgeCost(edgeCost);
+        model.applyTo(options, presetSkills);
     }
 
     private void updateModelFromCreatedControls() {
+        if (model == null) {
+            return;
+        }
+
         if (spnEdgeCost != null) {
-            edgeCost = (int) spnEdgeCost.getValue();
+            model.edgeCost = (int) spnEdgeCost.getValue();
         }
 
         for (String skillName : allTargetNumbers.keySet()) {
-            SkillConfiguration skillConfiguration = skillConfigurations.get(skillName);
+            SkillConfiguration skillConfiguration = model.getSkillConfiguration(skillName);
             if (skillConfiguration == null) {
                 continue;
             }
@@ -797,39 +768,4 @@ public class SkillsTab {
         }
     }
 
-    private static class SkillConfiguration {
-        private int targetNumber;
-        private Integer[] costs;
-        private int greenLevel;
-        private int regularLevel;
-        private int veteranLevel;
-        private int eliteLevel;
-        private int heroicLevel;
-        private int legendaryLevel;
-
-        private SkillConfiguration(SkillType skillType) {
-            targetNumber = skillType.getTarget();
-            costs = Arrays.copyOf(skillType.getCosts(), skillType.getCosts().length);
-            greenLevel = skillType.getGreenLevel();
-            regularLevel = skillType.getRegularLevel();
-            veteranLevel = skillType.getVeteranLevel();
-            eliteLevel = skillType.getEliteLevel();
-            heroicLevel = skillType.getHeroicLevel();
-            legendaryLevel = skillType.getLegendaryLevel();
-        }
-
-        private void applyTo(SkillType skillType) {
-            skillType.setTarget(targetNumber);
-            Integer[] targetCosts = skillType.getCosts();
-            for (int i = 0; i < Math.min(costs.length, targetCosts.length); i++) {
-                targetCosts[i] = costs[i];
-            }
-            skillType.setGreenLevel(greenLevel);
-            skillType.setRegularLevel(regularLevel);
-            skillType.setVeteranLevel(veteranLevel);
-            skillType.setEliteLevel(eliteLevel);
-            skillType.setHeroicLevel(heroicLevel);
-            skillType.setLegendaryLevel(legendaryLevel);
-        }
-    }
 }

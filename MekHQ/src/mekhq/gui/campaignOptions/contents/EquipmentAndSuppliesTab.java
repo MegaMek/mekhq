@@ -1113,23 +1113,6 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Applies the given campaign options to the campaign or uses default options if none are provided. This method
-     * updates the campaign settings for acquisitions, deliveries, planetary acquisitions, and technological limits to
-     * customize campaign behavior.
-     *
-     * @param presetCampaignOptions the campaign options to apply; if null, default campaign options are used instead
-     */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
-        }
-
-        updateModelFromCreatedControls();
-        model.applyTo(options);
-    }
-
-    /**
      * Loads values from the campaign options. This method serves as a convenience method that calls the overloaded
      * version of {@code loadValuesFromCampaignOptions} with a {@code null} parameter.
      * <p>
@@ -1155,6 +1138,23 @@ public class EquipmentAndSuppliesTab {
 
         model = new EquipmentAndSuppliesOptionsModel(options);
         updateCreatedControlsFromModel();
+    }
+
+    /**
+     * Applies the given campaign options to the campaign or uses default options if none are provided. This method
+     * updates the campaign settings for acquisitions, deliveries, planetary acquisitions, and technological limits to
+     * customize campaign behavior.
+     *
+     * @param presetCampaignOptions the campaign options to apply; if null, default campaign options are used instead
+     */
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
+        updateModelFromCreatedControls();
+        model.applyTo(options);
     }
 
     private void updateCreatedControlsFromModel() {
@@ -1239,7 +1239,7 @@ public class EquipmentAndSuppliesTab {
     }
 
     private void updateModelFromAcquisitionControls() {
-        if (!acquisitionPageCreated) {
+        if (!acquisitionPageCreated || model == null) {
             return;
         }
 
@@ -1266,7 +1266,7 @@ public class EquipmentAndSuppliesTab {
     }
 
     private void updateModelFromPlanetaryAcquisitionControls() {
-        if (!planetaryAcquisitionPageCreated) {
+        if (!planetaryAcquisitionPageCreated || model == null) {
             return;
         }
 
@@ -1292,7 +1292,7 @@ public class EquipmentAndSuppliesTab {
     }
 
     private void updateModelFromTechLimitsControls() {
-        if (!techLimitsPageCreated) {
+        if (!techLimitsPageCreated || model == null) {
             return;
         }
 

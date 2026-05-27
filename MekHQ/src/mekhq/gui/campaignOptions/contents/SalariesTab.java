@@ -582,7 +582,7 @@ public class SalariesTab {
     }
 
     private void updateModelFromSalariesControls(PersonnelRoleSubType type) {
-        if (!isPageCreated(type)) {
+        if (!isPageCreated(type) || model == null) {
             return;
         }
 
