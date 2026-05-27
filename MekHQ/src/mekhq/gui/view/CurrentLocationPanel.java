@@ -54,7 +54,6 @@ import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
@@ -81,7 +80,7 @@ import org.apache.commons.lang3.StringUtils;
  * <p>
  * Visually represents whether the player is currently on a planet, in transit, or at a jump point,
  * provides relevant planetary statistics (e.g. atmosphere, gravity, socio-industrial data) or
- * travel progress, and includes an entry point to the personnel market.
+ * travel progress, and includes an entry point to the Recruitment Dialog.
  * </p>
  */
 public class CurrentLocationPanel extends JPanel {
@@ -101,10 +100,10 @@ public class CurrentLocationPanel extends JPanel {
     /**
      * Constructs a new CurrentLocationPanel.
      *
-     * @param campaign            the active {@link Campaign} instance
-     * @param openPersonnelMarket a {@link Runnable} that triggers the opening of the Personnel Market UI
+     * @param campaign              the active {@link Campaign} instance
+     * @param openRecruitmentDialog a {@link Runnable} that triggers the opening of the Recruitment UI
      */
-    public CurrentLocationPanel(Campaign campaign, Runnable openPersonnelMarket) {
+    public CurrentLocationPanel(Campaign campaign, Runnable openRecruitmentDialog) {
         super();
         this.campaign = campaign;
 
@@ -136,7 +135,7 @@ public class CurrentLocationPanel extends JPanel {
         gridBagConstraints.weighty = 1;
         add(new JLabel(), gridBagConstraints);
 
-        btnHiringHall.addActionListener(e -> openPersonnelMarket.run());
+        btnHiringHall.addActionListener(e -> openRecruitmentDialog.run());
         gridBagConstraints.gridy++;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -168,9 +167,9 @@ public class CurrentLocationPanel extends JPanel {
         imgLocation.setImage(locationImage, scale);
 
         if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
-            // keep legacy personnel markets always available
+            // keep the legacy recruitment always available
             btnHiringHall.setEnabled(true);
-            btnHiringHall.setText(getTextAt("personnelMarket.legacy"));
+            btnHiringHall.setText(getTextAt("recruitment.legacy"));
         } else {
             String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
             btnHiringHall.setEnabled(availabilityMessage.isBlank());
@@ -179,9 +178,9 @@ public class CurrentLocationPanel extends JPanel {
             if (!availabilityMessage.isBlank()) {
                 btnHiringHall.setText(availabilityMessage);
             } else if (hiringHallLevel.isNone()) {
-                btnHiringHall.setText(getTextAt("hiringHall.none"));
+                btnHiringHall.setText(getTextAt("recruitment.hiringHall.none"));
             } else {
-                btnHiringHall.setText(getFormattedTextAt("hiringHall.some",
+                btnHiringHall.setText(getFormattedTextAt("recruitment.hiringHall.some",
                       StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
             }
         }

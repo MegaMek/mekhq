@@ -756,10 +756,10 @@ public class CampaignGUI extends JPanel {
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
-        miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
-        miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
-        menuMarket.add(miPersonnelMarket);
+        JMenuItem miRecruitment = new JMenuItem(resourceMap.getString("miRecruitment.text"));
+        miRecruitment.setMnemonic(KeyEvent.VK_R);
+        miRecruitment.addActionListener(evt -> openRecruitmentDialog());
+        menuMarket.add(miRecruitment);
 
         JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
         miContractMarket.setMnemonic(KeyEvent.VK_C);
@@ -789,62 +789,52 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
-        miBuyParts.setMnemonic(KeyEvent.VK_R);
+        miBuyParts.setMnemonic(KeyEvent.VK_P);
         miBuyParts.addActionListener(evt -> new PartsStoreDialog(true, this).setVisible(true));
         menuMarket.add(miBuyParts);
 
-        JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
-        miHireBulk.setMnemonic(KeyEvent.VK_B);
-        miHireBulk.addActionListener(evt -> hireBulkPersonnel());
-        menuMarket.add(miHireBulk);
+        JMenuItem miRecruitmentBulk = new JMenuItem(resourceMap.getString("miBulkRecruitment.text"));
+        miRecruitmentBulk.setMnemonic(KeyEvent.VK_B);
+        miRecruitmentBulk.addActionListener(evt -> openBulkRecruitmentDialog());
+        menuMarket.add(miRecruitmentBulk);
 
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
-        menuHire.setMnemonic(KeyEvent.VK_H);
+        JMenu menuRecruitment = new JMenu(resourceMap.getString("menuRecruitment.text"));
+        menuRecruitment.setMnemonic(KeyEvent.VK_H);
 
-        JMenuItem menuHireBlank = new JMenuItem(resourceMap.getString("menuHire.blank"));
-        menuHireBlank.addActionListener(this::addBlankPerson);
+        JMenuItem menuRecruitmentBlank = new JMenuItem(resourceMap.getString("menuRecruitment.blank"));
+        menuRecruitmentBlank.addActionListener(this::addBlankPerson);
 
-        JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
-        JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
-        JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
+        JMenu menuCombatRecruitment = new JMenu(resourceMap.getString("menuRecruitment.combat"));
+        JMenu menuSupportRecruitment = new JMenu(resourceMap.getString("menuRecruitment.support"));
+        JMenu menuCivilianRecruitment = new JMenu(resourceMap.getString("menuRecruitment.civilian"));
 
         PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
         for (PersonnelRole role : roles) {
-            // Dependent is handled speciality so that it's always at the top of the civilian category
-            if (role.isDependent()) {
-                continue;
-            }
-
-            JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
+            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(role.getMnemonic());
+                miRoleRecruitment.setMnemonic(role.getMnemonic());
             }
-            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
-            miHire.setActionCommand(role.name());
-            miHire.addActionListener(this::hirePerson);
+            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
+            miRoleRecruitment.setActionCommand(role.name());
+            miRoleRecruitment.addActionListener(this::hirePerson);
 
             if (role.isCombat()) {
-                menuHireCombat.add(miHire);
+                menuCombatRecruitment.add(miRoleRecruitment);
             } else if (role.isSupport(true)) {
-                menuHireSupport.add(miHire);
-            } else if (!role.isDependent()) {
-                menuHireCivilian.add(miHire);
+                menuSupportRecruitment.add(miRoleRecruitment);
+            } else if (role.isDependent()) {
+                // Dependent is handled specially so that it's always at the top of the civilian category
+                menuCivilianRecruitment.insert(miRoleRecruitment, 0);
+            } else {
+                menuCivilianRecruitment.add(miRoleRecruitment);
             }
         }
 
-        JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
-        if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-            miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
-        }
-        miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
-        miHire.addActionListener(this::hirePerson);
-        menuHireCivilian.insert(miHire, 0);
-
-        menuHire.add(menuHireBlank);
-        menuHire.add(menuHireCombat);
-        menuHire.add(menuHireSupport);
-        menuHire.add(menuHireCivilian);
-        menuMarket.add(menuHire);
+        menuRecruitment.add(menuRecruitmentBlank);
+        menuRecruitment.add(menuCombatRecruitment);
+        menuRecruitment.add(menuSupportRecruitment);
+        menuRecruitment.add(menuCivilianRecruitment);
+        menuMarket.add(menuRecruitment);
 
         // region Temp Pool
         JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
@@ -1343,7 +1333,7 @@ public class CampaignGUI extends JPanel {
         pnlTop = new JPanel(new GridBagLayout());
         pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
 
-        pnlLocation = new CurrentLocationPanel(getCampaign(), this::hirePersonMarket);
+        pnlLocation = new CurrentLocationPanel(getCampaign(), this::openRecruitmentDialog);
         pnlLocation.setMinimumSize(new Dimension(320, 60));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1846,16 +1836,16 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
+     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign
      * options.
      *
-     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
+     * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market
      * style.</p>
      *
-     * <p>If no personnel market is enabled display the bulk hiring dialog, instead.</p>
+     * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
-    public void hirePersonMarket() {
+    public void openRecruitmentDialog() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
 
@@ -1868,11 +1858,11 @@ public class CampaignGUI extends JPanel {
                 getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         } else {
-            hireBulkPersonnel();
+            openBulkRecruitmentDialog();
         }
     }
 
-    private void hireBulkPersonnel() {
+    private void openBulkRecruitmentDialog() {
         HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hireBulkPersonnelDialog.setVisible(true);
     }
