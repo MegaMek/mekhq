@@ -37,12 +37,15 @@ import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
 import static mekhq.utilities.MHQInternationalization.getText;
@@ -59,21 +62,7 @@ import java.awt.Insets;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -116,15 +105,7 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
@@ -1689,7 +1670,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-                List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.accept"),
+        List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.accept"),
               getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.cancel"));
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(),
@@ -1997,7 +1978,9 @@ public final class BriefingTab extends CampaignGuiTab {
             if (getCampaignOptions().isAutoConfigMunitions()) {
                 autoconfigureBotMunitions(atBScenario, chosen);
             }
-            configureBotAi(atBScenario);
+
+            AtBContract contract = atBScenario.getContract(getCampaign());
+            configureBotAI(atBScenario, contract, getCampaign().getLocalDate());
         }
 
         if (scenario.getStratConScenarioType().isConvoy() && (autoResolveBehaviorSettings != null)) {
@@ -2014,12 +1997,70 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
-    private void configureBotAi(AtBScenario scenario) {
-        Faction opFor = getEnemyFactionFromScenario(scenario);
-        boolean isPirate = opFor.isRebelOrPirate();
-        for (var bf : scenario.getBotForces()) {
-            bf.getBehaviorSettings().setIAmAPirate(isPirate);
+    /**
+     * Configures the AI behavior settings for all bot forces in the given scenario.
+     *
+     * <p>Each bot force is assigned a pirate flag based on its team alignment:</p>
+     * <ul>
+     *     <li>{@link ScenarioForceTemplate.ForceAlignment#Allied} forces inherit the employer faction's pirate status.</li>
+     *     <li>{@link ScenarioForceTemplate.ForceAlignment#Opposing} forces inherit the enemy faction's pirate status.</li>
+     *     <li>{@link ScenarioForceTemplate.ForceAlignment#PlanetOwner} forces are resolved against the planet
+     *     owner's alignment at the time of the scenario, then treated as either allied- or opposing-side accordingly.</li>
+     * </ul>
+     *
+     * <p>Bot forces whose template name contains {@code "convoy"} (case-insensitive) are additionally configured to
+     * ignore damage output, reflecting their non-combat role.</p>
+     *
+     * <p><b>Note:</b> Significantly overhauled during the 51.0 dev cycle.</p>
+     *
+     * @param scenario the {@link AtBScenario} whose bot forces will be configured
+     * @param contract the {@link AtBContract} providing employer and planet-owner context
+     * @param today    the current campaign date, used to resolve the planet owner's faction and alignment
+     */
+    private void configureBotAI(AtBScenario scenario, AtBContract contract, LocalDate today) {
+        Faction enemyFaction = getEnemyFactionFromScenario(scenario);
+        Faction employerFaction = getAlliedFactionFromScenario(scenario);
+
+        boolean isEnemyPirate = enemyFaction.isRebelOrPirate();
+        boolean isEmployerPirate = employerFaction.isRebelOrPirate();
+
+        // I hate using string comparison for convoy detection, but without going through and updating every scenario
+        // template and potentially breaking some along the way, this is our best option - Illiani, May/27/2026
+        boolean isPlanetOwnerPirate = resolvePlanetOwnerIsPirate(contract, today, isEmployerPirate, isEnemyPirate);
+
+        for (BotForce botForce : scenario.getBotForces()) {
+            ScenarioForceTemplate.ForceAlignment team = ScenarioForceTemplate.ForceAlignment.values()[botForce.getTeam()];
+
+            boolean isConvoy = botForce.getTemplateName().toLowerCase().contains("convoy");
+            botForce.getBehaviorSettings().setIgnoreDamageOutput(isConvoy);
+
+            boolean isPirate = switch (team) {
+                case Allied -> isEmployerPirate;
+                case Opposing -> isEnemyPirate;
+                case PlanetOwner -> isPlanetOwnerPirate;
+                default -> false;
+            };
+
+            botForce.getBehaviorSettings().setIAmAPirate(isPirate);
         }
+    }
+
+    /**
+     * Resolves whether the planet-owner force should be flagged as a pirate, based on which side of the contract the
+     * planet owner falls on.
+     *
+     * <p>We're going to deligate to {@link AtBDynamicScenarioFactory} methods here, as there is no point in
+     * doubling the code.</p>
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private boolean resolvePlanetOwnerIsPirate(AtBContract contract, LocalDate today,
+          boolean isEmployerPirate, boolean isEnemyPirate) {
+        String factionCode = getPlanetOwnerFaction(contract, today);
+        ScenarioForceTemplate.ForceAlignment alignment = getPlanetOwnerAlignment(contract, factionCode, today);
+
+        return alignment == ScenarioForceTemplate.ForceAlignment.Opposing ? isEnemyPirate : isEmployerPirate;
     }
 
     /**
@@ -2048,6 +2089,35 @@ public final class BriefingTab extends CampaignGuiTab {
         }
         enemy = Factions.getInstance().getFaction(opForFactionCode);
         return enemy;
+    }
+
+    /**
+     * Get the employer faction from the Mission from the scenario
+     *
+     * @param scenario the scenario to get the enemy faction from
+     *
+     * @return the employer faction
+     */
+    private Faction getAlliedFactionFromScenario(Scenario scenario) {
+        Mission mission = null;
+        if (scenario.getMissionId() != -1) {
+            mission = getCampaign().getMission(scenario.getMissionId());
+        }
+        if (mission == null) {
+            mission = comboMission.getSelectedItem();
+        }
+        String allyFactionCode = MERCENARY_FACTION_CODE;
+        Faction employerFaction;
+        if (mission instanceof AtBContract atBContract) {
+            employerFaction = atBContract.getEmployerFaction();
+            if (employerFaction != null) {
+                return employerFaction;
+            }
+            String employerCode = atBContract.getEmployerCode();
+            allyFactionCode = employerCode.isBlank() ? allyFactionCode : employerCode;
+        }
+        employerFaction = Factions.getInstance().getFaction(allyFactionCode);
+        return employerFaction;
     }
 
     /**
