@@ -81,7 +81,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class RelationshipsTab {
     private final CampaignOptions campaignOptions;
-      private RelationshipsDraft draft;
+      private RelationshipsOptionsModel model;
       private boolean marriagePageCreated;
       private boolean divorcePageCreated;
       private boolean procreationPageCreated;
@@ -312,7 +312,7 @@ public class RelationshipsTab {
         layoutParent.gridx++;
         panel.add(pnlRandomMarriage, layoutParent);
       marriagePageCreated = true;
-      updateMarriageControlsFromDraft();
+      updateMarriageControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panel, "MarriageTab");
@@ -519,7 +519,7 @@ public class RelationshipsTab {
         layoutParent.gridx++;
         panelParent.add(pnlRandomDivorce, layoutParent);
       divorcePageCreated = true;
-      updateDivorceControlsFromDraft();
+      updateDivorceControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "DivorceTab");
@@ -643,7 +643,7 @@ public class RelationshipsTab {
         layoutParent.gridy++;  // Move down one row
         panel.add(pnlRandomSexualityPanel, layoutParent);
       procreationPageCreated = true;
-      updateProcreationControlsFromDraft();
+      updateProcreationControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ProcreationTab");
@@ -942,8 +942,8 @@ public class RelationshipsTab {
             options = this.campaignOptions;
         }
 
-      draft = new RelationshipsDraft(options);
-      updateCreatedControlsFromDraft();
+      model = new RelationshipsOptionsModel(options);
+      updateCreatedControlsFromModel();
     }
 
     /**
@@ -959,275 +959,144 @@ public class RelationshipsTab {
             options = this.campaignOptions;
         }
 
-            updateDraftFromCreatedControls();
-            draft.applyTo(options);
+            updateModelFromCreatedControls();
+            model.applyTo(options);
     }
 
-      private void updateCreatedControlsFromDraft() {
-            updateMarriageControlsFromDraft();
-            updateDivorceControlsFromDraft();
-            updateProcreationControlsFromDraft();
+      private void updateCreatedControlsFromModel() {
+            updateMarriageControlsFromModel();
+            updateDivorceControlsFromModel();
+            updateProcreationControlsFromModel();
       }
 
-      private void updateMarriageControlsFromDraft() {
-            if (!marriagePageCreated || draft == null) {
+      private void updateMarriageControlsFromModel() {
+            if (!marriagePageCreated || model == null) {
                   return;
             }
 
-            chkUseManualMarriages.setSelected(draft.useManualMarriages);
-            chkUseClanPersonnelMarriages.setSelected(draft.useClanPersonnelMarriages);
-            chkUsePrisonerMarriages.setSelected(draft.usePrisonerMarriages);
-            spnCheckMutualAncestorsDepth.setValue(draft.checkMutualAncestorsDepth);
-            chkLogMarriageNameChanges.setSelected(draft.logMarriageNameChanges);
-            comboRandomMarriageMethod.setSelectedItem(draft.randomMarriageMethod);
-            chkUseRandomClanPersonnelMarriages.setSelected(draft.useRandomClanPersonnelMarriages);
-            chkUseRandomPrisonerMarriages.setSelected(draft.useRandomPrisonerMarriages);
-            spnRandomMarriageAgeRange.setValue(draft.randomMarriageAgeRange);
-            spnRandomMarriageDiceSize.setValue(draft.randomMarriageDiceSize);
-            spnRandomNewDependentMarriage.setValue(draft.randomNewDependentMarriage);
+            chkUseManualMarriages.setSelected(model.useManualMarriages);
+            chkUseClanPersonnelMarriages.setSelected(model.useClanPersonnelMarriages);
+            chkUsePrisonerMarriages.setSelected(model.usePrisonerMarriages);
+            spnCheckMutualAncestorsDepth.setValue(model.checkMutualAncestorsDepth);
+            chkLogMarriageNameChanges.setSelected(model.logMarriageNameChanges);
+            comboRandomMarriageMethod.setSelectedItem(model.randomMarriageMethod);
+            chkUseRandomClanPersonnelMarriages.setSelected(model.useRandomClanPersonnelMarriages);
+            chkUseRandomPrisonerMarriages.setSelected(model.useRandomPrisonerMarriages);
+            spnRandomMarriageAgeRange.setValue(model.randomMarriageAgeRange);
+            spnRandomMarriageDiceSize.setValue(model.randomMarriageDiceSize);
+            spnRandomNewDependentMarriage.setValue(model.randomNewDependentMarriage);
       }
 
-      private void updateDivorceControlsFromDraft() {
-            if (!divorcePageCreated || draft == null) {
+      private void updateDivorceControlsFromModel() {
+            if (!divorcePageCreated || model == null) {
                   return;
             }
 
-            chkUseManualDivorce.setSelected(draft.useManualDivorce);
-            chkUseClanPersonnelDivorce.setSelected(draft.useClanPersonnelDivorce);
-            chkUsePrisonerDivorce.setSelected(draft.usePrisonerDivorce);
-            comboRandomDivorceMethod.setSelectedItem(draft.randomDivorceMethod);
-            chkUseRandomOppositeSexDivorce.setSelected(draft.useRandomOppositeSexDivorce);
-            chkUseRandomSameSexDivorce.setSelected(draft.useRandomSameSexDivorce);
-            chkUseRandomClanPersonnelDivorce.setSelected(draft.useRandomClanPersonnelDivorce);
-            chkUseRandomPrisonerDivorce.setSelected(draft.useRandomPrisonerDivorce);
-            spnRandomDivorceDiceSize.setValue(draft.randomDivorceDiceSize);
+            chkUseManualDivorce.setSelected(model.useManualDivorce);
+            chkUseClanPersonnelDivorce.setSelected(model.useClanPersonnelDivorce);
+            chkUsePrisonerDivorce.setSelected(model.usePrisonerDivorce);
+            comboRandomDivorceMethod.setSelectedItem(model.randomDivorceMethod);
+            chkUseRandomOppositeSexDivorce.setSelected(model.useRandomOppositeSexDivorce);
+            chkUseRandomSameSexDivorce.setSelected(model.useRandomSameSexDivorce);
+            chkUseRandomClanPersonnelDivorce.setSelected(model.useRandomClanPersonnelDivorce);
+            chkUseRandomPrisonerDivorce.setSelected(model.useRandomPrisonerDivorce);
+            spnRandomDivorceDiceSize.setValue(model.randomDivorceDiceSize);
       }
 
-      private void updateProcreationControlsFromDraft() {
-            if (!procreationPageCreated || draft == null) {
+      private void updateProcreationControlsFromModel() {
+            if (!procreationPageCreated || model == null) {
                   return;
             }
 
-            chkUseManualProcreation.setSelected(draft.useManualProcreation);
-            chkUseClanPersonnelProcreation.setSelected(draft.useClanPersonnelProcreation);
-            chkUsePrisonerProcreation.setSelected(draft.usePrisonerProcreation);
-            spnMultiplePregnancyOccurrences.setValue(draft.multiplePregnancyOccurrences);
-            comboBabySurnameStyle.setSelectedItem(draft.babySurnameStyle);
-            chkAssignNonPrisonerBabiesFounderTag.setSelected(draft.assignNonPrisonerBabiesFounderTag);
-            chkAssignChildrenOfFoundersFounderTag.setSelected(draft.assignChildrenOfFoundersFounderTag);
-            chkDetermineFatherAtBirth.setSelected(draft.determineFatherAtBirth);
-            chkDisplayTrueDueDate.setSelected(draft.displayTrueDueDate);
-            spnNoInterestInChildrenDiceSize.setValue(draft.noInterestInChildrenDiceSize);
-            chkUseMaternityLeave.setSelected(draft.useMaternityLeave);
-            chkLogProcreation.setSelected(draft.logProcreation);
-            comboRandomProcreationMethod.setSelectedItem(draft.randomProcreationMethod);
-            chkUseRelationshiplessRandomProcreation.setSelected(draft.useRelationshiplessRandomProcreation);
-            chkUseRandomClanPersonnelProcreation.setSelected(draft.useRandomClanPersonnelProcreation);
-            chkUseRandomPrisonerProcreation.setSelected(draft.useRandomPrisonerProcreation);
-            spnRandomProcreationRelationshipDiceSize.setValue(draft.randomProcreationRelationshipDiceSize);
-            spnRandomProcreationRelationshiplessDiceSize.setValue(draft.randomProcreationRelationshiplessDiceSize);
-            spnNoInterestInRelationshipsDiceSize.setValue(draft.noInterestInRelationshipsDiceSize);
-            spnPrefersSameSexDiceSize.setValue(draft.interestedInSameSexDiceSize);
-            spnPrefersBothSexesDiceSize.setValue(draft.interestedInBothSexesDiceSize);
+            chkUseManualProcreation.setSelected(model.useManualProcreation);
+            chkUseClanPersonnelProcreation.setSelected(model.useClanPersonnelProcreation);
+            chkUsePrisonerProcreation.setSelected(model.usePrisonerProcreation);
+            spnMultiplePregnancyOccurrences.setValue(model.multiplePregnancyOccurrences);
+            comboBabySurnameStyle.setSelectedItem(model.babySurnameStyle);
+            chkAssignNonPrisonerBabiesFounderTag.setSelected(model.assignNonPrisonerBabiesFounderTag);
+            chkAssignChildrenOfFoundersFounderTag.setSelected(model.assignChildrenOfFoundersFounderTag);
+            chkDetermineFatherAtBirth.setSelected(model.determineFatherAtBirth);
+            chkDisplayTrueDueDate.setSelected(model.displayTrueDueDate);
+            spnNoInterestInChildrenDiceSize.setValue(model.noInterestInChildrenDiceSize);
+            chkUseMaternityLeave.setSelected(model.useMaternityLeave);
+            chkLogProcreation.setSelected(model.logProcreation);
+            comboRandomProcreationMethod.setSelectedItem(model.randomProcreationMethod);
+            chkUseRelationshiplessRandomProcreation.setSelected(model.useRelationshiplessRandomProcreation);
+            chkUseRandomClanPersonnelProcreation.setSelected(model.useRandomClanPersonnelProcreation);
+            chkUseRandomPrisonerProcreation.setSelected(model.useRandomPrisonerProcreation);
+            spnRandomProcreationRelationshipDiceSize.setValue(model.randomProcreationRelationshipDiceSize);
+            spnRandomProcreationRelationshiplessDiceSize.setValue(model.randomProcreationRelationshiplessDiceSize);
+            spnNoInterestInRelationshipsDiceSize.setValue(model.noInterestInRelationshipsDiceSize);
+            spnPrefersSameSexDiceSize.setValue(model.interestedInSameSexDiceSize);
+            spnPrefersBothSexesDiceSize.setValue(model.interestedInBothSexesDiceSize);
       }
 
-      private void updateDraftFromCreatedControls() {
-            updateDraftFromMarriageControls();
-            updateDraftFromDivorceControls();
-            updateDraftFromProcreationControls();
+      private void updateModelFromCreatedControls() {
+            updateModelFromMarriageControls();
+            updateModelFromDivorceControls();
+            updateModelFromProcreationControls();
       }
 
-      private void updateDraftFromMarriageControls() {
+      private void updateModelFromMarriageControls() {
             if (!marriagePageCreated) {
                   return;
             }
 
-            draft.useManualMarriages = chkUseManualMarriages.isSelected();
-            draft.useClanPersonnelMarriages = chkUseClanPersonnelMarriages.isSelected();
-            draft.usePrisonerMarriages = chkUsePrisonerMarriages.isSelected();
-            draft.checkMutualAncestorsDepth = (int) spnCheckMutualAncestorsDepth.getValue();
-            draft.logMarriageNameChanges = chkLogMarriageNameChanges.isSelected();
-            draft.randomMarriageMethod = comboRandomMarriageMethod.getSelectedItem();
-            draft.useRandomClanPersonnelMarriages = chkUseRandomClanPersonnelMarriages.isSelected();
-            draft.useRandomPrisonerMarriages = chkUseRandomPrisonerMarriages.isSelected();
-            draft.randomMarriageAgeRange = (int) spnRandomMarriageAgeRange.getValue();
-            draft.randomMarriageDiceSize = (int) spnRandomMarriageDiceSize.getValue();
-            draft.randomNewDependentMarriage = (int) spnRandomNewDependentMarriage.getValue();
+            model.useManualMarriages = chkUseManualMarriages.isSelected();
+            model.useClanPersonnelMarriages = chkUseClanPersonnelMarriages.isSelected();
+            model.usePrisonerMarriages = chkUsePrisonerMarriages.isSelected();
+            model.checkMutualAncestorsDepth = (int) spnCheckMutualAncestorsDepth.getValue();
+            model.logMarriageNameChanges = chkLogMarriageNameChanges.isSelected();
+            model.randomMarriageMethod = comboRandomMarriageMethod.getSelectedItem();
+            model.useRandomClanPersonnelMarriages = chkUseRandomClanPersonnelMarriages.isSelected();
+            model.useRandomPrisonerMarriages = chkUseRandomPrisonerMarriages.isSelected();
+            model.randomMarriageAgeRange = (int) spnRandomMarriageAgeRange.getValue();
+            model.randomMarriageDiceSize = (int) spnRandomMarriageDiceSize.getValue();
+            model.randomNewDependentMarriage = (int) spnRandomNewDependentMarriage.getValue();
       }
 
-      private void updateDraftFromDivorceControls() {
+      private void updateModelFromDivorceControls() {
             if (!divorcePageCreated) {
                   return;
             }
 
-            draft.useManualDivorce = chkUseManualDivorce.isSelected();
-            draft.useClanPersonnelDivorce = chkUseClanPersonnelDivorce.isSelected();
-            draft.usePrisonerDivorce = chkUsePrisonerDivorce.isSelected();
-            draft.randomDivorceMethod = comboRandomDivorceMethod.getSelectedItem();
-            draft.useRandomOppositeSexDivorce = chkUseRandomOppositeSexDivorce.isSelected();
-            draft.useRandomSameSexDivorce = chkUseRandomSameSexDivorce.isSelected();
-            draft.useRandomClanPersonnelDivorce = chkUseRandomClanPersonnelDivorce.isSelected();
-            draft.useRandomPrisonerDivorce = chkUseRandomPrisonerDivorce.isSelected();
-            draft.randomDivorceDiceSize = (int) spnRandomDivorceDiceSize.getValue();
+            model.useManualDivorce = chkUseManualDivorce.isSelected();
+            model.useClanPersonnelDivorce = chkUseClanPersonnelDivorce.isSelected();
+            model.usePrisonerDivorce = chkUsePrisonerDivorce.isSelected();
+            model.randomDivorceMethod = comboRandomDivorceMethod.getSelectedItem();
+            model.useRandomOppositeSexDivorce = chkUseRandomOppositeSexDivorce.isSelected();
+            model.useRandomSameSexDivorce = chkUseRandomSameSexDivorce.isSelected();
+            model.useRandomClanPersonnelDivorce = chkUseRandomClanPersonnelDivorce.isSelected();
+            model.useRandomPrisonerDivorce = chkUseRandomPrisonerDivorce.isSelected();
+            model.randomDivorceDiceSize = (int) spnRandomDivorceDiceSize.getValue();
       }
 
-      private void updateDraftFromProcreationControls() {
+      private void updateModelFromProcreationControls() {
             if (!procreationPageCreated) {
                   return;
             }
 
-            draft.useManualProcreation = chkUseManualProcreation.isSelected();
-            draft.useClanPersonnelProcreation = chkUseClanPersonnelProcreation.isSelected();
-            draft.usePrisonerProcreation = chkUsePrisonerProcreation.isSelected();
-            draft.multiplePregnancyOccurrences = (int) spnMultiplePregnancyOccurrences.getValue();
-            draft.babySurnameStyle = comboBabySurnameStyle.getSelectedItem();
-            draft.assignNonPrisonerBabiesFounderTag = chkAssignNonPrisonerBabiesFounderTag.isSelected();
-            draft.assignChildrenOfFoundersFounderTag = chkAssignChildrenOfFoundersFounderTag.isSelected();
-            draft.determineFatherAtBirth = chkDetermineFatherAtBirth.isSelected();
-            draft.displayTrueDueDate = chkDisplayTrueDueDate.isSelected();
-            draft.noInterestInChildrenDiceSize = (int) spnNoInterestInChildrenDiceSize.getValue();
-            draft.useMaternityLeave = chkUseMaternityLeave.isSelected();
-            draft.logProcreation = chkLogProcreation.isSelected();
-            draft.randomProcreationMethod = comboRandomProcreationMethod.getSelectedItem();
-            draft.useRelationshiplessRandomProcreation = chkUseRelationshiplessRandomProcreation.isSelected();
-            draft.useRandomClanPersonnelProcreation = chkUseRandomClanPersonnelProcreation.isSelected();
-            draft.useRandomPrisonerProcreation = chkUseRandomPrisonerProcreation.isSelected();
-            draft.randomProcreationRelationshipDiceSize = (int) spnRandomProcreationRelationshipDiceSize.getValue();
-            draft.randomProcreationRelationshiplessDiceSize = (int) spnRandomProcreationRelationshiplessDiceSize.getValue();
-            draft.interestedInSameSexDiceSize = (int) spnPrefersSameSexDiceSize.getValue();
-            draft.noInterestInRelationshipsDiceSize = (int) spnNoInterestInRelationshipsDiceSize.getValue();
-            draft.interestedInBothSexesDiceSize = (int) spnPrefersBothSexesDiceSize.getValue();
+            model.useManualProcreation = chkUseManualProcreation.isSelected();
+            model.useClanPersonnelProcreation = chkUseClanPersonnelProcreation.isSelected();
+            model.usePrisonerProcreation = chkUsePrisonerProcreation.isSelected();
+            model.multiplePregnancyOccurrences = (int) spnMultiplePregnancyOccurrences.getValue();
+            model.babySurnameStyle = comboBabySurnameStyle.getSelectedItem();
+            model.assignNonPrisonerBabiesFounderTag = chkAssignNonPrisonerBabiesFounderTag.isSelected();
+            model.assignChildrenOfFoundersFounderTag = chkAssignChildrenOfFoundersFounderTag.isSelected();
+            model.determineFatherAtBirth = chkDetermineFatherAtBirth.isSelected();
+            model.displayTrueDueDate = chkDisplayTrueDueDate.isSelected();
+            model.noInterestInChildrenDiceSize = (int) spnNoInterestInChildrenDiceSize.getValue();
+            model.useMaternityLeave = chkUseMaternityLeave.isSelected();
+            model.logProcreation = chkLogProcreation.isSelected();
+            model.randomProcreationMethod = comboRandomProcreationMethod.getSelectedItem();
+            model.useRelationshiplessRandomProcreation = chkUseRelationshiplessRandomProcreation.isSelected();
+            model.useRandomClanPersonnelProcreation = chkUseRandomClanPersonnelProcreation.isSelected();
+            model.useRandomPrisonerProcreation = chkUseRandomPrisonerProcreation.isSelected();
+            model.randomProcreationRelationshipDiceSize = (int) spnRandomProcreationRelationshipDiceSize.getValue();
+            model.randomProcreationRelationshiplessDiceSize = (int) spnRandomProcreationRelationshiplessDiceSize.getValue();
+            model.interestedInSameSexDiceSize = (int) spnPrefersSameSexDiceSize.getValue();
+            model.noInterestInRelationshipsDiceSize = (int) spnNoInterestInRelationshipsDiceSize.getValue();
+            model.interestedInBothSexesDiceSize = (int) spnPrefersBothSexesDiceSize.getValue();
       }
 
-      private static class RelationshipsDraft {
-            private boolean useManualMarriages;
-            private boolean useClanPersonnelMarriages;
-            private boolean usePrisonerMarriages;
-            private int checkMutualAncestorsDepth;
-            private boolean logMarriageNameChanges;
-            private RandomMarriageMethod randomMarriageMethod;
-            private boolean useRandomClanPersonnelMarriages;
-            private boolean useRandomPrisonerMarriages;
-            private int randomMarriageAgeRange;
-            private int randomMarriageDiceSize;
-            private int randomNewDependentMarriage;
-            private boolean useManualDivorce;
-            private boolean useClanPersonnelDivorce;
-            private boolean usePrisonerDivorce;
-            private RandomDivorceMethod randomDivorceMethod;
-            private boolean useRandomOppositeSexDivorce;
-            private boolean useRandomSameSexDivorce;
-            private boolean useRandomClanPersonnelDivorce;
-            private boolean useRandomPrisonerDivorce;
-            private int randomDivorceDiceSize;
-            private boolean useManualProcreation;
-            private boolean useClanPersonnelProcreation;
-            private boolean usePrisonerProcreation;
-            private int multiplePregnancyOccurrences;
-            private BabySurnameStyle babySurnameStyle;
-            private boolean assignNonPrisonerBabiesFounderTag;
-            private boolean assignChildrenOfFoundersFounderTag;
-            private boolean determineFatherAtBirth;
-            private boolean displayTrueDueDate;
-            private int noInterestInChildrenDiceSize;
-            private boolean useMaternityLeave;
-            private boolean logProcreation;
-            private RandomProcreationMethod randomProcreationMethod;
-            private boolean useRelationshiplessRandomProcreation;
-            private boolean useRandomClanPersonnelProcreation;
-            private boolean useRandomPrisonerProcreation;
-            private int randomProcreationRelationshipDiceSize;
-            private int randomProcreationRelationshiplessDiceSize;
-            private int noInterestInRelationshipsDiceSize;
-            private int interestedInSameSexDiceSize;
-            private int interestedInBothSexesDiceSize;
-
-            private RelationshipsDraft(CampaignOptions options) {
-                  useManualMarriages = options.isUseManualMarriages();
-                  useClanPersonnelMarriages = options.isUseClanPersonnelMarriages();
-                  usePrisonerMarriages = options.isUsePrisonerMarriages();
-                  checkMutualAncestorsDepth = options.getCheckMutualAncestorsDepth();
-                  logMarriageNameChanges = options.isLogMarriageNameChanges();
-                  randomMarriageMethod = options.getRandomMarriageMethod();
-                  useRandomClanPersonnelMarriages = options.isUseRandomClanPersonnelMarriages();
-                  useRandomPrisonerMarriages = options.isUseRandomPrisonerMarriages();
-                  randomMarriageAgeRange = options.getRandomMarriageAgeRange();
-                  randomMarriageDiceSize = options.getRandomMarriageDiceSize();
-                  randomNewDependentMarriage = options.getRandomNewDependentMarriage();
-                  useManualDivorce = options.isUseManualDivorce();
-                  useClanPersonnelDivorce = options.isUseClanPersonnelDivorce();
-                  usePrisonerDivorce = options.isUsePrisonerDivorce();
-                  randomDivorceMethod = options.getRandomDivorceMethod();
-                  useRandomOppositeSexDivorce = options.isUseRandomOppositeSexDivorce();
-                  useRandomSameSexDivorce = options.isUseRandomSameSexDivorce();
-                  useRandomClanPersonnelDivorce = options.isUseRandomClanPersonnelDivorce();
-                  useRandomPrisonerDivorce = options.isUseRandomPrisonerDivorce();
-                  randomDivorceDiceSize = options.getRandomDivorceDiceSize();
-                  useManualProcreation = options.isUseManualProcreation();
-                  useClanPersonnelProcreation = options.isUseClanPersonnelProcreation();
-                  usePrisonerProcreation = options.isUsePrisonerProcreation();
-                  multiplePregnancyOccurrences = options.getMultiplePregnancyOccurrences();
-                  babySurnameStyle = options.getBabySurnameStyle();
-                  assignNonPrisonerBabiesFounderTag = options.isAssignNonPrisonerBabiesFounderTag();
-                  assignChildrenOfFoundersFounderTag = options.isAssignChildrenOfFoundersFounderTag();
-                  determineFatherAtBirth = options.isDetermineFatherAtBirth();
-                  displayTrueDueDate = options.isDisplayTrueDueDate();
-                  noInterestInChildrenDiceSize = options.getNoInterestInChildrenDiceSize();
-                  useMaternityLeave = options.isUseMaternityLeave();
-                  logProcreation = options.isLogProcreation();
-                  randomProcreationMethod = options.getRandomProcreationMethod();
-                  useRelationshiplessRandomProcreation = options.isUseRelationshiplessRandomProcreation();
-                  useRandomClanPersonnelProcreation = options.isUseRandomClanPersonnelProcreation();
-                  useRandomPrisonerProcreation = options.isUseRandomPrisonerProcreation();
-                  randomProcreationRelationshipDiceSize = options.getRandomProcreationRelationshipDiceSize();
-                  randomProcreationRelationshiplessDiceSize = options.getRandomProcreationRelationshiplessDiceSize();
-                  noInterestInRelationshipsDiceSize = options.getNoInterestInRelationshipsDiceSize();
-                  interestedInSameSexDiceSize = options.getInterestedInSameSexDiceSize();
-                  interestedInBothSexesDiceSize = options.getInterestedInBothSexesDiceSize();
-            }
-
-            private void applyTo(CampaignOptions options) {
-                  options.setUseManualMarriages(useManualMarriages);
-                  options.setUseClanPersonnelMarriages(useClanPersonnelMarriages);
-                  options.setUsePrisonerMarriages(usePrisonerMarriages);
-                  options.setCheckMutualAncestorsDepth(checkMutualAncestorsDepth);
-                  options.setLogMarriageNameChanges(logMarriageNameChanges);
-                  options.setRandomMarriageMethod(randomMarriageMethod);
-                  options.setUseRandomClanPersonnelMarriages(useRandomClanPersonnelMarriages);
-                  options.setUseRandomPrisonerMarriages(useRandomPrisonerMarriages);
-                  options.setRandomMarriageAgeRange(randomMarriageAgeRange);
-                  options.setRandomMarriageDiceSize(randomMarriageDiceSize);
-                  options.setRandomNewDependentMarriage(randomNewDependentMarriage);
-                  options.setUseManualDivorce(useManualDivorce);
-                  options.setUseClanPersonnelDivorce(useClanPersonnelDivorce);
-                  options.setUsePrisonerDivorce(usePrisonerDivorce);
-                  options.setRandomDivorceMethod(randomDivorceMethod);
-                  options.setUseRandomOppositeSexDivorce(useRandomOppositeSexDivorce);
-                  options.setUseRandomSameSexDivorce(useRandomSameSexDivorce);
-                  options.setUseRandomClanPersonnelDivorce(useRandomClanPersonnelDivorce);
-                  options.setUseRandomPrisonerDivorce(useRandomPrisonerDivorce);
-                  options.setRandomDivorceDiceSize(randomDivorceDiceSize);
-                  options.setUseManualProcreation(useManualProcreation);
-                  options.setUseClanPersonnelProcreation(useClanPersonnelProcreation);
-                  options.setUsePrisonerProcreation(usePrisonerProcreation);
-                  options.setMultiplePregnancyOccurrences(multiplePregnancyOccurrences);
-                  options.setBabySurnameStyle(babySurnameStyle);
-                  options.setAssignNonPrisonerBabiesFounderTag(assignNonPrisonerBabiesFounderTag);
-                  options.setAssignChildrenOfFoundersFounderTag(assignChildrenOfFoundersFounderTag);
-                  options.setDetermineFatherAtBirth(determineFatherAtBirth);
-                  options.setDisplayTrueDueDate(displayTrueDueDate);
-                  options.setNoInterestInChildrenDiceSize(noInterestInChildrenDiceSize);
-                  options.setUseMaternityLeave(useMaternityLeave);
-                  options.setLogProcreation(logProcreation);
-                  options.setRandomProcreationMethod(randomProcreationMethod);
-                  options.setUseRelationshiplessRandomProcreation(useRelationshiplessRandomProcreation);
-                  options.setUseRandomClanPersonnelProcreation(useRandomClanPersonnelProcreation);
-                  options.setUseRandomPrisonerProcreation(useRandomPrisonerProcreation);
-                  options.setRandomProcreationRelationshipDiceSize(randomProcreationRelationshipDiceSize);
-                  options.setRandomProcreationRelationshiplessDiceSize(randomProcreationRelationshiplessDiceSize);
-                  options.setInterestedInSameSexDiceSize(interestedInSameSexDiceSize);
-                  options.setNoInterestInRelationshipsDiceSize(noInterestInRelationshipsDiceSize);
-                  options.setInterestedInBothSexesDiceSize(interestedInBothSexesDiceSize);
-            }
-      }
 }

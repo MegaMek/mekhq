@@ -44,7 +44,6 @@ import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -65,10 +64,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
-import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevised;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -103,7 +98,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 public class MarketsTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
-      private MarketsDraft draft;
+      private MarketsOptionsModel model;
       private boolean personnelMarketPageCreated;
       private boolean unitMarketPageCreated;
       private boolean contractMarketPageCreated;
@@ -270,7 +265,7 @@ public class MarketsTab {
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
         pnlRemovalTargets = createPersonnelMarketRemovalOptionsPanel();
       personnelMarketPageCreated = true;
-      updatePersonnelMarketControlsFromDraft();
+      updatePersonnelMarketControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true, "");
@@ -503,7 +498,7 @@ public class MarketsTab {
         chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
         chkUnitMarketReportRefresh.addMouseListener(createTipPanelUpdater(unitMarketHeader, "UnitMarketReportRefresh"));
       unitMarketPageCreated = true;
-      updateUnitMarketControlsFromDraft();
+      updateUnitMarketControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true, "");
@@ -616,7 +611,7 @@ public class MarketsTab {
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
         pnlContractPay = createContractPayPanel();
       contractMarketPageCreated = true;
-      updateContractMarketControlsFromDraft();
+      updateContractMarketControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true, "");
@@ -960,79 +955,79 @@ public class MarketsTab {
             options = this.campaignOptions;
         }
 
-            draft = new MarketsDraft(options);
-            updateCreatedControlsFromDraft();
+            model = new MarketsOptionsModel(options);
+            updateCreatedControlsFromModel();
     }
 
-      private void updateCreatedControlsFromDraft() {
-            updatePersonnelMarketControlsFromDraft();
-            updateUnitMarketControlsFromDraft();
-            updateContractMarketControlsFromDraft();
+      private void updateCreatedControlsFromModel() {
+            updatePersonnelMarketControlsFromModel();
+            updateUnitMarketControlsFromModel();
+            updateContractMarketControlsFromModel();
       }
 
-      private void updatePersonnelMarketControlsFromDraft() {
-            if (!personnelMarketPageCreated || draft == null) {
+      private void updatePersonnelMarketControlsFromModel() {
+            if (!personnelMarketPageCreated || model == null) {
                   return;
             }
 
-            comboPersonnelMarketStyle.setSelectedItem(draft.personnelMarketStyle);
-            comboPersonnelMarketType.setSelectedItem(draft.personnelMarketName);
-            chkPersonnelMarketReportRefresh.setSelected(draft.personnelMarketReportRefresh);
-            chkUsePersonnelHireHiringHallOnly.setSelected(draft.usePersonnelHireHiringHallOnly);
-            spnPersonnelMarketDylansWeight.setValue(draft.personnelMarketDylansWeight);
+            comboPersonnelMarketStyle.setSelectedItem(model.personnelMarketStyle);
+            comboPersonnelMarketType.setSelectedItem(model.personnelMarketName);
+            chkPersonnelMarketReportRefresh.setSelected(model.personnelMarketReportRefresh);
+            chkUsePersonnelHireHiringHallOnly.setSelected(model.usePersonnelHireHiringHallOnly);
+            spnPersonnelMarketDylansWeight.setValue(model.personnelMarketDylansWeight);
             for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
-                  entry.getValue().setValue(draft.personnelMarketRandomRemovalTargets.get(entry.getKey()));
+                  entry.getValue().setValue(model.personnelMarketRandomRemovalTargets.get(entry.getKey()));
             }
       }
 
-      private void updateUnitMarketControlsFromDraft() {
-            if (!unitMarketPageCreated || draft == null) {
+      private void updateUnitMarketControlsFromModel() {
+            if (!unitMarketPageCreated || model == null) {
                   return;
             }
 
-            comboUnitMarketMethod.setSelectedItem(draft.unitMarketMethod);
-            chkUnitMarketRegionalMekVariations.setSelected(draft.unitMarketRegionalMekVariations);
-            spnUnitMarketArtilleryUnitChance.setValue(draft.unitMarketArtilleryUnitChance);
-            spnUnitMarketRarityModifier.setValue(draft.unitMarketRarityModifier);
-            chkInstantUnitMarketDelivery.setSelected(draft.instantUnitMarketDelivery);
-            chkMothballUnitMarketDeliveries.setSelected(draft.mothballUnitMarketDeliveries);
-            chkUnitMarketReportRefresh.setSelected(draft.unitMarketReportRefresh);
+            comboUnitMarketMethod.setSelectedItem(model.unitMarketMethod);
+            chkUnitMarketRegionalMekVariations.setSelected(model.unitMarketRegionalMekVariations);
+            spnUnitMarketArtilleryUnitChance.setValue(model.unitMarketArtilleryUnitChance);
+            spnUnitMarketRarityModifier.setValue(model.unitMarketRarityModifier);
+            chkInstantUnitMarketDelivery.setSelected(model.instantUnitMarketDelivery);
+            chkMothballUnitMarketDeliveries.setSelected(model.mothballUnitMarketDeliveries);
+            chkUnitMarketReportRefresh.setSelected(model.unitMarketReportRefresh);
       }
 
-      private void updateContractMarketControlsFromDraft() {
-            if (!contractMarketPageCreated || draft == null) {
+      private void updateContractMarketControlsFromModel() {
+            if (!contractMarketPageCreated || model == null) {
                   return;
             }
 
-            comboContractMarketMethod.setSelectedItem(draft.contractMarketMethod);
-            spnContractSearchRadius.setValue(draft.contractSearchRadius);
-            chkVariableContractLength.setSelected(draft.variableContractLength);
-            chkUseTwoWayPay.setSelected(draft.useTwoWayPay);
-            chkUseCamOpsSalvage.setSelected(draft.useCamOpsSalvage);
-            chkUseRiskySalvage.setSelected(draft.useRiskySalvage);
-            chkEnableSalvageFlagByDefault.setSelected(draft.enableSalvageFlagByDefault);
-            chkUseDynamicDifficulty.setSelected(draft.useDynamicDifficulty);
-            chkUseBolsterContractSkill.setSelected(draft.useBolsterContractSkill);
-            chkContractMarketReportRefresh.setSelected(draft.contractMarketReportRefresh);
-            spnContractMaxSalvagePercentage.setValue(draft.contractMaxSalvagePercentage);
-            spnDropShipBonusPercentage.setValue(draft.dropShipBonusPercentage);
-            spnPityContracts.setValue(draft.pityContracts);
-            if (draft.equipmentContractBase) {
+            comboContractMarketMethod.setSelectedItem(model.contractMarketMethod);
+            spnContractSearchRadius.setValue(model.contractSearchRadius);
+            chkVariableContractLength.setSelected(model.variableContractLength);
+            chkUseTwoWayPay.setSelected(model.useTwoWayPay);
+            chkUseCamOpsSalvage.setSelected(model.useCamOpsSalvage);
+            chkUseRiskySalvage.setSelected(model.useRiskySalvage);
+            chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
+            chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
+            chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
+            chkContractMarketReportRefresh.setSelected(model.contractMarketReportRefresh);
+            spnContractMaxSalvagePercentage.setValue(model.contractMaxSalvagePercentage);
+            spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
+            spnPityContracts.setValue(model.pityContracts);
+            if (model.equipmentContractBase) {
                   btnContractEquipment.setSelected(true);
             } else {
                   btnContractPersonnel.setSelected(true);
             }
-            spnEquipPercent.setValue(draft.equipmentContractPercent);
-            chkUseAlternatePaymentMode.setSelected(draft.useAlternatePaymentMode);
-            chkUseDiminishingContractPay.setSelected(draft.useDiminishingContractPay);
-            chkEquipContractSaleValue.setSelected(draft.equipmentContractSaleValue);
-            spnDropShipPercent.setValue(draft.dropShipContractPercent);
-            spnJumpShipPercent.setValue(draft.jumpShipContractPercent);
-            spnWarShipPercent.setValue(draft.warShipContractPercent);
-            useInfantryDoseNotCountBox.setSelected(draft.infantryDontCount);
-            chkMercSizeLimited.setSelected(draft.mercSizeLimited);
-            chkBLCSaleValue.setSelected(draft.blcSaleValue);
-            chkOverageRepaymentInFinalPayment.setSelected(draft.overageRepaymentInFinalPayment);
+            spnEquipPercent.setValue(model.equipmentContractPercent);
+            chkUseAlternatePaymentMode.setSelected(model.useAlternatePaymentMode);
+            chkUseDiminishingContractPay.setSelected(model.useDiminishingContractPay);
+            chkEquipContractSaleValue.setSelected(model.equipmentContractSaleValue);
+            spnDropShipPercent.setValue(model.dropShipContractPercent);
+            spnJumpShipPercent.setValue(model.jumpShipContractPercent);
+            spnWarShipPercent.setValue(model.warShipContractPercent);
+            useInfantryDoseNotCountBox.setSelected(model.infantryDontCount);
+            chkMercSizeLimited.setSelected(model.mercSizeLimited);
+            chkBLCSaleValue.setSelected(model.blcSaleValue);
+            chkOverageRepaymentInFinalPayment.setSelected(model.overageRepaymentInFinalPayment);
       }
 
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
@@ -1041,217 +1036,76 @@ public class MarketsTab {
             options = this.campaignOptions;
         }
 
-            updateDraftFromCreatedControls();
+            updateModelFromCreatedControls();
 
-        // Personnel Market
-            PersonnelMarketStyle selectedPersonnelMarketStyle = draft.personnelMarketStyle;
-        if (selectedPersonnelMarketStyle != null) {
-            PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
-            if (selectedPersonnelMarketStyle != originalPersonnelMarketStyle) {
-                NewPersonnelMarket replacementMarket = switch (selectedPersonnelMarketStyle) {
-                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
-                    case MEKHQ -> new PersonnelMarketMekHQ();
-                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
-                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
-                };
-                replacementMarket.setCampaign(campaign);
-                campaign.setNewPersonnelMarket(replacementMarket);
-            }
-                  options.setPersonnelMarketStyle(selectedPersonnelMarketStyle);
-        }
-
-            options.setPersonnelMarketName(draft.personnelMarketName);
-            if (Objects.equals(draft.personnelMarketName, "Campaign Ops")) {
-            campaign.getPersonnelMarket().setPaidRecruitment(false);
-        }
-            options.setPersonnelMarketDylansWeight(draft.personnelMarketDylansWeight);
-            options.setUsePersonnelHireHiringHallOnly(draft.usePersonnelHireHiringHallOnly);
-            options.setPersonnelMarketReportRefresh(draft.personnelMarketReportRefresh);
-            options.getPersonnelMarketRandomRemovalTargets().putAll(draft.personnelMarketRandomRemovalTargets);
-
-        // Unit Market
-            options.setUnitMarketMethod(draft.unitMarketMethod);
-            options.setUnitMarketRegionalMekVariations(draft.unitMarketRegionalMekVariations);
-            options.setUnitMarketArtilleryUnitChance(draft.unitMarketArtilleryUnitChance);
-            options.setUnitMarketRarityModifier(draft.unitMarketRarityModifier);
-            options.setInstantUnitMarketDelivery(draft.instantUnitMarketDelivery);
-            options.setMothballUnitMarketDeliveries(draft.mothballUnitMarketDeliveries);
-            options.setUnitMarketReportRefresh(draft.unitMarketReportRefresh);
-
-        // Contract Market
-            options.setContractMarketMethod(draft.contractMarketMethod);
-            options.setContractSearchRadius(draft.contractSearchRadius);
-            options.setVariableContractLength(draft.variableContractLength);
-            options.setUseTwoWayPay(draft.useTwoWayPay);
-            options.setUseCamOpsSalvage(draft.useCamOpsSalvage);
-            options.setUseRiskySalvage(draft.useRiskySalvage);
-            options.setEnableSalvageFlagByDefault(draft.enableSalvageFlagByDefault);
-            options.setUseDynamicDifficulty(draft.useDynamicDifficulty);
-            options.setUseBolsterContractSkill(draft.useBolsterContractSkill);
-            options.setContractMarketReportRefresh(draft.contractMarketReportRefresh);
-            options.setContractMaxSalvagePercentage(draft.contractMaxSalvagePercentage);
-            options.setDropShipBonusPercentage(draft.dropShipBonusPercentage);
-            options.setPityContracts(draft.pityContracts);
-            options.setEquipmentContractBase(draft.equipmentContractBase);
-            options.setEquipmentContractPercent(draft.equipmentContractPercent);
-            options.setDropShipContractPercent(draft.dropShipContractPercent);
-            options.setJumpShipContractPercent(draft.jumpShipContractPercent);
-            options.setWarShipContractPercent(draft.warShipContractPercent);
-            options.setUseAlternatePaymentMode(draft.useAlternatePaymentMode);
-            options.setUseDiminishingContractPay(draft.useDiminishingContractPay);
-            options.setEquipmentContractSaleValue(draft.equipmentContractSaleValue);
-            options.setMercSizeLimited(draft.mercSizeLimited);
-            options.setBLCSaleValue(draft.blcSaleValue);
-            options.setUseInfantryDontCount(draft.infantryDontCount);
-            options.setOverageRepaymentInFinalPayment(draft.overageRepaymentInFinalPayment);
+                  model.applyTo(campaign, options);
     }
 
-      private void updateDraftFromCreatedControls() {
-            updateDraftFromPersonnelMarketControls();
-            updateDraftFromUnitMarketControls();
-            updateDraftFromContractMarketControls();
+      private void updateModelFromCreatedControls() {
+            updateModelFromPersonnelMarketControls();
+            updateModelFromUnitMarketControls();
+            updateModelFromContractMarketControls();
       }
 
-      private void updateDraftFromPersonnelMarketControls() {
-            if (!personnelMarketPageCreated || draft == null) {
+      private void updateModelFromPersonnelMarketControls() {
+            if (!personnelMarketPageCreated || model == null) {
                   return;
             }
 
-            draft.personnelMarketStyle = comboPersonnelMarketStyle.getSelectedItem();
-            draft.personnelMarketName = comboPersonnelMarketType.getSelectedItem();
-            draft.personnelMarketReportRefresh = chkPersonnelMarketReportRefresh.isSelected();
-            draft.usePersonnelHireHiringHallOnly = chkUsePersonnelHireHiringHallOnly.isSelected();
-            draft.personnelMarketDylansWeight = (double) spnPersonnelMarketDylansWeight.getValue();
+            model.personnelMarketStyle = comboPersonnelMarketStyle.getSelectedItem();
+            model.personnelMarketName = comboPersonnelMarketType.getSelectedItem();
+            model.personnelMarketReportRefresh = chkPersonnelMarketReportRefresh.isSelected();
+            model.usePersonnelHireHiringHallOnly = chkUsePersonnelHireHiringHallOnly.isSelected();
+            model.personnelMarketDylansWeight = (double) spnPersonnelMarketDylansWeight.getValue();
             for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
-                  draft.personnelMarketRandomRemovalTargets.put(entry.getKey(), (int) entry.getValue().getValue());
+                  model.personnelMarketRandomRemovalTargets.put(entry.getKey(), (int) entry.getValue().getValue());
             }
       }
 
-      private void updateDraftFromUnitMarketControls() {
-            if (!unitMarketPageCreated || draft == null) {
+      private void updateModelFromUnitMarketControls() {
+            if (!unitMarketPageCreated || model == null) {
                   return;
             }
 
-            draft.unitMarketMethod = comboUnitMarketMethod.getSelectedItem();
-            draft.unitMarketRegionalMekVariations = chkUnitMarketRegionalMekVariations.isSelected();
-            draft.unitMarketArtilleryUnitChance = (int) spnUnitMarketArtilleryUnitChance.getValue();
-            draft.unitMarketRarityModifier = (int) spnUnitMarketRarityModifier.getValue();
-            draft.instantUnitMarketDelivery = chkInstantUnitMarketDelivery.isSelected();
-            draft.mothballUnitMarketDeliveries = chkMothballUnitMarketDeliveries.isSelected();
-            draft.unitMarketReportRefresh = chkUnitMarketReportRefresh.isSelected();
+            model.unitMarketMethod = comboUnitMarketMethod.getSelectedItem();
+            model.unitMarketRegionalMekVariations = chkUnitMarketRegionalMekVariations.isSelected();
+            model.unitMarketArtilleryUnitChance = (int) spnUnitMarketArtilleryUnitChance.getValue();
+            model.unitMarketRarityModifier = (int) spnUnitMarketRarityModifier.getValue();
+            model.instantUnitMarketDelivery = chkInstantUnitMarketDelivery.isSelected();
+            model.mothballUnitMarketDeliveries = chkMothballUnitMarketDeliveries.isSelected();
+            model.unitMarketReportRefresh = chkUnitMarketReportRefresh.isSelected();
       }
 
-      private void updateDraftFromContractMarketControls() {
-            if (!contractMarketPageCreated || draft == null) {
+      private void updateModelFromContractMarketControls() {
+            if (!contractMarketPageCreated || model == null) {
                   return;
             }
 
-            draft.contractMarketMethod = comboContractMarketMethod.getSelectedItem();
-            draft.contractSearchRadius = (int) spnContractSearchRadius.getValue();
-            draft.variableContractLength = chkVariableContractLength.isSelected();
-            draft.useTwoWayPay = chkUseTwoWayPay.isSelected();
-            draft.useCamOpsSalvage = chkUseCamOpsSalvage.isSelected();
-            draft.useRiskySalvage = chkUseRiskySalvage.isSelected();
-            draft.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
-            draft.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
-            draft.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
-            draft.contractMarketReportRefresh = chkContractMarketReportRefresh.isSelected();
-            draft.contractMaxSalvagePercentage = (int) spnContractMaxSalvagePercentage.getValue();
-            draft.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
-            draft.pityContracts = (int) spnPityContracts.getValue();
-            draft.equipmentContractBase = btnContractEquipment.isSelected();
-            draft.equipmentContractPercent = (double) spnEquipPercent.getValue();
-            draft.dropShipContractPercent = (double) spnDropShipPercent.getValue();
-            draft.jumpShipContractPercent = (double) spnJumpShipPercent.getValue();
-            draft.warShipContractPercent = (double) spnWarShipPercent.getValue();
-            draft.useAlternatePaymentMode = chkUseAlternatePaymentMode.isSelected();
-            draft.useDiminishingContractPay = chkUseDiminishingContractPay.isSelected();
-            draft.equipmentContractSaleValue = chkEquipContractSaleValue.isSelected();
-            draft.mercSizeLimited = chkMercSizeLimited.isSelected();
-            draft.blcSaleValue = chkBLCSaleValue.isSelected();
-            draft.infantryDontCount = useInfantryDoseNotCountBox.isSelected();
-            draft.overageRepaymentInFinalPayment = chkOverageRepaymentInFinalPayment.isSelected();
+            model.contractMarketMethod = comboContractMarketMethod.getSelectedItem();
+            model.contractSearchRadius = (int) spnContractSearchRadius.getValue();
+            model.variableContractLength = chkVariableContractLength.isSelected();
+            model.useTwoWayPay = chkUseTwoWayPay.isSelected();
+            model.useCamOpsSalvage = chkUseCamOpsSalvage.isSelected();
+            model.useRiskySalvage = chkUseRiskySalvage.isSelected();
+            model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
+            model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
+            model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
+            model.contractMarketReportRefresh = chkContractMarketReportRefresh.isSelected();
+            model.contractMaxSalvagePercentage = (int) spnContractMaxSalvagePercentage.getValue();
+            model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
+            model.pityContracts = (int) spnPityContracts.getValue();
+            model.equipmentContractBase = btnContractEquipment.isSelected();
+            model.equipmentContractPercent = (double) spnEquipPercent.getValue();
+            model.dropShipContractPercent = (double) spnDropShipPercent.getValue();
+            model.jumpShipContractPercent = (double) spnJumpShipPercent.getValue();
+            model.warShipContractPercent = (double) spnWarShipPercent.getValue();
+            model.useAlternatePaymentMode = chkUseAlternatePaymentMode.isSelected();
+            model.useDiminishingContractPay = chkUseDiminishingContractPay.isSelected();
+            model.equipmentContractSaleValue = chkEquipContractSaleValue.isSelected();
+            model.mercSizeLimited = chkMercSizeLimited.isSelected();
+            model.blcSaleValue = chkBLCSaleValue.isSelected();
+            model.infantryDontCount = useInfantryDoseNotCountBox.isSelected();
+            model.overageRepaymentInFinalPayment = chkOverageRepaymentInFinalPayment.isSelected();
       }
 
-      private static class MarketsDraft {
-            private PersonnelMarketStyle personnelMarketStyle;
-            private String personnelMarketName;
-            private boolean personnelMarketReportRefresh;
-            private boolean usePersonnelHireHiringHallOnly;
-            private double personnelMarketDylansWeight;
-            private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
-            private UnitMarketMethod unitMarketMethod;
-            private boolean unitMarketRegionalMekVariations;
-            private int unitMarketArtilleryUnitChance;
-            private int unitMarketRarityModifier;
-            private boolean instantUnitMarketDelivery;
-            private boolean mothballUnitMarketDeliveries;
-            private boolean unitMarketReportRefresh;
-            private ContractMarketMethod contractMarketMethod;
-            private int contractSearchRadius;
-            private boolean variableContractLength;
-            private boolean useTwoWayPay;
-            private boolean useCamOpsSalvage;
-            private boolean useRiskySalvage;
-            private boolean enableSalvageFlagByDefault;
-            private boolean useDynamicDifficulty;
-            private boolean useBolsterContractSkill;
-            private boolean contractMarketReportRefresh;
-            private int contractMaxSalvagePercentage;
-            private int dropShipBonusPercentage;
-            private int pityContracts;
-            private boolean equipmentContractBase;
-            private double equipmentContractPercent;
-            private boolean useAlternatePaymentMode;
-            private boolean useDiminishingContractPay;
-            private boolean equipmentContractSaleValue;
-            private double dropShipContractPercent;
-            private double jumpShipContractPercent;
-            private double warShipContractPercent;
-            private boolean infantryDontCount;
-            private boolean mercSizeLimited;
-            private boolean blcSaleValue;
-            private boolean overageRepaymentInFinalPayment;
-
-            private MarketsDraft(CampaignOptions options) {
-                  personnelMarketStyle = options.getPersonnelMarketStyle();
-                  personnelMarketName = options.getPersonnelMarketName();
-                  personnelMarketReportRefresh = options.isPersonnelMarketReportRefresh();
-                  usePersonnelHireHiringHallOnly = options.isUsePersonnelHireHiringHallOnly();
-                  personnelMarketDylansWeight = options.getPersonnelMarketDylansWeight();
-                  personnelMarketRandomRemovalTargets = new HashMap<>(options.getPersonnelMarketRandomRemovalTargets());
-                  unitMarketMethod = options.getUnitMarketMethod();
-                  unitMarketRegionalMekVariations = options.isRegionalMekVariations();
-                  unitMarketArtilleryUnitChance = options.getUnitMarketArtilleryUnitChance();
-                  unitMarketRarityModifier = options.getUnitMarketRarityModifier();
-                  instantUnitMarketDelivery = options.isInstantUnitMarketDelivery();
-                  mothballUnitMarketDeliveries = options.isMothballUnitMarketDeliveries();
-                  unitMarketReportRefresh = options.isUnitMarketReportRefresh();
-                  contractMarketMethod = options.getContractMarketMethod();
-                  contractSearchRadius = options.getContractSearchRadius();
-                  variableContractLength = options.isVariableContractLength();
-                  useTwoWayPay = options.isUseTwoWayPay();
-                  useCamOpsSalvage = options.isUseCamOpsSalvage();
-                  useRiskySalvage = options.isUseRiskySalvage();
-                  enableSalvageFlagByDefault = options.isEnableSalvageFlagByDefault();
-                  useDynamicDifficulty = options.isUseDynamicDifficulty();
-                  useBolsterContractSkill = options.isUseBolsterContractSkill();
-                  contractMarketReportRefresh = options.isContractMarketReportRefresh();
-                  contractMaxSalvagePercentage = options.getContractMaxSalvagePercentage();
-                  dropShipBonusPercentage = options.getDropShipBonusPercentage();
-                  pityContracts = options.getPityContracts();
-                  equipmentContractBase = options.isEquipmentContractBase();
-                  equipmentContractPercent = options.getEquipmentContractPercent();
-                  useAlternatePaymentMode = options.isUseAlternatePaymentMode();
-                  useDiminishingContractPay = options.isUseDiminishingContractPay();
-                  equipmentContractSaleValue = options.isEquipmentContractSaleValue();
-                  dropShipContractPercent = options.getDropShipContractPercent();
-                  jumpShipContractPercent = options.getJumpShipContractPercent();
-                  warShipContractPercent = options.getWarShipContractPercent();
-                  infantryDontCount = options.isInfantryDontCount();
-                  mercSizeLimited = options.isMercSizeLimited();
-                  blcSaleValue = options.isBLCSaleValue();
-                  overageRepaymentInFinalPayment = options.isOverageRepaymentInFinalPayment();
-            }
-      }
 }

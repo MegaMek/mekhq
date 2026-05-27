@@ -83,7 +83,7 @@ public class AdvancementTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
-      private AdvancementDraft draft;
+      private AdvancementOptionsModel model;
       private boolean xpAwardsPageCreated;
       private boolean randomizationPageCreated;
       private boolean recruitmentBonusesPageCreated;
@@ -321,7 +321,7 @@ public class AdvancementTab {
         pnlAdministrators = createAdministratorsPanel();
         pnlMissions = createMissionsPanel();
       xpAwardsPageCreated = true;
-      updateXpAwardsControlsFromDraft();
+      updateXpAwardsControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("XpAwardsTab", true);
@@ -717,7 +717,7 @@ public class AdvancementTab {
         pnlRandomAbilities = createAbilityPanel();
         pnlSkillGroups = createSkillGroupPanel();
       randomizationPageCreated = true;
-      updateRandomizationControlsFromDraft();
+      updateRandomizationControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillRandomizationTab", true);
@@ -1268,7 +1268,7 @@ public class AdvancementTab {
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();
         pnlRecruitmentBonusesSupport = createRecruitmentBonusesSupportPanel();
       recruitmentBonusesPageCreated = true;
-      updateRecruitmentBonusControlsFromDraft();
+      updateRecruitmentBonusControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesTab", true);
@@ -1401,99 +1401,99 @@ public class AdvancementTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-            draft = new AdvancementDraft(options, skillPreferences);
-            updateCreatedControlsFromDraft();
+            model = new AdvancementOptionsModel(options, skillPreferences);
+            updateCreatedControlsFromModel();
     }
 
-      private void updateCreatedControlsFromDraft() {
-            updateXpAwardsControlsFromDraft();
-            updateRandomizationControlsFromDraft();
-            updateRecruitmentBonusControlsFromDraft();
+      private void updateCreatedControlsFromModel() {
+            updateXpAwardsControlsFromModel();
+            updateRandomizationControlsFromModel();
+            updateRecruitmentBonusControlsFromModel();
       }
 
-      private void updateXpAwardsControlsFromDraft() {
-            if (!xpAwardsPageCreated || draft == null) {
+      private void updateXpAwardsControlsFromModel() {
+            if (!xpAwardsPageCreated || model == null) {
                   return;
             }
 
-            spnXpCostMultiplier.setValue(draft.xpCostMultiplier);
-            spnTaskXP.setValue(draft.taskXP);
-            spnNTasksXP.setValue(draft.nTasksXP);
-            spnSuccessXP.setValue(draft.successXP);
-            spnMistakeXP.setValue(draft.mistakeXP);
-            spnScenarioXP.setValue(draft.scenarioXP);
-            spnKillXP.setValue(draft.killXP);
-            spnKills.setValue(draft.killsForXP);
-            spnVocationalXP.setValue(draft.vocationalXP);
-            spnVocationalXPFrequency.setValue(draft.vocationalXPFrequency);
-            spnVocationalXPTargetNumber.setValue(draft.vocationalXPTargetNumber);
-            spnMissionXpFail.setValue(draft.missionXpFail);
-            spnMissionXpSuccess.setValue(draft.missionXpSuccess);
-            spnMissionXpOutstandingSuccess.setValue(draft.missionXpOutstandingSuccess);
-            spnContractNegotiationXP.setValue(draft.contractNegotiationXP);
-            spnAdminWeeklyXP.setValue(draft.adminWeeklyXP);
-            spnAdminWeeklyXPPeriod.setValue(draft.adminWeeklyXPPeriod);
+            spnXpCostMultiplier.setValue(model.xpCostMultiplier);
+            spnTaskXP.setValue(model.taskXP);
+            spnNTasksXP.setValue(model.nTasksXP);
+            spnSuccessXP.setValue(model.successXP);
+            spnMistakeXP.setValue(model.mistakeXP);
+            spnScenarioXP.setValue(model.scenarioXP);
+            spnKillXP.setValue(model.killXP);
+            spnKills.setValue(model.killsForXP);
+            spnVocationalXP.setValue(model.vocationalXP);
+            spnVocationalXPFrequency.setValue(model.vocationalXPFrequency);
+            spnVocationalXPTargetNumber.setValue(model.vocationalXPTargetNumber);
+            spnMissionXpFail.setValue(model.missionXpFail);
+            spnMissionXpSuccess.setValue(model.missionXpSuccess);
+            spnMissionXpOutstandingSuccess.setValue(model.missionXpOutstandingSuccess);
+            spnContractNegotiationXP.setValue(model.contractNegotiationXP);
+            spnAdminWeeklyXP.setValue(model.adminWeeklyXP);
+            spnAdminWeeklyXPPeriod.setValue(model.adminWeeklyXPPeriod);
       }
 
-      private void updateRandomizationControlsFromDraft() {
-            if (!randomizationPageCreated || draft == null) {
+      private void updateRandomizationControlsFromModel() {
+            if (!randomizationPageCreated || model == null) {
                   return;
             }
 
-            chkExtraRandomness.setSelected(draft.randomizeSkill);
-            for (int i = 0; i < Math.min(phenotypeSpinners.length, draft.phenotypeProbabilities.length); i++) {
-                  phenotypeSpinners[i].setValue(draft.phenotypeProbabilities[i]);
+            chkExtraRandomness.setSelected(model.randomizeSkill);
+            for (int i = 0; i < Math.min(phenotypeSpinners.length, model.phenotypeProbabilities.length); i++) {
+                  phenotypeSpinners[i].setValue(model.phenotypeProbabilities[i]);
             }
 
-            spnAbilityUltraGreen.setValue(draft.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN]);
-            spnAbilityGreen.setValue(draft.specialAbilityBonus[SkillType.EXP_GREEN]);
-            spnAbilityReg.setValue(draft.specialAbilityBonus[SkillType.EXP_REGULAR]);
-            spnAbilityVet.setValue(draft.specialAbilityBonus[SkillType.EXP_VETERAN]);
-            spnAbilityElite.setValue(draft.specialAbilityBonus[SkillType.EXP_ELITE]);
-            spnAbilityHeroic.setValue(draft.specialAbilityBonus[SkillType.EXP_HEROIC]);
-            spnAbilityLegendary.setValue(draft.specialAbilityBonus[SkillType.EXP_LEGENDARY]);
+            spnAbilityUltraGreen.setValue(model.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN]);
+            spnAbilityGreen.setValue(model.specialAbilityBonus[SkillType.EXP_GREEN]);
+            spnAbilityReg.setValue(model.specialAbilityBonus[SkillType.EXP_REGULAR]);
+            spnAbilityVet.setValue(model.specialAbilityBonus[SkillType.EXP_VETERAN]);
+            spnAbilityElite.setValue(model.specialAbilityBonus[SkillType.EXP_ELITE]);
+            spnAbilityHeroic.setValue(model.specialAbilityBonus[SkillType.EXP_HEROIC]);
+            spnAbilityLegendary.setValue(model.specialAbilityBonus[SkillType.EXP_LEGENDARY]);
 
-            spnCommandSkillsUltraGreen.setValue(draft.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN]);
-            spnCommandSkillsGreen.setValue(draft.commandSkillsModifier[SkillType.EXP_GREEN]);
-            spnCommandSkillsReg.setValue(draft.commandSkillsModifier[SkillType.EXP_REGULAR]);
-            spnCommandSkillsVet.setValue(draft.commandSkillsModifier[SkillType.EXP_VETERAN]);
-            spnCommandSkillsElite.setValue(draft.commandSkillsModifier[SkillType.EXP_ELITE]);
-            spnCommandSkillsHeroic.setValue(draft.commandSkillsModifier[SkillType.EXP_HEROIC]);
-            spnCommandSkillsLegendary.setValue(draft.commandSkillsModifier[SkillType.EXP_LEGENDARY]);
+            spnCommandSkillsUltraGreen.setValue(model.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN]);
+            spnCommandSkillsGreen.setValue(model.commandSkillsModifier[SkillType.EXP_GREEN]);
+            spnCommandSkillsReg.setValue(model.commandSkillsModifier[SkillType.EXP_REGULAR]);
+            spnCommandSkillsVet.setValue(model.commandSkillsModifier[SkillType.EXP_VETERAN]);
+            spnCommandSkillsElite.setValue(model.commandSkillsModifier[SkillType.EXP_ELITE]);
+            spnCommandSkillsHeroic.setValue(model.commandSkillsModifier[SkillType.EXP_HEROIC]);
+            spnCommandSkillsLegendary.setValue(model.commandSkillsModifier[SkillType.EXP_LEGENDARY]);
 
-            spnUtilitySkillsUltraGreen.setValue(draft.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN]);
-            spnUtilitySkillsGreen.setValue(draft.utilitySkillsModifier[SkillType.EXP_GREEN]);
-            spnUtilitySkillsReg.setValue(draft.utilitySkillsModifier[SkillType.EXP_REGULAR]);
-            spnUtilitySkillsVet.setValue(draft.utilitySkillsModifier[SkillType.EXP_VETERAN]);
-            spnUtilitySkillsElite.setValue(draft.utilitySkillsModifier[SkillType.EXP_ELITE]);
-            spnUtilitySkillsHeroic.setValue(draft.utilitySkillsModifier[SkillType.EXP_HEROIC]);
-            spnUtilitySkillsLegendary.setValue(draft.utilitySkillsModifier[SkillType.EXP_LEGENDARY]);
+            spnUtilitySkillsUltraGreen.setValue(model.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN]);
+            spnUtilitySkillsGreen.setValue(model.utilitySkillsModifier[SkillType.EXP_GREEN]);
+            spnUtilitySkillsReg.setValue(model.utilitySkillsModifier[SkillType.EXP_REGULAR]);
+            spnUtilitySkillsVet.setValue(model.utilitySkillsModifier[SkillType.EXP_VETERAN]);
+            spnUtilitySkillsElite.setValue(model.utilitySkillsModifier[SkillType.EXP_ELITE]);
+            spnUtilitySkillsHeroic.setValue(model.utilitySkillsModifier[SkillType.EXP_HEROIC]);
+            spnUtilitySkillsLegendary.setValue(model.utilitySkillsModifier[SkillType.EXP_LEGENDARY]);
 
-            spnRoleplaySkillsModifier.setValue(draft.roleplaySkillsModifier);
-            spnCombatSA.setValue(draft.combatSmallArmsBonus);
-            spnSupportSA.setValue(draft.supportSmallArmsBonus);
-            spnArtyProb.setValue(draft.artilleryProb);
-            spnArtyBonus.setValue(draft.artilleryBonus);
-            spnAntiMekSkill.setValue(draft.antiMekProb);
-            spnSecondProb.setValue(draft.secondSkillProb);
-            spnSecondBonus.setValue(draft.secondSkillBonus);
+            spnRoleplaySkillsModifier.setValue(model.roleplaySkillsModifier);
+            spnCombatSA.setValue(model.combatSmallArmsBonus);
+            spnSupportSA.setValue(model.supportSmallArmsBonus);
+            spnArtyProb.setValue(model.artilleryProb);
+            spnArtyBonus.setValue(model.artilleryBonus);
+            spnAntiMekSkill.setValue(model.antiMekProb);
+            spnSecondProb.setValue(model.secondSkillProb);
+            spnSecondBonus.setValue(model.secondSkillBonus);
       }
 
-      private void updateRecruitmentBonusControlsFromDraft() {
-            if (!recruitmentBonusesPageCreated || draft == null) {
+      private void updateRecruitmentBonusControlsFromModel() {
+            if (!recruitmentBonusesPageCreated || model == null) {
                   return;
             }
 
             final List<PersonnelRole> combatRoles = PersonnelRole.getCombatRoles();
             for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
                   PersonnelRole role = combatRoles.get(i);
-                  spnRecruitmentBonusCombat[i].setValue(draft.recruitmentBonuses.getOrDefault(role, 0));
+                  spnRecruitmentBonusCombat[i].setValue(model.recruitmentBonuses.getOrDefault(role, 0));
             }
 
             final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
             for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
                   PersonnelRole role = supportRoles.get(i);
-                  spnRecruitmentBonusSupport[i].setValue(draft.recruitmentBonuses.getOrDefault(role, 0));
+                  spnRecruitmentBonusSupport[i].setValue(model.recruitmentBonuses.getOrDefault(role, 0));
             }
       }
 
@@ -1518,8 +1518,8 @@ public class AdvancementTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-            updateDraftFromCreatedControls();
-            draft.applyTo(options, skillPreferences);
+            updateModelFromCreatedControls();
+            model.applyTo(options, skillPreferences);
 
         // Finishing Touches
         // This must be the last item, after all other tabs, no matter what.
@@ -1528,82 +1528,82 @@ public class AdvancementTab {
         }
     }
 
-      private void updateDraftFromCreatedControls() {
-            updateDraftFromXpAwardsControls();
-            updateDraftFromRandomizationControls();
-            updateDraftFromRecruitmentBonusControls();
+      private void updateModelFromCreatedControls() {
+            updateModelFromXpAwardsControls();
+            updateModelFromRandomizationControls();
+            updateModelFromRecruitmentBonusControls();
       }
 
-      private void updateDraftFromXpAwardsControls() {
-            if (!xpAwardsPageCreated || draft == null) {
+      private void updateModelFromXpAwardsControls() {
+            if (!xpAwardsPageCreated || model == null) {
                   return;
             }
 
-            draft.xpCostMultiplier = (double) spnXpCostMultiplier.getValue();
-            draft.taskXP = (int) spnTaskXP.getValue();
-            draft.nTasksXP = (int) spnNTasksXP.getValue();
-            draft.successXP = (int) spnSuccessXP.getValue();
-            draft.mistakeXP = (int) spnMistakeXP.getValue();
-            draft.scenarioXP = (int) spnScenarioXP.getValue();
-            draft.killXP = (int) spnKillXP.getValue();
-            draft.killsForXP = (int) spnKills.getValue();
-            draft.vocationalXP = (int) spnVocationalXP.getValue();
-            draft.vocationalXPFrequency = (int) spnVocationalXPFrequency.getValue();
-            draft.vocationalXPTargetNumber = (int) spnVocationalXPTargetNumber.getValue();
-            draft.missionXpFail = (int) spnMissionXpFail.getValue();
-            draft.missionXpSuccess = (int) spnMissionXpSuccess.getValue();
-            draft.missionXpOutstandingSuccess = (int) spnMissionXpOutstandingSuccess.getValue();
-            draft.contractNegotiationXP = (int) spnContractNegotiationXP.getValue();
-            draft.adminWeeklyXP = (int) spnAdminWeeklyXP.getValue();
-            draft.adminWeeklyXPPeriod = (int) spnAdminWeeklyXPPeriod.getValue();
+            model.xpCostMultiplier = (double) spnXpCostMultiplier.getValue();
+            model.taskXP = (int) spnTaskXP.getValue();
+            model.nTasksXP = (int) spnNTasksXP.getValue();
+            model.successXP = (int) spnSuccessXP.getValue();
+            model.mistakeXP = (int) spnMistakeXP.getValue();
+            model.scenarioXP = (int) spnScenarioXP.getValue();
+            model.killXP = (int) spnKillXP.getValue();
+            model.killsForXP = (int) spnKills.getValue();
+            model.vocationalXP = (int) spnVocationalXP.getValue();
+            model.vocationalXPFrequency = (int) spnVocationalXPFrequency.getValue();
+            model.vocationalXPTargetNumber = (int) spnVocationalXPTargetNumber.getValue();
+            model.missionXpFail = (int) spnMissionXpFail.getValue();
+            model.missionXpSuccess = (int) spnMissionXpSuccess.getValue();
+            model.missionXpOutstandingSuccess = (int) spnMissionXpOutstandingSuccess.getValue();
+            model.contractNegotiationXP = (int) spnContractNegotiationXP.getValue();
+            model.adminWeeklyXP = (int) spnAdminWeeklyXP.getValue();
+            model.adminWeeklyXPPeriod = (int) spnAdminWeeklyXPPeriod.getValue();
       }
 
-      private void updateDraftFromRandomizationControls() {
-            if (!randomizationPageCreated || draft == null) {
+      private void updateModelFromRandomizationControls() {
+            if (!randomizationPageCreated || model == null) {
                   return;
             }
 
-            draft.randomizeSkill = chkExtraRandomness.isSelected();
-            for (int i = 0; i < Math.min(phenotypeSpinners.length, draft.phenotypeProbabilities.length); i++) {
-                  draft.phenotypeProbabilities[i] = (int) phenotypeSpinners[i].getValue();
+            model.randomizeSkill = chkExtraRandomness.isSelected();
+            for (int i = 0; i < Math.min(phenotypeSpinners.length, model.phenotypeProbabilities.length); i++) {
+                  model.phenotypeProbabilities[i] = (int) phenotypeSpinners[i].getValue();
             }
 
-            draft.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN] = (int) spnAbilityUltraGreen.getValue();
-            draft.specialAbilityBonus[SkillType.EXP_GREEN] = (int) spnAbilityGreen.getValue();
-            draft.specialAbilityBonus[SkillType.EXP_REGULAR] = (int) spnAbilityReg.getValue();
-            draft.specialAbilityBonus[SkillType.EXP_VETERAN] = (int) spnAbilityVet.getValue();
-            draft.specialAbilityBonus[SkillType.EXP_ELITE] = (int) spnAbilityElite.getValue();
-            draft.specialAbilityBonus[SkillType.EXP_HEROIC] = (int) spnAbilityHeroic.getValue();
-            draft.specialAbilityBonus[SkillType.EXP_LEGENDARY] = (int) spnAbilityLegendary.getValue();
+            model.specialAbilityBonus[SkillType.EXP_ULTRA_GREEN] = (int) spnAbilityUltraGreen.getValue();
+            model.specialAbilityBonus[SkillType.EXP_GREEN] = (int) spnAbilityGreen.getValue();
+            model.specialAbilityBonus[SkillType.EXP_REGULAR] = (int) spnAbilityReg.getValue();
+            model.specialAbilityBonus[SkillType.EXP_VETERAN] = (int) spnAbilityVet.getValue();
+            model.specialAbilityBonus[SkillType.EXP_ELITE] = (int) spnAbilityElite.getValue();
+            model.specialAbilityBonus[SkillType.EXP_HEROIC] = (int) spnAbilityHeroic.getValue();
+            model.specialAbilityBonus[SkillType.EXP_LEGENDARY] = (int) spnAbilityLegendary.getValue();
 
-            draft.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnCommandSkillsUltraGreen.getValue();
-            draft.commandSkillsModifier[SkillType.EXP_GREEN] = (int) spnCommandSkillsGreen.getValue();
-            draft.commandSkillsModifier[SkillType.EXP_REGULAR] = (int) spnCommandSkillsReg.getValue();
-            draft.commandSkillsModifier[SkillType.EXP_VETERAN] = (int) spnCommandSkillsVet.getValue();
-            draft.commandSkillsModifier[SkillType.EXP_ELITE] = (int) spnCommandSkillsElite.getValue();
-            draft.commandSkillsModifier[SkillType.EXP_HEROIC] = (int) spnCommandSkillsHeroic.getValue();
-            draft.commandSkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnCommandSkillsLegendary.getValue();
+            model.commandSkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnCommandSkillsUltraGreen.getValue();
+            model.commandSkillsModifier[SkillType.EXP_GREEN] = (int) spnCommandSkillsGreen.getValue();
+            model.commandSkillsModifier[SkillType.EXP_REGULAR] = (int) spnCommandSkillsReg.getValue();
+            model.commandSkillsModifier[SkillType.EXP_VETERAN] = (int) spnCommandSkillsVet.getValue();
+            model.commandSkillsModifier[SkillType.EXP_ELITE] = (int) spnCommandSkillsElite.getValue();
+            model.commandSkillsModifier[SkillType.EXP_HEROIC] = (int) spnCommandSkillsHeroic.getValue();
+            model.commandSkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnCommandSkillsLegendary.getValue();
 
-            draft.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnUtilitySkillsUltraGreen.getValue();
-            draft.utilitySkillsModifier[SkillType.EXP_GREEN] = (int) spnUtilitySkillsGreen.getValue();
-            draft.utilitySkillsModifier[SkillType.EXP_REGULAR] = (int) spnUtilitySkillsReg.getValue();
-            draft.utilitySkillsModifier[SkillType.EXP_VETERAN] = (int) spnUtilitySkillsVet.getValue();
-            draft.utilitySkillsModifier[SkillType.EXP_ELITE] = (int) spnUtilitySkillsElite.getValue();
-            draft.utilitySkillsModifier[SkillType.EXP_HEROIC] = (int) spnUtilitySkillsHeroic.getValue();
-            draft.utilitySkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnUtilitySkillsLegendary.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_ULTRA_GREEN] = (int) spnUtilitySkillsUltraGreen.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_GREEN] = (int) spnUtilitySkillsGreen.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_REGULAR] = (int) spnUtilitySkillsReg.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_VETERAN] = (int) spnUtilitySkillsVet.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_ELITE] = (int) spnUtilitySkillsElite.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_HEROIC] = (int) spnUtilitySkillsHeroic.getValue();
+            model.utilitySkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnUtilitySkillsLegendary.getValue();
 
-            draft.roleplaySkillsModifier = (int) spnRoleplaySkillsModifier.getValue();
-            draft.combatSmallArmsBonus = (int) spnCombatSA.getValue();
-            draft.supportSmallArmsBonus = (int) spnSupportSA.getValue();
-            draft.artilleryProb = (int) spnArtyProb.getValue();
-            draft.artilleryBonus = (int) spnArtyBonus.getValue();
-            draft.antiMekProb = (int) spnAntiMekSkill.getValue();
-            draft.secondSkillProb = (int) spnSecondProb.getValue();
-            draft.secondSkillBonus = (int) spnSecondBonus.getValue();
+            model.roleplaySkillsModifier = (int) spnRoleplaySkillsModifier.getValue();
+            model.combatSmallArmsBonus = (int) spnCombatSA.getValue();
+            model.supportSmallArmsBonus = (int) spnSupportSA.getValue();
+            model.artilleryProb = (int) spnArtyProb.getValue();
+            model.artilleryBonus = (int) spnArtyBonus.getValue();
+            model.antiMekProb = (int) spnAntiMekSkill.getValue();
+            model.secondSkillProb = (int) spnSecondProb.getValue();
+            model.secondSkillBonus = (int) spnSecondBonus.getValue();
       }
 
-      private void updateDraftFromRecruitmentBonusControls() {
-            if (!recruitmentBonusesPageCreated || draft == null) {
+      private void updateModelFromRecruitmentBonusControls() {
+            if (!recruitmentBonusesPageCreated || model == null) {
                   return;
             }
 
@@ -1612,16 +1612,16 @@ public class AdvancementTab {
 
             for (int i = 0; i < spnRecruitmentBonusCombat.length; i++) {
                   PersonnelRole role = combatRoles.get(i);
-                  draft.recruitmentBonuses.put(role, (int) spnRecruitmentBonusCombat[i].getValue());
+                  model.recruitmentBonuses.put(role, (int) spnRecruitmentBonusCombat[i].getValue());
             }
 
             for (int i = 0; i < spnRecruitmentBonusSupport.length; i++) {
                   PersonnelRole role = supportRoles.get(i);
-                  draft.recruitmentBonuses.put(role, (int) spnRecruitmentBonusSupport[i].getValue());
+                  model.recruitmentBonuses.put(role, (int) spnRecruitmentBonusSupport[i].getValue());
             }
       }
 
-      private static class AdvancementDraft {
+      private static class AdvancementOptionsModel {
             private double xpCostMultiplier;
             private int taskXP;
             private int nTasksXP;
@@ -1654,7 +1654,7 @@ public class AdvancementTab {
             private int secondSkillBonus;
             private Map<PersonnelRole, Integer> recruitmentBonuses;
 
-            private AdvancementDraft(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+            private AdvancementOptionsModel(CampaignOptions options, RandomSkillPreferences skillPreferences) {
                   xpCostMultiplier = options.getXpCostMultiplier();
                   taskXP = options.getTaskXP();
                   nTasksXP = options.getNTasksXP();

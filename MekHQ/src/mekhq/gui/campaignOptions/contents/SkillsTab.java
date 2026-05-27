@@ -449,7 +449,7 @@ public class SkillsTab {
         allSkillLevels.put(skill.getName(), skillLevels);
         allSkillCosts.put(skill.getName(), skillCosts);
         allSkillMilestones.put(skill.getName(), skillMilestones);
-        updateSkillControlsFromDraft(skill.getName());
+        updateSkillControlsFromModel(skill.getName());
 
         RoundedJButton copyButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
         copyButton.addActionListener(e -> {
@@ -612,7 +612,7 @@ public class SkillsTab {
             }
 
             skillConfigurations.put(skillName, new SkillConfiguration(skill));
-            updateSkillControlsFromDraft(skillName);
+            updateSkillControlsFromModel(skillName);
         }
 
         edgeCost = options.getEdgeCost();
@@ -621,7 +621,7 @@ public class SkillsTab {
         }
     }
 
-    private void updateSkillControlsFromDraft(String skillName) {
+    private void updateSkillControlsFromModel(String skillName) {
         SkillConfiguration skillConfiguration = skillConfigurations.get(skillName);
         if (skillConfiguration == null) {
             return;
@@ -712,7 +712,7 @@ public class SkillsTab {
             options = this.campaignOptions;
         }
 
-        updateDraftFromCreatedControls();
+        updateModelFromCreatedControls();
 
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
@@ -735,7 +735,7 @@ public class SkillsTab {
         options.setEdgeCost(edgeCost);
     }
 
-    private void updateDraftFromCreatedControls() {
+    private void updateModelFromCreatedControls() {
         if (spnEdgeCost != null) {
             edgeCost = (int) spnEdgeCost.getValue();
         }
@@ -760,12 +760,12 @@ public class SkillsTab {
 
             List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(skillName);
             if (skillMilestones != null) {
-                updateDraftMilestones(skillConfiguration, skillMilestones);
+                updateModelMilestones(skillConfiguration, skillMilestones);
             }
         }
     }
 
-    private void updateDraftMilestones(SkillConfiguration skillConfiguration,
+    private void updateModelMilestones(SkillConfiguration skillConfiguration,
           List<JComboBox<SkillLevel>> skillMilestones) {
         skillConfiguration.greenLevel = skillMilestones.size() - 6;
         skillConfiguration.regularLevel = skillMilestones.size() - 5;

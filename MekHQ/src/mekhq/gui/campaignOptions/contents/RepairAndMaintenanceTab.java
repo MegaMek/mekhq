@@ -74,7 +74,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
-      private RepairAndMaintenanceDraft draft;
+      private RepairAndMaintenanceOptionsModel model;
       private boolean repairPageCreated;
       private boolean maintenancePageCreated;
 
@@ -240,7 +240,7 @@ public class RepairAndMaintenanceTab {
               2, 2, 13, 1);
         spnDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
         repairPageCreated = true;
-        updateRepairControlsFromDraft();
+        updateRepairControlsFromModel();
 
         // Layout the Panel
         final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
@@ -370,7 +370,7 @@ public class RepairAndMaintenanceTab {
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
         logMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "LogMaintenance"));
       maintenancePageCreated = true;
-      updateMaintenanceControlsFromDraft();
+      updateMaintenanceControlsFromModel();
 
         // Layout the Panel
         final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
@@ -461,8 +461,8 @@ public class RepairAndMaintenanceTab {
             options = this.campaignOptions;
         }
 
-            updateDraftFromCreatedControls();
-            draft.applyTo(options);
+            updateModelFromCreatedControls();
+            model.applyTo(options);
     }
 
     /**
@@ -488,154 +488,86 @@ public class RepairAndMaintenanceTab {
             options = this.campaignOptions;
         }
 
-            draft = new RepairAndMaintenanceDraft(options);
-            updateCreatedControlsFromDraft();
+            model = new RepairAndMaintenanceOptionsModel(options);
+            updateCreatedControlsFromModel();
     }
 
-      private void updateCreatedControlsFromDraft() {
-            updateRepairControlsFromDraft();
-            updateMaintenanceControlsFromDraft();
+      private void updateCreatedControlsFromModel() {
+            updateRepairControlsFromModel();
+            updateMaintenanceControlsFromModel();
       }
 
-      private void updateRepairControlsFromDraft() {
-            if (!repairPageCreated || draft == null) {
+      private void updateRepairControlsFromModel() {
+            if (!repairPageCreated || model == null) {
                   return;
             }
 
-            chkTechsUseAdministration.setSelected(draft.techsUseAdministration);
-            chkUsefulAsTechs.setSelected(draft.useUsefulAsTechs);
-            useEraModsCheckBox.setSelected(draft.useEraMods);
-            assignedTechFirstCheckBox.setSelected(draft.assignedTechFirst);
-            resetToFirstTechCheckBox.setSelected(draft.resetToFirstTech);
-            useQuirksBox.setSelected(draft.useQuirks);
-            useAeroSystemHitsBox.setSelected(draft.useAeroSystemHits);
-            useDamageMargin.setSelected(draft.destroyByMargin);
-            spnDamageMargin.setValue(draft.destroyMargin);
-            spnDestroyPartTarget.setValue(draft.destroyPartTarget);
+            chkTechsUseAdministration.setSelected(model.techsUseAdministration);
+            chkUsefulAsTechs.setSelected(model.useUsefulAsTechs);
+            useEraModsCheckBox.setSelected(model.useEraMods);
+            assignedTechFirstCheckBox.setSelected(model.assignedTechFirst);
+            resetToFirstTechCheckBox.setSelected(model.resetToFirstTech);
+            useQuirksBox.setSelected(model.useQuirks);
+            useAeroSystemHitsBox.setSelected(model.useAeroSystemHits);
+            useDamageMargin.setSelected(model.destroyByMargin);
+            spnDamageMargin.setValue(model.destroyMargin);
+            spnDestroyPartTarget.setValue(model.destroyPartTarget);
       }
 
-      private void updateMaintenanceControlsFromDraft() {
-            if (!maintenancePageCreated || draft == null) {
+      private void updateMaintenanceControlsFromModel() {
+            if (!maintenancePageCreated || model == null) {
                   return;
             }
 
-            checkMaintenance.setSelected(draft.checkMaintenance);
-            spnMaintenanceDays.setValue(draft.maintenanceCycleDays);
-            spnMaintenanceBonus.setValue(draft.maintenanceBonus);
-            spnDefaultMaintenanceTime.setValue(draft.defaultMaintenanceTime);
-            useQualityMaintenance.setSelected(draft.useQualityMaintenance);
-            reverseQualityNames.setSelected(draft.reverseQualityNames);
-            chkUseRandomUnitQualities.setSelected(draft.useRandomUnitQualities);
-            chkUsePlanetaryModifiers.setSelected(draft.usePlanetaryModifiers);
-            useUnofficialMaintenance.setSelected(draft.useUnofficialMaintenance);
-            logMaintenance.setSelected(draft.logMaintenance);
+            checkMaintenance.setSelected(model.checkMaintenance);
+            spnMaintenanceDays.setValue(model.maintenanceCycleDays);
+            spnMaintenanceBonus.setValue(model.maintenanceBonus);
+            spnDefaultMaintenanceTime.setValue(model.defaultMaintenanceTime);
+            useQualityMaintenance.setSelected(model.useQualityMaintenance);
+            reverseQualityNames.setSelected(model.reverseQualityNames);
+            chkUseRandomUnitQualities.setSelected(model.useRandomUnitQualities);
+            chkUsePlanetaryModifiers.setSelected(model.usePlanetaryModifiers);
+            useUnofficialMaintenance.setSelected(model.useUnofficialMaintenance);
+            logMaintenance.setSelected(model.logMaintenance);
       }
 
-      private void updateDraftFromCreatedControls() {
-            updateDraftFromRepairControls();
-            updateDraftFromMaintenanceControls();
+      private void updateModelFromCreatedControls() {
+            updateModelFromRepairControls();
+            updateModelFromMaintenanceControls();
       }
 
-      private void updateDraftFromRepairControls() {
-            if (!repairPageCreated || draft == null) {
+      private void updateModelFromRepairControls() {
+            if (!repairPageCreated || model == null) {
                   return;
             }
 
-            draft.techsUseAdministration = chkTechsUseAdministration.isSelected();
-            draft.useUsefulAsTechs = chkUsefulAsTechs.isSelected();
-            draft.useEraMods = useEraModsCheckBox.isSelected();
-            draft.assignedTechFirst = assignedTechFirstCheckBox.isSelected();
-            draft.resetToFirstTech = resetToFirstTechCheckBox.isSelected();
-            draft.useQuirks = useQuirksBox.isSelected();
-            draft.useAeroSystemHits = useAeroSystemHitsBox.isSelected();
-            draft.destroyByMargin = useDamageMargin.isSelected();
-            draft.destroyMargin = (int) spnDamageMargin.getValue();
-            draft.destroyPartTarget = (int) spnDestroyPartTarget.getValue();
+            model.techsUseAdministration = chkTechsUseAdministration.isSelected();
+            model.useUsefulAsTechs = chkUsefulAsTechs.isSelected();
+            model.useEraMods = useEraModsCheckBox.isSelected();
+            model.assignedTechFirst = assignedTechFirstCheckBox.isSelected();
+            model.resetToFirstTech = resetToFirstTechCheckBox.isSelected();
+            model.useQuirks = useQuirksBox.isSelected();
+            model.useAeroSystemHits = useAeroSystemHitsBox.isSelected();
+            model.destroyByMargin = useDamageMargin.isSelected();
+            model.destroyMargin = (int) spnDamageMargin.getValue();
+            model.destroyPartTarget = (int) spnDestroyPartTarget.getValue();
       }
 
-      private void updateDraftFromMaintenanceControls() {
-            if (!maintenancePageCreated || draft == null) {
+      private void updateModelFromMaintenanceControls() {
+            if (!maintenancePageCreated || model == null) {
                   return;
             }
 
-            draft.checkMaintenance = checkMaintenance.isSelected();
-            draft.maintenanceCycleDays = (int) spnMaintenanceDays.getValue();
-            draft.maintenanceBonus = (int) spnMaintenanceBonus.getValue();
-            draft.defaultMaintenanceTime = (int) spnDefaultMaintenanceTime.getValue();
-            draft.useQualityMaintenance = useQualityMaintenance.isSelected();
-            draft.reverseQualityNames = reverseQualityNames.isSelected();
-            draft.useRandomUnitQualities = chkUseRandomUnitQualities.isSelected();
-            draft.usePlanetaryModifiers = chkUsePlanetaryModifiers.isSelected();
-            draft.useUnofficialMaintenance = useUnofficialMaintenance.isSelected();
-            draft.logMaintenance = logMaintenance.isSelected();
+            model.checkMaintenance = checkMaintenance.isSelected();
+            model.maintenanceCycleDays = (int) spnMaintenanceDays.getValue();
+            model.maintenanceBonus = (int) spnMaintenanceBonus.getValue();
+            model.defaultMaintenanceTime = (int) spnDefaultMaintenanceTime.getValue();
+            model.useQualityMaintenance = useQualityMaintenance.isSelected();
+            model.reverseQualityNames = reverseQualityNames.isSelected();
+            model.useRandomUnitQualities = chkUseRandomUnitQualities.isSelected();
+            model.usePlanetaryModifiers = chkUsePlanetaryModifiers.isSelected();
+            model.useUnofficialMaintenance = useUnofficialMaintenance.isSelected();
+            model.logMaintenance = logMaintenance.isSelected();
       }
 
-      private static class RepairAndMaintenanceDraft {
-            private boolean techsUseAdministration;
-            private boolean useUsefulAsTechs;
-            private boolean useEraMods;
-            private boolean assignedTechFirst;
-            private boolean resetToFirstTech;
-            private boolean useQuirks;
-            private boolean useAeroSystemHits;
-            private boolean destroyByMargin;
-            private int destroyMargin;
-            private int destroyPartTarget;
-            private boolean checkMaintenance;
-            private int maintenanceCycleDays;
-            private int maintenanceBonus;
-            private int defaultMaintenanceTime;
-            private boolean useQualityMaintenance;
-            private boolean reverseQualityNames;
-            private boolean useRandomUnitQualities;
-            private boolean usePlanetaryModifiers;
-            private boolean useUnofficialMaintenance;
-            private boolean logMaintenance;
-
-            private RepairAndMaintenanceDraft(CampaignOptions options) {
-                  techsUseAdministration = options.isTechsUseAdministration();
-                  useUsefulAsTechs = options.isUseUsefulAsTechs();
-                  useEraMods = options.isUseEraMods();
-                  assignedTechFirst = options.isAssignedTechFirst();
-                  resetToFirstTech = options.isResetToFirstTech();
-                  useQuirks = options.isUseQuirks();
-                  useAeroSystemHits = options.isUseAeroSystemHits();
-                  destroyByMargin = options.isDestroyByMargin();
-                  destroyMargin = options.getDestroyMargin();
-                  destroyPartTarget = options.getDestroyPartTarget();
-                  checkMaintenance = options.isCheckMaintenance();
-                  maintenanceCycleDays = options.getMaintenanceCycleDays();
-                  maintenanceBonus = options.getMaintenanceBonus();
-                  defaultMaintenanceTime = options.getDefaultMaintenanceTime();
-                  useQualityMaintenance = options.isUseQualityMaintenance();
-                  reverseQualityNames = options.isReverseQualityNames();
-                  useRandomUnitQualities = options.isUseRandomUnitQualities();
-                  usePlanetaryModifiers = options.isUsePlanetaryModifiers();
-                  useUnofficialMaintenance = options.isUseUnofficialMaintenance();
-                  logMaintenance = options.isLogMaintenance();
-            }
-
-            private void applyTo(CampaignOptions options) {
-                  options.setTechsUseAdministration(techsUseAdministration);
-                  options.setIsUseUsefulAsTechs(useUsefulAsTechs);
-                  options.setEraMods(useEraMods);
-                  options.setAssignedTechFirst(assignedTechFirst);
-                  options.setResetToFirstTech(resetToFirstTech);
-                  options.setQuirks(useQuirks);
-                  options.setUseAeroSystemHits(useAeroSystemHits);
-                  options.setDestroyByMargin(destroyByMargin);
-                  options.setDestroyMargin(destroyMargin);
-                  options.setDestroyPartTarget(destroyPartTarget);
-                  options.setCheckMaintenance(checkMaintenance);
-                  options.setMaintenanceCycleDays(maintenanceCycleDays);
-                  options.setMaintenanceBonus(maintenanceBonus);
-                  options.setDefaultMaintenanceTime(defaultMaintenanceTime);
-                  options.setUseQualityMaintenance(useQualityMaintenance);
-                  options.setReverseQualityNames(reverseQualityNames);
-                  options.setUseRandomUnitQualities(useRandomUnitQualities);
-                  options.setUsePlanetaryModifiers(usePlanetaryModifiers);
-                  options.setUseUnofficialMaintenance(useUnofficialMaintenance);
-                  options.setLogMaintenance(logMaintenance);
-            }
-      }
 }

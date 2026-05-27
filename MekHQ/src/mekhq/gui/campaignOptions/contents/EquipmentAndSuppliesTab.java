@@ -86,7 +86,7 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  */
 public class EquipmentAndSuppliesTab {
     private final CampaignOptions campaignOptions;
-    private EquipmentAndSuppliesDraft draft;
+    private EquipmentAndSuppliesOptionsModel model;
     private boolean acquisitionPageCreated;
     private boolean planetaryAcquisitionPageCreated;
     private boolean techLimitsPageCreated;
@@ -358,7 +358,7 @@ public class EquipmentAndSuppliesTab {
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
         acquisitionPageCreated = true;
-        updateAcquisitionControlsFromDraft();
+        updateAcquisitionControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
@@ -610,7 +610,7 @@ public class EquipmentAndSuppliesTab {
         JPanel options = createOptionsPanel();
         JPanel modifiers = createModifiersPanel();
         planetaryAcquisitionPageCreated = true;
-        updatePlanetaryAcquisitionControlsFromDraft();
+        updatePlanetaryAcquisitionControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTab", true);
@@ -1048,7 +1048,7 @@ public class EquipmentAndSuppliesTab {
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         useAmmoByTypeBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "UseAmmoByTypeBox"));
           techLimitsPageCreated = true;
-          updateTechLimitsControlsFromDraft();
+          updateTechLimitsControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TechLimitsTab", true);
@@ -1125,8 +1125,8 @@ public class EquipmentAndSuppliesTab {
             options = this.campaignOptions;
         }
 
-        updateDraftFromCreatedControls();
-        draft.applyTo(options);
+        updateModelFromCreatedControls();
+        model.applyTo(options);
     }
 
     /**
@@ -1153,303 +1153,158 @@ public class EquipmentAndSuppliesTab {
             options = this.campaignOptions;
         }
 
-        draft = new EquipmentAndSuppliesDraft(options);
-        updateCreatedControlsFromDraft();
+        model = new EquipmentAndSuppliesOptionsModel(options);
+        updateCreatedControlsFromModel();
     }
 
-    private void updateCreatedControlsFromDraft() {
-        updateAcquisitionControlsFromDraft();
-        updatePlanetaryAcquisitionControlsFromDraft();
-        updateTechLimitsControlsFromDraft();
+    private void updateCreatedControlsFromModel() {
+        updateAcquisitionControlsFromModel();
+        updatePlanetaryAcquisitionControlsFromModel();
+        updateTechLimitsControlsFromModel();
     }
 
-    private void updateAcquisitionControlsFromDraft() {
-        if (!acquisitionPageCreated || draft == null) {
+    private void updateAcquisitionControlsFromModel() {
+        if (!acquisitionPageCreated || model == null) {
             return;
         }
 
-        choiceAcquireSkill.setSelectedItem(draft.acquisitionType);
-        chkUseFunctionalAppraisal.setSelected(draft.useFunctionalAppraisal);
-        cboProcurementPersonnelPick.setSelectedItem(draft.acquisitionPersonnelCategory.toString());
-        spnAcquireClanPenalty.setValue(draft.clanAcquisitionPenalty);
-        spnAcquireIsPenalty.setValue(draft.isAcquisitionPenalty);
-        spnAcquireWaitingPeriod.setValue(draft.waitingPeriod);
-        spnMaxAcquisitions.setValue(draft.maxAcquisitions);
-        spnAutoLogisticsMekHead.setValue(draft.autoLogisticsMekHead);
-        spnAutoLogisticsMekLocation.setValue(draft.autoLogisticsMekLocation);
-        spnAutoLogisticsNonRepairableLocation.setValue(draft.autoLogisticsNonRepairableLocation);
-        spnAutoLogisticsArmor.setValue(draft.autoLogisticsArmor);
-        spnAutoLogisticsAmmunition.setValue(draft.autoLogisticsAmmunition);
-        spnAutoLogisticsActuators.setValue(draft.autoLogisticsActuators);
-        spnAutoLogisticsJumpJets.setValue(draft.autoLogisticsJumpJets);
-        spnAutoLogisticsEngines.setValue(draft.autoLogisticsEngines);
-        spnAutoLogisticsHeatSink.setValue(draft.autoLogisticsHeatSink);
-        spnAutoLogisticsWeapons.setValue(draft.autoLogisticsWeapons);
-        spnAutoLogisticsOther.setValue(draft.autoLogisticsOther);
-        choiceTransitTimeUnits.setSelectedIndex(draft.unitTransitTime);
-        chkNoDeliveriesInTransit.setSelected(draft.noDeliveriesInTransit);
+        choiceAcquireSkill.setSelectedItem(model.acquisitionType);
+        chkUseFunctionalAppraisal.setSelected(model.useFunctionalAppraisal);
+        cboProcurementPersonnelPick.setSelectedItem(model.acquisitionPersonnelCategory.toString());
+        spnAcquireClanPenalty.setValue(model.clanAcquisitionPenalty);
+        spnAcquireIsPenalty.setValue(model.isAcquisitionPenalty);
+        spnAcquireWaitingPeriod.setValue(model.waitingPeriod);
+        spnMaxAcquisitions.setValue(model.maxAcquisitions);
+        spnAutoLogisticsMekHead.setValue(model.autoLogisticsMekHead);
+        spnAutoLogisticsMekLocation.setValue(model.autoLogisticsMekLocation);
+        spnAutoLogisticsNonRepairableLocation.setValue(model.autoLogisticsNonRepairableLocation);
+        spnAutoLogisticsArmor.setValue(model.autoLogisticsArmor);
+        spnAutoLogisticsAmmunition.setValue(model.autoLogisticsAmmunition);
+        spnAutoLogisticsActuators.setValue(model.autoLogisticsActuators);
+        spnAutoLogisticsJumpJets.setValue(model.autoLogisticsJumpJets);
+        spnAutoLogisticsEngines.setValue(model.autoLogisticsEngines);
+        spnAutoLogisticsHeatSink.setValue(model.autoLogisticsHeatSink);
+        spnAutoLogisticsWeapons.setValue(model.autoLogisticsWeapons);
+        spnAutoLogisticsOther.setValue(model.autoLogisticsOther);
+        choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
+        chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
     }
 
-    private void updatePlanetaryAcquisitionControlsFromDraft() {
-        if (!planetaryAcquisitionPageCreated || draft == null) {
+    private void updatePlanetaryAcquisitionControlsFromModel() {
+        if (!planetaryAcquisitionPageCreated || model == null) {
             return;
         }
 
-        usePlanetaryAcquisitions.setSelected(draft.usePlanetaryAcquisition);
-        spnMaxJumpPlanetaryAcquisitions.setValue(draft.maxJumpsPlanetaryAcquisition);
-        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(draft.planetAcquisitionFactionLimit);
-        disallowPlanetaryAcquisitionClanCrossover.setSelected(draft.disallowPlanetAcquisitionClanCrossover);
-        disallowClanPartsFromIS.setSelected(draft.noClanPartsFromIS);
-        spnPenaltyClanPartsFromIS.setValue(draft.penaltyClanPartsFromIS);
-        usePlanetaryAcquisitionsVerbose.setSelected(draft.planetAcquisitionVerbose);
+        usePlanetaryAcquisitions.setSelected(model.usePlanetaryAcquisition);
+        spnMaxJumpPlanetaryAcquisitions.setValue(model.maxJumpsPlanetaryAcquisition);
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(model.planetAcquisitionFactionLimit);
+        disallowPlanetaryAcquisitionClanCrossover.setSelected(model.disallowPlanetAcquisitionClanCrossover);
+        disallowClanPartsFromIS.setSelected(model.noClanPartsFromIS);
+        spnPenaltyClanPartsFromIS.setValue(model.penaltyClanPartsFromIS);
+        usePlanetaryAcquisitionsVerbose.setSelected(model.planetAcquisitionVerbose);
 
-        for (int i = 0; i < Math.min(spnPlanetAcquireTechBonus.length, draft.planetTechAcquisitionBonus.length); i++) {
-            spnPlanetAcquireTechBonus[i].setValue(draft.planetTechAcquisitionBonus[i]);
+        for (int i = 0; i < Math.min(spnPlanetAcquireTechBonus.length, model.planetTechAcquisitionBonus.length); i++) {
+            spnPlanetAcquireTechBonus[i].setValue(model.planetTechAcquisitionBonus[i]);
         }
         for (int i = 0; i < Math.min(spnPlanetAcquireIndustryBonus.length,
-              draft.planetIndustryAcquisitionBonus.length); i++) {
-            spnPlanetAcquireIndustryBonus[i].setValue(draft.planetIndustryAcquisitionBonus[i]);
+              model.planetIndustryAcquisitionBonus.length); i++) {
+            spnPlanetAcquireIndustryBonus[i].setValue(model.planetIndustryAcquisitionBonus[i]);
         }
         for (int i = 0; i < Math.min(spnPlanetAcquireOutputBonus.length,
-              draft.planetOutputAcquisitionBonus.length); i++) {
-            spnPlanetAcquireOutputBonus[i].setValue(draft.planetOutputAcquisitionBonus[i]);
+              model.planetOutputAcquisitionBonus.length); i++) {
+            spnPlanetAcquireOutputBonus[i].setValue(model.planetOutputAcquisitionBonus[i]);
         }
     }
 
-    private void updateTechLimitsControlsFromDraft() {
-        if (!techLimitsPageCreated || draft == null) {
+    private void updateTechLimitsControlsFromModel() {
+        if (!techLimitsPageCreated || model == null) {
             return;
         }
 
-        limitByYearBox.setSelected(draft.limitByYear);
-        disallowExtinctStuffBox.setSelected(draft.disallowExtinctStuff);
-        allowClanPurchasesBox.setSelected(draft.allowClanPurchases);
-        allowISPurchasesBox.setSelected(draft.allowISPurchases);
-        allowCanonOnlyBox.setSelected(draft.allowCanonOnly);
-        allowCanonRefitOnlyBox.setSelected(draft.allowCanonRefitOnly);
-        choiceTechLevel.setSelectedIndex(draft.techLevel);
-        variableTechLevelBox.setSelected(draft.variableTechLevel);
-        useAmmoByTypeBox.setSelected(draft.useAmmoByType);
+        limitByYearBox.setSelected(model.limitByYear);
+        disallowExtinctStuffBox.setSelected(model.disallowExtinctStuff);
+        allowClanPurchasesBox.setSelected(model.allowClanPurchases);
+        allowISPurchasesBox.setSelected(model.allowISPurchases);
+        allowCanonOnlyBox.setSelected(model.allowCanonOnly);
+        allowCanonRefitOnlyBox.setSelected(model.allowCanonRefitOnly);
+        choiceTechLevel.setSelectedIndex(model.techLevel);
+        variableTechLevelBox.setSelected(model.variableTechLevel);
+        useAmmoByTypeBox.setSelected(model.useAmmoByType);
     }
 
-    private void updateDraftFromCreatedControls() {
-        updateDraftFromAcquisitionControls();
-        updateDraftFromPlanetaryAcquisitionControls();
-        updateDraftFromTechLimitsControls();
+    private void updateModelFromCreatedControls() {
+        updateModelFromAcquisitionControls();
+        updateModelFromPlanetaryAcquisitionControls();
+        updateModelFromTechLimitsControls();
     }
 
-    private void updateDraftFromAcquisitionControls() {
+    private void updateModelFromAcquisitionControls() {
         if (!acquisitionPageCreated) {
             return;
         }
 
-        draft.acquisitionType = choiceAcquireSkill.getSelectedItem();
-        draft.useFunctionalAppraisal = chkUseFunctionalAppraisal.isSelected();
-        draft.acquisitionPersonnelCategory = ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()];
-        draft.clanAcquisitionPenalty = (int) spnAcquireClanPenalty.getValue();
-        draft.isAcquisitionPenalty = (int) spnAcquireIsPenalty.getValue();
-        draft.waitingPeriod = (int) spnAcquireWaitingPeriod.getValue();
-        draft.maxAcquisitions = (int) spnMaxAcquisitions.getValue();
-        draft.autoLogisticsMekHead = (int) spnAutoLogisticsMekHead.getValue();
-        draft.autoLogisticsMekLocation = (int) spnAutoLogisticsMekLocation.getValue();
-        draft.autoLogisticsNonRepairableLocation = (int) spnAutoLogisticsNonRepairableLocation.getValue();
-        draft.autoLogisticsArmor = (int) spnAutoLogisticsArmor.getValue();
-        draft.autoLogisticsAmmunition = (int) spnAutoLogisticsAmmunition.getValue();
-        draft.autoLogisticsActuators = (int) spnAutoLogisticsActuators.getValue();
-        draft.autoLogisticsJumpJets = (int) spnAutoLogisticsJumpJets.getValue();
-        draft.autoLogisticsEngines = (int) spnAutoLogisticsEngines.getValue();
-        draft.autoLogisticsHeatSink = (int) spnAutoLogisticsHeatSink.getValue();
-        draft.autoLogisticsWeapons = (int) spnAutoLogisticsWeapons.getValue();
-        draft.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
-        draft.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
-        draft.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
+        model.acquisitionType = choiceAcquireSkill.getSelectedItem();
+        model.useFunctionalAppraisal = chkUseFunctionalAppraisal.isSelected();
+        model.acquisitionPersonnelCategory = ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()];
+        model.clanAcquisitionPenalty = (int) spnAcquireClanPenalty.getValue();
+        model.isAcquisitionPenalty = (int) spnAcquireIsPenalty.getValue();
+        model.waitingPeriod = (int) spnAcquireWaitingPeriod.getValue();
+        model.maxAcquisitions = (int) spnMaxAcquisitions.getValue();
+        model.autoLogisticsMekHead = (int) spnAutoLogisticsMekHead.getValue();
+        model.autoLogisticsMekLocation = (int) spnAutoLogisticsMekLocation.getValue();
+        model.autoLogisticsNonRepairableLocation = (int) spnAutoLogisticsNonRepairableLocation.getValue();
+        model.autoLogisticsArmor = (int) spnAutoLogisticsArmor.getValue();
+        model.autoLogisticsAmmunition = (int) spnAutoLogisticsAmmunition.getValue();
+        model.autoLogisticsActuators = (int) spnAutoLogisticsActuators.getValue();
+        model.autoLogisticsJumpJets = (int) spnAutoLogisticsJumpJets.getValue();
+        model.autoLogisticsEngines = (int) spnAutoLogisticsEngines.getValue();
+        model.autoLogisticsHeatSink = (int) spnAutoLogisticsHeatSink.getValue();
+        model.autoLogisticsWeapons = (int) spnAutoLogisticsWeapons.getValue();
+        model.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
+        model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
+        model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
     }
 
-    private void updateDraftFromPlanetaryAcquisitionControls() {
+    private void updateModelFromPlanetaryAcquisitionControls() {
         if (!planetaryAcquisitionPageCreated) {
             return;
         }
 
-        draft.usePlanetaryAcquisition = usePlanetaryAcquisitions.isSelected();
-        draft.maxJumpsPlanetaryAcquisition = (int) spnMaxJumpPlanetaryAcquisitions.getValue();
-        draft.planetAcquisitionFactionLimit = comboPlanetaryAcquisitionsFactionLimits.getSelectedItem();
-        draft.disallowPlanetAcquisitionClanCrossover = disallowPlanetaryAcquisitionClanCrossover.isSelected();
-        draft.noClanPartsFromIS = disallowClanPartsFromIS.isSelected();
-        draft.penaltyClanPartsFromIS = (int) spnPenaltyClanPartsFromIS.getValue();
-        draft.planetAcquisitionVerbose = usePlanetaryAcquisitionsVerbose.isSelected();
+        model.usePlanetaryAcquisition = usePlanetaryAcquisitions.isSelected();
+        model.maxJumpsPlanetaryAcquisition = (int) spnMaxJumpPlanetaryAcquisitions.getValue();
+        model.planetAcquisitionFactionLimit = comboPlanetaryAcquisitionsFactionLimits.getSelectedItem();
+        model.disallowPlanetAcquisitionClanCrossover = disallowPlanetaryAcquisitionClanCrossover.isSelected();
+        model.noClanPartsFromIS = disallowClanPartsFromIS.isSelected();
+        model.penaltyClanPartsFromIS = (int) spnPenaltyClanPartsFromIS.getValue();
+        model.planetAcquisitionVerbose = usePlanetaryAcquisitionsVerbose.isSelected();
 
-        for (int i = 0; i < Math.min(spnPlanetAcquireTechBonus.length, draft.planetTechAcquisitionBonus.length); i++) {
-            draft.planetTechAcquisitionBonus[i] = (int) spnPlanetAcquireTechBonus[i].getValue();
+        for (int i = 0; i < Math.min(spnPlanetAcquireTechBonus.length, model.planetTechAcquisitionBonus.length); i++) {
+            model.planetTechAcquisitionBonus[i] = (int) spnPlanetAcquireTechBonus[i].getValue();
         }
         for (int i = 0; i < Math.min(spnPlanetAcquireIndustryBonus.length,
-              draft.planetIndustryAcquisitionBonus.length); i++) {
-            draft.planetIndustryAcquisitionBonus[i] = (int) spnPlanetAcquireIndustryBonus[i].getValue();
+              model.planetIndustryAcquisitionBonus.length); i++) {
+            model.planetIndustryAcquisitionBonus[i] = (int) spnPlanetAcquireIndustryBonus[i].getValue();
         }
         for (int i = 0; i < Math.min(spnPlanetAcquireOutputBonus.length,
-              draft.planetOutputAcquisitionBonus.length); i++) {
-            draft.planetOutputAcquisitionBonus[i] = (int) spnPlanetAcquireOutputBonus[i].getValue();
+              model.planetOutputAcquisitionBonus.length); i++) {
+            model.planetOutputAcquisitionBonus[i] = (int) spnPlanetAcquireOutputBonus[i].getValue();
         }
     }
 
-    private void updateDraftFromTechLimitsControls() {
+    private void updateModelFromTechLimitsControls() {
         if (!techLimitsPageCreated) {
             return;
         }
 
-        draft.limitByYear = limitByYearBox.isSelected();
-        draft.disallowExtinctStuff = disallowExtinctStuffBox.isSelected();
-        draft.allowClanPurchases = allowClanPurchasesBox.isSelected();
-        draft.allowISPurchases = allowISPurchasesBox.isSelected();
-        draft.allowCanonOnly = allowCanonOnlyBox.isSelected();
-        draft.allowCanonRefitOnly = allowCanonRefitOnlyBox.isSelected();
-        draft.techLevel = choiceTechLevel.getSelectedIndex();
-        draft.variableTechLevel = variableTechLevelBox.isSelected();
-        draft.useAmmoByType = useAmmoByTypeBox.isSelected();
+        model.limitByYear = limitByYearBox.isSelected();
+        model.disallowExtinctStuff = disallowExtinctStuffBox.isSelected();
+        model.allowClanPurchases = allowClanPurchasesBox.isSelected();
+        model.allowISPurchases = allowISPurchasesBox.isSelected();
+        model.allowCanonOnly = allowCanonOnlyBox.isSelected();
+        model.allowCanonRefitOnly = allowCanonRefitOnlyBox.isSelected();
+        model.techLevel = choiceTechLevel.getSelectedIndex();
+        model.variableTechLevel = variableTechLevelBox.isSelected();
+        model.useAmmoByType = useAmmoByTypeBox.isSelected();
     }
 
-    private static class EquipmentAndSuppliesDraft {
-        private AcquisitionsType acquisitionType;
-        private boolean useFunctionalAppraisal;
-        private ProcurementPersonnelPick acquisitionPersonnelCategory;
-        private int clanAcquisitionPenalty;
-        private int isAcquisitionPenalty;
-        private int waitingPeriod;
-        private int maxAcquisitions;
-        private int autoLogisticsMekHead;
-        private int autoLogisticsMekLocation;
-        private int autoLogisticsNonRepairableLocation;
-        private int autoLogisticsArmor;
-        private int autoLogisticsAmmunition;
-        private int autoLogisticsActuators;
-        private int autoLogisticsJumpJets;
-        private int autoLogisticsEngines;
-        private int autoLogisticsHeatSink;
-        private int autoLogisticsWeapons;
-        private int autoLogisticsOther;
-        private int unitTransitTime;
-        private boolean noDeliveriesInTransit;
-        private boolean usePlanetaryAcquisition;
-        private int maxJumpsPlanetaryAcquisition;
-        private PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit;
-        private boolean disallowPlanetAcquisitionClanCrossover;
-        private boolean noClanPartsFromIS;
-        private int penaltyClanPartsFromIS;
-        private boolean planetAcquisitionVerbose;
-        private final int[] planetTechAcquisitionBonus = new int[PlanetarySophistication.values().length];
-        private final int[] planetIndustryAcquisitionBonus = new int[PlanetaryRating.values().length];
-        private final int[] planetOutputAcquisitionBonus = new int[PlanetaryRating.values().length];
-        private boolean limitByYear;
-        private boolean disallowExtinctStuff;
-        private boolean allowClanPurchases;
-        private boolean allowISPurchases;
-        private boolean allowCanonOnly;
-        private boolean allowCanonRefitOnly;
-        private int techLevel;
-        private boolean variableTechLevel;
-        private boolean useAmmoByType;
-
-        private EquipmentAndSuppliesDraft(CampaignOptions options) {
-            acquisitionType = options.getAcquisitionType();
-            useFunctionalAppraisal = options.isUseFunctionalAppraisal();
-            acquisitionPersonnelCategory = options.getAcquisitionPersonnelCategory();
-            clanAcquisitionPenalty = options.getClanAcquisitionPenalty();
-            isAcquisitionPenalty = options.getIsAcquisitionPenalty();
-            waitingPeriod = options.getWaitingPeriod();
-            maxAcquisitions = options.getMaxAcquisitions();
-            autoLogisticsMekHead = options.getAutoLogisticsMekHead();
-            autoLogisticsMekLocation = options.getAutoLogisticsMekLocation();
-            autoLogisticsNonRepairableLocation = options.getAutoLogisticsNonRepairableLocation();
-            autoLogisticsArmor = options.getAutoLogisticsArmor();
-            autoLogisticsAmmunition = options.getAutoLogisticsAmmunition();
-            autoLogisticsActuators = options.getAutoLogisticsActuators();
-            autoLogisticsJumpJets = options.getAutoLogisticsJumpJets();
-            autoLogisticsEngines = options.getAutoLogisticsEngines();
-            autoLogisticsHeatSink = options.getAutoLogisticsHeatSink();
-            autoLogisticsWeapons = options.getAutoLogisticsWeapons();
-            autoLogisticsOther = options.getAutoLogisticsOther();
-            unitTransitTime = options.getUnitTransitTime();
-            noDeliveriesInTransit = options.isNoDeliveriesInTransit();
-            usePlanetaryAcquisition = options.isUsePlanetaryAcquisition();
-            maxJumpsPlanetaryAcquisition = options.getMaxJumpsPlanetaryAcquisition();
-            planetAcquisitionFactionLimit = options.getPlanetAcquisitionFactionLimit();
-            disallowPlanetAcquisitionClanCrossover = options.isPlanetAcquisitionNoClanCrossover();
-            noClanPartsFromIS = options.isNoClanPartsFromIS();
-            penaltyClanPartsFromIS = options.getPenaltyClanPartsFromIS();
-            planetAcquisitionVerbose = options.isPlanetAcquisitionVerbose();
-
-            int index = 0;
-            for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
-                planetTechAcquisitionBonus[index] = options.getPlanetTechAcquisitionBonus(sophistication);
-                index++;
-            }
-            index = 0;
-            for (PlanetaryRating rating : PlanetaryRating.values()) {
-                planetIndustryAcquisitionBonus[index] = options.getPlanetIndustryAcquisitionBonus(rating);
-                planetOutputAcquisitionBonus[index] = options.getPlanetOutputAcquisitionBonus(rating);
-                index++;
-            }
-
-            limitByYear = options.isLimitByYear();
-            disallowExtinctStuff = options.isDisallowExtinctStuff();
-            allowClanPurchases = options.isAllowClanPurchases();
-            allowISPurchases = options.isAllowISPurchases();
-            allowCanonOnly = options.isAllowCanonOnly();
-            allowCanonRefitOnly = options.isAllowCanonRefitOnly();
-            techLevel = options.getTechLevel();
-            variableTechLevel = options.isVariableTechLevel();
-            useAmmoByType = options.isUseAmmoByType();
-        }
-
-        private void applyTo(CampaignOptions options) {
-            options.setAcquisitionType(acquisitionType);
-            options.setUseFunctionalAppraisal(useFunctionalAppraisal);
-            options.setAcquisitionPersonnelCategory(acquisitionPersonnelCategory);
-            options.setClanAcquisitionPenalty(clanAcquisitionPenalty);
-            options.setIsAcquisitionPenalty(isAcquisitionPenalty);
-            options.setWaitingPeriod(waitingPeriod);
-            options.setMaxAcquisitions(maxAcquisitions);
-            options.setAutoLogisticsMekHead(autoLogisticsMekHead);
-            options.setAutoLogisticsMekLocation(autoLogisticsMekLocation);
-            options.setAutoLogisticsNonRepairableLocation(autoLogisticsNonRepairableLocation);
-            options.setAutoLogisticsArmor(autoLogisticsArmor);
-            options.setAutoLogisticsAmmunition(autoLogisticsAmmunition);
-            options.setAutoLogisticsActuators(autoLogisticsActuators);
-            options.setAutoLogisticsJumpJets(autoLogisticsJumpJets);
-            options.setAutoLogisticsEngines(autoLogisticsEngines);
-            options.setAutoLogisticsHeatSink(autoLogisticsHeatSink);
-            options.setAutoLogisticsWeapons(autoLogisticsWeapons);
-            options.setAutoLogisticsOther(autoLogisticsOther);
-            options.setUnitTransitTime(unitTransitTime);
-            options.setNoDeliveriesInTransit(noDeliveriesInTransit);
-            options.setPlanetaryAcquisition(usePlanetaryAcquisition);
-            options.setMaxJumpsPlanetaryAcquisition(maxJumpsPlanetaryAcquisition);
-            options.setPlanetAcquisitionFactionLimit(planetAcquisitionFactionLimit);
-            options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetAcquisitionClanCrossover);
-            options.setDisallowClanPartsFromIS(noClanPartsFromIS);
-            options.setPenaltyClanPartsFromIS(penaltyClanPartsFromIS);
-            options.setPlanetAcquisitionVerboseReporting(planetAcquisitionVerbose);
-
-            int index = 0;
-            for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
-                options.setPlanetTechAcquisitionBonus(planetTechAcquisitionBonus[index], sophistication);
-                index++;
-            }
-            index = 0;
-            for (PlanetaryRating rating : PlanetaryRating.values()) {
-                options.setPlanetIndustryAcquisitionBonus(planetIndustryAcquisitionBonus[index], rating);
-                options.setPlanetOutputAcquisitionBonus(planetOutputAcquisitionBonus[index], rating);
-                index++;
-            }
-
-            options.setLimitByYear(limitByYear);
-            options.setDisallowExtinctStuff(disallowExtinctStuff);
-            options.setAllowClanPurchases(allowClanPurchases);
-            options.setAllowISPurchases(allowISPurchases);
-            options.setAllowCanonOnly(allowCanonOnly);
-            options.setAllowCanonRefitOnly(allowCanonRefitOnly);
-            options.setTechLevel(techLevel);
-            options.setVariableTechLevel(variableTechLevel);
-            options.setUseAmmoByType(useAmmoByType);
-        }
-    }
 }

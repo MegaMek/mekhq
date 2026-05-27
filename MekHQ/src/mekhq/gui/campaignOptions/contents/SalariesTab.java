@@ -43,7 +43,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,6 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
@@ -83,7 +81,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class SalariesTab {
     private final CampaignOptions campaignOptions;
-    private SalariesDraft draft;
+    private SalariesOptionsModel model;
     private boolean combatPageCreated;
     private boolean supportPageCreated;
     private boolean civilianPageCreated;
@@ -198,7 +196,7 @@ public class SalariesTab {
 
         pnlSalaryBaseSalaryPanel = createBaseSalariesPanel(type);
         markPageCreated(type);
-        updateSalariesControlsFromDraft(type);
+        updateSalariesControlsFromModel(type);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
@@ -497,8 +495,8 @@ public class SalariesTab {
             options = this.campaignOptions;
         }
 
-        draft = new SalariesDraft(options);
-        updateCreatedControlsFromDraft();
+        model = new SalariesOptionsModel(options);
+        updateCreatedControlsFromModel();
     }
 
     /**
@@ -513,8 +511,8 @@ public class SalariesTab {
             options = this.campaignOptions;
         }
 
-        updateDraftFromCreatedControls();
-        draft.applyTo(options);
+        updateModelFromCreatedControls();
+        model.applyTo(options);
     }
 
     private void markPageCreated(PersonnelRoleSubType type) {
@@ -549,23 +547,23 @@ public class SalariesTab {
         };
     }
 
-    private void updateCreatedControlsFromDraft() {
-        updateSalariesControlsFromDraft(PersonnelRoleSubType.COMBAT);
-        updateSalariesControlsFromDraft(PersonnelRoleSubType.SUPPORT);
-        updateSalariesControlsFromDraft(PersonnelRoleSubType.CIVILIAN);
+    private void updateCreatedControlsFromModel() {
+        updateSalariesControlsFromModel(PersonnelRoleSubType.COMBAT);
+        updateSalariesControlsFromModel(PersonnelRoleSubType.SUPPORT);
+        updateSalariesControlsFromModel(PersonnelRoleSubType.CIVILIAN);
     }
 
-    private void updateSalariesControlsFromDraft(PersonnelRoleSubType type) {
-        if (!isPageCreated(type) || draft == null) {
+    private void updateSalariesControlsFromModel(PersonnelRoleSubType type) {
+        if (!isPageCreated(type) || model == null) {
             return;
         }
 
         if (type == PersonnelRoleSubType.COMBAT) {
-            chkDisableSecondaryRoleSalary.setSelected(draft.disableSecondaryRoleSalary);
-            spnAntiMekSalary.setValue(draft.salaryAntiMekMultiplier);
-            spnSpecialistInfantrySalary.setValue(draft.salarySpecialistInfantryMultiplier);
+            chkDisableSecondaryRoleSalary.setSelected(model.disableSecondaryRoleSalary);
+            spnAntiMekSalary.setValue(model.salaryAntiMekMultiplier);
+            spnSpecialistInfantrySalary.setValue(model.salarySpecialistInfantryMultiplier);
             for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-                entry.getValue().setValue(draft.salaryXpMultipliers.get(entry.getKey()));
+                entry.getValue().setValue(model.salaryXpMultipliers.get(entry.getKey()));
             }
         }
 
@@ -573,69 +571,35 @@ public class SalariesTab {
         JSpinner[] salarySpinners = getBaseSalarySpinners(type);
         for (int i = 0; i < salarySpinners.length; i++) {
             PersonnelRole personnelRole = roles.get(i);
-            salarySpinners[i].setValue(draft.roleBaseSalaries.get(personnelRole));
+            salarySpinners[i].setValue(model.roleBaseSalaries.get(personnelRole));
         }
     }
 
-    private void updateDraftFromCreatedControls() {
-        updateDraftFromSalariesControls(PersonnelRoleSubType.COMBAT);
-        updateDraftFromSalariesControls(PersonnelRoleSubType.SUPPORT);
-        updateDraftFromSalariesControls(PersonnelRoleSubType.CIVILIAN);
+    private void updateModelFromCreatedControls() {
+        updateModelFromSalariesControls(PersonnelRoleSubType.COMBAT);
+        updateModelFromSalariesControls(PersonnelRoleSubType.SUPPORT);
+        updateModelFromSalariesControls(PersonnelRoleSubType.CIVILIAN);
     }
 
-    private void updateDraftFromSalariesControls(PersonnelRoleSubType type) {
+    private void updateModelFromSalariesControls(PersonnelRoleSubType type) {
         if (!isPageCreated(type)) {
             return;
         }
 
         if (type == PersonnelRoleSubType.COMBAT) {
-            draft.disableSecondaryRoleSalary = chkDisableSecondaryRoleSalary.isSelected();
-            draft.salaryAntiMekMultiplier = (double) spnAntiMekSalary.getValue();
-            draft.salarySpecialistInfantryMultiplier = (double) spnSpecialistInfantrySalary.getValue();
+            model.disableSecondaryRoleSalary = chkDisableSecondaryRoleSalary.isSelected();
+            model.salaryAntiMekMultiplier = (double) spnAntiMekSalary.getValue();
+            model.salarySpecialistInfantryMultiplier = (double) spnSpecialistInfantrySalary.getValue();
             for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-                draft.salaryXpMultipliers.put(entry.getKey(), (double) entry.getValue().getValue());
+                model.salaryXpMultipliers.put(entry.getKey(), (double) entry.getValue().getValue());
             }
         }
 
         List<PersonnelRole> roles = getRoles(type);
         JSpinner[] salarySpinners = getBaseSalarySpinners(type);
         for (int i = 0; i < salarySpinners.length; i++) {
-            draft.roleBaseSalaries.put(roles.get(i), (double) salarySpinners[i].getValue());
+            model.roleBaseSalaries.put(roles.get(i), (double) salarySpinners[i].getValue());
         }
     }
 
-    private static class SalariesDraft {
-        private boolean disableSecondaryRoleSalary;
-        private double salaryAntiMekMultiplier;
-        private double salarySpecialistInfantryMultiplier;
-        private final Map<SkillLevel, Double> salaryXpMultipliers = new EnumMap<>(SkillLevel.class);
-        private final Map<PersonnelRole, Double> roleBaseSalaries = new EnumMap<>(PersonnelRole.class);
-
-        private SalariesDraft(CampaignOptions options) {
-            disableSecondaryRoleSalary = options.isDisableSecondaryRoleSalary();
-            salaryAntiMekMultiplier = options.getSalaryAntiMekMultiplier();
-            salarySpecialistInfantryMultiplier = options.getSalarySpecialistInfantryMultiplier();
-            salaryXpMultipliers.putAll(options.getSalaryXPMultipliers());
-
-            Money[] baseSalaryTable = options.getRoleBaseSalaries();
-            for (PersonnelRole personnelRole : PersonnelRole.values()) {
-                int ordinal = personnelRole.ordinal();
-                roleBaseSalaries.put(personnelRole, baseSalaryTable[ordinal].getAmount().doubleValue());
-            }
-        }
-
-        private void applyTo(CampaignOptions options) {
-            options.setDisableSecondaryRoleSalary(disableSecondaryRoleSalary);
-            options.setSalaryAntiMekMultiplier(salaryAntiMekMultiplier);
-            options.setSalarySpecialistInfantryMultiplier(salarySpecialistInfantryMultiplier);
-
-            for (final Entry<SkillLevel, Double> entry : salaryXpMultipliers.entrySet()) {
-                options.getSalaryXPMultipliers().put(entry.getKey(), entry.getValue());
-            }
-
-            for (final Entry<PersonnelRole, Double> entry : roleBaseSalaries.entrySet()) {
-                options.setRoleBaseSalary(entry.getKey(), entry.getValue());
-            }
-        }
-    }
 }

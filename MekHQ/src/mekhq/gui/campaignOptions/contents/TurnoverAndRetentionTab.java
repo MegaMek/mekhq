@@ -83,7 +83,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  */
 public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;
-      private TurnoverAndRetentionDraft draft;
+      private TurnoverAndRetentionOptionsModel model;
       private boolean turnoverPageCreated;
       private boolean fatiguePageCreated;
 
@@ -385,7 +385,7 @@ public class TurnoverAndRetentionTab {
         layoutParent.gridx++;
         panelParent.add(panelRight, layoutParent);
       fatiguePageCreated = true;
-      updateFatigueControlsFromDraft();
+      updateFatigueControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "FatigueTab");
@@ -411,7 +411,7 @@ public class TurnoverAndRetentionTab {
         pnlPayout = createPayoutsPanel();
         pnlUnitCohesion = createUnitCohesionPanel();
       turnoverPageCreated = true;
-      updateTurnoverControlsFromDraft();
+      updateTurnoverControlsFromModel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TurnoverTab", true);
@@ -903,8 +903,8 @@ public class TurnoverAndRetentionTab {
             options = this.campaignOptions;
         }
 
-                        draft = new TurnoverAndRetentionDraft(options);
-                        updateCreatedControlsFromDraft();
+                        model = new TurnoverAndRetentionOptionsModel(options);
+                        updateCreatedControlsFromModel();
     }
 
     /**
@@ -920,259 +920,128 @@ public class TurnoverAndRetentionTab {
             options = this.campaignOptions;
         }
 
-            updateDraftFromCreatedControls();
-            draft.applyTo(options);
+            updateModelFromCreatedControls();
+            model.applyTo(options);
       }
 
-      private void updateCreatedControlsFromDraft() {
-            updateTurnoverControlsFromDraft();
-            updateFatigueControlsFromDraft();
+      private void updateCreatedControlsFromModel() {
+            updateTurnoverControlsFromModel();
+            updateFatigueControlsFromModel();
       }
 
-      private void updateTurnoverControlsFromDraft() {
-            if (!turnoverPageCreated || draft == null) {
+      private void updateTurnoverControlsFromModel() {
+            if (!turnoverPageCreated || model == null) {
                   return;
             }
 
-            chkUseRandomRetirement.setSelected(draft.useRandomRetirement);
-            spnTurnoverFixedTargetNumber.setValue(draft.turnoverFixedTargetNumber);
-            comboTurnoverFrequency.setSelectedItem(draft.turnoverFrequency);
-            chkUseContractCompletionRandomRetirement.setSelected(draft.useContractCompletionRandomRetirement);
-            chkUseRandomFounderTurnover.setSelected(draft.useRandomFounderTurnover);
-            chkTrackOriginalUnit.setSelected(draft.trackOriginalUnit);
-            chkAeroRecruitsHaveUnits.setSelected(draft.aeroRecruitsHaveUnits);
-            chkUseSubContractSoldiers.setSelected(draft.useSubContractSoldiers);
-            spnServiceContractDuration.setValue(draft.serviceContractDuration);
-            spnServiceContractModifier.setValue(draft.serviceContractModifier);
-            chkPayBonusDefault.setSelected(draft.payBonusDefault);
-            spnPayBonusDefaultThreshold.setValue(draft.payBonusDefaultThreshold);
-            chkIncludeCivilians.setSelected(draft.includeCivilians);
-            chkUseCustomRetirementModifiers.setSelected(draft.useCustomRetirementModifiers);
-            chkUseFatigueModifiers.setSelected(draft.useFatigueModifiers);
-            chkUseSkillModifiers.setSelected(draft.useSkillModifiers);
-            chkUseAgeModifiers.setSelected(draft.useAgeModifiers);
-            chkUseUnitRatingModifiers.setSelected(draft.useUnitRatingModifiers);
-            chkUseFactionModifiers.setSelected(draft.useFactionModifiers);
-            chkUseMissionStatusModifiers.setSelected(draft.useMissionStatusModifiers);
-            chkUseHostileTerritoryModifiers.setSelected(draft.useHostileTerritoryModifiers);
-            chkUseFamilyModifiers.setSelected(draft.useFamilyModifiers);
-            chkUseLoyaltyModifiers.setSelected(draft.useLoyaltyModifiers);
-            chkUseHideLoyalty.setSelected(draft.useHideLoyalty);
-            spnPayoutRateOfficer.setValue(draft.payoutRateOfficer);
-            spnPayoutRateEnlisted.setValue(draft.payoutRateEnlisted);
-            spnPayoutRetirementMultiplier.setValue(draft.payoutRetirementMultiplier);
-            chkUsePayoutServiceBonus.setSelected(draft.usePayoutServiceBonus);
-            spnPayoutServiceBonusRate.setValue(draft.payoutServiceBonusRate);
-            chkUseHRStrain.setSelected(draft.useHRStrain);
-            spnHRCapacity.setValue(draft.hrCapacity);
-            chkUseManagementSkill.setSelected(draft.useManagementSkill);
-            chkUseCommanderLeadershipOnly.setSelected(draft.useCommanderLeadershipOnly);
-            spnManagementSkillPenalty.setValue(draft.managementSkillPenalty);
+            chkUseRandomRetirement.setSelected(model.useRandomRetirement);
+            spnTurnoverFixedTargetNumber.setValue(model.turnoverFixedTargetNumber);
+            comboTurnoverFrequency.setSelectedItem(model.turnoverFrequency);
+            chkUseContractCompletionRandomRetirement.setSelected(model.useContractCompletionRandomRetirement);
+            chkUseRandomFounderTurnover.setSelected(model.useRandomFounderTurnover);
+            chkTrackOriginalUnit.setSelected(model.trackOriginalUnit);
+            chkAeroRecruitsHaveUnits.setSelected(model.aeroRecruitsHaveUnits);
+            chkUseSubContractSoldiers.setSelected(model.useSubContractSoldiers);
+            spnServiceContractDuration.setValue(model.serviceContractDuration);
+            spnServiceContractModifier.setValue(model.serviceContractModifier);
+            chkPayBonusDefault.setSelected(model.payBonusDefault);
+            spnPayBonusDefaultThreshold.setValue(model.payBonusDefaultThreshold);
+            chkIncludeCivilians.setSelected(model.includeCivilians);
+            chkUseCustomRetirementModifiers.setSelected(model.useCustomRetirementModifiers);
+            chkUseFatigueModifiers.setSelected(model.useFatigueModifiers);
+            chkUseSkillModifiers.setSelected(model.useSkillModifiers);
+            chkUseAgeModifiers.setSelected(model.useAgeModifiers);
+            chkUseUnitRatingModifiers.setSelected(model.useUnitRatingModifiers);
+            chkUseFactionModifiers.setSelected(model.useFactionModifiers);
+            chkUseMissionStatusModifiers.setSelected(model.useMissionStatusModifiers);
+            chkUseHostileTerritoryModifiers.setSelected(model.useHostileTerritoryModifiers);
+            chkUseFamilyModifiers.setSelected(model.useFamilyModifiers);
+            chkUseLoyaltyModifiers.setSelected(model.useLoyaltyModifiers);
+            chkUseHideLoyalty.setSelected(model.useHideLoyalty);
+            spnPayoutRateOfficer.setValue(model.payoutRateOfficer);
+            spnPayoutRateEnlisted.setValue(model.payoutRateEnlisted);
+            spnPayoutRetirementMultiplier.setValue(model.payoutRetirementMultiplier);
+            chkUsePayoutServiceBonus.setSelected(model.usePayoutServiceBonus);
+            spnPayoutServiceBonusRate.setValue(model.payoutServiceBonusRate);
+            chkUseHRStrain.setSelected(model.useHRStrain);
+            spnHRCapacity.setValue(model.hrCapacity);
+            chkUseManagementSkill.setSelected(model.useManagementSkill);
+            chkUseCommanderLeadershipOnly.setSelected(model.useCommanderLeadershipOnly);
+            spnManagementSkillPenalty.setValue(model.managementSkillPenalty);
       }
 
-      private void updateFatigueControlsFromDraft() {
-            if (!fatiguePageCreated || draft == null) {
+      private void updateFatigueControlsFromModel() {
+            if (!fatiguePageCreated || model == null) {
                   return;
             }
 
-            chkUseFatigue.setSelected(draft.useFatigue);
-            spnFatigueRate.setValue(draft.fatigueRate);
-            chkUseInjuryFatigue.setSelected(draft.useInjuryFatigue);
-            spnFieldKitchenCapacity.setValue(draft.fieldKitchenCapacity);
-            chkFieldKitchenIgnoreNonCombatants.setSelected(draft.fieldKitchenIgnoreNonCombatants);
-            spnFatigueUndeploymentThreshold.setValue(draft.fatigueUndeploymentThreshold);
-            spnFatigueLeaveThreshold.setValue(draft.fatigueLeaveThreshold);
+            chkUseFatigue.setSelected(model.useFatigue);
+            spnFatigueRate.setValue(model.fatigueRate);
+            chkUseInjuryFatigue.setSelected(model.useInjuryFatigue);
+            spnFieldKitchenCapacity.setValue(model.fieldKitchenCapacity);
+            chkFieldKitchenIgnoreNonCombatants.setSelected(model.fieldKitchenIgnoreNonCombatants);
+            spnFatigueUndeploymentThreshold.setValue(model.fatigueUndeploymentThreshold);
+            spnFatigueLeaveThreshold.setValue(model.fatigueLeaveThreshold);
       }
 
-      private void updateDraftFromCreatedControls() {
-            updateDraftFromTurnoverControls();
-            updateDraftFromFatigueControls();
+      private void updateModelFromCreatedControls() {
+            updateModelFromTurnoverControls();
+            updateModelFromFatigueControls();
       }
 
-      private void updateDraftFromTurnoverControls() {
+      private void updateModelFromTurnoverControls() {
             if (!turnoverPageCreated) {
                   return;
             }
 
-            draft.useRandomRetirement = chkUseRandomRetirement.isSelected();
-            draft.turnoverFixedTargetNumber = (int) spnTurnoverFixedTargetNumber.getValue();
-            draft.turnoverFrequency = comboTurnoverFrequency.getSelectedItem();
-            draft.useContractCompletionRandomRetirement = chkUseContractCompletionRandomRetirement.isSelected();
-            draft.useRandomFounderTurnover = chkUseRandomFounderTurnover.isSelected();
-            draft.trackOriginalUnit = chkTrackOriginalUnit.isSelected();
-            draft.aeroRecruitsHaveUnits = chkAeroRecruitsHaveUnits.isSelected();
-            draft.useSubContractSoldiers = chkUseSubContractSoldiers.isSelected();
-            draft.serviceContractDuration = (int) spnServiceContractDuration.getValue();
-            draft.serviceContractModifier = (int) spnServiceContractModifier.getValue();
-            draft.payBonusDefault = chkPayBonusDefault.isSelected();
-            draft.payBonusDefaultThreshold = (int) spnPayBonusDefaultThreshold.getValue();
-            draft.includeCivilians = chkIncludeCivilians.isSelected();
-            draft.useCustomRetirementModifiers = chkUseCustomRetirementModifiers.isSelected();
-            draft.useFatigueModifiers = chkUseFatigueModifiers.isSelected();
-            draft.useSkillModifiers = chkUseSkillModifiers.isSelected();
-            draft.useAgeModifiers = chkUseAgeModifiers.isSelected();
-            draft.useUnitRatingModifiers = chkUseUnitRatingModifiers.isSelected();
-            draft.useFactionModifiers = chkUseFactionModifiers.isSelected();
-            draft.useMissionStatusModifiers = chkUseMissionStatusModifiers.isSelected();
-            draft.useHostileTerritoryModifiers = chkUseHostileTerritoryModifiers.isSelected();
-            draft.useFamilyModifiers = chkUseFamilyModifiers.isSelected();
-            draft.useLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
-            draft.useHideLoyalty = chkUseHideLoyalty.isSelected();
-            draft.payoutRateOfficer = (int) spnPayoutRateOfficer.getValue();
-            draft.payoutRateEnlisted = (int) spnPayoutRateEnlisted.getValue();
-            draft.payoutRetirementMultiplier = (int) spnPayoutRetirementMultiplier.getValue();
-            draft.usePayoutServiceBonus = chkUsePayoutServiceBonus.isSelected();
-            draft.payoutServiceBonusRate = (int) spnPayoutServiceBonusRate.getValue();
-            draft.useHRStrain = chkUseHRStrain.isSelected();
-            draft.hrCapacity = (int) spnHRCapacity.getValue();
-            draft.useManagementSkill = chkUseManagementSkill.isSelected();
-            draft.useCommanderLeadershipOnly = chkUseCommanderLeadershipOnly.isSelected();
-            draft.managementSkillPenalty = (int) spnManagementSkillPenalty.getValue();
+            model.useRandomRetirement = chkUseRandomRetirement.isSelected();
+            model.turnoverFixedTargetNumber = (int) spnTurnoverFixedTargetNumber.getValue();
+            model.turnoverFrequency = comboTurnoverFrequency.getSelectedItem();
+            model.useContractCompletionRandomRetirement = chkUseContractCompletionRandomRetirement.isSelected();
+            model.useRandomFounderTurnover = chkUseRandomFounderTurnover.isSelected();
+            model.trackOriginalUnit = chkTrackOriginalUnit.isSelected();
+            model.aeroRecruitsHaveUnits = chkAeroRecruitsHaveUnits.isSelected();
+            model.useSubContractSoldiers = chkUseSubContractSoldiers.isSelected();
+            model.serviceContractDuration = (int) spnServiceContractDuration.getValue();
+            model.serviceContractModifier = (int) spnServiceContractModifier.getValue();
+            model.payBonusDefault = chkPayBonusDefault.isSelected();
+            model.payBonusDefaultThreshold = (int) spnPayBonusDefaultThreshold.getValue();
+            model.includeCivilians = chkIncludeCivilians.isSelected();
+            model.useCustomRetirementModifiers = chkUseCustomRetirementModifiers.isSelected();
+            model.useFatigueModifiers = chkUseFatigueModifiers.isSelected();
+            model.useSkillModifiers = chkUseSkillModifiers.isSelected();
+            model.useAgeModifiers = chkUseAgeModifiers.isSelected();
+            model.useUnitRatingModifiers = chkUseUnitRatingModifiers.isSelected();
+            model.useFactionModifiers = chkUseFactionModifiers.isSelected();
+            model.useMissionStatusModifiers = chkUseMissionStatusModifiers.isSelected();
+            model.useHostileTerritoryModifiers = chkUseHostileTerritoryModifiers.isSelected();
+            model.useFamilyModifiers = chkUseFamilyModifiers.isSelected();
+            model.useLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
+            model.useHideLoyalty = chkUseHideLoyalty.isSelected();
+            model.payoutRateOfficer = (int) spnPayoutRateOfficer.getValue();
+            model.payoutRateEnlisted = (int) spnPayoutRateEnlisted.getValue();
+            model.payoutRetirementMultiplier = (int) spnPayoutRetirementMultiplier.getValue();
+            model.usePayoutServiceBonus = chkUsePayoutServiceBonus.isSelected();
+            model.payoutServiceBonusRate = (int) spnPayoutServiceBonusRate.getValue();
+            model.useHRStrain = chkUseHRStrain.isSelected();
+            model.hrCapacity = (int) spnHRCapacity.getValue();
+            model.useManagementSkill = chkUseManagementSkill.isSelected();
+            model.useCommanderLeadershipOnly = chkUseCommanderLeadershipOnly.isSelected();
+            model.managementSkillPenalty = (int) spnManagementSkillPenalty.getValue();
       }
 
-      private void updateDraftFromFatigueControls() {
+      private void updateModelFromFatigueControls() {
             if (!fatiguePageCreated) {
                   return;
             }
 
-            draft.useFatigue = chkUseFatigue.isSelected();
-            draft.fatigueRate = (int) spnFatigueRate.getValue();
-            draft.useInjuryFatigue = chkUseInjuryFatigue.isSelected();
-            draft.fieldKitchenCapacity = (int) spnFieldKitchenCapacity.getValue();
-            draft.fieldKitchenIgnoreNonCombatants = chkFieldKitchenIgnoreNonCombatants.isSelected();
-            draft.fatigueUndeploymentThreshold = (int) spnFatigueUndeploymentThreshold.getValue();
-            draft.fatigueLeaveThreshold = (int) spnFatigueLeaveThreshold.getValue();
+            model.useFatigue = chkUseFatigue.isSelected();
+            model.fatigueRate = (int) spnFatigueRate.getValue();
+            model.useInjuryFatigue = chkUseInjuryFatigue.isSelected();
+            model.fieldKitchenCapacity = (int) spnFieldKitchenCapacity.getValue();
+            model.fieldKitchenIgnoreNonCombatants = chkFieldKitchenIgnoreNonCombatants.isSelected();
+            model.fatigueUndeploymentThreshold = (int) spnFatigueUndeploymentThreshold.getValue();
+            model.fatigueLeaveThreshold = (int) spnFatigueLeaveThreshold.getValue();
       }
 
-      private static class TurnoverAndRetentionDraft {
-            private boolean useRandomRetirement;
-            private int turnoverFixedTargetNumber;
-            private TurnoverFrequency turnoverFrequency;
-            private boolean useContractCompletionRandomRetirement;
-            private boolean useRandomFounderTurnover;
-            private boolean trackOriginalUnit;
-            private boolean aeroRecruitsHaveUnits;
-            private boolean useSubContractSoldiers;
-            private int serviceContractDuration;
-            private int serviceContractModifier;
-            private boolean payBonusDefault;
-            private int payBonusDefaultThreshold;
-            private boolean includeCivilians;
-            private boolean useCustomRetirementModifiers;
-            private boolean useFatigueModifiers;
-            private boolean useSkillModifiers;
-            private boolean useAgeModifiers;
-            private boolean useUnitRatingModifiers;
-            private boolean useFactionModifiers;
-            private boolean useMissionStatusModifiers;
-            private boolean useHostileTerritoryModifiers;
-            private boolean useFamilyModifiers;
-            private boolean useLoyaltyModifiers;
-            private boolean useHideLoyalty;
-            private int payoutRateOfficer;
-            private int payoutRateEnlisted;
-            private int payoutRetirementMultiplier;
-            private boolean usePayoutServiceBonus;
-            private int payoutServiceBonusRate;
-            private boolean useHRStrain;
-            private int hrCapacity;
-            private boolean useManagementSkill;
-            private boolean useCommanderLeadershipOnly;
-            private int managementSkillPenalty;
-            private boolean useFatigue;
-            private int fatigueRate;
-            private boolean useInjuryFatigue;
-            private int fieldKitchenCapacity;
-            private boolean fieldKitchenIgnoreNonCombatants;
-            private int fatigueUndeploymentThreshold;
-            private int fatigueLeaveThreshold;
-
-            private TurnoverAndRetentionDraft(CampaignOptions options) {
-                  useRandomRetirement = options.isUseRandomRetirement();
-                  turnoverFixedTargetNumber = options.getTurnoverFixedTargetNumber();
-                  turnoverFrequency = options.getTurnoverFrequency();
-                  useContractCompletionRandomRetirement = options.isUseContractCompletionRandomRetirement();
-                  useRandomFounderTurnover = options.isUseRandomFounderTurnover();
-                  trackOriginalUnit = options.isTrackOriginalUnit();
-                  aeroRecruitsHaveUnits = options.isAeroRecruitsHaveUnits();
-                  useSubContractSoldiers = options.isUseSubContractSoldiers();
-                  serviceContractDuration = options.getServiceContractDuration();
-                  serviceContractModifier = options.getServiceContractModifier();
-                  payBonusDefault = options.isPayBonusDefault();
-                  payBonusDefaultThreshold = options.getPayBonusDefaultThreshold();
-                  includeCivilians = options.isIncludeCivilians();
-                  useCustomRetirementModifiers = options.isUseCustomRetirementModifiers();
-                  useFatigueModifiers = options.isUseFatigueModifiers();
-                  useSkillModifiers = options.isUseSkillModifiers();
-                  useAgeModifiers = options.isUseAgeModifiers();
-                  useUnitRatingModifiers = options.isUseUnitRatingModifiers();
-                  useFactionModifiers = options.isUseFactionModifiers();
-                  useMissionStatusModifiers = options.isUseMissionStatusModifiers();
-                  useHostileTerritoryModifiers = options.isUseHostileTerritoryModifiers();
-                  useFamilyModifiers = options.isUseFamilyModifiers();
-                  useLoyaltyModifiers = options.isUseLoyaltyModifiers();
-                  useHideLoyalty = options.isUseHideLoyalty();
-                  payoutRateOfficer = options.getPayoutRateOfficer();
-                  payoutRateEnlisted = options.getPayoutRateEnlisted();
-                  payoutRetirementMultiplier = options.getPayoutRetirementMultiplier();
-                  usePayoutServiceBonus = options.isUsePayoutServiceBonus();
-                  payoutServiceBonusRate = options.getPayoutServiceBonusRate();
-                  useHRStrain = options.isUseHRStrain();
-                  hrCapacity = options.getHRCapacity();
-                  useManagementSkill = options.isUseManagementSkill();
-                  useCommanderLeadershipOnly = options.isUseCommanderLeadershipOnly();
-                  managementSkillPenalty = options.getManagementSkillPenalty();
-                  useFatigue = options.isUseFatigue();
-                  fatigueRate = options.getFatigueRate();
-                  useInjuryFatigue = options.isUseInjuryFatigue();
-                  fieldKitchenCapacity = options.getFieldKitchenCapacity();
-                  fieldKitchenIgnoreNonCombatants = options.isUseFieldKitchenIgnoreNonCombatants();
-                  fatigueUndeploymentThreshold = options.getFatigueUndeploymentThreshold();
-                  fatigueLeaveThreshold = options.getFatigueLeaveThreshold();
-            }
-
-            private void applyTo(CampaignOptions options) {
-                  options.setUseRandomRetirement(useRandomRetirement);
-                  options.setTurnoverFixedTargetNumber(turnoverFixedTargetNumber);
-                  options.setTurnoverFrequency(turnoverFrequency);
-                  options.setUseContractCompletionRandomRetirement(useContractCompletionRandomRetirement);
-                  options.setUseRandomFounderTurnover(useRandomFounderTurnover);
-                  options.setTrackOriginalUnit(trackOriginalUnit);
-                  options.setAeroRecruitsHaveUnits(aeroRecruitsHaveUnits);
-                  options.setUseSubContractSoldiers(useSubContractSoldiers);
-                  options.setServiceContractDuration(serviceContractDuration);
-                  options.setServiceContractModifier(serviceContractModifier);
-                  options.setPayBonusDefault(payBonusDefault);
-                  options.setPayBonusDefaultThreshold(payBonusDefaultThreshold);
-                  options.setIncludeCivilians(includeCivilians);
-                  options.setUseCustomRetirementModifiers(useCustomRetirementModifiers);
-                  options.setUseFatigueModifiers(useFatigueModifiers);
-                  options.setUseSkillModifiers(useSkillModifiers);
-                  options.setUseAgeModifiers(useAgeModifiers);
-                  options.setUseUnitRatingModifiers(useUnitRatingModifiers);
-                  options.setUseFactionModifiers(useFactionModifiers);
-                  options.setUseMissionStatusModifiers(useMissionStatusModifiers);
-                  options.setUseHostileTerritoryModifiers(useHostileTerritoryModifiers);
-                  options.setUseFamilyModifiers(useFamilyModifiers);
-                  options.setUseLoyaltyModifiers(useLoyaltyModifiers);
-                  options.setUseHideLoyalty(useHideLoyalty);
-                  options.setPayoutRateOfficer(payoutRateOfficer);
-                  options.setPayoutRateEnlisted(payoutRateEnlisted);
-                  options.setPayoutRetirementMultiplier(payoutRetirementMultiplier);
-                  options.setUsePayoutServiceBonus(usePayoutServiceBonus);
-                  options.setPayoutServiceBonusRate(payoutServiceBonusRate);
-                  options.setUseHRStrain(useHRStrain);
-                  options.setHRCapacity(hrCapacity);
-                  options.setUseManagementSkill(useManagementSkill);
-                  options.setUseCommanderLeadershipOnly(useCommanderLeadershipOnly);
-                  options.setManagementSkillPenalty(managementSkillPenalty);
-                  options.setUseFatigue(useFatigue);
-                  options.setFatigueRate(fatigueRate);
-                  options.setUseInjuryFatigue(useInjuryFatigue);
-                  options.setFieldKitchenCapacity(fieldKitchenCapacity);
-                  options.setFieldKitchenIgnoreNonCombatants(fieldKitchenIgnoreNonCombatants);
-                  options.setFatigueUndeploymentThreshold(fatigueUndeploymentThreshold);
-                  options.setFatigueLeaveThreshold(fatigueLeaveThreshold);
-            }
-    }
 }
