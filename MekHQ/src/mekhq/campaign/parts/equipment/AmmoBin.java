@@ -318,7 +318,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         try {
             mounted.getLinkedBy().setFired(false);
         } catch (Exception ignored) {
-            LOGGER.debug("Unable to reset fired state for mounted {}", mounted);
+            LOGGER.error("Unable to reset fired state for mounted {}", mounted);
         }
 
         shotsNeeded -= shots;
