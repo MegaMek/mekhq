@@ -1003,22 +1003,13 @@ public class HumanResources {
     }
 
     /**
-     * Refreshes the personnel markets.
-     *
-     * @param campaign the campaign
-     */
-    public void refreshPersonnelMarkets(Campaign campaign) {
-        refreshPersonnelMarkets(campaign, false);
-    }
-
-    /**
-     * Refreshes the personnel markets based on the current market style and the current date.
+     * Refreshes the applicants based on the current market style and the current date.
      *
      * @param campaign               the campaign
-     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
-     *                               start
+     * @param bypassDateRestrictions {@code true} if we want the applicants to refresh at an unusual time, such as
+     *                               campaign start
      */
-    public void refreshPersonnelMarkets(Campaign campaign, boolean bypassDateRestrictions) {
+    public void refreshApplicants(Campaign campaign, boolean bypassDateRestrictions) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
@@ -2489,7 +2480,7 @@ public class HumanResources {
             personnelMarket.writeToXML(writer, indent, campaign);
         }
 
-        // New personnel market is managed at campaign level (newPersonnelMarket) — not written here
+        // New recruitment is managed at campaign level (newPersonnelMarket) — not written here
         // as it writes at campaign info level
 
         // Retirement defection tracker

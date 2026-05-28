@@ -4334,23 +4334,17 @@ public class Campaign implements ITechManager, ILocation {
         }
     }
 
-    /** Use {@link #refreshPersonnelMarkets(boolean)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshPersonnelMarkets() {
-        humanResources.refreshPersonnelMarkets(this);
-    }
-
     /**
-     * Refreshes the personnel markets based on the current market style and the current date.
+     * Refreshes the applicants available for recruiting based on the current recruitment style and the current date.
      *
-     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
-     *                               start
+     * @param bypassDateRestrictions {@code true} if we want the applicants to refresh at an unusual time, such as
+     *                               campaign start
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets(boolean bypassDateRestrictions) {
-        humanResources.refreshPersonnelMarkets(this, bypassDateRestrictions);
+    public void refreshApplicants(boolean bypassDateRestrictions) {
+        humanResources.refreshApplicants(this, bypassDateRestrictions);
     }
 
     public int getInitiativeBonus() {

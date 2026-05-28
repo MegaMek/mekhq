@@ -42,7 +42,6 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -99,7 +98,6 @@ import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
-import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.persons.PersonEvent;
@@ -137,8 +135,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
+import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -154,10 +152,11 @@ import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.view.AdvanceTimePanel;
+import mekhq.gui.view.CommandSummaryPanel;
 import mekhq.gui.view.CurrentLocationPanel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -172,8 +171,15 @@ public class CampaignGUI extends JPanel {
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
     // region Variable Declarations
-    public static final int MAX_START_WIDTH = 1400;
-    public static final int MAX_START_HEIGHT = 900;
+    private static final int MAX_START_WIDTH = 1400;
+    private static final int MAX_START_HEIGHT = 900;
+    private static final int MIN_WINDOW_WIDTH = 1024;
+    private static final int MIN_WINDOW_HEIGHT = 768;
+    private static final int TOP_PANEL_HEIGHT = 90;
+    public static int THIN_GAP = 2;
+    public static int SMALL_GAP = 4;
+    public static int MEDIUM_GAP = 8;
+
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
     public static final int MAX_QUANTITY_SPINNER = 10000;
 
@@ -199,7 +205,6 @@ public class CampaignGUI extends JPanel {
 
     /* Components for the status panel */
     private JPanel statusPanel;
-    private JLabel lblFunds;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblTempSoldiers;
@@ -222,23 +227,12 @@ public class CampaignGUI extends JPanel {
     private JMenu menuVesselGunnerPool;
     private JMenu menuVesselCrewPool;
 
-    /* for the top button panel */
+    /* Top Panel */
     private JPanel pnlTop;
-    private CurrentLocationPanel pnlLocation;
-    private final RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(resourceMap.getString(
-          "btnAdvanceMultipleDays.text"));
-    private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
-    private final RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
-    private final RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
-    private final RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
-    private final RoundedJButton btnCompanyGenerator = new RoundedJButton(resourceMap.getString(
-          "btnCompanyGenerator.text"));
-    private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
-    private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
+    private RoundedJButton btnCompanyGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
-    private final RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -344,7 +338,7 @@ public class CampaignGUI extends JPanel {
             }
         });
 
-        initTopButtons();
+        initTopPanel();
         initStatusBar();
 
         setLayout(new BorderLayout());
@@ -355,8 +349,8 @@ public class CampaignGUI extends JPanel {
 
         standardTabs.values().forEach(CampaignGuiTab::refreshAll);
 
-        refreshCalendar();
-        refreshFunds();
+        refreshWindowTitle();
+        refreshCampaignControlButtons();
         refreshTempAsTechs();
         refreshTempMedics();
         refreshTempSoldiers();
@@ -372,6 +366,9 @@ public class CampaignGUI extends JPanel {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
         frame.setSize(Math.min(MAX_START_WIDTH, dim.width), Math.min(MAX_START_HEIGHT, dim.height));
+        frame.setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT));
+        pnlTop.setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, TOP_PANEL_HEIGHT));
+        pnlTop.setMaximumSize(new Dimension(Integer.MAX_VALUE, TOP_PANEL_HEIGHT));
 
         // Determine the new location of the window
         int w = frame.getSize().width;
@@ -725,7 +722,7 @@ public class CampaignGUI extends JPanel {
             god.setEditable(true);
             if (god.showDialog().isConfirmed()) {
                 getCampaign().setGameOptions(god.getOptions());
-                refreshCalendar();
+                refreshWindowTitle();
             }
         });
         menuFile.add(miGameOptions);
@@ -756,10 +753,10 @@ public class CampaignGUI extends JPanel {
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
-        miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
-        miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
-        menuMarket.add(miPersonnelMarket);
+        JMenuItem miRecruitment = new JMenuItem(resourceMap.getString("miRecruitment.text"));
+        miRecruitment.setMnemonic(KeyEvent.VK_R);
+        miRecruitment.addActionListener(evt -> openRecruitmentDialog());
+        menuMarket.add(miRecruitment);
 
         JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
         miContractMarket.setMnemonic(KeyEvent.VK_C);
@@ -789,62 +786,52 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
-        miBuyParts.setMnemonic(KeyEvent.VK_R);
+        miBuyParts.setMnemonic(KeyEvent.VK_P);
         miBuyParts.addActionListener(evt -> new PartsStoreDialog(true, this).setVisible(true));
         menuMarket.add(miBuyParts);
 
-        JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
-        miHireBulk.setMnemonic(KeyEvent.VK_B);
-        miHireBulk.addActionListener(evt -> hireBulkPersonnel());
-        menuMarket.add(miHireBulk);
+        JMenuItem miRecruitmentBulk = new JMenuItem(resourceMap.getString("miBulkRecruitment.text"));
+        miRecruitmentBulk.setMnemonic(KeyEvent.VK_B);
+        miRecruitmentBulk.addActionListener(evt -> openBulkRecruitmentDialog());
+        menuMarket.add(miRecruitmentBulk);
 
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
-        menuHire.setMnemonic(KeyEvent.VK_H);
+        JMenu menuRecruitment = new JMenu(resourceMap.getString("menuRecruitment.text"));
+        menuRecruitment.setMnemonic(KeyEvent.VK_H);
 
-        JMenuItem menuHireBlank = new JMenuItem(resourceMap.getString("menuHire.blank"));
-        menuHireBlank.addActionListener(this::addBlankPerson);
+        JMenuItem menuRecruitmentBlank = new JMenuItem(resourceMap.getString("menuRecruitment.blank"));
+        menuRecruitmentBlank.addActionListener(this::addBlankPerson);
 
-        JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
-        JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
-        JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
+        JMenu menuCombatRecruitment = new JMenu(resourceMap.getString("menuRecruitment.combat"));
+        JMenu menuSupportRecruitment = new JMenu(resourceMap.getString("menuRecruitment.support"));
+        JMenu menuCivilianRecruitment = new JMenu(resourceMap.getString("menuRecruitment.civilian"));
 
         PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
         for (PersonnelRole role : roles) {
-            // Dependent is handled speciality so that it's always at the top of the civilian category
-            if (role.isDependent()) {
-                continue;
-            }
-
-            JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
+            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(role.getMnemonic());
+                miRoleRecruitment.setMnemonic(role.getMnemonic());
             }
-            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
-            miHire.setActionCommand(role.name());
-            miHire.addActionListener(this::hirePerson);
+            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
+            miRoleRecruitment.setActionCommand(role.name());
+            miRoleRecruitment.addActionListener(this::hirePerson);
 
             if (role.isCombat()) {
-                menuHireCombat.add(miHire);
+                menuCombatRecruitment.add(miRoleRecruitment);
             } else if (role.isSupport(true)) {
-                menuHireSupport.add(miHire);
-            } else if (!role.isDependent()) {
-                menuHireCivilian.add(miHire);
+                menuSupportRecruitment.add(miRoleRecruitment);
+            } else if (role.isDependent()) {
+                // Dependent is handled specially so that it's always at the top of the civilian category
+                menuCivilianRecruitment.insert(miRoleRecruitment, 0);
+            } else {
+                menuCivilianRecruitment.add(miRoleRecruitment);
             }
         }
 
-        JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
-        if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-            miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
-        }
-        miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
-        miHire.addActionListener(this::hirePerson);
-        menuHireCivilian.insert(miHire, 0);
-
-        menuHire.add(menuHireBlank);
-        menuHire.add(menuHireCombat);
-        menuHire.add(menuHireSupport);
-        menuHire.add(menuHireCivilian);
-        menuMarket.add(menuHire);
+        menuRecruitment.add(menuRecruitmentBlank);
+        menuRecruitment.add(menuCombatRecruitment);
+        menuRecruitment.add(menuSupportRecruitment);
+        menuRecruitment.add(menuCivilianRecruitment);
+        menuMarket.add(menuRecruitment);
 
         // region Temp Pool
         JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
@@ -1297,7 +1284,6 @@ public class CampaignGUI extends JPanel {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
         statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
-        lblFunds = new JLabel();
         lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
         lblTempSoldiers = new JLabel();
@@ -1310,7 +1296,12 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        statusPanel.add(lblFunds);
+        RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
+        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
+
+        statusPanel.add(btnOvertime);
         statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
         statusPanel.add(lblTempSoldiers);
@@ -1339,92 +1330,45 @@ public class CampaignGUI extends JPanel {
      * <p>Accessibility names and layout constraints are assigned to ensure that the UI is properly arranged and
      * accessible.</p>
      */
-    private void initTopButtons() {
-        pnlTop = new JPanel(new GridBagLayout());
-        pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
+    private void initTopPanel() {
+        pnlTop = new JPanel();
+        pnlTop.setLayout(new BoxLayout(pnlTop, BoxLayout.X_AXIS));
 
-        pnlLocation = new CurrentLocationPanel(getCampaign(), this::hirePersonMarket);
-        pnlLocation.setMinimumSize(new Dimension(320, 60));
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
-        pnlTop.add(pnlLocation, gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getMarketButtons(), gridBagConstraints);
-
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getButtonPanel(), gridBagConstraints);
+        pnlTop.add(new CurrentLocationPanel(365, 420, getCampaign(), this::openRecruitmentDialog));
+        pnlTop.add(createMarketsPanel(95, 130));
+        pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
+        pnlTop.add(Box.createHorizontalGlue());
+        pnlTop.add(new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
+              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true)));
+        pnlTop.add(createCampaignControlPanel(140, 170));
     }
 
-    private JPanel getMarketButtons() {
-        JPanel pnlButton = new JPanel(new GridBagLayout());
-        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
+    private JPanel createMarketsPanel(int minWidth, int maxWidth) {
+        JPanel pnlMarkets = new HorizontallyConstrainedPanel(minWidth, maxWidth);
+        pnlMarkets.setLayout(new GridBagLayout());
+        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
 
         btnContractMarket.addActionListener(e -> showContractMarket());
         btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnContractMarket, gridBagConstraints);
+        pnlMarkets.add(btnContractMarket, gridBagConstraints);
 
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnUnitMarket, gridBagConstraints);
-
-        btnPartsMarket.addActionListener(e -> showPartsMarket());
-        btnPartsMarket.setHorizontalTextPosition(SwingConstants.CENTER);
-        btnPartsMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnPartsMarket, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(SMALL_GAP, 0, 0, 0);
+        pnlMarkets.add(btnUnitMarket, gridBagConstraints);
 
         refreshMarketButtonLabels();
 
-        return pnlButton;
-    }
-
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshDynamicButtons() {
-        refreshMarketButtonLabels();
+        return pnlMarkets;
     }
 
     public void refreshMarketButtonLabels() {
@@ -1439,151 +1383,54 @@ public class CampaignGUI extends JPanel {
         btnUnitMarket.setText(label);
     }
 
-    private JPanel getButtonPanel() {
-        JPanel pnlButton = new JPanel(new GridBagLayout());
-        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("campaignControls.title")));
+    private JPanel createCampaignControlPanel(int minWidth, int maxWidth) {
+        JPanel pnlButton = new HorizontallyConstrainedPanel(minWidth, maxWidth);
+        pnlButton.setLayout(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
-        GridBagConstraints gridBagConstraints;
-        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+
+        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
+        btnCompanyGenerator.addActionListener(
+              e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnGlossary, gridBagConstraints);
-
-        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
-              getCampaign().getSecondInCommand()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnGoRogue, gridBagConstraints);
-
-        btnCompanyGenerator.addActionListener(e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(
-              true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
         pnlButton.add(btnCompanyGenerator, gridBagConstraints);
 
+        RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> {
             getCampaign().setGMMode(btnGMMode.isSelected());
             refreshGMMenuItems();
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, 0, SMALL_GAP);
         pnlButton.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
-        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnOvertime, gridBagConstraints);
-
-        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnAdvanceMultipleDays, gridBagConstraints);
-
-        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
-        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnMassTraining, gridBagConstraints);
-
-        // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        String padding = "       ";
-        RoundedJButton btnAdvanceDay = new RoundedJButton(padding +
-                                                                resourceMap.getString("btnAdvanceDay.text") +
-                                                                padding);
-        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
-        btnAdvanceDay.addActionListener(evt -> {
-            // We disable the button here, as we don't want the user to be able to advance
-            // day  again, until after Advance Day has completed.
-            btnAdvanceDay.setEnabled(false);
-            btnAdvanceMultipleDays.setEnabled(false);
-
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    getCampaignController().advanceDay();
-                } finally {
-                    btnAdvanceDay.setEnabled(true);
-                    btnAdvanceMultipleDays.setEnabled(true);
-                    setCursor(Cursor.getDefaultCursor());
-                }
-            });
-        });
-        btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 15, 3, 0);
-        pnlButton.add(btnAdvanceDay, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
+        RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
+        pnlButton.add(btnGlossary, gridBagConstraints);
+
+        RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
         btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 15, 3, 15);
+        gridBagConstraints.weightx = 0.6;
+        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
         pnlButton.add(btnBugReport, gridBagConstraints);
 
         return pnlButton;
     }
+
     // endregion Initialization
 
     public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
@@ -1846,16 +1693,16 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
+     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign
      * options.
      *
-     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
+     * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market
      * style.</p>
      *
-     * <p>If no personnel market is enabled display the bulk hiring dialog, instead.</p>
+     * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
-    public void hirePersonMarket() {
+    public void openRecruitmentDialog() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
 
@@ -1868,11 +1715,11 @@ public class CampaignGUI extends JPanel {
                 getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         } else {
-            hireBulkPersonnel();
+            openBulkRecruitmentDialog();
         }
     }
 
-    private void hireBulkPersonnel() {
+    private void openBulkRecruitmentDialog() {
         HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hireBulkPersonnelDialog.setVisible(true);
     }
@@ -2354,7 +2201,7 @@ public class CampaignGUI extends JPanel {
         if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
-        refreshCalendar();
+        refreshWindowTitle();
         getCampaign().reloadNews();
     }
 
@@ -3154,23 +3001,8 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void refreshCalendar() {
+    public void refreshWindowTitle() {
         getFrame().setTitle(getCampaign().getTitle());
-    }
-
-    /**
-     * Refreshes the 'funds' display on the GUI.
-     */
-    private void refreshFunds() {
-        Money funds = getCampaign().getFunds();
-        String inDebt = "";
-        if (getCampaign().getFinances().isInDebt()) {
-            // FIXME : Localize
-            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
-        }
-        // FIXME : Localize
-        String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
-        lblFunds.setText(text);
     }
 
     private void refreshTempAsTechs() {
@@ -3303,7 +3135,11 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
+    private void refreshCampaignControlButtons() {
+        boolean emptyHangar = getCampaign().getUnits().isEmpty();
+        boolean noPersonnel = getCampaign().getPersonnel().isEmpty();
+        btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
+    }
 
     public int getTabIndexByName(String tabTitle) {
         int retVal = -1;
@@ -3523,8 +3359,6 @@ public class CampaignGUI extends JPanel {
         Campaign campaign = getCampaign();
         Money overdueAmount = campaign.getFinances().checkOverdueLoanPayments(campaign);
         if (overdueAmount.isPositive()) {
-            refreshFunds();
-
             String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogOverdueLoans.ic",
                   campaign.getCommanderAddress());
@@ -3603,8 +3437,8 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handleNewDay(NewDayEvent newDayEvent) {
-        refreshCalendar();
-        refreshFunds();
+        refreshWindowTitle();
+        refreshCampaignControlButtons();
         refreshPartsAvailability();
         refreshMarketButtonLabels();
 
@@ -3651,7 +3485,6 @@ public class CampaignGUI extends JPanel {
         refreshTempVesselCrew();
 
         refreshAllTabs();
-        fundsScheduler.schedule();
         refreshPartsAvailability();
 
         miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
@@ -3678,7 +3511,6 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(TransactionEvent transactionEvent) {
-        fundsScheduler.schedule();
         refreshPartsAvailability();
     }
 
@@ -3694,23 +3526,7 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(LoanEvent loanEvent) {
-        fundsScheduler.schedule();
         refreshPartsAvailability();
-    }
-
-    /**
-     * Handles updates related to assets within the campaign.
-     *
-     * <p>Schedules a funds update to ensure the campaign's financial state is current when assets change.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param assetEvent the event indicating a change in assets
-     */
-    @Subscribe
-    public void handle(AssetEvent assetEvent) {
-        fundsScheduler.schedule();
     }
 
     /**
