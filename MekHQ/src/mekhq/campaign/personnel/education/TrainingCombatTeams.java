@@ -281,6 +281,8 @@ public class TrainingCombatTeams {
                       xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
                       campaign.getLocalDate());
 
+                campaign.personUpdated(trainee);
+
                 if (!StringUtility.isNullOrBlank(report)) {
                     campaign.addReport(PERSONNEL, report);
                 }
