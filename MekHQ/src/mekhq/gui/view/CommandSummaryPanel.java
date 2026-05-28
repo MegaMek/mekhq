@@ -140,7 +140,7 @@ public class CommandSummaryPanel extends HorizontallyConstrainedPanel {
     private void refreshFunds() {
         String amount = campaign.getFunds().toAmountString();
         lblFundsValue.setText(getFormattedTextAt("funds.text", amount));
-        if (campaign.getFinances().isInDebt()) {
+        if (campaign.getFinances().hasActiveLoans()) {
             lblFunds.setText(getFormattedTextAt("funds.label.hasLoan", ReportingUtilities.getNegativeColor()));
         } else  {
             lblFunds.setText(getTextAt("funds.label.noLoan"));
