@@ -53,11 +53,13 @@ import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponMounted;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Jumpship;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
+import megamek.common.weapons.Weapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -310,6 +312,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             unload();
             mounted.changeAmmoType(getType());
             mounted.setShotsLeft(shots);
+        }
+
+        // Reset fired, mainly for One-Shot weapons
+        try {
+            mounted.getLinkedBy().setFired(false);
+        } catch (Exception ignored) {
+            LOGGER.error("Unable to reset fired state for mounted {}", mounted);
         }
 
         shotsNeeded -= shots;
