@@ -953,7 +953,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Refresh personnel market if it was previously disabled
         if (!isUsingLegacyPersonnelMarket(campaignOptions) && marketPreviouslyDisabled) {
-            getCampaign().refreshPersonnelMarkets(true);
+            getCampaign().refreshApplicants(true);
             CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
         }
 

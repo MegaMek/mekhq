@@ -45,7 +45,6 @@ import java.awt.Insets;
 import java.io.File;
 import java.time.LocalDate;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import megamek.common.Configuration;
@@ -54,7 +53,6 @@ import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
@@ -64,11 +62,13 @@ import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
 import mekhq.gui.baseComponents.VerticalFillImage;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -79,15 +79,17 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * A UI panel that displays the current location details.
  * <p>
- * Visually represents whether the player is currently on a planet, in transit, or at a jump point,
- * provides relevant planetary statistics (e.g. atmosphere, gravity, socio-industrial data) or
- * travel progress, and includes an entry point to the personnel market.
+ * Visually represents whether the player is currently on a planet, in transit, or at a jump point, provides relevant
+ * planetary statistics (e.g. atmosphere, gravity, socio-industrial data) or travel progress, and includes an entry
+ * point to the personnel market.
+ * </p>
+ * <p>
+ * This panel subscribes to the global event bus updates to stay synchronized with changes in the campaign's current
+ * location and transit status.
  * </p>
  */
-public class CurrentLocationPanel extends JPanel {
+public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
 
-    private static final int THIN_GAP = 2;
-    private static final int MEDIUM_GAP = 8;
     private static final File JUMP_SHIP_IMAGE = new File(Configuration.unitImagesDir(), "jumpships/invader.png");
 
     private final Campaign campaign;
@@ -99,18 +101,20 @@ public class CurrentLocationPanel extends JPanel {
     private final RoundedJButton btnHiringHall = new RoundedJButton();
 
     /**
-     * Constructs a new CurrentLocationPanel.
+     * Constructs a new {@code CurrentLocationPanel}.
      *
-     * @param campaign            the active {@link Campaign} instance
-     * @param openPersonnelMarket a {@link Runnable} that triggers the opening of the Personnel Market UI
+     * @param minWidth              the minimum enforced width of the panel in pixels
+     * @param maxWidth              the maximum enforced width of the panel in pixels
+     * @param campaign              the active {@link Campaign} instance
+     * @param openRecruitmentDialog a {@link Runnable} that triggers the opening of the Recruitment Dialog UI
      */
-    public CurrentLocationPanel(Campaign campaign, Runnable openPersonnelMarket) {
-        super();
+    public CurrentLocationPanel(int minWidth, int maxWidth, Campaign campaign, Runnable openRecruitmentDialog) {
+        super(minWidth, maxWidth);
         this.campaign = campaign;
 
         setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(0, THIN_GAP, 0, MEDIUM_GAP);
+        gridBagConstraints.insets = new Insets(0, CampaignGUI.THIN_GAP, 0, CampaignGUI.MEDIUM_GAP);
 
         imgLocation.setMaxHeight(60);
         gridBagConstraints.gridx = 0;
@@ -125,6 +129,7 @@ public class CurrentLocationPanel extends JPanel {
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(0, 0, 0, CampaignGUI.SMALL_GAP);
         add(lblLocationPrimaryInfo, gridBagConstraints);
 
         gridBagConstraints.gridy++;
@@ -136,7 +141,7 @@ public class CurrentLocationPanel extends JPanel {
         gridBagConstraints.weighty = 1;
         add(new JLabel(), gridBagConstraints);
 
-        btnHiringHall.addActionListener(e -> openPersonnelMarket.run());
+        btnHiringHall.addActionListener(e -> openRecruitmentDialog.run());
         gridBagConstraints.gridy++;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -167,30 +172,30 @@ public class CurrentLocationPanel extends JPanel {
         float scale = location.isAtJumpPoint() ? 1 : (float) (location.getPercentageTransit() * 1.3 + 0.1);
         imgLocation.setImage(locationImage, scale);
 
-        HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
-        if (hiringHallLevel.isNone()) {
-            btnHiringHall.setText(getTextAt("hiringHall.none"));
+        if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
+            // keep the legacy recruitment always available
+            btnHiringHall.setEnabled(true);
+            btnHiringHall.setText(getTextAt("recruitment.legacy"));
         } else {
-            btnHiringHall.setText(getFormattedTextAt("hiringHall.some",
-                  StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+            String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
+            btnHiringHall.setEnabled(availabilityMessage.isBlank());
+
+            HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
+            if (!availabilityMessage.isBlank()) {
+                btnHiringHall.setText(availabilityMessage);
+            } else if (hiringHallLevel.isNone()) {
+                btnHiringHall.setText(getTextAt("recruitment.hiringHall.none"));
+            } else {
+                btnHiringHall.setText(getFormattedTextAt("recruitment.hiringHall.some",
+                      StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+            }
         }
         if (location.isOnPlanet()) {
             lblLocationPrimaryInfo.setText(getPlanetaryConditionsInfo());
             lblLocationSecondaryInfo.setText(getSocioIndustrialInfo());
-            btnHiringHall.setVisible(true);
-            if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
-                btnHiringHall.setEnabled(!options.isUsePersonnelHireHiringHallOnly() || system.isHiringHall(date));
-            } else {
-                String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
-                btnHiringHall.setEnabled(availabilityMessage.isBlank());
-                if (!availabilityMessage.isBlank()) {
-                    btnHiringHall.setText(availabilityMessage);
-                }
-            }
         } else {
             lblLocationPrimaryInfo.setText(getCourseInfo());
             lblLocationSecondaryInfo.setText(getJumpCostInfo());
-            btnHiringHall.setVisible(false);
         }
     }
 
@@ -421,15 +426,17 @@ public class CurrentLocationPanel extends JPanel {
         return MHQOptions.convertFontColorToHexColor(color == null ? Color.WHITE : color);
     }
 
-    // Handle current location and travel status change events
+    // ======================================
+    // Event handlers for UI synchronization
+    // ======================================
 
     @Subscribe
-    public void handleLocationChanged(LocationChangedEvent e) {
+    public void handle(LocationChangedEvent event) {
         refresh();
     }
 
     @Subscribe
-    public void handleTransitStatusChanged(TransitStatusChangedEvent e) {
+    public void handle(TransitStatusChangedEvent event) {
         refresh();
     }
 
