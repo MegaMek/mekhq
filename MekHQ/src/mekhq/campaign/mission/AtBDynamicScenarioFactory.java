@@ -3568,7 +3568,7 @@ public class AtBDynamicScenarioFactory {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getBVBudgetForStratConSingles(Campaign campaign, boolean forceStandardBattleValue) {
+    public static int getBVBudgetForStratConSingles(Campaign campaign, boolean forceStandardBattleValue) {
         int defaultBVBudget = 10000; // We use this value if the player has no valid forces
 
         int totalForces = 0;

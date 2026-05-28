@@ -42,7 +42,6 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -60,6 +59,8 @@ import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
@@ -97,7 +98,6 @@ import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
-import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.persons.PersonEvent;
@@ -135,8 +135,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
+import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -152,10 +152,11 @@ import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.view.AdvanceTimePanel;
+import mekhq.gui.view.CommandSummaryPanel;
 import mekhq.gui.view.CurrentLocationPanel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -170,8 +171,15 @@ public class CampaignGUI extends JPanel {
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
     // region Variable Declarations
-    public static final int MAX_START_WIDTH = 1400;
-    public static final int MAX_START_HEIGHT = 900;
+    private static final int MAX_START_WIDTH = 1400;
+    private static final int MAX_START_HEIGHT = 900;
+    private static final int MIN_WINDOW_WIDTH = 1024;
+    private static final int MIN_WINDOW_HEIGHT = 768;
+    private static final int TOP_PANEL_HEIGHT = 90;
+    public static int THIN_GAP = 2;
+    public static int SMALL_GAP = 4;
+    public static int MEDIUM_GAP = 8;
+
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
     public static final int MAX_QUANTITY_SPINNER = 10000;
 
@@ -197,7 +205,6 @@ public class CampaignGUI extends JPanel {
 
     /* Components for the status panel */
     private JPanel statusPanel;
-    private JLabel lblFunds;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblTempSoldiers;
@@ -220,23 +227,12 @@ public class CampaignGUI extends JPanel {
     private JMenu menuVesselGunnerPool;
     private JMenu menuVesselCrewPool;
 
-    /* for the top button panel */
+    /* Top Panel */
     private JPanel pnlTop;
-    private CurrentLocationPanel pnlLocation;
-    private final RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(resourceMap.getString(
-          "btnAdvanceMultipleDays.text"));
-    private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
-    private final RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
-    private final RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
-    private final RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
-    private final RoundedJButton btnCompanyGenerator = new RoundedJButton(resourceMap.getString(
-          "btnCompanyGenerator.text"));
-    private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
-    private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
+    private RoundedJButton btnCompanyGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
-    private final RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -342,7 +338,7 @@ public class CampaignGUI extends JPanel {
             }
         });
 
-        initTopButtons();
+        initTopPanel();
         initStatusBar();
 
         setLayout(new BorderLayout());
@@ -353,8 +349,8 @@ public class CampaignGUI extends JPanel {
 
         standardTabs.values().forEach(CampaignGuiTab::refreshAll);
 
-        refreshCalendar();
-        refreshFunds();
+        refreshWindowTitle();
+        refreshCampaignControlButtons();
         refreshTempAsTechs();
         refreshTempMedics();
         refreshTempSoldiers();
@@ -370,6 +366,9 @@ public class CampaignGUI extends JPanel {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
         frame.setSize(Math.min(MAX_START_WIDTH, dim.width), Math.min(MAX_START_HEIGHT, dim.height));
+        frame.setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT));
+        pnlTop.setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, TOP_PANEL_HEIGHT));
+        pnlTop.setMaximumSize(new Dimension(Integer.MAX_VALUE, TOP_PANEL_HEIGHT));
 
         // Determine the new location of the window
         int w = frame.getSize().width;
@@ -723,7 +722,7 @@ public class CampaignGUI extends JPanel {
             god.setEditable(true);
             if (god.showDialog().isConfirmed()) {
                 getCampaign().setGameOptions(god.getOptions());
-                refreshCalendar();
+                refreshWindowTitle();
             }
         });
         menuFile.add(miGameOptions);
@@ -754,10 +753,10 @@ public class CampaignGUI extends JPanel {
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
-        miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
-        miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
-        menuMarket.add(miPersonnelMarket);
+        JMenuItem miRecruitment = new JMenuItem(resourceMap.getString("miRecruitment.text"));
+        miRecruitment.setMnemonic(KeyEvent.VK_R);
+        miRecruitment.addActionListener(evt -> openRecruitmentDialog());
+        menuMarket.add(miRecruitment);
 
         JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
         miContractMarket.setMnemonic(KeyEvent.VK_C);
@@ -787,62 +786,52 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
-        miBuyParts.setMnemonic(KeyEvent.VK_R);
+        miBuyParts.setMnemonic(KeyEvent.VK_P);
         miBuyParts.addActionListener(evt -> new PartsStoreDialog(true, this).setVisible(true));
         menuMarket.add(miBuyParts);
 
-        JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
-        miHireBulk.setMnemonic(KeyEvent.VK_B);
-        miHireBulk.addActionListener(evt -> hireBulkPersonnel());
-        menuMarket.add(miHireBulk);
+        JMenuItem miRecruitmentBulk = new JMenuItem(resourceMap.getString("miBulkRecruitment.text"));
+        miRecruitmentBulk.setMnemonic(KeyEvent.VK_B);
+        miRecruitmentBulk.addActionListener(evt -> openBulkRecruitmentDialog());
+        menuMarket.add(miRecruitmentBulk);
 
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
-        menuHire.setMnemonic(KeyEvent.VK_H);
+        JMenu menuRecruitment = new JMenu(resourceMap.getString("menuRecruitment.text"));
+        menuRecruitment.setMnemonic(KeyEvent.VK_H);
 
-        JMenuItem menuHireBlank = new JMenuItem(resourceMap.getString("menuHire.blank"));
-        menuHireBlank.addActionListener(this::addBlankPerson);
+        JMenuItem menuRecruitmentBlank = new JMenuItem(resourceMap.getString("menuRecruitment.blank"));
+        menuRecruitmentBlank.addActionListener(this::addBlankPerson);
 
-        JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
-        JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
-        JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
+        JMenu menuCombatRecruitment = new JMenu(resourceMap.getString("menuRecruitment.combat"));
+        JMenu menuSupportRecruitment = new JMenu(resourceMap.getString("menuRecruitment.support"));
+        JMenu menuCivilianRecruitment = new JMenu(resourceMap.getString("menuRecruitment.civilian"));
 
         PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
         for (PersonnelRole role : roles) {
-            // Dependent is handled speciality so that it's always at the top of the civilian category
-            if (role.isDependent()) {
-                continue;
-            }
-
-            JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
+            JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(role.getMnemonic());
+                miRoleRecruitment.setMnemonic(role.getMnemonic());
             }
-            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
-            miHire.setActionCommand(role.name());
-            miHire.addActionListener(this::hirePerson);
+            miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
+            miRoleRecruitment.setActionCommand(role.name());
+            miRoleRecruitment.addActionListener(this::hirePerson);
 
             if (role.isCombat()) {
-                menuHireCombat.add(miHire);
+                menuCombatRecruitment.add(miRoleRecruitment);
             } else if (role.isSupport(true)) {
-                menuHireSupport.add(miHire);
-            } else if (!role.isDependent()) {
-                menuHireCivilian.add(miHire);
+                menuSupportRecruitment.add(miRoleRecruitment);
+            } else if (role.isDependent()) {
+                // Dependent is handled specially so that it's always at the top of the civilian category
+                menuCivilianRecruitment.insert(miRoleRecruitment, 0);
+            } else {
+                menuCivilianRecruitment.add(miRoleRecruitment);
             }
         }
 
-        JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
-        if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-            miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
-        }
-        miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
-        miHire.addActionListener(this::hirePerson);
-        menuHireCivilian.insert(miHire, 0);
-
-        menuHire.add(menuHireBlank);
-        menuHire.add(menuHireCombat);
-        menuHire.add(menuHireSupport);
-        menuHire.add(menuHireCivilian);
-        menuMarket.add(menuHire);
+        menuRecruitment.add(menuRecruitmentBlank);
+        menuRecruitment.add(menuCombatRecruitment);
+        menuRecruitment.add(menuSupportRecruitment);
+        menuRecruitment.add(menuCivilianRecruitment);
+        menuMarket.add(menuRecruitment);
 
         // region Temp Pool
         JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
@@ -859,17 +848,44 @@ public class CampaignGUI extends JPanel {
         miTempPoolReleaseSurplus.addActionListener(evt -> releaseSurplusTempCrews());
         menuTempPool.add(miTempPoolReleaseSurplus);
 
+        menuTempPool.addMenuListener(menuListenerFor(() -> {
+            // For Astech/Medic: need + pool = what would be needed if there were no temp pool at all.
+            // resetAsTechPool/resetMedicPool is a no-op only when pool == max(0, real need).
+            int astechPool = getCampaign().getTemporaryAsTechPool();
+            int astechIdealPool = Math.max(0, getCampaign().getAsTechNeed() + astechPool);
+            int medicPool = getCampaign().getTemporaryMedicPool();
+            int medicIdealPool = Math.max(0, getCampaign().getMedicsNeed() + medicPool);
+
+            boolean anyNeed = astechPool != astechIdealPool
+                                    || medicPool != medicIdealPool
+                                    || anyBlobRoleHasNeed();
+            setMenuItemState(miTempPoolFullStrength, anyNeed,
+                  resourceMap.getString("miTempPoolFullStrength.disabledTip"));
+
+            boolean anyPool = astechPool > 0
+                                    || medicPool > 0
+                                    || anyBlobRoleHasPool();
+            setMenuItemState(miTempPoolReleaseAll, anyPool,
+                  resourceMap.getString("miTempPoolReleaseAll.disabledTip"));
+
+            boolean anySurplus = astechPool > astechIdealPool
+                                       || medicPool > medicIdealPool
+                                       || anyBlobRoleHasSurplus();
+            setMenuItemState(miTempPoolReleaseSurplus, anySurplus,
+                  resourceMap.getString("miTempPoolReleaseSurplus.disabledTip"));
+        }));
+
         menuTempPool.addSeparator();
 
         // region Astech Pool
         // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
         // B, E, F, H
-        JMenu menuAsTechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
-        menuAsTechPool.setMnemonic(KeyEvent.VK_A);
+        JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
+        menuAstechPool.setMnemonic(KeyEvent.VK_A);
 
-        JMenuItem miHireAsTechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
-        miHireAsTechs.setMnemonic(KeyEvent.VK_H);
-        miHireAsTechs.addActionListener(evt -> {
+        JMenuItem miHireAstechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
+        miHireAstechs.setMnemonic(KeyEvent.VK_H);
+        miHireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupHireAstechsNum.text"),
@@ -881,11 +897,11 @@ public class CampaignGUI extends JPanel {
                 getCampaign().increaseAsTechPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuAsTechPool.add(miHireAsTechs);
+        menuAstechPool.add(miHireAstechs);
 
-        JMenuItem miFireAsTechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
-        miFireAsTechs.setMnemonic(KeyEvent.VK_E);
-        miFireAsTechs.addActionListener(evt -> {
+        JMenuItem miFireAstechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
+        miFireAstechs.setMnemonic(KeyEvent.VK_E);
+        miFireAstechs.addActionListener(evt -> {
             PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
                   true,
                   resourceMap.getString("popupFireAstechsNum.text"),
@@ -897,18 +913,33 @@ public class CampaignGUI extends JPanel {
                 getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
             }
         });
-        menuAsTechPool.add(miFireAsTechs);
+        menuAstechPool.add(miFireAstechs);
 
-        JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
-        miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
-        menuAsTechPool.add(miFullStrengthAsTechs);
+        JMenuItem miFullStrengthAstechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
+        miFullStrengthAstechs.setMnemonic(KeyEvent.VK_B);
+        miFullStrengthAstechs.addActionListener(evt -> getCampaign().resetAsTechPool());
+        menuAstechPool.add(miFullStrengthAstechs);
 
-        JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
-        miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
-        miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
-        menuAsTechPool.add(miFireAllAsTechs);
-        menuTempPool.add(menuAsTechPool);
+        JMenuItem miFireAllAstechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
+        miFireAllAstechs.setMnemonic(KeyEvent.VK_R);
+        miFireAllAstechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
+        menuAstechPool.add(miFireAllAstechs);
+
+        menuAstechPool.addMenuListener(menuListenerFor(() -> {
+            int pool = getCampaign().getTemporaryAsTechPool();
+            int need = getCampaign().getAsTechNeed();
+            // need + pool = what would be needed if there were no temp pool at all;
+            // the action is a no-op only when pool == max(0, that real need)
+            int idealPool = Math.max(0, need + pool);
+            setMenuItemState(miFireAstechs, pool > 0,
+                  resourceMap.getString("miFireAstechs.disabledTip"));
+            setMenuItemState(miFullStrengthAstechs, pool != idealPool,
+                  resourceMap.getString("miFullStrengthAstechs.disabledTip"));
+            setMenuItemState(miFireAllAstechs, pool > 0,
+                  resourceMap.getString("miFireAllAstechs.disabledTip"));
+        }));
+
+        menuTempPool.add(menuAstechPool);
         // endregion Astech Pool
 
         // region Medic Pool
@@ -958,400 +989,84 @@ public class CampaignGUI extends JPanel {
         miFireAllMedics.setMnemonic(KeyEvent.VK_R);
         miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
         menuMedicPool.add(miFireAllMedics);
+
+        menuMedicPool.addMenuListener(menuListenerFor(() -> {
+            int pool = getCampaign().getTemporaryMedicPool();
+            int need = getCampaign().getMedicsNeed();
+            // need + pool = what would be needed if there were no temp pool at all;
+            // the action is a no-op only when pool == max(0, that real need)
+            int idealPool = Math.max(0, need + pool);
+            setMenuItemState(miFireMedics, pool > 0,
+                  resourceMap.getString("miFireMedics.disabledTip"));
+            setMenuItemState(miFullStrengthMedics, pool != idealPool,
+                  resourceMap.getString("miFullStrengthMedics.disabledTip"));
+            setMenuItemState(miFireAllMedics, pool > 0,
+                  resourceMap.getString("miFireAllMedics.disabledTip"));
+        }));
+
         menuTempPool.add(menuMedicPool);
         // endregion Medic Pool
 
-        // region Soldier Pool
-        menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
-        menuSoldierPool.setMnemonic(KeyEvent.VK_S);
-        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
+        // region Blob Crew Pools (Soldier, Battle Armor, Vehicle, Vessel)
+        // Each pool follows the same 4-item structure; see buildBlobCrewPoolSubMenu.
+        CampaignOptions opts = getCampaign().getCampaignOptions();
 
-        JMenuItem miHireSoldiers = new JMenuItem(resourceMap.getString("miHireSoldiers.text"));
-        miHireSoldiers.setMnemonic(KeyEvent.VK_H);
-        miHireSoldiers.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireSoldiersNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuSoldierPool.add(miHireSoldiers);
+        menuSoldierPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.SOLDIER,
+              opts.isUseBlobInfantry(),
+              "menuSoldierPool.text",
+              "miHireSoldiers.text", "popupHireSoldiersNum.text",
+              "miFireSoldiers.text", "popupFireSoldiersNum.text",
+              "miFullStrengthSoldiers.text", "miFireAllSoldiers.text");
 
-        JMenuItem miFireSoldiers = new JMenuItem(resourceMap.getString("miFireSoldiers.text"));
-        miFireSoldiers.setMnemonic(KeyEvent.VK_E);
-        miFireSoldiers.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireSoldiersNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.SOLDIER));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuSoldierPool.add(miFireSoldiers);
+        menuBattleArmorPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.BATTLE_ARMOUR,
+              opts.isUseBlobBattleArmor(),
+              "menuBattleArmorPool.text",
+              "miHireBattleArmor.text", "popupHireBattleArmorNum.text",
+              "miFireBattleArmor.text", "popupFireBattleArmorNum.text",
+              "miFullStrengthBattleArmor.text", "miFireAllBattleArmor.text");
 
-        JMenuItem miFullStrengthSoldiers = new JMenuItem(resourceMap.getString("miFullStrengthSoldiers.text"));
-        miFullStrengthSoldiers.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthSoldiers.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-        });
-        menuSoldierPool.add(miFullStrengthSoldiers);
+        menuVehicleCrewGroundPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VEHICLE_CREW_GROUND,
+              opts.isUseBlobVehicleCrewGround(),
+              "menuVehicleCrewGroundPool.text",
+              "miHireVehicleCrewGround.text", "popupHireVehicleCrewGroundNum.text",
+              "miFireVehicleCrewGround.text", "popupFireVehicleCrewGroundNum.text",
+              "miFullStrengthVehicleCrewGround.text", "miFireAllVehicleCrewGround.text");
 
-        JMenuItem miFireAllSoldiers = new JMenuItem(resourceMap.getString("miFireAllSoldiers.text"));
-        miFireAllSoldiers.setMnemonic(KeyEvent.VK_R);
-        miFireAllSoldiers.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.SOLDIER));
-        menuSoldierPool.add(miFireAllSoldiers);
-        menuTempPool.add(menuSoldierPool);
-        // endregion Soldier Pool
+        menuVehicleCrewVTOLPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VEHICLE_CREW_VTOL,
+              opts.isUseBlobVehicleCrewVTOL(),
+              "menuVehicleCrewVTOLPool.text",
+              "miHireVehicleCrewVTOL.text", "popupHireVehicleCrewVTOLNum.text",
+              "miFireVehicleCrewVTOL.text", "popupFireVehicleCrewVTOLNum.text",
+              "miFullStrengthVehicleCrewVTOL.text", "miFireAllVehicleCrewVTOL.text");
 
-        // region Battle Armor Pool
-        menuBattleArmorPool = new JMenu(resourceMap.getString("menuBattleArmorPool.text"));
-        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
+        menuVehicleCrewNavalPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VEHICLE_CREW_NAVAL,
+              opts.isUseBlobVehicleCrewNaval(),
+              "menuVehicleCrewNavalPool.text",
+              "miHireVehicleCrewNaval.text", "popupHireVehicleCrewNavalNum.text",
+              "miFireVehicleCrewNaval.text", "popupFireVehicleCrewNavalNum.text",
+              "miFullStrengthVehicleCrewNaval.text", "miFireAllVehicleCrewNaval.text");
 
-        JMenuItem miHireBattleArmor = new JMenuItem(resourceMap.getString("miHireBattleArmor.text"));
-        miHireBattleArmor.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireBattleArmorNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuBattleArmorPool.add(miHireBattleArmor);
+        menuVesselPilotPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VESSEL_PILOT,
+              opts.isUseBlobVesselPilot(),
+              "menuVesselPilotPool.text",
+              "miHireVesselPilot.text", "popupHireVesselPilotNum.text",
+              "miFireVesselPilot.text", "popupFireVesselPilotNum.text",
+              "miFullStrengthVesselPilot.text", "miFireAllVesselPilot.text");
 
-        JMenuItem miFireBattleArmor = new JMenuItem(resourceMap.getString("miFireBattleArmor.text"));
-        miFireBattleArmor.setMnemonic(KeyEvent.VK_E);
-        miFireBattleArmor.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireBattleArmorNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuBattleArmorPool.add(miFireBattleArmor);
+        menuVesselGunnerPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VESSEL_GUNNER,
+              opts.isUseBlobVesselGunner(),
+              "menuVesselGunnerPool.text",
+              "miHireVesselGunner.text", "popupHireVesselGunnerNum.text",
+              "miFireVesselGunner.text", "popupFireVesselGunnerNum.text",
+              "miFullStrengthVesselGunner.text", "miFireAllVesselGunner.text");
 
-        JMenuItem miFullStrengthBattleArmor = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmor.text"));
-        miFullStrengthBattleArmor.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthBattleArmor.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-        });
-        menuBattleArmorPool.add(miFullStrengthBattleArmor);
-
-        JMenuItem miFireAllBattleArmor = new JMenuItem(resourceMap.getString("miFireAllBattleArmor.text"));
-        miFireAllBattleArmor.setMnemonic(KeyEvent.VK_R);
-        miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR));
-        menuBattleArmorPool.add(miFireAllBattleArmor);
-        menuTempPool.add(menuBattleArmorPool);
-        // endregion Battle Armor Pool
-
-        // region Vehicle Crew Ground Pool
-        menuVehicleCrewGroundPool = new JMenu(resourceMap.getString("menuVehicleCrewGroundPool.text"));
-        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
-
-        JMenuItem miHireVehicleCrewGround = new JMenuItem(resourceMap.getString("miHireVehicleCrewGround.text"));
-        miHireVehicleCrewGround.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVehicleCrewGroundNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
-                      popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewGroundPool.add(miHireVehicleCrewGround);
-
-        JMenuItem miFireVehicleCrewGround = new JMenuItem(resourceMap.getString("miFireVehicleCrewGround.text"));
-        miFireVehicleCrewGround.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVehicleCrewGroundNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
-                      popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewGroundPool.add(miFireVehicleCrewGround);
-
-        JMenuItem miFullStrengthVehicleCrewGround = new JMenuItem(resourceMap.getString(
-              "miFullStrengthVehicleCrewGround.text"));
-        miFullStrengthVehicleCrewGround.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
-        });
-        menuVehicleCrewGroundPool.add(miFullStrengthVehicleCrewGround);
-
-        JMenuItem miFireAllVehicleCrewGround = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewGround.text"));
-        miFireAllVehicleCrewGround.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
-              0));
-        menuVehicleCrewGroundPool.add(miFireAllVehicleCrewGround);
-        menuTempPool.add(menuVehicleCrewGroundPool);
-        // endregion Vehicle Crew Ground Pool
-
-        // region Vehicle Crew VTOL Pool
-        menuVehicleCrewVTOLPool = new JMenu(resourceMap.getString("menuVehicleCrewVTOLPool.text"));
-        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
-
-        JMenuItem miHireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miHireVehicleCrewVTOL.text"));
-        miHireVehicleCrewVTOL.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVehicleCrewVTOLNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewVTOLPool.add(miHireVehicleCrewVTOL);
-
-        JMenuItem miFireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFireVehicleCrewVTOL.text"));
-        miFireVehicleCrewVTOL.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVehicleCrewVTOLNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewVTOLPool.add(miFireVehicleCrewVTOL);
-
-        JMenuItem miFullStrengthVehicleCrewVTOL = new JMenuItem(resourceMap.getString(
-              "miFullStrengthVehicleCrewVTOL.text"));
-        miFullStrengthVehicleCrewVTOL.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
-        });
-        menuVehicleCrewVTOLPool.add(miFullStrengthVehicleCrewVTOL);
-
-        JMenuItem miFireAllVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewVTOL.text"));
-        miFireAllVehicleCrewVTOL.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL,
-              0));
-        menuVehicleCrewVTOLPool.add(miFireAllVehicleCrewVTOL);
-        menuTempPool.add(menuVehicleCrewVTOLPool);
-        // endregion Vehicle Crew VTOL Pool
-
-        // region Vehicle Crew Naval Pool
-        menuVehicleCrewNavalPool = new JMenu(resourceMap.getString("menuVehicleCrewNavalPool.text"));
-        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
-
-        JMenuItem miHireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miHireVehicleCrewNaval.text"));
-        miHireVehicleCrewNaval.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVehicleCrewNavalNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewNavalPool.add(miHireVehicleCrewNaval);
-
-        JMenuItem miFireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFireVehicleCrewNaval.text"));
-        miFireVehicleCrewNaval.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVehicleCrewNavalNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewNavalPool.add(miFireVehicleCrewNaval);
-
-        JMenuItem miFullStrengthVehicleCrewNaval = new JMenuItem(resourceMap.getString(
-              "miFullStrengthVehicleCrewNaval.text"));
-        miFullStrengthVehicleCrewNaval.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
-        });
-        menuVehicleCrewNavalPool.add(miFullStrengthVehicleCrewNaval);
-
-        JMenuItem miFireAllVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewNaval.text"));
-        miFireAllVehicleCrewNaval.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL,
-              0));
-        menuVehicleCrewNavalPool.add(miFireAllVehicleCrewNaval);
-        menuTempPool.add(menuVehicleCrewNavalPool);
-        // endregion Vehicle Crew Naval Pool
-
-        // region Vessel Pilot Pool
-        menuVesselPilotPool = new JMenu(resourceMap.getString("menuVesselPilotPool.text"));
-        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
-
-        JMenuItem miHireVesselPilot = new JMenuItem(resourceMap.getString("miHireVesselPilot.text"));
-        miHireVesselPilot.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVesselPilotNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_PILOT, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselPilotPool.add(miHireVesselPilot);
-
-        JMenuItem miFireVesselPilot = new JMenuItem(resourceMap.getString("miFireVesselPilot.text"));
-        miFireVesselPilot.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVesselPilotNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_PILOT, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselPilotPool.add(miFireVesselPilot);
-
-        JMenuItem miFullStrengthVesselPilot = new JMenuItem(resourceMap.getString("miFullStrengthVesselPilot.text"));
-        miFullStrengthVesselPilot.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
-        });
-        menuVesselPilotPool.add(miFullStrengthVesselPilot);
-
-        JMenuItem miFireAllVesselPilot = new JMenuItem(resourceMap.getString("miFireAllVesselPilot.text"));
-        miFireAllVesselPilot.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0));
-        menuVesselPilotPool.add(miFireAllVesselPilot);
-        menuTempPool.add(menuVesselPilotPool);
-        // endregion Vessel Pilot Pool
-
-        // region Vessel Gunner Pool
-        menuVesselGunnerPool = new JMenu(resourceMap.getString("menuVesselGunnerPool.text"));
-        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
-
-        JMenuItem miHireVesselGunner = new JMenuItem(resourceMap.getString("miHireVesselGunner.text"));
-        miHireVesselGunner.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVesselGunnerNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_GUNNER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselGunnerPool.add(miHireVesselGunner);
-
-        JMenuItem miFireVesselGunner = new JMenuItem(resourceMap.getString("miFireVesselGunner.text"));
-        miFireVesselGunner.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVesselGunnerNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_GUNNER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselGunnerPool.add(miFireVesselGunner);
-
-        JMenuItem miFullStrengthVesselGunner = new JMenuItem(resourceMap.getString("miFullStrengthVesselGunner.text"));
-        miFullStrengthVesselGunner.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
-        });
-        menuVesselGunnerPool.add(miFullStrengthVesselGunner);
-
-        JMenuItem miFireAllVesselGunner = new JMenuItem(resourceMap.getString("miFireAllVesselGunner.text"));
-        miFireAllVesselGunner.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0));
-        menuVesselGunnerPool.add(miFireAllVesselGunner);
-        menuTempPool.add(menuVesselGunnerPool);
-        // endregion Vessel Gunner Pool
-
-        // region Vessel Crew Pool
-        menuVesselCrewPool = new JMenu(resourceMap.getString("menuVesselCrewPool.text"));
-        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
-
-        JMenuItem miHireVesselCrew = new JMenuItem(resourceMap.getString("miHireVesselCrew.text"));
-        miHireVesselCrew.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVesselCrewNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_CREW, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselCrewPool.add(miHireVesselCrew);
-
-        JMenuItem miFireVesselCrew = new JMenuItem(resourceMap.getString("miFireVesselCrew.text"));
-        miFireVesselCrew.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVesselCrewNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselCrewPool.add(miFireVesselCrew);
-
-        JMenuItem miFullStrengthVesselCrew = new JMenuItem(resourceMap.getString("miFullStrengthVesselCrew.text"));
-        miFullStrengthVesselCrew.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
-        });
-        menuVesselCrewPool.add(miFullStrengthVesselCrew);
-
-        JMenuItem miFireAllVesselCrew = new JMenuItem(resourceMap.getString("miFireAllVesselCrew.text"));
-        miFireAllVesselCrew.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_CREW, 0));
-        menuVesselCrewPool.add(miFireAllVesselCrew);
-        menuTempPool.add(menuVesselCrewPool);
-        // endregion Vessel Crew Pool
+        menuVesselCrewPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VESSEL_CREW,
+              opts.isUseBlobVesselCrew(),
+              "menuVesselCrewPool.text",
+              "miHireVesselCrew.text", "popupHireVesselCrewNum.text",
+              "miFireVesselCrew.text", "popupFireVesselCrewNum.text",
+              "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
+        // endregion Blob Crew Pools
 
         menuMarket.add(menuTempPool);
         // endregion Temp Pool
@@ -1569,7 +1284,6 @@ public class CampaignGUI extends JPanel {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
         statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
-        lblFunds = new JLabel();
         lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
         lblTempSoldiers = new JLabel();
@@ -1582,7 +1296,12 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        statusPanel.add(lblFunds);
+        RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
+        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
+
+        statusPanel.add(btnOvertime);
         statusPanel.add(lblTempAsTechs);
         statusPanel.add(lblTempMedics);
         statusPanel.add(lblTempSoldiers);
@@ -1611,92 +1330,45 @@ public class CampaignGUI extends JPanel {
      * <p>Accessibility names and layout constraints are assigned to ensure that the UI is properly arranged and
      * accessible.</p>
      */
-    private void initTopButtons() {
-        pnlTop = new JPanel(new GridBagLayout());
-        pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
+    private void initTopPanel() {
+        pnlTop = new JPanel();
+        pnlTop.setLayout(new BoxLayout(pnlTop, BoxLayout.X_AXIS));
 
-        pnlLocation = new CurrentLocationPanel(getCampaign(), this::hirePersonMarket);
-        pnlLocation.setMinimumSize(new Dimension(320, 60));
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
-        pnlTop.add(pnlLocation, gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getMarketButtons(), gridBagConstraints);
-
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getButtonPanel(), gridBagConstraints);
+        pnlTop.add(new CurrentLocationPanel(365, 420, getCampaign(), this::openRecruitmentDialog));
+        pnlTop.add(createMarketsPanel(95, 130));
+        pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
+        pnlTop.add(Box.createHorizontalGlue());
+        pnlTop.add(new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
+              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true)));
+        pnlTop.add(createCampaignControlPanel(140, 170));
     }
 
-    private JPanel getMarketButtons() {
-        JPanel pnlButton = new JPanel(new GridBagLayout());
-        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
+    private JPanel createMarketsPanel(int minWidth, int maxWidth) {
+        JPanel pnlMarkets = new HorizontallyConstrainedPanel(minWidth, maxWidth);
+        pnlMarkets.setLayout(new GridBagLayout());
+        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
 
         btnContractMarket.addActionListener(e -> showContractMarket());
         btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnContractMarket, gridBagConstraints);
+        pnlMarkets.add(btnContractMarket, gridBagConstraints);
 
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnUnitMarket, gridBagConstraints);
-
-        btnPartsMarket.addActionListener(e -> showPartsMarket());
-        btnPartsMarket.setHorizontalTextPosition(SwingConstants.CENTER);
-        btnPartsMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnPartsMarket, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(SMALL_GAP, 0, 0, 0);
+        pnlMarkets.add(btnUnitMarket, gridBagConstraints);
 
         refreshMarketButtonLabels();
 
-        return pnlButton;
-    }
-
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshDynamicButtons() {
-        refreshMarketButtonLabels();
+        return pnlMarkets;
     }
 
     public void refreshMarketButtonLabels() {
@@ -1711,151 +1383,54 @@ public class CampaignGUI extends JPanel {
         btnUnitMarket.setText(label);
     }
 
-    private JPanel getButtonPanel() {
-        JPanel pnlButton = new JPanel(new GridBagLayout());
-        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("campaignControls.title")));
+    private JPanel createCampaignControlPanel(int minWidth, int maxWidth) {
+        JPanel pnlButton = new HorizontallyConstrainedPanel(minWidth, maxWidth);
+        pnlButton.setLayout(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
-        GridBagConstraints gridBagConstraints;
-        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+
+        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
+        btnCompanyGenerator.addActionListener(
+              e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnGlossary, gridBagConstraints);
-
-        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
-              getCampaign().getSecondInCommand()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnGoRogue, gridBagConstraints);
-
-        btnCompanyGenerator.addActionListener(e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(
-              true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
         pnlButton.add(btnCompanyGenerator, gridBagConstraints);
 
+        RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> {
             getCampaign().setGMMode(btnGMMode.isSelected());
             refreshGMMenuItems();
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, 0, SMALL_GAP);
         pnlButton.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
-        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnOvertime, gridBagConstraints);
-
-        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnAdvanceMultipleDays, gridBagConstraints);
-
-        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
-        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnMassTraining, gridBagConstraints);
-
-        // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        String padding = "       ";
-        RoundedJButton btnAdvanceDay = new RoundedJButton(padding +
-                                                                resourceMap.getString("btnAdvanceDay.text") +
-                                                                padding);
-        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
-        btnAdvanceDay.addActionListener(evt -> {
-            // We disable the button here, as we don't want the user to be able to advance
-            // day  again, until after Advance Day has completed.
-            btnAdvanceDay.setEnabled(false);
-            btnAdvanceMultipleDays.setEnabled(false);
-
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    getCampaignController().advanceDay();
-                } finally {
-                    btnAdvanceDay.setEnabled(true);
-                    btnAdvanceMultipleDays.setEnabled(true);
-                    setCursor(Cursor.getDefaultCursor());
-                }
-            });
-        });
-        btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 15, 3, 0);
-        pnlButton.add(btnAdvanceDay, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
+        RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
+        pnlButton.add(btnGlossary, gridBagConstraints);
+
+        RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
         btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 15, 3, 15);
+        gridBagConstraints.weightx = 0.6;
+        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
         pnlButton.add(btnBugReport, gridBagConstraints);
 
         return pnlButton;
     }
+
     // endregion Initialization
 
     public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
@@ -2118,16 +1693,16 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
+     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign
      * options.
      *
-     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
+     * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market
      * style.</p>
      *
-     * <p>If no personnel market is enabled display the bulk hiring dialog, instead.</p>
+     * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
-    public void hirePersonMarket() {
+    public void openRecruitmentDialog() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
 
@@ -2140,13 +1715,157 @@ public class CampaignGUI extends JPanel {
                 getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         } else {
-            hireBulkPersonnel();
+            openBulkRecruitmentDialog();
         }
     }
 
-    private void hireBulkPersonnel() {
+    private void openBulkRecruitmentDialog() {
         HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hireBulkPersonnelDialog.setVisible(true);
+    }
+
+    private static final List<PersonnelRole> BLOB_CREW_ROLES = List.of(
+          PersonnelRole.SOLDIER, PersonnelRole.BATTLE_ARMOUR,
+          PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.VEHICLE_CREW_VTOL,
+          PersonnelRole.VEHICLE_CREW_NAVAL, PersonnelRole.VESSEL_PILOT,
+          PersonnelRole.VESSEL_GUNNER, PersonnelRole.VESSEL_CREW);
+
+    private static MenuListener menuListenerFor(Runnable onSelected) {
+        return new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                onSelected.run();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {}
+
+            @Override
+            public void menuCanceled(MenuEvent e) {}
+        };
+    }
+
+    private static void setMenuItemState(JMenuItem item, boolean enabled, String disabledTip) {
+        item.setEnabled(enabled);
+        item.setToolTipText(enabled ? null : disabledTip);
+    }
+
+    private boolean anyBlobRoleHasNeed() {
+        return BLOB_CREW_ROLES.stream().anyMatch(this::blobRoleHasUnitsNeedingCrew);
+    }
+
+    private boolean anyBlobRoleHasPool() {
+        Campaign c = getCampaign();
+        return BLOB_CREW_ROLES.stream()
+                     .anyMatch(role -> c.isBlobCrewEnabled(role) && c.getTempCrewPool(role) > 0);
+    }
+
+    private boolean anyBlobRoleHasSurplus() {
+        Campaign c = getCampaign();
+        for (PersonnelRole role : BLOB_CREW_ROLES) {
+            if (!c.isBlobCrewEnabled(role)) {
+                continue;
+            }
+            if (c.getAvailableTempCrewPool(role) > 0) {
+                return true;
+            }
+            for (Unit unit : c.getUnits()) {
+                int tempCrew = unit.getTempCrewByPersonnelRole(role);
+                if (tempCrew > 0) {
+                    int excess = (unit.getActiveCrew().size() + tempCrew) - unit.getFullCrewSize();
+                    if (excess > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean blobRoleHasUnitsNeedingCrew(PersonnelRole role) {
+        Campaign c = getCampaign();
+        if (!c.isBlobCrewEnabled(role)) {
+            return false;
+        }
+        for (Unit unit : c.getUnits()) {
+            boolean unitMatchesRole = (role == PersonnelRole.VESSEL_CREW)
+                                            ? unit.canTakeMoreVesselCrew()
+                                            : (role == unit.getDriverRole() || role == unit.getGunnerRole());
+            if (!unitMatchesRole || unit.getActiveCrew().isEmpty()) {
+                continue;
+            }
+            // Use total temp crew across all roles (mirrors distributeTempCrewPoolToUnits logic)
+            // so a vessel already full of another role's temp crew is not counted as needing crew
+            int current = unit.getActiveCrew().size() + unit.getTotalTempCrew();
+            if (current < unit.getFullCrewSize()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateBlobCrewPoolMenuItems(PersonnelRole role,
+          JMenuItem fireItem, JMenuItem fullStrengthItem, JMenuItem fireAllItem) {
+        int pool = getCampaign().getTempCrewPool(role);
+        boolean unitsNeedCrew = blobRoleHasUnitsNeedingCrew(role);
+
+        setMenuItemState(fireItem, pool > 0,
+              resourceMap.getString("miFireBlobCrew.disabledTip"));
+        setMenuItemState(fullStrengthItem, unitsNeedCrew,
+              resourceMap.getString("miFullStrengthBlobCrew.disabledTip"));
+        setMenuItemState(fireAllItem, pool > 0,
+              resourceMap.getString("miFireAllBlobCrew.disabledTip"));
+    }
+
+    private JMenu buildBlobCrewPoolSubMenu(JMenu parentMenu, PersonnelRole role, boolean isVisible,
+          String menuKey, String hireKey, String hirePopupKey,
+          String fireSomeKey, String fireSomePopupKey,
+          String fullStrengthKey, String fireAllKey) {
+        JMenu menu = new JMenu(resourceMap.getString(menuKey));
+        menu.setVisible(isVisible);
+
+        JMenuItem miHire = new JMenuItem(resourceMap.getString(hireKey));
+        miHire.addActionListener(evt -> {
+            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(),
+                  true, resourceMap.getString(hirePopupKey), 1, 0, MAX_QUANTITY_SPINNER);
+            dialog.setVisible(true);
+            if (dialog.getValue() >= 0) {
+                getCampaign().increaseTempCrewPool(role, dialog.getValue());
+            }
+        });
+        menu.add(miHire);
+
+        JMenuItem miFireSome = new JMenuItem(resourceMap.getString(fireSomeKey));
+        miFireSome.addActionListener(evt -> {
+            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(),
+                  true, resourceMap.getString(fireSomePopupKey), 1, 0,
+                  getCampaign().getTempCrewPool(role));
+            dialog.setVisible(true);
+            if (dialog.getValue() >= 0) {
+                getCampaign().decreaseTempCrewPool(role, dialog.getValue());
+            }
+        });
+        menu.add(miFireSome);
+
+        JMenuItem miFullStrength = new JMenuItem(resourceMap.getString(fullStrengthKey));
+        miFullStrength.addActionListener(evt -> {
+            getCampaign().resetTempCrewPoolForRole(role);
+            getCampaign().distributeTempCrewPoolToUnits(role);
+        });
+        menu.add(miFullStrength);
+
+        JMenuItem miFireAll = new JMenuItem(resourceMap.getString(fireAllKey));
+        miFireAll.addActionListener(evt -> getCampaign().setTempCrewPool(role, 0));
+        menu.add(miFireAll);
+
+        menu.addMenuListener(menuListenerFor(() ->
+                                                   updateBlobCrewPoolMenuItems(role,
+                                                         miFireSome,
+                                                         miFullStrength,
+                                                         miFireAll)));
+
+        parentMenu.add(menu);
+        return menu;
     }
 
     private void bringAllTempCrewsToFullStrength() {
@@ -2482,7 +2201,7 @@ public class CampaignGUI extends JPanel {
         if (factionIntroDate != newOptions.isFactionIntroDate()) {
             getCampaign().updateTechFactionCode();
         }
-        refreshCalendar();
+        refreshWindowTitle();
         getCampaign().reloadNews();
     }
 
@@ -3282,23 +3001,8 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void refreshCalendar() {
+    public void refreshWindowTitle() {
         getFrame().setTitle(getCampaign().getTitle());
-    }
-
-    /**
-     * Refreshes the 'funds' display on the GUI.
-     */
-    private void refreshFunds() {
-        Money funds = getCampaign().getFunds();
-        String inDebt = "";
-        if (getCampaign().getFinances().isInDebt()) {
-            // FIXME : Localize
-            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
-        }
-        // FIXME : Localize
-        String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
-        lblFunds.setText(text);
     }
 
     private void refreshTempAsTechs() {
@@ -3431,7 +3135,11 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
+    private void refreshCampaignControlButtons() {
+        boolean emptyHangar = getCampaign().getUnits().isEmpty();
+        boolean noPersonnel = getCampaign().getPersonnel().isEmpty();
+        btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
+    }
 
     public int getTabIndexByName(String tabTitle) {
         int retVal = -1;
@@ -3651,8 +3359,6 @@ public class CampaignGUI extends JPanel {
         Campaign campaign = getCampaign();
         Money overdueAmount = campaign.getFinances().checkOverdueLoanPayments(campaign);
         if (overdueAmount.isPositive()) {
-            refreshFunds();
-
             String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogOverdueLoans.ic",
                   campaign.getCommanderAddress());
@@ -3731,8 +3437,8 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handleNewDay(NewDayEvent newDayEvent) {
-        refreshCalendar();
-        refreshFunds();
+        refreshWindowTitle();
+        refreshCampaignControlButtons();
         refreshPartsAvailability();
         refreshMarketButtonLabels();
 
@@ -3779,7 +3485,6 @@ public class CampaignGUI extends JPanel {
         refreshTempVesselCrew();
 
         refreshAllTabs();
-        fundsScheduler.schedule();
         refreshPartsAvailability();
 
         miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
@@ -3806,7 +3511,6 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(TransactionEvent transactionEvent) {
-        fundsScheduler.schedule();
         refreshPartsAvailability();
     }
 
@@ -3822,23 +3526,7 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(LoanEvent loanEvent) {
-        fundsScheduler.schedule();
         refreshPartsAvailability();
-    }
-
-    /**
-     * Handles updates related to assets within the campaign.
-     *
-     * <p>Schedules a funds update to ensure the campaign's financial state is current when assets change.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param assetEvent the event indicating a change in assets
-     */
-    @Subscribe
-    public void handle(AssetEvent assetEvent) {
-        fundsScheduler.schedule();
     }
 
     /**

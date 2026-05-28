@@ -184,6 +184,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         btnMassRepair.addActionListener(evt -> new MRMSDialog(getCampaignGui().getFrame(), true, getCampaignGui(),
               MRMSMode.WAREHOUSE).setVisible(true));
 
+        RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
+        btnPartsMarket.addActionListener(e -> getCampaignGui().showPartsMarket());
+
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -258,6 +261,16 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panSupplies.add(btnMassRepair, gridBagConstraints);
 
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0; // expand for layout padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panSupplies.add(btnPartsMarket, gridBagConstraints);
+
         PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
         Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, false, QUALITY_A);
         partsModel = new PartsTableModel(partsInUse);
@@ -286,7 +299,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
