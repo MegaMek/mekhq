@@ -503,6 +503,10 @@ public class PrisonerEventManager {
             return;
         }
 
+        if (campaign.getCampaignOptions().isDisableIntelBreachChance()) {
+            return;
+        }
+
         List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
         activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
                                                    contract.getMoraleLevel().isRouted());

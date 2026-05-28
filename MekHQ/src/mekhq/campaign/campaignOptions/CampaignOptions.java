@@ -295,6 +295,7 @@ public class CampaignOptions {
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
     private boolean useFunctionalEscapeArtist;
+    private boolean disableIntelBreachChance;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -906,6 +907,7 @@ public class CampaignOptions {
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
         useFunctionalEscapeArtist = false;
+        disableIntelBreachChance = false;
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -2259,6 +2261,14 @@ public class CampaignOptions {
 
     public void setUseFunctionalEscapeArtist(final boolean useFunctionalEscapeArtist) {
         this.useFunctionalEscapeArtist = useFunctionalEscapeArtist;
+    }
+
+    public boolean isDisableIntelBreachChance() {
+        return disableIntelBreachChance;
+    }
+
+    public void setDisableIntelBreachChance(final boolean disableIntelBreachChance) {
+        this.disableIntelBreachChance = disableIntelBreachChance;
     }
     // endregion Prisoners
 

@@ -406,6 +406,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "useFunctionalEscapeArtist",
               campaignOptions.isUseFunctionalEscapeArtist());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "disableIntelBreachChance",
+              campaignOptions.isDisableIntelBreachChance());
         // endregion Prisoners
 
         // region Dependent
