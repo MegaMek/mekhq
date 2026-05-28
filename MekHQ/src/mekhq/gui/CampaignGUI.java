@@ -136,7 +136,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
-import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -363,18 +363,16 @@ public class CampaignGUI extends JPanel {
         refreshTempVesselCrew();
         refreshPartsAvailability();
 
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension screenSize = getUsableScreenSize();
 
-        frame.setSize(Math.min(MAX_START_WIDTH, dim.width), Math.min(MAX_START_HEIGHT, dim.height));
-        frame.setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT));
-        pnlTop.setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, TOP_PANEL_HEIGHT));
-        pnlTop.setMaximumSize(new Dimension(Integer.MAX_VALUE, TOP_PANEL_HEIGHT));
+        frame.setSize(Math.min(MAX_START_WIDTH, screenSize.width), Math.min(MAX_START_HEIGHT, screenSize.height));
+        refreshGuiScale();
 
         // Determine the new location of the window
         int w = frame.getSize().width;
         int h = frame.getSize().height;
-        int x = (dim.width - w) / 2;
-        int y = (dim.height - h) / 2;
+        int x = (screenSize.width - w) / 2;
+        int y = (screenSize.height - h) / 2;
 
         // Move the window
         frame.setLocation(x, y);
@@ -1334,7 +1332,8 @@ public class CampaignGUI extends JPanel {
         pnlTop = new JPanel();
         pnlTop.setLayout(new BoxLayout(pnlTop, BoxLayout.X_AXIS));
 
-        pnlTop.add(new CurrentLocationPanel(365, 420, getCampaign(), this::openRecruitmentDialog));
+        pnlTop.add(new CurrentLocationPanel(365, 420, TOP_PANEL_HEIGHT - 30,
+              getCampaign(), this::openRecruitmentDialog));
         pnlTop.add(createMarketsPanel(95, 130));
         pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
         pnlTop.add(Box.createHorizontalGlue());
@@ -1344,7 +1343,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
-        JPanel pnlMarkets = new HorizontallyConstrainedPanel(minWidth, maxWidth);
+        JPanel pnlMarkets = new ScalingWidthConstrainedPanel(minWidth, maxWidth);
         pnlMarkets.setLayout(new GridBagLayout());
         pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
 
@@ -1384,7 +1383,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private JPanel createCampaignControlPanel(int minWidth, int maxWidth) {
-        JPanel pnlButton = new HorizontallyConstrainedPanel(minWidth, maxWidth);
+        JPanel pnlButton = new ScalingWidthConstrainedPanel(minWidth, maxWidth);
         pnlButton.setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
@@ -1577,6 +1576,24 @@ public class CampaignGUI extends JPanel {
                 miPlaf.addActionListener(this::changeTheme);
             }
         }
+    }
+
+    private void refreshGuiScale() {
+        Dimension screenSize = getUsableScreenSize();
+        int minWidth = Math.min(UIUtil.scaleForGUI(MIN_WINDOW_WIDTH), screenSize.width);
+        int minHeight = Math.min(UIUtil.scaleForGUI(MIN_WINDOW_HEIGHT), screenSize.height);
+        frame.setMinimumSize(new Dimension(minWidth, minHeight));
+        pnlTop.setMinimumSize(new Dimension(minWidth, UIUtil.scaleForGUI(TOP_PANEL_HEIGHT)));
+        pnlTop.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(TOP_PANEL_HEIGHT)));
+    }
+
+    private static Dimension getUsableScreenSize() {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(gd.getDefaultConfiguration());
+        int usableScreenWidth = screenSize.width - screenInsets.left - screenInsets.right;
+        int usableScreenHeight = screenSize.height - screenInsets.top - screenInsets.bottom;
+        return new Dimension(usableScreenWidth, usableScreenHeight);
     }
 
     public void focusOnUnit(UUID id) {
@@ -3682,7 +3699,10 @@ public class CampaignGUI extends JPanel {
     /**
      * Handles changes to general application options.
      *
-     * <p>Updates the visibility of the company generator menu item according to the new option settings.</p>
+     * <p>
+     * Updates the visibility of the company generator menu item according to the new option settings.
+     * Ensures that GUI scale changes are applied.
+     * </p>
      *
      * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
      * wrong.</p>
@@ -3692,6 +3712,7 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
+        refreshGuiScale();
     }
     // endregion Subscriptions
 }
