@@ -125,10 +125,10 @@ public class ScalingVerticalFillImage extends JComponent {
             this.filePath = filePath;
             image = ImageUtil.loadImageFromFile(filePath);
             if (image != null) {
-                int w = image.getWidth(null);
-                int h = image.getHeight(null);
-                if (w > 0 && h > 0) {
-                    aspectRatio = (float) w / h;
+                int width = image.getWidth(null);
+                int height = image.getHeight(null);
+                if (width > 0 && height > 0) {
+                    aspectRatio = (float) width / height;
                 }
             }
         }
@@ -168,8 +168,8 @@ public class ScalingVerticalFillImage extends JComponent {
 
     @Override
     public Dimension getMaximumSize() {
-        int h = getScaledMaxHeight();
-        return new Dimension((int) (h * aspectRatio), h);
+        int height = getScaledMaxHeight();
+        return new Dimension((int) (height * aspectRatio), height);
     }
 
     private int getScaledMaxHeight() {
