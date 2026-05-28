@@ -2008,8 +2008,8 @@ public final class BriefingTab extends CampaignGuiTab {
      *     owner's alignment at the time of the scenario, then treated as either allied- or opposing-side accordingly.</li>
      * </ul>
      *
-     * <p>Bot forces whose template name contains {@code "convoy"} (case-insensitive) are additionally configured to
-     * ignore damage output, reflecting their non-combat role.</p>
+     * <p>Bot forces whose template name contains {@code "convoy"} or {@code "vip"} (case-insensitive) are additionally
+     * configured to ignore damage output, reflecting their non-combat (or scenario-essential role).</p>
      *
      * <p><b>Note:</b> Significantly overhauled during the 51.0 dev cycle.</p>
      *
@@ -2023,16 +2023,21 @@ public final class BriefingTab extends CampaignGuiTab {
 
         boolean isEnemyPirate = enemyFaction.isRebelOrPirate();
         boolean isEmployerPirate = employerFaction.isRebelOrPirate();
-
-        // I hate using string comparison for convoy detection, but without going through and updating every scenario
-        // template and potentially breaking some along the way, this is our best option - Illiani, May/27/2026
         boolean isPlanetOwnerPirate = resolvePlanetOwnerIsPirate(contract, today, isEmployerPirate, isEnemyPirate);
 
         for (BotForce botForce : scenario.getBotForces()) {
             ScenarioForceTemplate.ForceAlignment team = ScenarioForceTemplate.ForceAlignment.values()[botForce.getTeam()];
 
+            // I hate using string comparison for convoy & VIP detection, but without going through and updating every
+            // scenario template and potentially breaking some along the way, this is our best option
+            // - Illiani, May/27/2026
+
+            // We want roughly the same behavior from both convoy forces. I.e., don't go charging ahead of the main
+            // force, putting yourself in danger. `IgnoreDamageOutput` tells the unit to consider its outbound damage
+            // potential to be 0, when rating movement paths.
             boolean isConvoy = botForce.getTemplateName().toLowerCase().contains("convoy");
-            botForce.getBehaviorSettings().setIgnoreDamageOutput(isConvoy);
+            boolean isVIP = botForce.getTemplateName().toLowerCase().contains("vip");
+            botForce.getBehaviorSettings().setIgnoreDamageOutput(isConvoy || isVIP);
 
             boolean isPirate = switch (team) {
                 case Allied -> isEmployerPirate;
