@@ -44,31 +44,36 @@ import java.io.File;
 import java.util.Objects;
 import javax.swing.JComponent;
 
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.util.ImageUtil;
 
 /**
  * Displays an image that fills the available vertical space up to a specified maximum height,
- * while preserving its original aspect ratio. Includes a ratcheting minimum size mechanism:
- * as the component is resized larger, its minimum size increases (up to the maximum height),
- * preventing it from being shrunk back past its largest realized size. Also supports an internal
- * scaling factor to zoom the image during rendering.
+ * while preserving its original aspect ratio. This maximum height is automatically multiplied by the
+ * {@link GUIPreferences#GUI_SCALE} setting.
+ * <p>
+ * Includes a ratcheting minimum size mechanism: as the component is resized larger, its minimum size
+ * increases (up to the maximum height), preventing it from being shrunk back past its largest realized size.
+ * Also supports an internal scaling factor to zoom the image during rendering.
+ * </p>
  */
-public class VerticalFillImage extends JComponent {
+public class ScalingVerticalFillImage extends JComponent {
 
-    // minimum height allowed
+    /** Minimum height allowed */
     private static final int MIN_HEIGHT = 20;
-    // maximum height allowed
+    /** Maximum height allowed, before GUI scaling */
     private int maxHeight;
-    // minimum height that grows as the component is resized
+    /** Minimum height that grows as the component is resized */
     private int ratchetedHeight = MIN_HEIGHT;
 
-    // caches the current file path to prevent redundant image loading
+    /** Caches the current file path to prevent redundant image loading */
     private String filePath;
-    // image to be rendered, corresponds to filePath
+    /** Image to be rendered, corresponds to filePath */
     private Image image;
-    // image's width-to-height ratio
+    /** Image's width-to-height ratio */
     private float aspectRatio = 1.0f;
-    // scaling factor applied to the image during rendering, does not affect the component size
+    /** Scaling factor applied to the image during rendering, does not affect the component size */
     private float scale = 1.0f;
 
     /**
@@ -77,7 +82,7 @@ public class VerticalFillImage extends JComponent {
     private final ComponentAdapter resizeListener = new ComponentAdapter() {
         @Override
         public void componentResized(ComponentEvent e) {
-            int newHeight = Math.min(getHeight(), maxHeight);
+            int newHeight = Math.min(getHeight(), getScaledMaxHeight());
             int delta = newHeight - ratchetedHeight;
             if (delta <= 0) {
                 return;
@@ -86,7 +91,7 @@ public class VerticalFillImage extends JComponent {
         }
     };
 
-    public VerticalFillImage() {
+    public ScalingVerticalFillImage() {
         super();
         setOpaque(true);
     }
@@ -141,8 +146,8 @@ public class VerticalFillImage extends JComponent {
         if (maxHeight <= 0) {
             throw new IllegalArgumentException("maxHeight <= 0");
         }
-        this.maxHeight = Math.max(maxHeight, MIN_HEIGHT);
-        ratchetedHeight = Math.min(this.maxHeight, ratchetedHeight);
+        this.maxHeight = maxHeight;
+        ratchetedHeight = Math.min(getScaledMaxHeight(), ratchetedHeight);
     }
 
     @Override
@@ -150,9 +155,7 @@ public class VerticalFillImage extends JComponent {
         if (image == null) {
             return new Dimension(0, 0);
         }
-        int h = maxHeight; // prefer max size
-        int w = (int) (h * aspectRatio);
-        return new Dimension(w, h);
+        return getMaximumSize(); // prefer max size
     }
 
     @Override
@@ -165,7 +168,12 @@ public class VerticalFillImage extends JComponent {
 
     @Override
     public Dimension getMaximumSize() {
-        return new Dimension((int) (maxHeight * aspectRatio), maxHeight);
+        int h = getScaledMaxHeight();
+        return new Dimension((int) (h * aspectRatio), h);
+    }
+
+    private int getScaledMaxHeight() {
+        return Math.max(MIN_HEIGHT, UIUtil.scaleForGUI(maxHeight));
     }
 
     /**

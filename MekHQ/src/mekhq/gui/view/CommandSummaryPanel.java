@@ -50,7 +50,7 @@ import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.ActionScheduler;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
@@ -62,7 +62,7 @@ import mekhq.utilities.ReportingUtilities;
  * This panel subscribes to the global event bus updates to stay synchronized with changes in the displayed stats.
  * </p>
  */
-public class CommandSummaryPanel extends HorizontallyConstrainedPanel {
+public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandSummary";
 

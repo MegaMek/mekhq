@@ -68,8 +68,8 @@ import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
-import mekhq.gui.baseComponents.VerticalFillImage;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
+import mekhq.gui.baseComponents.ScalingVerticalFillImage;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.utilities.ReportingUtilities;
@@ -88,14 +88,14 @@ import org.apache.commons.lang3.StringUtils;
  * location and transit status.
  * </p>
  */
-public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
+public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
 
     private static final File JUMP_SHIP_IMAGE = new File(Configuration.unitImagesDir(), "jumpships/invader.png");
 
     private final Campaign campaign;
 
     // UI components
-    private final VerticalFillImage imgLocation = new VerticalFillImage();
+    private final ScalingVerticalFillImage imgLocation = new ScalingVerticalFillImage();
     private final JLabel lblLocationPrimaryInfo = new JLabel();
     private final JLabel lblLocationSecondaryInfo = new JLabel();
     private final RoundedJButton btnHiringHall = new RoundedJButton();
@@ -105,10 +105,12 @@ public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
      *
      * @param minWidth              the minimum enforced width of the panel in pixels
      * @param maxWidth              the maximum enforced width of the panel in pixels
+     * @param iconMaxHeight         the maximum enforced height of the location image in pixels
      * @param campaign              the active {@link Campaign} instance
      * @param openRecruitmentDialog a {@link Runnable} that triggers the opening of the Recruitment Dialog UI
      */
-    public CurrentLocationPanel(int minWidth, int maxWidth, Campaign campaign, Runnable openRecruitmentDialog) {
+    public CurrentLocationPanel(int minWidth, int maxWidth, int iconMaxHeight,
+          Campaign campaign, Runnable openRecruitmentDialog) {
         super(minWidth, maxWidth);
         this.campaign = campaign;
 
@@ -116,7 +118,7 @@ public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(0, CampaignGUI.THIN_GAP, 0, CampaignGUI.MEDIUM_GAP);
 
-        imgLocation.setMaxHeight(60);
+        imgLocation.setMaxHeight(iconMaxHeight);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 4;
