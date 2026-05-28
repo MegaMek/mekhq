@@ -4346,23 +4346,17 @@ public class Campaign implements ITechManager, ILocation {
         }
     }
 
-    /** Use {@link #refreshPersonnelMarkets(boolean)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshPersonnelMarkets() {
-        humanResources.refreshPersonnelMarkets(this);
-    }
-
     /**
-     * Refreshes the personnel markets based on the current market style and the current date.
+     * Refreshes the applicants available for recruiting based on the current recruitment style and the current date.
      *
-     * @param bypassDateRestrictions {@code true} if we want the market to refresh at an unusual time, such as campaign
-     *                               start
+     * @param bypassDateRestrictions {@code true} if we want the applicants to refresh at an unusual time, such as
+     *                               campaign start
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets(boolean bypassDateRestrictions) {
-        humanResources.refreshPersonnelMarkets(this, bypassDateRestrictions);
+    public void refreshApplicants(boolean bypassDateRestrictions) {
+        humanResources.refreshApplicants(this, bypassDateRestrictions);
     }
 
     public int getInitiativeBonus() {
@@ -5448,9 +5442,10 @@ public class Campaign implements ITechManager, ILocation {
             CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
 
-        // We've had instances where game options isn't loaded correctly from player campaigns, potentially due to
-        // age. This safeguards.
-        if (true) {
+        // We've had instances where game options aren't loaded correctly from player campaigns, potentially due to
+        // age. This safeguards against that occurance, preventing players entering a state where they cannot
+        // continue their campaigns.
+        if (gameOptions == null) {
             gameOptions = new GameOptions();
             LOGGER.errorDialog(new NullPointerException(),
                   getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.body"),
@@ -7140,16 +7135,16 @@ public class Campaign implements ITechManager, ILocation {
 
 
     /**
-     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusAsTechPool() {
         humanResources.releaseSurplusAsTechPool(this);
     }
 
     /**
-     * Releases surplus Medics from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusMedicPool() {
         humanResources.releaseSurplusMedicPool(this);
@@ -7159,8 +7154,7 @@ public class Campaign implements ITechManager, ILocation {
      * Releases surplus temp crew for a specific blob crew role.
      *
      * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
-     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
-     * emptied.</p>
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
      *
      * @param role the personnel role to trim
      */
