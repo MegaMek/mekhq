@@ -146,7 +146,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
-import mekhq.gui.dialog.glossary.NewGlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
@@ -1444,7 +1444,7 @@ public class CampaignGUI extends JPanel {
         pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("campaignControls.title")));
 
         GridBagConstraints gridBagConstraints;
-        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
+        btnGlossary.addActionListener(evt -> new GlossaryDialog(getFrame()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -3088,7 +3088,7 @@ public class CampaignGUI extends JPanel {
 
         final int selectedIndex = tabMain.getSelectedIndex();
         final Component selectedTab = ((selectedIndex >= 0) && (selectedIndex < tabMain.getTabCount())) ?
-                                             tabMain.getComponentAt(selectedIndex) : null;
+                                            tabMain.getComponentAt(selectedIndex) : null;
 
         EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
         int logsSelected = tabLogs.getSelectedIndex();

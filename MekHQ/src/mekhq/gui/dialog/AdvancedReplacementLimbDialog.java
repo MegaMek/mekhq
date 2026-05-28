@@ -105,7 +105,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
 import mekhq.gui.view.PaperDoll;
 
 /**
@@ -689,7 +689,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         GlossaryEntry glossaryEntry = GlossaryEntry.PROSTHETICS;
 
         try {
-            new NewGlossaryEntryDialog(this, glossaryEntry);
+            new GlossaryEntryDialog(this, glossaryEntry);
         } catch (Exception ex) {
             LOGGER.error("Failed to open Glossary Entry", ex);
         }
