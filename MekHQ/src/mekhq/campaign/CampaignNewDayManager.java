@@ -447,7 +447,7 @@ public class CampaignNewDayManager {
         }
 
         // Manage the Markets
-        campaign.refreshPersonnelMarkets(false);
+        campaign.refreshApplicants(false);
         if (isFirstOfMonth) {
             showRarePersonnelDialog(campaign, false);
         }

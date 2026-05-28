@@ -295,7 +295,7 @@ public class CurrentLocation extends AbstractLocation {
 
             // We've just stopped traveling, so we should see if there are any local applicants.
             if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
-                campaign.refreshPersonnelMarkets(true);
+                campaign.refreshApplicants(true);
                 CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
             }
         }
