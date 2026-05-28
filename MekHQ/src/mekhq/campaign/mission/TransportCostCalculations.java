@@ -79,6 +79,12 @@ import mekhq.campaign.universe.PlanetarySystem;
  * <p>Usage: Create an instance with the unit's hangar, relevant personnel, and statistics, then
  * call {@link #calculateJumpCostForEachDay()} or {@link #calculateJumpCostForEntireJourney(int, int)}.</p>
  *
+ * <p><b>A Rules Note:</b> The rules state that Space Stations must be shut down for jump transit. We received a
+ * rule clarification that this was intended to take them out of combat and not render them wholly inoperable for
+ * purposes of transport calculations. Therefore, they continue to provide bay and personnel transportation. This was
+ * not an official rules forum clarification, but did come from the CGL 'space guru' Mike Miller, so is as official as
+ * we'll get.</p>
+ *
  * @author Illiani
  * @since 50.10
  */
@@ -877,12 +883,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
-
             total += unit.getSmallCraftCapacity();
         }
 
@@ -893,11 +893,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getASFCapacity();
         }
 
@@ -908,11 +903,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getMekCapacity();
         }
 
@@ -923,11 +913,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getSuperHeavyVehicleCapacity();
         }
 
@@ -938,11 +923,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getHeavyVehicleCapacity();
         }
 
@@ -953,11 +933,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getLightVehicleCapacity();
         }
 
@@ -968,11 +943,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getProtoMekCapacity();
         }
 
@@ -983,11 +953,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getBattleArmorCapacity();
         }
 
@@ -998,11 +963,6 @@ public class TransportCostCalculations {
         double total = 0.0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
-            Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             total += unit.getInfantryCapacity();
         }
 
@@ -1013,11 +973,7 @@ public class TransportCostCalculations {
         int total = 0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
             Entity entity = unit.getEntity();
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
             if (!(entity instanceof Jumpship)) {
                 continue;
             }
@@ -1031,17 +987,9 @@ public class TransportCostCalculations {
         int total = 0;
 
         for (Unit unit : hangarStatistics.getHangar().getUnits()) {
-            // Space stations must be fully shut down to jump and therefore cannot contribute to transport capacity.
             Entity entity = unit.getEntity();
-            if (entity == null) {
-                continue;
-            }
 
-            if (entity instanceof SpaceStation) {
-                continue;
-            }
-
-            if (!(entity.isLargeCraft() || entity.isSmallCraft())) {
+            if (!entity.isLargeCraft() && !entity.isSmallCraft() && !entity.isSpaceStation()) {
                 continue;
             }
 
