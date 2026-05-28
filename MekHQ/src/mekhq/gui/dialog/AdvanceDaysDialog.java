@@ -543,7 +543,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             getSpnDays().setValue(days);
         }
 
-        getGUI().refreshCalendar();
+        getGUI().refreshWindowTitle();
         getGUI().refreshAllTabs();
     }
 

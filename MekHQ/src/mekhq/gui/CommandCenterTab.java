@@ -98,6 +98,7 @@ import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -138,6 +139,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
     private JLabel lblFacilityCapacities;
+
+    // faction panel
+    private JPanel panFaction;
 
     // objectives panel
     private JPanel panObjectives;
@@ -242,17 +246,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         JPanel panCommand = new JPanel(new GridBagLayout());
 
         initInfoPanel();
+        initFactionPanel();
         initLogPanel();
         initReportsPanel();
         initProcurementPanel();
         initObjectivesPanel();
-        //icon panel
-        JPanel panIcon = new JPanel(new BorderLayout());
-        lblIcon = new JLabel();
-        lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
-        panIcon.add(lblIcon, BorderLayout.CENTER);
-        ImageIcon icon = getAndScaleCampaignIcon();
-        lblIcon.setIcon(icon);
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -277,7 +275,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panReports, gridBagConstraints);
         gridBagConstraints.gridx = 3;
@@ -299,7 +297,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        panCommand.add(panIcon, gridBagConstraints);
+        panCommand.add(panFaction, gridBagConstraints);
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("commandCenterTab");
 
@@ -491,6 +489,26 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getName()));
     }
 
+    private void initFactionPanel() {
+        lblIcon = new JLabel();
+        lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
+        ImageIcon icon = getAndScaleCampaignIcon();
+        lblIcon.setIcon(icon);
+        lblIcon.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblIcon.getPreferredSize().height));
+
+        RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
+        btnGoRogue.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnGoRogue.getPreferredSize().height));
+        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
+              getCampaign().getSecondInCommand()));
+
+        panFaction = new JPanel();
+        panFaction.setLayout(new BoxLayout(panFaction, BoxLayout.Y_AXIS));
+        panFaction.add(lblIcon);
+        panFaction.add(Box.createVerticalStrut(5));
+        panFaction.add(btnGoRogue);
+
+    }
+
     /**
      * Initialize the panel for showing any objectives that might exist. Objectives might come from different play
      * modes.
@@ -638,6 +656,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         /* shopping buttons */
         JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1, 0, 5));
         panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
+
+        RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
+        btnPartsMarket.addActionListener(e -> getCampaignGui().showPartsMarket());
+        panProcurementButtons.add(btnPartsMarket);
 
         RoundedJButton btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
