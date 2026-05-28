@@ -385,4 +385,51 @@ class AutomatedPersonnelCleanUpTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    void testGetPersonnelToCleanUp_NoExemptions_BackgroundPersonsAfterDate() {
+        HumanResources humanResources = testCampaign.getHumanResources();
+        for (int i = 0; i < 10; i++) {
+            Person eligibleDeadPerson = new Person(testCampaign);
+            eligibleDeadPerson.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            eligibleDeadPerson.setDateOfDeath(today.minusMonths(1).minusDays(i + 1));
+
+            humanResources.importPerson(eligibleDeadPerson);
+        }
+
+        AutomatedPersonnelCleanUp cleanUp = new AutomatedPersonnelCleanUp(humanResources, today, false, false);
+
+        int expected = 10;
+        int actual = cleanUp.getPersonnelToCleanUp().size();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetPersonnelToCleanUp_NoExemptions_BackgroundPersonsAfterDateActiveGenealogy() {
+        // Setup
+        HumanResources humanResources = testCampaign.getHumanResources();
+        for (int i = 0; i < 10; i++) {
+            Person personWhoRetiredAfterThresholdButActiveGenealogy = new Person(testCampaign);
+            personWhoRetiredAfterThresholdButActiveGenealogy.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            personWhoRetiredAfterThresholdButActiveGenealogy.setRetirement(today.minusMonths(1).minusDays(i + 1));
+
+            Genealogy genealogy = personWhoRetiredAfterThresholdButActiveGenealogy.getGenealogy();
+
+            Person activeParent = new Person(testCampaign);
+            activeParent.setStatus(PersonnelStatus.ACTIVE);
+            genealogy.addFamilyMember(FamilialRelationshipType.PARENT, activeParent);
+
+            humanResources.importPerson(personWhoRetiredAfterThresholdButActiveGenealogy);
+        }
+
+        // Act
+        AutomatedPersonnelCleanUp cleanUp = new AutomatedPersonnelCleanUp(humanResources, today, false, false);
+
+        // Assert
+        int expected = 0;
+        int actual = cleanUp.getPersonnelToCleanUp().size();
+
+        assertEquals(expected, actual);
+    }
 }
