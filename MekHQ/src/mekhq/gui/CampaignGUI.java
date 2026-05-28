@@ -43,7 +43,15 @@ import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -54,7 +62,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -1417,7 +1424,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
-        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
+        btnGlossary.addActionListener(evt -> new GlossaryDialog(getFrame()));
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
         pnlButton.add(btnGlossary, gridBagConstraints);
@@ -1693,12 +1700,10 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign
-     * options.
+     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign options.
      *
      * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market
-     * style.</p>
+     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market style.</p>
      *
      * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
