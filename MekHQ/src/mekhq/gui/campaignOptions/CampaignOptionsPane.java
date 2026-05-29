@@ -262,6 +262,7 @@ public class CampaignOptionsPane extends JPanel {
                 "advancementParentTab", "awardsAndRandomizationContentTabs", "1xpAwardsTab");
         registerDirectRoute("advancement.awards-and-randomization.recruitment-bonuses",
                 this::createAdvancementRecruitmentBonusesTab,
+                CampaignOptionsRouteOptions.withoutHelpPanel(),
                 "advancementParentTab", "awardsAndRandomizationContentTabs", "2recruitmentBonusesTab");
         registerParentRoute("advancement.skills", "advancementParentTab", "skillsContentTabs");
         registerDirectRoute("advancement.skills.gunnery", this::createAdvancementGunnerySkillsTab,
@@ -365,7 +366,7 @@ public class CampaignOptionsPane extends JPanel {
             return false;
         }
 
-        activeContentHost.setContent(directPage, getQuoteResourceName(route));
+        activeContentHost.setContent(directPage, getQuoteResourceName(route), route.shouldShowHelpPanel());
         return true;
     }
 
@@ -472,7 +473,12 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void registerDirectRoute(String id, Supplier<Component> pageFactory, String... titleResourceNames) {
-        registerRoute(CampaignOptionsRouteDescriptor.direct(id, pageFactory, titleResourceNames));
+        registerDirectRoute(id, pageFactory, CampaignOptionsRouteOptions.defaults(), titleResourceNames);
+    }
+
+    private void registerDirectRoute(String id, Supplier<Component> pageFactory,
+            CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
+        registerRoute(CampaignOptionsRouteDescriptor.direct(id, pageFactory, routeOptions, titleResourceNames));
     }
 
     private void registerRoute(CampaignOptionsRouteDescriptor descriptor) {
@@ -486,28 +492,55 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         navigationTargets
-                .add(new CampaignOptionsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames()));
+                .add(new CampaignOptionsRoute(descriptor.getId(), path, descriptor.getTitleResourceNames(),
+                        descriptor.shouldShowHelpPanel()));
+    }
+
+    private static class CampaignOptionsRouteOptions {
+        private static final CampaignOptionsRouteOptions DEFAULT = new CampaignOptionsRouteOptions(true);
+        private static final CampaignOptionsRouteOptions WITHOUT_HELP_PANEL = new CampaignOptionsRouteOptions(false);
+
+        private final boolean showHelpPanel;
+
+        private CampaignOptionsRouteOptions(boolean showHelpPanel) {
+            this.showHelpPanel = showHelpPanel;
+        }
+
+        private static CampaignOptionsRouteOptions defaults() {
+            return DEFAULT;
+        }
+
+        private static CampaignOptionsRouteOptions withoutHelpPanel() {
+            return WITHOUT_HELP_PANEL;
+        }
+
+        private boolean shouldShowHelpPanel() {
+            return showHelpPanel;
+        }
     }
 
     private static class CampaignOptionsRouteDescriptor {
         private final String id;
         private final List<String> titleResourceNames;
         private final Supplier<Component> pageFactory;
+        private final CampaignOptionsRouteOptions routeOptions;
 
         private CampaignOptionsRouteDescriptor(String id, @Nullable Supplier<Component> pageFactory,
-                String... titleResourceNames) {
+                CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
             this.id = id;
             this.pageFactory = pageFactory;
+            this.routeOptions = routeOptions;
             this.titleResourceNames = List.of(titleResourceNames);
         }
 
         private static CampaignOptionsRouteDescriptor parent(String id, String... titleResourceNames) {
-            return new CampaignOptionsRouteDescriptor(id, null, titleResourceNames);
+            return new CampaignOptionsRouteDescriptor(id, null, CampaignOptionsRouteOptions.defaults(),
+                    titleResourceNames);
         }
 
         private static CampaignOptionsRouteDescriptor direct(String id, Supplier<Component> pageFactory,
-                String... titleResourceNames) {
-            return new CampaignOptionsRouteDescriptor(id, pageFactory, titleResourceNames);
+                CampaignOptionsRouteOptions routeOptions, String... titleResourceNames) {
+            return new CampaignOptionsRouteDescriptor(id, pageFactory, routeOptions, titleResourceNames);
         }
 
         private String getId() {
@@ -520,6 +553,10 @@ public class CampaignOptionsPane extends JPanel {
 
         private Supplier<Component> getPageFactory() {
             return pageFactory;
+        }
+
+        private boolean shouldShowHelpPanel() {
+            return routeOptions.shouldShowHelpPanel();
         }
     }
 

@@ -35,12 +35,16 @@ package mekhq.gui.campaignOptions.contents;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -54,8 +58,10 @@ import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -86,6 +92,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </ul>
  */
 public class RelationshipsTab {
+        private static final int RELATIONSHIPS_LABEL_COLUMN_WIDTH = 300;
+        private static final int RELATIONSHIPS_CONTROL_COLUMN_WIDTH = 220;
+
     private final CampaignOptions campaignOptions;
     private RelationshipsOptionsModel model;
     private boolean marriagePageCreated;
@@ -309,21 +318,37 @@ public class RelationshipsTab {
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
         pnlRandomMarriage = createRandomMarriagePanel();
 
+        MHQCollapsiblePanel generalSection = new MHQCollapsiblePanel(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblMarriageGeneralOptionsPanel.text"), pnlMarriageGeneralOptions);
+        generalSection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblMarriageGeneralOptionsPanel.summary"));
+        MHQCollapsiblePanel randomMarriageSection = new MHQCollapsiblePanel(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblRandomMarriages.text"), pnlRandomMarriage);
+        randomMarriageSection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblRandomMarriages.summary"));
+
+        JPanel sectionControls = createSectionControls(generalSection, randomMarriageSection);
+
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("MarriageTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("MarriageTab");
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layoutParent.gridwidth = 5;
+        layoutParent.gridwidth = 1;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
+        layoutParent.weightx = 1.0;
         panel.add(marriageHeader, layoutParent);
 
         layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlMarriageGeneralOptions, layoutParent);
+        layoutParent.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layoutParent);
 
-        layoutParent.gridx++;
-        panel.add(pnlRandomMarriage, layoutParent);
+        layoutParent.anchor = GridBagConstraints.NORTHWEST;
+        layoutParent.gridy++;
+        panel.add(generalSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(randomMarriageSection, layoutParent);
         marriagePageCreated = true;
         updateMarriageControlsFromModel();
 
@@ -360,29 +385,14 @@ public class RelationshipsTab {
         chkLogMarriageNameChanges.addMouseListener(createTipPanelUpdater(marriageHeader, "LogMarriageNameChanges"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseManualMarriages, layout);
-
-        layout.gridy++;
-        panel.add(chkUseClanPersonnelMarriages, layout);
-
-        layout.gridy++;
-        panel.add(chkUsePrisonerMarriages, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCheckMutualAncestorsDepth, layout);
-        layout.gridx++;
-        panel.add(spnCheckMutualAncestorsDepth, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkLogMarriageNameChanges, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MarriageGeneralOptionsPanel",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseManualMarriages);
+        panel.addCheckBox(chkUseClanPersonnelMarriages);
+        panel.addCheckBox(chkUsePrisonerMarriages);
+        panel.addRow(lblCheckMutualAncestorsDepth, spnCheckMutualAncestorsDepth);
+        panel.addCheckBox(chkLogMarriageNameChanges);
 
         return panel;
     }
@@ -417,7 +427,7 @@ public class RelationshipsTab {
                 "UseRandomClanPersonnelMarriages"));
         chkUseRandomPrisonerMarriages = new CampaignOptionsCheckBox("UseRandomPrisonerMarriages");
         chkUseRandomPrisonerMarriages.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "UseRandomClanPersonnelMarriages"));
+                "UseRandomPrisonerMarriages"));
 
         lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange");
         lblRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
@@ -442,43 +452,15 @@ public class RelationshipsTab {
                 "RandomNewDependentMarriage"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomMarriages", true,
-                "RandomMarriages");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblRandomMarriageMethod, layout);
-        layout.gridx++;
-        panel.add(comboRandomMarriageMethod, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkUseRandomClanPersonnelMarriages, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomPrisonerMarriages, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblRandomMarriageAgeRange, layout);
-        layout.gridx++;
-        panel.add(spnRandomMarriageAgeRange, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRandomMarriageDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnRandomMarriageDiceSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRandomNewDependentMarriage, layout);
-        layout.gridx++;
-        panel.add(spnRandomNewDependentMarriage, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomMarriages",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRandomMarriageMethod, comboRandomMarriageMethod);
+        panel.addCheckBox(chkUseRandomClanPersonnelMarriages);
+        panel.addCheckBox(chkUseRandomPrisonerMarriages);
+        panel.addRow(lblRandomMarriageAgeRange, spnRandomMarriageAgeRange);
+        panel.addRow(lblRandomMarriageDiceSize, spnRandomMarriageDiceSize);
+        panel.addRow(lblRandomNewDependentMarriage, spnRandomNewDependentMarriage);
 
         return panel;
     }
@@ -496,6 +478,50 @@ public class RelationshipsTab {
                 3);
 
         // Contents
+        JPanel divorceGeneralOptionsPanel = createDivorceGeneralOptionsPanel();
+        pnlRandomDivorce = createRandomDivorcePanel();
+
+        MHQCollapsiblePanel generalSection = new MHQCollapsiblePanel(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblDivorceGeneralOptionsPanel.text"), divorceGeneralOptionsPanel);
+        generalSection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblDivorceGeneralOptionsPanel.summary"));
+        MHQCollapsiblePanel randomDivorceSection = new MHQCollapsiblePanel(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblRandomDivorcePanel.text"), pnlRandomDivorce);
+        randomDivorceSection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblRandomDivorcePanel.summary"));
+
+        JPanel sectionControls = createSectionControls(generalSection, randomDivorceSection);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("DivorceTab");
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 1;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        layoutParent.weightx = 1.0;
+        panel.add(divorceHeader, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layoutParent);
+
+        layoutParent.anchor = GridBagConstraints.NORTHWEST;
+        layoutParent.gridy++;
+        panel.add(generalSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(randomDivorceSection, layoutParent);
+
+        divorcePageCreated = true;
+        updateDivorceControlsFromModel();
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "DivorceTab");
+    }
+
+    private JPanel createDivorceGeneralOptionsPanel() {
+        // Contents
         chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
         chkUseManualDivorce.addMouseListener(createTipPanelUpdater(divorceHeader, "UseManualDivorce"));
         chkUseClanPersonnelDivorce = new CampaignOptionsCheckBox("UseClanPersonnelDivorce");
@@ -504,42 +530,16 @@ public class RelationshipsTab {
         chkUsePrisonerDivorce = new CampaignOptionsCheckBox("UsePrisonerDivorce");
         chkUsePrisonerDivorce.addMouseListener(createTipPanelUpdater(divorceHeader, "UsePrisonerDivorce"));
 
-        pnlRandomDivorce = createRandomDivorcePanel();
-
         // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("DivorceTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DivorceGeneralOptionsPanel",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkUseManualDivorce,
+                chkUseClanPersonnelDivorce,
+                chkUsePrisonerDivorce);
 
-        layoutLeft.gridwidth = 1;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        panelLeft.add(chkUseManualDivorce, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseClanPersonnelDivorce, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUsePrisonerDivorce, layoutLeft);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("DivorceTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(divorceHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(pnlRandomDivorce, layoutParent);
-        divorcePageCreated = true;
-        updateDivorceControlsFromModel();
-
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "DivorceTab");
+        return panel;
     }
 
     /**
@@ -587,37 +587,15 @@ public class RelationshipsTab {
         spnRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceDiceSize"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomDivorcePanel", true,
-                "RandomDivorcePanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblRandomDivorceMethod, layout);
-        layout.gridx++;
-        panel.add(comboRandomDivorceMethod, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkUseRandomOppositeSexDivorce, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomSameSexDivorce, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomClanPersonnelDivorce, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomPrisonerDivorce, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblRandomDivorceDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnRandomDivorceDiceSize, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomDivorcePanel",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRandomDivorceMethod, comboRandomDivorceMethod);
+        panel.addCheckBox(chkUseRandomOppositeSexDivorce);
+        panel.addCheckBox(chkUseRandomSameSexDivorce);
+        panel.addCheckBox(chkUseRandomClanPersonnelDivorce);
+        panel.addCheckBox(chkUseRandomPrisonerDivorce);
+        panel.addRow(lblRandomDivorceDiceSize, spnRandomDivorceDiceSize);
 
         return panel;
     }
@@ -639,35 +617,78 @@ public class RelationshipsTab {
         pnlRandomProcreationPanel = createRandomProcreationPanel();
         pnlRandomSexualityPanel = createRandomSexualityPanel();
 
+        MHQCollapsiblePanel generalSection = new MHQCollapsiblePanel(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblProcreationGeneralOptionsPanel.text"), pnlProcreationGeneralOptionsPanel);
+        generalSection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblProcreationGeneralOptionsPanel.summary"));
+        MHQCollapsiblePanel randomProcreationSection = new MHQCollapsiblePanel(getTextAt(
+                getCampaignOptionsResourceBundle(), "lblRandomProcreationPanel.text"), pnlRandomProcreationPanel);
+        randomProcreationSection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblRandomProcreationPanel.summary"));
+        MHQCollapsiblePanel randomSexualitySection = new MHQCollapsiblePanel(getTextAt(
+                getCampaignOptionsResourceBundle(), "lblRandomSexualityPanel.text"), pnlRandomSexualityPanel);
+        randomSexualitySection.setSummary(getTextAt(getCampaignOptionsResourceBundle(),
+                "lblRandomSexualityPanel.summary"));
+
+        JPanel sectionControls = createSectionControls(generalSection,
+                randomProcreationSection,
+                randomSexualitySection);
+
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationTab", true, "ProcreationTab",
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationTab");
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layoutParent.gridwidth = 5;
+        layoutParent.gridwidth = 1;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
+        layoutParent.weightx = 1.0;
         panel.add(procreationHeader, layoutParent);
-        layoutParent.gridy++;
 
         layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        layoutParent.gridheight = 2; // Span 2 rows vertically
-        layoutParent.fill = GridBagConstraints.BOTH;
-        panel.add(pnlProcreationGeneralOptionsPanel, layoutParent);
+        layoutParent.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layoutParent);
 
-        layoutParent.gridx++;
-        layoutParent.gridheight = 1; // Reset to single row
-        layoutParent.weighty = 0.5; // Give equal vertical space
-        panel.add(pnlRandomProcreationPanel, layoutParent);
+        layoutParent.anchor = GridBagConstraints.NORTHWEST;
+        layoutParent.gridy++;
+        panel.add(generalSection, layoutParent);
 
-        layoutParent.gridy++; // Move down one row
-        panel.add(pnlRandomSexualityPanel, layoutParent);
+        layoutParent.gridy++;
+        panel.add(randomProcreationSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(randomSexualitySection, layoutParent);
+
         procreationPageCreated = true;
         updateProcreationControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ProcreationTab");
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
     }
 
     /**
@@ -738,57 +759,21 @@ public class RelationshipsTab {
         chkLogProcreation.addMouseListener(createTipPanelUpdater(procreationHeader, "LogProcreation"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationGeneralOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseManualProcreation, layout);
-
-        layout.gridy++;
-        panel.add(chkUseClanPersonnelProcreation, layout);
-
-        layout.gridy++;
-        panel.add(chkUsePrisonerProcreation, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblMultiplePregnancyOccurrences, layout);
-        layout.gridx++;
-        panel.add(spnMultiplePregnancyOccurrences, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblBabySurnameStyle, layout);
-        layout.gridx++;
-        panel.add(comboBabySurnameStyle, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkAssignNonPrisonerBabiesFounderTag, layout);
-
-        layout.gridy++;
-        panel.add(chkAssignChildrenOfFoundersFounderTag, layout);
-
-        layout.gridy++;
-        panel.add(chkDetermineFatherAtBirth, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayTrueDueDate, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblNoInterestInChildrenDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnNoInterestInChildrenDiceSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseMaternityLeave, layout);
-
-        layout.gridy++;
-        panel.add(chkLogProcreation, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ProcreationGeneralOptionsPanel",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseManualProcreation);
+        panel.addCheckBox(chkUseClanPersonnelProcreation);
+        panel.addCheckBox(chkUsePrisonerProcreation);
+        panel.addRow(lblMultiplePregnancyOccurrences, spnMultiplePregnancyOccurrences);
+        panel.addRow(lblBabySurnameStyle, comboBabySurnameStyle);
+        panel.addCheckBox(chkAssignNonPrisonerBabiesFounderTag);
+        panel.addCheckBox(chkAssignChildrenOfFoundersFounderTag);
+        panel.addCheckBox(chkDetermineFatherAtBirth);
+        panel.addCheckBox(chkDisplayTrueDueDate);
+        panel.addRow(lblNoInterestInChildrenDiceSize, spnNoInterestInChildrenDiceSize);
+        panel.addCheckBox(chkUseMaternityLeave);
+        panel.addCheckBox(chkLogProcreation);
 
         return panel;
     }
@@ -855,40 +840,15 @@ public class RelationshipsTab {
                 "RandomProcreationRelationshiplessDiceSize"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomProcreationPanel", true,
-                "RandomProcreationPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblRandomProcreationMethod, layout);
-        layout.gridx++;
-        panel.add(comboRandomProcreationMethod, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkUseRelationshiplessRandomProcreation, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomClanPersonnelProcreation, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomPrisonerProcreation, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblRandomProcreationRelationshipDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnRandomProcreationRelationshipDiceSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRandomProcreationRelationshiplessDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnRandomProcreationRelationshiplessDiceSize, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomProcreationPanel",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRandomProcreationMethod, comboRandomProcreationMethod);
+        panel.addCheckBox(chkUseRelationshiplessRandomProcreation);
+        panel.addCheckBox(chkUseRandomClanPersonnelProcreation);
+        panel.addCheckBox(chkUseRandomPrisonerProcreation);
+        panel.addRow(lblRandomProcreationRelationshipDiceSize, spnRandomProcreationRelationshipDiceSize);
+        panel.addRow(lblRandomProcreationRelationshiplessDiceSize, spnRandomProcreationRelationshiplessDiceSize);
 
         return panel;
     }
@@ -923,28 +883,12 @@ public class RelationshipsTab {
                 "PrefersBothSexesDiceSize"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomSexualityPanel", true,
-                "RandomSexualityPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblNoInterestInRelationshipsDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnNoInterestInRelationshipsDiceSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblPrefersSameSexDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnPrefersSameSexDiceSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblPrefersBothSexesDiceSize, layout);
-        layout.gridx++;
-        panel.add(spnPrefersBothSexesDiceSize, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomSexualityPanel",
+                RELATIONSHIPS_LABEL_COLUMN_WIDTH,
+                RELATIONSHIPS_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblNoInterestInRelationshipsDiceSize, spnNoInterestInRelationshipsDiceSize);
+        panel.addRow(lblPrefersSameSexDiceSize, spnPrefersSameSexDiceSize);
+        panel.addRow(lblPrefersBothSexesDiceSize, spnPrefersBothSexesDiceSize);
 
         return panel;
     }

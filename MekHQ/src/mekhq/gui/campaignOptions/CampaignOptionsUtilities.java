@@ -51,6 +51,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -85,6 +86,7 @@ public class CampaignOptionsUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
     public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
+    private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
     private static Consumer<String> tipTextConsumer;
 
 
@@ -194,6 +196,7 @@ public class CampaignOptionsUtilities {
         }
 
         JPanel quotePanel = new JPanel(new GridBagLayout());
+        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, 0, 0));
         JLabel quote = new JLabel(String.format(
               "<html><div style='width: %s; text-align:center;'>%s</div></html>",
               UIUtil.scaleForGUI(content.getPreferredSize().width),

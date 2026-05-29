@@ -35,11 +35,16 @@ package mekhq.gui.campaignOptions.contents;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.util.List;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,11 +58,15 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -76,6 +85,11 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </p>
  */
 public class AdvancementTab {
+    private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = 300;
+    private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
+    private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
+
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
@@ -138,7 +152,7 @@ public class AdvancementTab {
     private JLabel[] phenotypeLabels;
     private JSpinner[] phenotypeSpinners;
 
-    private JPanel pnlRandomAbilities;
+    private JPanel pnlExperienceLevelModifiers;
     private JLabel lblAbilityUltraGreen;
     private JSpinner spnAbilityUltraGreen;
     private JLabel lblAbilityGreen;
@@ -154,53 +168,34 @@ public class AdvancementTab {
     private JLabel lblAbilityLegendary;
     private JSpinner spnAbilityLegendary;
 
-    private JPanel pnlSkillGroups;
+    private JPanel pnlSpecialSkillModifiers;
 
-    private JPanel pnlCommandSkills;
-    private JLabel lblCommandSkillsUltraGreen;
     private JSpinner spnCommandSkillsUltraGreen;
-    private JLabel lblCommandSkillsGreen;
     private JSpinner spnCommandSkillsGreen;
-    private JLabel lblCommandSkillsReg;
     private JSpinner spnCommandSkillsReg;
-    private JLabel lblCommandSkillsVet;
     private JSpinner spnCommandSkillsVet;
-    private JLabel lblCommandSkillsElite;
     private JSpinner spnCommandSkillsElite;
-    private JLabel lblCommandSkillsHeroic;
     private JSpinner spnCommandSkillsHeroic;
-    private JLabel lblCommandSkillsLegendary;
     private JSpinner spnCommandSkillsLegendary;
 
-    private JPanel pnlUtilitySkills;
-    private JLabel lblUtilitySkillsUltraGreen;
     private JSpinner spnUtilitySkillsUltraGreen;
-    private JLabel lblUtilitySkillsGreen;
     private JSpinner spnUtilitySkillsGreen;
-    private JLabel lblUtilitySkillsReg;
     private JSpinner spnUtilitySkillsReg;
-    private JLabel lblUtilitySkillsVet;
     private JSpinner spnUtilitySkillsVet;
-    private JLabel lblUtilitySkillsElite;
     private JSpinner spnUtilitySkillsElite;
-    private JLabel lblUtilitySkillsHeroic;
     private JSpinner spnUtilitySkillsHeroic;
-    private JLabel lblUtilitySkillsLegendary;
     private JSpinner spnUtilitySkillsLegendary;
 
-    private JPanel pnlSmallArms;
     private JLabel lblCombatSA;
     private JSpinner spnCombatSA;
     private JLabel lblSupportSA;
     private JSpinner spnSupportSA;
 
-    private JPanel pnlArtillery;
     private JLabel lblArtyProb;
     private JSpinner spnArtyProb;
     private JLabel lblArtyBonus;
     private JSpinner spnArtyBonus;
 
-    private JPanel pnlSecondarySkills;
     private JLabel lblAntiMekSkill;
     private JSpinner spnAntiMekSkill;
     private JLabel lblSecondProb;
@@ -314,51 +309,130 @@ public class AdvancementTab {
                 6);
 
         // Contents
+        JPanel xpAwardOptions = createXpAwardOptionsPanel();
+        pnlTasks = createTasksPanel();
+        pnlScenarios = createScenariosPanel();
+        pnlMissions = createMissionsPanel();
+        pnlAdministrators = createAdministratorsPanel();
+        xpAwardsPageCreated = true;
+        updateXpAwardsControlsFromModel();
+
+        MHQCollapsiblePanel optionsSection = createSection("lblXpAwardsTab.text",
+                "lblXpAwardsTab.summary",
+                xpAwardOptions);
+        MHQCollapsiblePanel tasksSection = createSection("lblTasksPanel.text",
+                "lblTasksPanel.summary",
+                pnlTasks);
+        MHQCollapsiblePanel scenariosSection = createSection("lblScenariosPanel.text",
+                "lblScenariosPanel.summary",
+                pnlScenarios,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+        MHQCollapsiblePanel missionsSection = createSection("lblMissionsPanel.text",
+                "lblMissionsPanel.summary",
+                pnlMissions);
+        MHQCollapsiblePanel administratorsSection = createSection("lblAdministratorsXpPanel.text",
+                "lblAdministratorsXpPanel.summary",
+                pnlAdministrators,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.RECOMMENDED));
+
+        JPanel panel = createSectionedPanel("XpAwardsTab",
+                xpAwardsHeader,
+                optionsSection,
+                tasksSection,
+                scenariosSection,
+                missionsSection,
+                administratorsSection);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "XpAwardsTab");
+    }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+            MHQCollapsiblePanel... sections) {
+        JPanel sectionControls = createSectionControls(sections);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(name);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.weightx = 1.0;
+        panel.add(header, layout);
+
+        layout.gridy++;
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
+
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        for (MHQCollapsiblePanel section : sections) {
+            layout.gridy++;
+            panel.add(section, layout);
+        }
+
+        return panel;
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+            @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
+    }
+
+    private JPanel createXpAwardOptionsPanel() {
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
         spnXpCostMultiplier = new CampaignOptionsSpinner("XpCostMultiplier", 1, 0, 5, 0.05);
         spnXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
 
-        pnlTasks = createTasksPanel();
-        pnlScenarios = createScenariosPanel();
-        pnlAdministrators = createAdministratorsPanel();
-        pnlMissions = createMissionsPanel();
-        xpAwardsPageCreated = true;
-        updateXpAwardsControlsFromModel();
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("XpAwardOptionsPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblXpCostMultiplier, spnXpCostMultiplier);
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("XpAwardsTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(xpAwardsHeader, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblXpCostMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnXpCostMultiplier, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 3;
-        panel.add(pnlTasks, layout);
-        layout.gridx += 3;
-        layout.gridwidth = 1;
-        panel.add(pnlMissions, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 3;
-        panel.add(pnlScenarios, layout);
-        layout.gridx += 3;
-        layout.gridwidth = 1;
-        panel.add(pnlAdministrators, layout);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "XpAwardsTab");
+        return panel;
     }
 
     /**
@@ -395,34 +469,13 @@ public class AdvancementTab {
         spnMistakeXP = new CampaignOptionsSpinner("MistakeXP", 0, 0, 20, 1);
         spnMistakeXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "MistakeXP"));
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TasksPanel", true, "TasksPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(spnTaskXP, layout);
-        layout.gridx++;
-        panel.add(lblTaskXP, layout);
-        layout.gridx++;
-        panel.add(spnNTasksXP, layout);
-        layout.gridx++;
-        panel.add(lblNTasksXP, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(spnSuccessXP, layout);
-        layout.gridx++;
-        layout.gridwidth = 2;
-        panel.add(lblSuccessXP, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(spnMistakeXP, layout);
-        layout.gridx++;
-        layout.gridwidth = 2;
-        panel.add(lblMistakeXP, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TasksPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblTaskXP, spnTaskXP);
+        panel.addRow(lblNTasksXP, spnNTasksXP);
+        panel.addRow(lblSuccessXP, spnSuccessXP);
+        panel.addRow(lblMistakeXP, spnMistakeXP);
 
         return panel;
     }
@@ -451,28 +504,12 @@ public class AdvancementTab {
         spnKills = new CampaignOptionsSpinner("Kills", 0, 0, 100, 1);
         spnKills.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "Kills"));
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ScenariosPanel", true, "ScenariosPanel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(spnScenarioXP, layout);
-        layout.gridx++;
-        layout.gridwidth = 2;
-        panel.add(lblScenarioXP, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(spnKillXP, layout);
-        layout.gridx++;
-        panel.add(lblKillXP, layout);
-        layout.gridx++;
-        panel.add(spnKills, layout);
-        layout.gridx++;
-        panel.add(lblKills, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ScenariosPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblScenarioXP, spnScenarioXP);
+        panel.addRow(lblKillXP, spnKillXP);
+        panel.addRow(lblKills, spnKills);
 
         return panel;
     }
@@ -518,46 +555,15 @@ public class AdvancementTab {
         spnMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater(xpAwardsHeader,
                 "MissionXpOutstandingSuccess"));
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("MissionsPanel", true, "MissionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(spnVocationalXP, layout);
-        layout.gridx++;
-        panel.add(lblVocationalXP, layout);
-        layout.gridx++;
-        panel.add(spnVocationalXPFrequency, layout);
-        layout.gridx++;
-        panel.add(lblVocationalXPFrequency, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(lblVocationalXPTargetNumber, layout);
-        layout.gridx += 2;
-        layout.gridwidth = 1;
-        panel.add(spnVocationalXPTargetNumber, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(spnMissionXpFail, layout);
-        layout.gridx++;
-        panel.add(lblMissionXpFail, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(spnMissionXpSuccess, layout);
-        layout.gridx++;
-        panel.add(lblMissionXpSuccess, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(spnMissionXpOutstandingSuccess, layout);
-        layout.gridx++;
-        layout.gridwidth = 2;
-        panel.add(lblMissionXpOutstandingSuccess, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MissionsPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblVocationalXP, spnVocationalXP);
+        panel.addRow(lblVocationalXPFrequency, spnVocationalXPFrequency);
+        panel.addRow(lblVocationalXPTargetNumber, spnVocationalXPTargetNumber);
+        panel.addRow(lblMissionXpFail, spnMissionXpFail);
+        panel.addRow(lblMissionXpSuccess, spnMissionXpSuccess);
+        panel.addRow(lblMissionXpOutstandingSuccess, spnMissionXpOutstandingSuccess);
 
         return panel;
     }
@@ -588,28 +594,12 @@ public class AdvancementTab {
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP", 0, 0, 20, 1);
         spnContractNegotiationXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ContractNegotiationXP"));
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsXpPanel", true, "AdministratorsXpPanel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
-                        CampaignOptionFlag.RECOMMENDED));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(spnAdminWeeklyXP, layout);
-        layout.gridx++;
-        panel.add(lblAdminWeeklyXP, layout);
-        layout.gridx++;
-        panel.add(spnAdminWeeklyXPPeriod, layout);
-        layout.gridx++;
-        panel.add(lblAdminWeeklyXPPeriod, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(spnContractNegotiationXP, layout);
-        layout.gridx++;
-        layout.gridwidth = 2;
-        panel.add(lblContractNegotiationXP, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AdministratorsXpPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblAdminWeeklyXP, spnAdminWeeklyXP);
+        panel.addRow(lblAdminWeeklyXPPeriod, spnAdminWeeklyXPPeriod);
+        panel.addRow(lblContractNegotiationXP, spnContractNegotiationXP);
 
         return panel;
     }
@@ -626,53 +616,34 @@ public class AdvancementTab {
         phenotypeLabels = new JLabel[] {}; // This will be initialized properly later
         phenotypeSpinners = new JSpinner[] {}; // This will be initialized properly later
 
-        pnlSkillGroups = new JPanel();
+        pnlSpecialSkillModifiers = new JPanel();
 
-        pnlCommandSkills = new JPanel();
-        lblCommandSkillsUltraGreen = new JLabel();
         spnCommandSkillsUltraGreen = new JSpinner();
-        lblCommandSkillsGreen = new JLabel();
         spnCommandSkillsGreen = new JSpinner();
-        lblCommandSkillsReg = new JLabel();
         spnCommandSkillsReg = new JSpinner();
-        lblCommandSkillsVet = new JLabel();
         spnCommandSkillsVet = new JSpinner();
-        lblCommandSkillsElite = new JLabel();
         spnCommandSkillsElite = new JSpinner();
-        lblCommandSkillsHeroic = new JLabel();
         spnCommandSkillsHeroic = new JSpinner();
-        lblCommandSkillsLegendary = new JLabel();
         spnCommandSkillsLegendary = new JSpinner();
 
-        pnlUtilitySkills = new JPanel();
-        lblUtilitySkillsUltraGreen = new JLabel();
         spnUtilitySkillsUltraGreen = new JSpinner();
-        lblUtilitySkillsGreen = new JLabel();
         spnUtilitySkillsGreen = new JSpinner();
-        lblUtilitySkillsReg = new JLabel();
         spnUtilitySkillsReg = new JSpinner();
-        lblUtilitySkillsVet = new JLabel();
         spnUtilitySkillsVet = new JSpinner();
-        lblUtilitySkillsElite = new JLabel();
         spnUtilitySkillsElite = new JSpinner();
-        lblUtilitySkillsHeroic = new JLabel();
         spnUtilitySkillsHeroic = new JSpinner();
-        lblUtilitySkillsLegendary = new JLabel();
         spnUtilitySkillsLegendary = new JSpinner();
 
-        pnlSmallArms = new JPanel();
         lblCombatSA = new JLabel();
         spnCombatSA = new JSpinner();
         lblSupportSA = new JLabel();
         spnSupportSA = new JSpinner();
 
-        pnlArtillery = new JPanel();
         lblArtyProb = new JLabel();
         spnArtyProb = new JSpinner();
         lblArtyBonus = new JLabel();
         spnArtyBonus = new JSpinner();
 
-        pnlSecondarySkills = new JPanel();
         lblAntiMekSkill = new JLabel();
         spnAntiMekSkill = new JSpinner();
         lblSecondProb = new JLabel();
@@ -683,7 +654,7 @@ public class AdvancementTab {
         lblRoleplaySkillsModifier = new JLabel();
         spnRoleplaySkillsModifier = new JSpinner();
 
-        pnlRandomAbilities = new JPanel();
+        pnlExperienceLevelModifiers = new JPanel();
         lblAbilityGreen = new JLabel();
         spnAbilityGreen = new JSpinner();
         lblAbilityUltraGreen = new JLabel();
@@ -697,7 +668,7 @@ public class AdvancementTab {
         lblAbilityHeroic = new JLabel();
         spnAbilityHeroic = new JSpinner();
         lblAbilityLegendary = new JLabel();
-        spnAbilityHeroic = new JSpinner();
+        spnAbilityLegendary = new JSpinner();
 
         pnlRecruitmentBonusesCombat = new JPanel();
         lblRecruitmentBonusCombat = new JLabel[] {}; // This will be initialized properly later
@@ -725,38 +696,49 @@ public class AdvancementTab {
                 11);
 
         // Contents
+        JPanel randomizationOptions = createSkillRandomizationOptionsPanel();
+        pnlPhenotype = createPhenotypePanel();
+        pnlExperienceLevelModifiers = createExperienceLevelModifiersPanel();
+        pnlSpecialSkillModifiers = createSpecialSkillModifiersPanel();
+        randomizationPageCreated = true;
+        updateRandomizationControlsFromModel();
+
+        MHQCollapsiblePanel optionsSection = createSection("lblSkillRandomizationTab.text",
+                "lblSkillRandomizationTab.summary",
+                randomizationOptions);
+        MHQCollapsiblePanel phenotypeSection = createSection("lblPhenotypesPanel.text",
+                "lblPhenotypesPanel.summary",
+                pnlPhenotype);
+        MHQCollapsiblePanel experienceModifiersSection = createSection("lblExperienceLevelModifiersPanel.text",
+                "lblExperienceLevelModifiersPanel.summary",
+                pnlExperienceLevelModifiers,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+        MHQCollapsiblePanel specialSkillsSection = createSection("lblSpecialSkillModifiersPanel.text",
+                "lblSpecialSkillModifiersPanel.summary",
+                pnlSpecialSkillModifiers);
+
+        JPanel panel = createSectionedPanel("SkillRandomizationTab",
+                skillRandomizationHeader,
+                optionsSection,
+                phenotypeSection,
+                experienceModifiersSection,
+                specialSkillsSection);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "SkillRandomizationTab");
+    }
+
+    private JPanel createSkillRandomizationOptionsPanel() {
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
 
-        pnlPhenotype = createPhenotypePanel();
-        pnlRandomAbilities = createAbilityPanel();
-        pnlSkillGroups = createSkillGroupPanel();
-        randomizationPageCreated = true;
-        updateRandomizationControlsFromModel();
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SkillRandomizationOptionsPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkExtraRandomness);
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SkillRandomizationTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(skillRandomizationHeader, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(chkExtraRandomness, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlPhenotype, layout);
-        layout.gridx++;
-        panel.add(pnlRandomAbilities, layout);
-        layout.gridx++;
-        panel.add(pnlSkillGroups, layout);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "XpAwardsTab");
+        return panel;
     }
 
     /**
@@ -773,11 +755,9 @@ public class AdvancementTab {
         phenotypeLabels = new JLabel[phenotypes.size()];
         phenotypeSpinners = new JSpinner[phenotypes.size()];
 
-        final JPanel panel = new CampaignOptionsStandardPanel("PhenotypesPanel", true, "PhenotypesPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = -1;
-        layout.gridy = 0;
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PhenotypesPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
 
         for (int i = 0; i < phenotypes.size(); i++) {
             phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getLabel());
@@ -789,446 +769,137 @@ public class AdvancementTab {
                     null,
                     phenotypes.get(i).getTooltip()));
 
-            layout.gridx = 0;
-            panel.add(phenotypeLabels[i], layout);
-            layout.gridx++;
-            panel.add(phenotypeSpinners[i], layout);
-            layout.gridy++;
+            panel.addRow(phenotypeLabels[i], phenotypeSpinners[i]);
         }
 
         return panel;
     }
 
-    /**
-     * Creates and returns the Ability panel, which allows users to configure
-     * settings for bonuses to special abilities
-     * at different experience levels, such as green, regular, veteran, and elite.
-     *
-     * @return A {@code JPanel} containing configuration options for special ability
-     *         bonuses.
-     */
-    private JPanel createAbilityPanel() {
-        // Contents
-        lblAbilityUltraGreen = new CampaignOptionsLabel("AbilityUltraGreen",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnAbilityUltraGreen = new CampaignOptionsSpinner("AbilityUltraGreen", 0, -12, 12, 1);
+    private JPanel createExperienceLevelModifiersPanel() {
+        createAbilityModifierControls();
+        createCommandSkillModifierControls();
+        createUtilitySkillModifierControls();
 
-        lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblAbilityGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityGreen"));
-        spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen", 0, -12, 12, 1);
+        final CampaignOptionsModifierTablePanel panel = new CampaignOptionsModifierTablePanel(
+                "ExperienceLevelModifiersPanel",
+                MODIFIER_ROW_LABEL_COLUMN_WIDTH,
+                MODIFIER_CONTROL_COLUMN_WIDTH,
+                createModifierColumnHeader("AbilityPanel"),
+                createModifierColumnHeader("CommandSkillsPanel"),
+                createModifierColumnHeader("UtilitySkillsPanel"));
 
-        lblAbilityReg = new CampaignOptionsLabel("AbilityRegular",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblAbilityReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityRegular"));
-        spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular", 0, -12, 12, 1);
-        spnAbilityReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityRegular"));
-
-        lblAbilityVet = new CampaignOptionsLabel("AbilityVeteran",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblAbilityVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityVeteran"));
-        spnAbilityVet = new CampaignOptionsSpinner("AbilityVeteran", 0, -12, 12, 1);
-        spnAbilityVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityVeteran"));
-
-        lblAbilityElite = new CampaignOptionsLabel("AbilityElite",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblAbilityElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityElite"));
-        spnAbilityElite = new CampaignOptionsSpinner("AbilityElite", 0, -12, 12, 1);
-        spnAbilityElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AbilityElite"));
-
-        lblAbilityHeroic = new CampaignOptionsLabel("AbilityHeroic",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnAbilityHeroic = new CampaignOptionsSpinner("AbilityHeroic", 0, -12, 12, 1);
-
-        lblAbilityLegendary = new CampaignOptionsLabel("AbilityLegendary",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnAbilityLegendary = new CampaignOptionsSpinner("AbilityLegendary", 0, -12, 12, 1);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AbilityPanel", true, "AbilityPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblAbilityUltraGreen, layout);
-        layout.gridx++;
-        panel.add(spnAbilityUltraGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAbilityGreen, layout);
-        layout.gridx++;
-        panel.add(spnAbilityGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAbilityReg, layout);
-        layout.gridx++;
-        panel.add(spnAbilityReg, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAbilityVet, layout);
-        layout.gridx++;
-        panel.add(spnAbilityVet, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAbilityElite, layout);
-        layout.gridx++;
-        panel.add(spnAbilityElite, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAbilityHeroic, layout);
-        layout.gridx++;
-        panel.add(spnAbilityHeroic, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAbilityLegendary, layout);
-        layout.gridx++;
-        panel.add(spnAbilityLegendary, layout);
+        panel.addRow(lblAbilityUltraGreen,
+                spnAbilityUltraGreen,
+                spnCommandSkillsUltraGreen,
+                spnUtilitySkillsUltraGreen);
+        panel.addRow(lblAbilityGreen,
+                spnAbilityGreen,
+                spnCommandSkillsGreen,
+                spnUtilitySkillsGreen);
+        panel.addRow(lblAbilityReg,
+                spnAbilityReg,
+                spnCommandSkillsReg,
+                spnUtilitySkillsReg);
+        panel.addRow(lblAbilityVet,
+                spnAbilityVet,
+                spnCommandSkillsVet,
+                spnUtilitySkillsVet);
+        panel.addRow(lblAbilityElite,
+                spnAbilityElite,
+                spnCommandSkillsElite,
+                spnUtilitySkillsElite);
+        panel.addRow(lblAbilityHeroic,
+                spnAbilityHeroic,
+                spnCommandSkillsHeroic,
+                spnUtilitySkillsHeroic);
+        panel.addRow(lblAbilityLegendary,
+                spnAbilityLegendary,
+                spnCommandSkillsLegendary,
+                spnUtilitySkillsLegendary);
 
         return panel;
     }
 
-    /**
-     * Creates and returns the Skill Groups panel, which groups together related
-     * panels for configuring various
-     * skill-related options, including tactics, small arms, secondary skills, and
-     * artillery.
-     *
-     * @return A {@code JPanel} containing grouped configuration options for skills.
-     */
-    private JPanel createSkillGroupPanel() {
-        // Contents
-        pnlCommandSkills = createCommandSkillsPanel();
-        pnlUtilitySkills = createUtilitySkillsPanel();
-        pnlSecondarySkills = createSecondarySkillPanel();
+    private void createAbilityModifierControls() {
+        lblAbilityUltraGreen = createExperienceLevelLabel(SkillType.EXP_ULTRA_GREEN);
+        spnAbilityUltraGreen = createSkillModifierSpinner("AbilityUltraGreen");
+        lblAbilityGreen = createExperienceLevelLabel(SkillType.EXP_GREEN);
+        spnAbilityGreen = createSkillModifierSpinner("AbilityGreen");
+        lblAbilityReg = createExperienceLevelLabel(SkillType.EXP_REGULAR);
+        spnAbilityReg = createSkillModifierSpinner("AbilityRegular");
+        lblAbilityVet = createExperienceLevelLabel(SkillType.EXP_VETERAN);
+        spnAbilityVet = createSkillModifierSpinner("AbilityVeteran");
+        lblAbilityElite = createExperienceLevelLabel(SkillType.EXP_ELITE);
+        spnAbilityElite = createSkillModifierSpinner("AbilityElite");
+        lblAbilityHeroic = createExperienceLevelLabel(SkillType.EXP_HEROIC);
+        spnAbilityHeroic = createSkillModifierSpinner("AbilityHeroic");
+        lblAbilityLegendary = createExperienceLevelLabel(SkillType.EXP_LEGENDARY);
+        spnAbilityLegendary = createSkillModifierSpinner("AbilityLegendary");
+    }
 
-        pnlArtillery = createArtilleryPanel();
-        pnlSmallArms = createSmallArmsPanel();
-        JPanel pnlGunnerySkillsContainer = createGunnerySkillsContainer();
+    private void createCommandSkillModifierControls() {
+        spnCommandSkillsUltraGreen = createSkillModifierSpinner("CommandSkillsUltraGreen");
+        spnCommandSkillsGreen = createSkillModifierSpinner("CommandSkillsGreen");
+        spnCommandSkillsReg = createSkillModifierSpinner("CommandSkillsRegular");
+        spnCommandSkillsVet = createSkillModifierSpinner("CommandSkillsVeteran");
+        spnCommandSkillsElite = createSkillModifierSpinner("CommandSkillsElite");
+        spnCommandSkillsHeroic = createSkillModifierSpinner("CommandSkillsHeroic");
+        spnCommandSkillsLegendary = createSkillModifierSpinner("CommandSkillsLegendary");
+    }
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(pnlCommandSkills, layout);
-        layout.gridx++;
-        panel.add(pnlUtilitySkills, layout);
-        layout.gridx++;
-        panel.add(pnlSecondarySkills, layout);
-        layout.gridx++;
-        panel.add(pnlGunnerySkillsContainer, layout);
+    private void createUtilitySkillModifierControls() {
+        spnUtilitySkillsUltraGreen = createSkillModifierSpinner("UtilitySkillsUltraGreen");
+        spnUtilitySkillsGreen = createSkillModifierSpinner("UtilitySkillsGreen");
+        spnUtilitySkillsReg = createSkillModifierSpinner("UtilitySkillsRegular");
+        spnUtilitySkillsVet = createSkillModifierSpinner("UtilitySkillsVeteran");
+        spnUtilitySkillsElite = createSkillModifierSpinner("UtilitySkillsElite");
+        spnUtilitySkillsHeroic = createSkillModifierSpinner("UtilitySkillsHeroic");
+        spnUtilitySkillsLegendary = createSkillModifierSpinner("UtilitySkillsLegendary");
+    }
+
+    private JLabel createModifierColumnHeader(String name) {
+        return new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+    }
+
+    private JLabel createExperienceLevelLabel(int experienceLevel) {
+        return new JLabel(SkillType.getExperienceLevelName(experienceLevel));
+    }
+
+    private JSpinner createSkillModifierSpinner(String name) {
+        JSpinner spinner = new CampaignOptionsSpinner(name, 0, -12, 12, 1);
+        spinner.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, name));
+        return spinner;
+    }
+
+    private JPanel createSpecialSkillModifiersPanel() {
+        createSecondarySkillControls();
+        createArtilleryControls();
+        createSmallArmsControls();
+
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SpecialSkillModifiersPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRoleplaySkillsModifier, spnRoleplaySkillsModifier);
+        panel.addRow(lblAntiMekSkill, spnAntiMekSkill);
+        panel.addRow(lblSecondProb, spnSecondProb);
+        panel.addRow(lblSecondBonus, spnSecondBonus);
+        panel.addRow(lblArtyProb, spnArtyProb);
+        panel.addRow(lblArtyBonus, spnArtyBonus);
+        panel.addRow(lblCombatSA, spnCombatSA);
+        panel.addRow(lblSupportSA, spnSupportSA);
 
         return panel;
     }
 
-    private JPanel createGunnerySkillsContainer() {
-        JPanel pnlGunnerySkillsContainer = new JPanel();
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(pnlGunnerySkillsContainer);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        pnlGunnerySkillsContainer.add(pnlArtillery, layout);
-        layout.gridy++;
-        pnlGunnerySkillsContainer.add(pnlSmallArms, layout);
-        return pnlGunnerySkillsContainer;
-    }
-
-    /**
-     * Creates and returns the Command Skills panel, which allows users to configure
-     * settings for Command Skill
-     * modifiers for different skill levels, such as green, regular, veteran, and
-     * elite.
-     *
-     * @return A {@code JPanel} containing configuration options for Command Skill
-     *         modifiers.
-     */
-    private JPanel createCommandSkillsPanel() {
-        // Contents
-        lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen",
+    private void createSecondarySkillControls() {
+        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblCommandSkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                "CommandSkillsUltraGreen"));
-        spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
-        spnCommandSkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                "CommandSkillsUltraGreen"));
+        lblRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+                "RoleplaySkillsModifier"));
+        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
+        spnRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
+                "RoleplaySkillsModifier"));
 
-        lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblCommandSkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsGreen"));
-        spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen", 0, -12, 12, 1);
-        spnCommandSkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsGreen"));
-
-        lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblCommandSkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsRegular"));
-        spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular", 0, -12, 12, 1);
-        spnCommandSkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsRegular"));
-
-        lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblCommandSkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsVeteran"));
-        spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran", 0, -12, 12, 1);
-        spnCommandSkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsVeteran"));
-
-        lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblCommandSkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsElite"));
-        spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite", 0, -12, 12, 1);
-        spnCommandSkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CommandSkillsElite"));
-
-        lblCommandSkillsHeroic = new CampaignOptionsLabel("CommandSkillsHeroic",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnCommandSkillsHeroic = new CampaignOptionsSpinner("CommandSkillsHeroic", 0, -12, 12, 1);
-
-        lblCommandSkillsLegendary = new CampaignOptionsLabel("CommandSkillsLegendary",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnCommandSkillsLegendary = new CampaignOptionsSpinner("CommandSkillsLegendary", 0, -12, 12, 1);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("CommandSkillsPanel", true, "CommandSkillsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblCommandSkillsUltraGreen, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsUltraGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCommandSkillsGreen, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCommandSkillsReg, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsReg, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCommandSkillsVet, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsVet, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCommandSkillsElite, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsElite, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCommandSkillsHeroic, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsHeroic, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCommandSkillsLegendary, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsLegendary, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates and returns the Utility Skills panel, which allows users to configure
-     * settings for Non-Command Utility
-     * Skill modifiers for different skill levels, such as green, regular, veteran,
-     * and elite.
-     *
-     * @return A {@code JPanel} containing configuration options for Utility Skill
-     *         modifiers.
-     */
-    private JPanel createUtilitySkillsPanel() {
-        // Contents
-        lblUtilitySkillsUltraGreen = new CampaignOptionsLabel("UtilitySkillsUltraGreen",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                "UtilitySkillsUltraGreen"));
-        spnUtilitySkillsUltraGreen = new CampaignOptionsSpinner("UtilitySkillsUltraGreen", 0, -12, 12, 1);
-        spnUtilitySkillsUltraGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                "UtilitySkillsUltraGreen"));
-
-        lblUtilitySkillsGreen = new CampaignOptionsLabel("UtilitySkillsGreen",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
-        spnUtilitySkillsGreen = new CampaignOptionsSpinner("UtilitySkillsGreen", 0, -12, 12, 1);
-        spnUtilitySkillsGreen.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsGreen"));
-
-        lblUtilitySkillsReg = new CampaignOptionsLabel("UtilitySkillsRegular",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
-        spnUtilitySkillsReg = new CampaignOptionsSpinner("UtilitySkillsRegular", 0, -12, 12, 1);
-        spnUtilitySkillsReg.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsRegular"));
-
-        lblUtilitySkillsVet = new CampaignOptionsLabel("UtilitySkillsVeteran",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
-        spnUtilitySkillsVet = new CampaignOptionsSpinner("UtilitySkillsVeteran", 0, -12, 12, 1);
-        spnUtilitySkillsVet.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsVeteran"));
-
-        lblUtilitySkillsElite = new CampaignOptionsLabel("UtilitySkillsElite",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
-        spnUtilitySkillsElite = new CampaignOptionsSpinner("UtilitySkillsElite", 0, -12, 12, 1);
-        spnUtilitySkillsElite.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "UtilitySkillsElite"));
-
-        lblUtilitySkillsHeroic = new CampaignOptionsLabel("UtilitySkillsHeroic",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnUtilitySkillsHeroic = new CampaignOptionsSpinner("UtilitySkillsHeroic", 0, -12, 12, 1);
-
-        lblUtilitySkillsLegendary = new CampaignOptionsLabel("UtilitySkillsLegendary",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        spnUtilitySkillsLegendary = new CampaignOptionsSpinner("UtilitySkillsLegendary", 0, -12, 12, 1);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("UtilitySkillsPanel", true, "UtilitySkillsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblUtilitySkillsUltraGreen, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsUltraGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUtilitySkillsGreen, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUtilitySkillsReg, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsReg, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUtilitySkillsVet, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsVet, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUtilitySkillsElite, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsElite, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUtilitySkillsHeroic, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsHeroic, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUtilitySkillsLegendary, layout);
-        layout.gridx++;
-        panel.add(spnUtilitySkillsLegendary, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates and returns the Small Arms panel, which allows users to configure
-     * settings for combat and non-combat
-     * small arms bonuses.
-     *
-     * @return A {@code JPanel} containing configuration options for small arms
-     *         skill bonuses.
-     */
-    private JPanel createSmallArmsPanel() {
-        // Contents
-        lblCombatSA = new CampaignOptionsLabel("CombatSmallArms");
-        lblCombatSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CombatSmallArms"));
-        spnCombatSA = new CampaignOptionsSpinner("CombatSmallArms", 0, -12, 12, 1);
-        spnCombatSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CombatSmallArms"));
-
-        lblSupportSA = new CampaignOptionsLabel("NonCombatSmallArms");
-        lblSupportSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "NonCombatSmallArms"));
-        spnSupportSA = new CampaignOptionsSpinner("NonCombatSmallArms", 0, -12, 12, 1);
-        spnSupportSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "NonCombatSmallArms"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SmallArmsPanel", true, "SmallArmsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblCombatSA, layout);
-        layout.gridx++;
-        panel.add(spnCombatSA, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSupportSA, layout);
-        layout.gridx++;
-        panel.add(spnSupportSA, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates and returns the Artillery panel, which allows users to configure
-     * settings for artillery-specific skills,
-     * including the chance for an artillery skill and the bonus associated with it.
-     *
-     * @return A {@code JPanel} containing configuration options for
-     *         artillery-related skills.
-     */
-    private JPanel createArtilleryPanel() {
-        // Contents
-        lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
-        lblArtyProb.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryChance"));
-        spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance", 0, 0, 100, 1);
-        spnArtyProb.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryChance"));
-
-        lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
-        lblArtyBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryBonus"));
-        spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus", 0, -12, 12, 1);
-        spnArtyBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryBonus"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ArtilleryPanel", true, "ArtilleryPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblArtyProb, layout);
-        layout.gridx++;
-        panel.add(spnArtyProb, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblArtyBonus, layout);
-        layout.gridx++;
-        panel.add(spnArtyBonus, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates and returns the Secondary Skill panel, which allows users to
-     * configure settings related to special
-     * secondary skills such as Anti-Mek, secondary skill probability, and secondary
-     * skill bonuses.
-     *
-     * @return A {@code JPanel} containing configuration options for secondary
-     *         skills.
-     */
-    private JPanel createSecondarySkillPanel() {
-        // Contents
         lblAntiMekSkill = new CampaignOptionsLabel("AntiMekChance");
         lblAntiMekSkill.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "AntiMekChance"));
         spnAntiMekSkill = new CampaignOptionsSpinner("AntiMekChance", 0, 0, 100, 1);
@@ -1243,44 +914,30 @@ public class AdvancementTab {
         lblSecondBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "SecondarySkillBonus"));
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
         spnSecondBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "SecondarySkillBonus"));
+    }
 
-        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                "RoleplaySkillsModifier"));
-        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
-        spnRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
-                "RoleplaySkillsModifier"));
+    private void createArtilleryControls() {
+        lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
+        lblArtyProb.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryChance"));
+        spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance", 0, 0, 100, 1);
+        spnArtyProb.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryChance"));
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel", true, "SecondarySkillPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblAntiMekSkill, layout);
-        layout.gridx++;
-        panel.add(spnAntiMekSkill, layout);
+        lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
+        lblArtyBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryBonus"));
+        spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus", 0, -12, 12, 1);
+        spnArtyBonus.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ArtilleryBonus"));
+    }
 
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRoleplaySkillsModifier, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsModifier, layout);
+    private void createSmallArmsControls() {
+        lblCombatSA = new CampaignOptionsLabel("CombatSmallArms");
+        lblCombatSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CombatSmallArms"));
+        spnCombatSA = new CampaignOptionsSpinner("CombatSmallArms", 0, -12, 12, 1);
+        spnCombatSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "CombatSmallArms"));
 
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSecondProb, layout);
-        layout.gridx++;
-        panel.add(spnSecondProb, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSecondBonus, layout);
-        layout.gridx++;
-        panel.add(spnSecondBonus, layout);
-
-        return panel;
+        lblSupportSA = new CampaignOptionsLabel("NonCombatSmallArms");
+        lblSupportSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "NonCombatSmallArms"));
+        spnSupportSA = new CampaignOptionsSpinner("NonCombatSmallArms", 0, -12, 12, 1);
+        spnSupportSA.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "NonCombatSmallArms"));
     }
 
     /**
@@ -1299,8 +956,6 @@ public class AdvancementTab {
         // start Recruitment Bonus Tab
         CampaignOptionsHeaderPanel recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
                 getImageDirectory() + "logo_calderon_protectorate.png",
-                true,
-                false,
                 0);
 
         // Contents
@@ -1309,19 +964,17 @@ public class AdvancementTab {
         recruitmentBonusesPageCreated = true;
         updateRecruitmentBonusControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(recruitmentBonusesHeader, layout);
+        MHQCollapsiblePanel combatRolesSection = createSection("lblRecruitmentBonusesCombatPanel.text",
+                "lblRecruitmentBonusesCombatPanel.summary",
+                pnlRecruitmentBonusesCombat);
+        MHQCollapsiblePanel supportRolesSection = createSection("lblRecruitmentBonusesSupportPanel.text",
+                "lblRecruitmentBonusesSupportPanel.summary",
+                pnlRecruitmentBonusesSupport);
 
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlRecruitmentBonusesCombat, layout);
-        layout.gridy++;
-        panel.add(pnlRecruitmentBonusesSupport, layout);
+        JPanel panel = createSectionedPanel("RecruitmentBonusesTab",
+                recruitmentBonusesHeader,
+                combatRolesSection,
+                supportRolesSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "RecruitmentBonusesTab");
@@ -1348,28 +1001,14 @@ public class AdvancementTab {
         lblRecruitmentBonusCombat = new JLabel[roles.size()];
         spnRecruitmentBonusCombat = new JSpinner[roles.size()];
 
-        final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesCombatPanel",
-                true,
-                "RecruitmentBonusesCombatPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-
-        int columnsPerRow = 4;
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RecruitmentBonusesCombatPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
 
         for (int i = 0; i < roles.size(); i++) {
-            int currentColumn = i % columnsPerRow;
-            int currentRow = i / columnsPerRow;
-
-            layout.gridx = currentColumn * 2;
-            layout.gridy = currentRow;
-
             lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusCombat[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-
-            panel.add(lblRecruitmentBonusCombat[i], layout);
-
-            layout.gridx = currentColumn * 2 + 1;
-            panel.add(spnRecruitmentBonusCombat[i], layout);
+            panel.addRow(lblRecruitmentBonusCombat[i], spnRecruitmentBonusCombat[i]);
         }
 
         return panel;
@@ -1396,28 +1035,14 @@ public class AdvancementTab {
         lblRecruitmentBonusSupport = new JLabel[roles.size()];
         spnRecruitmentBonusSupport = new JSpinner[roles.size()];
 
-        final JPanel panel = new CampaignOptionsStandardPanel("RecruitmentBonusesSupportPanel",
-                true,
-                "RecruitmentBonusesSupportPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-
-        int columnsPerRow = 4;
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RecruitmentBonusesSupportPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
 
         for (int i = 0; i < roles.size(); i++) {
-            int currentColumn = i % columnsPerRow;
-            int currentRow = i / columnsPerRow;
-
-            layout.gridx = currentColumn * 2;
-            layout.gridy = currentRow;
-
             lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusSupport[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-
-            panel.add(lblRecruitmentBonusSupport[i], layout);
-
-            layout.gridx = currentColumn * 2 + 1;
-            panel.add(spnRecruitmentBonusSupport[i], layout);
+            panel.addRow(lblRecruitmentBonusSupport[i], spnRecruitmentBonusSupport[i]);
         }
 
         return panel;

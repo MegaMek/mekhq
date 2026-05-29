@@ -41,12 +41,18 @@ class CampaignOptionsRoute {
     private final String id;
     private final List<String> path;
     private final List<String> titleResourceNames;
+    private final boolean showHelpPanel;
     private final String searchableText;
 
     CampaignOptionsRoute(String id, List<String> path, List<String> titleResourceNames) {
+        this(id, path, titleResourceNames, true);
+    }
+
+    CampaignOptionsRoute(String id, List<String> path, List<String> titleResourceNames, boolean showHelpPanel) {
         this.id = id;
         this.path = List.copyOf(path);
         this.titleResourceNames = List.copyOf(titleResourceNames);
+        this.showHelpPanel = showHelpPanel;
         this.searchableText = normalizeSearchText(String.join(" ", path) + " " + id + " "
                                                          + String.join(" ", titleResourceNames));
     }
@@ -61,6 +67,10 @@ class CampaignOptionsRoute {
 
     List<String> getTitleResourceNames() {
         return titleResourceNames;
+    }
+
+    boolean shouldShowHelpPanel() {
+        return showHelpPanel;
     }
 
     String getTopLevelResourceName() {

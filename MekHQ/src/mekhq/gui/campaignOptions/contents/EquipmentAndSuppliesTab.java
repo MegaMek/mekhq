@@ -36,34 +36,38 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -85,6 +89,11 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  * options and labels.
  */
 public class EquipmentAndSuppliesTab {
+    private static final int EQUIPMENT_LABEL_COLUMN_WIDTH = 300;
+    private static final int EQUIPMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
+    private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
+
     private final CampaignOptions campaignOptions;
     private EquipmentAndSuppliesOptionsModel model;
     private boolean acquisitionPageCreated;
@@ -158,14 +167,8 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnPenaltyClanPartsFromIS;
     private JCheckBox usePlanetaryAcquisitionsVerbose;
 
-    private JPanel pnlTechModifiers;
-    private JLabel[] lblPlanetAcquireTechBonus;
     private JSpinner[] spnPlanetAcquireTechBonus;
-
-    private JPanel pnlIndustryModifiers;
     private JSpinner[] spnPlanetAcquireIndustryBonus;
-
-    private JPanel pnlOutputModifiers;
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
 
@@ -237,14 +240,8 @@ public class EquipmentAndSuppliesTab {
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
 
         // Modifiers
-        pnlTechModifiers = new JPanel();
-        lblPlanetAcquireTechBonus = new JLabel[PlanetarySophistication.values().length];
         spnPlanetAcquireTechBonus = new JSpinner[PlanetarySophistication.values().length];
-
-        pnlIndustryModifiers = new JPanel();
         spnPlanetAcquireIndustryBonus = new JSpinner[PlanetaryRating.values().length];
-
-        pnlOutputModifiers = new JPanel();
         spnPlanetAcquireOutputBonus = new JSpinner[PlanetaryRating.values().length];
     }
 
@@ -357,28 +354,100 @@ public class EquipmentAndSuppliesTab {
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
+          JPanel pnlDelivery = createDeliveryPanel();
         acquisitionPageCreated = true;
         updateAcquisitionControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+          MHQCollapsiblePanel acquisitionsSection = createSection("lblAcquisitionPanel.text",
+              "lblAcquisitionPanel.summary",
+              pnlAcquisitions);
+          MHQCollapsiblePanel deliverySection = createSection("lblDeliveryPanel.text",
+              "lblDeliveryPanel.summary",
+              pnlDelivery);
+          MHQCollapsiblePanel autoLogisticsSection = createSection("lblAutoLogisticsPanel.text",
+              "lblAutoLogisticsPanel.summary",
+              pnlAutoLogistics);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(acquisitionHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlAcquisitions, layoutParent);
-
-        layoutParent.gridx++;
-        panel.add(pnlAutoLogistics, layoutParent);
-
+          JPanel panel = createSectionedPanel("AcquisitionTab",
+              acquisitionHeader,
+              acquisitionsSection,
+              deliverySection,
+              autoLogisticsSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "acquisitionsTab");
+    }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+          MHQCollapsiblePanel... sections) {
+        JPanel sectionControls = createSectionControls(sections);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(name);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.weightx = 1.0;
+        panel.add(header, layout);
+
+        layout.gridy++;
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
+
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        for (MHQCollapsiblePanel section : sections) {
+            layout.gridy++;
+            panel.add(section, layout);
+        }
+
+        return panel;
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+          @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
     }
 
     /**
@@ -421,6 +490,22 @@ public class EquipmentAndSuppliesTab {
         spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions", 0, 0, 100, 1);
         spnMaxAcquisitions.addMouseListener(createTipPanelUpdater(acquisitionHeader, "MaxAcquisitions"));
 
+        // Layout the Panel
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AcquisitionPanel",
+              EQUIPMENT_LABEL_COLUMN_WIDTH,
+              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblChoiceAcquireSkill, choiceAcquireSkill);
+        panel.addCheckBox(chkUseFunctionalAppraisal);
+        panel.addRow(lblProcurementPersonnelPick, cboProcurementPersonnelPick);
+        panel.addRow(lblAcquireClanPenalty, spnAcquireClanPenalty);
+        panel.addRow(lblAcquireIsPenalty, spnAcquireIsPenalty);
+        panel.addRow(lblAcquireWaitingPeriod, spnAcquireWaitingPeriod);
+        panel.addRow(lblMaxAcquisitions, spnMaxAcquisitions);
+
+        return panel;
+    }
+
+    private JPanel createDeliveryPanel() {
         lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
         lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
@@ -429,61 +514,11 @@ public class EquipmentAndSuppliesTab {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true, "AcquisitionPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblChoiceAcquireSkill, layout);
-        layout.gridx++;
-        panel.add(choiceAcquireSkill, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFunctionalAppraisal, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblProcurementPersonnelPick, layout);
-        layout.gridx++;
-        panel.add(cboProcurementPersonnelPick, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblAcquireClanPenalty, layout);
-        layout.gridx++;
-        panel.add(spnAcquireClanPenalty, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAcquireIsPenalty, layout);
-        layout.gridx++;
-        panel.add(spnAcquireIsPenalty, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAcquireWaitingPeriod, layout);
-        layout.gridx++;
-        panel.add(spnAcquireWaitingPeriod, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblMaxAcquisitions, layout);
-        layout.gridx++;
-        panel.add(spnMaxAcquisitions, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblTransitTimeUnits, layout);
-        layout.gridx++;
-        panel.add(choiceTransitTimeUnits, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkNoDeliveriesInTransit, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeliveryPanel",
+              EQUIPMENT_LABEL_COLUMN_WIDTH,
+              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblTransitTimeUnits, choiceTransitTimeUnits);
+        panel.addCheckBox(chkNoDeliveriesInTransit);
 
         return panel;
     }
@@ -563,33 +598,22 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsOther"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AutoLogisticsPanel", true, "AutoLogisticsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsMekHead, spnAutoLogisticsMekHead);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsMekLocation, spnAutoLogisticsMekLocation);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsNonRepairableLocation, spnAutoLogisticsNonRepairableLocation);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsHeatSink, spnAutoLogisticsHeatSink);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsArmor, spnAutoLogisticsArmor);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsAmmunition, spnAutoLogisticsAmmunition);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsActuators, spnAutoLogisticsActuators);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsJumpJets, spnAutoLogisticsJumpJets);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsEngines, spnAutoLogisticsEngines);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsWeapons, spnAutoLogisticsWeapons);
-        addSpinnerToPanel(panel, layout, lblAutoLogisticsOther, spnAutoLogisticsOther);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoLogisticsPanel",
+              EQUIPMENT_LABEL_COLUMN_WIDTH,
+              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblAutoLogisticsMekHead, spnAutoLogisticsMekHead);
+        panel.addRow(lblAutoLogisticsMekLocation, spnAutoLogisticsMekLocation);
+        panel.addRow(lblAutoLogisticsNonRepairableLocation, spnAutoLogisticsNonRepairableLocation);
+        panel.addRow(lblAutoLogisticsHeatSink, spnAutoLogisticsHeatSink);
+        panel.addRow(lblAutoLogisticsArmor, spnAutoLogisticsArmor);
+        panel.addRow(lblAutoLogisticsAmmunition, spnAutoLogisticsAmmunition);
+        panel.addRow(lblAutoLogisticsActuators, spnAutoLogisticsActuators);
+        panel.addRow(lblAutoLogisticsJumpJets, spnAutoLogisticsJumpJets);
+        panel.addRow(lblAutoLogisticsEngines, spnAutoLogisticsEngines);
+        panel.addRow(lblAutoLogisticsWeapons, spnAutoLogisticsWeapons);
+        panel.addRow(lblAutoLogisticsOther, spnAutoLogisticsOther);
 
         return panel;
-    }
-
-    private void addSpinnerToPanel(JPanel panel, GridBagConstraints layout, JLabel label, JSpinner spinner) {
-        layout.gridy++;
-        panel.add(label, layout);
-        layout.gridx++;
-        panel.add(spinner, layout);
-        layout.gridx = 0;
     }
 
     /**
@@ -612,21 +636,17 @@ public class EquipmentAndSuppliesTab {
         planetaryAcquisitionPageCreated = true;
         updatePlanetaryAcquisitionControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        MHQCollapsiblePanel optionsSection = createSection("lblPlanetaryAcquisitionTab.text",
+              "lblPlanetaryAcquisitionTab.summary",
+              options);
+        MHQCollapsiblePanel modifiersSection = createSection("lblModifiersPanel.text",
+              "lblModifiersPanel.summary",
+              modifiers);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridy = 0;
-        panel.add(planetaryAcquisitionHeader, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(options, layoutParent);
-
-        layoutParent.gridx++;
-        panel.add(modifiers, layoutParent);
+        JPanel panel = createSectionedPanel("PlanetaryAcquisitionTab",
+              planetaryAcquisitionHeader,
+              optionsSection,
+              modifiersSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PlanetaryAcquisitionTab");
@@ -679,270 +699,81 @@ public class EquipmentAndSuppliesTab {
               "UsePlanetaryAcquisitionsVerbose"));
 
         // Layout the Panel
-        final JPanel panel = new JPanel();
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(usePlanetaryAcquisitions, layout);
-        layout.gridx++;
-        panel.add(usePlanetaryAcquisitionsVerbose, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblMaxJumpPlanetaryAcquisitions, layout);
-        layout.gridx++;
-        panel.add(spnMaxJumpPlanetaryAcquisitions, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblPlanetaryAcquisitionsFactionLimits, layout);
-        layout.gridx++;
-        panel.add(comboPlanetaryAcquisitionsFactionLimits, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(disallowPlanetaryAcquisitionClanCrossover, layout);
-
-        layout.gridy++;
-        panel.add(disallowClanPartsFromIS, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblPenaltyClanPartsFromIS, layout);
-        layout.gridx++;
-        panel.add(spnPenaltyClanPartsFromIS, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionOptionsPanel",
+              EQUIPMENT_LABEL_COLUMN_WIDTH,
+              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(usePlanetaryAcquisitions);
+        panel.addCheckBox(usePlanetaryAcquisitionsVerbose);
+        panel.addRow(lblMaxJumpPlanetaryAcquisitions, spnMaxJumpPlanetaryAcquisitions);
+        panel.addRow(lblPlanetaryAcquisitionsFactionLimits, comboPlanetaryAcquisitionsFactionLimits);
+        panel.addCheckBox(disallowPlanetaryAcquisitionClanCrossover);
+        panel.addCheckBox(disallowClanPartsFromIS);
+        panel.addRow(lblPenaltyClanPartsFromIS, spnPenaltyClanPartsFromIS);
 
         return panel;
     }
 
-    /**
-     * Creates and returns a panel that organizes and displays the planetary acquisition modifiers for technology,
-     * industry, and output. This method sets up spinners and labels for each equipment type rating (A through F) to
-     * adjust acquisition bonuses.
-     * <p>
-     * The method initializes modifier spinners for technology, industry, and output acquisition bonuses, creates
-     * separate panels for each category, and combines them into a single panel using a grid layout.
-     *
-     * @return a {@code JPanel} representing the planetary acquisition modifiers panel, including elements for adjusting
-     *       technology, industry, and output modifiers.
-     */
     private JPanel createModifiersPanel() {
-        // Modifier Spinners
         int i = 0;
-        for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
-            String techModifierLabel = sophistication.getName();
-            lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
-                  techModifierLabel));
-            lblPlanetAcquireTechBonus[i].setHorizontalAlignment(SwingConstants.RIGHT);
-            lblPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "TechLabel"));
-            spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-            spnPlanetAcquireTechBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "TechLabel"));
-            setSpinnerWidth(spnPlanetAcquireTechBonus[i]);
+        for (PlanetarySophistication ignored : PlanetarySophistication.values()) {
+            spnPlanetAcquireTechBonus[i] = createModifierSpinner("TechLabel");
             i++;
         }
+
         i = 0;
         for (PlanetaryRating ignored : PlanetaryRating.values()) {
-            spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-            spnPlanetAcquireIndustryBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "IndustryLabel"));
-            setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
-            spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-            spnPlanetAcquireOutputBonus[i].addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-                  "OutputLabel"));
-            setSpinnerWidth(spnPlanetAcquireOutputBonus[i]);
+            spnPlanetAcquireIndustryBonus[i] = createModifierSpinner("IndustryLabel");
+            spnPlanetAcquireOutputBonus[i] = createModifierSpinner("OutputLabel");
             i++;
         }
-        // Panels
-        pnlTechModifiers = createTechModifiersPanel();
-        pnlIndustryModifiers = createIndustryModifiersPanel();
-        pnlOutputModifiers = createOutputModifiersPanel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
-              true,
-              "ModifiersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        final CampaignOptionsModifierTablePanel panel = new CampaignOptionsModifierTablePanel(
+              "PlanetaryAcquisitionTabModifiers",
+              MODIFIER_ROW_LABEL_COLUMN_WIDTH,
+              MODIFIER_CONTROL_COLUMN_WIDTH,
+              createModifierColumnHeader("TechLabel"),
+              createModifierColumnHeader("IndustryLabel"),
+              createModifierColumnHeader("OutputLabel"));
 
-        layout.anchor = GridBagConstraints.NORTH;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(pnlTechModifiers, layout);
-        layout.gridx++;
-        panel.add(pnlIndustryModifiers, layout);
-        layout.gridx++;
-        panel.add(pnlOutputModifiers, layout);
-
-        return panel;
-    }
-
-    /**
-     * Creates and returns a {@code JPanel} layout containing components for configuring technology-related modifiers in
-     * a campaign setting. The panel includes labels and corresponding input components (spinners) arranged in a grid
-     * layout.
-     *
-     * @return a {@code JPanel} containing the layout for technology modifiers configuration
-     */
-    private JPanel createTechModifiersPanel() {
-        JLabel techLabel = new CampaignOptionsLabel("TechLabel");
-        techLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        techLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "TechLabel"));
-
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        // Add the label
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        layout.weightx = 1.0;
-        panel.add(techLabel, layout);
-
-        // Add the other elements
-        for (int i = 0; i < PlanetarySophistication.values().length; i++) {
-            layout.gridx = 0;
-            layout.gridy = i + 1;
-            layout.gridwidth = 1;
-            layout.weightx = 0;
-            layout.anchor = GridBagConstraints.WEST;
-            panel.add(lblPlanetAcquireTechBonus[i], layout);
-
-            layout.gridx++;
-            panel.add(spnPlanetAcquireTechBonus[i], layout);
+        i = 0;
+        for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
+            int ratingIndex = getPlanetaryRatingIndex(sophistication.getName());
+            panel.addRow(createModifierRowLabel(sophistication.getName()),
+                  spnPlanetAcquireTechBonus[i],
+                  ratingIndex >= 0 ? spnPlanetAcquireIndustryBonus[ratingIndex] : null,
+                  ratingIndex >= 0 ? spnPlanetAcquireOutputBonus[ratingIndex] : null);
+            i++;
         }
 
         return panel;
     }
 
-    private int getSpinnerHeight() {
-        int spinnerHeight;
-        if (spnPlanetAcquireIndustryBonus != null &&
-                  spnPlanetAcquireIndustryBonus.length > 0 &&
-                  spnPlanetAcquireIndustryBonus[0] != null) {
-            spinnerHeight = spnPlanetAcquireIndustryBonus[0].getPreferredSize().height;
-        } else {
-            //fallback
-            spinnerHeight = new JSpinner().getPreferredSize().height;
-        }
-        return spinnerHeight;
+    private JLabel createModifierColumnHeader(String name) {
+        JLabel label = new CampaignOptionsLabel(name);
+        label.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, name));
+        return label;
     }
 
-    /**
-     * Creates and configures a {@code JPanel} that serves as the Industry Modifiers Panel. The panel contains labels
-     * and spinners arranged in a grid layout to display and allow modification of industry bonuses.
-     *
-     * @return a {@code JPanel} component configured as the Industry Modifiers Panel with labels and spinners for
-     *       industry adjustment.
-     */
-    private JPanel createIndustryModifiersPanel() {
-        JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
-        industryLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        industryLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "IndustryLabel"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        // Add the label
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        layout.weightx = 1.0;
-        panel.add(industryLabel, layout);
-        layout.gridx = 0;
-        layout.gridy = 1;
-        layout.gridwidth = 1;
-        layout.weightx = 0;
-        layout.anchor = GridBagConstraints.WEST;
-        JPanel spacer = new JPanel();
-        spacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
-        panel.add(spacer, layout);
-        // Add the other elements
-        for (int i = 0; i < PlanetaryRating.values().length; i++) {
-            layout.gridx = 0;
-            layout.gridy = i + 2;
-            layout.gridwidth = 1;
-            layout.weightx = 0;
-            layout.anchor = GridBagConstraints.WEST;
-            panel.add(spnPlanetAcquireIndustryBonus[i], layout);
-        }
-
-        // Filler
-        layout.gridx = 0;
-        layout.gridy = PlanetaryRating.values().length + 2;
-        layout.gridwidth = 1;
-        JPanel bottomSpacer = new JPanel();
-        bottomSpacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
-        panel.add(bottomSpacer, layout);
-
-        return panel;
+    private JLabel createModifierRowLabel(String text) {
+        JLabel label = new JLabel(String.format("<html>%s</html>", text));
+        label.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "TechLabel"));
+        return label;
     }
 
-    /**
-     * Creates and configures a {@code JPanel} for displaying and adjusting output modifiers. The panel includes labels
-     * and corresponding spinner components to modify planet acquisition output bonuses.
-     *
-     * @return a {@code JPanel} configured with labels and spinners for planet output modifiers
-     */
-    private JPanel createOutputModifiersPanel() {
-        JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
-        outputLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        outputLabel.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "OutputLabel"));
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        // Add the label
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        layout.weightx = 1.0;
-        panel.add(outputLabel, layout);
-
-        layout.gridx = 0;
-        layout.gridy = 1;
-        layout.gridwidth = 1;
-        layout.weightx = 0;
-        layout.anchor = GridBagConstraints.WEST;
-        JPanel spacer = new JPanel();
-        spacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
-        panel.add(spacer, layout);
-
-        // Add the other elements
-        for (int i = 0; i < PlanetaryRating.values().length; i++) {
-            layout.gridx = 0;
-            layout.gridy = i + 2;
-            layout.gridwidth = 1;
-            layout.weightx = 0;
-            layout.anchor = GridBagConstraints.WEST;
-            panel.add(spnPlanetAcquireOutputBonus[i], layout);
-        }
-
-        // Filler
-        layout.gridx = 0;
-        layout.gridy = PlanetaryRating.values().length + 2;
-        layout.gridwidth = 1;
-        JPanel bottomSpacer = new JPanel();
-        bottomSpacer.setPreferredSize(new Dimension(1, getSpinnerHeight()));
-        panel.add(bottomSpacer, layout);
-
-        return panel;
+    private JSpinner createModifierSpinner(String tipKey) {
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
+        spinner.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, tipKey));
+        return spinner;
     }
 
-    /**
-     * Sets the minimum width of the specified JSpinner component by scaling its preferred size.
-     *
-     * @param spinner the JSpinner component whose minimum width is to be set
-     */
-    private void setSpinnerWidth(JSpinner spinner) {
-        Dimension size = spinner.getPreferredSize();
-        spinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+    private int getPlanetaryRatingIndex(String name) {
+        for (PlanetaryRating rating : PlanetaryRating.values()) {
+            if (rating.getName().equals(name)) {
+                return rating.getIndex();
+            }
+        }
+
+        return -1;
     }
 
     /**
@@ -1047,51 +878,52 @@ public class EquipmentAndSuppliesTab {
         useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         useAmmoByTypeBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "UseAmmoByTypeBox"));
-          techLimitsPageCreated = true;
-          updateTechLimitsControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TechLimitsTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        JPanel techLevelPanel = createTechLevelPanel();
+        JPanel purchaseRulesPanel = createPurchaseRulesPanel();
+        techLimitsPageCreated = true;
+        updateTechLimitsControlsFromModel();
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(techLimitsHeader, layoutParent);
+        MHQCollapsiblePanel techLevelSection = createSection("lblTechLimitsTab.text",
+              "lblTechLimitsTab.summary",
+              techLevelPanel);
+        MHQCollapsiblePanel purchaseRulesSection = createSection("lblTechPurchaseRulesPanel.text",
+              "lblTechPurchaseRulesPanel.summary",
+              purchaseRulesPanel);
 
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(lblChoiceTechLevel, layoutParent);
-        layoutParent.gridx++;
-        panel.add(choiceTechLevel, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(limitByYearBox, layoutParent);
-        layoutParent.gridx++;
-        panel.add(disallowExtinctStuffBox, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(allowClanPurchasesBox, layoutParent);
-        layoutParent.gridx++;
-        panel.add(allowISPurchasesBox, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(allowCanonOnlyBox, layoutParent);
-        layoutParent.gridx++;
-        panel.add(allowCanonRefitOnlyBox, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(variableTechLevelBox, layoutParent);
-        layoutParent.gridx++;
-        panel.add(useAmmoByTypeBox, layoutParent);
+        JPanel panel = createSectionedPanel("TechLimitsTab",
+              techLimitsHeader,
+              techLevelSection,
+              purchaseRulesSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "TechLimitsTab");
+    }
+
+    private JPanel createTechLevelPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TechLevelPanel",
+              EQUIPMENT_LABEL_COLUMN_WIDTH,
+              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblChoiceTechLevel, choiceTechLevel);
+        panel.addCheckBox(variableTechLevelBox);
+        panel.addCheckBox(useAmmoByTypeBox);
+
+        return panel;
+    }
+
+    private JPanel createPurchaseRulesPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TechPurchaseRulesPanel",
+              EQUIPMENT_LABEL_COLUMN_WIDTH,
+              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+              limitByYearBox,
+              disallowExtinctStuffBox,
+              allowClanPurchasesBox,
+              allowISPurchasesBox,
+              allowCanonOnlyBox,
+              allowCanonRefitOnlyBox);
+
+        return panel;
     }
 
     /**

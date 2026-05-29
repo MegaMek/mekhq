@@ -37,26 +37,31 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.*;
 
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -105,6 +110,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </p>
  */
 public class PersonnelTab {
+        private static final int PERSONNEL_LABEL_COLUMN_WIDTH = 300;
+        private static final int PERSONNEL_CONTROL_COLUMN_WIDTH = 220;
+
     private final CampaignOptions campaignOptions;
     private PersonnelOptionsModel model;
     private boolean generalPageCreated;
@@ -206,7 +214,8 @@ public class PersonnelTab {
     private JTextArea txtAwardSetFilterList;
     // end Awards Tab
 
-    private JCheckBox chkUseAdvancedMedical;
+        private CampaignOptionsHeaderPanel medicalHeader;
+        private JCheckBox chkUseAdvancedMedical;
     private JLabel lblHealWaitingPeriod;
     private JSpinner spnHealWaitingPeriod;
     private JLabel lblNaturalHealWaitingPeriod;
@@ -460,35 +469,28 @@ public class PersonnelTab {
         pnlAdministrators = createAdministratorsPanel();
         pnlBlobCrew = createBlobCrewPanel();
 
-        // Layout the Panels
-        final JPanel panelRight = new CampaignOptionsStandardPanel("RightPanel");
-        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+        MHQCollapsiblePanel generalSection = createSection("lblPersonnelGeneralTab.text",
+                "lblPersonnelGeneralTab.summary",
+                pnlPersonnelGeneralOptions);
+        MHQCollapsiblePanel cleanupSection = createSection("lblPersonnelCleanUpPanel.text",
+                "lblPersonnelCleanUpPanel.summary",
+                pnlPersonnelCleanup,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+        MHQCollapsiblePanel administratorsSection = createSection("lblAdministratorsPanel.text",
+                "lblAdministratorsPanel.summary",
+                pnlAdministrators,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+        MHQCollapsiblePanel temporaryCrewSection = createSection("lblBlobCrewPanel.text",
+                "lblBlobCrewPanel.summary",
+                pnlBlobCrew,
+                getMetadata(new Version(0, 50, 12)));
 
-        layoutRight.gridwidth = 1;
-        layoutRight.gridx = 0;
-        layoutRight.gridy = 0;
-        panelRight.add(pnlPersonnelCleanup, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(pnlAdministrators, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(pnlBlobCrew, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
-        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridy = 0;
-        panelParent.add(generalHeader, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(pnlPersonnelGeneralOptions, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
+        JPanel panelParent = createSectionedPanel("PersonnelGeneralTab",
+                generalHeader,
+                generalSection,
+                cleanupSection,
+                administratorsSection,
+                temporaryCrewSection);
 
         generalPageCreated = true;
         updateGeneralControlsFromModel();
@@ -496,6 +498,78 @@ public class PersonnelTab {
         // Create Parent Panel and return
         return createParentPanel(panelParent, "PersonnelGeneralTab");
     }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+            MHQCollapsiblePanel... sections) {
+        JPanel sectionControls = createSectionControls(sections);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(name);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.weightx = 1.0;
+        panel.add(header, layout);
+
+        layout.gridy++;
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
+
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        for (MHQCollapsiblePanel section : sections) {
+            layout.gridy++;
+            panel.add(section, layout);
+        }
+
+        return panel;
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+            @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
+        }
 
     /**
      * Creates the panel for general personnel options in the General Tab.
@@ -545,52 +619,23 @@ public class PersonnelTab {
                 "UseAlternativeQualityAveraging"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab");
-        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseTactics, layout);
-
-        layout.gridy++;
-        panel.add(chkUseInitiativeBonus, layout);
-
-        layout.gridy++;
-        panel.add(chkUseToughness, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomToughness, layout);
-
-        layout.gridy++;
-        panel.add(chkUseArtillery, layout);
-
-        layout.gridy++;
-        panel.add(chkUseAbilities, layout);
-
-        layout.gridy++;
-        panel.add(chkOnlyCommandersMatterVehicles, layout);
-
-        layout.gridy++;
-        panel.add(chkOnlyCommandersMatterInfantry, layout);
-
-        layout.gridy++;
-        panel.add(chkOnlyCommandersMatterBattleArmor, layout);
-
-        layout.gridy++;
-        panel.add(chkUseEdge, layout);
-
-        layout.gridy++;
-        panel.add(chkUseSupportEdge, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseImplants, layout);
-
-        layout.gridy++;
-        panel.add(chkUseImplants, layout);
-
-        layout.gridy++;
-        panel.add(chkUseAlternativeQualityAveraging, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelGeneralTab",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkUseTactics,
+                chkUseInitiativeBonus,
+                chkUseToughness,
+                chkUseRandomToughness,
+                chkUseArtillery,
+                chkUseAbilities,
+                chkOnlyCommandersMatterVehicles,
+                chkOnlyCommandersMatterInfantry,
+                chkOnlyCommandersMatterBattleArmor,
+                chkUseEdge,
+                chkUseSupportEdge,
+                chkUseImplants,
+                chkUseAlternativeQualityAveraging);
 
         return panel;
     }
@@ -613,30 +658,13 @@ public class PersonnelTab {
                 .addMouseListener(createTipPanelUpdater(generalHeader, "UseRemovalExemptRetirees"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelCleanUpPanel", true,
-                "PersonnelCleanUpPanel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel, null,
-                GridBagConstraints.NONE);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUsePersonnelRemoval, layout);
-        layout.gridx++;
-        panel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(35)));
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseRemovalExemptCemetery, layout);
-        layout.gridx++;
-        panel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(35)));
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseRemovalExemptRetirees, layout);
-        layout.gridx++;
-        panel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(35)));
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelCleanUpPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkUsePersonnelRemoval,
+                chkUseRemovalExemptCemetery,
+                chkUseRemovalExemptRetirees);
 
         return panel;
     }
@@ -657,16 +685,12 @@ public class PersonnelTab {
                 "AdminExperienceLevelIncludeNegotiation"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsPanel", true, "AdministratorsPanel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(chkAdminsHaveNegotiation, layout);
-
-        layout.gridy++;
-        panel.add(chkAdminExperienceLevelIncludeNegotiation, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AdministratorsPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkAdminsHaveNegotiation,
+                chkAdminExperienceLevelIncludeNegotiation);
 
         return panel;
     }
@@ -706,34 +730,18 @@ public class PersonnelTab {
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselCrew"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BlobCrewPanel", true, "BlobCrewPanel",
-                getMetadata(new Version(0, 50, 12)));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseBlobInfantry, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobBattleArmor, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobVehicleCrewGround, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobVehicleCrewVTOL, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobVehicleCrewNaval, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobVesselPilot, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobVesselGunner, layout);
-
-        layout.gridy++;
-        panel.add(chkUseBlobVesselCrew, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BlobCrewPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkUseBlobInfantry,
+                chkUseBlobBattleArmor,
+                chkUseBlobVehicleCrewGround,
+                chkUseBlobVehicleCrewVTOL,
+                chkUseBlobVehicleCrewNaval,
+                chkUseBlobVesselPilot,
+                chkUseBlobVesselGunner,
+                chkUseBlobVesselCrew);
 
         return panel;
     }
@@ -754,7 +762,7 @@ public class PersonnelTab {
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
         pnlAutoAwardsFilter = createAutoAwardsFilterPanel();
 
-        txtAwardSetFilterList = new JTextArea(10, 60);
+        txtAwardSetFilterList = new JTextArea(10, 1);
         txtAwardSetFilterList.setLineWrap(true);
         txtAwardSetFilterList.setWrapStyleWord(true);
         txtAwardSetFilterList.addMouseListener(createTipPanelUpdater(awardsHeader, "AwardSetFilterList"));
@@ -763,47 +771,26 @@ public class PersonnelTab {
         txtAwardSetFilterList.setName("txtAwardSetFilterList");
         txtAwardSetFilterList.setText("");
         JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
-        scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        JPanel pnlAwardSetFilter = createAwardSetFilterPanel(scrollAwardSetFilterList);
 
-        // Layout the Panel
-        final JPanel panelRight = new CampaignOptionsStandardPanel("AwardsTabRight");
-        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutRight.gridy = 0;
-        layoutRight.gridwidth = 1;
-        layoutRight.gridy++;
-        panelRight.add(pnlAutoAwardsFilter, layoutRight);
-
-        final JPanel panelBottom = new CampaignOptionsStandardPanel("AwardsTabBottom", true, "AwardsTabBottom",
+        MHQCollapsiblePanel awardRulesSection = createSection("lblAwardsTab.text",
+                "lblAwardsTab.summary",
+                pnlAwardsGeneralOptions);
+        MHQCollapsiblePanel awardTrackingSection = createSection("lblAutoAwardsFilterPanel.text",
+                "lblAutoAwardsFilterPanel.summary",
+                pnlAutoAwardsFilter);
+        MHQCollapsiblePanel awardFilterSection = createSection("lblAwardsTabBottom.text",
+                "lblAwardsTabBottom.summary",
+                pnlAwardSetFilter,
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        final GridBagConstraints layoutBottom = new CampaignOptionsGridBagConstraints(panelBottom,
-                null,
-                GridBagConstraints.HORIZONTAL);
 
-        layoutBottom.gridx = 0;
-        layoutBottom.gridy++;
-        panelBottom.add(txtAwardSetFilterList, layoutBottom);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("AwardsTabRight", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridy = 0;
-        panelParent.add(awardsHeader, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(pnlAwardsGeneralOptions, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 2;
-        panelParent.add(panelBottom, layoutParent);
+        JPanel panelParent = createSectionedPanel("AwardsTab",
+                awardsHeader,
+                awardRulesSection,
+                awardTrackingSection,
+                awardFilterSection);
 
         awardsPageCreated = true;
         updateAwardsControlsFromModel();
@@ -854,34 +841,15 @@ public class PersonnelTab {
         chkIgnoreStandardSet.addMouseListener(createTipPanelUpdater(awardsHeader, "IgnoreStandardSet"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AwardsGeneralOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblAwardBonusStyle, layout);
-        layout.gridx++;
-        panel.add(comboAwardBonusStyle, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAwardTierSize, layout);
-        layout.gridx++;
-        panel.add(spnAwardTierSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkEnableAutoAwards, layout);
-
-        layout.gridy++;
-        panel.add(chkIssuePosthumousAwards, layout);
-
-        layout.gridy++;
-        panel.add(chkIssueBestAwardOnly, layout);
-
-        layout.gridy++;
-        panel.add(chkIgnoreStandardSet, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AwardsGeneralOptionsPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblAwardBonusStyle, comboAwardBonusStyle);
+        panel.addRow(lblAwardTierSize, spnAwardTierSize);
+        panel.addCheckBox(chkEnableAutoAwards);
+        panel.addCheckBox(chkIssuePosthumousAwards);
+        panel.addCheckBox(chkIssueBestAwardOnly);
+        panel.addCheckBox(chkIgnoreStandardSet);
 
         return panel;
     }
@@ -927,43 +895,31 @@ public class PersonnelTab {
         chkEnableMiscAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableMiscAwards"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AutoAwardsFilterPanel", true,
-                "AutoAwardsFilterPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoAwardsFilterPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkEnableContractAwards,
+                chkEnableFactionHunterAwards,
+                chkEnableInjuryAwards,
+                chkEnableIndividualKillAwards,
+                chkEnableFormationKillAwards,
+                chkEnableRankAwards,
+                chkEnableScenarioAwards,
+                chkEnableSkillAwards,
+                chkEnableTheatreOfWarAwards,
+                chkEnableTimeAwards,
+                chkEnableTrainingAwards,
+                chkEnableMiscAwards);
 
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(chkEnableContractAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableFactionHunterAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableInjuryAwards, layout);
+        return panel;
+    }
 
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkEnableIndividualKillAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableFormationKillAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableRankAwards, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkEnableScenarioAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableSkillAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableTheatreOfWarAwards, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkEnableTimeAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableTrainingAwards, layout);
-        layout.gridx++;
-        panel.add(chkEnableMiscAwards, layout);
-
+    private JPanel createAwardSetFilterPanel(JScrollPane scrollAwardSetFilterList) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setName("pnlAwardSetFilterPanel");
+        panel.setOpaque(false);
+        panel.add(scrollAwardSetFilterList, BorderLayout.CENTER);
         return panel;
     }
 
@@ -976,7 +932,7 @@ public class PersonnelTab {
     public JPanel createMedicalTab() {
         // Header
         // start Medical Tab
-        CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
+        medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
                 getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
                 3);
 
@@ -1053,89 +1009,50 @@ public class PersonnelTab {
         spnMASHTheatreCapacity = new CampaignOptionsSpinner("MASHTheatreCapacity", 25, 1, 100, 1);
         spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater(medicalHeader, "MASHTheatreCapacity"));
 
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
-
-        layoutLeft.gridy = 0;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(lblMaximumPatients, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaximumPatients, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkDoctorsUseAdministration, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseUsefulMedics, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseMASHTheatres, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblMASHTheatreCapacity, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMASHTheatreCapacity, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblHealWaitingPeriod, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnHealWaitingPeriod, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblNaturalHealWaitingPeriod, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnNaturalHealWaitingPeriod, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomHitsForVehicles, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblMinimumHitsForVehicles, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMinimumHitsForVehicles, layoutLeft);
-
         // Layout the Panels
-        final JPanel panelRight = new CampaignOptionsStandardPanel("MedicalTabRight");
-        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+        final CampaignOptionsFormPanel medicalCapacityPanel = new CampaignOptionsFormPanel("MedicalCapacityPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        medicalCapacityPanel.addRow(lblMaximumPatients, spnMaximumPatients);
+        medicalCapacityPanel.addCheckBox(chkDoctorsUseAdministration);
+        medicalCapacityPanel.addCheckBox(chkUseUsefulMedics);
+        medicalCapacityPanel.addCheckBox(chkUseMASHTheatres);
+        medicalCapacityPanel.addRow(lblMASHTheatreCapacity, spnMASHTheatreCapacity);
 
-        layoutRight.gridy++;
-        layoutRight.gridwidth = 1;
-        panelRight.add(chkUseAdvancedMedical, layoutRight);
+        final CampaignOptionsFormPanel healingChecksPanel = new CampaignOptionsFormPanel("HealingChecksPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        healingChecksPanel.addRow(lblHealWaitingPeriod, spnHealWaitingPeriod);
+        healingChecksPanel.addRow(lblNaturalHealWaitingPeriod, spnNaturalHealWaitingPeriod);
+        healingChecksPanel.addCheckBox(chkUseRandomHitsForVehicles);
+        healingChecksPanel.addRow(lblMinimumHitsForVehicles, spnMinimumHitsForVehicles);
 
-        layoutRight.gridx = 0;
-        layoutRight.gridy++;
-        panelRight.add(chkUseTougherHealing, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(chkUseAlternativeAdvancedMedical, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(chkUseKinderAlternativeAdvancedMedical, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(chkUseRandomDiseases, layoutRight);
+        final CampaignOptionsFormPanel advancedMedicalRulesPanel = new CampaignOptionsFormPanel(
+                "AdvancedMedicalRulesPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        advancedMedicalRulesPanel.addCheckBoxGrid(2,
+                chkUseAdvancedMedical,
+                chkUseTougherHealing,
+                chkUseAlternativeAdvancedMedical,
+                chkUseKinderAlternativeAdvancedMedical,
+                chkUseRandomDiseases);
 
-        // Layout the Panels
-        final JPanel panelParent = new CampaignOptionsStandardPanel("MedicalTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+        MHQCollapsiblePanel medicalCapacitySection = createSection("lblMedicalCapacityPanel.text",
+                "lblMedicalCapacityPanel.summary",
+                medicalCapacityPanel);
+        MHQCollapsiblePanel healingChecksSection = createSection("lblHealingChecksPanel.text",
+                "lblHealingChecksPanel.summary",
+                healingChecksPanel);
+        MHQCollapsiblePanel advancedMedicalSection = createSection("lblAdvancedMedicalRulesPanel.text",
+                "lblAdvancedMedicalRulesPanel.summary",
+                advancedMedicalRulesPanel);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(medicalHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
+        JPanel panelParent = createSectionedPanel("MedicalTab",
+                medicalHeader,
+                medicalCapacitySection,
+                healingChecksSection,
+                advancedMedicalSection);
 
         medicalPageCreated = true;
         updateMedicalControlsFromModel();
@@ -1181,55 +1098,30 @@ public class PersonnelTab {
         JPanel pnlPersonnelLogs = createPersonnelLogsPanel();
 
         // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("PersonnelInformationLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkUseTimeInService, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(lblTimeInServiceDisplayFormat, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(comboTimeInServiceDisplayFormat, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseTimeInRank, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblTimeInRankDisplayFormat, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(comboTimeInRankDisplayFormat, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkTrackTotalEarnings, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkTrackTotalXPEarnings, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkShowOriginFaction, layoutLeft);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelInformation", true,
+        final CampaignOptionsFormPanel personnelInformationPanel = new CampaignOptionsFormPanel(
                 "PersonnelInformation",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        personnelInformationPanel.addCheckBox(chkUseTimeInService);
+        personnelInformationPanel.addRow(lblTimeInServiceDisplayFormat, comboTimeInServiceDisplayFormat);
+        personnelInformationPanel.addCheckBox(chkUseTimeInRank);
+        personnelInformationPanel.addRow(lblTimeInRankDisplayFormat, comboTimeInRankDisplayFormat);
+        personnelInformationPanel.addCheckBox(chkTrackTotalEarnings);
+        personnelInformationPanel.addCheckBox(chkTrackTotalXPEarnings);
+        personnelInformationPanel.addCheckBox(chkShowOriginFaction);
+
+        MHQCollapsiblePanel personnelInformationSection = createSection("lblPersonnelInformation.text",
+                "lblPersonnelInformation.summary",
+                personnelInformationPanel,
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+        MHQCollapsiblePanel personnelLogsSection = createSection("lblPersonnelLogsPanel.text",
+                "lblPersonnelLogsPanel.summary",
+                pnlPersonnelLogs);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(personnelInformationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(pnlPersonnelLogs, layoutParent);
+        JPanel panelParent = createSectionedPanel("PersonnelInformation",
+                personnelInformationHeader,
+                personnelInformationSection,
+                personnelLogsSection);
 
         informationPageCreated = true;
         updateInformationControlsFromModel();
@@ -1285,46 +1177,22 @@ public class PersonnelTab {
                 "DisplayPerformanceRecord"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsPanel", true, "PersonnelLogsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkUseTransfers, layout);
-
-        layout.gridy++;
-        panel.add(chkUseExtendedTOEForceName, layout);
-
-        layout.gridy++;
-        panel.add(chkPersonnelLogSkillGain, layout);
-
-        layout.gridy++;
-        panel.add(chkPersonnelLogAbilityGain, layout);
-
-        layout.gridy++;
-        panel.add(chkPersonnelLogEdgeGain, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayPersonnelLog, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayScenarioLog, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayKillRecord, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayMedicalRecord, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayPatientRecord, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayAssignmentRecord, layout);
-
-        layout.gridy++;
-        panel.add(chkDisplayPerformanceRecord, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelLogsPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                chkUseTransfers,
+                chkUseExtendedTOEForceName,
+                chkPersonnelLogSkillGain,
+                chkPersonnelLogAbilityGain,
+                chkPersonnelLogEdgeGain,
+                chkDisplayPersonnelLog,
+                chkDisplayScenarioLog,
+                chkDisplayKillRecord,
+                chkDisplayMedicalRecord,
+                chkDisplayPatientRecord,
+                chkDisplayAssignmentRecord,
+                chkDisplayPerformanceRecord);
 
         return panel;
     }
@@ -1347,23 +1215,19 @@ public class PersonnelTab {
         prisonerPanel = createPrisonersPanel();
         dependentsPanel = createDependentsPanel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersAndDependentsTab", true,
-                "PrisonersAndDependentsTab",
+        MHQCollapsiblePanel prisonersSection = createSection("lblPrisonersPanel.text",
+                "lblPrisonersPanel.summary",
+                prisonerPanel,
                 getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        MHQCollapsiblePanel civiliansSection = createSection("lblDependentsPanel.text",
+                "lblDependentsPanel.summary",
+                dependentsPanel,
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(prisonersAndDependentsHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(prisonerPanel, layoutParent);
-
-        layoutParent.gridx++;
-        panel.add(dependentsPanel, layoutParent);
+        JPanel panel = createSectionedPanel("PrisonersAndDependentsTab",
+                prisonersAndDependentsHeader,
+                prisonersSection,
+                civiliansSection);
 
         prisonersAndDependentsPageCreated = true;
         updatePrisonersAndDependentsControlsFromModel();
@@ -1409,25 +1273,12 @@ public class PersonnelTab {
                 "UseFunctionalEscapeArtist"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblPrisonerCaptureStyle, layout);
-        layout.gridx++;
-        panel.add(comboPrisonerCaptureStyle, layout);
-
-        layout.gridy++;
-        layout.gridx = 0;
-        layout.gridwidth = 2;
-        panel.add(chkUseFunctionalEscapeArtist, layout);
-
-        layout.gridy++;
-        layout.gridx = 0;
-        layout.gridwidth = 2;
-        panel.add(chkResetTemporaryPrisonerCapacity, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PrisonersPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblPrisonerCaptureStyle, comboPrisonerCaptureStyle);
+        panel.addCheckBox(chkUseFunctionalEscapeArtist);
+        panel.addCheckBox(chkResetTemporaryPrisonerCapacity);
 
         return panel;
     }
@@ -1467,27 +1318,13 @@ public class PersonnelTab {
                 "CivilianProfessionDieSize"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DependentsPanel", true, "DependentsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseRandomDependentAddition, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomDependentRemoval, layout);
-
-        layout.gridy++;
-        panel.add(lblDependentProfessionDieSize, layout);
-        layout.gridx++;
-        panel.add(spnDependentProfessionDieSize, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCivilianProfessionDieSize, layout);
-        layout.gridx++;
-        panel.add(spnCivilianProfessionDieSize, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DependentsPanel",
+                PERSONNEL_LABEL_COLUMN_WIDTH,
+                PERSONNEL_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseRandomDependentAddition);
+        panel.addCheckBox(chkUseRandomDependentRemoval);
+        panel.addRow(lblDependentProfessionDieSize, spnDependentProfessionDieSize);
+        panel.addRow(lblCivilianProfessionDieSize, spnCivilianProfessionDieSize);
 
         return panel;
     }

@@ -50,7 +50,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * Sticky contextual help surface for Campaign Options.
  */
 class CampaignOptionsHelpPanel extends JPanel {
-    private static final int HELP_PANEL_HEIGHT = 88;
+    private static final int HELP_PANEL_HEIGHT = 144;
     private static final int SCROLL_SPEED = 12;
 
     private final JEditorPane helpTextPane;

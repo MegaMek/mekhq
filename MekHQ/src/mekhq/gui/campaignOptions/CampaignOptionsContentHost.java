@@ -80,12 +80,19 @@ class CampaignOptionsContentHost extends JPanel {
     }
 
     void setContent(Component content, @Nullable String quoteResourceName) {
+        setContent(content, quoteResourceName, true);
+    }
+
+    void setContent(Component content, @Nullable String quoteResourceName, boolean showHelpPanel) {
         helpPanel.clearHelpText();
+        helpPanel.setVisible(showHelpPanel);
         contentPanel.removeAll();
         contentPanel.add(CampaignOptionsUtilities.createContentWithQuote(content, quoteResourceName),
               BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
+        revalidate();
+        repaint();
     }
 
     void resetScrollPosition() {

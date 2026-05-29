@@ -37,10 +37,15 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -56,8 +61,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -75,6 +83,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * `GroupLayout` for modularity and clarity.
  */
 public class FinancesTab {
+        private static final int FINANCES_LABEL_COLUMN_WIDTH = 300;
+        private static final int FINANCES_CONTROL_COLUMN_WIDTH = 220;
+
     private final CampaignOptions campaignOptions;
     private FinancesOptionsModel model;
     private boolean generalOptionsPageCreated;
@@ -108,8 +119,6 @@ public class FinancesTab {
     private JPanel pnlSales;
     private JCheckBox sellUnitsBox;
     private JCheckBox sellPartsBox;
-
-    private JPanel pnlOtherSystems;
 
     private JPanel pnlTaxes;
     private JCheckBox chkUseTaxes;
@@ -235,8 +244,6 @@ public class FinancesTab {
         sellUnitsBox = new JCheckBox();
         sellPartsBox = new JCheckBox();
 
-        pnlOtherSystems = new JPanel();
-
         // Taxes
         pnlTaxes = new JPanel();
         chkUseTaxes = new JCheckBox();
@@ -278,45 +285,125 @@ public class FinancesTab {
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
-        pnlOtherSystems = createOtherSystemsPanel();
-
         pnlPayments = createPaymentsPanel();
         pnlSales = createSalesPanel();
+        pnlTaxes = createTaxesPanel();
+        pnlShares = createSharesPanel();
+        pnlRentedFacilities = createRentedFacilitiesPanel();
+
+        MHQCollapsiblePanel generalSection = createSection("lblFinancialRulesPanel.text",
+                "lblFinancialRulesPanel.summary",
+                pnlGeneralOptions);
+        MHQCollapsiblePanel paymentsSection = createSection("lblPaymentsPanel.text",
+                "lblPaymentsPanel.summary",
+                pnlPayments);
+        MHQCollapsiblePanel salesSection = createSection("lblSalesPanel.text",
+                "lblSalesPanel.summary",
+                pnlSales);
+        MHQCollapsiblePanel taxesSection = createSection("lblTaxesPanel.text",
+                "lblTaxesPanel.summary",
+                pnlTaxes,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+        MHQCollapsiblePanel sharesSection = createSection("lblSharesPanel.text",
+                "lblSharesPanel.summary",
+                pnlShares,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+        MHQCollapsiblePanel rentedFacilitiesSection = createSection("lblRentedFacilitiesPanel.text",
+                "lblRentedFacilitiesPanel.summary",
+                pnlRentedFacilities,
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+
+        JPanel sectionControls = createSectionControls(generalSection,
+                paymentsSection,
+                salesSection,
+                taxesSection,
+                sharesSection,
+                rentedFacilitiesSection);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab");
+        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 1;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        layoutParent.weightx = 1.0;
+        panel.add(financesGeneralOptions, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layoutParent);
+
+        layoutParent.anchor = GridBagConstraints.NORTHWEST;
+        layoutParent.gridy++;
+        panel.add(generalSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(paymentsSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(salesSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(taxesSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(sharesSection, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(rentedFacilitiesSection, layoutParent);
+
         generalOptionsPageCreated = true;
         updateGeneralControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panelTransactions = new CampaignOptionsStandardPanel("FinancesGeneralTabTransactions");
-        GridBagConstraints layoutTransactions = new CampaignOptionsGridBagConstraints(panelTransactions);
-
-        layoutTransactions.gridwidth = 2;
-        layoutTransactions.gridy = 0;
-        layoutTransactions.gridx = 0;
-        panelTransactions.add(pnlPayments, layoutTransactions);
-        layoutTransactions.gridx += 2;
-        panelTransactions.add(pnlSales, layoutTransactions);
-
-        final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab", true);
-        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridy = 0;
-        panel.add(financesGeneralOptions, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlGeneralOptions, layoutParent);
-        layoutParent.gridx++;
-        panel.add(pnlOtherSystems, layoutParent);
-
-        layoutParent.gridwidth = 2;
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(panelTransactions, layoutParent);
-
         // Create Parent Panel and return
         return createParentPanel(panel, "FinancesGeneralTab");
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+            @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
     }
 
     /**
@@ -356,71 +443,20 @@ public class FinancesTab {
         payForHousingBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true, "PaymentsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(payForPartsBox, layout);
-        layout.gridx++;
-        panel.add(payForRepairsBox, layout);
-        layout.gridx++;
-        panel.add(payForUnitsBox, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(payForSalariesBox, layout);
-        layout.gridx++;
-        panel.add(payForOverheadBox, layout);
-        layout.gridx++;
-        panel.add(payForMaintainBox, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(payForTransportBox, layout);
-        layout.gridx++;
-        panel.add(payForRecruitmentBox, layout);
-        layout.gridx++;
-        panel.add(payForFoodBox, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(payForHousingBox, layout);
-
-        return panel;
-    }
-
-    /**
-     * Constructs and returns a {@link JPanel} for the 'Other Systems Panel'. This
-     * panel combines two sub-panels: 'Taxes
-     * Panel' and 'Shares Panel'. Each sub-panel is added sequentially to the main
-     * panel using a grid-bag layout. These
-     * panels are organized vertically in the resulting panel.
-     *
-     * @return {@link JPanel} representing the 'Other Systems Panel', containing the
-     *         'Taxes Panel' and 'Shares Panel'.
-     */
-    private JPanel createOtherSystemsPanel() {
-        // Contents
-        pnlTaxes = createTaxesPanel();
-        pnlShares = createSharesPanel();
-        pnlRentedFacilities = createRentedFacilitiesPanel();
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(pnlTaxes, layout);
-
-        layout.gridy++;
-        panel.add(pnlShares, layout);
-
-        layout.gridy++;
-        panel.add(pnlRentedFacilities, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PaymentsPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2,
+                payForPartsBox,
+                payForRepairsBox,
+                payForUnitsBox,
+                payForSalariesBox,
+                payForOverheadBox,
+                payForMaintainBox,
+                payForTransportBox,
+                payForRecruitmentBox,
+                payForFoodBox,
+                payForHousingBox);
 
         return panel;
     }
@@ -469,39 +505,17 @@ public class FinancesTab {
         chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SimulateGrayMonday"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(useLoanLimitsBox, layout);
-
-        layout.gridy++;
-        panel.add(usePercentageMaintenanceBox, layout);
-
-        layout.gridy++;
-        panel.add(useExtendedPartsModifierBox, layout);
-
-        layout.gridy++;
-        panel.add(usePeacetimeCostBox, layout);
-
-        layout.gridy++;
-        panel.add(showPeacetimeCostBox, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblFinancialYearDuration, layout);
-        layout.gridx++;
-        panel.add(comboFinancialYearDuration, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(newFinancialYearFinancesToCSVExportBox, layout);
-
-        layout.gridy++;
-        panel.add(chkSimulateGrayMonday, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralOptionsPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(useLoanLimitsBox);
+        panel.addCheckBox(usePercentageMaintenanceBox);
+        panel.addCheckBox(useExtendedPartsModifierBox);
+        panel.addCheckBox(usePeacetimeCostBox);
+        panel.addCheckBox(showPeacetimeCostBox);
+        panel.addRow(lblFinancialYearDuration, comboFinancialYearDuration);
+        panel.addCheckBox(newFinancialYearFinancesToCSVExportBox);
+        panel.addCheckBox(chkSimulateGrayMonday);
 
         return panel;
     }
@@ -523,16 +537,10 @@ public class FinancesTab {
         sellPartsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SellPartsBox"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SalesPanel", true, "SalesPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(sellUnitsBox, layout);
-
-        layout.gridy++;
-        panel.add(sellPartsBox, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalesPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2, sellUnitsBox, sellPartsBox);
 
         return panel;
     }
@@ -556,20 +564,11 @@ public class FinancesTab {
         spnTaxesPercentage.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "TaxesPercentage"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true, "TaxesPanel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkUseTaxes, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblTaxesPercentage, layout);
-        layout.gridx++;
-        panel.add(spnTaxesPercentage, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TaxesPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseTaxes);
+        panel.addRow(lblTaxesPercentage, spnTaxesPercentage);
 
         return panel;
     }
@@ -592,17 +591,10 @@ public class FinancesTab {
         chkSharesForAll.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SharesForAll"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true, "SharesPanel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseShareSystem, layout);
-
-        layout.gridy++;
-        panel.add(chkSharesForAll, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SharesPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(2, chkUseShareSystem, chkSharesForAll);
 
         return panel;
     }
@@ -646,35 +638,13 @@ public class FinancesTab {
                 "RentedFacilitiesCostRepairBays"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RentedFacilitiesPanel", true,
-                "RentedFacilitiesPanel",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(lblRentedFacilitiesCostHospitalBeds, layout);
-        layout.gridx++;
-        panel.add(spnRentedFacilitiesCostHospitalBeds, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRentedFacilitiesCostKitchens, layout);
-        layout.gridx++;
-        panel.add(spnRentedFacilitiesCostKitchens, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRentedFacilitiesCostHoldingCells, layout);
-        layout.gridx++;
-        panel.add(spnRentedFacilitiesCostHoldingCells, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRentedFacilitiesCostRepairBays, layout);
-        layout.gridx++;
-        panel.add(spnRentedFacilitiesCostRepairBays, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RentedFacilitiesPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRentedFacilitiesCostHospitalBeds, spnRentedFacilitiesCostHospitalBeds);
+        panel.addRow(lblRentedFacilitiesCostKitchens, spnRentedFacilitiesCostKitchens);
+        panel.addRow(lblRentedFacilitiesCostHoldingCells, spnRentedFacilitiesCostHoldingCells);
+        panel.addRow(lblRentedFacilitiesCostRepairBays, spnRentedFacilitiesCostRepairBays);
 
         return panel;
     }
