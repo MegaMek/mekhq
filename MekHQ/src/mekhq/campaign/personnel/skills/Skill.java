@@ -489,7 +489,7 @@ public class Skill {
         // Appraisal
         if (Objects.equals(S_APPRAISAL, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_BARGAIN_HUNTER)) {
-                modifier += 1;
+                modifier += 2;
             }
         }
 
