@@ -58,7 +58,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import megamek.Version;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
 import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
@@ -1175,6 +1178,60 @@ public class AmmoBinTest {
 
         // ... but the correct amount of our original ammo type unloaded from the bin.
         assertEquals(ammoType.getShots(), quartermaster.getAmmoAvailable(ammoType));
+    }
+
+    @Test
+    public void loadBinForOneShotResetsFiredState() {
+        Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        Warehouse warehouse = new Warehouse();
+        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        AmmoType ammoType = getAmmoType("IS Ammo RL-10");
+
+        // Create an Ammo Bin with no ammo ...
+        int shotsNeeded = ammoType.getShots();
+        int equipmentNum = 42;
+        AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, shotsNeeded, true, false, mockCampaign);
+
+        // ... place the ammo bin on a unit ...
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockMounted.getType()).thenReturn(ammoType);
+        when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+        ammoBin.setUnit(mockUnit);
+
+
+        // ...Set up the linking weapon...
+        WeaponType launcherType = (WeaponType) EquipmentUtilities.getEquipmentType("RL 10");
+        WeaponMounted launcher = new WeaponMounted(mockEntity, launcherType);
+        launcher.setLinked(mockMounted);
+        when(mockMounted.getLinkedBy()).thenReturn((Mounted) launcher);
+
+        // ...set the linking weapon as having fired...
+        launcher.setFired(true);
+
+        // ... and add just enough ammo of the right type to the warehouse ...
+        quartermaster.addAmmo(ammoType, ammoType.getShots());
+
+        // ... and try to load it.
+        ammoBin.loadBin();
+
+        // The launcher should now no longer be in the "fired" state.
+        assertFalse(launcher.isFired());
+
+        // We should have no shots needed ...
+        assertEquals(0, ammoBin.getShotsNeeded());
+        verify(mockMounted, times(1)).setShotsLeft(eq(shotsNeeded));
+
+        // ... and no more ammo available in the warehouse
+        assertEquals(0, quartermaster.getAmmoAvailable(ammoType));
     }
 
     @Test
