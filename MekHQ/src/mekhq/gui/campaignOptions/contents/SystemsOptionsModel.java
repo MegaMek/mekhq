@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 class SystemsOptionsModel {
     int manualUnitRatingModifier;
     boolean resetCriminalRecord;
+    boolean requireSupportForceTransportation;
     boolean clampReputationPayMultiplier;
     boolean reduceReputationPerformanceModifier;
     boolean reputationPerformanceModifierCutOff;
@@ -67,6 +68,7 @@ class SystemsOptionsModel {
     SystemsOptionsModel(CampaignOptions options, RandomSkillPreferences skillPreferences) {
         manualUnitRatingModifier = options.getManualUnitRatingModifier();
         resetCriminalRecord = false;
+        requireSupportForceTransportation = options.isRequireSupportForceTransportation();
         clampReputationPayMultiplier = options.isClampReputationPayMultiplier();
         reduceReputationPerformanceModifier = options.isReduceReputationPerformanceModifier();
         reputationPerformanceModifierCutOff = options.isReputationPerformanceModifierCutOff();
@@ -96,6 +98,7 @@ class SystemsOptionsModel {
 
     void applyTo(CampaignOptions options, RandomSkillPreferences skillPreferences) {
         options.setManualUnitRatingModifier(manualUnitRatingModifier);
+        options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
         options.setReduceReputationPerformanceModifier(reduceReputationPerformanceModifier);
         options.setReputationPerformanceModifierCutOff(reputationPerformanceModifierCutOff);

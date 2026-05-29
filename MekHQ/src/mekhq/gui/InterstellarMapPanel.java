@@ -354,9 +354,8 @@ public class InterstellarMapPanel extends JPanel {
                                           InterstellarMapPanel.this.campaign.isGM());
                     item.addActionListener(evt -> {
                         InterstellarMapPanel.this.campaign.getCurrentLocation()
-                              .setRecharged(InterstellarMapPanel.this.campaign);
+                              .chargeFully(InterstellarMapPanel.this.campaign);
                         InterstellarMapPanel.this.campaign.addReport(GENERAL, "GM: Jumpship drives fully charged");
-                        hqView.refreshLocation();
                     });
                     menuGM.add(item);
 

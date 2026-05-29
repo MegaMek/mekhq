@@ -50,6 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -101,6 +102,7 @@ public class SystemsTab {
     private JButton btnResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
+    private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
@@ -256,6 +258,11 @@ public class SystemsTab {
      */
     private JPanel createReputationSanityPanel() {
         // Contents
+        chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
+                getMetadata(new Version(0, 51, 0)));
+        chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater(reputationHeader,
+                "RequireSupportForceTransportation"));
+
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.RECOMMENDED));
@@ -280,6 +287,7 @@ public class SystemsTab {
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
                 chkClampReputationPayMultiplier,
+                chkRequireSupportForceTransportation,
                 chkReduceReputationPerformanceModifier,
                 chkReputationPerformanceModifierCutOff);
 
@@ -699,6 +707,7 @@ public class SystemsTab {
 
         manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
         updateResetCriminalRecordButtonFromModel();
+        chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
         chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
         chkReduceReputationPerformanceModifier.setSelected(model.reduceReputationPerformanceModifier);
         chkReputationPerformanceModifierCutOff.setSelected(model.reputationPerformanceModifierCutOff);
@@ -764,6 +773,7 @@ public class SystemsTab {
         }
 
         model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
+        model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
         model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();
         model.reputationPerformanceModifierCutOff = chkReputationPerformanceModifierCutOff.isSelected();

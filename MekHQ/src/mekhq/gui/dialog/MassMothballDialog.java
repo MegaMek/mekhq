@@ -63,6 +63,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.utilities.ReportingUtilities;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
  *
@@ -77,6 +79,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     private final Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
     private final Campaign campaign;
     private boolean activating;
+    private JCheckBox clearDesignationsCheckbox;
 
     private final JPanel contentPanel = new JPanel();
     // endregion Variable Declarations
@@ -124,6 +127,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             gbc.gridy++;
             addUnitTypePanel(unitType, gbc);
         }
+
+        gbc.gridy++;
+        addClearDesignationsCheckBox(gbc);
 
         gbc.gridy++;
         addExecuteButton(activating, gbc);
@@ -249,6 +255,24 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     }
 
     /**
+     * Renders a checkbox to remove designations/assignments to the content pane
+     *
+     * @param gbc       the input gridBagConstraints to use
+     */
+
+    private void addClearDesignationsCheckBox(GridBagConstraints gbc) {
+        if (!activating) {
+            gbc.gridx = 1;
+            gbc.weightx = 0.8;
+            gbc.weighty = 0.1;
+            gbc.anchor = GridBagConstraints.CENTER;
+            clearDesignationsCheckbox = new JCheckBox();
+            clearDesignationsCheckbox.setText(getText("mothballUnit.clearDesignationsDialog.text"));
+            contentPanel.add(clearDesignationsCheckbox, gbc);
+        }
+    }
+
+    /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
      */
     private void setUserPreferences() {
@@ -304,6 +328,10 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
                 UUID id = selectedTechs.get(techIndex).getId();
                 Person tech = campaign.getPerson(id);
                 if (isMothballing) {
+                    if (clearDesignationsCheckbox != null && clearDesignationsCheckbox.isSelected()) {
+                        unit.clearCrew();
+                        unit.getCampaign().removeUnitFromFormation(unit);
+                    }
                     unit.startMothballing(tech);
                 } else {
                     unit.startActivating(tech);

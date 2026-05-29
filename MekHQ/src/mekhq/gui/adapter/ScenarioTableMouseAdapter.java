@@ -76,9 +76,12 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
             return Optional.empty();
         }
 
-        JPopupMenu popup = new JPopupMenu();
-
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        if ((scenario == null) || !scenario.getStatus().isCurrent()) {
+            return Optional.empty();
+        }
+
+        JPopupMenu popup = new JPopupMenu();
         JMenuItem menuItem;
         JMenu menu;
 

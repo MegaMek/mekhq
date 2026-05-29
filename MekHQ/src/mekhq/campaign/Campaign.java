@@ -70,6 +70,7 @@ import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.io.IOException;
@@ -159,6 +160,8 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
@@ -257,7 +260,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Taharqa
  */
-public class Campaign implements ITechManager {
+public class Campaign implements ITechManager, ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
@@ -376,8 +379,9 @@ public class Campaign implements ITechManager {
     private Finances finances;
 
     private Systems systemsInstance;
+    private LocationNode locationNode;
+    private List<AbstractLocation> locations = new ArrayList<>();
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
-    private CurrentLocation location;
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -457,8 +461,11 @@ public class Campaign implements ITechManager {
         COMMAND, LOGISTICS, TRANSPORT, HR
     }
 
+    @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     private HumanResources humanResources = new HumanResources();
 
@@ -510,7 +517,7 @@ public class Campaign implements ITechManager {
           PartsStore partsStore, NewPersonnelMarket newPersonnelMarket,
           RandomDeath randomDeath, CampaignSummary campaignSummary,
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
-          Systems systemsInstance, CurrentLocation startLocation, ReputationController reputationController,
+          Systems systemsInstance, AbstractLocation startLocation, ReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Formation formation, Finances finances,
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
@@ -532,7 +539,9 @@ public class Campaign implements ITechManager {
         game.setOptions(gameOptions);
         this.techFaction = techFaction;
         this.systemsInstance = systemsInstance;
-        location = startLocation;
+        this.locationNode = new LocationNode(this);
+        setLocation(startLocation);
+        this.setParent(startLocation);
         reputation = reputationController;
         this.factionStandings = factionStandings;
         formations = formation;
@@ -798,10 +807,6 @@ public class Campaign implements ITechManager {
 
     public void setCampaignStartDate(LocalDate campaignStartDate) {
         this.campaignStartDate = campaignStartDate;
-    }
-
-    public PlanetarySystem getCurrentSystem() {
-        return location.getCurrentSystem();
     }
 
     public boolean isAvoidingEmptySystems() {
@@ -1716,8 +1721,22 @@ public class Campaign implements ITechManager {
         return scenarios.values().stream().filter(s -> s.getStatus().isCurrent()).toList();
     }
 
-    public void setLocation(CurrentLocation l) {
-        location = l;
+    public void setLocation(AbstractLocation location) {
+        locations.clear();
+        if (location != null) {
+            locations.add(location);
+        }
+        setParent(location);
+    }
+
+    public void addLocation(AbstractLocation location) {
+        if (location != null) {
+            locations.add(location);
+        }
+    }
+
+    public List<AbstractLocation> getLocations() {
+        return Collections.unmodifiableList(locations);
     }
 
     /**
@@ -1748,13 +1767,15 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public CurrentLocation getCurrentLocation() {
-        return location;
+    @Override
+    @Nullable
+    public LocationNode getLocationNode() {
+        return locationNode;
     }
 
     public boolean isOnContractAndPlanetside() {
         boolean isOnContract = !getActiveMissions(false).isEmpty();
-        boolean isPlanetside = location.isOnPlanet();
+        boolean isPlanetside = isOnPlanet();
         return isPlanetside && isOnContract;
     }
 
@@ -2541,6 +2562,10 @@ public class Campaign implements ITechManager {
         return humanResources.getPatientsAssignedToDoctors();
     }
 
+    public List<Person> getPatientsWithNonPermanentInjuries() {
+        return humanResources.getPatientsWithNonPermanentInjuries();
+    }
+
     /**
      * List of all units that can show up in the repair bay.
      */
@@ -2859,7 +2884,12 @@ public class Campaign implements ITechManager {
      * @return The person in the designated role with the most experience.
      */
     public Person findBestInRole(PersonnelRole role, String primary, @Nullable String secondary) {
-        return humanResources.findBestInRole(role, primary, secondary, getCampaignOptions(), isClanCampaign(), getLocalDate());
+        return humanResources.findBestInRole(role,
+              primary,
+              secondary,
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate());
     }
 
     public Person findBestInRole(PersonnelRole role, String skill) {
@@ -2886,15 +2916,27 @@ public class Campaign implements ITechManager {
     }
 
     public List<Person> getTechs(final boolean noZeroMinute) {
-        return humanResources.getTechs(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute);
+        return humanResources.getTechs(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute);
     }
 
     public List<Person> getTechsExpanded() {
-        return humanResources.getTechsExpanded(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate());
+        return humanResources.getTechsExpanded(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate());
     }
 
     public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
-        return humanResources.getTechs(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute, eliteFirst);
+        return humanResources.getTechs(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute,
+              eliteFirst);
     }
 
     /**
@@ -2907,7 +2949,13 @@ public class Campaign implements ITechManager {
      * @return A list of active technicians sorted appropriately.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
-        return humanResources.getTechsExpanded(getHangar().getUnits(), getCampaignOptions(), isClanCampaign(), getLocalDate(), noZeroMinute, eliteFirst, expanded);
+        return humanResources.getTechsExpanded(getHangar().getUnits(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              noZeroMinute,
+              eliteFirst,
+              expanded);
     }
 
     public List<Person> getAdmins() {
@@ -4284,22 +4332,17 @@ public class Campaign implements ITechManager {
         }
     }
 
-    /** Use {@link #refreshPersonnelMarkets(boolean)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshPersonnelMarkets() {
-        humanResources.refreshPersonnelMarkets(this);
-    }
-
     /**
-     * Refreshes the personnel markets based on the current market style and the current date.
+     * Refreshes the applicants available for recruiting based on the current recruitment style and the current date.
      *
-     * @param isCampaignStart {@code true} if campaign method is being called at the start of the campaign
+     * @param bypassDateRestrictions {@code true} if we want the applicants to refresh at an unusual time, such as
+     *                               campaign start
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets(boolean isCampaignStart) {
-        humanResources.refreshPersonnelMarkets(this, isCampaignStart);
+    public void refreshApplicants(boolean bypassDateRestrictions) {
+        humanResources.refreshApplicants(this, bypassDateRestrictions);
     }
 
     public int getInitiativeBonus() {
@@ -5372,6 +5415,17 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions() != null) {
             CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
+
+        // We've had instances where game options aren't loaded correctly from player campaigns, potentially due to
+        // age. This safeguards against that occurance, preventing players entering a state where they cannot
+        // continue their campaigns.
+        if (gameOptions == null) {
+            gameOptions = new GameOptions();
+            LOGGER.errorDialog(new NullPointerException(),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.body"),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.title"));
+        }
+
         getGameOptions().writeToXML(writer, indent);
         // endregion Options
 
@@ -5394,7 +5448,12 @@ public class Campaign implements ITechManager {
         formations.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
-        location.writeToXML(writer, indent);
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
+        for (AbstractLocation loc : locations) {
+            loc.writeToXML(writer, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
+        locationNode.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         MHQXMLUtility.writeSimpleXMLTag(writer,
               indent,
@@ -7035,26 +7094,7 @@ public class Campaign implements ITechManager {
      * @param role the personnel role to fill
      */
     public void fillTempCrewPoolForRole(PersonnelRole role) {
-        if (!isBlobCrewEnabled(role)) {
-            return;
-        }
-
-        int need = 0;
-        for (Unit unit : getUnits()) {
-            if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-                int totalCurrentCrew = currentCrew + currentTempCrew;
-                if (fullCrew > totalCurrentCrew) {
-                    need += (fullCrew - totalCurrentCrew);
-                }
-            }
-        }
-
-        if (need > 0) {
-            increaseTempCrewPool(role, need);
-        }
+        humanResources.fillTempCrewPoolForRole(this, getCampaignOptions(), role);
     }
 
     /**
@@ -7069,23 +7109,41 @@ public class Campaign implements ITechManager {
 
 
     /**
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
+     */
+    public void releaseSurplusAsTechPool() {
+        humanResources.releaseSurplusAsTechPool(this);
+    }
+
+    /**
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
+     */
+    public void releaseSurplusMedicPool() {
+        humanResources.releaseSurplusMedicPool(this);
+    }
+
+    /**
+     * Releases surplus temp crew for a specific blob crew role.
+     *
+     * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
+     *
+     * @param role the personnel role to trim
+     */
+    public void releaseSurplusBlobCrewForRole(PersonnelRole role) {
+        humanResources.releaseSurplusBlobCrewForRole(this, role);
+    }
+
+    /**
      * Clears blob crew for a specific personnel role from units and empties the campaign pool. Should be called when a
      * specific blob crew option is disabled.
      *
      * @param role the personnel role to clear
      */
     public void clearBlobCrewForRole(PersonnelRole role) {
-        // Clear temp crew from all units for this specific role
-        for (Unit unit : getUnits()) {
-            if (unit.getTempCrewByPersonnelRole(role) > 0) {
-                unit.setTempCrew(role, 0);
-            }
-        }
-
-        // Empty the campaign pool for this specific role
-        if (getTempCrewPool(role) > 0) {
-            setTempCrewPool(role, 0);
-        }
+        humanResources.clearBlobCrewForRole(this, role);
     }
 
     /**
@@ -7096,85 +7154,18 @@ public class Campaign implements ITechManager {
      */
     @Deprecated
     public void clearBlobCrew() {
-        // Clear temp crew from all units
-        for (Unit unit : getUnits()) {
-            for (PersonnelRole role : PersonnelRole.values()) {
-                if (unit.getTempCrewByPersonnelRole(role) > 0) {
-                    unit.setTempCrew(role, 0);
-                }
-            }
-        }
-
-        // Empty all campaign pools
         for (PersonnelRole role : PersonnelRole.values()) {
-            if (getTempCrewPool(role) > 0) {
-                setTempCrewPool(role, 0);
-            }
+            clearBlobCrewForRole(role);
         }
     }
 
     /**
-     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use temp
-     * crew - checks if the commander is null
-     *
-     * @param unit the unit to check
-     * @param role the personnel role
-     *
-     * @return true if the unit can use this type of temp crew
-     */
-    private boolean unitCanUseTempCrewRole(Unit unit, PersonnelRole role) {
-        if (unit.getCommander() == null || unit.getEntity() == null) {
-            return false;
-        }
-
-        return switch (role) {
-            case SOLDIER,
-                 BATTLE_ARMOUR,
-                 VEHICLE_CREW_GROUND,
-                 VEHICLE_CREW_VTOL,
-                 VEHICLE_CREW_NAVAL,
-                 VESSEL_PILOT -> unit.getDriverRole() == role;
-            case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter)) &&
-                                      unit.canTakeMoreVesselCrew();
-            default -> false;
-        };
-    }
-
-    /**
-     * Distributes temp crew from the pool to units that need crew for a specific personnel role. Each unit can be
-     * filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     * Distributes temp crew from the pool to units that need crew for a specific personnel role.
      *
      * @param role the personnel role to distribute
      */
     public void distributeTempCrewPoolToUnits(PersonnelRole role) {
-        if (!isBlobCrewEnabled(role)) {
-            return;
-        }
-
-        int availablePool = getAvailableTempCrewPool(role);
-        for (Unit unit : getUnits()) {
-            if (availablePool <= 0) {
-                break;
-            }
-
-            if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-
-                int totalCurrentCrew = currentCrew + unit.getTotalTempCrew();
-                int needed = fullCrew - totalCurrentCrew;
-
-                if (needed > 0) {
-                    int toAssign = Math.min(needed, availablePool);
-                    unit.setTempCrew(role, currentTempCrew + toAssign);
-                    availablePool -= toAssign;
-                }
-            }
-        }
-        // Note: No need to decrease the total pool - it's tracked by units automatically
-        // The pool represents the TOTAL, and "in use" is calculated from units
+        humanResources.distributeTempCrewPoolToUnits(this, getCampaignOptions(), role);
     }
 
 
@@ -8341,7 +8332,7 @@ public class Campaign implements ITechManager {
      *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
      */
     public int checkTurnoverPrompt() {
-        if (!location.isOnPlanet()) {
+        if (!isOnPlanet()) {
             return -1;
         }
 

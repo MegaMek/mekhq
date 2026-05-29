@@ -60,9 +60,11 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.sorter.LevelSorter;
@@ -127,18 +129,20 @@ public class SalvageTechPicker extends JDialog {
      *                             instructions and a Cancel button are shown.
      * @param alreadySelectedTechs list of tech UUIDs that should start as pre-selected.
      * @param isClanCampaign       {@code true} if the campaign is Clan affiliated
+     * @param fieldControl         who controls the field at the end of the scenario
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign) {
+    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign,
+          ScenarioTemplate.BattlefieldControlType fieldControl) {
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
 
         // Instructions at the top
         JPanel instructionsPanel = new JPanel(new BorderLayout());
-        JTextArea instructionsLabel = new JTextArea(getInstructions());
+        JTextArea instructionsLabel = new JTextArea(getInstructions(fieldControl));
         instructionsLabel.setLineWrap(true);
         instructionsLabel.setWrapStyleWord(true);
         instructionsLabel.setEditable(false);
@@ -325,13 +329,25 @@ public class SalvageTechPicker extends JDialog {
     /**
      * Localized instructional text for the dialog header.
      *
+     * @param fieldControl the field control type to use for the instructions text
+     *
      * @return the localized instructions string
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getInstructions() {
-        return getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.instructions");
+    private static String getInstructions(@Nullable ScenarioTemplate.BattlefieldControlType fieldControl) {
+        String instructions = getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.instructions");
+
+        if (fieldControl != null) {
+            String controlText = getText("ResolveDialog.control." + fieldControl.name());
+
+            return instructions + ' ' + controlText;
+        }
+
+        String unknownFieldControlText = getTextAt(RESOURCE_BUNDLE,
+              "SalvageTechPicker.instructions.fieldControlUnknown");
+        return instructions + ' ' + unknownFieldControlText;
     }
 
     /**

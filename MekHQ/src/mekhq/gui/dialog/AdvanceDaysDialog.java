@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -543,8 +543,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             getSpnDays().setValue(days);
         }
 
-        getGUI().refreshCalendar();
-        getGUI().refreshLocation();
+        getGUI().refreshWindowTitle();
         getGUI().refreshAllTabs();
     }
 

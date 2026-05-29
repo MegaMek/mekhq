@@ -38,7 +38,9 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.Locale;
 import javax.swing.BorderFactory;
+import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -58,6 +60,10 @@ import megamek.client.ui.util.UIUtil;
  */
 public class RoundedLineBorder extends AbstractBorder {
     private static final int PADDING = 5;
+    private static final int SUBTLE_PADDING = 4;
+    private static final String TITLE_GAP = "  ";
+    private static final String HTML_TITLE_GAP = "&nbsp;&nbsp;";
+    private static final String HTML_CLOSE = "</html>";
 
     private final Color color;
     private final int thickness;
@@ -92,8 +98,63 @@ public class RoundedLineBorder extends AbstractBorder {
      * @since 0.50.07
      */
     public static TitledBorder createRoundedLineBorder(String borderTitle) {
-        return BorderFactory.createTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
+        return createRoundedTitledBorder(RoundedLineBorder.createRoundedLineBorder(),
               String.format("<html><b>%s</b></html>", borderTitle));
+    }
+
+    /** Creates a titled rounded border using the supplied visual details and internal padding. */
+    public static TitledBorder createRoundedLineBorder(String borderTitle, Color color, int thickness, int arc,
+          int padding) {
+        Border rounded = new RoundedLineBorder(color, thickness, arc);
+        Border innerPadding = BorderFactory.createEmptyBorder(padding, padding, padding, padding);
+
+        return createRoundedTitledBorder(BorderFactory.createCompoundBorder(rounded, innerPadding), borderTitle);
+    }
+
+    /** Creates a compact 1px rounded border. */
+    public static CompoundBorder createSubtleRoundedLineBorder() {
+        Border rounded = new RoundedLineBorder(getSubtleBorderColor(), 1, 10);
+        Border padding = BorderFactory.createEmptyBorder(SUBTLE_PADDING,
+              SUBTLE_PADDING,
+              SUBTLE_PADDING,
+              SUBTLE_PADDING);
+
+        return BorderFactory.createCompoundBorder(rounded, padding);
+    }
+
+    /** Creates a titled compact 1px rounded border. */
+    public static TitledBorder createSubtleRoundedLineBorder(String borderTitle) {
+        return createRoundedTitledBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
+              String.format("<html><b>%s</b></html>", borderTitle));
+    }
+
+    private static TitledBorder createRoundedTitledBorder(Border border, String borderTitle) {
+        return new RoundedTitledBorder(border, borderTitle);
+    }
+
+    private static String addTitleGap(String title) {
+        if ((title == null) || title.isBlank()) {
+            return title;
+        }
+
+        int htmlCloseIndex = title.toLowerCase(Locale.ROOT).lastIndexOf(HTML_CLOSE);
+        if (htmlCloseIndex >= 0) {
+            String htmlTitle = title.substring(0, htmlCloseIndex);
+            if (htmlTitle.endsWith(HTML_TITLE_GAP)) {
+                return title;
+            }
+            return htmlTitle + HTML_TITLE_GAP + title.substring(htmlCloseIndex);
+        }
+
+        return title.endsWith(TITLE_GAP) ? title : title + TITLE_GAP;
+    }
+
+    private static Color getSubtleBorderColor() {
+        Color color = UIManager.getColor("Component.borderColor");
+        if (color == null) {
+            color = UIManager.getColor("Separator.foreground");
+        }
+        return (color == null) ? UIUtil.uiIndependentGray() : color;
     }
 
     /**
@@ -110,6 +171,18 @@ public class RoundedLineBorder extends AbstractBorder {
         this.color = color;
         this.thickness = thickness;
         this.arc = arc;
+    }
+
+    private static class RoundedTitledBorder extends TitledBorder {
+        private RoundedTitledBorder(Border border, String title) {
+            super(border);
+            setTitle(title);
+        }
+
+        @Override
+        public void setTitle(String title) {
+            super.setTitle(addTitleGap(title));
+        }
     }
 
     /**

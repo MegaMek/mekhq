@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import megamek.common.battleArmor.BattleArmor;
+import megamek.common.enums.SkillLevel;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Mek;
@@ -792,13 +793,16 @@ public class MRMSService {
             }
 
             Skill skill = tech.getSkillForWorkingOn(partWork);
+            SkillModifierData skillModifierData = tech.getSkillModifierData();
 
             if (canChangeWorkTime) {
                 ((Part) partWork).resetModeToNormal();
             }
 
             // We really only have to check one tech of each skill level
-            if (!techSkillToWorktimeMap.containsKey(skill.getType().getName() + "-" + skill.getLevel())) {
+            SkillLevel skillLevel = skill.getSkillLevel(skillModifierData);
+            int experienceLevel = skillLevel.getExperienceLevel();
+            if (!techSkillToWorktimeMap.containsKey(skill.getType().getName() + "-" + experienceLevel)) {
                 TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
                 WorkTime selectedWorktime = WorkTime.NORMAL;
 
@@ -851,7 +855,7 @@ public class MRMSService {
                     }
                 }
 
-                techSkillToWorktimeMap.put(skill.getType().getName() + "-" + skill.getLevel(), selectedWorktime);
+                techSkillToWorktimeMap.put(skill.getType().getName() + "-" + experienceLevel, selectedWorktime);
 
                 if (canChangeWorkTime) {
                     ((Part) partWork).resetModeToNormal();
@@ -861,7 +865,7 @@ public class MRMSService {
             // Fallback TN check to account for discrepancies between Techs
             TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
             if (canChangeWorkTime) {
-                WorkTime workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+                WorkTime workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + experienceLevel);
                 if (null == workTime) {
                     debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
                     workTime = WorkTime.NORMAL;
@@ -894,7 +898,7 @@ public class MRMSService {
 
             boolean isSameDayTech;
 
-            WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
+            WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech, experienceLevel);
             int expectedTime = getExpectedWorkTime((partWork), workTime);
 
             if ((tech.getMinutesLeft() < expectedTime)) {
@@ -957,7 +961,10 @@ public class MRMSService {
         Person tech = validTechs.getFirst();
 
         Skill skill = tech.getSkillForWorkingOn(partWork);
-        WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech);
+        SkillModifierData skillModifierData = tech.getSkillModifierData();
+        SkillLevel skillLevel = skill.getSkillLevel(skillModifierData);
+        int experienceLevel = skillLevel.getExperienceLevel();
+        WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech, experienceLevel);
 
         setPartWorkTime(partWork, workTime);
 
@@ -988,12 +995,12 @@ public class MRMSService {
         }
     }
 
-    private static WorkTime getWorkTime(boolean canChangeWorkTime,
-          Map<String, WorkTime> techSkillToWorktimeMap, Skill skill, Person tech) {
+    private static WorkTime getWorkTime(boolean canChangeWorkTime, Map<String, WorkTime> techSkillToWorktimeMap,
+          Skill skill, Person tech, int experienceLevel) {
         WorkTime workTime = WorkTime.NORMAL;
         if (canChangeWorkTime) {
 
-            workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + skill.getLevel());
+            workTime = techSkillToWorktimeMap.get(skill.getType().getName() + "-" + experienceLevel);
 
             if (null == workTime) {
                 debugLog("[ERROR] Null work-time from techToWorktimeMap for %s", "repairPart", tech.getFullName());
@@ -1121,13 +1128,11 @@ public class MRMSService {
             }
 
             Skill skill = tech.getSkillForWorkingOn(partWork);
-
             if (skill == null) {
                 continue;
             }
 
             SkillModifierData skillModifierData = tech.getSkillModifierData();
-
             if (mrmsOption.getSkillMin() > skill.getExperienceLevel(skillModifierData)) {
                 continue;
             }
