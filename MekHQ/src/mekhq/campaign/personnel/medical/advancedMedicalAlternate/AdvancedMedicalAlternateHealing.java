@@ -38,6 +38,8 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HOLISTIC_CARE;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PROTHESIS_TECHNICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEON;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
@@ -201,13 +203,21 @@ public class AdvancedMedicalAlternateHealing {
     public static void performUnassistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
           Person patient, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
+
+        PersonnelOptions personnelOptions = patient.getOptions();
+        boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
                 int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
 
                 injury.changeTime(-1);
-                int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
+                int miscPenalty = getMiscPenalty(injuryPenalty,
+                      prostheticPenalties,
+                      injury.getLocation(),
+                      hasTraumaSurgeon,
+                      hasProthesisTechnician);
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
                 if (injury.getTime() <= 0) { // Time to try and fully heal the injury
@@ -231,21 +241,34 @@ public class AdvancedMedicalAlternateHealing {
      * represented by a prosthetic and that location is present in {@code prostheticPenalties}, the prosthetic penalty
      * is added.</p>
      *
-     * @param injuryPenalty       the total injury severity for the patient
-     * @param prostheticPenalties the set of body locations that incur prosthetic penalties
-     * @param location            the body location of the injury being healed
+     * @param injuryPenalty          the total injury severity for the patient
+     * @param prostheticPenalties    the set of body locations that incur prosthetic penalties
+     * @param location               the body location of the injury being healed
+     * @param hasTraumaSurgeon       {@code true} if the patient has the trauma surgeon SPA (reduces injury penalty)
+     * @param hasProthesisTechnician {@code true} if the patient has the prothesis technician SPA (reduces prosthetic
+     *                               penalty)
      *
      * @return the sum of the base injury penalty and any applicable prosthetic penalty
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getMiscPenalty(int injuryPenalty, Set<BodyLocation> prostheticPenalties, BodyLocation location) {
+    private static int getMiscPenalty(int injuryPenalty, Set<BodyLocation> prostheticPenalties, BodyLocation location,
+          boolean hasTraumaSurgeon, boolean hasProthesisTechnician) {
         int miscPenalty = injuryPenalty;
+        int traumaSurgeonModifier = hasTraumaSurgeon ? -1 : 0;
+        miscPenalty = max(0, miscPenalty + traumaSurgeonModifier);
 
+        boolean hasProstheticPenalty = false;
         BodyLocation primaryLocation = location.getPrimaryLocation();
         if (prostheticPenalties.contains(primaryLocation)) {
             miscPenalty += PROSTHETIC_PENALTY;
+            hasProstheticPenalty = true;
+        }
+
+        if (hasProstheticPenalty) {
+            int technicianModifier = hasProthesisTechnician ? -1 : 0;
+            miscPenalty = max(0, miscPenalty + technicianModifier);
         }
 
         return miscPenalty;
@@ -330,6 +353,10 @@ public class AdvancedMedicalAlternateHealing {
         boolean hasHolisticCareSPA = doctor.getOptions().booleanOption(UNOFFICIAL_HOLISTIC_CARE);
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
+
+        PersonnelOptions personnelOptions = doctor.getOptions();
+        boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
@@ -339,7 +366,8 @@ public class AdvancedMedicalAlternateHealing {
                 injury.changeTime(healingDelta);
 
                 if (injury.getTime() <= 0) {
-                    int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
+                    int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation(),
+                          hasTraumaSurgeon, hasProthesisTechnician);
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(doctor, modifiers, miscPenalty, useEdge);
 
                     processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);

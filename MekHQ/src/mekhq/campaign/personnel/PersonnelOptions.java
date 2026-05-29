@@ -109,6 +109,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_NATURAL_THESPIAN = "unofficial_natural_thespian";
     public static final String UNOFFICIAL_BIOLOGICAL_MACHINIST = "unofficial_biological_machinist";
     public static final String UNOFFICIAL_HOLISTIC_CARE = "unofficial_holistic_care";
+    public static final String UNOFFICIAL_TRAUMA_SURGEON = "unofficial_trauma_surgeon";
+    public static final String UNOFFICIAL_PROTHESIS_TECHNICIAN = "unofficial_prothesis_technician";
     public static final String UNOFFICIAL_BARGAIN_HUNTER = "unofficial_bargain_hunter";
     public static final String FLAW_VACCINE_DODGER = "flaw_vaccine_dodger";
     public static final String FLAW_SUPER_SPREADER = "flaw_super_spreader";
@@ -281,6 +283,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_BIOLOGICAL_MACHINIST, false);
         addOption(l3a, UNOFFICIAL_HOLISTIC_CARE, false);
         addOption(l3a, UNOFFICIAL_BARGAIN_HUNTER, false);
+        addOption(l3a, UNOFFICIAL_TRAUMA_SURGEON, false);
+        addOption(l3a, UNOFFICIAL_PROTHESIS_TECHNICIAN, false);
         addOption(l3a, UNOFFICIAL_PICK_POCKET, false);
         addOption(l3a, FLAW_VACCINE_DODGER, false);
         addOption(l3a, FLAW_SUPER_SPREADER, false);
