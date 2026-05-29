@@ -1710,12 +1710,10 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign
-     * options.
+     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign options.
      *
      * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market
-     * style.</p>
+     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market style.</p>
      *
      * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
@@ -2952,7 +2950,7 @@ public class CampaignGUI extends JPanel {
 
         final int selectedIndex = tabMain.getSelectedIndex();
         final Component selectedTab = ((selectedIndex >= 0) && (selectedIndex < tabMain.getTabCount())) ?
-                                             tabMain.getComponentAt(selectedIndex) : null;
+                                            tabMain.getComponentAt(selectedIndex) : null;
 
         EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
         int logsSelected = tabLogs.getSelectedIndex();
@@ -2980,6 +2978,7 @@ public class CampaignGUI extends JPanel {
                 case TECHNICAL -> commandCenterTab.getTechnicalLog();
                 case POLITICS -> commandCenterTab.getPoliticsLog();
                 case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+                case AGGREGATE -> commandCenterTab.getAggregateLog();
             };
 
             if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
@@ -3700,8 +3699,8 @@ public class CampaignGUI extends JPanel {
      * Handles changes to general application options.
      *
      * <p>
-     * Updates the visibility of the company generator menu item according to the new option settings.
-     * Ensures that GUI scale changes are applied.
+     * Updates the visibility of the company generator menu item according to the new option settings. Ensures that GUI
+     * scale changes are applied.
      * </p>
      *
      * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
