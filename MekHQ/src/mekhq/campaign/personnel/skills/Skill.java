@@ -468,14 +468,14 @@ public class Skill {
             }
         }
 
-        // Ranger
+        // Tracking
         if (Objects.equals(S_TRACKING, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_RANGER)) {
                 modifier += 1;
             }
         }
 
-        // Ranger
+        // Stealth
         if (Objects.equals(S_STEALTH, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_GHOST)) {
                 modifier += 1;
@@ -483,6 +483,13 @@ public class Skill {
 
             if (characterOptions.booleanOption(UNOFFICIAL_LOUD_MOUTH)) {
                 modifier -= 1;
+            }
+        }
+
+        // Appraisal
+        if (Objects.equals(S_APPRAISAL, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_BARGAIN_HUNTER)) {
+                modifier += 1;
             }
         }
 
