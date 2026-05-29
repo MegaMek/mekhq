@@ -398,6 +398,10 @@ public class CampaignNewDayManager {
         campaign.setTechnicalReportHTML("");
         campaign.getNewTechnicalReports().clear();
 
+        campaign.getAggregateReport().clear();
+        campaign.setAggregateReportHTML("");
+        campaign.getNewAggregateReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
         campaign.getPersonnelWhoAdvancedInXP().clear();
