@@ -599,7 +599,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         tabLogs.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
         tabLogs.addTab(SKILL_CHECKS.getIconString(), pnlSkillLog);
         tabLogs.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
-        tabLogs.addTab(AGGREGATE.getIconString(), pnlSkillLog);
+        tabLogs.addTab(AGGREGATE.getIconString(), pnlAggregateLog);
         tabLogs.setToolTipTextAt(AGGREGATE.getTabIndex(), AGGREGATE.getTooltip());
 
         tabLogs.addChangeListener(evt -> {
