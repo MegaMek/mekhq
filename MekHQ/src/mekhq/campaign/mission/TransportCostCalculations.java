@@ -54,6 +54,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
 import megamek.common.units.SpaceStation;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
@@ -189,6 +190,7 @@ public class TransportCostCalculations {
     private int lightVehicleCount;
     private int mekCount;
     private int asfCount;
+    private int lamCount;
     private int protoMekCount;
     private int battleArmorCount;
     private int infantryCount;
@@ -370,6 +372,14 @@ public class TransportCostCalculations {
 
     public void setMekCount(int mekCount) {
         this.mekCount = mekCount;
+    }
+
+    int getLAMCount() {
+        return lamCount;
+    }
+
+    public void setLAMCount(int lamCount) {
+        this.lamCount = lamCount;
     }
 
     int getAsfCount() {
@@ -612,16 +622,25 @@ public class TransportCostCalculations {
         totalCost = totalCost.plus(additionalSmallCraftBaysCost);
         int smallCraftSpareCapacity = max(0, smallCraftBayUsage);
 
-        // ASF (including Conv Fighters)
+        // ASF (including conventional fighters), Meks, and LAM
         int asfBays = getTotalASFBays() + smallCraftSpareCapacity;
+        int mekBays = getTotalMekBays();
+
         int asfBayUsage = asfBays - asfCount;
+        int mekBayUsage = mekBays - mekCount;
+
+        // If we have more spare aerospace bays, we're going to put our LAM in there; otherwise we'll put them in the
+        // mek bays. Cost is identical for each.
+        if (asfBayUsage > mekBayUsage) {
+            asfBayUsage -= -lamCount;
+        } else {
+            mekBayUsage -= lamCount;
+        }
+
         additionalASFBaysRequired = -min(0, asfBayUsage);
         additionalASFBaysCost = round(additionalASFBaysRequired * ASF_COST);
         totalCost = totalCost.plus(additionalASFBaysCost);
 
-        // Meks
-        int mekBays = getTotalMekBays();
-        int mekBayUsage = mekBays - mekCount;
         additionalMekBaysRequired = -min(0, mekBayUsage);
         additionalMekBaysCost = round(additionalMekBaysRequired * MEK_COST);
         totalCost = totalCost.plus(additionalMekBaysCost);
@@ -731,6 +750,8 @@ public class TransportCostCalculations {
                     dropShipCount += getAdditionalCollarNeeds(spaceStation);
                 } else if (entity.isSmallCraft()) {
                     smallCraftCount++;
+                } else if (entity instanceof LandAirMek) {
+                    lamCount++;
                 } else if (entity.isMek()) {
                     mekCount++;
                 } else if (entity.isFighter()) {
