@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -119,6 +119,7 @@ import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.unit.actions.RestoreUnitAction;
 import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
+import mekhq.campaign.unit.actions.UnloadAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
@@ -938,7 +939,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // swap ammo
             if (oneSelected) {
                 if (unit.getEntity().usesWeaponBays()) {
-                    menuItem = new JMenuItem("Swap ammo...");
+                    menuItem = new JMenuItem(resources.getString("swapAmmo.text") + "...");
                     menuItem.setActionCommand(COMMAND_LC_SWAP_AMMO);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
@@ -951,15 +952,21 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               .stream()
                               .anyMatch(m -> (m.getType() instanceof InfantryWeapon) &&
                                                    ((InfantryWeapon) m.getType()).hasInfernoAmmo())) {
-                        menuItem = new JMenuItem("Swap ammo...");
+                        menuItem = new JMenuItem(resources.getString("swapAmmo.text") + "...");
                         menuItem.setActionCommand(COMMAND_SMALL_SV_SWAP_AMMO);
                         menuItem.addActionListener(this);
                         popup.add(menuItem);
                     }
                 } else {
-                    menu = new JMenu("Swap ammo");
+                    menu = new JMenu(resources.getString("swapAmmo.text"));
                     for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
                         JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
+                        cbMenuItem = new JCheckBoxMenuItem(resources.getString("unloadAllAmmo.text"));
+                        cbMenuItem.addActionListener(evt -> {
+                            IUnitAction unloadAmmoTypeAction = new UnloadAmmoTypeAction(ammo);
+                            unloadAmmoTypeAction.execute(gui.getCampaign(), unit);
+                        });
+                        ammoMenu.add(cbMenuItem);
                         AmmoType curType = ammo.getType();
                         for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
                               curType,
