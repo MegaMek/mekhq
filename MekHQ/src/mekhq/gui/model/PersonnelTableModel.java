@@ -217,7 +217,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 } else if (personIsFatigued) {
                     setForeground(MekHQ.getMHQOptions().getFatiguedForeground());
                     setBackground(MekHQ.getMHQOptions().getFatiguedBackground());
-                } else if (person.hasOnlyHealedPermanentInjuries()) {
+                } else if (person.hasNonProstheticPermanentInjuries()) {
                     setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
                     setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 } else {
@@ -244,7 +244,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 if (personIsFatigued) {
                     colorReasonKeys.add("colorReason.personnel.fatigued");
                 }
-                if (person.hasOnlyHealedPermanentInjuries()) {
+                if (person.hasNonProstheticPermanentInjuries()) {
                     colorReasonKeys.add("colorReason.personnel.healedInjuries");
                 }
             }
