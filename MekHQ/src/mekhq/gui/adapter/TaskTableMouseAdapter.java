@@ -33,6 +33,7 @@
 package mekhq.gui.adapter;
 
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
@@ -166,8 +167,9 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void reportAndTriggerEvent(IPartWork partWork) {
-        gui.getCampaign()
-              .addReport(TECHNICAL, String.format("GM Repair, %s %s", partWork.getPartName(), partWork.succeed()));
+        gui.getCampaign().addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+              "TaskTableMouseAdapter.FIX_GM_ACQUIRE.report",
+              partWork.getPartName(), partWork.succeed()));
         if (partWork.getUnit() != null) {
             partWork.getUnit().refreshPodSpace();
         }
