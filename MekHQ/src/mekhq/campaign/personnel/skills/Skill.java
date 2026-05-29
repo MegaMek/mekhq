@@ -498,6 +498,9 @@ public class Skill {
             if (characterOptions.booleanOption(UNOFFICIAL_SHAKEY_SCALPEL)) {
                 modifier -= 2;
             }
+            if (characterOptions.booleanOption(UNOFFICIAL_PAPER_SURGEON)) {
+                modifier -= 2;
+            }
         }
 
         // Training
