@@ -137,15 +137,15 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
-    private static void processGMAcquireSpecialCases(IPartWork p, String command) {
+    private static void processGMAcquireSpecialCases(IPartWork partWork, String command) {
         if (command.contains("FIX_GM_ACQUIRE")) {
-            if (p instanceof Armor armor) {
+            if (partWork instanceof Armor armor) {
                 int needed = armor.getAmountNeeded();
                 int current = armor.getAmount();
                 armor.setAmount(current + needed);
             }
 
-            if (p instanceof AmmoBin ammoBin) {
+            if (partWork instanceof AmmoBin ammoBin) {
                 Part acquisitionPart = ammoBin.getAcquisitionPart();
                 IAcquisitionWork acquisitionWork = acquisitionPart.getAcquisitionWork();
                 acquisitionWork.find(0, 1.0);
@@ -154,9 +154,9 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
-    private static void processGmAcquireNormal(IPartWork p, String command) {
+    private static void processGmAcquireNormal(IPartWork partWork, String command) {
         if (command.contains("FIX_GM_ACQUIRE")) {
-            if (p instanceof MissingPart missingPart) {
+            if (partWork instanceof MissingPart missingPart) {
                 Part acquisitionPart = missingPart.getAcquisitionPart();
                 IAcquisitionWork acquisitionWork = acquisitionPart.getAcquisitionWork();
                 acquisitionWork.find(0, 1.0);
@@ -165,16 +165,16 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
-    private void reportAndTriggerEvent(IPartWork p) {
+    private void reportAndTriggerEvent(IPartWork partWork) {
         gui.getCampaign()
-              .addReport(TECHNICAL, String.format("GM Repair, %s %s", p.getPartName(), p.succeed()));
-        if (p.getUnit() != null) {
-            p.getUnit().refreshPodSpace();
+              .addReport(TECHNICAL, String.format("GM Repair, %s %s", partWork.getPartName(), partWork.succeed()));
+        if (partWork.getUnit() != null) {
+            partWork.getUnit().refreshPodSpace();
         }
 
         // PodSpace triggers event for each child part
-        if (p instanceof Part) {
-            MekHQ.triggerEvent(new PartChangedEvent((Part) p));
+        if (partWork instanceof Part) {
+            MekHQ.triggerEvent(new PartChangedEvent((Part) partWork));
         }
     }
 
