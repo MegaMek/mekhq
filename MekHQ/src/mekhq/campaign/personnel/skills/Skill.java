@@ -517,6 +517,13 @@ public class Skill {
             }
         }
 
+        // Administration
+        if (Objects.equals(S_ADMIN, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_LOSES_PAPERWORK)) {
+                modifier -= 2;
+            }
+        }
+
         return modifier;
     }
 
