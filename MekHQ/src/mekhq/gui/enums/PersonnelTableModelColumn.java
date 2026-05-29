@@ -60,6 +60,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.Academy;
@@ -183,6 +184,7 @@ public enum PersonnelTableModelColumn {
     BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
     FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
+    MODIFICATION_COUNT("PersonnelTableModelColumn.MODIFICATION_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
     LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
     HIGHEST_EDUCATION("PersonnelTableModelColumn.HIGHEST_EDUCATION.text"),
@@ -775,6 +777,7 @@ public enum PersonnelTableModelColumn {
             case IMMORTAL -> resources.getString(person.getStatus().isDead() ? "NA.text"
                                                        : (convertBooleanToYesNo(person.isImmortal())));
             case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
+            case MODIFICATION_COUNT -> Integer.toString(person.getProstheticInjuries().size());
             case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
                                    ? Integer.toString(person.getInjuries().size())
                                    : Integer.toString(person.getHits());
@@ -1117,6 +1120,13 @@ public enum PersonnelTableModelColumn {
                 return person.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
             case IMPLANT_COUNT:
                 return person.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+            case MODIFICATION_COUNT:
+                StringBuilder modificationCount = new StringBuilder("<html>");
+                for (Injury injury : person.getProstheticInjuries()) {
+                    modificationCount.append(injury.getName()).append("<br>");
+                }
+                modificationCount.append("</html>");
+                return modificationCount.toString();
             default:
                 return null;
         }
@@ -1380,6 +1390,7 @@ public enum PersonnelTableModelColumn {
                 case FATIGUE -> campaign.getCampaignOptions().isUseFatigue();
                 case SPA_COUNT -> campaign.getCampaignOptions().isUseAbilities();
                 case IMPLANT_COUNT -> campaign.getCampaignOptions().isUseImplants();
+                case MODIFICATION_COUNT -> campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
                 case LOYALTY -> campaign.getCampaignOptions().isUseLoyaltyModifiers() &&
                                       !campaign.getCampaignOptions().isUseHideLoyalty();
                 default -> false;
@@ -1436,6 +1447,7 @@ public enum PersonnelTableModelColumn {
                  BLOODMARK,
                  SPA_COUNT,
                  IMPLANT_COUNT,
+                 MODIFICATION_COUNT,
                  LOYALTY -> new IntegerStringSorter();
             case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE ->
                   new AttributeScoreSorter();
