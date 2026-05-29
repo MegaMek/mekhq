@@ -107,27 +107,6 @@ public record Accountant(Campaign campaign) {
         }
 
         // Add all temporary personnel (medics, astechs, temp crew)
-        salaries.plus(getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool()));
-        salaries.plus(getTempCrewPay(PersonnelRole.MEDIC, campaign.getTemporaryMedicPool()));
-
-        PersonnelRole[] notInfantry = { PersonnelRole.BATTLE_ARMOUR,
-                                        PersonnelRole.VEHICLE_CREW_GROUND,
-                                        PersonnelRole.VEHICLE_CREW_VTOL,
-                                        PersonnelRole.VEHICLE_CREW_NAVAL,
-                                        PersonnelRole.VESSEL_PILOT,
-                                        PersonnelRole.VESSEL_GUNNER,
-                                        PersonnelRole.VESSEL_CREW };
-
-        if (getCampaignOptions().isInfantryDontCount()) {
-            for (PersonnelRole personnelRole : notInfantry) {
-                salaries.plus(getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole)));
-            }
-            for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
-                salaries.plus(getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole)));
-            }
-        }
-
-
         salaries = salaries.plus(sumTempCrewPay());
 
         return salaries;
@@ -642,20 +621,25 @@ public record Accountant(Campaign campaign) {
             payRollSummary.put(person, person.getSalary(campaign()));
         }
         // And pay our pool
-        payRollSummary.put(null, Money.of(sumTempCrewPay()));
+        payRollSummary.put(null, Money.of(sumTempCrewPay(getCampaignOptions().isInfantryDontCount())));
 
         return payRollSummary;
     }
 
     private double sumTempCrewPay() {
+        return sumTempCrewPay(false);
+    }
+
+    private double sumTempCrewPay(boolean noInfantry) {
         double tempCrewPay = 0.0;
         tempCrewPay += getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool());
-        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign.getTemporaryMedicPool());
+        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign().getTemporaryMedicPool());
 
         for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
-            tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            if (!(noInfantry && personnelRole.isSoldier())) {
+                tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            }
         }
-
 
         return tempCrewPay;
     }
