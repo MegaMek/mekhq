@@ -63,6 +63,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -152,6 +153,7 @@ public class TransportCostCalculations {
     private double additionalCargoSpaceRequired;
     private double cargoBayCost;
     private double tetrisMasterMultiplier = 1.0;
+    private boolean hasTransportNegotiatorSPA;
     private int requiredCargoDropShips;
 
     private int additionalSmallCraftBaysRequired;
@@ -433,7 +435,7 @@ public class TransportCostCalculations {
         this.crewExperienceLevel = crewExperienceLevel;
         this.allPersonnel = allPersonnel;
 
-        setTetrisMasterMultiplier();
+        setSPAValues();
     }
 
     /**
@@ -446,13 +448,23 @@ public class TransportCostCalculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private void setTetrisMasterMultiplier() {
+    private void setSPAValues() {
         Collection<Person> activePersonnel = allPersonnel.stream()
                                                    .filter(p -> p.getStatus().isActive())
                                                    .toList();
         for (Person person : activePersonnel) {
-            if (person.getOptions().booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
+            PersonnelOptions personnelOptions = person.getOptions();
+
+            boolean isTransportAdmin = person.hasRole(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+            boolean isLogisticsAdmin = person.hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+            if ((isTransportAdmin || isLogisticsAdmin) &&
+                      personnelOptions.booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
+            }
+
+            if (isTransportAdmin &&
+                      personnelOptions.booleanOption(PersonnelOptions.UNOFFICIAL_TRANSPORT_NEGOTIATOR)) {
+                hasTransportNegotiatorSPA = true;
             }
         }
     }
@@ -507,6 +519,10 @@ public class TransportCostCalculations {
         calculateAdditionalJumpCollarsRequirements();
 
         adjustForCrewExperienceLevel();
+
+        if (hasTransportNegotiatorSPA) {
+            totalCost = totalCost.multipliedBy(1.05);
+        }
 
         totalCost = totalCost.round();
     }
