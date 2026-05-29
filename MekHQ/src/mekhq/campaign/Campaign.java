@@ -5001,7 +5001,7 @@ public class Campaign implements ITechManager, ILocation {
 
         addReportInternal(type, report);
 
-        if (type != AGGREGATE) {
+        if (type != AGGREGATE && MekHQ.getMHQOptions().isUseAggregateDailyReport()) {
             addReportInternal(AGGREGATE, report);
         }
     }
