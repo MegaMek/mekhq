@@ -507,6 +507,13 @@ public class Skill {
             }
         }
 
+        // Communications/Any
+        if (Objects.equals(S_COMMUNICATIONS, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_RADIO_HOBBYIST)) {
+                modifier += 2;
+            }
+        }
+
         return modifier;
     }
 
