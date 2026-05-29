@@ -45,6 +45,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -79,6 +80,7 @@ public class SystemsTab {
     private JCheckBox chkResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
+    private JCheckBox chkRequireSupportForceTransportation;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
@@ -215,6 +217,11 @@ public class SystemsTab {
      */
     private JPanel createReputationSanityPanel() {
         // Contents
+        chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
+              getMetadata(new Version(0, 51, 0)));
+        chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater(reputationHeader,
+              "RequireSupportForceTransportation"));
+
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         chkClampReputationPayMultiplier.addMouseListener(createTipPanelUpdater(reputationHeader,
@@ -238,6 +245,9 @@ public class SystemsTab {
         layout.gridx = 0;
         layout.gridwidth = 1;
         panel.add(chkClampReputationPayMultiplier, layout);
+
+        layout.gridy++;
+        panel.add(chkRequireSupportForceTransportation, layout);
 
         layout.gridy++;
         panel.add(chkReduceReputationPerformanceModifier, layout);
@@ -551,6 +561,7 @@ public class SystemsTab {
         // Reputation
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
 
+        chkRequireSupportForceTransportation.setSelected(options.isRequireSupportForceTransportation());
         chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
         chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
         chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
@@ -615,6 +626,7 @@ public class SystemsTab {
             campaign.setCrimePirateModifier(0);
         }
 
+        options.setRequireSupportForceTransportation(chkRequireSupportForceTransportation.isSelected());
         options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
         options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
         options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());

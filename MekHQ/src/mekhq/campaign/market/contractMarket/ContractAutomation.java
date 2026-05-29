@@ -82,7 +82,7 @@ public class ContractAutomation {
      */
     public static void contractStartPrompt(Campaign campaign, Contract contract) {
         // If we're already in the right system, there is no need to automate these actions
-        if (Objects.equals(campaign.getLocation().getCurrentSystem(), contract.getSystem())) {
+        if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
             return;
         }
 
@@ -147,10 +147,9 @@ public class ContractAutomation {
                 return;
             }
 
-            campaign.getLocation().setJumpPath(jumpPath);
+            campaign.getCurrentLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
-            campaign.getApp().getCampaigngui().refreshLocation();
             boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
 
             // This will return an empty string if the transaction was successful

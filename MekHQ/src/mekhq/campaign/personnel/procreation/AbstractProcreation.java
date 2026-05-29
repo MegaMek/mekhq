@@ -55,6 +55,7 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
@@ -432,7 +433,7 @@ public abstract class AbstractProcreation {
             // Create a baby
             final Person baby = campaign.newDependent(Gender.RANDOMIZE,
                   mother.getOriginFaction(),
-                  campaign.getLocation().getPlanet());
+                  campaign.getCurrentLocation().getPlanet());
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
 
@@ -444,6 +445,11 @@ public abstract class AbstractProcreation {
             baby.setOptions(new PersonnelOptions()); // Stop babies being born with SPAs
             baby.setPreNominal(""); // Stop babies being born with doctorates
             baby.setPostNominal(""); // Stop babies being born with post-nominal titles
+
+            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+                      baby.isChild(campaign.getLocalDate(), false)) {
+                baby.setPortrait(new Portrait());
+            }
 
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
@@ -478,21 +484,23 @@ public abstract class AbstractProcreation {
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
             }
 
-            // Apply postpartum effects
-            if (campaignOptions.isUseAdvancedMedical()) {
-                Injury injury;
-                if (campaignOptions.isUseAlternativeAdvancedMedical() &&
-                          // These injury types don't stack
-                          !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
-                                AlternateInjuries.POSTPARTUM_RECOVERY)) {
-                    injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
+            // Apply postpartum effects (first baby only)
+            if (i == 0) {
+                if (campaignOptions.isUseAdvancedMedical()) {
+                    Injury injury;
+                    if (campaignOptions.isUseAlternativeAdvancedMedical() &&
+                              // These injury types don't stack
+                              !AdvancedMedicalAlternate.hasInjuryOfType(mother.getInjuries(),
+                                    AlternateInjuries.POSTPARTUM_RECOVERY)) {
+                        injury = AlternateInjuries.POSTPARTUM_RECOVERY.newInjury(campaign, mother, GENERIC, 1);
+                    } else {
+                        injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                    }
+                    mother.addInjury(injury);
                 } else {
-                    injury = InjuryTypes.POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                    int currentHits = mother.getHits();
+                    mother.setHits(currentHits + 1);
                 }
-                mother.addInjury(injury);
-            } else {
-                int currentHits = mother.getHits();
-                mother.setHits(currentHits + 1);
             }
 
             // Check for hereditary diseases
@@ -604,6 +612,11 @@ public abstract class AbstractProcreation {
             baby.removeAllSkills(); // Limit skills by age for children and adolescents
             baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT); // Babies can't have jobs
 
+            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+                      baby.isChild(campaign.getLocalDate(), false)) {
+                baby.setPortrait(new Portrait());
+            }
+
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
 
@@ -710,7 +723,10 @@ public abstract class AbstractProcreation {
             }
 
             if (campaign.getCampaignOptions().isUseMaternityLeave() && !person.isBlockMaternityLeave()) {
-                if (!person.isBusy() && (person.getDueDate().minusWeeks(20).isBefore(today))) {
+                if (!person.isBusy()
+                          && !person.getStatus().isCampFollower()
+                          && person.getNonPermanentInjurySeverity() == 0
+                          && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
             }

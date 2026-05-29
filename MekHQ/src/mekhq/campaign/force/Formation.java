@@ -531,8 +531,10 @@ public class Formation {
     }
 
     /**
-     * Add a unit id to the units vector. In general, this should not be called directly to add unid because they will
-     * not be assigned a formation id. Use {@link Campaign#addUnitToFormation(Unit, int)} instead
+     * Add a unit id to the unit's vector.
+     *
+     * <p><b>Warning:</b> In general, this should not be called directly to add unid because they will not be
+     * assigned a formation id. Use {@link Campaign#addUnitToFormation(Unit, int)} instead</p>
      */
     public void addUnit(UUID uid) {
         addUnit(null, uid, false, null);

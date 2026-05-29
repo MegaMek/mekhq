@@ -90,10 +90,12 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Kill;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.ReputationController;
@@ -104,6 +106,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
@@ -316,9 +319,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(
                           workingNode,
                           version));
+                } else if (nodeName.equalsIgnoreCase("humanResources")) {
+                    campaign.setHumanResources(
+                          mekhq.campaign.HumanResources.loadFromXML(workingNode, campaign, version));
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
+                    // backward compat: old save without <humanResources> wrapper
                     // TODO: Make this depending on campaign options
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
@@ -333,8 +340,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     processFormations(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("finances")) {
                     processFinances(campaign, workingNode);
+                } else if (nodeName.equalsIgnoreCase("locations")) {
+                    processLocations(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("location")) {
+                    // legacy single-location format: read and treat as the sole active location
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(workingNode, campaign));
+                } else if (nodeName.equalsIgnoreCase("locationNodeChildren")) {
+                    LocationNode.reconnectChildren(workingNode, campaign);
                 } else if (nodeName.equalsIgnoreCase("isAvoidingEmptySystems")) {
                     campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(workingNode.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("skillTypes")) {
@@ -1350,6 +1362,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    private static void processLocations(Campaign campaign, Node wn) {
+        NodeList children = wn.getChildNodes();
+        boolean first = true;
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if (!child.getNodeName().equalsIgnoreCase("location")) {
+                continue;
+            }
+            AbstractLocation loc = CurrentLocation.generateInstanceFromXML(child, campaign);
+            if (first) {
+                campaign.setLocation(loc);
+                first = false;
+            } else {
+                campaign.addLocation(loc);
+            }
+        }
+    }
+
     private static void processFinances(Campaign retVal, Node wn) {
         LOGGER.info("Loading Finances from XML...");
         retVal.setFinances(Finances.generateInstanceFromXML(wn));
@@ -1440,33 +1473,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processPersonnelNodes(Campaign campaign, Node wn, Version version) {
         LOGGER.info("Loading Personnel Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
+        Personnel.loadFromXML(wn, campaign, version);
 
-        // Okay, let's iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
-                LOGGER.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
-
-                continue;
-            }
-
-            Person p = Person.generateInstanceFromXML(wn2, campaign, version);
-
-            if (p != null) {
-                campaign.importPerson(p);
-
-                // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based
-                performEdgeConversion(campaign, p);
-            }
+        // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
+        for (Person person : campaign.getPersonnel()) {
+            performEdgeConversion(campaign, person);
         }
 
         // this block verifies all in-use academies are valid

@@ -59,12 +59,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
-import mekhq.campaign.CurrentLocation;
+import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
@@ -81,10 +80,9 @@ import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
-
-import megamek.common.options.OptionsConstants;
-import megamek.common.units.Entity;
-import megamek.common.units.UnitType;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link StratConRulesManager}
@@ -553,7 +551,7 @@ class StratConRulesManagerTest {
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
         CurrentLocation location = mock(CurrentLocation.class);
-        when(campaign.getLocation()).thenReturn(location);
+        when(campaign.getCurrentLocation()).thenReturn(location);
 
         if (atmosphere != null) {
             Planet planet = mock(Planet.class);

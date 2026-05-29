@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -374,7 +374,7 @@ public abstract class AbstractMarriage {
             }
         }
 
-        if (!isInterUnit && campaign.getLocation().isOnPlanet()) {
+        if (!isInterUnit && campaign.getCurrentLocation().isOnPlanet()) {
             List<Gender> possibleGenders = new ArrayList<>();
             if (prefersMen) {
                 possibleGenders.add(Gender.MALE);

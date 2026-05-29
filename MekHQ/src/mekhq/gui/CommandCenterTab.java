@@ -98,6 +98,7 @@ import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
+import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -106,6 +107,7 @@ import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.DiplomacyReport;
 import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.dialog.PartsReportDialog;
+import mekhq.gui.dialog.ShoppingListPriorityDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -138,6 +140,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblCargoSummary;
     private JLabel lblFacilityCapacities;
 
+    // faction panel
+    private JPanel panFaction;
+
     // objectives panel
     private JPanel panObjectives;
     JList<String> listObjectives;
@@ -169,6 +174,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JTable procurementTable;
     private JLabel procurementTotalCostLabel;
     private ProcurementTableModel procurementModel;
+    private RoundedJButton btnChangePriority;
     private RoundedJButton btnPauseProcurement;
     private RoundedJButton btnResumeProcurement;
     private RoundedJButton btnMRMSDialog;
@@ -240,17 +246,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         JPanel panCommand = new JPanel(new GridBagLayout());
 
         initInfoPanel();
+        initFactionPanel();
         initLogPanel();
         initReportsPanel();
         initProcurementPanel();
         initObjectivesPanel();
-        //icon panel
-        JPanel panIcon = new JPanel(new BorderLayout());
-        lblIcon = new JLabel();
-        lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
-        panIcon.add(lblIcon, BorderLayout.CENTER);
-        ImageIcon icon = getAndScaleCampaignIcon();
-        lblIcon.setIcon(icon);
 
         /* Set overall layout */
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -275,7 +275,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panReports, gridBagConstraints);
         gridBagConstraints.gridx = 3;
@@ -297,7 +297,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        panCommand.add(panIcon, gridBagConstraints);
+        panCommand.add(panFaction, gridBagConstraints);
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("commandCenterTab");
 
@@ -489,6 +489,26 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(getCampaign().getName()));
     }
 
+    private void initFactionPanel() {
+        lblIcon = new JLabel();
+        lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
+        ImageIcon icon = getAndScaleCampaignIcon();
+        lblIcon.setIcon(icon);
+        lblIcon.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblIcon.getPreferredSize().height));
+
+        RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
+        btnGoRogue.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnGoRogue.getPreferredSize().height));
+        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
+              getCampaign().getSecondInCommand()));
+
+        panFaction = new JPanel();
+        panFaction.setLayout(new BoxLayout(panFaction, BoxLayout.Y_AXIS));
+        panFaction.add(lblIcon);
+        panFaction.add(Box.createVerticalStrut(5));
+        panFaction.add(btnGoRogue);
+
+    }
+
     /**
      * Initialize the panel for showing any objectives that might exist. Objectives might come from different play
      * modes.
@@ -637,6 +657,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1, 0, 5));
         panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
 
+        RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
+        btnPartsMarket.addActionListener(e -> getCampaignGui().showPartsMarket());
+        panProcurementButtons.add(btnPartsMarket);
+
         RoundedJButton btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
         btnNeededParts.addActionListener(evt -> new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(
@@ -647,6 +671,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
+
+        btnChangePriority = new RoundedJButton(resourceMap.getString("btnChangePriority.text"));
+        btnChangePriority.addActionListener(evt -> {
+            new ShoppingListPriorityDialog(this.getFrame(), getCampaign());
+            this.refreshProcurementList();
+        });
+        btnChangePriority.setEnabled(true);
+        panProcurementButtons.add(btnChangePriority);
 
         btnPauseProcurement = new RoundedJButton(resourceMap.getString("btnPauseProcurement.text"));
         btnPauseProcurement.addActionListener(evt -> {

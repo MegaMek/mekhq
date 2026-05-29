@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
@@ -48,22 +49,31 @@ import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -87,9 +97,11 @@ import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -103,6 +115,7 @@ import mekhq.campaign.events.scenarios.ScenarioRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -111,6 +124,7 @@ import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
@@ -121,6 +135,7 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
+import mekhq.campaign.stratCon.MaplessStratCon;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
@@ -130,8 +145,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -148,6 +161,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -159,35 +173,66 @@ import mekhq.gui.view.ScenarioViewPanel;
 public final class BriefingTab extends CampaignGuiTab {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
-    @Deprecated(since = "0.50.10", forRemoval = false)
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-          MekHQ.getMHQOptions().getLocale());
+    private static final int SCENARIO_DETAILS_TAB_INDEX = 0;
+    private static final int ASSIGNMENTS_TAB_INDEX = 1;
+
+    private static final double CONTRACT_AND_QUEUE_COLUMNS_WEIGHT = 0.60;
+    private static final double CONTRACT_COLUMN_WEIGHT = 27.0 / 60.0;
+    private static final String FLATLAF_STYLE_CLASS = "FlatLaf.styleClass";
+    private static final int BRIEFING_COLUMN_PADDING = 4;
+    private static final int BRIEFING_SPLIT_DIVIDER_SIZE = 10;
+    private static final int SCENARIO_TABLE_ROW_HEIGHT = 24;
 
     private LanceAssignmentView panLanceAssignment;
-    private JSplitPane splitScenario;
+    private JTabbedPane scenarioWorkTabs;
     private JTable scenarioTable;
     private MMComboBox<Mission> comboMission;
+    private MMComboBox<ScenarioQueueFilter> scenarioFilter;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
-    private RoundedJButton btnAddScenario;
-    private RoundedJButton btnEditMission;
-    private RoundedJButton btnCompleteMission;
-    private RoundedJButton btnDeleteMission;
-    private RoundedJButton btnGMGenerateScenarios;
-    private RoundedJButton btnStartGame;
-    private RoundedJButton btnJoinGame;
-    private RoundedJButton btnLoadGame;
-    private RoundedJButton btnPrintRS;
-    private RoundedJButton btnGetMul;
-    private RoundedJButton btnClearAssignedUnits;
-    private RoundedJButton btnResolveScenario;
-    private RoundedJButton btnAutoResolveScenario;
+    private JPanel panScenarioActions;
+    private JButton btnAddScenario;
+    private JButton btnEditMission;
+    private JButton btnCompleteMission;
+    private JButton btnDeleteMission;
+    private JButton btnGMGenerateScenarios;
+    private JButton btnStartGame;
+    private JButton btnJoinGame;
+    private JButton btnLoadGame;
+    private JButton btnPrintRS;
+    private JButton btnGetMul;
+    private JButton btnClearAssignedUnits;
+    private JButton btnResolveScenario;
+    private JButton btnAutoResolveScenario;
+    private JButton btnDeploySelectedScenario;
 
     private ScenarioTableModel scenarioModel;
 
     public int selectedScenario;
 
     private static final MMLogger logger = MMLogger.create(BriefingTab.class);
+
+    private enum ScenarioQueueFilter {
+        ALL_ACTIVE("briefingTab.scenarioFilter.allActive"),
+        PRIORITY("briefingTab.scenarioFilter.priority"),
+        CRISIS("briefingTab.scenarioFilter.crisis"),
+        STRATEGIC("briefingTab.scenarioFilter.strategic"),
+        TURNING_POINT("briefingTab.scenarioFilter.turningPoint"),
+        ASSIGNED("briefingTab.scenarioFilter.assigned"),
+        UNASSIGNED("briefingTab.scenarioFilter.unassigned"),
+        ALL_RESOLVED("briefingTab.scenarioFilter.allResolved");
+
+        private final String resourceKey;
+
+        ScenarioQueueFilter(String resourceKey) {
+            this.resourceKey = resourceKey;
+        }
+
+        @Override
+        public String toString() {
+            return getTextAt(RESOURCE_BUNDLE, resourceKey);
+        }
+    }
 
     // region Constructors
     public BriefingTab(CampaignGUI gui, String tabName) {
@@ -215,189 +260,501 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        panMission.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
+        panMission.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "lblMission.text")), gridBagConstraints);
 
         comboMission = new MMComboBox<>("comboMission");
+        styleCompactComponent(comboMission);
         comboMission.addActionListener(ev -> changeMission());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
         panMission.add(comboMission, gridBagConstraints);
 
-        JPanel panMissionButtons = new JPanel(new GridLayout(2, 3));
+        JPanel panMissionButtons = new JPanel(new GridLayout(1, 0, 5, 0));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
-        RoundedJButton btnAddMission = new RoundedJButton(resourceMap.getString("btnAddMission.text"));
-        btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText"));
+        JButton btnAddMission = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAddMission.text"));
+        btnAddMission.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAddMission.toolTipText"));
         btnAddMission.addActionListener(ev -> addMission());
         panMissionButtons.add(btnAddMission);
 
-        btnAddScenario = new RoundedJButton(resourceMap.getString("btnAddScenario.text"));
-        btnAddScenario.setToolTipText(resourceMap.getString("btnAddScenario.toolTipText"));
+        btnAddScenario = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAddScenario.text"));
+        btnAddScenario.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAddScenario.toolTipText"));
         btnAddScenario.addActionListener(ev -> addScenario());
         panMissionButtons.add(btnAddScenario);
 
-        btnEditMission = new RoundedJButton(resourceMap.getString("btnEditMission.text"));
-        btnEditMission.setToolTipText(resourceMap.getString("btnEditMission.toolTipText"));
+        btnEditMission = new JButton(getTextAt(RESOURCE_BUNDLE, "btnEditMission.text"));
+        btnEditMission.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnEditMission.toolTipText"));
         btnEditMission.addActionListener(ev -> editMission());
         panMissionButtons.add(btnEditMission);
 
-        btnCompleteMission = new RoundedJButton(resourceMap.getString("btnCompleteMission.text"));
-        btnCompleteMission.setToolTipText(resourceMap.getString("btnCompleteMission.toolTipText"));
+        btnCompleteMission = new JButton(getTextAt(RESOURCE_BUNDLE, "btnCompleteMission.text"));
+        btnCompleteMission.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnCompleteMission.toolTipText"));
         btnCompleteMission.addActionListener(ev -> completeMission());
         panMissionButtons.add(btnCompleteMission);
 
-        btnDeleteMission = new RoundedJButton(resourceMap.getString("btnDeleteMission.text"));
-        btnDeleteMission.setToolTipText(resourceMap.getString("btnDeleteMission.toolTipText"));
+        btnDeleteMission = new JButton(getTextAt(RESOURCE_BUNDLE, "btnDeleteMission.text"));
+        btnDeleteMission.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnDeleteMission.toolTipText"));
         btnDeleteMission.setName("btnDeleteMission");
         btnDeleteMission.addActionListener(ev -> deleteMission());
         panMissionButtons.add(btnDeleteMission);
 
-        btnGMGenerateScenarios = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.text"));
-        btnGMGenerateScenarios.setToolTipText(resourceMap.getString("btnGMGenerateScenarios.toolTipText"));
+        btnGMGenerateScenarios = new JButton(getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.text"));
+        btnGMGenerateScenarios.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnGMGenerateScenarios.toolTipText"));
         btnGMGenerateScenarios.setName("btnGMGenerateScenarios");
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
+        styleSecondaryButtons(btnAddMission,
+              btnAddScenario,
+              btnEditMission,
+              btnCompleteMission,
+              btnGMGenerateScenarios);
+        styleDangerButton(btnDeleteMission);
 
         scrollMissionView = new FastJScrollPane();
-        scrollMissionView.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        scrollMissionView.setBorder(BorderFactory.createEmptyBorder());
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panMission.add(scrollMissionView, gridBagConstraints);
+        scrollMissionView.setMinimumSize(new Dimension(220, 160));
 
         scenarioModel = new ScenarioTableModel(getCampaign());
-        scenarioTable = new JTable(scenarioModel);
-        scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableRowSorter<ScenarioTableModel> scenarioSorter = new TableRowSorter<>(scenarioModel);
-        scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
-        scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
-        scenarioTable.setRowSorter(scenarioSorter);
-        scenarioTable.setShowGrid(false);
-        ScenarioTableMouseAdapter.connect(getCampaignGui(), scenarioTable, scenarioModel);
-        for (int i = 0; i < ScenarioTableModel.N_COL; i++) {
-            final TableColumn column = scenarioTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(scenarioModel.getColumnWidth(i));
-            column.setCellRenderer(scenarioModel.getRenderer());
-        }
-        scenarioTable.setIntercellSpacing(new Dimension(0, 0));
-        scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
+        scenarioTable = createScenarioTable(scenarioModel);
+        scenarioFilter = createScenarioFilterCombo("scenarioFilter", new ScenarioQueueFilter[] {
+              ScenarioQueueFilter.ALL_ACTIVE,
+              ScenarioQueueFilter.PRIORITY,
+              ScenarioQueueFilter.CRISIS,
+              ScenarioQueueFilter.STRATEGIC,
+              ScenarioQueueFilter.TURNING_POINT,
+              ScenarioQueueFilter.ASSIGNED,
+              ScenarioQueueFilter.UNASSIGNED,
+              ScenarioQueueFilter.ALL_RESOLVED
+        });
 
-        JPanel panScenario = new JPanel(new GridBagLayout());
+        panScenarioActions = BriefingStyle.createSectionPanel(
+              getTextAt(RESOURCE_BUNDLE, "briefingTab.scenarioActions.title"));
+        JPanel panScenarioButtons = new JPanel(new GridLayout(3, 3, 5, 5));
+        panScenarioActions.add(panScenarioButtons, BorderLayout.CENTER);
 
-        JPanel panScenarioButtons = new JPanel(new GridLayout(3, 3));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panScenario.add(panScenarioButtons, gridBagConstraints);
+        btnDeploySelectedScenario = new JButton(
+              getTextAt(RESOURCE_BUNDLE, "briefingTab.selectedScenario.button.deploy"));
+        btnDeploySelectedScenario.setToolTipText(
+              getTextAt(RESOURCE_BUNDLE, "briefingTab.selectedScenario.button.deploy.toolTipText"));
+        btnDeploySelectedScenario.addActionListener(ev -> deploySelectedScenario());
+        btnDeploySelectedScenario.setEnabled(false);
 
-        btnStartGame = new RoundedJButton(resourceMap.getString("btnStartGame.text"));
-        btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText"));
+        btnStartGame = new JButton(getTextAt(RESOURCE_BUNDLE, "btnStartGame.text"));
+        btnStartGame.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnStartGame.toolTipText"));
         btnStartGame.addActionListener(ev -> startScenario());
         btnStartGame.setEnabled(false);
-        panScenarioButtons.add(btnStartGame);
 
-        btnJoinGame = new RoundedJButton(resourceMap.getString("btnJoinGame.text"));
-        btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText"));
+        btnJoinGame = new JButton(getTextAt(RESOURCE_BUNDLE, "btnJoinGame.text"));
+        btnJoinGame.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnJoinGame.toolTipText"));
         btnJoinGame.addActionListener(ev -> joinScenario());
         btnJoinGame.setEnabled(false);
-        panScenarioButtons.add(btnJoinGame);
 
-        btnLoadGame = new RoundedJButton(resourceMap.getString("btnLoadGame.text"));
-        btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText"));
+        btnLoadGame = new JButton(getTextAt(RESOURCE_BUNDLE, "btnLoadGame.text"));
+        btnLoadGame.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnLoadGame.toolTipText"));
         btnLoadGame.addActionListener(ev -> loadScenario());
         btnLoadGame.setEnabled(false);
-        panScenarioButtons.add(btnLoadGame);
 
-        btnPrintRS = new RoundedJButton(resourceMap.getString("btnPrintRS.text"));
-        btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText"));
+        btnPrintRS = new JButton(getTextAt(RESOURCE_BUNDLE, "btnPrintRS.text"));
+        btnPrintRS.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnPrintRS.toolTipText"));
         btnPrintRS.addActionListener(ev -> printRecordSheets());
         btnPrintRS.setEnabled(false);
-        panScenarioButtons.add(btnPrintRS);
 
-        btnGetMul = new RoundedJButton(resourceMap.getString("btnGetMul.text"));
-        btnGetMul.setToolTipText(resourceMap.getString("btnGetMul.toolTipText"));
+        btnGetMul = new JButton(getTextAt(RESOURCE_BUNDLE, "btnGetMul.text"));
+        btnGetMul.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnGetMul.toolTipText"));
         btnGetMul.setName("btnGetMul");
         btnGetMul.addActionListener(ev -> deployListFile());
         btnGetMul.setEnabled(false);
-        panScenarioButtons.add(btnGetMul);
 
-        btnResolveScenario = new RoundedJButton(resourceMap.getString("btnResolveScenario.text"));
-        btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText"));
+        btnResolveScenario = new JButton(getTextAt(RESOURCE_BUNDLE, "btnResolveScenario.text"));
+        btnResolveScenario.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnResolveScenario.toolTipText"));
         btnResolveScenario.addActionListener(ev -> resolveScenario());
         btnResolveScenario.setEnabled(false);
-        panScenarioButtons.add(btnResolveScenario);
 
-        btnAutoResolveScenario = new RoundedJButton(resourceMap.getString("btnAutoResolveScenario.text"));
-        btnAutoResolveScenario.setToolTipText(resourceMap.getString("btnAutoResolveScenario.toolTipText"));
+        btnAutoResolveScenario = new JButton(getTextAt(RESOURCE_BUNDLE, "btnAutoResolveScenario.text"));
+        btnAutoResolveScenario.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnAutoResolveScenario.toolTipText"));
         btnAutoResolveScenario.addActionListener(ev -> autoResolveScenario());
         btnAutoResolveScenario.setEnabled(false);
-        panScenarioButtons.add(btnAutoResolveScenario);
 
-        btnClearAssignedUnits = new RoundedJButton(resourceMap.getString("btnClearAssignedUnits.text"));
-        btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText"));
+        btnClearAssignedUnits = new JButton(getTextAt(RESOURCE_BUNDLE, "btnClearAssignedUnits.text"));
+        btnClearAssignedUnits.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnClearAssignedUnits.toolTipText"));
         btnClearAssignedUnits.addActionListener(ev -> clearAssignedUnits());
         btnClearAssignedUnits.setEnabled(false);
+
+        styleSecondaryButton(btnDeploySelectedScenario);
+        styleSecondaryButton(btnStartGame);
+        styleSecondaryButton(btnJoinGame);
+        styleSecondaryButton(btnLoadGame);
+        styleSecondaryButton(btnPrintRS);
+        styleSecondaryButton(btnGetMul);
+        styleSecondaryButton(btnResolveScenario);
+        styleSecondaryButton(btnAutoResolveScenario);
+        styleDangerButton(btnClearAssignedUnits);
+
+        panScenarioButtons.add(btnDeploySelectedScenario);
+        panScenarioButtons.add(btnStartGame);
+        panScenarioButtons.add(btnJoinGame);
+        panScenarioButtons.add(btnLoadGame);
+        panScenarioButtons.add(btnGetMul);
+        panScenarioButtons.add(btnPrintRS);
+        panScenarioButtons.add(btnResolveScenario);
+        panScenarioButtons.add(btnAutoResolveScenario);
         panScenarioButtons.add(btnClearAssignedUnits);
 
+        JPanel panScenarioQueue = createScenarioQueuePanel(scenarioTable,
+              getTextAt(RESOURCE_BUNDLE, "briefingTab.scenarios.title"),
+              scenarioFilter,
+              panScenarioActions);
+
         scrollScenarioView = new FastJScrollPane();
-        scrollScenarioView.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        scrollScenarioView.setBorder(BorderFactory.createEmptyBorder());
         scrollScenarioView.setViewportView(null);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panScenario.add(scrollScenarioView, gridBagConstraints);
-
-        /* ATB */
+        scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new FastJScrollPane(panLanceAssignment);
-        paneLanceDeployment.setBorder(null);
-        paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
-        paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaignOptions().isUseStratCon());
-        splitScenario = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panScenario, paneLanceDeployment);
-        splitScenario.setOneTouchExpandable(true);
-        splitScenario.setResizeWeight(1.0);
 
-        JSplitPane splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
-        splitBrief.setOneTouchExpandable(true);
-        splitBrief.setResizeWeight(0.5);
-        splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
+        scenarioWorkTabs = new JTabbedPane();
+        styleBriefingTabs(scenarioWorkTabs);
+        scenarioWorkTabs.addTab(getTextAt(RESOURCE_BUNDLE, "briefingTab.details.title"), scrollScenarioView);
+        scenarioWorkTabs.addTab(getTextAt(RESOURCE_BUNDLE, "briefingTab.assignments.title"), panLanceAssignment);
+        scenarioWorkTabs.setEnabledAt(ASSIGNMENTS_TAB_INDEX, getCampaignOptions().isUseStratCon());
+
+        JSplitPane splitMissionAndScenarioQueue = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+              createBriefingColumnPanel(scrollMissionView),
+              createBriefingColumnPanel(panScenarioQueue));
+        styleBriefingSplitPane(splitMissionAndScenarioQueue);
+        splitMissionAndScenarioQueue.setResizeWeight(CONTRACT_COLUMN_WEIGHT);
+        splitMissionAndScenarioQueue.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+              ev -> refreshScenarioView());
+
+        JSplitPane splitOverview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitMissionAndScenarioQueue,
+              createBriefingColumnPanel(scenarioWorkTabs));
+        styleBriefingSplitPane(splitOverview);
+        splitOverview.setResizeWeight(CONTRACT_AND_QUEUE_COLUMNS_WEIGHT);
+        splitOverview.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
+        splitOverview.addComponentListener(new java.awt.event.ComponentAdapter() {
+            private boolean dividerLocationsInitialized;
+
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                if (!dividerLocationsInitialized && (splitOverview.getWidth() > 0)) {
+                    dividerLocationsInitialized = true;
+                    applyOverviewColumnLayout(splitOverview, splitMissionAndScenarioQueue);
+                }
+            }
+        });
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("missionTab");
 
         setLayout(new BorderLayout());
-        add(splitBrief, BorderLayout.CENTER);
+        add(panMission, BorderLayout.NORTH);
+        add(splitOverview, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
+    }
+
+    private void applyOverviewColumnLayout(JSplitPane splitOverview, JSplitPane splitMissionAndScenarioQueue) {
+        splitOverview.setDividerLocation(CONTRACT_AND_QUEUE_COLUMNS_WEIGHT);
+        SwingUtilities.invokeLater(() -> splitMissionAndScenarioQueue.setDividerLocation(CONTRACT_COLUMN_WEIGHT));
+    }
+
+    private void styleBriefingTabs(JTabbedPane tabs) {
+        tabs.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        tabs.setBorder(BorderFactory.createEmptyBorder());
+    }
+
+    private void styleBriefingSplitPane(JSplitPane splitPane) {
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setContinuousLayout(true);
+        splitPane.setDividerSize(BRIEFING_SPLIT_DIVIDER_SIZE);
+        splitPane.setBorder(BorderFactory.createEmptyBorder());
+    }
+
+    private JPanel createBriefingColumnPanel(JComponent content) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(content, BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(0,
+              BRIEFING_COLUMN_PADDING,
+              0,
+              BRIEFING_COLUMN_PADDING));
+
+        return panel;
+    }
+
+    private void styleScenarioTable(JTable table) {
+        table.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        table.setRowHeight(Math.max(table.getRowHeight(), SCENARIO_TABLE_ROW_HEIGHT));
+        if (table.getTableHeader() != null) {
+            table.getTableHeader().putClientProperty(FLATLAF_STYLE_CLASS, "small");
+            table.getTableHeader().setReorderingAllowed(false);
+        }
+    }
+
+    private void styleCompactComponent(JComponent component) {
+        component.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+    }
+
+    private void styleSecondaryButtons(AbstractButton... buttons) {
+        for (AbstractButton button : buttons) {
+            styleSecondaryButton(button);
+        }
+    }
+
+    private void styleSecondaryButton(AbstractButton button) {
+        styleBriefingButton(button);
+        button.setBackground(null);
+        button.setForeground(null);
+        button.setFont(button.getFont().deriveFont(Font.PLAIN));
+    }
+
+    private void stylePrimaryButton(AbstractButton button) {
+        styleBriefingButton(button);
+        button.setFont(button.getFont().deriveFont(Font.BOLD));
+
+        Color background = getUIColor("Button.default.background", "Actions.Blue");
+        if (background != null) {
+            button.setBackground(background);
+        }
+
+        Color foreground = getUIColor("Button.default.foreground", "Button.foreground");
+        if (foreground != null) {
+            button.setForeground(foreground);
+        }
+    }
+
+    private void styleDangerButton(AbstractButton button) {
+        styleBriefingButton(button);
+        button.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+    }
+
+    private void styleBriefingButton(AbstractButton button) {
+        button.putClientProperty(FLATLAF_STYLE_CLASS, "small");
+        button.setFocusPainted(false);
+        button.setMargin(new Insets(3, 8, 3, 8));
+    }
+
+    private void refreshScenarioActionButtonEmphasis() {
+        styleSecondaryButton(btnDeploySelectedScenario);
+        styleSecondaryButton(btnStartGame);
+
+        if (btnStartGame.isEnabled()) {
+            stylePrimaryButton(btnStartGame);
+        } else if (btnDeploySelectedScenario.isEnabled()) {
+            stylePrimaryButton(btnDeploySelectedScenario);
+        }
+    }
+
+    private Color getUIColor(String... keys) {
+        for (String key : keys) {
+            Color color = UIManager.getColor(key);
+            if (color != null) {
+                return color;
+            }
+        }
+        return null;
+    }
+
+    private JTable createScenarioTable(ScenarioTableModel model) {
+        JTable table = new JTable(model);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        TableRowSorter<ScenarioTableModel> scenarioSorter = new TableRowSorter<>(model);
+        scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
+        scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
+        table.setRowSorter(scenarioSorter);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setFillsViewportHeight(true);
+        styleScenarioTable(table);
+
+        for (int i = 0; i < ScenarioTableModel.N_COL; i++) {
+            final TableColumn column = table.getColumnModel().getColumn(i);
+            column.setPreferredWidth(model.getColumnWidth(i));
+            if (i == ScenarioTableModel.COL_SECTOR) {
+                column.setMinWidth(model.getColumnWidth(i));
+            }
+            column.setCellRenderer(model.getRenderer());
+        }
+
+        ScenarioTableMouseAdapter.connect(getCampaignGui(), table, model);
+
+        table.getSelectionModel().addListSelectionListener(ev -> {
+            if (!ev.getValueIsAdjusting()) {
+                refreshScenarioView();
+            }
+        });
+
+        return table;
+    }
+
+    private MMComboBox<ScenarioQueueFilter> createScenarioFilterCombo(String name, ScenarioQueueFilter[] filters) {
+        MMComboBox<ScenarioQueueFilter> comboBox = new MMComboBox<>(name, filters);
+        styleCompactComponent(comboBox);
+        comboBox.setMaximumRowCount(filters.length);
+        comboBox.addActionListener(ev -> refreshScenarioTableData(false));
+        return comboBox;
+    }
+
+    private JPanel createScenarioQueuePanel(JTable table, String title, MMComboBox<ScenarioQueueFilter> filterCombo) {
+        return createScenarioQueuePanel(table, title, filterCombo, null);
+    }
+
+    private JPanel createScenarioQueuePanel(JTable table, String title, MMComboBox<ScenarioQueueFilter> filterCombo,
+          @Nullable JPanel detailPanel) {
+        JPanel queuePanel = BriefingStyle.createSectionPanel(title);
+        queuePanel.setMinimumSize(new Dimension(300, 180));
+
+        JPanel queueBody = new JPanel(new BorderLayout(0, 5));
+        queuePanel.add(queueBody, BorderLayout.CENTER);
+
+        JPanel filterPanel = new JPanel(new BorderLayout(5, 0));
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+        JLabel filterLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "briefingTab.scenarioFilter.label"));
+        styleCompactComponent(filterLabel);
+        filterPanel.add(filterLabel, BorderLayout.LINE_START);
+        filterPanel.add(filterCombo, BorderLayout.CENTER);
+        queueBody.add(filterPanel, BorderLayout.PAGE_START);
+
+        JScrollPane tableScrollPane = new FastJScrollPane(table);
+        tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        tableScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        fitLastScenarioColumnToViewport(table, tableScrollPane);
+        if (detailPanel == null) {
+            queueBody.add(tableScrollPane, BorderLayout.CENTER);
+        } else {
+            JPanel queueContent = new JPanel(new BorderLayout(0, 5));
+            queueContent.add(tableScrollPane, BorderLayout.CENTER);
+            queueContent.add(detailPanel, BorderLayout.PAGE_END);
+            queueBody.add(queueContent, BorderLayout.CENTER);
+        }
+
+        return queuePanel;
+    }
+
+    private void fitLastScenarioColumnToViewport(JTable table, JScrollPane tableScrollPane) {
+        tableScrollPane.getViewport().addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                updateLastScenarioColumnWidth(table, tableScrollPane);
+            }
+        });
+        SwingUtilities.invokeLater(() -> updateLastScenarioColumnWidth(table, tableScrollPane));
+    }
+
+    private void updateLastScenarioColumnWidth(JTable table, JScrollPane tableScrollPane) {
+        int lastColumnIndex = table.getColumnCount() - 1;
+        if (lastColumnIndex < 0) {
+            return;
+        }
+
+        int fixedWidth = 0;
+        for (int i = 0; i < lastColumnIndex; i++) {
+            fixedWidth += table.getColumnModel().getColumn(i).getPreferredWidth();
+        }
+
+        TableColumn lastColumn = table.getColumnModel().getColumn(lastColumnIndex);
+        int availableWidth = tableScrollPane.getViewport().getExtentSize().width - fixedWidth;
+        int preferredWidth = Math.max(lastColumn.getMinWidth(), availableWidth);
+        if (lastColumn.getPreferredWidth() != preferredWidth) {
+            lastColumn.setPreferredWidth(preferredWidth);
+            table.revalidate();
+        }
+    }
+
+    private int getSelectedScenarioId(JTable table, ScenarioTableModel model) {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow < 0) {
+            return -1;
+        }
+
+        Scenario scenario = model.getScenario(table.convertRowIndexToModel(selectedRow));
+        return (scenario == null) ? -1 : scenario.getId();
+    }
+
+    private boolean selectScenarioInTable(JTable table, ScenarioTableModel model, int scenarioId) {
+        table.clearSelection();
+        if (scenarioId < 0) {
+            return false;
+        }
+
+        for (int viewRow = 0; viewRow < table.getRowCount(); viewRow++) {
+            Scenario scenario = model.getScenario(table.convertRowIndexToModel(viewRow));
+            if ((scenario != null) && (scenario.getId() == scenarioId)) {
+                table.setRowSelectionInterval(viewRow, viewRow);
+                table.scrollRectToVisible(table.getCellRect(viewRow, 0, true));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private ScenarioQueueFilter getSelectedScenarioFilter(MMComboBox<ScenarioQueueFilter> comboBox,
+          ScenarioQueueFilter fallback) {
+        if (comboBox == null) {
+            return fallback;
+        }
+        ScenarioQueueFilter selectedFilter = comboBox.getSelectedItem();
+        return (selectedFilter == null) ? fallback : selectedFilter;
+    }
+
+    private boolean matchesScenarioFilter(Scenario scenario, ScenarioQueueFilter filter) {
+        return switch (filter) {
+            case ALL_ACTIVE, ALL_RESOLVED -> true;
+            case PRIORITY -> scenarioModel.isPriorityScenario(scenario);
+            case CRISIS -> scenarioModel.isCrisisScenario(scenario);
+            case STRATEGIC -> scenarioModel.isStrategicScenario(scenario);
+            case TURNING_POINT -> scenarioModel.isTurningPointScenario(scenario);
+            case ASSIGNED -> !scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
+            case UNASSIGNED -> scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
+        };
+    }
+
+    private void refreshSelectedScenarioActions(@Nullable Scenario scenario) {
+        if (scenario == null) {
+            btnDeploySelectedScenario.setEnabled(false);
+            refreshScenarioActionButtonEmphasis();
+            return;
+        }
+
+        boolean stratConScenario = isStratConScenario(scenario);
+        btnDeploySelectedScenario.setEnabled(stratConScenario &&
+                                                   (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab));
+        refreshScenarioActionButtonEmphasis();
+    }
+
+    private boolean isStratConScenario(Scenario scenario) {
+        Mission mission = getCampaign().getMission(scenario.getMissionId());
+        return (scenario instanceof AtBDynamicScenario) &&
+                     (mission instanceof AtBContract contract) &&
+                     (contract.getStratconCampaignState() != null);
+    }
+
+    private void deploySelectedScenario() {
+        Scenario scenario = getSelectedScenario();
+        if ((scenario == null) || !isStratConScenario(scenario)) {
+            return;
+        }
+
+        if (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab) {
+            MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(), getCampaign(), scenario);
+        }
     }
 
     private void addMission() {
@@ -471,6 +828,10 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
         }
+
+        // Set up some variables we'll be using later
+        NewPersonnelMarket newPersonnelMarket = getCampaign().getNewPersonnelMarket();
+        boolean marketPreviouslyDisabled = !newPersonnelMarket.getAvailabilityMessage().isBlank();
 
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
@@ -590,6 +951,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        // Refresh personnel market if it was previously disabled
+        if (!isUsingLegacyPersonnelMarket(campaignOptions) && marketPreviouslyDisabled) {
+            getCampaign().refreshApplicants(true);
+            CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
+        }
+
         // Undeploy forces & units
         boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
         boolean hadCadreForces = false;
@@ -611,7 +978,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (hadCadreForces) {
-            new ImmersiveDialogNotification(getCampaign(), resourceMap.getString("cadreReassignment.text"),
+            new ImmersiveDialogNotification(getCampaign(), getTextAt(RESOURCE_BUNDLE, "cadreReassignment.text"),
                   true);
         }
 
@@ -920,11 +1287,35 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(scenario, null);
     }
 
+    /**
+     * Handles salvage assignment prompts for the supplied scenario before it is started or auto-resolved.
+     *
+     * <p>If the scenario's mission allows salvage, this method first displays the salvage formation picker. If the
+     * player cancels that picker or confirms it without selecting any salvage formations, processing should stop. When
+     * salvage formations are selected, the salvage tech picker is displayed next.</p>
+     *
+     * @param scenario the scenario whose salvage formations and salvage techs should be assigned
+     *
+     * @return {@code true} if the caller should stop initializing the scenario; {@code false} if there is no salvage
+     *       opportunity, or if all required salvage assignment prompts were confirmed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
     private boolean handleSalvageAssignments(Scenario scenario) {
+        if (!getCampaignOptions().isUseCamOpsSalvage()) {
+            return false;
+        }
+
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
             if (!displaySalvageFormationPicker(scenario)) {
                 return true;
+            }
+
+            // If we didn't pick any salvage units, there's no point assigning techs
+            if (scenario.getSalvageFormations().isEmpty()) {
+                return false;
             }
 
             return !displaySalvageTechPicker(scenario);
@@ -977,7 +1368,8 @@ public final class BriefingTab extends CampaignGuiTab {
               scenario.getSalvageFormations());
 
         SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
-              scenario.getSalvageFormations());
+              scenario.getSalvageFormations(), getBattlefieldControlType(scenario));
+
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageFormations();
@@ -1014,6 +1406,20 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         return forcePicker.wasConfirmed();
+    }
+
+    private static @Nullable ScenarioTemplate.BattlefieldControlType getBattlefieldControlType(Scenario scenario) {
+        if (scenario instanceof AtBDynamicScenario dynamicScenario) {
+            ScenarioTemplate template = dynamicScenario.getTemplate();
+
+            if (template != null) {
+                return template.getBattlefieldControl();
+            }
+
+            return ScenarioTemplate.BattlefieldControlType.VICTOR;
+        }
+
+        return null;
     }
 
 
@@ -1077,7 +1483,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
-              getCampaign().isClanCampaign());
+              getCampaign().isClanCampaign(), getBattlefieldControlType(scenario));
         boolean wasConfirmed = techPicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageTechs();
@@ -1283,15 +1689,15 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        List<String> buttons = List.of(resourceMap.getString("dialogScenarioAcceptance.button.accept"),
-              resourceMap.getString("dialogScenarioAcceptance.button.cancel"));
+                List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.accept"),
+              getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.cancel"));
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(),
               speaker,
               overallCommander,
               description,
               buttons,
-              resourceMap.getString("dialogScenarioAcceptance.outOfCharacter"),
+              getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.outOfCharacter"),
               null,
               false);
 
@@ -1303,10 +1709,17 @@ public final class BriefingTab extends CampaignGuiTab {
      * Resolve the selected scenario by proving a MUL file
      */
     private void resolveScenario() {
+
+
         Scenario scenario = getSelectedScenario();
         if (null == scenario) {
             return;
         }
+
+        if (handleSalvageAssignments(scenario)) {
+            return;
+        }
+
         getCampaign().getApp().resolveScenario(scenario);
     }
 
@@ -1945,33 +2358,35 @@ public final class BriefingTab extends CampaignGuiTab {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             scrollScenarioView.setViewportView(null);
-            btnStartGame.setEnabled(false);
-            btnJoinGame.setEnabled(false);
-            btnLoadGame.setEnabled(false);
-            btnGetMul.setEnabled(false);
-            btnClearAssignedUnits.setEnabled(false);
-            btnResolveScenario.setEnabled(false);
-            btnAutoResolveScenario.setEnabled(false);
-            btnPrintRS.setEnabled(false);
+            panScenarioActions.setVisible(!isResolvedScenarioFilterSelected());
+            refreshAssignmentsTabAvailability(null);
+            clearScenarioActionButtons();
             selectedScenario = -1;
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         if (scenario == null) {
+            scrollScenarioView.setViewportView(null);
+            panScenarioActions.setVisible(!isResolvedScenarioFilterSelected());
+            refreshAssignmentsTabAvailability(null);
+            clearScenarioActionButtons();
+            selectedScenario = -1;
             return;
         }
         selectedScenario = scenario.getId();
-        if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario)) {
-            scrollScenarioView.setViewportView(new AtBScenarioViewPanel((AtBScenario) scenario,
-                  getCampaign(),
-                  getFrame()));
-        } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(getFrame(), getCampaign(), scenario));
-        }
+        scrollScenarioView.setViewportView(createScenarioViewPanel(scenario));
+        refreshSelectedScenarioActions(scenario);
+        panScenarioActions.setVisible(scenario.getStatus().isCurrent());
+        refreshAssignmentsTabAvailability(scenario);
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
+
+        if (!scenario.getStatus().isCurrent()) {
+            clearScenarioActionButtons();
+            return;
+        }
 
         final boolean canStartGame = ((!getCampaign().checkLinkedScenario(scenario.getId())) &&
                                             (scenario.canStartScenario(getCampaign())));
@@ -1991,10 +2406,48 @@ public final class BriefingTab extends CampaignGuiTab {
         btnResolveScenario.setEnabled(canStartGame);
         btnAutoResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(canStartGame);
+        refreshScenarioActionButtonEmphasis();
+    }
+
+    private boolean isResolvedScenarioFilterSelected() {
+        return getSelectedScenarioFilter(scenarioFilter,
+              ScenarioQueueFilter.ALL_ACTIVE) == ScenarioQueueFilter.ALL_RESOLVED;
+    }
+
+    private void refreshAssignmentsTabAvailability(@Nullable Scenario scenario) {
+        boolean assignmentsEnabled = getCampaignOptions().isUseStratCon() &&
+                                           !isResolvedScenarioFilterSelected() &&
+                                           ((scenario == null) || scenario.getStatus().isCurrent());
+        scenarioWorkTabs.setEnabledAt(ASSIGNMENTS_TAB_INDEX, assignmentsEnabled);
+        if (!assignmentsEnabled && (scenarioWorkTabs.getSelectedIndex() == ASSIGNMENTS_TAB_INDEX)) {
+            scenarioWorkTabs.setSelectedIndex(SCENARIO_DETAILS_TAB_INDEX);
+        }
+    }
+
+    private void clearScenarioActionButtons() {
+        btnDeploySelectedScenario.setEnabled(false);
+        btnStartGame.setEnabled(false);
+        btnJoinGame.setEnabled(false);
+        btnLoadGame.setEnabled(false);
+        btnGetMul.setEnabled(false);
+        btnClearAssignedUnits.setEnabled(false);
+        btnResolveScenario.setEnabled(false);
+        btnAutoResolveScenario.setEnabled(false);
+        btnPrintRS.setEnabled(false);
+        refreshScenarioActionButtonEmphasis();
+    }
+
+    private JPanel createScenarioViewPanel(Scenario scenario) {
+        if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario)) {
+            return new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame());
+        }
+        return new ScenarioViewPanel(getFrame(), getCampaign(), scenario);
     }
 
     public void refreshLanceAssignments() {
         panLanceAssignment.refresh();
+        refreshSelectedScenarioActions(getSelectedScenario());
+        refreshAssignmentsTabAvailability(getSelectedScenario());
     }
 
     /*
@@ -2018,7 +2471,7 @@ public final class BriefingTab extends CampaignGuiTab {
             btnAddScenario.setEnabled(false);
             btnGMGenerateScenarios.setEnabled(false);
         } else {
-            scrollMissionView.setViewportView(new MissionViewPanel(mission, scenarioTable, getCampaignGui()));
+            scrollMissionView.setViewportView(new MissionViewPanel(mission, getCampaignGui()));
             // This odd code is to make sure that the scrollbar stays at the top
             // I can't just call it here, because it ends up getting reset somewhere later
             SwingUtilities.invokeLater(() -> scrollMissionView.getVerticalScrollBar().setValue(0));
@@ -2034,11 +2487,49 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void refreshScenarioTableData() {
+        refreshScenarioTableData(true);
+    }
+
+    private void refreshScenarioTableData(boolean preserveResolvedSelection) {
+        int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
+        ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
+              ScenarioQueueFilter.ALL_ACTIVE);
         final Mission mission = comboMission.getSelectedItem();
-        scenarioModel.setData((mission == null) ? new ArrayList<>() : mission.getVisibleScenarios());
-        selectedScenario = -1;
-        scenarioTable.setPreferredScrollableViewportSize(scenarioTable.getPreferredSize());
+        List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
+        if (preserveResolvedSelection && (scenarioSelection >= 0) &&
+                  (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
+                  isResolvedScenario(visibleScenarios, scenarioSelection)) {
+            scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
+            return;
+        }
+
+        List<Scenario> filteredScenarios = new ArrayList<>();
+
+        for (Scenario scenario : visibleScenarios) {
+            if (selectedFilter == ScenarioQueueFilter.ALL_RESOLVED) {
+                if (!scenario.getStatus().isCurrent()) {
+                    filteredScenarios.add(scenario);
+                }
+            } else if (scenario.getStatus().isCurrent() && matchesScenarioFilter(scenario, selectedFilter)) {
+                filteredScenarios.add(scenario);
+            }
+        }
+
+        scenarioModel.setData(filteredScenarios);
+
+        selectScenarioInTable(scenarioTable, scenarioModel, scenarioSelection);
+
         scenarioTable.setFillsViewportHeight(true);
+        refreshScenarioView();
+    }
+
+    private boolean isResolvedScenario(List<Scenario> scenarios, int scenarioId) {
+        for (Scenario scenario : scenarios) {
+            if ((scenario.getId() == scenarioId) && !scenario.getStatus().isCurrent()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -2064,12 +2555,14 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     public void focusOnScenario(int targetId) {
         Mission targetMission = null;
+        Scenario targetScenario = null;
 
         // First find the mission and scenario
         for (Mission mission : getCampaign().getMissions()) {
             for (Scenario scenario : mission.getScenarios()) {
                 if (scenario.getId() == targetId) {
                     targetMission = mission;
+                    targetScenario = scenario;
                     break;
                 }
             }
@@ -2093,18 +2586,15 @@ public final class BriefingTab extends CampaignGuiTab {
             if (missionInCombo) {
                 comboMission.setSelectedItem(targetMission);
 
-                // Only try to select in the table if the table has rows
-                if (scenarioTable.getRowCount() > 0) {
-                    for (int row = 0; row < scenarioTable.getRowCount(); row++) {
-                        Scenario currentScenario = scenarioModel.getScenario(row);
-                        if (currentScenario.getId() == targetId) {
-                            // Select the row in the table
-                            scenarioTable.setRowSelectionInterval(row, row);
-                            // Ensure the selected row is visible
-                            scenarioTable.scrollRectToVisible(scenarioTable.getCellRect(row, 0, true));
-                            selectedScenario = row;
-                            break;
-                        }
+                if ((targetScenario != null) && targetScenario.getStatus().isCurrent()) {
+                    scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_ACTIVE);
+                    if (selectScenarioInTable(scenarioTable, scenarioModel, targetId)) {
+                        selectedScenario = targetId;
+                    }
+                } else {
+                    scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
+                    if (selectScenarioInTable(scenarioTable, scenarioModel, targetId)) {
+                        selectedScenario = targetId;
                     }
                 }
             }
@@ -2149,8 +2639,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
-        splitScenario.getBottomComponent().setVisible(getCampaignOptions().isUseStratCon());
-        splitScenario.resetToPreferredSizes();
+        refreshAssignmentsTabAvailability(getSelectedScenario());
     }
 
     @Subscribe
@@ -2174,6 +2663,17 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
+        if (getCampaignOptions().isUseStratCon()) {
+            lanceAssignmentScheduler.schedule();
+        }
+    }
+
+    @Subscribe
+    public void handle(DeploymentChangedEvent ev) {
+        scenarioDataScheduler.schedule();
+        if ((ev.getScenario() != null) && (ev.getScenario().getId() == selectedScenario)) {
+            scenarioViewScheduler.schedule();
+        }
         if (getCampaignOptions().isUseStratCon()) {
             lanceAssignmentScheduler.schedule();
         }

@@ -43,7 +43,9 @@ import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -638,9 +640,29 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
-                MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
-                mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                if (tech != null) {
+                    if ((!selectedUnit.getActiveCrew().isEmpty()) || (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
+                        Campaign campaign = gui.getCampaign();
+                        ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
+                              tech,
+                              null,
+                              getFormattedText("mothballUnit.clearDesignationsICMessage.text",
+                                    campaign.getCommanderAddress()),
+                              List.of(
+                                    getText("mothballUnit.clearDesignationsCancelButton.text"),
+                                    getText("mothballUnit.clearDesignationsConfirmButton.text")),
+                              getText("mothballUnit.clearDesignationsOOCMessage.text"),
+                              null,
+                              false);
+                        if (clearAssignments.getDialogChoice() == 1) {
+                            selectedUnit.clearCrew();
+                            campaign.removeUnitFromFormation(selectedUnit);
+                        }
+                    }
+                    MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
+                    mothballUnitAction.execute(gui.getCampaign(), selectedUnit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                }
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
             if (units.length > 1) {
@@ -1165,30 +1187,44 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             // fill with temp crew (blob crew)
-            if (oneSelected) {
-                boolean canFillWithTempCrew = canUnitUseTempCrew(unit);
+            if (oneSelected && canUnitUseTempCrew(unit)) {
+                int currentCrew = unit.getActiveCrew().size();
+                int currentTempCrew = unit.getTotalTempCrew();
+                int fullCrew = unit.getFullCrewSize();
 
-                if (canFillWithTempCrew && !unit.getActiveCrew().isEmpty()) {
-                    int currentCrew = unit.getActiveCrew().size();
-                    int currentTempCrew = unit.getTotalTempCrew();
-                    int fullCrew = unit.getFullCrewSize();
-
-                    // Only show if unit can accept more temp crew
-                    if (currentCrew + currentTempCrew < fullCrew) {
-                        menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
-                        menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
-                        menuItem.addActionListener(this);
-                        popup.add(menuItem);
-                    }
-
-                    // Show "Remove temp crew" if unit has any temp crew
-                    if (currentTempCrew > 0) {
-                        menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
-                        menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
-                        menuItem.addActionListener(this);
-                        popup.add(menuItem);
+                // Determine why filling might not be possible
+                String fillDisabledReason = null;
+                if (currentCrew == 0) {
+                    fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.noCommander");
+                } else if (currentCrew + currentTempCrew >= fullCrew) {
+                    fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.atFullStrength");
+                } else {
+                    PersonnelRole crewRole = unit.getDriverRole();
+                    boolean hasPool = crewRole != null
+                          && gui.getCampaign().isBlobCrewEnabled(crewRole)
+                          && gui.getCampaign().getAvailableTempCrewPool(crewRole) > 0;
+                    if (!hasPool) {
+                        fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.noPoolAvailable");
                     }
                 }
+
+                menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
+                menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
+                menuItem.addActionListener(this);
+                if (fillDisabledReason != null) {
+                    menuItem.setEnabled(false);
+                    menuItem.setToolTipText(fillDisabledReason);
+                }
+                popup.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
+                menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
+                menuItem.addActionListener(this);
+                if (currentTempCrew == 0) {
+                    menuItem.setEnabled(false);
+                    menuItem.setToolTipText(resources.getString("tempCrew.removeTempCrew.noTempCrew"));
+                }
+                popup.add(menuItem);
             }
 
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
