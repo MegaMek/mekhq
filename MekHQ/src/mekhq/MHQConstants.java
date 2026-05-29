@@ -99,6 +99,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
     public static final String USE_UNIFIED_DAILY_REPORT = "useUnifiedDailyReport";
+    public static final String USE_AGGREGATE_DAILY_REPORT = "useAggregateDailyReport";
     // endregion Personnel Tab
     // endregion Display
 
