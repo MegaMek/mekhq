@@ -630,16 +630,15 @@ public class TransportCostCalculations {
         int mekBayUsage = mekBays - mekCount;
 
         // Do we have spare ASF bays? If so, try and use them for LAM units
-        if (asfBayUsage > 0) {
-            if (asfBayUsage > lamCount) {
-                asfBayUsage -= lamCount;
-            } else {
-                lamCount -= asfBayUsage;
-                asfBayUsage = 0;
-            }
+        if (asfBayUsage > lamCount) {
+            asfBayUsage -= lamCount;
+            lamCount = 0;
+        } else {
+            lamCount -= asfBayUsage;
+            asfBayUsage = 0;
         }
 
-        // Any remainder are placed in mek bays. Both ASF and Mek bay rentals cost the same, so this works out
+        // Any remaining LAM are placed in mek bays. Both ASF and Mek bay rentals cost the same, so this works out
         mekBayUsage -= lamCount;
 
         additionalASFBaysRequired = -min(0, asfBayUsage);
