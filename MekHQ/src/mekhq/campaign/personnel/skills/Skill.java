@@ -500,6 +500,13 @@ public class Skill {
             }
         }
 
+        // Training
+        if (Objects.equals(S_TRAINING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_PATIENT_EDUCATOR)) {
+                modifier += 2;
+            }
+        }
+
         return modifier;
     }
 
