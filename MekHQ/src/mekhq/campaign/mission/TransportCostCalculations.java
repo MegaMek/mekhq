@@ -622,29 +622,25 @@ public class TransportCostCalculations {
         totalCost = totalCost.plus(additionalSmallCraftBaysCost);
         int smallCraftSpareCapacity = max(0, smallCraftBayUsage);
 
-        // ASF (including conventional fighters), Meks, and LAM
+        // ASF (including Conv Fighters)
         int asfBays = getTotalASFBays() + smallCraftSpareCapacity;
-        int mekBays = getTotalMekBays();
-
+        int lamUsage = lamCount;
         int asfBayUsage = asfBays - asfCount;
-        int mekBayUsage = mekBays - mekCount;
 
-        // Do we have spare ASF bays? If so, try and use them for LAM units
-        if (asfBayUsage > lamCount) {
-            asfBayUsage -= lamCount;
-            lamCount = 0;
-        } else {
-            lamCount -= asfBayUsage;
-            asfBayUsage = 0;
+        if (asfBays > asfCount) {
+            int spareCapacity = asfBays - asfCount;
+            int deduction = Math.min(spareCapacity, lamCount);
+            asfCount += deduction;
+            lamCount -= deduction;
         }
-
-        // Any remaining LAM are placed in mek bays. Both ASF and Mek bay rentals cost the same, so this works out
-        mekBayUsage -= lamCount;
 
         additionalASFBaysRequired = -min(0, asfBayUsage);
         additionalASFBaysCost = round(additionalASFBaysRequired * ASF_COST);
         totalCost = totalCost.plus(additionalASFBaysCost);
 
+        // Meks
+        int mekBays = getTotalMekBays();
+        int mekBayUsage = mekBays - (mekCount + lamCount);
         additionalMekBaysRequired = -min(0, mekBayUsage);
         additionalMekBaysCost = round(additionalMekBaysRequired * MEK_COST);
         totalCost = totalCost.plus(additionalMekBaysCost);
