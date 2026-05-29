@@ -493,6 +493,13 @@ public class Skill {
             }
         }
 
+        // Surgery/Any
+        if (Objects.equals(S_SURGERY, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SHAKEY_SCALPEL)) {
+                modifier -= 2;
+            }
+        }
+
         return modifier;
     }
 

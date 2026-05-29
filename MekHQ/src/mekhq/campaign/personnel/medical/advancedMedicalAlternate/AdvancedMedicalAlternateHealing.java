@@ -38,6 +38,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HOLISTIC_CARE;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PATHOLOGIC_INSIGHT;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PROTHESIS_TECHNICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEON;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
@@ -202,12 +203,16 @@ public class AdvancedMedicalAlternateHealing {
      */
     public static void performUnassistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
           Person patient, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
-        // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
 
         PersonnelOptions personnelOptions = patient.getOptions();
         boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
         boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = personnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+        
+        // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
+            addPathologicInsightModifier(modifiers, injury, hasPathologicInsight);
+
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
                 int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
@@ -230,6 +235,13 @@ public class AdvancedMedicalAlternateHealing {
                     injury.changeTime(1); // Undo the prior reduction
                 }
             }
+        }
+    }
+
+    private static void addPathologicInsightModifier(List<TargetRollModifier> modifiers, Injury injury,
+          boolean hasPathologicInsight) {
+        if (hasPathologicInsight && injury.isDisease()) {
+            modifiers.add(new TargetRollModifier(-2, "Pathologic Insight"));
         }
     }
 
@@ -352,12 +364,15 @@ public class AdvancedMedicalAlternateHealing {
           boolean useEdge) {
         boolean hasHolisticCareSPA = doctor.getOptions().booleanOption(UNOFFICIAL_HOLISTIC_CARE);
 
-        // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
-
         PersonnelOptions personnelOptions = doctor.getOptions();
         boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
         boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = personnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+        // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
+
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
+            addPathologicInsightModifier(modifiers, injury, hasPathologicInsight);
+
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
                 int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
