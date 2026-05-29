@@ -36,20 +36,24 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
@@ -66,14 +70,18 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.model.RankTableModel;
 import mekhq.gui.panes.RankSystemsPane;
 
 /**
@@ -103,6 +111,17 @@ import mekhq.gui.panes.RankSystemsPane;
  * tab in the campaign options dialog.
  */
 public class BiographyTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = 300;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
+    private static final int CHECKBOX_GRID_COLUMNS = 2;
+    private static final int RANK_SYSTEMS_PANEL_WIDTH = 860;
+    private static final int RANK_SYSTEMS_PANEL_HEIGHT = 430;
+    private static final int RANK_TABLE_HEIGHT = 260;
+    private static final int RANK_RATE_COLUMN_WIDTH = 60;
+    private static final int RANK_NAME_COLUMN_WIDTH = 150;
+    private static final int RANK_OFFICER_COLUMN_WIDTH = 90;
+    private static final int RANK_PAY_MULTIPLIER_COLUMN_WIDTH = 120;
+
     private final Campaign campaign;
     private final GeneralTab generalTab;
     private final CampaignOptions campaignOptions;
@@ -118,7 +137,7 @@ public class BiographyTab {
     private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseDylansRandomXP;
     private JLabel lblGender;
-    private JSlider sldGender;
+    private JSpinner spnGender;
     private JLabel lblNonBinaryDiceSize;
     private JSpinner spnNonBinaryDiceSize;
     private JLabel lblFamilyDisplayLevel;
@@ -410,7 +429,7 @@ public class BiographyTab {
     private void initializeGeneralTab() {
         chkUseDylansRandomXP = new JCheckBox();
         lblGender = new JLabel();
-        sldGender = new JSlider();
+        spnGender = new JSpinner();
         lblNonBinaryDiceSize = new JLabel();
         spnNonBinaryDiceSize = new JSpinner();
         lblFamilyDisplayLevel = new JLabel();
@@ -473,11 +492,8 @@ public class BiographyTab {
 
         lblGender = new CampaignOptionsLabel("Gender");
         lblGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
-        sldGender = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 50);
-        sldGender.setMajorTickSpacing(25);
-        sldGender.setPaintTicks(true);
-        sldGender.setPaintLabels(true);
-        sldGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
+        spnGender = new CampaignOptionsSpinner("Gender", 50, 0, 100, 1);
+        spnGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
 
         lblNonBinaryDiceSize = new CampaignOptionsLabel("NonBinaryDiceSize",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
@@ -490,64 +506,147 @@ public class BiographyTab {
         lblFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
         comboFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
 
+        JPanel generalOptionsPanel = createBiographyGeneralOptionsPanel();
         pnlAnniversariesPanel = createAnniversariesPanel();
-
         pnlLifeEvents = createLifeEventsPanel();
-
         pnlComingOfAge = createComingOfAgePanel();
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("BiographyGeneralTabLeft", true);
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
-
-        layoutLeft.gridy = 0;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkUseDylansRandomXP, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblGender, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(sldGender, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblNonBinaryDiceSize, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnNonBinaryDiceSize, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblFamilyDisplayLevel, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(comboFamilyDisplayLevel, layoutLeft);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true, "BiographyGeneralTab",
+        MHQCollapsiblePanel generalOptionsSection = createSection("lblBiographyGeneralTab.text",
+                "lblBiographyGeneralTab.summary",
+                generalOptionsPanel,
                 getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(generalHeader, layoutParent);
+        MHQCollapsiblePanel anniversariesSection = createSection("lblAnniversariesPanel.text",
+                "lblAnniversariesPanel.summary",
+                pnlAnniversariesPanel);
+        MHQCollapsiblePanel lifeEventsSection = createSection("lblLifeEventsPanel.text",
+                "lblLifeEventsPanel.summary",
+                pnlLifeEvents);
+        MHQCollapsiblePanel comingOfAgeSection = createSection("lblComingOfAgePanel.text",
+                "lblComingOfAgePanel.summary",
+                pnlComingOfAge);
 
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(pnlAnniversariesPanel, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panelParent.add(pnlLifeEvents, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(pnlComingOfAge, layoutParent);
+        JPanel panelParent = createSectionedPanel("BiographyGeneralTab",
+                generalHeader,
+                generalOptionsSection,
+                anniversariesSection,
+                lifeEventsSection,
+                comingOfAgeSection);
 
         generalPageCreated = true;
         updateGeneralControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "BiographyGeneralTab");
+    }
+
+    private JPanel createBiographyGeneralOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BiographyGeneralOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseDylansRandomXP);
+        panel.addRow(lblGender, spnGender);
+        panel.addRow(lblNonBinaryDiceSize, spnNonBinaryDiceSize);
+        panel.addRow(lblFamilyDisplayLevel, comboFamilyDisplayLevel);
+
+        return panel;
+    }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+            MHQCollapsiblePanel... sections) {
+        return createSectionedPanel(name, header, null, sections);
+    }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header, @Nullable String bodyTextKey,
+            MHQCollapsiblePanel... sections) {
+        JPanel sectionControls = createSectionControls(sections);
+        JPanel introPanel = bodyTextKey == null ? null : createSectionIntro(name + "Body", bodyTextKey, sections);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(name);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.weightx = 1.0;
+        panel.add(header, layout);
+
+        if (introPanel != null) {
+            layout.gridy++;
+            panel.add(introPanel, layout);
+        }
+
+        layout.gridy++;
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
+
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        for (MHQCollapsiblePanel section : sections) {
+            layout.gridy++;
+            panel.add(section, layout);
+        }
+
+        return panel;
+    }
+
+    private JPanel createSectionIntro(String name, String bodyTextKey, MHQCollapsiblePanel... sections) {
+        return new CampaignOptionsIntroPanel(name,
+                getTextAt(getCampaignOptionsResourceBundle(), bodyTextKey),
+                getPreferredSectionContentWidth(sections));
+    }
+
+    private int getPreferredSectionContentWidth(MHQCollapsiblePanel... sections) {
+        int preferredWidth = 0;
+        for (MHQCollapsiblePanel section : sections) {
+            preferredWidth = Math.max(preferredWidth, section.getContentPreferredWidth());
+        }
+
+        return preferredWidth;
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+            @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
     }
 
     /**
@@ -575,23 +674,14 @@ public class BiographyTab {
         chkAnnounceChildBirthdays.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceChildBirthdays"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AnniversariesPanel", true, "AnniversariesPanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkAnnounceBirthdays, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(chkAnnounceRecruitmentAnniversaries, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkAnnounceOfficersOnly, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkAnnounceChildBirthdays, layoutParent);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AnniversariesPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkAnnounceBirthdays,
+                chkAnnounceRecruitmentAnniversaries,
+                chkAnnounceOfficersOnly,
+                chkAnnounceChildBirthdays);
 
         return panel;
     }
@@ -609,19 +699,13 @@ public class BiographyTab {
                 "ShowLifeEventDialogCelebrations"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LifeEventsPanel", true, "LifeEventsPanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 1;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkShowLifeEventDialogBirths, layoutParent);
-        layoutParent.gridx++;
-        panel.add(chkShowLifeEventDialogComingOfAge, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(chkShowLifeEventDialogCelebrations, layoutParent);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("LifeEventsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkShowLifeEventDialogBirths,
+                chkShowLifeEventDialogComingOfAge,
+                chkShowLifeEventDialogCelebrations);
 
         return panel;
     }
@@ -647,22 +731,14 @@ public class BiographyTab {
                 "ComingOfAgeRPSkills"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ComingOfAgePanel", true, "ComingOfAgePanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 1;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkVeterancySPAs, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkAwardRelevantVeterancySPAs, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkComingOfAgeSPAs, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkRewardComingOfAgeRPSkills, layoutParent);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComingOfAgePanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkVeterancySPAs,
+                chkAwardRelevantVeterancySPAs,
+                chkComingOfAgeSPAs,
+                chkRewardComingOfAgeRPSkills);
 
         return panel;
     }
@@ -688,22 +764,18 @@ public class BiographyTab {
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
         pnlRandomBackgrounds = createRandomBackgroundsPanel();
 
-        // Layout the Panels
-        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true, "BackgroundsTab",
+        MHQCollapsiblePanel originSection = createSection("lblRandomOriginOptionsPanel.text",
+                "lblRandomOriginOptionsPanel.summary",
+                pnlRandomOriginOptions,
                 getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        MHQCollapsiblePanel randomBackgroundsSection = createSection("lblRandomBackgroundsPanel.text",
+                "lblRandomBackgroundsPanel.summary",
+                pnlRandomBackgrounds);
 
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(backgroundHeader, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(pnlRandomOriginOptions, layout);
-
-        layout.gridx++;
-        panel.add(pnlRandomBackgrounds, layout);
+        JPanel panel = createSectionedPanel("BackgroundsTab",
+                backgroundHeader,
+                originSection,
+                randomBackgroundsSection);
 
         backgroundsPageCreated = true;
         updateBackgroundControlsFromModel();
@@ -742,22 +814,14 @@ public class BiographyTab {
                 "UseSimulatedRelationships"));
 
         // Layout the Panels
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomBackgroundsPanel", true, "RandomBackgroundsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkUseRandomPersonalities, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomPersonalityReputation, layout);
-
-        layout.gridy++;
-        panel.add(chkUseReasoningXpMultiplier, layout);
-
-        layout.gridy++;
-        panel.add(chkUseSimulatedRelationships, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomBackgroundsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkUseRandomPersonalities,
+                chkUseRandomPersonalityReputation,
+                chkUseReasoningXpMultiplier,
+                chkUseSimulatedRelationships);
 
         return panel;
     }
@@ -854,62 +918,19 @@ public class BiographyTab {
         chkExtraRandomOrigin.addMouseListener(createTipPanelUpdater(backgroundHeader, "ExtraRandomOrigin"));
 
         // Layout the Panel
-        final JPanel panelSystemPlanetOrigins = new CampaignOptionsStandardPanel(
-                "RandomOriginOptionsPanelSystemPlanetOrigins",
-                false,
-                "");
-        final GridBagConstraints layoutSystemPlanetOrigins = new CampaignOptionsGridBagConstraints(
-                panelSystemPlanetOrigins);
-
-        layoutSystemPlanetOrigins.gridwidth = 1;
-        layoutSystemPlanetOrigins.gridx = 0;
-        layoutSystemPlanetOrigins.gridy = 0;
-        panelSystemPlanetOrigins.add(lblSpecifiedSystem, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(comboSpecifiedSystem, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(lblSpecifiedPlanet, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(comboSpecifiedPlanet, layoutSystemPlanetOrigins);
-
-        layoutSystemPlanetOrigins.gridx = 0;
-        layoutSystemPlanetOrigins.gridy++;
-        panelSystemPlanetOrigins.add(lblOriginSearchRadius, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(spnOriginSearchRadius, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(lblOriginDistanceScale, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(spnOriginDistanceScale, layoutSystemPlanetOrigins);
-
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomOriginOptionsPanel",
-                true,
-                "RandomOriginOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkRandomizeOrigin, layout);
-
-        layout.gridy++;
-        panel.add(chkRandomizeDependentsOrigin, layout);
-
-        layout.gridy++;
-        panel.add(chkRandomizeAroundSpecifiedPlanet, layout);
-
-        layout.gridy++;
-        panel.add(chkSpecifiedSystemFactionSpecific, layout);
-
-        layout.gridy++;
-        panel.add(panelSystemPlanetOrigins, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkAllowClanOrigins, layout);
-
-        layout.gridy++;
-        panel.add(chkExtraRandomOrigin, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomOriginOptionsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkRandomizeOrigin);
+        panel.addCheckBox(chkRandomizeDependentsOrigin);
+        panel.addCheckBox(chkRandomizeAroundSpecifiedPlanet);
+        panel.addCheckBox(chkSpecifiedSystemFactionSpecific);
+        panel.addRow(lblSpecifiedSystem, comboSpecifiedSystem);
+        panel.addRow(lblSpecifiedPlanet, comboSpecifiedPlanet);
+        panel.addRow(lblOriginSearchRadius, spnOriginSearchRadius);
+        panel.addRow(lblOriginDistanceScale, spnOriginDistanceScale);
+        panel.addCheckBox(chkAllowClanOrigins);
+        panel.addCheckBox(chkExtraRandomOrigin);
 
         return panel;
     }
@@ -1031,45 +1052,36 @@ public class BiographyTab {
         chkUseRandomDeathSuicideCause.addMouseListener(createTipPanelUpdater(deathHeader,
                 "UseRandomDeathSuicideCause"));
 
+        JPanel deathOptionsPanel = createDeathOptionsPanel();
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("DeathTabLeft", true);
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        MHQCollapsiblePanel deathOptionsSection = createSection("lblDeathTab.text",
+                "lblDeathTab.summary",
+                deathOptionsPanel);
+        MHQCollapsiblePanel ageGroupsSection = createSection("lblDeathAgeGroupsPanel.text",
+                "lblDeathAgeGroupsPanel.summary",
+                pnlDeathAgeGroup);
 
-        layoutLeft.gridy = 0;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(lblRandomDeathMultiplier, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnRandomDeathMultiplier, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
-
-        layoutLeft.gridy++;
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(deathHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(pnlDeathAgeGroup, layoutParent);
+        JPanel panelParent = createSectionedPanel("DeathTab",
+                deathHeader,
+                deathOptionsSection,
+                ageGroupsSection);
 
         deathPageCreated = true;
         updateDeathControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "DeathTab");
+    }
+
+    private JPanel createDeathOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRandomDeathMultiplier, spnRandomDeathMultiplier);
+        panel.addCheckBox(chkUseRandomDeathSuicideCause);
+
+        return panel;
     }
 
     /**
@@ -1082,20 +1094,23 @@ public class BiographyTab {
     private JPanel createDeathAgeGroupsPanel() {
         final AgeGroup[] ageGroups = AgeGroup.values();
 
-        // Create the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DeathAgeGroupsPanel", true, "DeathAgeGroupsPanel");
-        panel.setLayout(new GridLayout((ageGroups.length / 2) + 1, 1));
-
         // Contents
+        JCheckBox[] ageGroupCheckBoxes = new JCheckBox[ageGroups.length];
         for (final AgeGroup ageGroup : ageGroups) {
             final JCheckBox checkBox = new JCheckBox(ageGroup.toString());
             checkBox.setToolTipText(ageGroup.getToolTipText());
             checkBox.setName("chk" + ageGroup);
             checkBox.addMouseListener(createTipPanelUpdater(deathHeader, null, ageGroup.getToolTipText()));
 
-            panel.add(checkBox);
+            ageGroupCheckBoxes[ageGroup.ordinal()] = checkBox;
             chkEnabledRandomDeathAgeGroups.put(ageGroup, checkBox);
         }
+
+        // Layout the Panel
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathAgeGroupsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, ageGroupCheckBoxes);
 
         return panel;
     }
@@ -1154,92 +1169,56 @@ public class BiographyTab {
         spnEntranceExamBaseTargetNumber.addMouseListener(createTipPanelUpdater(educationHeader,
                 "EntranceExamBaseTargetNumber"));
 
+        JPanel educationOptionsPanel = createEducationOptionsPanel();
         pnlEnableStandardSets = createEnableStandardSetsPanel();
-
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
-
         pnlDropoutChance = createDropoutChancePanel();
-
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
 
-        // Layout the Panels
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("EducationTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        MHQCollapsiblePanel educationOptionsSection = createSection("lblEducationTab.text",
+                "lblEducationTab.summary",
+                educationOptionsPanel);
+        MHQCollapsiblePanel academySetsSection = createSection("lblEnableStandardSetsPanel.text",
+                "lblEnableStandardSetsPanel.summary",
+                pnlEnableStandardSets);
+        MHQCollapsiblePanel bonusesSection = createSection("lblXpAndSkillBonusesPanel.text",
+                "lblXpAndSkillBonusesPanel.summary",
+                pnlXpAndSkillBonuses);
+        MHQCollapsiblePanel dropoutSection = createSection("lblDropoutChancePanel.text",
+                "lblDropoutChancePanel.summary",
+                pnlDropoutChance);
+        MHQCollapsiblePanel accidentsSection = createSection("lblAccidentsAndEventsPanel.text",
+                "lblAccidentsAndEventsPanel.summary",
+                pnlAccidentsAndEvents);
 
-        layoutLeft.gridwidth = 5;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        panelLeft.add(educationHeader, layoutLeft);
-
-        layoutLeft.gridy++;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkUseEducationModule, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(lblCurriculumXpRate, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnCurriculumXpRate, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblMaximumJumpCount, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaximumJumpCount, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseReeducationCamps, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkEnableOverrideRequirements, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkShowIneligibleAcademies, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(lblEntranceExamBaseTargetNumber, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnEntranceExamBaseTargetNumber, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(pnlEnableStandardSets, layoutLeft);
-
-        final JPanel panelRight = new CampaignOptionsStandardPanel("EducationTabRight");
-        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutRight.gridy++;
-        layoutRight.gridwidth = 1;
-        panelRight.add(panelLeft, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(pnlXpAndSkillBonuses, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(pnlDropoutChance, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(pnlAccidentsAndEvents, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("EducationTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(educationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
+        JPanel panelParent = createSectionedPanel("EducationTab",
+                educationHeader,
+                educationOptionsSection,
+                academySetsSection,
+                bonusesSection,
+                dropoutSection,
+                accidentsSection);
 
         educationPageCreated = true;
         updateEducationControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "EducationTab");
+    }
+
+    private JPanel createEducationOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EducationOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseEducationModule);
+        panel.addRow(lblCurriculumXpRate, spnCurriculumXpRate);
+        panel.addRow(lblMaximumJumpCount, spnMaximumJumpCount);
+        panel.addCheckBox(chkUseReeducationCamps);
+        panel.addCheckBox(chkEnableOverrideRequirements);
+        panel.addCheckBox(chkShowIneligibleAcademies);
+        panel.addRow(lblEntranceExamBaseTargetNumber, spnEntranceExamBaseTargetNumber);
+
+        return panel;
     }
 
     /**
@@ -1263,22 +1242,13 @@ public class BiographyTab {
         chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation");
         chkEnableUnitEducation.addMouseListener(createTipPanelUpdater(educationHeader, "EnableUnitEducation"));
 
-        final JPanel panel = new CampaignOptionsStandardPanel("EnableStandardSetsPanel",
-                true,
-                "EnableStandardSetsPanel");
-
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkEnableLocalAcademies, layout);
-
-        layout.gridy++;
-        panel.add(chkEnablePrestigiousAcademies, layout);
-
-        layout.gridy++;
-        panel.add(chkEnableUnitEducation, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EnableStandardSetsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkEnableLocalAcademies,
+                chkEnablePrestigiousAcademies,
+                chkEnableUnitEducation);
 
         return panel;
     }
@@ -1305,19 +1275,11 @@ public class BiographyTab {
         spnFacultyXpMultiplier.addMouseListener(createTipPanelUpdater(educationHeader, "FacultyXpMultiplier"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("XpAndSkillBonusesPanel", true, "XpAndSkillBonusesPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkEnableBonuses, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblFacultyXpMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnFacultyXpMultiplier, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("XpAndSkillBonusesPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkEnableBonuses);
+        panel.addRow(lblFacultyXpMultiplier, spnFacultyXpMultiplier);
 
         return panel;
     }
@@ -1346,21 +1308,11 @@ public class BiographyTab {
         spnChildrenDropoutChance.addMouseListener(createTipPanelUpdater(educationHeader, "ChildrenDropoutChance"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DropoutChancePanel", true, "DropoutChancePanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblAdultDropoutChance, layout);
-        layout.gridx++;
-        panel.add(spnAdultDropoutChance, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblChildrenDropoutChance, layout);
-        layout.gridx++;
-        panel.add(spnChildrenDropoutChance, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DropoutChancePanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblAdultDropoutChance, spnAdultDropoutChance);
+        panel.addRow(lblChildrenDropoutChance, spnChildrenDropoutChance);
 
         return panel;
     }
@@ -1391,19 +1343,11 @@ public class BiographyTab {
                 "MilitaryAcademyAccidents"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AccidentsAndEventsPanel",
-                true,
-                "AccidentsAndEventsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkAllAges, layout);
-
-        layout.gridy++;
-        panel.add(lblMilitaryAcademyAccidents, layout);
-        layout.gridx++;
-        panel.add(spnMilitaryAcademyAccidents, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AccidentsAndEventsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkAllAges);
+        panel.addRow(lblMilitaryAcademyAccidents, spnMilitaryAcademyAccidents);
 
         return panel;
     }
@@ -1459,56 +1403,55 @@ public class BiographyTab {
         lblFactionNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader, "FactionNames"));
         comboFactionNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader, "FactionNames"));
 
+        JPanel nameGenerationPanel = createNameGenerationPanel();
+        JPanel portraitRulesPanel = createPortraitRulesPanel();
         pnlRandomPortrait = createRandomPortraitPanel();
 
-        // Layout the Panels
-        final JPanel panelTop = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab");
-        final GridBagConstraints layoutTop = new CampaignOptionsGridBagConstraints(panelTop);
+        MHQCollapsiblePanel nameGenerationSection = createSection("lblNameGenerationPanel.text",
+                "lblNameGenerationPanel.summary",
+                nameGenerationPanel);
+        MHQCollapsiblePanel portraitRulesSection = createSection("lblPortraitRulesPanel.text",
+                "lblPortraitRulesPanel.summary",
+                portraitRulesPanel);
+        MHQCollapsiblePanel portraitAssignmentSection = createSection("lblRandomPortraitPanel.text",
+                "lblRandomPortraitPanel.summary",
+                pnlRandomPortrait);
 
-        layoutTop.gridwidth = 1;
-        layoutTop.gridx = 0;
-        layoutTop.gridy = 0;
-        panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(chkAllowDuplicatePortraits, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(chkUseGenderedPortraitsOnly, layoutTop);
-
-        layoutTop.gridx = 0;
-        layoutTop.gridy++;
-        panelTop.add(chkUseOriginFactionForNames, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(lblFactionNames, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(comboFactionNames, layoutTop);
-
-        layoutTop.gridx = 0;
-        layoutTop.gridy++;
-        panelTop.add(chkNoRandomPortraitsForChildren, layoutTop);
-
-        layoutTop.gridy++;
-        panelTop.add(chkChildPortraitsWhenComingOfAge, layoutTop);
-
-        final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(nameAndPortraitGenerationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(panelTop, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(pnlRandomPortrait, layoutParent);
+        JPanel panel = createSectionedPanel("NameAndPortraitGenerationTab",
+                nameAndPortraitGenerationHeader,
+                nameGenerationSection,
+                portraitRulesSection,
+                portraitAssignmentSection);
 
         nameAndPortraitPageCreated = true;
         updateNameAndPortraitControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panel, "NameAndPortraitGenerationTab");
+    }
+
+    private JPanel createNameGenerationPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("NameGenerationPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseOriginFactionForNames);
+        panel.addRow(lblFactionNames, comboFactionNames);
+
+        return panel;
+    }
+
+    private JPanel createPortraitRulesPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PortraitRulesPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+            chkAssignPortraitOnRoleChange,
+            chkAllowDuplicatePortraits,
+            chkUseGenderedPortraitsOnly,
+            chkNoRandomPortraitsForChildren);
+        panel.addCheckBox(chkChildPortraitsWhenComingOfAge);
+
+        return panel;
     }
 
     /**
@@ -1528,31 +1471,36 @@ public class BiographyTab {
         // Contents
         chkUsePortrait = new JCheckBox[personnelRoles.size() + 1];
 
-        btnEnableAllPortraits = new CampaignOptionsButton("EnableAllPortraits");
+        btnEnableAllPortraits = createPortraitAssignmentButton("EnableAllPortraits");
         btnEnableAllPortraits.addActionListener(evt -> {
             for (JCheckBox checkBox : chkUsePortrait) {
-                checkBox.setSelected(true);
+                if (checkBox != null) {
+                    checkBox.setSelected(true);
+                }
             }
         });
         btnEnableAllPortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
                 "EnableAllPortraits"));
 
-        btnDisableAllPortraits = new CampaignOptionsButton("DisableAllPortraits");
+        btnDisableAllPortraits = createPortraitAssignmentButton("DisableAllPortraits");
         btnDisableAllPortraits.addActionListener(evt -> {
             for (JCheckBox checkBox : chkUsePortrait) {
-                checkBox.setSelected(false);
+                if (checkBox != null) {
+                    checkBox.setSelected(false);
+                }
             }
         });
         btnDisableAllPortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
                 "DisableAllPortraits"));
 
         // Layout the Panel
-        JPanel panel = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.size() + 3) / 5.0), 5));
-        panel.setBorder(BorderFactory.createTitledBorder(String.format(String.format("<html>%s</html>",
-                getTextAt(getCampaignOptionsResourceBundle(), "lblRandomPortraitPanel.text")))));
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        actionPanel.setOpaque(false);
+        actionPanel.add(btnEnableAllPortraits);
+        actionPanel.add(btnDisableAllPortraits);
 
-        panel.add(btnEnableAllPortraits);
-        panel.add(btnDisableAllPortraits);
+        JCheckBox[] portraitCheckBoxes = new JCheckBox[personnelRoles.size() + 1];
+        int portraitIndex = 0;
 
         // Add remaining checkboxes
         JCheckBox jCheckBox;
@@ -1561,7 +1509,7 @@ public class BiographyTab {
             jCheckBox.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
                     null,
                     role.getDescription(false)));
-            panel.add(jCheckBox);
+            portraitCheckBoxes[portraitIndex++] = jCheckBox;
             chkUsePortrait[role.ordinal()] = jCheckBox;
         }
 
@@ -1569,10 +1517,29 @@ public class BiographyTab {
         jCheckBox.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
                 null,
                 getTextAt(getCampaignOptionsResourceBundle(), "lblCivilian.tooltip")));
-        panel.add(jCheckBox);
+        portraitCheckBoxes[portraitIndex] = jCheckBox;
         chkUsePortrait[personnelRoles.size()] = jCheckBox;
 
+        CampaignOptionsFormPanel rolePanel = new CampaignOptionsFormPanel("RandomPortraitRolePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        rolePanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, portraitCheckBoxes);
+
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.setName("pnlRandomPortraitPanel");
+        panel.setOpaque(false);
+        panel.add(actionPanel, BorderLayout.NORTH);
+        panel.add(rolePanel, BorderLayout.CENTER);
+
         return panel;
+    }
+
+    private JButton createPortraitAssignmentButton(String name) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+        button.setName("btn" + name);
+        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
     }
 
     /**
@@ -1590,27 +1557,90 @@ public class BiographyTab {
     public JPanel createRankTab() {
         // Header
         CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
-                getImageDirectory() + "logo_umayyad_caliphate.png", true, false, 0);
+                getImageDirectory() + "logo_umayyad_caliphate.png");
 
         // Contents
-        Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
-        rankSystemsPane.applyToCampaign();
+        JPanel rankSystemsPanel = createRankSystemsPanel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        MHQCollapsiblePanel rankSystemsSection = createSection("lblRankTab.text",
+                "lblRankTab.summary",
+                rankSystemsPanel);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(headerPanel, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(rankSystemsViewport, layoutParent);
+        JPanel panel = createSectionedPanel("RankTab",
+                headerPanel,
+                "lblRankTabBody.text",
+                rankSystemsSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "RankTab");
+    }
+
+    private JPanel createRankSystemsPanel() {
+        rankSystemsPane.applyToCampaign();
+        configureEmbeddedRankSystemsPane();
+
+        JPanel rankSystemsPanel = new JPanel(new BorderLayout());
+        rankSystemsPanel.setName("pnlRankSystemsPanel");
+        rankSystemsPanel.setOpaque(false);
+        rankSystemsPanel.add(rankSystemsPane, BorderLayout.CENTER);
+
+        return rankSystemsPanel;
+    }
+
+    private void configureEmbeddedRankSystemsPane() {
+        Dimension rankSystemsSize = new Dimension(RANK_SYSTEMS_PANEL_WIDTH, RANK_SYSTEMS_PANEL_HEIGHT);
+        rankSystemsPane.setPreferredSize(rankSystemsSize);
+        rankSystemsPane.setMinimumSize(new Dimension(0, RANK_SYSTEMS_PANEL_HEIGHT));
+        rankSystemsPane.setBorder(BorderFactory.createEmptyBorder());
+        rankSystemsPane.setViewportBorder(null);
+        rankSystemsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        rankSystemsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        removeEmbeddedRankSystemsBorders(rankSystemsPane.getViewport().getView());
+
+        JTable ranksTable = rankSystemsPane.getRanksTable();
+        ranksTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        ranksTable.setFillsViewportHeight(true);
+        configureEmbeddedRankTableColumns(ranksTable);
+
+        JScrollPane tableScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
+                ranksTable);
+        if (tableScrollPane != null) {
+            Dimension tableSize = new Dimension(RANK_SYSTEMS_PANEL_WIDTH, RANK_TABLE_HEIGHT);
+            tableScrollPane.setPreferredSize(tableSize);
+            tableScrollPane.setMinimumSize(new Dimension(0, RANK_TABLE_HEIGHT));
+            tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        }
+    }
+
+    private void configureEmbeddedRankTableColumns(JTable ranksTable) {
+        for (int index = 0; index < ranksTable.getColumnModel().getColumnCount(); index++) {
+            int modelIndex = ranksTable.convertColumnIndexToModel(index);
+            TableColumn column = ranksTable.getColumnModel().getColumn(index);
+            column.setPreferredWidth(getEmbeddedRankColumnWidth(modelIndex));
+        }
+    }
+
+    private int getEmbeddedRankColumnWidth(int modelIndex) {
+        return switch (modelIndex) {
+            case RankTableModel.COL_NAME_RATE -> RANK_RATE_COLUMN_WIDTH;
+            case RankTableModel.COL_OFFICER -> RANK_OFFICER_COLUMN_WIDTH;
+            case RankTableModel.COL_PAY_MULTI -> RANK_PAY_MULTIPLIER_COLUMN_WIDTH;
+            default -> RANK_NAME_COLUMN_WIDTH;
+        };
+    }
+
+    private void removeEmbeddedRankSystemsBorders(Component component) {
+        if (component instanceof JPanel panel && ("rankSystemPanel".equals(panel.getName()) ||
+                "rankSystemFileButtonsPanel".equals(panel.getName()))) {
+            panel.setBorder(BorderFactory.createEmptyBorder());
+        }
+
+        if (component instanceof java.awt.Container container) {
+            for (Component child : container.getComponents()) {
+                removeEmbeddedRankSystemsBorders(child);
+            }
+        }
     }
 
     public void loadValuesFromCampaignOptions() {
@@ -1698,7 +1728,7 @@ public class BiographyTab {
         }
 
         chkUseDylansRandomXP.setSelected(model.useDylansRandomXP);
-        sldGender.setValue(model.percentFemale);
+        spnGender.setValue(model.percentFemale);
         spnNonBinaryDiceSize.setValue(model.nonBinaryDiceSize);
         comboFamilyDisplayLevel.setSelectedItem(model.familyDisplayLevel);
         chkAnnounceOfficersOnly.setSelected(model.announceOfficersOnly);
@@ -1808,7 +1838,7 @@ public class BiographyTab {
         }
 
         model.useDylansRandomXP = chkUseDylansRandomXP.isSelected();
-        model.percentFemale = sldGender.getValue();
+        model.percentFemale = (int) spnGender.getValue();
         model.nonBinaryDiceSize = (int) spnNonBinaryDiceSize.getValue();
         model.familyDisplayLevel = comboFamilyDisplayLevel.getSelectedItem();
         model.announceOfficersOnly = chkAnnounceOfficersOnly.isSelected();

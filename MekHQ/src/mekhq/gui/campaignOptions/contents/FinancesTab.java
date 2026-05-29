@@ -68,6 +68,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
@@ -83,8 +84,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * `GroupLayout` for modularity and clarity.
  */
 public class FinancesTab {
-        private static final int FINANCES_LABEL_COLUMN_WIDTH = 300;
-        private static final int FINANCES_CONTROL_COLUMN_WIDTH = 220;
+    private static final int FINANCES_LABEL_COLUMN_WIDTH = 300;
+    private static final int FINANCES_CONTROL_COLUMN_WIDTH = 220;
 
     private final CampaignOptions campaignOptions;
     private FinancesOptionsModel model;
@@ -701,34 +702,80 @@ public class FinancesTab {
     public JPanel createPriceMultipliersTab() {
         // Header
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-                getImageDirectory() + "logo_clan_stone_lion.png", true, true, 1);
+                getImageDirectory() + "logo_clan_stone_lion.png",
+                1);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
         pnlUsedPartsMultipliers = createUsedPartsMultiplierPanel();
         pnlOtherMultipliers = createOtherMultipliersPanel();
-        priceMultipliersPageCreated = true;
-        updatePriceMultiplierControlsFromModel();
+
+        MHQCollapsiblePanel generalMultipliersSection = createSection("lblGeneralMultipliersPanel.text",
+                "lblGeneralMultipliersPanel.summary",
+                pnlGeneralMultipliers);
+        MHQCollapsiblePanel usedPartsSection = createSection("lblUsedPartsMultiplierPanel.text",
+                "lblUsedPartsMultiplierPanel.summary",
+                pnlUsedPartsMultipliers);
+        MHQCollapsiblePanel otherMultipliersSection = createSection("lblOtherMultipliersPanel.text",
+                "lblOtherMultipliersPanel.summary",
+                pnlOtherMultipliers);
+        JPanel introPanel = createSectionIntro("PriceMultipliersTabBody",
+                "lblPriceMultipliersTabBody.text",
+                generalMultipliersSection,
+                usedPartsSection,
+                otherMultipliersSection);
+
+        JPanel sectionControls = createSectionControls(generalMultipliersSection,
+                usedPartsSection,
+                otherMultipliersSection);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.gridwidth = 5;
+        layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
+        layout.weightx = 1.0;
         panel.add(priceMultipliersHeader, layout);
 
         layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(pnlGeneralMultipliers, layout);
-        layout.gridx++;
-        panel.add(pnlUsedPartsMultipliers, layout);
-        layout.gridx++;
-        panel.add(pnlOtherMultipliers, layout);
+        panel.add(introPanel, layout);
+
+        layout.gridy++;
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
+
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        layout.gridy++;
+        panel.add(generalMultipliersSection, layout);
+
+        layout.gridy++;
+        panel.add(usedPartsSection, layout);
+
+        layout.gridy++;
+        panel.add(otherMultipliersSection, layout);
+
+        priceMultipliersPageCreated = true;
+        updatePriceMultiplierControlsFromModel();
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PriceMultipliersTab");
+    }
+
+    private JPanel createSectionIntro(String name, String bodyTextKey, MHQCollapsiblePanel... sections) {
+        return new CampaignOptionsIntroPanel(name,
+                getTextAt(getCampaignOptionsResourceBundle(), bodyTextKey),
+                getPreferredSectionContentWidth(sections));
+    }
+
+    private int getPreferredSectionContentWidth(MHQCollapsiblePanel... sections) {
+        int preferredWidth = 0;
+        for (MHQCollapsiblePanel section : sections) {
+            preferredWidth = Math.max(preferredWidth, section.getContentPreferredWidth());
+        }
+
+        return preferredWidth;
     }
 
     /**
@@ -798,41 +845,15 @@ public class FinancesTab {
                 "MixedTechUnitPriceMultiplier"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("GeneralMultipliersPanel",
-                true,
-                "GeneralMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(lblCommonPartPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnCommonPartPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(lblMixedTechUnitPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnMixedTechUnitPriceMultiplier, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblInnerSphereUnitPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnInnerSphereUnitPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(lblInnerSpherePartPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnInnerSpherePartPriceMultiplier, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblClanUnitPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnClanUnitPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(lblClanPartPriceMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnClanPartPriceMultiplier, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralMultipliersPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblCommonPartPriceMultiplier, spnCommonPartPriceMultiplier);
+        panel.addRow(lblMixedTechUnitPriceMultiplier, spnMixedTechUnitPriceMultiplier);
+        panel.addRow(lblInnerSphereUnitPriceMultiplier, spnInnerSphereUnitPriceMultiplier);
+        panel.addRow(lblInnerSpherePartPriceMultiplier, spnInnerSpherePartPriceMultiplier);
+        panel.addRow(lblClanUnitPriceMultiplier, spnClanUnitPriceMultiplier);
+        panel.addRow(lblClanPartPriceMultiplier, spnClanPartPriceMultiplier);
 
         return panel;
     }
@@ -877,19 +898,11 @@ public class FinancesTab {
         }
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("UsedPartsMultiplierPanel",
-                true,
-                "UsedPartsMultiplierPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-
-        for (int i = 0; i < 6; i++) {
-            layout.gridx = 0;
-            layout.gridy = i;
-            panel.add(lblUsedPartPriceMultipliers[i], layout);
-            layout.gridx++;
-            panel.add(spnUsedPartPriceMultipliers[i], layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UsedPartsMultiplierPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        for (int index = 0; index < spnUsedPartPriceMultipliers.length; index++) {
+            panel.addRow(lblUsedPartPriceMultipliers[index], spnUsedPartPriceMultipliers[index]);
         }
 
         return panel;
@@ -941,28 +954,12 @@ public class FinancesTab {
                 "CancelledOrderRefundMultiplier"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("OtherMultipliersPanel", true,
-                "OtherMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 1;
-        panel.add(lblDamagedPartsValueMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnDamagedPartsValueMultiplier, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblUnrepairablePartsValueMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnUnrepairablePartsValueMultiplier, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblCancelledOrderRefundMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnCancelledOrderRefundMultiplier, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("OtherMultipliersPanel",
+                FINANCES_LABEL_COLUMN_WIDTH,
+                FINANCES_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblDamagedPartsValueMultiplier, spnDamagedPartsValueMultiplier);
+        panel.addRow(lblUnrepairablePartsValueMultiplier, spnUnrepairablePartsValueMultiplier);
+        panel.addRow(lblCancelledOrderRefundMultiplier, spnCancelledOrderRefundMultiplier);
 
         return panel;
     }

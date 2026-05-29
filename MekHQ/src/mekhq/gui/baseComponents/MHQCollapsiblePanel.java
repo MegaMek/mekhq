@@ -149,6 +149,10 @@ public class MHQCollapsiblePanel extends JPanel {
         return expanded;
     }
 
+    public int getContentPreferredWidth() {
+        return contentPanel.getPreferredSize().width;
+    }
+
     public void setExpanded(boolean expanded) {
         if (this.expanded == expanded) {
             return;
@@ -281,12 +285,25 @@ public class MHQCollapsiblePanel extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        return getStableSize(headerPanel.getPreferredSize(), contentPanel.getPreferredSize());
+        return getStableSize(getHeaderBaselineSize(), contentPanel.getPreferredSize());
     }
 
     @Override
     public Dimension getMinimumSize() {
-        return getStableSize(headerPanel.getMinimumSize(), contentPanel.getMinimumSize());
+        return getStableSize(getHeaderBaselineSize(), contentPanel.getMinimumSize());
+    }
+
+    private Dimension getHeaderBaselineSize() {
+        Insets insets = headerPanel.getInsets();
+        int width = insets.left + insets.right
+                + iconLabel.getPreferredSize().width
+                + HEADER_HORIZONTAL_PADDING
+                + titleLabel.getPreferredSize().width;
+        if (trailingPanel.isVisible()) {
+            width += HEADER_HORIZONTAL_PADDING + trailingPanel.getPreferredSize().width;
+        }
+
+        return new Dimension(width, headerPanel.getPreferredSize().height);
     }
 
     private Dimension getStableSize(Dimension headerSize, Dimension contentSize) {

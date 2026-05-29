@@ -36,10 +36,15 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,8 +52,11 @@ import javax.swing.JSpinner;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -77,6 +85,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </p>
  */
 public class RepairAndMaintenanceTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = 300;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+    private static final int CHECKBOX_GRID_COLUMNS = 2;
+
     private final CampaignOptions campaignOptions;
     private RepairAndMaintenanceOptionsModel model;
     private boolean repairPageCreated;
@@ -249,75 +261,56 @@ public class RepairAndMaintenanceTab {
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
                 2, 2, 13, 1);
         spnDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
+
+        JPanel repairOptionsPanel = createRepairOptionsPanel();
+        JPanel componentDamagePanel = createComponentDamagePanel();
+
+        MHQCollapsiblePanel repairOptionsSection = createSection("lblRepairTab.text",
+                "lblRepairTab.summary",
+                repairOptionsPanel);
+        MHQCollapsiblePanel componentDamageSection = createSection("lblRepairTabRight.text",
+                "lblRepairTabRight.summary",
+                componentDamagePanel,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+
+        final JPanel panelParent = createSectionedPanel("RepairTab",
+                repairHeader,
+                repairOptionsSection,
+                componentDamageSection);
+
         repairPageCreated = true;
         updateRepairControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkTechsUseAdministration, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUsefulAsTechs, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(useEraModsCheckBox, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(assignedTechFirstCheckBox, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(resetToFirstTechCheckBox, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(useQuirksBox, layoutLeft);
-
-        final JPanel panelRight = new CampaignOptionsStandardPanel("RepairTabRight", true,
-                "RepairTabRight",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutRight.gridx = 0;
-        layoutRight.gridy = 0;
-        layoutRight.gridwidth = 2;
-        panelRight.add(useAeroSystemHitsBox, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(useDamageMargin, layoutRight);
-
-        layoutRight.gridy++;
-        layoutRight.gridwidth = 1;
-        panelRight.add(lblDamageMargin, layoutRight);
-        layoutRight.gridx++;
-        panelRight.add(spnDamageMargin, layoutRight);
-
-        layoutRight.gridx = 0;
-        layoutRight.gridy++;
-        panelRight.add(lblDestroyPartTarget, layoutRight);
-        layoutRight.gridx++;
-        panelRight.add(spnDestroyPartTarget, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("RepairTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(repairHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
-
         // Create Parent Panel and return
         return createParentPanel(panelParent, "repairTab");
+    }
+
+    private JPanel createRepairOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RepairOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkTechsUseAdministration,
+                chkUsefulAsTechs,
+                useEraModsCheckBox,
+                assignedTechFirstCheckBox,
+                resetToFirstTechCheckBox,
+                useQuirksBox);
+
+        return panel;
+    }
+
+    private JPanel createComponentDamagePanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComponentDamagePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                useAeroSystemHitsBox,
+                useDamageMargin);
+        panel.addRow(lblDamageMargin, spnDamageMargin);
+        panel.addRow(lblDestroyPartTarget, spnDestroyPartTarget);
+
+        return panel;
     }
 
     /**
@@ -382,79 +375,127 @@ public class RepairAndMaintenanceTab {
 
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
         logMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "LogMaintenance"));
+
+        JPanel schedulePanel = createMaintenanceSchedulePanel();
+        JPanel qualityPanel = createMaintenanceQualityPanel();
+
+        MHQCollapsiblePanel scheduleSection = createSection("lblMaintenanceTab.text",
+                "lblMaintenanceTab.summary",
+                schedulePanel);
+        MHQCollapsiblePanel qualitySection = createSection("lblMaintenanceQualityPanel.text",
+                "lblMaintenanceQualityPanel.summary",
+                qualityPanel,
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+
+        final JPanel panelParent = createSectionedPanel("MaintenanceTab",
+                maintenanceHeader,
+                scheduleSection,
+                qualitySection);
+
         maintenancePageCreated = true;
         updateMaintenanceControlsFromModel();
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
-        GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(checkMaintenance, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(lblMaintenanceDays, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaintenanceDays, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblMaintenanceBonus, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaintenanceBonus, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblDefaultMaintenanceTime, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnDefaultMaintenanceTime, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        layoutLeft.gridwidth = 2;
-        panelLeft.add(logMaintenance, layoutLeft);
-
-        final JPanel panelRight = new CampaignOptionsStandardPanel("repairTabRight", true);
-        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelRight.add(useQualityMaintenance, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(reverseQualityNames, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(chkUseRandomUnitQualities, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(chkUseRandomUnitQualities, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(chkUsePlanetaryModifiers, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(useUnofficialMaintenance, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("repairTab", true);
-        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridy = 0;
-        panelParent.add(maintenanceHeader, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
-
         // Create Parent Panel and return
         return createParentPanel(panelParent, "maintenanceTab");
+    }
+
+    private JPanel createMaintenanceSchedulePanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MaintenanceSchedulePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(checkMaintenance);
+        panel.addRow(lblMaintenanceDays, spnMaintenanceDays);
+        panel.addRow(lblMaintenanceBonus, spnMaintenanceBonus);
+        panel.addRow(lblDefaultMaintenanceTime, spnDefaultMaintenanceTime);
+        panel.addCheckBox(logMaintenance);
+
+        return panel;
+    }
+
+    private JPanel createMaintenanceQualityPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MaintenanceQualityPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                useQualityMaintenance,
+                reverseQualityNames,
+                chkUseRandomUnitQualities,
+                chkUsePlanetaryModifiers);
+        panel.addCheckBox(useUnofficialMaintenance);
+
+        return panel;
+    }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+            MHQCollapsiblePanel... sections) {
+        JPanel sectionControls = createSectionControls(sections);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(name);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.weightx = 1.0;
+        panel.add(header, layout);
+
+        layout.gridy++;
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
+
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        for (MHQCollapsiblePanel section : sections) {
+            layout.gridy++;
+            panel.add(section, layout);
+        }
+
+        return panel;
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+            @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
     }
 
     /**

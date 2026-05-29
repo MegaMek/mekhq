@@ -36,16 +36,20 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,8 +69,11 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -74,8 +81,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 /**
  * The {@code MarketsTab} class represents the campaign options tab related to
@@ -102,6 +107,11 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
  * </p>
  */
 public class MarketsTab {
+      private static final int FORM_LABEL_COLUMN_WIDTH = 300;
+      private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+      private static final int REMOVAL_TARGET_LABEL_COLUMN_WIDTH = 150;
+      private static final int CHECKBOX_GRID_COLUMNS = 2;
+
       private final Campaign campaign;
       private final CampaignOptions campaignOptions;
       private MarketsOptionsModel model;
@@ -281,23 +291,22 @@ public class MarketsTab {
             // Contents
             pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
             pnlRemovalTargets = createPersonnelMarketRemovalOptionsPanel();
+
+            MHQCollapsiblePanel generalSection = createSection("lblPersonnelMarketGeneralOptionsPanel.text",
+                        "lblPersonnelMarketGeneralOptionsPanel.summary",
+                        pnlPersonnelMarketGeneralOptions);
+            MHQCollapsiblePanel removalTargetsSection = createSection("lblPersonnelMarketRemovalOptionsPanel.text",
+                        "lblPersonnelMarketRemovalOptionsPanel.summary",
+                        pnlRemovalTargets,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+
+            final JPanel panel = createSectionedPanel("PersonnelMarketTab",
+                        personnelMarketHeader,
+                        generalSection,
+                        removalTargetsSection);
+
             personnelMarketPageCreated = true;
             updatePersonnelMarketControlsFromModel();
-
-            // Layout the Panel
-            final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true, "");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-            layout.gridwidth = 5;
-            layout.gridx = 0;
-            layout.gridy = 0;
-            panel.add(personnelMarketHeader, layout);
-
-            layout.gridy++;
-            layout.gridwidth = 1;
-            panel.add(pnlPersonnelMarketGeneralOptions, layout);
-            layout.gridx++;
-            panel.add(pnlRemovalTargets, layout);
 
             // Create Parent Panel and return
             return createParentPanel(panel, "PersonnelMarketTab");
@@ -348,35 +357,15 @@ public class MarketsTab {
                         "UsePersonnelHireHiringHallOnly"));
 
             // Layout the Panel
-            final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false, "");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-            layout.gridx = 0;
-            layout.gridy = 0;
-            layout.gridwidth = 1;
-            panel.add(lblPersonnelMarketStyle, layout);
-            layout.gridx++;
-            panel.add(comboPersonnelMarketStyle, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblPersonnelMarketType, layout);
-            layout.gridx++;
-            panel.add(comboPersonnelMarketType, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblPersonnelMarketDylansWeight, layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketDylansWeight, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            layout.gridwidth = 2;
-            panel.add(chkPersonnelMarketReportRefresh, layout);
-
-            layout.gridy++;
-            panel.add(chkUsePersonnelHireHiringHallOnly, layout);
+            final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelMarketGeneralOptionsPanel",
+                        FORM_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            panel.addRow(lblPersonnelMarketStyle, comboPersonnelMarketStyle);
+            panel.addRow(lblPersonnelMarketType, comboPersonnelMarketType);
+            panel.addRow(lblPersonnelMarketDylansWeight, spnPersonnelMarketDylansWeight);
+            panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                        chkPersonnelMarketReportRefresh,
+                        chkUsePersonnelHireHiringHallOnly);
 
             return panel;
       }
@@ -407,53 +396,87 @@ public class MarketsTab {
             }
 
             // Layout the Panels
-            final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketRemovalOptionsPanel",
-                        true,
-                        "PersonnelMarketRemovalOptionsPanel");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-            layout.gridx = 0;
-            layout.gridy = 0;
-            layout.gridwidth = 1;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE), layout);
-            layout.gridx++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN), layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN), layout);
-            layout.gridx++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE), layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN), layout);
-            layout.gridx++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC), layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR), layout);
-            layout.gridx++;
-            panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY), layout);
-            layout.gridx++;
-            panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY), layout);
+            final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelMarketRemovalOptionsPanel",
+                        REMOVAL_TARGET_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            for (SkillLevel skillLevel : Skills.SKILL_LEVELS) {
+                  panel.addRow(lblPersonnelMarketRandomRemovalTargets.get(skillLevel),
+                              spnPersonnelMarketRandomRemovalTargets.get(skillLevel));
+            }
 
             return panel;
+      }
+
+      private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+                  MHQCollapsiblePanel... sections) {
+            JPanel sectionControls = createSectionControls(sections);
+
+            final JPanel panel = new CampaignOptionsStandardPanel(name);
+            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+            layout.gridwidth = 1;
+            layout.gridx = 0;
+            layout.gridy = 0;
+            layout.weightx = 1.0;
+            panel.add(header, layout);
+
+            layout.gridy++;
+            layout.anchor = GridBagConstraints.EAST;
+            panel.add(sectionControls, layout);
+
+            layout.anchor = GridBagConstraints.NORTHWEST;
+            for (MHQCollapsiblePanel section : sections) {
+                  layout.gridy++;
+                  panel.add(section, layout);
+            }
+
+            return panel;
+      }
+
+      private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+            return createSection(titleKey, summaryKey, content, null);
+      }
+
+      private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+                  @Nullable CampaignOptionsMetadata metadata) {
+            MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+            section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+            return section;
+      }
+
+      private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+            String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+            String badges = formatBadges(metadata);
+            if (badges.isBlank()) {
+                  return title;
+            }
+            return "<html>" + title + badges + "</html>";
+      }
+
+      private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+            JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+            expandAllButton.addActionListener(event -> setExpanded(true, sections));
+            JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+            collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+            JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+            controls.setOpaque(false);
+            controls.add(expandAllButton);
+            controls.add(collapseAllButton);
+
+            return controls;
+      }
+
+      private JButton createSectionActionButton(String resourceKey) {
+            JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+            button.putClientProperty("JComponent.sizeVariant", "small");
+            return button;
+      }
+
+      private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+            for (MHQCollapsiblePanel section : sections) {
+                  section.setExpanded(expanded);
+            }
       }
 
       /**
@@ -528,54 +551,51 @@ public class MarketsTab {
             chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
             chkUnitMarketReportRefresh
                         .addMouseListener(createTipPanelUpdater(unitMarketHeader, "UnitMarketReportRefresh"));
+
+            JPanel generationPanel = createUnitMarketGenerationPanel();
+            JPanel deliveryPanel = createUnitMarketDeliveryPanel();
+
+            MHQCollapsiblePanel generationSection = createSection("lblUnitMarketGenerationPanel.text",
+                        "lblUnitMarketGenerationPanel.summary",
+                        generationPanel);
+            MHQCollapsiblePanel deliverySection = createSection("lblUnitMarketDeliveryPanel.text",
+                        "lblUnitMarketDeliveryPanel.summary",
+                        deliveryPanel);
+
+            final JPanel panel = createSectionedPanel("UnitMarketTab",
+                        unitMarketHeader,
+                        generationSection,
+                        deliverySection);
+
             unitMarketPageCreated = true;
             updateUnitMarketControlsFromModel();
 
-            // Layout the Panel
-            final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true, "");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-            layout.gridwidth = 5;
-            layout.gridy = 0;
-            panel.add(unitMarketHeader, layout);
-
-            layout.gridwidth = 1;
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblUnitMarketMethod, layout);
-            layout.gridx++;
-            panel.add(comboUnitMarketMethod, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            layout.gridwidth = 2;
-            panel.add(chkUnitMarketRegionalMekVariations, layout);
-
-            layout.gridy++;
-            layout.gridwidth = 1;
-            panel.add(lblUnitMarketArtilleryUnitChance, layout);
-            layout.gridx++;
-            panel.add(spnUnitMarketArtilleryUnitChance, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblUnitMarketRarityModifier, layout);
-            layout.gridx++;
-            panel.add(spnUnitMarketRarityModifier, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            layout.gridwidth = 2;
-            panel.add(chkInstantUnitMarketDelivery, layout);
-
-            layout.gridy++;
-            panel.add(chkMothballUnitMarketDeliveries, layout);
-
-            layout.gridy++;
-            panel.add(chkUnitMarketReportRefresh, layout);
-
             // Create Parent Panel and return
             return createParentPanel(panel, "UnitMarketTab");
+      }
+
+      private JPanel createUnitMarketGenerationPanel() {
+            final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitMarketGenerationPanel",
+                        FORM_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            panel.addRow(lblUnitMarketMethod, comboUnitMarketMethod);
+            panel.addCheckBox(chkUnitMarketRegionalMekVariations);
+            panel.addRow(lblUnitMarketArtilleryUnitChance, spnUnitMarketArtilleryUnitChance);
+            panel.addRow(lblUnitMarketRarityModifier, spnUnitMarketRarityModifier);
+
+            return panel;
+      }
+
+      private JPanel createUnitMarketDeliveryPanel() {
+            final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitMarketDeliveryPanel",
+                        FORM_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                        chkInstantUnitMarketDelivery,
+                        chkMothballUnitMarketDeliveries,
+                        chkUnitMarketReportRefresh);
+
+            return panel;
       }
 
       /**
@@ -644,23 +664,21 @@ public class MarketsTab {
             // Contents
             pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
             pnlContractPay = createContractPayPanel();
+
+            MHQCollapsiblePanel generalSection = createSection("lblContractMarketGeneralOptionsPanel.text",
+                        "lblContractMarketGeneralOptionsPanel.summary",
+                        pnlContractMarketGeneralOptions);
+            MHQCollapsiblePanel paySection = createSection("lblContractPayPanel.text",
+                        "lblContractPayPanel.summary",
+                        pnlContractPay);
+
+            final JPanel panel = createSectionedPanel("ContractMarketTab",
+                        contractMarketHeader,
+                        generalSection,
+                        paySection);
+
             contractMarketPageCreated = true;
             updateContractMarketControlsFromModel();
-
-            // Layout the Panel
-            final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true, "");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-            layout.gridwidth = 5;
-            layout.gridx = 0;
-            layout.gridy = 0;
-            panel.add(contractMarketHeader, layout);
-
-            layout.gridy++;
-            layout.gridwidth = 1;
-            panel.add(pnlContractMarketGeneralOptions, layout);
-            layout.gridx++;
-            panel.add(pnlContractPay, layout);
 
             // Create Parent Panel and return
             return createParentPanel(panel, "ContractMarketTab");
@@ -754,65 +772,22 @@ public class MarketsTab {
                         "PityContracts"));
 
             // Layout the Panel
-            final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-            layout.gridx = 0;
-            layout.gridy = 0;
-            layout.gridwidth = 1;
-            panel.add(lblContractMarketMethod, layout);
-            layout.gridx++;
-            panel.add(comboContractMarketMethod, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblContractSearchRadius, layout);
-            layout.gridx++;
-            panel.add(spnContractSearchRadius, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            layout.gridwidth = 2;
-            panel.add(chkVariableContractLength, layout);
-
-            layout.gridy++;
-            panel.add(chkUseTwoWayPay, layout);
-
-            layout.gridy++;
-            panel.add(chkUseCamOpsSalvage, layout);
-
-            layout.gridy++;
-            panel.add(chkUseRiskySalvage, layout);
-
-            layout.gridy++;
-            panel.add(chkEnableSalvageFlagByDefault, layout);
-
-            layout.gridy++;
-            panel.add(chkUseDynamicDifficulty, layout);
-
-            layout.gridy++;
-            panel.add(chkUseBolsterContractSkill, layout);
-
-            layout.gridy++;
-            panel.add(chkContractMarketReportRefresh, layout);
-
-            layout.gridy++;
-            layout.gridwidth = 1;
-            panel.add(lblContractMaxSalvagePercentage, layout);
-            layout.gridx++;
-            panel.add(spnContractMaxSalvagePercentage, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblDropShipBonusPercentage, layout);
-            layout.gridx++;
-            panel.add(spnDropShipBonusPercentage, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(lblPityContracts, layout);
-            layout.gridx++;
-            panel.add(spnPityContracts, layout);
+            final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ContractMarketGeneralOptionsPanel",
+                        FORM_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            panel.addRow(lblContractMarketMethod, comboContractMarketMethod);
+            panel.addRow(lblContractSearchRadius, spnContractSearchRadius);
+            panel.addCheckBox(chkVariableContractLength);
+            panel.addCheckBox(chkUseTwoWayPay);
+            panel.addCheckBox(chkUseCamOpsSalvage);
+            panel.addCheckBox(chkUseRiskySalvage);
+            panel.addCheckBox(chkEnableSalvageFlagByDefault);
+            panel.addCheckBox(chkUseDynamicDifficulty);
+            panel.addCheckBox(chkUseBolsterContractSkill);
+            panel.addCheckBox(chkContractMarketReportRefresh);
+            panel.addRow(lblContractMaxSalvagePercentage, spnContractMaxSalvagePercentage);
+            panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
+            panel.addRow(lblPityContracts, spnPityContracts);
 
             return panel;
       }
@@ -911,72 +886,42 @@ public class MarketsTab {
                         "OverageRepaymentInFinalPayment"));
 
             // Layout the Panel
-            final JPanel panelValuePercent = new CampaignOptionsStandardPanel("ContractPayPanelValuePercent", false);
-            final GridBagConstraints layoutValuePercent = new CampaignOptionsGridBagConstraints(panelValuePercent);
+            final CampaignOptionsFormPanel equipmentValuePanel = new CampaignOptionsFormPanel(
+                        "ContractPayPanelValuePercent",
+                        FORM_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            equipmentValuePanel.addCheckBox(chkEquipContractSaleValue);
+            equipmentValuePanel.addCheckBox(chkUseAlternatePaymentMode);
+            equipmentValuePanel.addCheckBox(chkUseDiminishingContractPay);
+            equipmentValuePanel.addRow(lblEquipPercent, spnEquipPercent);
+            equipmentValuePanel.addRow(lblDropShipPercent, spnDropShipPercent);
+            equipmentValuePanel.addRow(lblJumpShipPercent, spnJumpShipPercent);
+            equipmentValuePanel.addRow(lblWarShipPercent, spnWarShipPercent);
 
-            layoutValuePercent.gridx = 0;
-            layoutValuePercent.gridy = 0;
-            layoutValuePercent.gridwidth = 1;
-            panelValuePercent.add(chkEquipContractSaleValue, layoutValuePercent);
+            final CampaignOptionsFormPanel personnelPayPanel = new CampaignOptionsFormPanel(
+                        "ContractPayPersonnelPanel",
+                        FORM_LABEL_COLUMN_WIDTH,
+                        FORM_CONTROL_COLUMN_WIDTH);
+            personnelPayPanel.addCheckBox(chkBLCSaleValue);
+            personnelPayPanel.addCheckBox(useInfantryDoseNotCountBox);
+            personnelPayPanel.addCheckBox(chkMercSizeLimited);
+            personnelPayPanel.addCheckBox(chkOverageRepaymentInFinalPayment);
 
-            layoutValuePercent.gridy++;
-            panelValuePercent.add(chkUseAlternatePaymentMode, layoutValuePercent);
-
-            layoutValuePercent.gridy++;
-            panelValuePercent.add(chkUseDiminishingContractPay, layoutValuePercent);
-
-            layoutValuePercent.gridy++;
-            panelValuePercent.add(lblEquipPercent, layoutValuePercent);
-            layoutValuePercent.gridx++;
-            panelValuePercent.add(spnEquipPercent, layoutValuePercent);
-
-            layoutValuePercent.gridx = 0;
-            layoutValuePercent.gridy++;
-            panelValuePercent.add(lblDropShipPercent, layoutValuePercent);
-            layoutValuePercent.gridx++;
-            panelValuePercent.add(spnDropShipPercent, layoutValuePercent);
-
-            layoutValuePercent.gridx = 0;
-            layoutValuePercent.gridy++;
-            panelValuePercent.add(lblJumpShipPercent, layoutValuePercent);
-            layoutValuePercent.gridx++;
-            panelValuePercent.add(spnJumpShipPercent, layoutValuePercent);
-
-            layoutValuePercent.gridx = 0;
-            layoutValuePercent.gridy++;
-            panelValuePercent.add(lblWarShipPercent, layoutValuePercent);
-            layoutValuePercent.gridx++;
-            panelValuePercent.add(spnWarShipPercent, layoutValuePercent);
-
-            final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel", true, "ContractPayPanel");
+            final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel");
             final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
             layout.gridx = 0;
             layout.gridy = 0;
-            layout.gridwidth = 1;
             panel.add(btnContractEquipment, layout);
 
             layout.gridy++;
-            panel.add(panelValuePercent, layout);
+            panel.add(equipmentValuePanel, layout);
 
             layout.gridy++;
             panel.add(btnContractPersonnel, layout);
 
-            layout.gridx = 0;
             layout.gridy++;
-            panel.add(chkBLCSaleValue, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(useInfantryDoseNotCountBox, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(chkMercSizeLimited, layout);
-
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(chkOverageRepaymentInFinalPayment, layout);
+            panel.add(personnelPayPanel, layout);
 
             return panel;
       }

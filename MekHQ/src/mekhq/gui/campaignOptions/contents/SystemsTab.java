@@ -36,10 +36,15 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEF
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,8 +54,11 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -75,6 +83,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * @since 0.50.07
  */
 public class SystemsTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = 220;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+    private static final int CHECKBOX_GRID_COLUMNS = 2;
+
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
@@ -86,7 +98,7 @@ public class SystemsTab {
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
-    private JCheckBox chkResetCriminalRecord;
+    private JButton btnResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
     private JCheckBox chkClampReputationPayMultiplier;
@@ -156,24 +168,21 @@ public class SystemsTab {
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
         JPanel pnlReputationSanityOptions = createReputationSanityPanel();
+        MHQCollapsiblePanel generalSection = createSection("lblReputationGeneralOptionsPanel.text",
+                "lblReputationGeneralOptionsPanel.summary",
+                pnlReputationGeneralOptions);
+        MHQCollapsiblePanel safeguardsSection = createSection("lblReputationSanityOptionsPanel.text",
+                "lblReputationSanityOptionsPanel.summary",
+                pnlReputationSanityOptions);
+
         reputationPageCreated = true;
         updateReputationControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(reputationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlReputationGeneralOptions, layoutParent);
-
-        layoutParent.gridx++;
-        panel.add(pnlReputationSanityOptions, layoutParent);
+        final JPanel panel = createSectionedPanel("ReputationTab",
+                reputationHeader,
+                generalSection,
+                safeguardsSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ReputationTab");
@@ -198,25 +207,40 @@ public class SystemsTab {
         manualUnitRatingModifier
                 .addMouseListener(createTipPanelUpdater(reputationHeader, "ManualUnitRatingModifier"));
 
-        chkResetCriminalRecord = new CampaignOptionsCheckBox("ResetCriminalRecord",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        chkResetCriminalRecord.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        JLabel lblResetCriminalRecord = new CampaignOptionsLabel("ResetCriminalRecord",
+                getResetCriminalRecordMetadata());
+        lblResetCriminalRecord.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        btnResetCriminalRecord = createResetCriminalRecordButton();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationGeneralOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationGeneralOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblManualUnitRatingModifier, manualUnitRatingModifier);
+        panel.addRow(lblResetCriminalRecord, createLeftAlignedButtonPanel(btnResetCriminalRecord));
 
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblManualUnitRatingModifier, layout);
-        layout.gridx++;
-        panel.add(manualUnitRatingModifier, layout);
+        return panel;
+    }
 
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkResetCriminalRecord, layout);
+    private JButton createResetCriminalRecordButton() {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnResetCriminalRecord.text"));
+        button.setName("btnResetCriminalRecord");
+        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblResetCriminalRecord.tooltip"));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        button.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        button.addActionListener(event -> {
+            if (model != null) {
+                model.resetCriminalRecord = true;
+            }
+            updateResetCriminalRecordButtonFromModel();
+        });
+        return button;
+    }
 
+    private JPanel createLeftAlignedButtonPanel(JButton button) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        panel.setOpaque(false);
+        panel.add(button);
         return panel;
     }
 
@@ -251,19 +275,13 @@ public class SystemsTab {
                 "ReputationPerformanceModifierCutOff"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationSanityOptionsPanel", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkClampReputationPayMultiplier, layout);
-
-        layout.gridy++;
-        panel.add(chkReduceReputationPerformanceModifier, layout);
-
-        layout.gridy++;
-        panel.add(chkReputationPerformanceModifierCutOff, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationSanityOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkClampReputationPayMultiplier,
+                chkReduceReputationPerformanceModifier,
+                chkReputationPerformanceModifierCutOff);
 
         return panel;
     }
@@ -286,6 +304,30 @@ public class SystemsTab {
                 3);
 
         // Contents
+        JPanel pnlFactionStandingTrackingPanel = createFactionStandingTrackingPanel();
+        JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
+        MHQCollapsiblePanel trackingSection = createSection("lblFactionStandingTrackingPanel.text",
+                "lblFactionStandingTrackingPanel.summary",
+                pnlFactionStandingTrackingPanel);
+        MHQCollapsiblePanel effectsSection = createSection("lblFactionStandingEffectsPanel.text",
+                "lblFactionStandingEffectsPanel.summary",
+                pnlFactionStandingModifiersPanel);
+
+        factionStandingPageCreated = true;
+        updateFactionStandingControlsFromModel();
+
+        // Layout the Panel
+        final JPanel panel = createSectionedPanel("FactionStandingTab",
+                factionStandingHeader,
+                trackingSection,
+                effectsSection);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "FactionStandingTab");
+    }
+
+    private JPanel createFactionStandingTrackingPanel() {
+        // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.DOCUMENTED));
@@ -303,38 +345,16 @@ public class SystemsTab {
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
-        JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
-        factionStandingPageCreated = true;
-        updateFactionStandingControlsFromModel();
-
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingTrackingPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkTrackFactionStanding,
+                chkTrackClimateRegardChanges);
+        panel.addRow(lblRegardMultiplier, spnRegardMultiplier);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(factionStandingHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(chkTrackFactionStanding, layoutParent);
-        layoutParent.gridx++;
-        panel.add(chkTrackClimateRegardChanges, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(lblRegardMultiplier, layoutParent);
-        layoutParent.gridx++;
-        panel.add(spnRegardMultiplier, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 2;
-        panel.add(pnlFactionStandingModifiersPanel, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "FactionStandingTab");
+        return panel;
     }
 
     /**
@@ -401,39 +421,20 @@ public class SystemsTab {
                 "UseFactionStandingSupportPoints"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingModifiersPanel", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseFactionStandingNegotiation, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingResupply, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingCommandCircuit, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingOutlawed, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingBatchallRestrictions, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingRecruitment, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingBarracksCosts, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingUnitMarket, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingContractPay, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingSupportPoints, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingEffectsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkUseFactionStandingNegotiation,
+                chkUseFactionStandingResupply,
+                chkUseFactionStandingCommandCircuit,
+                chkUseFactionStandingOutlawed,
+                chkUseFactionStandingBatchallRestrictions,
+                chkUseFactionStandingRecruitment,
+                chkUseFactionStandingBarracksCosts,
+                chkUseFactionStandingUnitMarket,
+                chkUseFactionStandingContractPay,
+                chkUseFactionStandingSupportPoints);
 
         return panel;
     }
@@ -455,21 +456,17 @@ public class SystemsTab {
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
+        MHQCollapsiblePanel attributesSection = createSection("lblATOWAttributesPanel.text",
+                "lblATOWAttributesPanel.summary",
+                pnlATOWAttributes);
+
         atowPageCreated = true;
         updateATOWControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ATimeOfWarTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(atowHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlATOWAttributes, layoutParent);
+        final JPanel panel = createSectionedPanel("ATimeOfWarTab",
+                atowHeader,
+                attributesSection);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ATimeOfWarTab");
@@ -515,36 +512,93 @@ public class SystemsTab {
         chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater(atowHeader,
                 "UseSmallArmsOnly"));
 
-        final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ATOWAttributesPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkUseAttributes,
+                chkRandomizeAttributes,
+                chkDisplayAllAttributes,
+                chkUseAgeEffects,
+                chkRandomizeTraits,
+                chkAllowMonthlyReinvestment,
+                chkAllowMonthlyConnections,
+                chkUseBetterExtraIncome,
+                chkUseSmallArmsOnly);
+
+        return panel;
+    }
+
+    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
+            MHQCollapsiblePanel... sections) {
+        JPanel sectionControls = createSectionControls(sections);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(name);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
+        layout.weightx = 1.0;
+        panel.add(header, layout);
 
         layout.gridy++;
-        panel.add(chkUseAttributes, layout);
-        layout.gridx++;
-        panel.add(chkRandomizeAttributes, layout);
-        layout.gridx++;
-        panel.add(chkDisplayAllAttributes, layout);
-        layout.gridx++;
-        panel.add(chkUseAgeEffects, layout);
+        layout.anchor = GridBagConstraints.EAST;
+        panel.add(sectionControls, layout);
 
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkRandomizeTraits, layout);
-        layout.gridx++;
-        panel.add(chkAllowMonthlyReinvestment, layout);
-        layout.gridx++;
-        panel.add(chkAllowMonthlyConnections, layout);
-        layout.gridx++;
-        panel.add(chkUseBetterExtraIncome, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseSmallArmsOnly, layout);
+        layout.anchor = GridBagConstraints.NORTHWEST;
+        for (MHQCollapsiblePanel section : sections) {
+            layout.gridy++;
+            panel.add(section, layout);
+        }
 
         return panel;
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
+        return createSection(titleKey, summaryKey, content, null);
+    }
+
+    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
+            @Nullable CampaignOptionsMetadata metadata) {
+        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
+        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
+        return section;
+    }
+
+    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
+        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
+        String badges = formatBadges(metadata);
+        if (badges.isBlank()) {
+            return title;
+        }
+        return "<html>" + title + badges + "</html>";
+    }
+
+    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        expandAllButton.addActionListener(event -> setExpanded(true, sections));
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
+
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+
+        return controls;
+    }
+
+    private JButton createSectionActionButton(String resourceKey) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
+    }
+
+    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
+        for (MHQCollapsiblePanel section : sections) {
+            section.setExpanded(expanded);
+        }
     }
 
     /**
@@ -625,9 +679,11 @@ public class SystemsTab {
             campaign.setDateOfLastCrime(null);
             campaign.setCrimeRating(0);
             campaign.setCrimePirateModifier(0);
+            model.resetCriminalRecord = false;
         }
 
         model.applyTo(options, skillPreferences);
+        updateResetCriminalRecordButtonFromModel();
     }
 
     private void updateCreatedControlsFromModel() {
@@ -642,10 +698,22 @@ public class SystemsTab {
         }
 
         manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
-        chkResetCriminalRecord.setSelected(model.resetCriminalRecord);
+        updateResetCriminalRecordButtonFromModel();
         chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
         chkReduceReputationPerformanceModifier.setSelected(model.reduceReputationPerformanceModifier);
         chkReputationPerformanceModifierCutOff.setSelected(model.reputationPerformanceModifierCutOff);
+    }
+
+    private void updateResetCriminalRecordButtonFromModel() {
+        if (btnResetCriminalRecord == null) {
+            return;
+        }
+
+        boolean isResetPending = model != null && model.resetCriminalRecord;
+        String resourceKey = isResetPending ? "btnResetCriminalRecord.pending.text" :
+                "btnResetCriminalRecord.text";
+        btnResetCriminalRecord.setText(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        btnResetCriminalRecord.setEnabled(!isResetPending);
     }
 
     private void updateFactionStandingControlsFromModel() {
@@ -696,10 +764,13 @@ public class SystemsTab {
         }
 
         model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
-        model.resetCriminalRecord = chkResetCriminalRecord.isSelected();
         model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
         model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();
         model.reputationPerformanceModifierCutOff = chkReputationPerformanceModifierCutOff.isSelected();
+    }
+
+    private CampaignOptionsMetadata getResetCriminalRecordMetadata() {
+        return getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT);
     }
 
     private void updateModelFromFactionStandingControls() {

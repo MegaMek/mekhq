@@ -56,6 +56,8 @@ import megamek.client.ui.util.UIUtil;
  * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
+    private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
+
     @Deprecated(since = "0.50.06", forRemoval = true)
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
         this(name, imageAddress, includeBodyText, false, 0);
@@ -84,15 +86,15 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      *
      * @param name           a unique identifier used to fetch resource bundle entries and to form the panel's name
      * @param imageAddress   the path to the image file displayed in the panel
-    * @param tipPanelHeight retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight retained for constructor compatibility; contextual help is shown in the shell
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, int tipPanelHeight) {
         this(name, imageAddress, false, true, tipPanelHeight);
     }
 
     /**
-    * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
-    * additional descriptive body text.
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
+     * additional descriptive body text.
      *
      * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
      * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
@@ -101,8 +103,8 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
      * @param imageAddress    the path to the image file to display at the top of the panel
      * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-         * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
-         * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
+     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight) {
@@ -127,14 +129,15 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html><div style='width: %s'>%s</div></html>",
-                  UIUtil.scaleForGUI(750), getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
+                  UIUtil.scaleForGUI(DEFAULT_BODY_TEXT_WIDTH),
+                  getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
                   SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             setFontScaling(lblBody, false, 1);
         }
 
         // Initialize the panel's layout using a GridBagLayout
-        new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
+        setName("pnl" + name + "HeaderPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(this);
 
         // Configure and add components to the panel
