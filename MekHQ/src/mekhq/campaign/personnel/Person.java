@@ -4517,7 +4517,7 @@ public class Person {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
-        
+
         if (person != null) {
             // < 0.51.00 compatibility handler
             if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
@@ -7726,9 +7726,24 @@ public class Person {
         return false;
     }
 
-    public boolean hasOnlyHealedPermanentInjuries() {
-        return !injuries.isEmpty() &&
-                     injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
+    /**
+     * Determines whether the character has any permanent, non-prosthetic injuries.
+     *
+     * @return Returns {@code true} if the character has no non-permanent injuries, has at least one permanent injury,
+     *       and that injury is not a permanent modification, such as an implant.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean hasNonProstheticPermanentInjuries() {
+        if (getNonPermanentInjurySeverity() > 0) {
+            return false;
+        }
+
+        ArrayList<Injury> relevantInjuries = new ArrayList<>(injuries);
+        relevantInjuries.removeAll(getProstheticInjuries());
+
+        return !relevantInjuries.isEmpty();
     }
 
     public List<Injury> getInjuriesByLocation(final BodyLocation location) {
