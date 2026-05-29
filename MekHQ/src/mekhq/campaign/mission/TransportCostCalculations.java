@@ -629,13 +629,18 @@ public class TransportCostCalculations {
         int asfBayUsage = asfBays - asfCount;
         int mekBayUsage = mekBays - mekCount;
 
-        // If we have more spare aerospace bays, we're going to put our LAM in there; otherwise we'll put them in the
-        // mek bays. Cost is identical for each.
-        if (asfBayUsage > mekBayUsage) {
-            asfBayUsage -= -lamCount;
-        } else {
-            mekBayUsage -= lamCount;
+        // Do we have spare ASF bays? If so, try and use them for LAM units
+        if (asfBayUsage > 0) {
+            if (asfBayUsage > lamCount) {
+                asfBayUsage -= lamCount;
+            } else {
+                lamCount -= asfBayUsage;
+                asfBayUsage = 0;
+            }
         }
+
+        // Any remainder are placed in mek bays. Both ASF and Mek bay rentals cost the same, so this works out
+        mekBayUsage -= lamCount;
 
         additionalASFBaysRequired = -min(0, asfBayUsage);
         additionalASFBaysCost = round(additionalASFBaysRequired * ASF_COST);
