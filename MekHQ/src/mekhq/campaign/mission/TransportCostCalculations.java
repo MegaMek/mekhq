@@ -624,7 +624,6 @@ public class TransportCostCalculations {
 
         // ASF (including Conv Fighters)
         int asfBays = getTotalASFBays() + smallCraftSpareCapacity;
-        int lamUsage = lamCount;
         int asfBayUsage = asfBays - asfCount;
 
         if (asfBays > asfCount) {
