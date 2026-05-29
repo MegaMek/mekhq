@@ -33,9 +33,11 @@
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.max;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HOLISTIC_CARE;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
@@ -325,13 +327,16 @@ public class AdvancedMedicalAlternateHealing {
     public static void performAssistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
           Person patient, Person doctor, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties,
           boolean useEdge) {
+        boolean hasHolisticCareSPA = doctor.getOptions().booleanOption(UNOFFICIAL_HOLISTIC_CARE);
+
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
                 int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
 
-                injury.changeTime(-1);
+                int healingDelta = hasHolisticCareSPA && randomInt(20) == 0 ? -2 : -1;
+                injury.changeTime(healingDelta);
 
                 if (injury.getTime() <= 0) {
                     int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
