@@ -116,6 +116,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String UNOFFICIAL_RADIO_HOBBYIST = "unofficial_radio_hobbyist";
     public static final String UNOFFICIAL_PAPER_SURGEON = "unofficial_paper_surgeon";
     public static final String UNOFFICIAL_LOSES_PAPERWORK = "unofficial_loses_paperwork";
+    public static final String UNOFFICIAL_EMBEZZLER = "unofficial_embezzler";
     public static final String UNOFFICIAL_HYPOCHONDRIAC = "unofficial_hypochondriac";
     public static final String UNOFFICIAL_USELESS_TALENT = "unofficial_useless_talent";
     public static final String UNOFFICIAL_PATHOLOGIC_INSIGHT = "unofficial_pathologic_insight";
@@ -298,6 +299,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, UNOFFICIAL_RADIO_HOBBYIST, false);
         addOption(l3a, UNOFFICIAL_PAPER_SURGEON, false);
         addOption(l3a, UNOFFICIAL_LOSES_PAPERWORK, false);
+        addOption(l3a, UNOFFICIAL_EMBEZZLER, false);
         addOption(l3a, UNOFFICIAL_HYPOCHONDRIAC, false);
         addOption(l3a, UNOFFICIAL_USELESS_TALENT, false);
         addOption(l3a, UNOFFICIAL_PATHOLOGIC_INSIGHT, false);
