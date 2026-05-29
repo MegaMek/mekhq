@@ -7729,7 +7729,7 @@ public class Person {
     /**
      * Determines whether the character has any permanent, non-prosthetic injuries.
      *
-     * <p>If {@link #isUseAlternateAdvancedMedical} is {@code true} we check whether the character has
+     * <p>If {@code isUseAlternateAdvancedMedical} is {@code true} we check whether the character has
      * non-prosthetic permanent injuries. Otherwise we use legacy testing that just checks for permanent injuries.</p>
      *
      * @return Returns {@code true} if the character has no non-permanent injuries, has at least one permanent injury,
