@@ -195,11 +195,13 @@ public class CampaignOptionsUtilities {
             return content;
         }
 
+        int quoteWidth = Math.max(1, Math.min(content.getPreferredSize().width, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+
         JPanel quotePanel = new JPanel(new GridBagLayout());
         quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, 0, 0));
         JLabel quote = new JLabel(String.format(
-              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              UIUtil.scaleForGUI(content.getPreferredSize().width),
+              "<html><div style='width: %spx; text-align:center;'>%s</div></html>",
+              quoteWidth,
               getTextAt(RESOURCE_BUNDLE, quoteResourceName + ".border")));
 
         GridBagConstraints quoteConstraints = new GridBagConstraints();

@@ -32,11 +32,8 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -44,20 +41,15 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.List;
-import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
@@ -73,15 +65,14 @@ import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
@@ -102,6 +93,9 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = 150;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 360;
+
     private static final LocalDate RANDOM_DATE_EARLIEST = LocalDate.of(2775, 1, 1);
     private static final LocalDate RANDOM_DATE_LATEST = LocalDate.of(3151, 1, 1);
 
@@ -182,15 +176,13 @@ public class GeneralTab {
      *     <li>Buttons for choosing camouflage and unit icons</li>
      * </ul>
      *
-     * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
+     * @return A {@link JPanel} containing the general tab content.
      */
-    public AbstractMHQScrollablePanel createGeneralTab() {
-        // Header
-        JPanel headerPanel = createGeneralHeader();
-
+    public JPanel createGeneralTab() {
         // Campaign name
         lblName = new CampaignOptionsLabel("Name");
         txtName = new CampaignOptionsTextField("Name");
+        txtName.setColumns(24);
 
         // Generate new random campaign name
         btnNameGenerator = new CampaignOptionsButton("NameGenerator");
@@ -243,102 +235,47 @@ public class GeneralTab {
         btnIcon.addActionListener(this::btnIconActionPerformed);
         btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
 
-        // Initialize the parent panel
-        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
-              "generalPanel",
-              new GridBagLayout());
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridwidth = 5;
-        layout.weightx = 1.0;
-        layout.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(headerPanel, layout);
-
-        layout.gridwidth = 1;
-        layout.weightx = 1;
-        layout.gridy++;
-        panel.add(lblDate, layout);
-        panel.add(btnDate, layout);
-        panel.add(btnRandomDate, layout);
-
-        layout.gridy++;
-        panel.add(lblName, layout);
-        panel.add(txtName, layout);
-
-        panel.add(btnNameGenerator, layout);
-
-        layout.gridy++;
-        panel.add(lblFaction, layout);
-        panel.add(comboFaction, layout);
-        panel.add(btnRandomFaction, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 5;
-        layout.gridx = GridBagConstraints.RELATIVE;
-
-        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        iconsPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        iconsPanel.setMinimumSize(UIUtil.scaleForGUI(0, 120));
-
-        iconsPanel.add(lblIcon);
-        iconsPanel.add(btnIcon);
-        iconsPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(50)));
-        iconsPanel.add(lblCamo);
-        iconsPanel.add(btnCamo);
-
-        panel.add(iconsPanel, layout);
-        layout.gridy++;
-        layout.gridwidth = 5;
-        panel.add(createFurtherReadingPanel(), layout);
-        generalPanel.add(panel);
-
-        return generalPanel;
+        return CampaignOptionsPagePanel.builder("GeneralTab", "General", "data/images/misc/MekHQ.png")
+              .showDetailsPanel(false)
+              .quote("generalPanel")
+              .section("lblGeneralCampaignBasicsPanel.text",
+                    "lblGeneralCampaignBasicsPanel.summary",
+                    createCampaignBasicsPanel())
+              .section("lblGeneralIdentityArtworkPanel.text",
+                    "lblGeneralIdentityArtworkPanel.summary",
+                    createIdentityArtworkPanel())
+              .section("lblFurtherReadingPanel.text",
+                    "lblFurtherReadingPanel.summary",
+                    createFurtherReadingPanel())
+              .build();
     }
 
-    /**
-     * Creates a header panel for the general tab, which includes:
-     * <p>
-     * <li>An image representing the campaign options</li>
-     * <li>A title for the general tab</li>
-     * <li>A description of the general tab functionalities</li>
-     * </p>
-     *
-     * @return A {@link JPanel} containing the general tab header.
-     */
-    private static JPanel createGeneralHeader() {
-        ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
-        imageIcon = scaleImageIcon(imageIcon, 200, true);
-        JLabel imageLabel = new JLabel(imageIcon);
+    private JPanel createCampaignBasicsPanel() {
+        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralCampaignBasicsPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
+        panel.addRow(lblName, createInlineControls(txtName, btnNameGenerator));
+        panel.addRow(lblFaction, createInlineControls(comboFaction, btnRandomFaction));
+        return panel;
+    }
 
-        final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblGeneral.text"),
-              SwingConstants.CENTER);
-        lblHeader.setMinimumSize(UIUtil.scaleForGUI(600, 0));
-        setFontScaling(lblHeader, true, 2);
-        lblHeader.setName("lblGeneral");
+    private JPanel createIdentityArtworkPanel() {
+        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralIdentityArtworkPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              UIUtil.scaleForGUI(120));
+        panel.addRow(lblIcon, createInlineControls(btnIcon));
+        panel.addRow(lblCamo, createInlineControls(btnCamo));
+        return panel;
+    }
 
-        JLabel lblBody = new JLabel(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralBody.text")),
-              SwingConstants.CENTER);
-        lblBody.setName("lblGeneralHeaderBody");
+    private JPanel createInlineControls(JComponent... components) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIUtil.scaleForGUI(5), 0));
+        panel.setOpaque(false);
 
-        final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                                      .addComponent(lblHeader)
-                                      .addComponent(imageLabel)
-                                      .addComponent(lblBody)
-                                      .addGap(UIUtil.scaleForGUI(20)));
-
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.CENTER)
-                                        .addComponent(lblHeader)
-                                        .addComponent(imageLabel)
-                                        .addComponent(lblBody));
+        for (JComponent component : components) {
+            panel.add(component);
+        }
 
         return panel;
     }
@@ -492,7 +429,7 @@ public class GeneralTab {
     private JPanel createFurtherReadingPanel() {
         JLabel lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
 
-        final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 5;

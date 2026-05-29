@@ -86,6 +86,53 @@ public class CampaignOptionsFormPanel extends JPanel {
         addTrailingFiller(currentRow, 2);
     }
 
+    public void addFullWidthComponent(JComponent component) {
+        int currentRow = row++;
+        GridBagConstraints layout = new GridBagConstraints();
+        layout.gridx = 0;
+        layout.gridy = currentRow;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        layout.anchor = GridBagConstraints.WEST;
+        layout.fill = GridBagConstraints.HORIZONTAL;
+        layout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, 0);
+        add(component, layout);
+    }
+
+    public void addComponentGrid(int columnCount, JComponent... components) {
+        if (columnCount <= 1) {
+            for (JComponent component : components) {
+                addFullWidthComponent(component);
+            }
+            return;
+        }
+
+        int firstRow = row;
+        for (int index = 0; index < components.length; index++) {
+            int column = index % columnCount;
+
+            GridBagConstraints layout = new GridBagConstraints();
+            layout.gridx = column;
+            layout.gridy = firstRow + index / columnCount;
+            layout.weightx = 0.0;
+            layout.anchor = GridBagConstraints.WEST;
+            layout.fill = GridBagConstraints.NONE;
+            layout.insets = new Insets(ROW_VERTICAL_PADDING,
+                    0,
+                    ROW_VERTICAL_PADDING,
+                    getComponentGridRightPadding(column, columnCount));
+            setMinimumComponentGridWidth(components[index], column);
+            add(components[index], layout);
+        }
+
+        int rowCount = (components.length + columnCount - 1) / columnCount;
+        for (int rowOffset = 0; rowOffset < rowCount; rowOffset++) {
+            addTrailingFiller(firstRow + rowOffset, columnCount);
+        }
+
+        row += rowCount;
+    }
+
     public void addCheckBoxGrid(int columnCount, JCheckBox... checkBoxes) {
         if (columnCount <= 1) {
             for (JCheckBox checkBox : checkBoxes) {
@@ -119,6 +166,21 @@ public class CampaignOptionsFormPanel extends JPanel {
         }
 
         row += rowCount;
+    }
+
+    private int getComponentGridRightPadding(int column, int columnCount) {
+        if (column == columnCount - 1) {
+            return 0;
+        }
+        return labelWidth > 0 ? LABEL_RIGHT_PADDING : CHECK_BOX_COLUMN_GAP;
+    }
+
+    private void setMinimumComponentGridWidth(JComponent component, int column) {
+        if (labelWidth <= 0 || column != 0) {
+            return;
+        }
+
+        setMinimumWidth(component, labelWidth);
     }
 
     private int getCheckBoxGridRightPadding(int column, int columnCount) {

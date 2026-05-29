@@ -43,6 +43,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
 import megamek.common.annotations.Nullable;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 
 /**
  * Owns the central Campaign Options content area and sticky contextual help surface.
@@ -55,6 +56,10 @@ class CampaignOptionsContentHost extends JPanel {
     private final CampaignOptionsHelpPanel helpPanel;
 
     CampaignOptionsContentHost(Component content) {
+        this(content, null, true);
+    }
+
+    CampaignOptionsContentHost(Component content, @Nullable String quoteResourceName, boolean showHelpPanel) {
         super(new BorderLayout());
         setName("campaignOptionsContentHost");
 
@@ -72,7 +77,7 @@ class CampaignOptionsContentHost extends JPanel {
 
         add(contentScrollPane, BorderLayout.CENTER);
         add(helpPanel, BorderLayout.SOUTH);
-        setContent(content);
+        setContent(content, quoteResourceName, showHelpPanel);
     }
 
     void setContent(Component content) {
@@ -85,14 +90,27 @@ class CampaignOptionsContentHost extends JPanel {
 
     void setContent(Component content, @Nullable String quoteResourceName, boolean showHelpPanel) {
         helpPanel.clearHelpText();
-        helpPanel.setVisible(showHelpPanel);
+        helpPanel.setVisible(shouldShowHelpPanel(content, showHelpPanel));
         contentPanel.removeAll();
-        contentPanel.add(CampaignOptionsUtilities.createContentWithQuote(content, quoteResourceName),
-              BorderLayout.CENTER);
+        contentPanel.add(getDisplayContent(content, quoteResourceName), BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
         revalidate();
         repaint();
+    }
+
+    private boolean shouldShowHelpPanel(Component content, boolean defaultShowHelpPanel) {
+        if (content instanceof CampaignOptionsPagePanel pagePanel) {
+            return pagePanel.shouldShowDetailsPanel();
+        }
+        return defaultShowHelpPanel;
+    }
+
+    private Component getDisplayContent(Component content, @Nullable String quoteResourceName) {
+        if (content instanceof CampaignOptionsPagePanel) {
+            return content;
+        }
+        return CampaignOptionsUtilities.createContentWithQuote(content, quoteResourceName);
     }
 
     void resetScrollPosition() {

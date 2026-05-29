@@ -178,10 +178,11 @@ public class CampaignOptionsPane extends JPanel {
     protected void initialize() {
         JPanel generalPage = createGeneralTab(mode);
         registerRoutes(generalPage);
+        CampaignOptionsRoute initialRoute = navigationTargets.get(0);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 createNavigationPanel(),
-                createContentHost(generalPage));
+                createContentHost(generalPage, initialRoute));
         splitPane.setName("campaignOptionsSplitPane");
         splitPane.setResizeWeight(0.0);
         splitPane.setDividerLocation(NAVIGATION_WIDTH);
@@ -194,8 +195,10 @@ public class CampaignOptionsPane extends JPanel {
         return navigationPanel;
     }
 
-    private CampaignOptionsContentHost createContentHost(Component initialContent) {
-        activeContentHost = new CampaignOptionsContentHost(initialContent);
+    private CampaignOptionsContentHost createContentHost(Component initialContent, CampaignOptionsRoute initialRoute) {
+        activeContentHost = new CampaignOptionsContentHost(initialContent,
+                getQuoteResourceName(initialRoute),
+                initialRoute.shouldShowHelpPanel());
         return activeContentHost;
     }
 

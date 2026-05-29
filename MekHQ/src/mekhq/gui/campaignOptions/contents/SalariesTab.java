@@ -43,8 +43,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -86,6 +84,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -101,8 +100,6 @@ public class SalariesTab {
     private static final int SECTION_CONTENT_WIDTH = FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP
           + FORM_CONTROL_COLUMN_WIDTH;
     private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
-    private static final int GRID_LABEL_CONTROL_GAP = 8;
-    private static final int GRID_VERTICAL_GAP = 5;
     private static final int CIVILIAN_TABLE_WIDTH = SECTION_CONTENT_WIDTH;
     private static final int CIVILIAN_SALARY_COLUMN_WIDTH = 120;
     private static final int CIVILIAN_ROLE_COLUMN_WIDTH = CIVILIAN_TABLE_WIDTH - CIVILIAN_SALARY_COLUMN_WIDTH;
@@ -460,93 +457,13 @@ public class SalariesTab {
 
     private JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
             int columnCount, int controlWidth) {
-        final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setName("pnl" + name);
-        panel.setOpaque(false);
-
-        for (int index = 0; index < labels.length; index++) {
-            int column = index % columnCount;
-            int row = index / columnCount;
-
-            JPanel pairPanel = createPairedFieldCell(labels[index], controls[index], column, controlWidth);
-
-            GridBagConstraints pairLayout = new GridBagConstraints();
-            pairLayout.gridx = column;
-            pairLayout.gridy = row;
-            pairLayout.anchor = GridBagConstraints.WEST;
-            pairLayout.fill = GridBagConstraints.NONE;
-            pairLayout.insets = new Insets(GRID_VERTICAL_GAP, 0, GRID_VERTICAL_GAP, 0);
-            panel.add(pairPanel, pairLayout);
-        }
-
-        GridBagConstraints fillerLayout = new GridBagConstraints();
-        fillerLayout.gridx = columnCount;
-        fillerLayout.gridy = 0;
-        fillerLayout.weightx = 1.0;
-        fillerLayout.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(createTransparentSpacer(1, 1), fillerLayout);
-
-        return panel;
-    }
-
-    private JPanel createPairedFieldCell(JComponent label, JComponent control, int column, int controlWidth) {
-        JPanel pairPanel = new JPanel(new GridBagLayout());
-        pairPanel.setOpaque(false);
-
-        setMinimumWidth(control, controlWidth);
-        alignLabel(label);
-
-        GridBagConstraints labelLayout = new GridBagConstraints();
-        labelLayout.gridx = 0;
-        labelLayout.gridy = 0;
-        labelLayout.weightx = 1.0;
-        labelLayout.anchor = GridBagConstraints.WEST;
-        labelLayout.fill = GridBagConstraints.HORIZONTAL;
-        labelLayout.insets = new Insets(0, 0, 0, GRID_LABEL_CONTROL_GAP);
-        pairPanel.add(label, labelLayout);
-
-        GridBagConstraints controlLayout = new GridBagConstraints();
-        controlLayout.gridx = 1;
-        controlLayout.gridy = 0;
-        controlLayout.anchor = GridBagConstraints.EAST;
-        controlLayout.fill = GridBagConstraints.NONE;
-        controlLayout.insets = new Insets(0, 0, 0, column == 0 ? GRID_LABEL_CONTROL_GAP : 0);
-        pairPanel.add(control, controlLayout);
-
-        int pairWidth = column == 0
-              ? FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP
-              : FORM_CONTROL_COLUMN_WIDTH;
-        setPreferredWidth(pairPanel, pairWidth);
-
-        return pairPanel;
-    }
-
-    private void alignLabel(JComponent component) {
-        if (component instanceof JLabel label) {
-            label.setHorizontalAlignment(SwingConstants.LEADING);
-        }
-    }
-
-    private void setMinimumWidth(JComponent component, int minimumWidth) {
-        Dimension preferredSize = component.getPreferredSize();
-        Dimension adjustedSize = new Dimension(Math.max(preferredSize.width, minimumWidth), preferredSize.height);
-        component.setPreferredSize(adjustedSize);
-        component.setMinimumSize(adjustedSize);
-    }
-
-    private void setPreferredWidth(JComponent component, int preferredWidth) {
-        Dimension preferredSize = component.getPreferredSize();
-        Dimension adjustedSize = new Dimension(preferredWidth, preferredSize.height);
-        component.setPreferredSize(adjustedSize);
-        component.setMinimumSize(adjustedSize);
-    }
-
-    private JComponent createTransparentSpacer(int width, int height) {
-        JPanel spacer = new JPanel();
-        spacer.setOpaque(false);
-        spacer.setPreferredSize(new Dimension(width, height));
-        spacer.setMinimumSize(new Dimension(width, height));
-        return spacer;
+        CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+              FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP,
+              FORM_CONTROL_COLUMN_WIDTH,
+              controlWidth,
+              columnCount);
+        panel.addPairs(labels, controls);
+          return panel;
     }
 
     private JPanel createCivilianBaseSalariesPanel() {
