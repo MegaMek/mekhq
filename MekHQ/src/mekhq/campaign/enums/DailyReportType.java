@@ -92,7 +92,11 @@ public enum DailyReportType {
      * scenario-related skill usage.
      */
     SKILL_CHECKS("SKILL_CHECKS", 8),
-    AGGREGATE("SKILL_CHECKS", 9);
+
+    /**
+     * All log entries, if enabled in Client Options
+     */
+    AGGREGATE("AGGREGATE", 9);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DailyReportType";
 
