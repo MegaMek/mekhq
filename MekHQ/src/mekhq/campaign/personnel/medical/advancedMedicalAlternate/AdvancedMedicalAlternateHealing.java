@@ -38,6 +38,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HOLISTIC_CARE;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HYPOCHONDRIAC;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PATHOLOGIC_INSIGHT;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PROTHESIS_TECHNICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEON;
@@ -208,7 +209,8 @@ public class AdvancedMedicalAlternateHealing {
         boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
         boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
         boolean hasPathologicInsight = personnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
-        
+        boolean hasHypochondriac = personnelOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
+
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             addPathologicInsightModifier(modifiers, injury, hasPathologicInsight);
@@ -223,6 +225,8 @@ public class AdvancedMedicalAlternateHealing {
                       injury.getLocation(),
                       hasTraumaSurgeon,
                       hasProthesisTechnician);
+                miscPenalty += hasHypochondriac ? 1 : 0;
+
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
                 if (injury.getTime() <= 0) { // Time to try and fully heal the injury
@@ -362,14 +366,17 @@ public class AdvancedMedicalAlternateHealing {
     public static void performAssistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
           Person patient, Person doctor, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties,
           boolean useEdge) {
-        boolean hasHolisticCareSPA = doctor.getOptions().booleanOption(UNOFFICIAL_HOLISTIC_CARE);
 
-        PersonnelOptions personnelOptions = doctor.getOptions();
-        boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
-        boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
-        boolean hasPathologicInsight = personnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+        PersonnelOptions doctorPersonnelOptions = doctor.getOptions();
+        boolean hasHolisticCareSPA = doctorPersonnelOptions.booleanOption(UNOFFICIAL_HOLISTIC_CARE);
+        boolean hasTraumaSurgeon = doctorPersonnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = doctorPersonnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = doctorPersonnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+
+        PersonnelOptions patientPersonnelOptions = patient.getOptions();
+        boolean hasHypochondriac = patientPersonnelOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
+
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
-
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             addPathologicInsightModifier(modifiers, injury, hasPathologicInsight);
 
@@ -383,6 +390,8 @@ public class AdvancedMedicalAlternateHealing {
                 if (injury.getTime() <= 0) {
                     int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation(),
                           hasTraumaSurgeon, hasProthesisTechnician);
+                    miscPenalty += hasHypochondriac ? 1 : 0;
+
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(doctor, modifiers, miscPenalty, useEdge);
 
                     processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
