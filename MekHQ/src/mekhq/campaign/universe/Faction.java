@@ -63,6 +63,7 @@ public class Faction {
     public static final String MERCENARY_FACTION_CODE = "MERC";
     public static final String PIRATE_FACTION_CODE = "PIR";
     public static final String COMSTAR_FACTION_CODE = "CS";
+    public static final String TORTUGA_DOMINIONS_FACTION_CODE = "TD";
 
     private Faction2 faction2;
 

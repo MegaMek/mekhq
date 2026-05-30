@@ -69,6 +69,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -250,6 +251,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import mekhq.gui.dialog.StartingSystemConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
@@ -8692,8 +8694,8 @@ public class Campaign implements ITechManager, ILocation {
      * fallback scenarios.
      *
      * <p>This method first checks if the campaign is classified as a mercenary or pirate campaign. If so, it
-     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String)}, which implements
-     * special logic to handle those campaign types.</p>
+     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String, boolean)}, which
+     * implements special logic to handle those campaign types.</p>
      *
      * <p>For all other campaign types, it uses the current campaign's faction to attempt to retrieve that faction’s
      * canonical starting system for the current game date. If no valid system can be found (due to, for example, the
@@ -8719,7 +8721,8 @@ public class Campaign implements ITechManager, ILocation {
         PlanetarySystem startingSystem;
 
         if (isMercenaryCampaign() || isPirateCampaign()) {
-            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID);
+            boolean useRandomStartLocation = StartingSystemConfirmationDialog.getStartingSystemConfirmationDialog(this);
+            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID, useRandomStartLocation);
         }
 
         // Default for non-merc/pirate campaigns
@@ -8767,23 +8770,25 @@ public class Campaign implements ITechManager, ILocation {
      * valid system is found, the logic falls back to Terra, ensuring that the campaign always has a valid starting
      * world even in case of missing data.</p>
      *
-     * @param factions The {@link Factions} manager supplying access to all faction data.
-     * @param TERRA_ID The globally unique identifier for the planet Terra, used for the ultimate fallback.
+     * @param factions               The {@link Factions} manager supplying access to all faction data.
+     * @param TERRA_ID               The globally unique identifier for the planet Terra, used for the ultimate
+     *                               fallback.
+     * @param useRandomStartLocation {@code true} if the campaign can start on a random faction's capital, {@code false}
+     *                               to limit starting location to the current campaign's capital
      *
      * @return the {@link Planet} used as the campaign start location.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID) {
-        final String TORTUGA_CODE = "TD";
-
+    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID,
+          boolean useRandomStartLocation) {
         PlanetarySystem startingSystem;
         Faction startingFaction;
         // Determine fallback faction for merc/pirate
         startingFaction = isMercenaryCampaign()
                                 ? factions.getFaction(MERCENARY_FACTION_CODE)
-                                : factions.getFaction(TORTUGA_CODE);
+                                : factions.getFaction(TORTUGA_DOMINIONS_FACTION_CODE);
 
         // If pirate fallback is unavailable at the campaign's start date, use the default faction
         if (isPirateCampaign() && !startingFaction.validIn(currentDay)) {
@@ -8791,7 +8796,7 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         // 33% chance to start in fallback faction's capital
-        if (randomInt(3) != 0) {
+        if (useRandomStartLocation && randomInt(3) != 0) {
             // Pick a random, eligible recruiting faction
             List<Faction> recruitingFactions = new ArrayList<>();
             for (Faction possibleFaction : factions.getActiveFactions(currentDay)) {
