@@ -40,6 +40,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.AGGREGATE;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -362,6 +363,10 @@ public class Campaign implements ITechManager, ILocation {
     private transient String politicsReportHTML;
     private transient List<String> newPoliticsReports;
 
+    private final ArrayList<String> aggregateReport;
+    private transient String aggregateReportHTML;
+    private transient List<String> newAggregateReports;
+
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
     private int repairBaysRented;
@@ -637,6 +642,10 @@ public class Campaign implements ITechManager, ILocation {
         politicsReport = new ArrayList<>();
         politicsReportHTML = "";
         newPoliticsReports = new ArrayList<>();
+
+        aggregateReport = new ArrayList<>();
+        aggregateReportHTML = "";
+        newAggregateReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -2901,6 +2910,32 @@ public class Campaign implements ITechManager, ILocation {
         return oldPoliticsReports;
     }
 
+    public List<String> getAggregateReport() {
+        return aggregateReport;
+    }
+
+    public void setAggregateReportHTML(String html) {
+        aggregateReportHTML = html;
+    }
+
+    public String getAggregateReportHTML() {
+        return aggregateReportHTML;
+    }
+
+    public List<String> getNewAggregateReports() {
+        return newAggregateReports;
+    }
+
+    public void setNewAggregateReports(List<String> reports) {
+        newAggregateReports = reports;
+    }
+
+    public List<String> fetchAndClearNewAggregateReports() {
+        List<String> oldAggregateReports = newAggregateReports;
+        setNewAggregateReports(new ArrayList<>());
+        return oldAggregateReports;
+    }
+
     /**
      * Finds the active person in a particular role with the highest level in a given, with an optional secondary skill
      * to break ties.
@@ -4994,6 +5029,10 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         addReportInternal(type, report);
+
+        if (type != AGGREGATE && MekHQ.getMHQOptions().isUseAggregateDailyReport()) {
+            addReportInternal(AGGREGATE, report);
+        }
     }
 
     private void addReportInternal(final DailyReportType type, final String report) {
@@ -5096,6 +5135,17 @@ public class Campaign implements ITechManager, ILocation {
                 }
 
                 newPoliticsReports.add(report);
+            }
+            case AGGREGATE -> {
+                aggregateReport.add(report);
+                if (!aggregateReportHTML.isEmpty()) {
+                    aggregateReportHTML = aggregateReportHTML + REPORT_LINEBREAK + report;
+                    newAggregateReports.add(REPORT_LINEBREAK);
+                } else {
+                    aggregateReportHTML = report;
+                }
+
+                newAggregateReports.add(report);
             }
         }
         MekHQ.triggerEvent(new ReportEvent(this, report));
@@ -5436,6 +5486,13 @@ public class Campaign implements ITechManager, ILocation {
             writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicsReport");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "aggregateReport");
+        for (String report : aggregateReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "aggregateReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info

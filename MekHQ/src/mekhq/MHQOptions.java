@@ -244,6 +244,16 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
               .putBoolean(MHQConstants.USE_UNIFIED_DAILY_REPORT, value);
     }
+
+    public boolean isUseAggregateDailyReport() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, false);
+    }
+
+    public void setAggregateDailyReport(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, value);
+    }
     // endregion Personnel Tab
     // endregion Display Tab
 
