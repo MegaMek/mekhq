@@ -59,21 +59,7 @@ import java.awt.Insets;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -1482,8 +1468,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        Campaign campaign = getCampaign();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isUseEdge = campaignOptions.isUseEdge() && campaignOptions.isUseSupportEdge();
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
-              getCampaign().isClanCampaign(), getBattlefieldControlType(scenario));
+              isClanCampaign, getBattlefieldControlType(scenario), isUseEdge);
         boolean wasConfirmed = techPicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageTechs();
@@ -1689,7 +1679,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-                List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.accept"),
+        List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.accept"),
               getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.button.cancel"));
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(),
