@@ -69,6 +69,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -250,6 +251,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import mekhq.gui.dialog.StartingSystemConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
@@ -2223,11 +2225,15 @@ public class Campaign implements ITechManager, ILocation {
      * Recruits a person into the campaign roster using their current prisoner status, assuming recruitment is not
      * performed by a game master that recruitment actions should be logged, and the character should be employed.
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person the person to recruit; must not be {@code null}
      *
      * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person) {
         return humanResources.recruitPerson(this, person);
@@ -2249,6 +2255,9 @@ public class Campaign implements ITechManager, ILocation {
      * upon recruitment.
      * </p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person the person to recruit; must not be {@code null}
      * @param gmAdd  if {@code true}, recruitment is performed by a game master (bypassing funds check)
      * @param employ if {@code true}, the person is marked as employed in the campaign
@@ -2256,6 +2265,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
         return humanResources.recruitPerson(this, person, gmAdd, employ);
@@ -2276,6 +2286,9 @@ public class Campaign implements ITechManager, ILocation {
      * actions should be logged. If successful, the person is marked as employed based on the given flag.
      * </p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person         the person to recruit; must not be {@code null}
      * @param prisonerStatus the prison status to assign to the person
      * @param employ         if {@code true}, the person is marked as employed in the campaign
@@ -2283,6 +2296,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
         return humanResources.recruitPerson(this, person, prisonerStatus, employ);
@@ -2295,6 +2309,9 @@ public class Campaign implements ITechManager, ILocation {
      * {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)} with
      * {@code bypassSimulateRelationships} set to {@code false}.</p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person         the {@link Person} to recruit
      * @param prisonerStatus the {@link PrisonerStatus} applied to the recruited person
      * @param gmAdd          if {@code true}, the person is added in GM Mode
@@ -2304,6 +2321,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if the person was successfully recruited; {@code false} otherwise
      *
      * @author Illiani
+     * @see #importPerson(Person)
      * @since 0.50.07
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
@@ -2323,6 +2341,9 @@ public class Campaign implements ITechManager, ILocation {
      * Recruits a person into the campaign roster, handling employment status, prisoner status, finances, logging, and
      * optional relationship simulation.
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person                      the person to recruit; must not be {@code null}
      * @param prisonerStatus              the prison status to assign to the person
      * @param gmAdd                       if {@code true}, indicates the recruitment is being performed by a game master
@@ -2333,6 +2354,8 @@ public class Campaign implements ITechManager, ILocation {
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} on failure
      *       or insufficient funds
+     *
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
           boolean employ, boolean bypassSimulateRelationships) {
@@ -2371,7 +2394,13 @@ public class Campaign implements ITechManager, ILocation {
     /**
      * Imports a {@link Person} into a campaign.
      *
+     * <p><b>Notes:</b> This is a super lightweight way of adding a character to the campaign. It doesn't include
+     * all the extra steps that the various {@link #recruitPerson(Person)} methods need to go through. That makes this
+     * method particularly useful for inclusion in Unit Tests.</p>
+     *
      * @param person A {@link Person} to import into the campaign.
+     *
+     * @see #recruitPerson(Person)
      */
     public void importPerson(Person person) {
         humanResources.importPerson(person);
@@ -8692,8 +8721,8 @@ public class Campaign implements ITechManager, ILocation {
      * fallback scenarios.
      *
      * <p>This method first checks if the campaign is classified as a mercenary or pirate campaign. If so, it
-     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String)}, which implements
-     * special logic to handle those campaign types.</p>
+     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String, boolean)}, which
+     * implements special logic to handle those campaign types.</p>
      *
      * <p>For all other campaign types, it uses the current campaign's faction to attempt to retrieve that faction’s
      * canonical starting system for the current game date. If no valid system can be found (due to, for example, the
@@ -8719,7 +8748,8 @@ public class Campaign implements ITechManager, ILocation {
         PlanetarySystem startingSystem;
 
         if (isMercenaryCampaign() || isPirateCampaign()) {
-            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID);
+            boolean useRandomStartLocation = StartingSystemConfirmationDialog.getStartingSystemConfirmationDialog(this);
+            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID, useRandomStartLocation);
         }
 
         // Default for non-merc/pirate campaigns
@@ -8767,23 +8797,25 @@ public class Campaign implements ITechManager, ILocation {
      * valid system is found, the logic falls back to Terra, ensuring that the campaign always has a valid starting
      * world even in case of missing data.</p>
      *
-     * @param factions The {@link Factions} manager supplying access to all faction data.
-     * @param TERRA_ID The globally unique identifier for the planet Terra, used for the ultimate fallback.
+     * @param factions               The {@link Factions} manager supplying access to all faction data.
+     * @param TERRA_ID               The globally unique identifier for the planet Terra, used for the ultimate
+     *                               fallback.
+     * @param useRandomStartLocation {@code true} if the campaign can start on a random faction's capital, {@code false}
+     *                               to limit starting location to the current campaign's capital
      *
      * @return the {@link Planet} used as the campaign start location.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID) {
-        final String TORTUGA_CODE = "TD";
-
+    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID,
+          boolean useRandomStartLocation) {
         PlanetarySystem startingSystem;
         Faction startingFaction;
         // Determine fallback faction for merc/pirate
         startingFaction = isMercenaryCampaign()
                                 ? factions.getFaction(MERCENARY_FACTION_CODE)
-                                : factions.getFaction(TORTUGA_CODE);
+                                : factions.getFaction(TORTUGA_DOMINIONS_FACTION_CODE);
 
         // If pirate fallback is unavailable at the campaign's start date, use the default faction
         if (isPirateCampaign() && !startingFaction.validIn(currentDay)) {
@@ -8791,7 +8823,7 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         // 33% chance to start in fallback faction's capital
-        if (randomInt(3) != 0) {
+        if (useRandomStartLocation && randomInt(3) != 0) {
             // Pick a random, eligible recruiting faction
             List<Faction> recruitingFactions = new ArrayList<>();
             for (Faction possibleFaction : factions.getActiveFactions(currentDay)) {
