@@ -812,7 +812,9 @@ public class CampaignNewDayManager {
 
             person.checkForIlliterateRemoval();
 
-            AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+            if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+            }
 
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
