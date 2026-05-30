@@ -5094,7 +5094,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Faction code.
      */
-    static String getPlanetOwnerFaction(AtBContract contract, LocalDate currentDate) {
+    public static String getPlanetOwnerFaction(AtBContract contract, LocalDate currentDate) {
         String factionCode = "MERC";
 
         // planet owner is the first of the factions that owns the current planet.
@@ -5121,7 +5121,8 @@ public class AtBDynamicScenarioFactory {
      *
      * @return ForceAlignment.
      */
-    static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, LocalDate currentDate) {
+    public static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode,
+          LocalDate currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer
         // or op for. If it's not, third-party.
         if (contract.getSystem().getFactions(currentDate).contains(factionCode)) {

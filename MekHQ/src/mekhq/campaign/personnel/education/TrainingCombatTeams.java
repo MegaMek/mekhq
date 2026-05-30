@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
@@ -104,6 +105,8 @@ public class TrainingCombatTeams {
     @Deprecated(since = "0.50.10")
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
           MekHQ.getMHQOptions().getLocale());
+
+    private static final int EXPERIENCE_LEVEL_REDUCTION = -1;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -254,13 +257,15 @@ public class TrainingCombatTeams {
                     Skill traineeSkill = trainee.getSkill(commanderSkill);
 
                     if (traineeSkill != null) {
+                        SkillType skillType = traineeSkill.getType();
+                        int targetLevel = skillType.getRegularLevel();
+
                         int traineeSkillLevel = traineeSkill.getLevel();
-                        if (traineeSkillLevel > 3) {
+                        if (traineeSkillLevel >= targetLevel) {
                             continue;
                         }
 
-                        // The commander is required to be one step above the skill level they are teaching.
-                        if (traineeSkillLevel < (educatorSkills.get(commanderSkill) - 1)) {
+                        if (traineeSkillLevel < educatorSkills.get(commanderSkill)) {
                             skillsBeingTrained.add(traineeSkill);
                         }
                     }
@@ -280,6 +285,8 @@ public class TrainingCombatTeams {
                 String report = processTrainingTime(commander, trainee, skillsBeingTrained, marginOfSuccess,
                       xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
                       campaign.getLocalDate());
+
+                campaign.personUpdated(trainee);
 
                 if (!StringUtility.isNullOrBlank(report)) {
                     campaign.addReport(PERSONNEL, report);
@@ -358,7 +365,7 @@ public class TrainingCombatTeams {
         skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
         Skill targetSkill = skillsBeingTrained.getFirst();
 
-        // The +1 is to account for the next experience level to be gained
+        // The +1 is to account for the next skill level to be gained
         int targetSkillLevel = targetSkill.getLevel() + 1;
 
         // Reasoning cost changes should always take place before global changes
@@ -478,7 +485,8 @@ public class TrainingCombatTeams {
                 Skill skill = educator.getSkill(professionSkill);
 
                 if (skill != null) {
-                    educatorSkills.merge(professionSkill, skill.getTotalSkillLevel(skillModifierData), Math::max);
+                    int experienceLevel = skill.getExperienceLevel(skillModifierData) + EXPERIENCE_LEVEL_REDUCTION;
+                    educatorSkills.merge(professionSkill, experienceLevel, Math::max);
                 }
             }
         }

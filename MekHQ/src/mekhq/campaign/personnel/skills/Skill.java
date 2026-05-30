@@ -468,14 +468,14 @@ public class Skill {
             }
         }
 
-        // Ranger
+        // Tracking
         if (Objects.equals(S_TRACKING, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_RANGER)) {
                 modifier += 1;
             }
         }
 
-        // Ranger
+        // Stealth
         if (Objects.equals(S_STEALTH, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_GHOST)) {
                 modifier += 1;
@@ -483,6 +483,44 @@ public class Skill {
 
             if (characterOptions.booleanOption(UNOFFICIAL_LOUD_MOUTH)) {
                 modifier -= 1;
+            }
+        }
+
+        // Appraisal
+        if (Objects.equals(S_APPRAISAL, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_BARGAIN_HUNTER)) {
+                modifier += 2;
+            }
+        }
+
+        // Surgery/Any
+        if (Objects.equals(S_SURGERY, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SHAKEY_SCALPEL)) {
+                modifier -= 2;
+            }
+            if (characterOptions.booleanOption(UNOFFICIAL_PAPER_SURGEON)) {
+                modifier -= 2;
+            }
+        }
+
+        // Training
+        if (Objects.equals(S_TRAINING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_PATIENT_EDUCATOR)) {
+                modifier += 2;
+            }
+        }
+
+        // Communications/Any
+        if (Objects.equals(S_COMMUNICATIONS, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_RADIO_HOBBYIST)) {
+                modifier += 2;
+            }
+        }
+
+        // Administration
+        if (Objects.equals(S_ADMIN, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_LOSES_PAPERWORK)) {
+                modifier -= 2;
             }
         }
 

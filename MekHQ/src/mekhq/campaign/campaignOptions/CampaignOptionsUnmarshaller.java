@@ -924,6 +924,8 @@ public class CampaignOptionsUnmarshaller {
             case "useAdvancedBuildingGunEmplacements" ->
                   campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
                         nodeContents));
+            case "reinforcementBaseTargetNumber" ->
+                  campaignOptions.setReinforcementBaseTargetNumber(parseInt(nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
             case "clansObeyBiddingRules" -> campaignOptions.setClansObeyBiddingRules(parseBoolean(nodeContents));
             case "alliedFacilityModifierDieSize" ->
