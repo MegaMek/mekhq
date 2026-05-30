@@ -2225,11 +2225,15 @@ public class Campaign implements ITechManager, ILocation {
      * Recruits a person into the campaign roster using their current prisoner status, assuming recruitment is not
      * performed by a game master that recruitment actions should be logged, and the character should be employed.
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person the person to recruit; must not be {@code null}
      *
      * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person) {
         return humanResources.recruitPerson(this, person);
@@ -2251,6 +2255,9 @@ public class Campaign implements ITechManager, ILocation {
      * upon recruitment.
      * </p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person the person to recruit; must not be {@code null}
      * @param gmAdd  if {@code true}, recruitment is performed by a game master (bypassing funds check)
      * @param employ if {@code true}, the person is marked as employed in the campaign
@@ -2258,6 +2265,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
         return humanResources.recruitPerson(this, person, gmAdd, employ);
@@ -2278,6 +2286,9 @@ public class Campaign implements ITechManager, ILocation {
      * actions should be logged. If successful, the person is marked as employed based on the given flag.
      * </p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person         the person to recruit; must not be {@code null}
      * @param prisonerStatus the prison status to assign to the person
      * @param employ         if {@code true}, the person is marked as employed in the campaign
@@ -2285,6 +2296,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
         return humanResources.recruitPerson(this, person, prisonerStatus, employ);
@@ -2297,6 +2309,9 @@ public class Campaign implements ITechManager, ILocation {
      * {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)} with
      * {@code bypassSimulateRelationships} set to {@code false}.</p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person         the {@link Person} to recruit
      * @param prisonerStatus the {@link PrisonerStatus} applied to the recruited person
      * @param gmAdd          if {@code true}, the person is added in GM Mode
@@ -2306,6 +2321,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if the person was successfully recruited; {@code false} otherwise
      *
      * @author Illiani
+     * @see #importPerson(Person)
      * @since 0.50.07
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
@@ -2325,6 +2341,9 @@ public class Campaign implements ITechManager, ILocation {
      * Recruits a person into the campaign roster, handling employment status, prisoner status, finances, logging, and
      * optional relationship simulation.
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person                      the person to recruit; must not be {@code null}
      * @param prisonerStatus              the prison status to assign to the person
      * @param gmAdd                       if {@code true}, indicates the recruitment is being performed by a game master
@@ -2335,6 +2354,8 @@ public class Campaign implements ITechManager, ILocation {
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} on failure
      *       or insufficient funds
+     *
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
           boolean employ, boolean bypassSimulateRelationships) {
@@ -2373,7 +2394,13 @@ public class Campaign implements ITechManager, ILocation {
     /**
      * Imports a {@link Person} into a campaign.
      *
+     * <p><b>Notes:</b> This is a super lightweight way of adding a character to the campaign. It doesn't include
+     * all the extra steps that the various {@link #recruitPerson(Person)} methods need to go through. That makes this
+     * method particularly useful for inclusion in Unit Tests.</p>
+     *
      * @param person A {@link Person} to import into the campaign.
+     *
+     * @see #recruitPerson(Person)
      */
     public void importPerson(Person person) {
         humanResources.importPerson(person);
