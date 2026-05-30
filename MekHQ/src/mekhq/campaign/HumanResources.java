@@ -842,7 +842,7 @@ public class HumanResources {
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
             case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter))
-                    && unit.canTakeMoreVesselCrew();
+                                      && unit.canTakeMoreVesselCrew();
             default -> false;
         };
     }
@@ -924,8 +924,8 @@ public class HumanResources {
     }
 
     /**
-     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
-     * If the pool is at or below the required amount, no change is made.
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool is at or below the
+     * required amount, no change is made.
      *
      * @param campaign the campaign
      */
@@ -937,8 +937,8 @@ public class HumanResources {
     }
 
     /**
-     * Releases surplus Medics from the pool, keeping only what is currently needed.
-     * If the pool is at or below the required amount, no change is made.
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool is at or below the
+     * required amount, no change is made.
      *
      * @param campaign the campaign
      */
@@ -953,8 +953,7 @@ public class HumanResources {
      * Releases surplus temp crew for a specific blob crew role.
      *
      * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
-     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
-     * emptied.</p>
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
      *
      * @param campaign the campaign
      * @param role     the personnel role to trim
@@ -1428,7 +1427,11 @@ public class HumanResources {
         for (final Unit unit : units) {
             if (unit.isSelfCrewed() && !(unit.getEntity() instanceof Infantry) &&
                       (unit.getEngineer() != null)) {
-                techs.add(unit.getEngineer());
+                // As we're directly fetching the engineer, we need to make sure that we're not fetching twice;
+                // otherwise the engineer may appear multiple times in the array
+                if (!techs.contains(unit.getEngineer())) {
+                    techs.add(unit.getEngineer());
+                }
             }
         }
 

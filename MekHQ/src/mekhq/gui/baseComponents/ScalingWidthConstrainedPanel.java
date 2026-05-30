@@ -36,20 +36,27 @@ package mekhq.gui.baseComponents;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.util.UIUtil;
+
 /**
- * A custom {@link JPanel} that enforces minimum and maximum width constraints.
+ * A custom {@link JPanel} that enforces minimum and maximum width constraints and respects the GUI scale setting.
  * <p>
  * This component is useful in flexible UI layouts (such as {@code BoxLayout}) where a panel's horizontal growth and
  * shrinkage must be explicitly limited. It overrides the standard sizing methods to ensure the width always respects
- * the specified {@code minWidth} and {@code maxWidth}, while allowing the height to scale dynamically based on the
- * layout manager's calculations.
+ * the specified {@code minWidth} and {@code maxWidth}. These constraints are automatically multiplied by the
+ * {@link GUIPreferences#GUI_SCALE}, while allowing the height to scale dynamically based on the layout manager's
+ * calculations.
  * </p>
  */
-public class HorizontallyConstrainedPanel extends JPanel {
+public class ScalingWidthConstrainedPanel extends JPanel {
+
+    /** Minimum panel width allowed, before GUI scaling */
     private final int minWidth;
+    /** Maximum width allowed, before GUI scaling */
     private final int maxWidth;
 
-    public HorizontallyConstrainedPanel(int minWidth, int maxWidth) {
+    public ScalingWidthConstrainedPanel(int minWidth, int maxWidth) {
         if (minWidth > maxWidth) {
             throw new IllegalArgumentException("minWidth cannot be greater than maxWidth");
         }
@@ -59,16 +66,16 @@ public class HorizontallyConstrainedPanel extends JPanel {
 
     @Override
     public Dimension getMinimumSize() {
-        return new Dimension(minWidth, super.getMinimumSize().height);
+        return new Dimension(UIUtil.scaleForGUI(minWidth), super.getMinimumSize().height);
     }
 
     @Override
     public Dimension getMaximumSize() {
-        return new Dimension(maxWidth, Integer.MAX_VALUE);
+        return new Dimension(UIUtil.scaleForGUI(maxWidth), Integer.MAX_VALUE);
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(maxWidth, super.getPreferredSize().height);
+        return new Dimension(UIUtil.scaleForGUI(maxWidth), super.getPreferredSize().height);
     }
 }

@@ -68,13 +68,14 @@ import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
-import mekhq.gui.baseComponents.VerticalFillImage;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
+import mekhq.gui.baseComponents.ScalingVerticalFillImage;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * A UI panel that displays the current location details.
@@ -88,27 +89,29 @@ import org.apache.commons.lang3.StringUtils;
  * location and transit status.
  * </p>
  */
-public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
+public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
 
     private static final File JUMP_SHIP_IMAGE = new File(Configuration.unitImagesDir(), "jumpships/invader.png");
 
     private final Campaign campaign;
 
     // UI components
-    private final VerticalFillImage imgLocation = new VerticalFillImage();
+    private final ScalingVerticalFillImage imgLocation = new ScalingVerticalFillImage();
     private final JLabel lblLocationPrimaryInfo = new JLabel();
     private final JLabel lblLocationSecondaryInfo = new JLabel();
-    private final RoundedJButton btnHiringHall = new RoundedJButton();
+    private final RoundedJButton btnRecruitment = new RoundedJButton();
 
     /**
      * Constructs a new {@code CurrentLocationPanel}.
      *
      * @param minWidth              the minimum enforced width of the panel in pixels
      * @param maxWidth              the maximum enforced width of the panel in pixels
+     * @param iconMaxHeight         the maximum enforced height of the location image in pixels
      * @param campaign              the active {@link Campaign} instance
      * @param openRecruitmentDialog a {@link Runnable} that triggers the opening of the Recruitment Dialog UI
      */
-    public CurrentLocationPanel(int minWidth, int maxWidth, Campaign campaign, Runnable openRecruitmentDialog) {
+    public CurrentLocationPanel(int minWidth, int maxWidth, int iconMaxHeight,
+          Campaign campaign, Runnable openRecruitmentDialog) {
         super(minWidth, maxWidth);
         this.campaign = campaign;
 
@@ -116,7 +119,7 @@ public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(0, CampaignGUI.THIN_GAP, 0, CampaignGUI.MEDIUM_GAP);
 
-        imgLocation.setMaxHeight(60);
+        imgLocation.setMaxHeight(iconMaxHeight);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 4;
@@ -141,11 +144,12 @@ public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
         gridBagConstraints.weighty = 1;
         add(new JLabel(), gridBagConstraints);
 
-        btnHiringHall.addActionListener(e -> openRecruitmentDialog.run());
+        btnRecruitment.addActionListener(e -> openRecruitmentDialog.run());
+        btnRecruitment.setToolTipText(getTextAt("recruitment.tooltip"));
         gridBagConstraints.gridy++;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        add(btnHiringHall, gridBagConstraints);
+        add(btnRecruitment, gridBagConstraints);
 
         refresh();
         MekHQ.registerHandler(this);
@@ -174,28 +178,32 @@ public class CurrentLocationPanel extends HorizontallyConstrainedPanel {
 
         if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
             // keep the legacy recruitment always available
-            btnHiringHall.setEnabled(true);
-            btnHiringHall.setText(getTextAt("recruitment.legacy"));
+            btnRecruitment.setEnabled(true);
+            btnRecruitment.setText(getTextAt("recruitment.legacy"));
         } else {
             String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
-            btnHiringHall.setEnabled(availabilityMessage.isBlank());
+            btnRecruitment.setEnabled(availabilityMessage.isBlank());
 
             HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
             if (!availabilityMessage.isBlank()) {
-                btnHiringHall.setText(availabilityMessage);
+                btnRecruitment.setText(availabilityMessage);
             } else if (hiringHallLevel.isNone()) {
-                btnHiringHall.setText(getTextAt("recruitment.hiringHall.none"));
+                btnRecruitment.setText(getTextAt("recruitment.hiringHall.none"));
             } else {
-                btnHiringHall.setText(getFormattedTextAt("recruitment.hiringHall.some",
+                btnRecruitment.setText(getFormattedTextAt("recruitment.hiringHall.some",
                       StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
             }
         }
         if (location.isOnPlanet()) {
             lblLocationPrimaryInfo.setText(getPlanetaryConditionsInfo());
+            lblLocationPrimaryInfo.setToolTipText(getTextAt("info.atmosphere.tooltip"));
             lblLocationSecondaryInfo.setText(getSocioIndustrialInfo());
+            lblLocationSecondaryInfo.setToolTipText(getTextAt("info.socioIndustrial.tooltip"));
         } else {
             lblLocationPrimaryInfo.setText(getCourseInfo());
+            lblLocationPrimaryInfo.setToolTipText(Strings.EMPTY);
             lblLocationSecondaryInfo.setText(getJumpCostInfo());
+            lblLocationSecondaryInfo.setToolTipText(Strings.EMPTY);
         }
     }
 

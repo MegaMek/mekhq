@@ -931,6 +931,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             campaign.getPoliticsReport().add(wn2.getTextContent());
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("aggregateReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getAggregateReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getAggregateReport().add(wn2.getTextContent());
+                        }
+                    }
                 } else if (nodeName.equalsIgnoreCase("personnelReport")) {
                     // First, get all the child nodes;
                     NodeList nl2 = childNode.getChildNodes();
@@ -1197,6 +1218,20 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             newPoliticsReports.add(report);
         }
         campaign.setNewPoliticsReports(newPoliticsReports);
+
+        campaign.setAggregateReportHTML(Utilities.combineString(campaign.getAggregateReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newAggregateReports = new ArrayList<>(campaign.getAggregateReport().size() * 2);
+        boolean firstAggregateReport = true;
+        for (String report : campaign.getAggregateReport()) {
+            if (firstAggregateReport) {
+                firstAggregateReport = false;
+            } else {
+                newAggregateReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newAggregateReports.add(report);
+        }
+        campaign.setNewAggregateReports(newAggregateReports);
 
         campaign.setPersonnelReportHTML(Utilities.combineString(campaign.getPersonnelReport(),
               Campaign.REPORT_LINEBREAK));

@@ -787,6 +787,11 @@ public class PrisonerEventManager {
                         }
                     }
 
+                    prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
+                                              PRISONER_CAPACITY_BATTLE_ARMOR :
+                                              PRISONER_CAPACITY_BATTLE_ARMOR *
+                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+
                     continue;
                 }
 
@@ -799,6 +804,12 @@ public class PrisonerEventManager {
                                                       PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
+
+                    prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
+                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
+                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+
                     continue;
                 }
 
