@@ -4517,7 +4517,7 @@ public class Person {
             LOGGER.error(e, "Failed to read person {} from file", person.getFullName());
             person = null;
         }
-        
+
         if (person != null) {
             // < 0.51.00 compatibility handler
             if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
@@ -7726,7 +7726,30 @@ public class Person {
         return false;
     }
 
-    public boolean hasOnlyHealedPermanentInjuries() {
+    /**
+     * Determines whether the character has any permanent, non-prosthetic injuries.
+     *
+     * <p>If {@code isUseAlternateAdvancedMedical} is {@code true} we check whether the character has
+     * non-prosthetic permanent injuries. Otherwise we use legacy testing that just checks for permanent injuries.</p>
+     *
+     * @return Returns {@code true} if the character has no non-permanent injuries, has at least one permanent injury,
+     *       and that injury is not a permanent modification, such as an implant.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean hasNonProstheticPermanentInjuries(boolean isUseAlternateAdvancedMedical) {
+        if (isUseAlternateAdvancedMedical) {
+            if (getNonPermanentInjurySeverity() > 0) {
+                return false;
+            }
+
+            ArrayList<Injury> relevantInjuries = new ArrayList<>(injuries);
+            relevantInjuries.removeAll(getProstheticInjuries());
+
+            return !relevantInjuries.isEmpty();
+        }
+
         return !injuries.isEmpty() &&
                      injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
