@@ -34,6 +34,33 @@
 
 package mekhq.gui.menus;
 
+import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.xml.parsers.DocumentBuilder;
+
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.CopySystemDataAction;
@@ -89,6 +116,7 @@ import mekhq.gui.HangarTab;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
 import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
@@ -101,33 +129,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.xml.parsers.DocumentBuilder;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 
 public class MekHQMenuBar extends JMenuBar {
 
@@ -958,6 +959,14 @@ public class MekHQMenuBar extends JMenuBar {
         });
 
         menuManage.add(miAutoResolveBehaviorEditor);
+
+        JMenu menuRoleplay = new JMenu(resourceMap.getString("menuRoleplay.text"));
+        JMenuItem miLifePathBuilder = new JMenuItem(resourceMap.getString("miLifePathBuilder.text"));
+        miLifePathBuilder.addActionListener(evt -> {
+            new LifePathBuilderDialog(getCampaign(), getFrame());
+        });
+        menuRoleplay.add(miLifePathBuilder);
+        menuManage.add(menuRoleplay);
 
         add(menuManage);
         // endregion Manage Campaign Menu
