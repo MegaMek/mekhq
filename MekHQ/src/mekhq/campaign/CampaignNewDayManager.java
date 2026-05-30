@@ -1389,10 +1389,8 @@ public class CampaignNewDayManager {
      * @since 0.50.06
      */
     private void performPersonnelCleanUp() {
-        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(today,
-              campaign.getPersonnel(),
-              campaignOptions.isUseRemovalExemptRetirees(),
-              campaignOptions.isUseRemovalExemptCemetery());
+        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(campaign.getHumanResources(), today,
+              campaignOptions.isUseRemovalExemptRetirees(), campaignOptions.isUseRemovalExemptCemetery());
 
         List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
         for (Person person : personnelToRemove) {
