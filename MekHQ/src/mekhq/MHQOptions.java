@@ -130,14 +130,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setCommandCenterUseUnitMarket(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
     }
-
-    public boolean getCommandCenterMRMS() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_MRMS, false);
-    }
-
-    public void setCommandCenterMRMS(boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_MRMS, value);
-    }
     // endregion Command Center Tab
 
     // region Interstellar Map Tab
@@ -251,6 +243,16 @@ public final class MHQOptions extends SuiteOptions {
     public void setUnifiedDailyReport(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
               .putBoolean(MHQConstants.USE_UNIFIED_DAILY_REPORT, value);
+    }
+
+    public boolean isUseAggregateDailyReport() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, false);
+    }
+
+    public void setAggregateDailyReport(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, value);
     }
     // endregion Personnel Tab
     // endregion Display Tab

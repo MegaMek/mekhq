@@ -32,15 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
-import static mekhq.campaign.enums.DailyReportType.BATTLE;
-import static mekhq.campaign.enums.DailyReportType.FINANCES;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
-import static mekhq.campaign.enums.DailyReportType.MEDICAL;
-import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
-import static mekhq.campaign.enums.DailyReportType.POLITICS;
-import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
-import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.campaign.enums.DailyReportType.*;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -98,6 +90,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     private DailyReportLogPanel financesLogPanel;
     private DailyReportLogPanel acquisitionsLogPanel;
     private DailyReportLogPanel technicalLogPanel;
+    private DailyReportLogPanel aggregateLogPanel;
     // endregion Variable Declarations
 
     // region Constructors
@@ -256,6 +249,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
     public void setTechnicalLogPanel(final DailyReportLogPanel technicalLogPanel) {
         this.technicalLogPanel = technicalLogPanel;
     }
+
+    public DailyReportLogPanel getAggregateLogPanel() {
+        return aggregateLogPanel;
+    }
+
+    public void setAggregateLogPanel(final DailyReportLogPanel aggregateLogPanel) {
+        this.aggregateLogPanel = aggregateLogPanel;
+    }
     // endregion Getters/Setters
 
     // region Initialization
@@ -292,6 +293,9 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         setTechnicalLogPanel(new DailyReportLogPanel(getGUI()));
         getTechnicalLogPanel().refreshLog(commandCenterTab.getTechnicalLog().getLogText(), TECHNICAL);
 
+        setAggregateLogPanel(new DailyReportLogPanel(getGUI()));
+        getAggregateLogPanel().refreshLog(commandCenterTab.getAggregateLog().getLogText(), AGGREGATE);
+
         EnhancedTabbedPane dailyReportTab = new EnhancedTabbedPane();
         dailyReportTab.addTab(GENERAL.getIconString(), getDailyLogPanel());
         dailyReportTab.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
@@ -311,6 +315,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         dailyReportTab.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
         dailyReportTab.addTab(SKILL_CHECKS.getIconString(), getSkillLogPanel());
         dailyReportTab.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
+        dailyReportTab.addTab(AGGREGATE.getIconString(), getSkillLogPanel());
+        dailyReportTab.setToolTipTextAt(AGGREGATE.getTabIndex(), AGGREGATE.getTooltip());
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -456,6 +462,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         final List<String> financesReports = new ArrayList<>();
         final List<String> acquisitionsReports = new ArrayList<>();
         final List<String> technicalReports = new ArrayList<>();
+        final List<String> aggregateReports = new ArrayList<>();
         Campaign campaign = getGUI().getCampaign();
         for (; days > 0; days--) {
             try {
@@ -472,6 +479,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
                 final String financesReport = campaign.getFinancesReportHTML();
                 final String acquisitionsReport = campaign.getAcquisitionsReportHTML();
                 final String technicalReport = campaign.getTechnicalReportHTML();
+                final String aggregateReport = campaign.getAggregateReportHTML();
                 if (firstDay) {
                     getDailyLogPanel().refreshLog(generalReport, GENERAL);
                     getSkillLogPanel().refreshLog(skillReport, SKILL_CHECKS);
@@ -482,6 +490,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
                     getFinancesLogPanel().refreshLog(financesReport, ACQUISITIONS);
                     getAcquisitionsLogPanel().refreshLog(acquisitionsReport, ACQUISITIONS);
                     getTechnicalLogPanel().refreshLog(technicalReport, TECHNICAL);
+                    getAggregateLogPanel().refreshLog(aggregateReport, AGGREGATE);
                     firstDay = false;
                 } else {
                     generalReports.add("<hr>");
@@ -510,6 +519,9 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
 
                     technicalReports.add("<hr>");
                     technicalReports.add(technicalReport);
+
+                    aggregateReports.add("<hr>");
+                    aggregateReports.add(aggregateReport);
                 }
                 generalReports.addAll(campaign.fetchAndClearNewReports());
                 skillReports.addAll(campaign.fetchAndClearNewSkillReports());
@@ -520,6 +532,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
                 financesReports.addAll(campaign.fetchAndClearNewFinancesReports());
                 acquisitionsReports.addAll(campaign.fetchAndClearNewAcquisitionsReports());
                 technicalReports.addAll(campaign.fetchAndClearNewTechnicalReports());
+                aggregateReports.addAll(campaign.fetchAndClearNewAggregateReports());
             } catch (Exception ex) {
                 LOGGER.error("", ex);
                 break;
@@ -536,6 +549,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         getFinancesLogPanel().appendLog(financesReports, FINANCES);
         getAcquisitionsLogPanel().appendLog(acquisitionsReports, ACQUISITIONS);
         getTechnicalLogPanel().appendLog(technicalReports, TECHNICAL);
+        getAggregateLogPanel().appendLog(aggregateReports, AGGREGATE);
 
         // We couldn't advance all days for some reason,
         // set the spinner to the number of remaining days
@@ -562,6 +576,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
             getFinancesLogPanel().refreshLog(campaign.getFinancesReportHTML(), FINANCES);
             getAcquisitionsLogPanel().refreshLog(campaign.getAcquisitionsReportHTML(), ACQUISITIONS);
             getTechnicalLogPanel().refreshLog(campaign.getTechnicalReportHTML(), TECHNICAL);
+            getAggregateLogPanel().refreshLog(campaign.getAggregateReportHTML(), AGGREGATE);
         }
     }
 }

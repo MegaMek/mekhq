@@ -38,16 +38,19 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.HorizontallyConstrainedPanel;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.utilities.MHQInternationalization;
@@ -58,7 +61,7 @@ import mekhq.utilities.MHQInternationalization;
  * This panel subscribes to the global event bus updates to stay synchronized with the current date changes.
  * </p>
  */
-public class AdvanceTimePanel extends HorizontallyConstrainedPanel {
+public class AdvanceTimePanel extends ScalingWidthConstrainedPanel {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvanceTime";
 
@@ -143,7 +146,9 @@ public class AdvanceTimePanel extends HorizontallyConstrainedPanel {
      */
     private void refresh(LocalDate date) {
         String formattedDate = MekHQ.getMHQOptions().getLongDisplayFormattedDate(date);
-        setBorder(RoundedLineBorder.createRoundedLineBorder(formattedDate));
+        Border innerPadding = BorderFactory.createEmptyBorder(CampaignGUI.THIN_GAP, 0, 0, 0);
+        TitledBorder rounded = RoundedLineBorder.createRoundedLineBorder(formattedDate);
+        setBorder(BorderFactory.createCompoundBorder(rounded, innerPadding));
     }
 
     /**

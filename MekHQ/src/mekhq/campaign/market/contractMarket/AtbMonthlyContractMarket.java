@@ -35,10 +35,8 @@ package mekhq.campaign.market.contractMarket;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
-import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
@@ -1006,11 +1004,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             mods.mods[CLAUSE_SUPPORT] -= 1;
         }
 
-        int modifier = getEmployerNegotiatorModifier(employerFaction);
-        mods.mods[CLAUSE_COMMAND] -= modifier;
-        mods.mods[CLAUSE_SALVAGE] -= modifier;
-        mods.mods[CLAUSE_SUPPORT] -= modifier;
-        mods.mods[CLAUSE_TRANSPORT] -= modifier;
+        getEmployerNegotiatorModifiers(employerFaction, mods);
 
         if (contract.getContractType().isGuerrillaType()) {
             contract.setCommandRights(ContractCommandRights.INDEPENDENT);
@@ -1026,31 +1020,42 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     }
 
     /**
-     * Calculates the negotiation modifier for a contract based on the employer's faction type. The modifier reflects
-     * the negotiation capabilities of the employer, making it harder to achieve favorable results with more influential
-     * or powerful employers.
+     * Applies negotiation modifiers to contract clauses based on the employer faction's type.
      *
-     * <p>The negotiation modifier is determined as follows:
-     * <ul>
-     *   <li>Default: A "Green" modifier is used for most employers.</li>
-     *   <li>Major or superpower faction: A "Regular" modifier is applied.</li>
-     *   <li>Clan faction: A "Veteran" modifier is applied.</li>
-     *   <li>ComStar or Word of Blake (WoB): An "Elite" modifier is applied.</li>
-     * </ul>
+     * <p>Faction types are not mutually exclusive; multiple modifier sets may be applied if the employer qualifies
+     * under more than one classification.</p>
      *
-     * @param employerFaction The {@link Faction} that is performing the negotiation.
-     *
-     * @return An integer representing the negotiation modifier corresponding to the employer's capabilities.
+     * @param employerFaction the faction representing the employer whose type determines which negotiation modifiers
+     *                        are applied
+     * @param mods            the {@link ClauseMods} object whose modifier array is updated in place; entries are
+     *                        indexed by {@code CLAUSE_*} constants
      */
-    private static int getEmployerNegotiatorModifier(Faction employerFaction) {
-        if (employerFaction.isMajorOrSuperPower()) {
-            return REGULAR.getExperienceLevel();
-        } else if (employerFaction.isClan()) {
-            return VETERAN.getExperienceLevel();
-        } else if (employerFaction.isComStarOrWoB()) {
-            return ELITE.getExperienceLevel();
+    private void getEmployerNegotiatorModifiers(Faction employerFaction, ClauseMods mods) {
+        boolean employerIsMajorOrSuperPower = employerFaction.isISMajorOrSuperPower();
+        boolean employerIsClan = employerFaction.isClan();
+
+        if (employerIsMajorOrSuperPower || employerIsClan) {
+            mods.mods[CLAUSE_SALVAGE] -= 1;
+            mods.mods[CLAUSE_TRANSPORT] += 1;
         }
 
-        return GREEN.getExperienceLevel();
+        boolean employerIsIndependent = employerFaction.isIndependent();
+        if (employerIsIndependent) {
+            mods.mods[CLAUSE_SALVAGE] -= 1;
+            mods.mods[CLAUSE_SUPPORT] -= 1;
+        }
+
+        boolean employerIsMercenary = employerFaction.isMercenary();
+        if (employerIsMercenary) {
+            mods.mods[CLAUSE_COMMAND] -= 1;
+            mods.mods[CLAUSE_SALVAGE] += 2;
+            mods.mods[CLAUSE_SUPPORT] += 1;
+            mods.mods[CLAUSE_TRANSPORT] += 1;
+        }
+
+        boolean employerIsMinor = employerFaction.isMinorPower();
+        if (employerIsMinor) {
+            mods.mods[CLAUSE_SALVAGE] += -2;
+        }
     }
 }

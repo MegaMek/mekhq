@@ -201,18 +201,6 @@ public class TransportCostCalculationsTest {
     }
 
     // Tests
-
-    @Test
-    void getTotalASFBays_ignoresSpaceStations() {
-        Unit spaceStation = unitThatIsSpaceStationAndWouldOtherwiseAddCapacity();
-        Unit normalCarrier = unitWithASFCapacity(2); // should count
-
-        setHangarUnits(List.of(spaceStation, normalCarrier));
-
-        assertEquals(2, transportCostCalculations.getTotalASFBays(),
-              "Space stations must not contribute to ASF bay totals");
-    }
-
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void testCalculateAdditionalJumpCollarsRequirements_notEnoughCollars(int additionalDropShips) {

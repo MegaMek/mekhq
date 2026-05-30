@@ -81,6 +81,7 @@ public final class MHQConstants extends SuiteConstants {
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     // endregion Command Center Tab
 
@@ -99,6 +100,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
     public static final String USE_UNIFIED_DAILY_REPORT = "useUnifiedDailyReport";
+    public static final String USE_AGGREGATE_DAILY_REPORT = "useAggregateDailyReport";
     // endregion Personnel Tab
     // endregion Display
 

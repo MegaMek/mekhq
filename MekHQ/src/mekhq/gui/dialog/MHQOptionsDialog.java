@@ -97,10 +97,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkShowCompanyGenerator;
     private JCheckBox chkShowUnitPicturesOnTOE;
 
-    // region Command Center Tab
-    private JCheckBox optionCommandCenterMRMS;
-    // endregion Command Center Tab
-
     // region Interstellar Map Tab
     private JCheckBox chkInterstellarMapShowJumpRadius;
     private JSpinner spnInterstellarMapShowJumpRadiusMinimumZoom;
@@ -116,10 +112,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
     private JCheckBox chkUnifiedDailyReport;
+    private JCheckBox chkEnableDailyReportAggregateTab;
     // endregion Personnel Tab
     // endregion Display
 
     // region Colours
+    private JTextArea txtDisclaimer;
     private ColourSelectorButton optionDeployedForeground;
     private ColourSelectorButton optionDeployedBackground;
     private ColourSelectorButton optionBelowContractMinimumForeground;
@@ -371,13 +369,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkShowUnitPicturesOnTOE.setToolTipText(resources.getString("chkShowUnitPicturesOnTOE.toolTipText"));
         chkShowUnitPicturesOnTOE.setName("chkShowUnitPicturesOnTOE");
 
-        // region Command Center Tab
-        JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
-
-        optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
-        optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
-        // endregion Command Center Tab
-
         // region Interstellar Map Tab
         final JLabel lblInterstellarMapTab = new JLabel(resources.getString("lblInterstellarMapTab.text"));
         lblInterstellarMapTab.setName("lblInterstellarMapTab");
@@ -483,6 +474,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkUnifiedDailyReport = new JCheckBox(resources.getString("chkUnifiedDailyReport.text"));
         chkUnifiedDailyReport.setToolTipText(resources.getString("chkUnifiedDailyReport.toolTipText"));
         chkUnifiedDailyReport.setName("chkUnifiedDailyReport");
+
+        chkEnableDailyReportAggregateTab = new JCheckBox(getText("chkEnableDailyReportAggregateTab.text"));
+        chkEnableDailyReportAggregateTab.setToolTipText(wordWrap(getText(
+              "chkEnableDailyReportAggregateTab.toolTipText")));
+        chkEnableDailyReportAggregateTab.setName("chkEnableDailyReportAggregateTab");
         // endregion Personnel Tab
 
         // Programmatically Assign Accessibility Labels
@@ -522,8 +518,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkCompanyGeneratorStartup)
                                       .addComponent(chkShowCompanyGenerator)
                                       .addComponent(chkShowUnitPicturesOnTOE)
-                                      .addComponent(labelCommandCenterDisplay)
-                                      .addComponent(optionCommandCenterMRMS)
                                       .addComponent(lblInterstellarMapTab)
                                       .addComponent(chkInterstellarMapShowJumpRadius)
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -549,6 +543,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             GroupLayout.DEFAULT_SIZE,
                                                             40))
                                       .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                      .addComponent(chkEnableDailyReportAggregateTab)
                                       .addComponent(chkUnifiedDailyReport));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -566,8 +561,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkCompanyGeneratorStartup)
                                         .addComponent(chkShowCompanyGenerator)
                                         .addComponent(chkShowUnitPicturesOnTOE)
-                                        .addComponent(labelCommandCenterDisplay)
-                                        .addComponent(optionCommandCenterMRMS)
                                         .addComponent(lblInterstellarMapTab)
                                         .addComponent(chkInterstellarMapShowJumpRadius)
                                         .addGroup(layout.createSequentialGroup()
@@ -588,12 +581,15 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(labelPersonnelFilterStyle)
                                                         .addComponent(optionPersonnelFilterStyle))
                                         .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                        .addComponent(chkEnableDailyReportAggregateTab)
                                         .addComponent(chkUnifiedDailyReport));
 
         return body;
     }
 
     private JPanel createColoursTab() {
+        txtDisclaimer = new JTextArea(getText("coloursTab.disclaimer"));
+
         // region Create Graphical Components
         optionDeployedForeground = new ColourSelectorButton(resources.getString("optionDeployedForeground.text"));
 
@@ -710,6 +706,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(layout.createSequentialGroup()
+                                      .addComponent(txtDisclaimer)
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(optionDeployedForeground)
                                                       .addComponent(optionDeployedBackground, Alignment.TRAILING))
@@ -785,6 +782,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .addComponent(optionFontColorSkillElite, Alignment.TRAILING)));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(txtDisclaimer)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(optionDeployedForeground)
                                                         .addComponent(optionDeployedBackground))
@@ -1730,9 +1728,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options.setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
         options.setShowUnitPicturesOnTOE(chkShowUnitPicturesOnTOE.isSelected());
 
-        // Command Center Tab
-        options.setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
-
         // Interstellar Map Tab
         options.setInterstellarMapShowJumpRadius(chkInterstellarMapShowJumpRadius.isSelected());
         options
@@ -1754,6 +1749,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         options.setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
         options.setUnifiedDailyReport(chkUnifiedDailyReport.isSelected());
+        options.setAggregateDailyReport(chkEnableDailyReportAggregateTab.isSelected());
 
         // Colours
         options.setDeployedForeground(optionDeployedForeground.getColour());
@@ -1952,9 +1948,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkShowCompanyGenerator.setSelected(options.getShowCompanyGenerator());
         chkShowUnitPicturesOnTOE.setSelected(options.getShowUnitPicturesOnTOE());
 
-        // Command Center Tab
-        optionCommandCenterMRMS.setSelected(options.getCommandCenterMRMS());
-
         // Interstellar Map Tab
         if (chkInterstellarMapShowJumpRadius.isSelected() != options.getInterstellarMapShowJumpRadius()) {
             chkInterstellarMapShowJumpRadius.doClick();
@@ -1981,6 +1974,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPersonnelFilterStyle.setSelectedItem(options.getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(options.getPersonnelFilterOnPrimaryRole());
         chkUnifiedDailyReport.setSelected(options.getUnifiedDailyReport());
+        chkEnableDailyReportAggregateTab.setSelected(options.isUseAggregateDailyReport());
 
         // Colours
         optionDeployedForeground.setColour(options.getDeployedForeground());
