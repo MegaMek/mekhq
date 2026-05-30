@@ -177,7 +177,7 @@ public class Factions {
         return factions.getOrDefault(name, defaultFaction);
     }
 
-    public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
+    public @Nullable Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
         return factions.values().stream()
                      .filter(faction -> faction.getFullName(year).equals(factionName))
                      .findFirst()
