@@ -140,6 +140,10 @@ public class AtBScenarioFactory {
      * @param campaign the campaign for which to generate scenarios
      */
     public static void createScenariosForNewWeek(Campaign campaign) {
+        // StratCon's scenario generation is handled in StratConRulesManager, not here. Though we can't just filter
+        // StratCon campaigns out of this method, because StratCon does do some processing here, just not related to
+        // scenario generation.
+
         // First, we only want to generate if we have an active contract
         if (!campaign.hasActiveContract()) {
             return;

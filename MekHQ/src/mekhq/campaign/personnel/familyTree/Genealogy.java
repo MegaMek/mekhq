@@ -41,13 +41,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.HumanResources;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -456,24 +459,145 @@ public class Genealogy {
     }
 
     /**
-     * Checks if there is at least one person in the family who is not marked as "departed".
+     * Determines whether this family unit is considered "active" by checking whether any member of the extended family
+     * network is currently active (i.e., has not left the unit).
      *
-     * <p>The method iterates through all relationship groups in the {@code family} map and checks
-     * the status of each person. If any person is found whose status is not marked as "departed", the method returns
-     * {@code true}. Otherwise, it returns {@code false} once all groups have been checked.
+     * <p>Traverses the full genealogical graph rooted at {@code origin}, including parents, children, current and
+     * former spouses, and pregnancy fathers, returning {@code true} as soon as any such relative is found to be
+     * active.</p>
      *
-     * @return {@code true} if at least one person in the family is active (not "departed"), {@code false} otherwise.
+     * @param humanResources the {@link HumanResources} registry used to resolve person lookups by ID (e.g., pregnancy
+     *                       father resolution)
+     *
+     * @return {@code true} if at least one member of the extended family is active; {@code false} if all reachable
+     *       relatives have left the unit
+     *
+     * @author Illiani
+     * @since 0.51.0
      */
-    public boolean isActive() {
-        for (List<Person> relationshipGroup : family.values()) {
-            for (Person relation : relationshipGroup) {
-                if (!relation.getStatus().isDepartedUnit()) {
+    public boolean isActive(HumanResources humanResources) {
+        HashSet<Person> allFamilyMembers = new HashSet<>();
+        return collectRelatives(humanResources, origin, allFamilyMembers, true);
+    }
+
+    /**
+     * Recursively traverses the genealogical graph from {@code currentPerson}, collecting all reachable relatives and
+     * optionally short-circuiting as soon as a genealogically active person is found.
+     *
+     * <p>Traversal covers the following relationships at each node:</p>
+     * <ul>
+     *     <li>Parents</li>
+     *     <li>Children</li>
+     *     <li>Former spouses (via {@link FormerSpouse} wrapper)</li>
+     *     <li>Current spouse</li>
+     *     <li>Pregnancy father, resolved through {@link HumanResources} when the current person is pregnant and
+     *     father ID data is present</li>
+     * </ul>
+     *
+     * <p>Already-visited persons are tracked in {@code allFamilyMembers} to prevent infinite recursion across
+     * cyclical or bidirectional relationships.</p>
+     *
+     * @param humanResources          the {@link HumanResources} registry for resolving persons by UUID
+     * @param currentPerson           the person whose relatives are currently being examined
+     * @param allFamilyMembers        the set of already-visited persons; modified in place to prevent revisiting nodes
+     * @param checkForActiveGenealogy if {@code true}, the traversal will return {@code true} immediately upon finding
+     *                                any non-departed relative; if {@code false}, no activity check is performed
+     *
+     * @return {@code true} if {@code checkForActiveGenealogy} is {@code true} and an active relative was found;
+     *       {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static boolean collectRelatives(HumanResources humanResources, Person currentPerson,
+          HashSet<Person> allFamilyMembers, boolean checkForActiveGenealogy) {
+        // Short-circuit if already visited (prevents infinite recursion on bidirectional links)
+        // or if this person is themselves active
+        if (!allFamilyMembers.add(currentPerson)) {
+            return false;
+        }
+
+        if (isGenealogicallyActive(checkForActiveGenealogy, currentPerson)) {
+            return true;
+        }
+
+        Genealogy currentGenealogy = currentPerson.getGenealogy();
+
+        // Lots of null protection throughout to make sure we're not processing null entries. That shouldn't
+        // happen, but it is a possibility with very old campaigns from before we had better protections
+        for (Person parent : currentGenealogy.getParents()) {
+            if (parent != null) {
+                if (collectRelatives(humanResources, parent, allFamilyMembers, checkForActiveGenealogy)) {
                     return true;
                 }
             }
         }
 
+        for (Person child : currentGenealogy.getChildren()) {
+            if (child != null) {
+                if (collectRelatives(humanResources, child, allFamilyMembers, checkForActiveGenealogy)) {
+                    return true;
+                }
+            }
+        }
+
+        for (FormerSpouse formerSpouse : currentGenealogy.getFormerSpouses()) {
+            if (formerSpouse != null) {
+                Person formerSpousePerson = formerSpouse.getFormerSpouse();
+                if (formerSpousePerson != null) {
+                    if (collectRelatives(humanResources,
+                          formerSpousePerson,
+                          allFamilyMembers,
+                          checkForActiveGenealogy)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        Person spouse = currentGenealogy.getSpouse();
+        if (spouse != null) {
+            if (collectRelatives(humanResources, spouse, allFamilyMembers, checkForActiveGenealogy)) {
+                return true;
+            }
+        }
+
+        if (currentPerson.isPregnant()) {
+            String fatherIdString = currentPerson.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
+            UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
+            if (fatherId != null) {
+                Person father = humanResources.getPerson(fatherId);
+                if (father != null) {
+                    return collectRelatives(humanResources, father, allFamilyMembers, checkForActiveGenealogy);
+                }
+            }
+        }
+
         return false;
+    }
+
+    /**
+     * Evaluates whether a given person should be considered genealogically active.
+     *
+     * <p>A person is considered active if the activity check is enabled, and they have not left the unit. Returns
+     * {@code false} unconditionally for {@code null} persons.</p>
+     *
+     * @param checkForActiveGenealogy {@code true} to apply the active status check; {@code false} to always return
+     *                                {@code false}
+     * @param currentPerson           the person to evaluate; may be {@code null}
+     *
+     * @return {@code true} if {@code checkForActiveGenealogy} is {@code true}, {@code currentPerson} is non-null, and
+     *       their status indicates they have not left the unit; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static boolean isGenealogicallyActive(boolean checkForActiveGenealogy, Person currentPerson) {
+        if (currentPerson == null) {
+            return false;
+        }
+
+        return checkForActiveGenealogy && !currentPerson.getStatus().isDepartedUnit();
     }
 
     // region File I/O

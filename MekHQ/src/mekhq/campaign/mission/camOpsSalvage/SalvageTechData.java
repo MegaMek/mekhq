@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,8 +44,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 public record SalvageTechData(Person tech, UUID techId, String rank, int rankNumeric, PersonnelRole primaryRole,
-      PersonnelRole secondaryRole, List<String> techUnits, String firstName, String lastName, String skillLevelName,
-      int injuries, int minutesAvailable) {
+      PersonnelRole secondaryRole, List<String> techUnits, String firstName, String lastName, int edge,
+      String skillLevelName, int injuries, int minutesAvailable) {
     public static SalvageTechData buildData(Campaign campaign, Person tech) {
         boolean isSecondaryTech = tech.getSecondaryRole().isTechSecondary();
         List<String> techUnits = new ArrayList<>();
@@ -61,6 +61,7 @@ public record SalvageTechData(Person tech, UUID techId, String rank, int rankNum
               List.copyOf(techUnits),
               tech.getFirstName(),
               tech.getLastName(),
+              tech.getCurrentEdge(),
               tech.getSkillLevel(campaign, isSecondaryTech, true).toString(),
               max(tech.getHits(), tech.getInjuries().size()),
               tech.getMinutesLeft());
