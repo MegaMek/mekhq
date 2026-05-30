@@ -174,34 +174,33 @@ public class Faction {
     }
 
     /**
-     * Tests whether this faction is institutionally compatible with another faction via the
-     * {@code fallBackFactions} successor/predecessor data already populated in the YAML faction files.
+     * Tests whether this faction is institutionally compatible with another faction via the {@code fallBackFactions}
+     * successor/predecessor data already populated in the YAML faction files.
      *
      * <p>Used by faction-restricted academy access (and any future eligibility check) for non-FedCom
-     * faction successions: Clan Ghost Bear / Free Rasalhague Republic into Rasalhague Dominion, ComStar
-     * into Word of Blake, and similar mergers/splits. The check is bidirectional — either side's
-     * {@code fallBackFactions} can carry the relationship — because the YAMLs only declare the
-     * successor's predecessors (e.g. {@code RD.fallBackFactions = [CGB, FRR]}), never the inverse.
+     * faction successions: Clan Ghost Bear / Free Rasalhague Republic into Rasalhague Dominion, ComStar into Word of
+     * Blake, and similar mergers/splits. The check is bidirectional — either side's {@code fallBackFactions} can carry
+     * the relationship — because the YAMLs only declare the successor's predecessors (e.g.
+     * {@code RD.fallBackFactions = [CGB, FRR]}), never the inverse.
      *
      * <p>Meta-faction codes are excluded as compatibility <em>targets</em>: a real faction is never
-     * considered "compatible" with the abstract meta-faction {@code IS} (or {@code CLAN.IS}, or any
-     * {@code Periphery.*} / {@code CLAN.*} code) just because the real faction's
-     * {@code fallBackFactions} list includes that meta code as a generic data-lookup fallback. Most
-     * playable Inner Sphere factions list {@code IS} as a fallback for the
-     * {@link mekhq.campaign.universe.RandomFactionGenerator} machinery, so without this exclusion
-     * any of them would erroneously test compatible with the abstract IS umbrella.
+     * considered "compatible" with the abstract meta-faction {@code IS} (or {@code CLAN.IS}, or any {@code Periphery.*}
+     * / {@code CLAN.*} code) just because the real faction's {@code fallBackFactions} list includes that meta code as a
+     * generic data-lookup fallback. Most playable Inner Sphere factions list {@code IS} as a fallback for the
+     * {@link mekhq.campaign.universe.RandomFactionGenerator} machinery, so without this exclusion any of them would
+     * erroneously test compatible with the abstract IS umbrella.
      *
      * <p>The exclusion does <em>not</em> change comparisons between two real factions: LA and FS, for
-     * example, are correctly considered incompatible by this method because neither lists the other's
-     * short code in its fallbacks, regardless of any shared meta entries.
+     * example, are correctly considered incompatible by this method because neither lists the other's short code in its
+     * fallbacks, regardless of any shared meta entries.
      *
      * <p>FedCom-specific era rules (LA seceding 3057, Yvonne reverting to Federated Suns 3067) are
      * handled separately at the call site; this method intentionally does not look at the date.
      *
      * @param other the other faction to test compatibility against
      *
-     * @return {@code true} if this and {@code other} are the same faction, or if either lists the
-     *       other in its {@code fallBackFactions} (after meta-code exclusion); {@code false} otherwise
+     * @return {@code true} if this and {@code other} are the same faction, or if either lists the other in its
+     *       {@code fallBackFactions} (after meta-code exclusion); {@code false} otherwise
      */
     public boolean isLineageCompatible(final @Nullable Faction other) {
         if (other == null) {
@@ -716,5 +715,29 @@ public class Faction {
      */
     public @Nullable FactionLeaderData getLeaderForYear(final int year) {
         return faction2 != null ? faction2.getFactionLeaderForYear(year) : null;
+    }
+
+    /**
+     * Determines whether this faction is a Homeworld Clan.
+     *
+     * <p>A faction qualifies as a Homeworld Clan if it is a Clan faction and one of its alternative faction codes
+     * matches {@code "Clan.HW"} (case-insensitive).
+     *
+     * @return {@code true} if this faction is a Clan and has {@code "Clan.HW"} among its alternative faction codes;
+     *       {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean isHomeworldClan() {
+        if (isClan()) {
+            for (String factionCode : alternativeFactionCodes) {
+                if (factionCode.equalsIgnoreCase("Clan.HW")) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
