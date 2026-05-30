@@ -533,6 +533,7 @@ public class Campaign implements ITechManager, ILocation {
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce, AbstractMarriage marriage,
           AbstractProcreation procreation) {
+        MHQOptions mekhqOptions = MekHQ.getMHQOptions();
 
         // Essential state
         id = UUID.randomUUID();
@@ -602,7 +603,7 @@ public class Campaign implements ITechManager, ILocation {
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
-        topUpWeekly = false;
+        topUpWeekly = mekhqOptions.getNewDayAutoLogistics();
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
