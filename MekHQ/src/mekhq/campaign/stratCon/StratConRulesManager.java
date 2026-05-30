@@ -216,6 +216,10 @@ public class StratConRulesManager {
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
           AtBContract contract, StratConTrackState track, boolean isUseStratConSingles) {
+        // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
+        // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
+        // scheduled.
+
         int scenarioRolls = isUseStratConSingles ? 1 :
                                   // We divide the number of scenario rolls by the number of tracks so that we're not
                                   // unintentionally multiplying Intensity by tracks
@@ -2227,15 +2231,17 @@ public class StratConRulesManager {
      *             <li>-- If command rights indicate that a liaison is required, the modifier is adjusted.</li>
      * </ol>
      *
-     * @param commandLiaison the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
-     * @param contract       the {@link AtBContract} defining the terms of the contract for this scenario.
+     * @param commandLiaison   the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
+     * @param contract         the {@link AtBContract} defining the terms of the contract for this scenario.
+     * @param baseTargetNumber the starting target number before adjustments
      *
      * @return a {@link TargetRoll} object representing the calculated reinforcement target number, with appropriate
      *       modifiers applied.
      */
-    public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract) {
+    public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract,
+          int baseTargetNumber) {
         // Create Target Roll
-        TargetRoll reinforcementTargetNumber = new TargetRoll(7, "Base Target Number");
+        TargetRoll reinforcementTargetNumber = new TargetRoll(baseTargetNumber, "Base Target Number");
 
         // Base Target Number
         Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;
@@ -3876,7 +3882,11 @@ public class StratConRulesManager {
                     }
                     weeklyScenarioDates.removeIf(date -> date.equals(today));
 
-                    generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioCount);
+                    // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
+                    // canceled due to impending defeat
+                    if (!contract.getMoraleLevel().isRouted()) {
+                        generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioCount);
+                    }
                 }
             }
         }

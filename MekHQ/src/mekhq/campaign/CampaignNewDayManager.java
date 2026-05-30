@@ -2131,6 +2131,9 @@ public class CampaignNewDayManager {
 
         // Third, on Mondays we generate new scenarios for the week
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+            // StratCon's scenario generation is handled in StratConRulesManager, not here. Though we can't just
+            // filter StratCon campaigns out of this call, because StratCon does do some processing in this method,
+            // just not related to scenario generation.
             AtBScenarioFactory.createScenariosForNewWeek(campaign);
         }
 
