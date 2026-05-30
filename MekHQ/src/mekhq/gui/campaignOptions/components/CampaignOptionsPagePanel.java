@@ -61,7 +61,10 @@ import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
  * Standard page shell for Campaign Options screens.
  */
 public class CampaignOptionsPagePanel extends JPanel {
+    private static final int INTRO_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int QUOTE_TOP_PADDING = UIUtil.scaleForGUI(12);
+    private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
+    private static final int DEFAULT_HEADER_IMAGE_SIZE = 64;
 
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
@@ -124,8 +127,8 @@ public class CampaignOptionsPagePanel extends JPanel {
               : new CampaignOptionsHeaderPanel(builder.headerResourceName,
                     builder.imageAddress,
                     builder.includeHeaderBodyText,
-                    false,
-                    0);
+                    builder.headerImageSize,
+                    builder.tintHeaderImage);
 
         JPanel panel = new CampaignOptionsStandardPanel(builder.name);
         GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -187,9 +190,19 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private JPanel createIntroPanel(Builder builder, int textWidth) {
-        return new CampaignOptionsIntroPanel(builder.name + "Intro",
-              getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
-              textWidth);
+        int introHorizontalPadding = getIntroHorizontalPadding(textWidth);
+        JPanel introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
+            getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
+            textWidth - (introHorizontalPadding * 2));
+        introPanel.setBorder(BorderFactory.createEmptyBorder(0,
+            introHorizontalPadding,
+            0,
+            introHorizontalPadding));
+        return introPanel;
+    }
+
+    private int getIntroHorizontalPadding(int introWidth) {
+        return Math.min(INTRO_HORIZONTAL_PADDING, Math.max(0, (introWidth - 1) / 2));
     }
 
     private List<MHQCollapsiblePanel> createSections(List<Section> sectionDefinitions,
@@ -215,7 +228,10 @@ public class CampaignOptionsPagePanel extends JPanel {
         if (badges.isBlank()) {
             return title;
         }
-        return "<html>" + title + badges + "</html>";
+        // <nobr> keeps the title (which becomes HTML once badges are present) on a single line. Without it an HTML
+        // label only reserves the width of its longest word, so the title would wrap whenever the section content is
+        // narrow, making the header width appear tied to the content width.
+        return "<html><nobr>" + title + badges + "</nobr></html>";
     }
 
     private int getPreferredSectionWidth(List<MHQCollapsiblePanel> sections) {
@@ -266,25 +282,30 @@ public class CampaignOptionsPagePanel extends JPanel {
             return null;
         }
 
-        int quoteWidth = Math.max(1, Math.min(contentWidth, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        int quotePanelWidth = Math.max(1, Math.min(contentWidth, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        int quoteHorizontalPadding = getQuoteHorizontalPadding(quotePanelWidth);
+        int quoteTextWidth = quotePanelWidth - (quoteHorizontalPadding * 2);
         JPanel quotePanel = new JPanel(new GridBagLayout());
         quotePanel.setName("pnl" + quoteResourceName + "QuotePanel");
         quotePanel.setOpaque(false);
-        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, 0, 0));
+        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING,
+              quoteHorizontalPadding,
+              0,
+              quoteHorizontalPadding));
 
-                JEditorPane quote = new JEditorPane("text/html",
-                            formatQuoteText(getTextAt(getCampaignOptionsResourceBundle(), quoteResourceName + ".border")));
-                quote.setName("txt" + quoteResourceName + "Quote");
-                quote.setEditable(false);
-                quote.setFocusable(false);
-                quote.setOpaque(false);
-                quote.setBorder(BorderFactory.createEmptyBorder());
-                quote.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
-                setFontScaling(quote, false, 1);
+        JEditorPane quote = new JEditorPane("text/html",
+              formatQuoteText(getTextAt(getCampaignOptionsResourceBundle(), quoteResourceName + ".border")));
+        quote.setName("txt" + quoteResourceName + "Quote");
+        quote.setEditable(false);
+        quote.setFocusable(false);
+        quote.setOpaque(false);
+        quote.setBorder(BorderFactory.createEmptyBorder());
+        quote.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
+        setFontScaling(quote, false, 1);
 
-                Dimension quoteSize = getWrappedQuoteSize(quote, quoteWidth);
-                quote.setPreferredSize(quoteSize);
-                quote.setMinimumSize(quoteSize);
+        Dimension quoteSize = getWrappedQuoteSize(quote, quoteTextWidth);
+        quote.setPreferredSize(quoteSize);
+        quote.setMinimumSize(quoteSize);
 
         GridBagConstraints quoteConstraints = new GridBagConstraints();
         quoteConstraints.gridx = GridBagConstraints.RELATIVE;
@@ -292,6 +313,10 @@ public class CampaignOptionsPagePanel extends JPanel {
         quotePanel.add(quote, quoteConstraints);
 
         return quotePanel;
+    }
+
+    private int getQuoteHorizontalPadding(int quotePanelWidth) {
+        return Math.min(QUOTE_HORIZONTAL_PADDING, Math.max(0, (quotePanelWidth - 1) / 2));
     }
 
     private Dimension getWrappedQuoteSize(JEditorPane quote, int quoteWidth) {
@@ -313,6 +338,8 @@ public class CampaignOptionsPagePanel extends JPanel {
         private String quoteResourceName;
         private String introTextKey;
         private boolean includeHeaderBodyText;
+        private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
+        private boolean tintHeaderImage = true;
         private boolean sectionsExpandedByDefault;
         private boolean showDetailsPanel = true;
 
@@ -324,6 +351,16 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder includeHeaderBodyText() {
             includeHeaderBodyText = true;
+            return this;
+        }
+
+        public Builder headerImageSize(int headerImageSize) {
+            this.headerImageSize = headerImageSize;
+            return this;
+        }
+
+        public Builder tintHeaderImage(boolean tintHeaderImage) {
+            this.tintHeaderImage = tintHeaderImage;
             return this;
         }
 

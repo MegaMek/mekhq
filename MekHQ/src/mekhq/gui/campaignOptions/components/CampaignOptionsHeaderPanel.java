@@ -56,11 +56,12 @@ import megamek.client.ui.util.UIUtil;
  * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
+    private static final int DEFAULT_IMAGE_SIZE = 64;
     private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
 
     @Deprecated(since = "0.50.06", forRemoval = true)
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
-        this(name, imageAddress, includeBodyText, false, 0);
+        this(name, imageAddress, includeBodyText, false, 0, DEFAULT_IMAGE_SIZE);
     }
 
     /**
@@ -74,7 +75,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageAddress the path to the image file displayed in the panel
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress) {
-        this(name, imageAddress, false, false, 0);
+        this(name, imageAddress, false, false, 0, DEFAULT_IMAGE_SIZE);
     }
 
     /**
@@ -89,7 +90,33 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param tipPanelHeight retained for constructor compatibility; contextual help is shown in the shell
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, int tipPanelHeight) {
-        this(name, imageAddress, false, true, tipPanelHeight);
+        this(name, imageAddress, false, true, tipPanelHeight, DEFAULT_IMAGE_SIZE);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} with a custom image size.
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param imageSize       the target width or height for the header image
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText, int imageSize) {
+        this(name, imageAddress, includeBodyText, imageSize, true);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} with custom image sizing and tint behavior.
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param imageSize       the target width or height for the header image
+     * @param tintImage       if true, tints the image black to match the standard options header style
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText, int imageSize,
+          boolean tintImage) {
+        this(name, imageAddress, includeBodyText, false, 0, imageSize, tintImage);
     }
 
     /**
@@ -108,10 +135,53 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight) {
+        this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, DEFAULT_IMAGE_SIZE);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
+     * additional descriptive body text.
+     *
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
+     * @param imageSize       the target width or height for the header image
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+          boolean includeTipPanel, int tipPanelHeight, int imageSize) {
+        this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, imageSize, true);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
+     * additional descriptive body text.
+     *
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
+     * @param imageSize       the target width or height for the header image
+     * @param tintImage       if true, tints the image black to match the standard options header style
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+          boolean includeTipPanel, int tipPanelHeight, int imageSize, boolean tintImage) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
-        imageIcon = scaleImageIcon(imageIcon, 64, true);
-        imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
+        imageIcon = scaleImageIcon(imageIcon, imageSize, true);
+        if (tintImage) {
+            imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
+        }
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);

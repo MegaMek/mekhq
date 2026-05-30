@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -59,6 +60,7 @@ import javax.swing.JPanel;
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -195,7 +197,7 @@ public class CampaignOptionsUtilities {
             return content;
         }
 
-        int quoteWidth = Math.max(1, Math.min(content.getPreferredSize().width, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        int quoteWidth = Math.max(1, Math.min(getQuoteReferenceWidth(content), CAMPAIGN_OPTIONS_PANEL_WIDTH));
 
         JPanel quotePanel = new JPanel(new GridBagLayout());
         quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, 0, 0));
@@ -214,6 +216,40 @@ public class CampaignOptionsUtilities {
         quotedContent.add(content, BorderLayout.CENTER);
         quotedContent.add(quotePanel, BorderLayout.SOUTH);
         return quotedContent;
+    }
+
+    /**
+     * Determines the width that the closing quote should be sized to.
+     *
+     * <p>
+     * The page header reserves a fixed (wide) body text width, so sizing the quote to the whole content's preferred
+     * width makes the quote noticeably wider than the option sections beneath it. To keep the quote aligned with the
+     * visible sections, this method returns the width of the widest {@link MHQCollapsiblePanel} section found within the
+     * content tree, falling back to the content's preferred width when no section is present.
+     * </p>
+     *
+     * @param content the content whose section widths should be inspected
+     *
+     * @return the reference width to use for the quote
+     */
+    private static int getQuoteReferenceWidth(Component content) {
+        int widestSection = findWidestSection(content);
+        return widestSection > 0 ? widestSection : content.getPreferredSize().width;
+    }
+
+    private static int findWidestSection(Component component) {
+        int widest = 0;
+        if (component instanceof MHQCollapsiblePanel) {
+            widest = component.getPreferredSize().width;
+        }
+
+        if (component instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                widest = Math.max(widest, findWidestSection(child));
+            }
+        }
+
+        return widest;
     }
 
     private static class CampaignOptionsPageWrapper extends JPanel {

@@ -34,16 +34,13 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -55,16 +52,14 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code SystemsTab} class is responsible for managing and displaying the
@@ -163,31 +158,29 @@ public class SystemsTab {
      */
     public JPanel createReputationTab() {
         // Header
-        reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab",
-                getImageDirectory() + "logo_morgrains_valkyrate.png",
-                8);
+        String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
+        reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab", imageAddress);
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
         JPanel pnlReputationSanityOptions = createReputationSanityPanel();
-        MHQCollapsiblePanel generalSection = createSection("lblReputationGeneralOptionsPanel.text",
-                "lblReputationGeneralOptionsPanel.summary",
-                pnlReputationGeneralOptions);
-        MHQCollapsiblePanel safeguardsSection = createSection("lblReputationSanityOptionsPanel.text",
-                "lblReputationSanityOptionsPanel.summary",
-                pnlReputationSanityOptions);
 
         reputationPageCreated = true;
         updateReputationControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = createSectionedPanel("ReputationTab",
-                reputationHeader,
-                generalSection,
-                safeguardsSection);
+        final JPanel panel = CampaignOptionsPagePanel.builder("ReputationTab", "ReputationTab", imageAddress)
+                .header(reputationHeader)
+                .quote("reputationTab")
+                .section("lblReputationGeneralOptionsPanel.text",
+                        "lblReputationGeneralOptionsPanel.summary",
+                        pnlReputationGeneralOptions)
+                .section("lblReputationSanityOptionsPanel.text",
+                        "lblReputationSanityOptionsPanel.summary",
+                        pnlReputationSanityOptions)
+                .build();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "ReputationTab");
+        return panel;
     }
 
     /**
@@ -307,31 +300,30 @@ public class SystemsTab {
      */
     public JPanel createFactionStandingTab() {
         // Header
-        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
-                getImageDirectory() + "logo_morgrains_valkyrate.png",
-                3);
+        String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
+        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab", imageAddress);
 
         // Contents
         JPanel pnlFactionStandingTrackingPanel = createFactionStandingTrackingPanel();
         JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
-        MHQCollapsiblePanel trackingSection = createSection("lblFactionStandingTrackingPanel.text",
-                "lblFactionStandingTrackingPanel.summary",
-                pnlFactionStandingTrackingPanel);
-        MHQCollapsiblePanel effectsSection = createSection("lblFactionStandingEffectsPanel.text",
-                "lblFactionStandingEffectsPanel.summary",
-                pnlFactionStandingModifiersPanel);
 
         factionStandingPageCreated = true;
         updateFactionStandingControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = createSectionedPanel("FactionStandingTab",
-                factionStandingHeader,
-                trackingSection,
-                effectsSection);
+        final JPanel panel = CampaignOptionsPagePanel.builder("FactionStandingTab", "FactionStandingTab",
+                        imageAddress)
+                .header(factionStandingHeader)
+                .quote("factionStandingTab")
+                .section("lblFactionStandingTrackingPanel.text",
+                        "lblFactionStandingTrackingPanel.summary",
+                        pnlFactionStandingTrackingPanel)
+                .section("lblFactionStandingEffectsPanel.text",
+                        "lblFactionStandingEffectsPanel.summary",
+                        pnlFactionStandingModifiersPanel)
+                .build();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "FactionStandingTab");
+        return panel;
     }
 
     private JPanel createFactionStandingTrackingPanel() {
@@ -458,26 +450,25 @@ public class SystemsTab {
      */
     public JPanel createATOWTab() {
         // Header
-        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab",
-                getImageDirectory() + "logo_elysian_fields.png",
-                8);
+        String imageAddress = getImageDirectory() + "logo_elysian_fields.png";
+        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab", imageAddress);
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
-        MHQCollapsiblePanel attributesSection = createSection("lblATOWAttributesPanel.text",
-                "lblATOWAttributesPanel.summary",
-                pnlATOWAttributes);
 
         atowPageCreated = true;
         updateATOWControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = createSectionedPanel("ATimeOfWarTab",
-                atowHeader,
-                attributesSection);
+        final JPanel panel = CampaignOptionsPagePanel.builder("ATimeOfWarTab", "ATimeOfWarTab", imageAddress)
+                .header(atowHeader)
+                .quote("atowTab")
+                .section("lblATOWAttributesPanel.text",
+                        "lblATOWAttributesPanel.summary",
+                        pnlATOWAttributes)
+                .build();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "ATimeOfWarTab");
+        return panel;
     }
 
     /**
@@ -535,78 +526,6 @@ public class SystemsTab {
                 chkUseSmallArmsOnly);
 
         return panel;
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-            MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
-        return panel;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-            @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
     }
 
     /**

@@ -219,12 +219,16 @@ public class CampaignOptionsFormPanel extends JPanel {
         GridBagConstraints controlLayout = new GridBagConstraints();
         controlLayout.gridx = 1;
         controlLayout.gridy = currentRow;
-        controlLayout.weightx = 0.0;
+        // REMAINDER + weightx/fill makes the control absorb all horizontal slack so its right edge reaches the form's
+        // (and therefore the section's) right edge. The page stretches every section to a common width, so without this
+        // the fixed-width control would be left stranded with a trailing filler eating the extra space, ending short of
+        // the right edge whenever another section is wider. The minimum control width keeps it from collapsing.
+        controlLayout.gridwidth = GridBagConstraints.REMAINDER;
+        controlLayout.weightx = 1.0;
         controlLayout.anchor = GridBagConstraints.WEST;
-        controlLayout.fill = GridBagConstraints.NONE;
+        controlLayout.fill = GridBagConstraints.HORIZONTAL;
         controlLayout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, 0);
         add(control, controlLayout);
-        addTrailingFiller(currentRow, 2);
     }
 
     private void addTrailingFiller(int rowIndex, int columnIndex) {

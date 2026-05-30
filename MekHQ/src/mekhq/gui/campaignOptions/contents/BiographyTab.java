@@ -34,9 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -46,7 +44,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -70,17 +67,13 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.panes.RankSystemsPane;
 
@@ -115,7 +108,6 @@ public class BiographyTab {
     private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
     private static final int RANK_SYSTEMS_PANEL_WIDTH = 860;
-    private static final int RANK_SYSTEMS_PANEL_HEIGHT = 430;
     private static final int RANK_TABLE_HEIGHT = 260;
     private static final int RANK_RATE_COLUMN_WIDTH = 60;
     private static final int RANK_NAME_COLUMN_WIDTH = 150;
@@ -482,9 +474,8 @@ public class BiographyTab {
      */
     public JPanel createGeneralTab() {
         // Header
-        generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
-                getImageDirectory() + "logo_clan_blood_spirit.png",
-                6);
+        String imageAddress = getImageDirectory() + "logo_clan_blood_spirit.png";
+        generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab", imageAddress, 6);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -510,33 +501,22 @@ public class BiographyTab {
         pnlAnniversariesPanel = createAnniversariesPanel();
         pnlLifeEvents = createLifeEventsPanel();
         pnlComingOfAge = createComingOfAgePanel();
-
-        MHQCollapsiblePanel generalOptionsSection = createSection("lblBiographyGeneralTab.text",
+        JPanel panel = CampaignOptionsPagePanel.builder("BiographyGeneralTab", "BiographyGeneralTab", imageAddress)
+            .header(generalHeader)
+            .quote("biographyGeneralTab")
+            .section("lblBiographyGeneralTab.text",
                 "lblBiographyGeneralTab.summary",
                 generalOptionsPanel,
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel anniversariesSection = createSection("lblAnniversariesPanel.text",
-                "lblAnniversariesPanel.summary",
-                pnlAnniversariesPanel);
-        MHQCollapsiblePanel lifeEventsSection = createSection("lblLifeEventsPanel.text",
-                "lblLifeEventsPanel.summary",
-                pnlLifeEvents);
-        MHQCollapsiblePanel comingOfAgeSection = createSection("lblComingOfAgePanel.text",
-                "lblComingOfAgePanel.summary",
-                pnlComingOfAge);
-
-        JPanel panelParent = createSectionedPanel("BiographyGeneralTab",
-                generalHeader,
-                generalOptionsSection,
-                anniversariesSection,
-                lifeEventsSection,
-                comingOfAgeSection);
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM))
+            .section("lblAnniversariesPanel.text", "lblAnniversariesPanel.summary", pnlAnniversariesPanel)
+            .section("lblLifeEventsPanel.text", "lblLifeEventsPanel.summary", pnlLifeEvents)
+            .section("lblComingOfAgePanel.text", "lblComingOfAgePanel.summary", pnlComingOfAge)
+            .build();
 
         generalPageCreated = true;
         updateGeneralControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "BiographyGeneralTab");
+        return panel;
     }
 
     private JPanel createBiographyGeneralOptionsPanel() {
@@ -549,104 +529,6 @@ public class BiographyTab {
         panel.addRow(lblFamilyDisplayLevel, comboFamilyDisplayLevel);
 
         return panel;
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-            MHQCollapsiblePanel... sections) {
-        return createSectionedPanel(name, header, null, sections);
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header, @Nullable String bodyTextKey,
-            MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-        JPanel introPanel = bodyTextKey == null ? null : createSectionIntro(name + "Body", bodyTextKey, sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        if (introPanel != null) {
-            layout.gridy++;
-            panel.add(introPanel, layout);
-        }
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
-        return panel;
-    }
-
-    private JPanel createSectionIntro(String name, String bodyTextKey, MHQCollapsiblePanel... sections) {
-        return new CampaignOptionsIntroPanel(name,
-                getTextAt(getCampaignOptionsResourceBundle(), bodyTextKey),
-                getPreferredSectionContentWidth(sections));
-    }
-
-    private int getPreferredSectionContentWidth(MHQCollapsiblePanel... sections) {
-        int preferredWidth = 0;
-        for (MHQCollapsiblePanel section : sections) {
-            preferredWidth = Math.max(preferredWidth, section.getContentPreferredWidth());
-        }
-
-        return preferredWidth;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-            @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
     }
 
     /**
@@ -756,32 +638,28 @@ public class BiographyTab {
      */
     public JPanel createBackgroundsTab() {
         // Header
-        backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
-                getImageDirectory() + "logo_nueva_castile.png",
-                3);
+        String imageAddress = getImageDirectory() + "logo_nueva_castile.png";
+        backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab", imageAddress, 3);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
         pnlRandomBackgrounds = createRandomBackgroundsPanel();
-
-        MHQCollapsiblePanel originSection = createSection("lblRandomOriginOptionsPanel.text",
+        JPanel panel = CampaignOptionsPagePanel.builder("BackgroundsTab", "BackgroundsTab", imageAddress)
+            .header(backgroundHeader)
+            .quote("backgroundsTab")
+            .section("lblRandomOriginOptionsPanel.text",
                 "lblRandomOriginOptionsPanel.summary",
                 pnlRandomOriginOptions,
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel randomBackgroundsSection = createSection("lblRandomBackgroundsPanel.text",
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM))
+            .section("lblRandomBackgroundsPanel.text",
                 "lblRandomBackgroundsPanel.summary",
-                pnlRandomBackgrounds);
-
-        JPanel panel = createSectionedPanel("BackgroundsTab",
-                backgroundHeader,
-                originSection,
-                randomBackgroundsSection);
+                pnlRandomBackgrounds)
+            .build();
 
         backgroundsPageCreated = true;
         updateBackgroundControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "BackgroundsTab");
+        return panel;
     }
 
     /**
@@ -921,16 +799,16 @@ public class BiographyTab {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomOriginOptionsPanel",
             FORM_LABEL_COLUMN_WIDTH,
             FORM_CONTROL_COLUMN_WIDTH);
-        panel.addCheckBox(chkRandomizeOrigin);
-        panel.addCheckBox(chkRandomizeDependentsOrigin);
-        panel.addCheckBox(chkRandomizeAroundSpecifiedPlanet);
-        panel.addCheckBox(chkSpecifiedSystemFactionSpecific);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+            chkRandomizeOrigin,
+            chkRandomizeDependentsOrigin,
+            chkRandomizeAroundSpecifiedPlanet,
+            chkSpecifiedSystemFactionSpecific);
         panel.addRow(lblSpecifiedSystem, comboSpecifiedSystem);
         panel.addRow(lblSpecifiedPlanet, comboSpecifiedPlanet);
         panel.addRow(lblOriginSearchRadius, spnOriginSearchRadius);
         panel.addRow(lblOriginDistanceScale, spnOriginDistanceScale);
-        panel.addCheckBox(chkAllowClanOrigins);
-        panel.addCheckBox(chkExtraRandomOrigin);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, chkAllowClanOrigins, chkExtraRandomOrigin);
 
         return panel;
     }
@@ -1037,9 +915,8 @@ public class BiographyTab {
      */
     public JPanel createDeathTab() {
         // Header
-        deathHeader = new CampaignOptionsHeaderPanel("DeathTab",
-                getImageDirectory() + "logo_clan_fire_mandrills.png",
-                5);
+        String imageAddress = getImageDirectory() + "logo_clan_fire_mandrills.png";
+        deathHeader = new CampaignOptionsHeaderPanel("DeathTab", imageAddress, 5);
 
         // Contents
         lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier",
@@ -1054,24 +931,17 @@ public class BiographyTab {
 
         JPanel deathOptionsPanel = createDeathOptionsPanel();
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
-
-        MHQCollapsiblePanel deathOptionsSection = createSection("lblDeathTab.text",
-                "lblDeathTab.summary",
-                deathOptionsPanel);
-        MHQCollapsiblePanel ageGroupsSection = createSection("lblDeathAgeGroupsPanel.text",
-                "lblDeathAgeGroupsPanel.summary",
-                pnlDeathAgeGroup);
-
-        JPanel panelParent = createSectionedPanel("DeathTab",
-                deathHeader,
-                deathOptionsSection,
-                ageGroupsSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("DeathTab", "DeathTab", imageAddress)
+            .header(deathHeader)
+            .quote("deathTab")
+            .section("lblDeathTab.text", "lblDeathTab.summary", deathOptionsPanel)
+            .section("lblDeathAgeGroupsPanel.text", "lblDeathAgeGroupsPanel.summary", pnlDeathAgeGroup)
+            .build();
 
         deathPageCreated = true;
         updateDeathControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "DeathTab");
+        return panel;
     }
 
     private JPanel createDeathOptionsPanel() {
@@ -1132,9 +1002,8 @@ public class BiographyTab {
      */
     public JPanel createEducationTab() {
         // Header
-        educationHeader = new CampaignOptionsHeaderPanel("EducationTab",
-                getImageDirectory() + "logo_taurian_concordat.png",
-                3);
+        String imageAddress = getImageDirectory() + "logo_taurian_concordat.png";
+        educationHeader = new CampaignOptionsHeaderPanel("EducationTab", imageAddress, 3);
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
@@ -1174,36 +1043,20 @@ public class BiographyTab {
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
         pnlDropoutChance = createDropoutChancePanel();
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
-
-        MHQCollapsiblePanel educationOptionsSection = createSection("lblEducationTab.text",
-                "lblEducationTab.summary",
-                educationOptionsPanel);
-        MHQCollapsiblePanel academySetsSection = createSection("lblEnableStandardSetsPanel.text",
-                "lblEnableStandardSetsPanel.summary",
-                pnlEnableStandardSets);
-        MHQCollapsiblePanel bonusesSection = createSection("lblXpAndSkillBonusesPanel.text",
-                "lblXpAndSkillBonusesPanel.summary",
-                pnlXpAndSkillBonuses);
-        MHQCollapsiblePanel dropoutSection = createSection("lblDropoutChancePanel.text",
-                "lblDropoutChancePanel.summary",
-                pnlDropoutChance);
-        MHQCollapsiblePanel accidentsSection = createSection("lblAccidentsAndEventsPanel.text",
-                "lblAccidentsAndEventsPanel.summary",
-                pnlAccidentsAndEvents);
-
-        JPanel panelParent = createSectionedPanel("EducationTab",
-                educationHeader,
-                educationOptionsSection,
-                academySetsSection,
-                bonusesSection,
-                dropoutSection,
-                accidentsSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("EducationTab", "EducationTab", imageAddress)
+            .header(educationHeader)
+            .quote("educationTab")
+            .section("lblEducationTab.text", "lblEducationTab.summary", educationOptionsPanel)
+            .section("lblEnableStandardSetsPanel.text", "lblEnableStandardSetsPanel.summary", pnlEnableStandardSets)
+            .section("lblXpAndSkillBonusesPanel.text", "lblXpAndSkillBonusesPanel.summary", pnlXpAndSkillBonuses)
+            .section("lblDropoutChancePanel.text", "lblDropoutChancePanel.summary", pnlDropoutChance)
+            .section("lblAccidentsAndEventsPanel.text", "lblAccidentsAndEventsPanel.summary", pnlAccidentsAndEvents)
+            .build();
 
         educationPageCreated = true;
         updateEducationControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "EducationTab");
+        return panel;
     }
 
     private JPanel createEducationOptionsPanel() {
@@ -1213,9 +1066,10 @@ public class BiographyTab {
         panel.addCheckBox(chkUseEducationModule);
         panel.addRow(lblCurriculumXpRate, spnCurriculumXpRate);
         panel.addRow(lblMaximumJumpCount, spnMaximumJumpCount);
-        panel.addCheckBox(chkUseReeducationCamps);
-        panel.addCheckBox(chkEnableOverrideRequirements);
-        panel.addCheckBox(chkShowIneligibleAcademies);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+            chkUseReeducationCamps,
+            chkEnableOverrideRequirements,
+            chkShowIneligibleAcademies);
         panel.addRow(lblEntranceExamBaseTargetNumber, spnEntranceExamBaseTargetNumber);
 
         return panel;
@@ -1367,9 +1221,10 @@ public class BiographyTab {
      */
     public JPanel createNameAndPortraitGenerationTab() {
         // Header
+        String imageAddress = getImageDirectory() + "logo_clan_nova_cat.png";
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
-                getImageDirectory() + "logo_clan_nova_cat.png",
-                5);
+            imageAddress,
+            5);
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
@@ -1406,28 +1261,20 @@ public class BiographyTab {
         JPanel nameGenerationPanel = createNameGenerationPanel();
         JPanel portraitRulesPanel = createPortraitRulesPanel();
         pnlRandomPortrait = createRandomPortraitPanel();
-
-        MHQCollapsiblePanel nameGenerationSection = createSection("lblNameGenerationPanel.text",
-                "lblNameGenerationPanel.summary",
-                nameGenerationPanel);
-        MHQCollapsiblePanel portraitRulesSection = createSection("lblPortraitRulesPanel.text",
-                "lblPortraitRulesPanel.summary",
-                portraitRulesPanel);
-        MHQCollapsiblePanel portraitAssignmentSection = createSection("lblRandomPortraitPanel.text",
-                "lblRandomPortraitPanel.summary",
-                pnlRandomPortrait);
-
-        JPanel panel = createSectionedPanel("NameAndPortraitGenerationTab",
-                nameAndPortraitGenerationHeader,
-                nameGenerationSection,
-                portraitRulesSection,
-                portraitAssignmentSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("NameAndPortraitGenerationTab",
+                "NameAndPortraitGenerationTab",
+                imageAddress)
+            .header(nameAndPortraitGenerationHeader)
+            .quote("nameAndPortraitGenerationTab")
+            .section("lblNameGenerationPanel.text", "lblNameGenerationPanel.summary", nameGenerationPanel)
+            .section("lblPortraitRulesPanel.text", "lblPortraitRulesPanel.summary", portraitRulesPanel)
+            .section("lblRandomPortraitPanel.text", "lblRandomPortraitPanel.summary", pnlRandomPortrait)
+            .build();
 
         nameAndPortraitPageCreated = true;
         updateNameAndPortraitControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "NameAndPortraitGenerationTab");
+        return panel;
     }
 
     private JPanel createNameGenerationPanel() {
@@ -1556,23 +1403,17 @@ public class BiographyTab {
      */
     public JPanel createRankTab() {
         // Header
-        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
-                getImageDirectory() + "logo_umayyad_caliphate.png");
+        String imageAddress = getImageDirectory() + "logo_umayyad_caliphate.png";
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab", imageAddress);
 
         // Contents
         JPanel rankSystemsPanel = createRankSystemsPanel();
-
-        MHQCollapsiblePanel rankSystemsSection = createSection("lblRankTab.text",
-                "lblRankTab.summary",
-                rankSystemsPanel);
-
-        JPanel panel = createSectionedPanel("RankTab",
-                headerPanel,
-                "lblRankTabBody.text",
-                rankSystemsSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "RankTab");
+        return CampaignOptionsPagePanel.builder("RankTab", "RankTab", imageAddress)
+            .header(headerPanel)
+            .intro("lblRankTabBody.text")
+            .quote("rankTab")
+            .section("lblRankTab.text", "lblRankTab.summary", rankSystemsPanel)
+            .build();
     }
 
     private JPanel createRankSystemsPanel() {
@@ -1588,9 +1429,6 @@ public class BiographyTab {
     }
 
     private void configureEmbeddedRankSystemsPane() {
-        Dimension rankSystemsSize = new Dimension(RANK_SYSTEMS_PANEL_WIDTH, RANK_SYSTEMS_PANEL_HEIGHT);
-        rankSystemsPane.setPreferredSize(rankSystemsSize);
-        rankSystemsPane.setMinimumSize(new Dimension(0, RANK_SYSTEMS_PANEL_HEIGHT));
         rankSystemsPane.setBorder(BorderFactory.createEmptyBorder());
         rankSystemsPane.setViewportBorder(null);
         rankSystemsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -1611,6 +1449,18 @@ public class BiographyTab {
             tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         }
+
+        Dimension rankSystemsSize = getEmbeddedRankSystemsSize();
+        rankSystemsPane.setPreferredSize(rankSystemsSize);
+        rankSystemsPane.setMinimumSize(new Dimension(0, rankSystemsSize.height));
+    }
+
+    private Dimension getEmbeddedRankSystemsSize() {
+        Component view = rankSystemsPane.getViewport().getView();
+        int viewHeight = view == null ? RANK_TABLE_HEIGHT : view.getPreferredSize().height;
+        int horizontalScrollBarHeight = rankSystemsPane.getHorizontalScrollBar().getPreferredSize().height;
+
+        return new Dimension(RANK_SYSTEMS_PANEL_WIDTH, viewHeight + horizontalScrollBarHeight);
     }
 
     private void configureEmbeddedRankTableColumns(JTable ranksTable) {

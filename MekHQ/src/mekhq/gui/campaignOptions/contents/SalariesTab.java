@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -42,7 +41,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,7 +49,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -77,13 +74,12 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
@@ -189,53 +185,53 @@ public class SalariesTab {
      */
     public JPanel createSalariesTab(PersonnelRoleSubType type) {
         // Header
-        salariesHeader = createSalariesHeader(type);
+        String imageAddress = getImageDirectory() + "logo_clan_coyote.png";
+        String headerName = getHeaderName(type);
+        salariesHeader = new CampaignOptionsHeaderPanel(headerName, imageAddress);
+        CampaignOptionsPagePanel.Builder builder = CampaignOptionsPagePanel.builder(headerName, headerName, imageAddress)
+            .header(salariesHeader)
+            .quote(getQuoteResourceName(type));
 
-        // Contents
-        MHQCollapsiblePanel baseSalariesSection = createSection("lblBaseSalariesPanel.text",
-              getBaseSalariesSummaryKey(type),
-              createBaseSalariesPanel(type));
-
-        JPanel panel;
         if (type == PersonnelRoleSubType.COMBAT) {
             chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary",
-                  getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
             chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-                  "DisableSecondaryRoleSalary"));
+                "DisableSecondaryRoleSalary"));
 
-            MHQCollapsiblePanel rulesSection = createSection("lblSalaryRulesPanel.text",
-                  "lblSalaryRulesPanel.summary",
-                  createSalaryRulesPanel());
-            MHQCollapsiblePanel roleMultipliersSection = createSection("lblSalaryMultipliersPanel.text",
-                  "lblSalaryMultipliersPanel.summary",
-                  createSalaryMultipliersPanel());
-            MHQCollapsiblePanel experienceMultipliersSection = createSection("lblExperienceMultipliersPanel.text",
-                  "lblExperienceMultipliersPanel.summary",
-                  createExperienceMultipliersPanel());
-            panel = createSectionedPanel("SalariesTab",
-                  salariesHeader,
-                  rulesSection,
-                  roleMultipliersSection,
-                  experienceMultipliersSection,
-                  baseSalariesSection);
-        } else {
-            panel = createSectionedPanel("SalariesTab", salariesHeader, baseSalariesSection);
+            builder.section("lblSalaryRulesPanel.text", "lblSalaryRulesPanel.summary", createSalaryRulesPanel())
+                    .section("lblSalaryMultipliersPanel.text",
+                            "lblSalaryMultipliersPanel.summary",
+                            createSalaryMultipliersPanel())
+                    .section("lblExperienceMultipliersPanel.text",
+                            "lblExperienceMultipliersPanel.summary",
+                            createExperienceMultipliersPanel());
         }
+
+        JPanel panel = builder.section("lblBaseSalariesPanel.text",
+                getBaseSalariesSummaryKey(type),
+                createBaseSalariesPanel(type))
+                .build();
 
         markPageCreated(type);
         updateSalariesControlsFromModel(type);
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "SalariesTab");
+        return panel;
     }
 
-    private CampaignOptionsHeaderPanel createSalariesHeader(PersonnelRoleSubType type) {
-        String headerName = switch (type) {
+    private String getHeaderName(PersonnelRoleSubType type) {
+        return switch (type) {
             case COMBAT -> "CombatSalariesTab";
             case SUPPORT -> "SupportSalariesTab";
             case CIVILIAN -> "CivilianSalariesTab";
         };
-        return new CampaignOptionsHeaderPanel(headerName, getImageDirectory() + "logo_clan_coyote.png");
+    }
+
+    private String getQuoteResourceName(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> "0combatSalariesTab";
+            case SUPPORT -> "1supportSalariesTab";
+            case CIVILIAN -> "2civilianSalariesTab";
+        };
     }
 
     private String getBaseSalariesSummaryKey(PersonnelRoleSubType type) {
@@ -244,66 +240,6 @@ public class SalariesTab {
             case SUPPORT -> "lblBaseSalariesPanel.summary.support";
             case CIVILIAN -> "lblBaseSalariesPanel.summary.civilian";
         };
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-          MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
-        return panel;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(
-              getTextAt(getCampaignOptionsResourceBundle(), titleKey),
-              content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
     }
 
     private JPanel createSalaryRulesPanel() {

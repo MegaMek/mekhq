@@ -35,17 +35,10 @@ package mekhq.gui.campaignOptions.contents;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,17 +54,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The FinancesTab class represents a UI tab within a larger financial
@@ -80,8 +69,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * configure various financial options,
  * payments, sales, taxes, shares, and price multipliers for the campaign.
  * <p>
- * It is primarily composed of multiple `JPanel` sections organized using
- * `GroupLayout` for modularity and clarity.
+ * It is primarily composed of multiple `JPanel` sections organized inside the campaign options page shell for
+ * modularity and clarity.
  */
 public class FinancesTab {
     private static final int FINANCES_LABEL_COLUMN_WIDTH = 300;
@@ -281,8 +270,9 @@ public class FinancesTab {
      */
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
+        String imageAddress = getImageDirectory() + "logo_star_league.png";
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-                getImageDirectory() + "logo_star_league.png", 8);
+                imageAddress, 8);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -292,119 +282,36 @@ public class FinancesTab {
         pnlShares = createSharesPanel();
         pnlRentedFacilities = createRentedFacilitiesPanel();
 
-        MHQCollapsiblePanel generalSection = createSection("lblFinancialRulesPanel.text",
-                "lblFinancialRulesPanel.summary",
-                pnlGeneralOptions);
-        MHQCollapsiblePanel paymentsSection = createSection("lblPaymentsPanel.text",
-                "lblPaymentsPanel.summary",
-                pnlPayments);
-        MHQCollapsiblePanel salesSection = createSection("lblSalesPanel.text",
-                "lblSalesPanel.summary",
-                pnlSales);
-        MHQCollapsiblePanel taxesSection = createSection("lblTaxesPanel.text",
-                "lblTaxesPanel.summary",
-                pnlTaxes,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel sharesSection = createSection("lblSharesPanel.text",
-                "lblSharesPanel.summary",
-                pnlShares,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel rentedFacilitiesSection = createSection("lblRentedFacilitiesPanel.text",
-                "lblRentedFacilitiesPanel.summary",
-                pnlRentedFacilities,
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-
-        JPanel sectionControls = createSectionControls(generalSection,
-                paymentsSection,
-                salesSection,
-                taxesSection,
-                sharesSection,
-                rentedFacilitiesSection);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab");
-        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 1;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        layoutParent.weightx = 1.0;
-        panel.add(financesGeneralOptions, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layoutParent);
-
-        layoutParent.anchor = GridBagConstraints.NORTHWEST;
-        layoutParent.gridy++;
-        panel.add(generalSection, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(paymentsSection, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(salesSection, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(taxesSection, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(sharesSection, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(rentedFacilitiesSection, layoutParent);
+        JPanel panel = CampaignOptionsPagePanel.builder("FinancesGeneralTab", "FinancesGeneralTab", imageAddress)
+                .header(financesGeneralOptions)
+                .quote("financesGeneralTab")
+                .section("lblFinancialRulesPanel.text",
+                        "lblFinancialRulesPanel.summary",
+                        pnlGeneralOptions)
+                .section("lblPaymentsPanel.text",
+                        "lblPaymentsPanel.summary",
+                        pnlPayments)
+                .section("lblSalesPanel.text",
+                        "lblSalesPanel.summary",
+                        pnlSales)
+                .section("lblTaxesPanel.text",
+                        "lblTaxesPanel.summary",
+                        pnlTaxes,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblSharesPanel.text",
+                        "lblSharesPanel.summary",
+                        pnlShares,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblRentedFacilitiesPanel.text",
+                        "lblRentedFacilitiesPanel.summary",
+                        pnlRentedFacilities,
+                        getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .build();
 
         generalOptionsPageCreated = true;
         updateGeneralControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "FinancesGeneralTab");
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-            @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
+        return panel;
     }
 
     /**
@@ -509,14 +416,15 @@ public class FinancesTab {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralOptionsPanel",
                 FINANCES_LABEL_COLUMN_WIDTH,
                 FINANCES_CONTROL_COLUMN_WIDTH);
-        panel.addCheckBox(useLoanLimitsBox);
-        panel.addCheckBox(usePercentageMaintenanceBox);
-        panel.addCheckBox(useExtendedPartsModifierBox);
-        panel.addCheckBox(usePeacetimeCostBox);
-        panel.addCheckBox(showPeacetimeCostBox);
+        panel.addCheckBoxGrid(2,
+                useLoanLimitsBox,
+                usePercentageMaintenanceBox,
+                useExtendedPartsModifierBox,
+                usePeacetimeCostBox,
+                showPeacetimeCostBox,
+                newFinancialYearFinancesToCSVExportBox,
+                chkSimulateGrayMonday);
         panel.addRow(lblFinancialYearDuration, comboFinancialYearDuration);
-        panel.addCheckBox(newFinancialYearFinancesToCSVExportBox);
-        panel.addCheckBox(chkSimulateGrayMonday);
 
         return panel;
     }
@@ -690,19 +598,15 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and returns a JPanel representing the "Price Multipliers" tab in the
-     * user interface. The method includes
-     * a header section, general multipliers panel, used parts multipliers panel,
-     * and other multipliers panel. These
-     * components are arranged using a specific layout and added to a parent panel.
+     * Builds the Price Multipliers tab.
      *
-     * @return a JPanel representing the "Price Multipliers" tab with all its
-     *         components and layout configured
+     * @return a JPanel representing the Price Multipliers tab
      */
     public JPanel createPriceMultipliersTab() {
         // Header
+        String imageAddress = getImageDirectory() + "logo_clan_stone_lion.png";
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-                getImageDirectory() + "logo_clan_stone_lion.png",
+                imageAddress,
                 1);
 
         // Contents
@@ -710,72 +614,25 @@ public class FinancesTab {
         pnlUsedPartsMultipliers = createUsedPartsMultiplierPanel();
         pnlOtherMultipliers = createOtherMultipliersPanel();
 
-        MHQCollapsiblePanel generalMultipliersSection = createSection("lblGeneralMultipliersPanel.text",
-                "lblGeneralMultipliersPanel.summary",
-                pnlGeneralMultipliers);
-        MHQCollapsiblePanel usedPartsSection = createSection("lblUsedPartsMultiplierPanel.text",
-                "lblUsedPartsMultiplierPanel.summary",
-                pnlUsedPartsMultipliers);
-        MHQCollapsiblePanel otherMultipliersSection = createSection("lblOtherMultipliersPanel.text",
-                "lblOtherMultipliersPanel.summary",
-                pnlOtherMultipliers);
-        JPanel introPanel = createSectionIntro("PriceMultipliersTabBody",
-                "lblPriceMultipliersTabBody.text",
-                generalMultipliersSection,
-                usedPartsSection,
-                otherMultipliersSection);
-
-        JPanel sectionControls = createSectionControls(generalMultipliersSection,
-                usedPartsSection,
-                otherMultipliersSection);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(priceMultipliersHeader, layout);
-
-        layout.gridy++;
-        panel.add(introPanel, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        layout.gridy++;
-        panel.add(generalMultipliersSection, layout);
-
-        layout.gridy++;
-        panel.add(usedPartsSection, layout);
-
-        layout.gridy++;
-        panel.add(otherMultipliersSection, layout);
+        JPanel panel = CampaignOptionsPagePanel.builder("PriceMultipliersTab", "PriceMultipliersTab", imageAddress)
+                .header(priceMultipliersHeader)
+                .intro("lblPriceMultipliersTabBody.text")
+                .quote("priceMultipliersTab")
+                .section("lblGeneralMultipliersPanel.text",
+                        "lblGeneralMultipliersPanel.summary",
+                        pnlGeneralMultipliers)
+                .section("lblUsedPartsMultiplierPanel.text",
+                        "lblUsedPartsMultiplierPanel.summary",
+                        pnlUsedPartsMultipliers)
+                .section("lblOtherMultipliersPanel.text",
+                        "lblOtherMultipliersPanel.summary",
+                        pnlOtherMultipliers)
+                .build();
 
         priceMultipliersPageCreated = true;
         updatePriceMultiplierControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "PriceMultipliersTab");
-    }
-
-    private JPanel createSectionIntro(String name, String bodyTextKey, MHQCollapsiblePanel... sections) {
-        return new CampaignOptionsIntroPanel(name,
-                getTextAt(getCampaignOptionsResourceBundle(), bodyTextKey),
-                getPreferredSectionContentWidth(sections));
-    }
-
-    private int getPreferredSectionContentWidth(MHQCollapsiblePanel... sections) {
-        int preferredWidth = 0;
-        for (MHQCollapsiblePanel section : sections) {
-            preferredWidth = Math.max(preferredWidth, section.getContentPreferredWidth());
-        }
-
-        return preferredWidth;
+        return panel;
     }
 
     /**
