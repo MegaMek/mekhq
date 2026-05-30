@@ -54,6 +54,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
@@ -544,6 +545,7 @@ public class PrisonerEventManagerTest {
             when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
             when(mockCampaign.getTemporaryPrisonerCapacity()).thenReturn(temporaryCapacity);
             when(mockCampaign.getActiveContracts()).thenReturn(List.of());
+            when(mockCampaign.getAllFormations()).thenReturn(List.of());
             return mockCampaign;
         }
 
@@ -554,14 +556,87 @@ public class PrisonerEventManagerTest {
             return mockFormation;
         }
 
+        private Person healthySoldier() {
+            return mock(Person.class);
+        }
+
+        private Person injuredSoldier() {
+            Person p = mock(Person.class);
+            when(p.needsFixing()).thenReturn(true);
+            return p;
+        }
+
+        private Unit infantryUnit(Person... crew) {
+            Unit unit = mock(Unit.class);
+            when(unit.isAvailable()).thenReturn(true);
+            when(unit.isBattleArmor()).thenReturn(false);
+            when(unit.isConventionalInfantry()).thenReturn(true);
+            when(unit.getCrew()).thenReturn(List.of(crew));
+            return unit;
+        }
+
+        private Unit infantryUnit(int soldierCount) {
+            Person[] crew = new Person[soldierCount];
+            for (int i = 0; i < soldierCount; i++) {
+                crew[i] = healthySoldier();
+            }
+            return infantryUnit(crew);
+        }
+
+        private Unit battleArmorUnit(int operableSuits) {
+            Unit unit = mock(Unit.class);
+            when(unit.isAvailable()).thenReturn(true);
+            when(unit.isBattleArmor()).thenReturn(true);
+            List<Person> crew = new ArrayList<>();
+            for (int i = 0; i < operableSuits; i++) {
+                crew.add(mock(Person.class));
+                when(unit.isBattleArmorSuitOperable(i)).thenReturn(true);
+            }
+            when(unit.getCrew()).thenReturn(crew);
+            return unit;
+        }
+
+        private Unit otherUnit(boolean damaged) {
+            Unit unit = mock(Unit.class);
+            when(unit.isAvailable()).thenReturn(true);
+            when(unit.isBattleArmor()).thenReturn(false);
+            when(unit.isConventionalInfantry()).thenReturn(false);
+            when(unit.isDamaged()).thenReturn(damaged);
+            return unit;
+        }
+
+        private Campaign campaignWithUnits(PrisonerCaptureStyle style, int tempCapacity, Unit... units) {
+            Vector<UUID> unitIds = new Vector<>();
+            Campaign mockCampaign = buildCampaign(style, tempCapacity);
+            for (Unit unit : units) {
+                UUID id = UUID.randomUUID();
+                unitIds.add(id);
+                when(mockCampaign.getUnit(id)).thenReturn(unit);
+            }
+            Formation formation = securityFormation(unitIds);
+            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
+            return mockCampaign;
+        }
+
+        private Campaign campaignWithUnits(Unit... units) {
+            return campaignWithUnits(PrisonerCaptureStyle.MEKHQ, 100, units);
+        }
+
+        private Campaign campaignWithUnit(Unit unit, PrisonerCaptureStyle style, int tempCapacity) {
+            return campaignWithUnits(style, tempCapacity, unit);
+        }
+
+        private Campaign campaignWithUnit(Unit unit) {
+            return campaignWithUnits(unit);
+        }
+
         @Test
         void noFormations_returnsZero() {
             // Arrange
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of());
+            Campaign campaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(0, result);
@@ -570,13 +645,12 @@ public class PrisonerEventManagerTest {
         @Test
         void nonSecurityFormation_returnsZero() {
             // Arrange
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation mockFormation = mock(Formation.class);
             // isFormationType returns false by default — formation is not SECURITY
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(mockFormation));
+            Campaign campaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
+            when(campaign.getAllFormations()).thenReturn(List.of(mock(Formation.class)));
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(0, result);
@@ -585,19 +659,12 @@ public class PrisonerEventManagerTest {
         @Test
         void unavailableUnit_returnsZero() {
             // Arrange
-            UUID unitId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
             Unit mockUnit = mock(Unit.class);
             when(mockUnit.isAvailable()).thenReturn(false);
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+            Campaign campaign = campaignWithUnit(mockUnit);
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(0, result);
@@ -606,23 +673,10 @@ public class PrisonerEventManagerTest {
         @Test
         void battleArmor_mekHQStyle_countsOperableSuits() {
             // Arrange
-            UUID unitId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-            Unit mockUnit = mock(Unit.class);
-            when(mockUnit.isAvailable()).thenReturn(true);
-            when(mockUnit.isBattleArmor()).thenReturn(true);
-            when(mockUnit.getCrew()).thenReturn(List.of(mock(Person.class), mock(Person.class)));
-            when(mockUnit.isBattleArmorSuitOperable(0)).thenReturn(true);
-            when(mockUnit.isBattleArmorSuitOperable(1)).thenReturn(true);
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+            Campaign campaign = campaignWithUnit(battleArmorUnit(2));
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(2 * PRISONER_CAPACITY_BATTLE_ARMOR, result);
@@ -631,23 +685,10 @@ public class PrisonerEventManagerTest {
         @Test
         void battleArmor_camOpsStyle_appliesCapacityMultiplier() {
             // Arrange
-            UUID unitId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-            Unit mockUnit = mock(Unit.class);
-            when(mockUnit.isAvailable()).thenReturn(true);
-            when(mockUnit.isBattleArmor()).thenReturn(true);
-            when(mockUnit.getCrew()).thenReturn(List.of(mock(Person.class), mock(Person.class)));
-            when(mockUnit.isBattleArmorSuitOperable(0)).thenReturn(true);
-            when(mockUnit.isBattleArmorSuitOperable(1)).thenReturn(true);
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.CAMPAIGN_OPERATIONS, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+            Campaign campaign = campaignWithUnit(battleArmorUnit(2), PrisonerCaptureStyle.CAMPAIGN_OPERATIONS, 100);
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(2 * PRISONER_CAPACITY_BATTLE_ARMOR * PRISONER_CAPACITY_CAM_OPS_MULTIPLIER, result);
@@ -656,27 +697,10 @@ public class PrisonerEventManagerTest {
         @Test
         void conventionalInfantry_mekHQStyle_countsHealthySoldiers() {
             // Arrange
-            UUID unitId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-            Person s1 = mock(Person.class);
-            Person s2 = mock(Person.class);
-            Person s3 = mock(Person.class);
-            // needsFixing returns false by default
-
-            Unit mockUnit = mock(Unit.class);
-            when(mockUnit.isAvailable()).thenReturn(true);
-            when(mockUnit.isBattleArmor()).thenReturn(false);
-            when(mockUnit.isConventionalInfantry()).thenReturn(true);
-            when(mockUnit.getCrew()).thenReturn(List.of(s1, s2, s3));
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+            Campaign campaign = campaignWithUnit(infantryUnit(3));
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(3 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY, result);
@@ -685,27 +709,10 @@ public class PrisonerEventManagerTest {
         @Test
         void conventionalInfantry_injuredSoldierSkipped_returnsReducedCapacity() {
             // Arrange
-            UUID unitId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-            Person healthy1 = mock(Person.class);
-            Person healthy2 = mock(Person.class);
-            Person injured = mock(Person.class);
-            when(injured.needsFixing()).thenReturn(true);
-
-            Unit mockUnit = mock(Unit.class);
-            when(mockUnit.isAvailable()).thenReturn(true);
-            when(mockUnit.isBattleArmor()).thenReturn(false);
-            when(mockUnit.isConventionalInfantry()).thenReturn(true);
-            when(mockUnit.getCrew()).thenReturn(List.of(healthy1, healthy2, injured));
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+            Campaign campaign = campaignWithUnit(infantryUnit(healthySoldier(), healthySoldier(), injuredSoldier()));
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(2 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY, result);
@@ -713,39 +720,13 @@ public class PrisonerEventManagerTest {
 
         @Test
         void otherUnit_undamaged_mekHQStyle_boostsCapacityMultiplier() {
-            // Arrange — infantry unit provides base capacity; other unit raises the multiplier
-            UUID infantryId = UUID.randomUUID();
-            UUID otherId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(infantryId, otherId));
-
-            Person s1 = mock(Person.class);
-            Person s2 = mock(Person.class);
-            Person s3 = mock(Person.class);
-            Person s4 = mock(Person.class);
-
-            Unit infantryUnit = mock(Unit.class);
-            when(infantryUnit.isAvailable()).thenReturn(true);
-            when(infantryUnit.isBattleArmor()).thenReturn(false);
-            when(infantryUnit.isConventionalInfantry()).thenReturn(true);
-            when(infantryUnit.getCrew()).thenReturn(List.of(s1, s2, s3, s4));
-
-            Unit otherUnit = mock(Unit.class);
-            when(otherUnit.isAvailable()).thenReturn(true);
-            when(otherUnit.isBattleArmor()).thenReturn(false);
-            when(otherUnit.isConventionalInfantry()).thenReturn(false);
-            when(otherUnit.isDamaged()).thenReturn(false);
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(infantryId)).thenReturn(infantryUnit);
-            when(mockCampaign.getUnit(otherId)).thenReturn(otherUnit);
-
-            int baseCapacity = 4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
-            int expected = (int) round(baseCapacity * (1.0 + PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER));
+            // Arrange — infantry provides base capacity; other unit raises the multiplier
+            Campaign campaign = campaignWithUnits(infantryUnit(4), otherUnit(false));
+            int expected = (int) round(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                             (1.0 + PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER));
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(expected, result);
@@ -754,35 +735,10 @@ public class PrisonerEventManagerTest {
         @Test
         void otherUnit_damaged_mekHQStyle_doesNotBoostMultiplier() {
             // Arrange — damaged other unit leaves the multiplier at its 1.0 baseline
-            UUID infantryId = UUID.randomUUID();
-            UUID otherId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(infantryId, otherId));
-
-            Person s1 = mock(Person.class);
-            Person s2 = mock(Person.class);
-            Person s3 = mock(Person.class);
-            Person s4 = mock(Person.class);
-
-            Unit infantryUnit = mock(Unit.class);
-            when(infantryUnit.isAvailable()).thenReturn(true);
-            when(infantryUnit.isBattleArmor()).thenReturn(false);
-            when(infantryUnit.isConventionalInfantry()).thenReturn(true);
-            when(infantryUnit.getCrew()).thenReturn(List.of(s1, s2, s3, s4));
-
-            Unit otherUnit = mock(Unit.class);
-            when(otherUnit.isAvailable()).thenReturn(true);
-            when(otherUnit.isBattleArmor()).thenReturn(false);
-            when(otherUnit.isConventionalInfantry()).thenReturn(false);
-            when(otherUnit.isDamaged()).thenReturn(true);
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(infantryId)).thenReturn(infantryUnit);
-            when(mockCampaign.getUnit(otherId)).thenReturn(otherUnit);
+            Campaign campaign = campaignWithUnits(infantryUnit(4), otherUnit(true));
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY, result);
@@ -791,42 +747,17 @@ public class PrisonerEventManagerTest {
         @Test
         void manyOtherUnits_multiplierCappedAtMaximum() {
             // Arrange — 6 undamaged other units would push multiplier to 1.30, but cap is 1.25
-            UUID infantryId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(infantryId));
-
-            Person s1 = mock(Person.class);
-            Person s2 = mock(Person.class);
-            Person s3 = mock(Person.class);
-            Person s4 = mock(Person.class);
-
-            Unit infantryUnit = mock(Unit.class);
-            when(infantryUnit.isAvailable()).thenReturn(true);
-            when(infantryUnit.isBattleArmor()).thenReturn(false);
-            when(infantryUnit.isConventionalInfantry()).thenReturn(true);
-            when(infantryUnit.getCrew()).thenReturn(List.of(s1, s2, s3, s4));
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-            when(mockCampaign.getUnit(infantryId)).thenReturn(infantryUnit);
-
-            for (int i = 0; i < 6; i++) {
-                UUID otherId = UUID.randomUUID();
-                unitIds.add(otherId);
-                Unit otherUnit = mock(Unit.class);
-                when(otherUnit.isAvailable()).thenReturn(true);
-                when(otherUnit.isBattleArmor()).thenReturn(false);
-                when(otherUnit.isConventionalInfantry()).thenReturn(false);
-                when(otherUnit.isDamaged()).thenReturn(false);
-                when(mockCampaign.getUnit(otherId)).thenReturn(otherUnit);
+            Unit[] units = new Unit[7];
+            units[0] = infantryUnit(4);
+            for (int i = 1; i < units.length; i++) {
+                units[i] = otherUnit(false);
             }
-
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-
-            int baseCapacity = 4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
-            int expected = (int) round(baseCapacity * PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER);
+            Campaign campaign = campaignWithUnits(units);
+            int expected = (int) round(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                             PRISONER_CAPACITY_OTHER_UNIT_MAX_MULTIPLIER);
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(expected, result);
@@ -835,29 +766,11 @@ public class PrisonerEventManagerTest {
         @Test
         void temporaryCapacityModifier_scalesResult() {
             // Arrange — halved temporary capacity halves the final result
-            UUID unitId = UUID.randomUUID();
-            Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-            Person s1 = mock(Person.class);
-            Person s2 = mock(Person.class);
-            Person s3 = mock(Person.class);
-            Person s4 = mock(Person.class);
-
-            Unit mockUnit = mock(Unit.class);
-            when(mockUnit.isAvailable()).thenReturn(true);
-            when(mockUnit.isBattleArmor()).thenReturn(false);
-            when(mockUnit.isConventionalInfantry()).thenReturn(true);
-            when(mockUnit.getCrew()).thenReturn(List.of(s1, s2, s3, s4));
-
-            Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 50);
-            Formation formation = securityFormation(unitIds);
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-            when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
-
-            int expected = (int) round(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY * 1.0 * 0.5);
+            Campaign campaign = campaignWithUnit(infantryUnit(4), PrisonerCaptureStyle.MEKHQ, 50);
+            int expected = (int) round(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY * 0.5);
 
             // Act
-            int result = calculatePrisonerCapacity(mockCampaign);
+            int result = calculatePrisonerCapacity(campaign);
 
             // Assert
             assertEquals(expected, result);
@@ -881,23 +794,12 @@ public class PrisonerEventManagerTest {
             void conventionalInfantry_partialBlobCrew_blobSoldiersCountedEquallyToRegular() {
                 // Arrange
                 int blobCount = 2;
-                UUID unitId = UUID.randomUUID();
-                Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-                Unit mockUnit = mock(Unit.class);
-                when(mockUnit.isAvailable()).thenReturn(true);
-                when(mockUnit.isBattleArmor()).thenReturn(false);
-                when(mockUnit.isConventionalInfantry()).thenReturn(true);
-                when(mockUnit.getCrew()).thenReturn(List.of(mock(Person.class)));
-                when(mockUnit.getTotalTempCrew()).thenReturn(blobCount);
-
-                Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-                Formation formation = securityFormation(unitIds);
-                when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-                when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+                Unit unit = infantryUnit(1);
+                when(unit.getTotalTempCrew()).thenReturn(blobCount);
+                Campaign campaign = campaignWithUnit(unit);
 
                 // Act
-                int result = calculatePrisonerCapacity(mockCampaign);
+                int result = calculatePrisonerCapacity(campaign);
 
                 // Assert
                 assertEquals((1 + blobCount) * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY, result);
@@ -907,23 +809,12 @@ public class PrisonerEventManagerTest {
             void conventionalInfantry_fullyCrewedWithBlobCrew_blobSoldiersCountedEquallyToRegular() {
                 // Arrange
                 int blobCount = 3;
-                UUID unitId = UUID.randomUUID();
-                Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-                Unit mockUnit = mock(Unit.class);
-                when(mockUnit.isAvailable()).thenReturn(true);
-                when(mockUnit.isBattleArmor()).thenReturn(false);
-                when(mockUnit.isConventionalInfantry()).thenReturn(true);
-                when(mockUnit.getCrew()).thenReturn(List.of(mock(Person.class)));
-                when(mockUnit.getTotalTempCrew()).thenReturn(blobCount);
-
-                Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-                Formation formation = securityFormation(unitIds);
-                when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-                when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+                Unit unit = infantryUnit(1);
+                when(unit.getTotalTempCrew()).thenReturn(blobCount);
+                Campaign campaign = campaignWithUnit(unit);
 
                 // Act
-                int result = calculatePrisonerCapacity(mockCampaign);
+                int result = calculatePrisonerCapacity(campaign);
 
                 // Assert
                 assertEquals((1 + blobCount) * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY, result);
@@ -933,23 +824,12 @@ public class PrisonerEventManagerTest {
             void battleArmor_partialBlobCrew_blobTroopersCountedEquallyToRegular() {
                 // Arrange
                 int blobCount = 2;
-                UUID unitId = UUID.randomUUID();
-                Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-                Unit mockUnit = mock(Unit.class);
-                when(mockUnit.isAvailable()).thenReturn(true);
-                when(mockUnit.isBattleArmor()).thenReturn(true);
-                when(mockUnit.getCrew()).thenReturn(List.of(mock(Person.class)));
-                when(mockUnit.isBattleArmorSuitOperable(0)).thenReturn(true);
-                when(mockUnit.getTotalTempCrew()).thenReturn(blobCount);
-
-                Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-                Formation formation = securityFormation(unitIds);
-                when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-                when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+                Unit unit = battleArmorUnit(1);
+                when(unit.getTotalTempCrew()).thenReturn(blobCount);
+                Campaign campaign = campaignWithUnit(unit);
 
                 // Act
-                int result = calculatePrisonerCapacity(mockCampaign);
+                int result = calculatePrisonerCapacity(campaign);
 
                 // Assert
                 assertEquals((1 + blobCount) * PRISONER_CAPACITY_BATTLE_ARMOR, result);
@@ -959,23 +839,12 @@ public class PrisonerEventManagerTest {
             void battleArmor_fullyCrewedWithBlobCrew_blobTroopersCountedEquallyToRegular() {
                 // Arrange
                 int blobCount = 3;
-                UUID unitId = UUID.randomUUID();
-                Vector<UUID> unitIds = new Vector<>(List.of(unitId));
-
-                Unit mockUnit = mock(Unit.class);
-                when(mockUnit.isAvailable()).thenReturn(true);
-                when(mockUnit.isBattleArmor()).thenReturn(true);
-                when(mockUnit.getCrew()).thenReturn(List.of(mock(Person.class)));
-                when(mockUnit.isBattleArmorSuitOperable(0)).thenReturn(true);
-                when(mockUnit.getTotalTempCrew()).thenReturn(blobCount);
-
-                Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-                Formation formation = securityFormation(unitIds);
-                when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-                when(mockCampaign.getUnit(unitId)).thenReturn(mockUnit);
+                Unit unit = battleArmorUnit(1);
+                when(unit.getTotalTempCrew()).thenReturn(blobCount);
+                Campaign campaign = campaignWithUnit(unit);
 
                 // Act
-                int result = calculatePrisonerCapacity(mockCampaign);
+                int result = calculatePrisonerCapacity(campaign);
 
                 // Assert
                 assertEquals((1 + blobCount) * PRISONER_CAPACITY_BATTLE_ARMOR, result);
@@ -984,37 +853,14 @@ public class PrisonerEventManagerTest {
             @Test
             void tank_partialBlobCrew_unitContributesToCapacity() {
                 // Arrange — infantry provides base capacity; blob-crewed tank still raises the multiplier
-                UUID infantryId = UUID.randomUUID();
-                UUID tankId = UUID.randomUUID();
-                Vector<UUID> unitIds = new Vector<>(List.of(infantryId, tankId));
-
-                Unit infantryUnit = mock(Unit.class);
-                when(infantryUnit.isAvailable()).thenReturn(true);
-                when(infantryUnit.isBattleArmor()).thenReturn(false);
-                when(infantryUnit.isConventionalInfantry()).thenReturn(true);
-                when(infantryUnit.getCrew()).thenReturn(
-                      List.of(mock(Person.class), mock(Person.class),
-                              mock(Person.class), mock(Person.class)));
-
-                Unit tankUnit = mock(Unit.class);
-                when(tankUnit.isAvailable()).thenReturn(true);
-                when(tankUnit.isBattleArmor()).thenReturn(false);
-                when(tankUnit.isConventionalInfantry()).thenReturn(false);
-                when(tankUnit.isDamaged()).thenReturn(false);
-                when(tankUnit.getCrew()).thenReturn(List.of(mock(Person.class)));
-                when(tankUnit.getTotalTempCrew()).thenReturn(2);
-
-                Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-                Formation formation = securityFormation(unitIds);
-                when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-                when(mockCampaign.getUnit(infantryId)).thenReturn(infantryUnit);
-                when(mockCampaign.getUnit(tankId)).thenReturn(tankUnit);
-
-                int baseCapacity = 4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
-                int expected = (int) round(baseCapacity * (1.0 + PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER));
+                Unit tank = otherUnit(false);
+                when(tank.getTotalTempCrew()).thenReturn(2);
+                Campaign campaign = campaignWithUnits(infantryUnit(4), tank);
+                int expected = (int) round(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                 (1.0 + PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER));
 
                 // Act
-                int result = calculatePrisonerCapacity(mockCampaign);
+                int result = calculatePrisonerCapacity(campaign);
 
                 // Assert
                 assertEquals(expected, result);
@@ -1023,37 +869,14 @@ public class PrisonerEventManagerTest {
             @Test
             void tank_fullyCrewedWithBlobCrew_unitContributesToCapacity() {
                 // Arrange — infantry provides base capacity; fully blob-crewed tank still raises the multiplier
-                UUID infantryId = UUID.randomUUID();
-                UUID tankId = UUID.randomUUID();
-                Vector<UUID> unitIds = new Vector<>(List.of(infantryId, tankId));
-
-                Unit infantryUnit = mock(Unit.class);
-                when(infantryUnit.isAvailable()).thenReturn(true);
-                when(infantryUnit.isBattleArmor()).thenReturn(false);
-                when(infantryUnit.isConventionalInfantry()).thenReturn(true);
-                when(infantryUnit.getCrew()).thenReturn(
-                      List.of(mock(Person.class), mock(Person.class),
-                              mock(Person.class), mock(Person.class)));
-
-                Unit tankUnit = mock(Unit.class);
-                when(tankUnit.isAvailable()).thenReturn(true);
-                when(tankUnit.isBattleArmor()).thenReturn(false);
-                when(tankUnit.isConventionalInfantry()).thenReturn(false);
-                when(tankUnit.isDamaged()).thenReturn(false);
-                when(tankUnit.getCrew()).thenReturn(List.of(mock(Person.class)));
-                when(tankUnit.getTotalTempCrew()).thenReturn(3);
-
-                Campaign mockCampaign = buildCampaign(PrisonerCaptureStyle.MEKHQ, 100);
-                Formation formation = securityFormation(unitIds);
-                when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
-                when(mockCampaign.getUnit(infantryId)).thenReturn(infantryUnit);
-                when(mockCampaign.getUnit(tankId)).thenReturn(tankUnit);
-
-                int baseCapacity = 4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
-                int expected = (int) round(baseCapacity * (1.0 + PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER));
+                Unit tank = otherUnit(false);
+                when(tank.getTotalTempCrew()).thenReturn(3);
+                Campaign campaign = campaignWithUnits(infantryUnit(4), tank);
+                int expected = (int) round(4 * PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                 (1.0 + PRISONER_CAPACITY_OTHER_UNIT_MULTIPLIER));
 
                 // Act
-                int result = calculatePrisonerCapacity(mockCampaign);
+                int result = calculatePrisonerCapacity(campaign);
 
                 // Assert
                 assertEquals(expected, result);
