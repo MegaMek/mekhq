@@ -90,13 +90,21 @@ public class TransportationRating {
         // ASF
         capacity = transportationCapacities.get("asfBays") + spareCapacity;
         requirements = transportationRequirements.get("asfCount");
+        spareCapacity = Math.max(0, capacity - requirements);
+
+        int lamCount = transportationRequirements.getOrDefault("lamCount", 0);
+        if (spareCapacity > 0) {
+            int deduction = Math.min(spareCapacity, lamCount);
+            requirements += deduction;
+            lamCount -= deduction;
+        }
 
         rating = calculateRating(capacity, requirements);
         capacityRating = getCapacityRating(rating, capacityRating);
 
         // Meks
         capacity = transportationCapacities.get("mekBays");
-        requirements = transportationRequirements.get("mekCount");
+        requirements = transportationRequirements.get("mekCount") + lamCount;
 
         rating = calculateRating(capacity, requirements);
         capacityRating = getCapacityRating(rating, capacityRating);
