@@ -116,6 +116,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     // endregion Display
 
     // region Colours
+    private JTextArea txtDisclaimer;
     private ColourSelectorButton optionDeployedForeground;
     private ColourSelectorButton optionDeployedBackground;
     private ColourSelectorButton optionBelowContractMinimumForeground;
@@ -578,6 +579,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createColoursTab() {
+        txtDisclaimer = new JTextArea(getText("coloursTab.disclaimer"));
+
         // region Create Graphical Components
         optionDeployedForeground = new ColourSelectorButton(resources.getString("optionDeployedForeground.text"));
 
@@ -694,6 +697,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(layout.createSequentialGroup()
+                                      .addComponent(txtDisclaimer)
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(optionDeployedForeground)
                                                       .addComponent(optionDeployedBackground, Alignment.TRAILING))
@@ -769,6 +773,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .addComponent(optionFontColorSkillElite, Alignment.TRAILING)));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(txtDisclaimer)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(optionDeployedForeground)
                                                         .addComponent(optionDeployedBackground))
