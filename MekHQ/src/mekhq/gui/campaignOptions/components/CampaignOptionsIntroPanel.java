@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -44,8 +45,6 @@ import javax.swing.JPanel;
  * Optional explanatory text shown before a sectioned campaign-options page.
  */
 public class CampaignOptionsIntroPanel extends JPanel {
-    private static final int MAXIMUM_TEXT_WIDTH = 560;
-
     public CampaignOptionsIntroPanel(String name, String text, int textWidth) {
         setName("pnl" + name);
         setOpaque(false);
@@ -67,7 +66,7 @@ public class CampaignOptionsIntroPanel extends JPanel {
     }
 
     private static int getTextWidth(int textWidth) {
-        return Math.max(1, Math.min(textWidth, MAXIMUM_TEXT_WIDTH));
+        return Math.max(1, Math.min(textWidth, CAMPAIGN_OPTIONS_PANEL_WIDTH));
     }
 
     private static Dimension getWrappedTextSize(JEditorPane textPane, int textWidth) {

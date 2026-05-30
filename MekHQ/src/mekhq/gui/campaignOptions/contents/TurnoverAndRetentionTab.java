@@ -33,17 +33,11 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.JButton;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -56,15 +50,13 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code TurnoverAndRetentionTab} class represents a graphical user
@@ -289,9 +281,8 @@ public class TurnoverAndRetentionTab {
     public JPanel createFatigueTab() {
         // Header
         // start Fatigue Tab
-        CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab",
-                getImageDirectory() + "logo_clan_mongoose.png",
-                0);
+                String imageAddress = getImageDirectory() + "logo_clan_mongoose.png";
+                CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab", imageAddress, 0);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
@@ -336,86 +327,21 @@ public class TurnoverAndRetentionTab {
                 13, 0, 17, 1);
         spnFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater(fatigueHeader, "FatigueLeaveThreshold"));
 
-        MHQCollapsiblePanel fatigueRulesSection = createSection("lblFatigueRulesPanel.text",
-                "lblFatigueRulesPanel.summary",
-                createFatigueRulesPanel());
-        MHQCollapsiblePanel fieldKitchenSection = createSection("lblFatigueFieldKitchenPanel.text",
-                "lblFatigueFieldKitchenPanel.summary",
-                createFatigueFieldKitchenPanel());
-        MHQCollapsiblePanel automationSection = createSection("lblFatigueAutomationPanel.text",
-                "lblFatigueAutomationPanel.summary",
-                createFatigueAutomationPanel());
-
-        final JPanel panelParent = createSectionedPanel("FatigueTab",
-                fatigueHeader,
-                fatigueRulesSection,
-                fieldKitchenSection,
-                automationSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("FatigueTab", "FatigueTab", imageAddress)
+                .header(fatigueHeader)
+                .quote("fatigueTab")
+                .section("lblFatigueRulesPanel.text", "lblFatigueRulesPanel.summary", createFatigueRulesPanel())
+                .section("lblFatigueFieldKitchenPanel.text",
+                        "lblFatigueFieldKitchenPanel.summary",
+                        createFatigueFieldKitchenPanel())
+                .section("lblFatigueAutomationPanel.text",
+                        "lblFatigueAutomationPanel.summary",
+                        createFatigueAutomationPanel())
+                .build();
         fatiguePageCreated = true;
         updateFatigueControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "FatigueTab");
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-            MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
         return panel;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(
-                getTextAt(getCampaignOptionsResourceBundle(), titleKey),
-                content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
     }
 
     private JPanel createFatigueRulesPanel() {
@@ -459,43 +385,32 @@ public class TurnoverAndRetentionTab {
      */
     public JPanel createTurnoverTab() {
         // Header
-        turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab",
-                getImageDirectory() + "logo_duchy_of_andurien.png",
-                0);
+        String imageAddress = getImageDirectory() + "logo_duchy_of_andurien.png";
+        turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab", imageAddress, 0);
 
         // Contents
-        MHQCollapsiblePanel generalSection = createSection("lblTurnoverGeneralPanel.text",
-                "lblTurnoverGeneralPanel.summary",
-                createTurnoverGeneralPanel());
-        MHQCollapsiblePanel contractSection = createSection("lblTurnoverContractRulesPanel.text",
-                "lblTurnoverContractRulesPanel.summary",
-                createContractRulesPanel());
-        MHQCollapsiblePanel retentionBonusSection = createSection("lblTurnoverRetentionBonusPanel.text",
-                "lblTurnoverRetentionBonusPanel.summary",
-                createRetentionBonusPanel());
-        MHQCollapsiblePanel modifiersSection = createSection("lblTurnoverModifiersPanel.text",
-                "lblTurnoverModifiersPanel.summary",
-                createModifiersPanel());
-        MHQCollapsiblePanel payoutsSection = createSection("lblPayoutsPanel.text",
-                "lblPayoutsPanel.summary",
-                createPayoutsPanel());
-        MHQCollapsiblePanel unitCohesionSection = createSection("lblUnitCohesionPanel.text",
-                "lblUnitCohesionPanel.summary",
-                createUnitCohesionPanel());
-
-        final JPanel panel = createSectionedPanel("TurnoverTab",
-                turnoverHeader,
-                generalSection,
-                contractSection,
-                retentionBonusSection,
-                modifiersSection,
-                payoutsSection,
-                unitCohesionSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("TurnoverTab", "TurnoverTab", imageAddress)
+                .header(turnoverHeader)
+                .quote("turnoverTab")
+                .section("lblTurnoverGeneralPanel.text",
+                        "lblTurnoverGeneralPanel.summary",
+                        createTurnoverGeneralPanel())
+                .section("lblTurnoverContractRulesPanel.text",
+                        "lblTurnoverContractRulesPanel.summary",
+                        createContractRulesPanel())
+                .section("lblTurnoverRetentionBonusPanel.text",
+                        "lblTurnoverRetentionBonusPanel.summary",
+                        createRetentionBonusPanel())
+                .section("lblTurnoverModifiersPanel.text",
+                        "lblTurnoverModifiersPanel.summary",
+                        createModifiersPanel())
+                .section("lblPayoutsPanel.text", "lblPayoutsPanel.summary", createPayoutsPanel())
+                .section("lblUnitCohesionPanel.text", "lblUnitCohesionPanel.summary", createUnitCohesionPanel())
+                .build();
         turnoverPageCreated = true;
         updateTurnoverControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "TurnoverTab");
+        return panel;
     }
 
     private JPanel createTurnoverGeneralPanel() {
@@ -585,11 +500,12 @@ public class TurnoverAndRetentionTab {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TurnoverContractRulesPanel",
                 TURNOVER_LABEL_COLUMN_WIDTH,
                 TURNOVER_CONTROL_COLUMN_WIDTH);
-        panel.addCheckBox(chkUseContractCompletionRandomRetirement);
-        panel.addCheckBox(chkUseRandomFounderTurnover);
-        panel.addCheckBox(chkTrackOriginalUnit);
-        panel.addCheckBox(chkAeroRecruitsHaveUnits);
-        panel.addCheckBox(chkUseSubContractSoldiers);
+        panel.addCheckBoxGrid(2,
+                chkUseContractCompletionRandomRetirement,
+                chkUseRandomFounderTurnover,
+                chkTrackOriginalUnit,
+                chkAeroRecruitsHaveUnits,
+                chkUseSubContractSoldiers);
         panel.addRow(lblServiceContractDuration, spnServiceContractDuration);
         panel.addRow(lblServiceContractModifier, spnServiceContractModifier);
 
@@ -762,8 +678,7 @@ public class TurnoverAndRetentionTab {
                 TURNOVER_CONTROL_COLUMN_WIDTH);
         panel.addCheckBox(chkUseHRStrain);
         panel.addRow(lblHRCapacity, spnHRCapacity);
-        panel.addCheckBox(chkUseManagementSkill);
-        panel.addCheckBox(chkUseCommanderLeadershipOnly);
+        panel.addCheckBoxGrid(2, chkUseManagementSkill, chkUseCommanderLeadershipOnly);
         panel.addRow(lblManagementSkillPenalty, spnManagementSkillPenalty);
 
         return panel;

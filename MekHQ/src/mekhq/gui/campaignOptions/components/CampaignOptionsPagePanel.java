@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.components;
 
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -48,7 +49,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
 import megamek.client.ui.util.UIUtil;
@@ -74,9 +75,14 @@ public class CampaignOptionsPagePanel extends JPanel {
         pageBody.setName("pnl" + builder.name + "PageBody");
         pageBody.setOpaque(false);
 
-        JPanel contentPanel = createContentPanel(builder);
+        List<MHQCollapsiblePanel> sections = createSections(builder.sections, builder.sectionsExpandedByDefault);
+        JPanel sectionControls = createSectionControls(sections);
+        int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
+
+        JPanel contentPanel = createContentPanel(builder, sections, sectionControls, sectionStackWidth);
         pageBody.add(contentPanel, BorderLayout.CENTER);
-        JComponent quotePanel = createQuotePanel(builder.quoteResourceName, contentPanel.getPreferredSize().width);
+        int quoteWidth = sectionStackWidth > 0 ? sectionStackWidth : contentPanel.getPreferredSize().width;
+        JComponent quotePanel = createQuotePanel(builder.quoteResourceName, quoteWidth);
         if (quotePanel != null) {
             pageBody.add(quotePanel, BorderLayout.SOUTH);
         }
@@ -112,14 +118,14 @@ public class CampaignOptionsPagePanel extends JPanel {
         pageBody.setBounds(x, 0, contentWidth, preferredSize.height);
     }
 
-    private JPanel createContentPanel(Builder builder) {
+    private JPanel createContentPanel(Builder builder, List<MHQCollapsiblePanel> sections,
+          JPanel sectionControls, int sectionStackWidth) {
         CampaignOptionsHeaderPanel header = builder.headerPanel != null ? builder.headerPanel
               : new CampaignOptionsHeaderPanel(builder.headerResourceName,
                     builder.imageAddress,
                     builder.includeHeaderBodyText,
                     false,
                     0);
-        List<MHQCollapsiblePanel> sections = createSections(builder.sections, builder.sectionsExpandedByDefault);
 
         JPanel panel = new CampaignOptionsStandardPanel(builder.name);
         GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -134,21 +140,21 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         if (builder.introTextKey != null) {
             layout.gridy++;
-            panel.add(createIntroPanel(builder, sections), layout);
+            int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
+            panel.add(createIntroPanel(builder, introWidth), layout);
         }
 
         if (!sections.isEmpty()) {
             layout.gridy++;
             layout.anchor = GridBagConstraints.NORTHWEST;
-            panel.add(createSectionStackPanel(sections), layout);
+            panel.add(createSectionStackPanel(sections, sectionControls, sectionStackWidth), layout);
         }
 
         return panel;
     }
 
-    private JPanel createSectionStackPanel(List<MHQCollapsiblePanel> sections) {
-        JPanel sectionControls = createSectionControls(sections);
-        int stackWidth = Math.max(getPreferredSectionWidth(sections), sectionControls.getPreferredSize().width);
+    private JPanel createSectionStackPanel(List<MHQCollapsiblePanel> sections, JPanel sectionControls,
+          int stackWidth) {
         JPanel stackPanel = new JPanel(new GridBagLayout()) {
             @Override
             public Dimension getPreferredSize() {
@@ -180,10 +186,10 @@ public class CampaignOptionsPagePanel extends JPanel {
         return stackPanel;
     }
 
-    private JPanel createIntroPanel(Builder builder, List<MHQCollapsiblePanel> sections) {
+    private JPanel createIntroPanel(Builder builder, int textWidth) {
         return new CampaignOptionsIntroPanel(builder.name + "Intro",
               getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
-              getPreferredSectionContentWidth(sections));
+              textWidth);
     }
 
     private List<MHQCollapsiblePanel> createSections(List<Section> sectionDefinitions,
@@ -212,20 +218,20 @@ public class CampaignOptionsPagePanel extends JPanel {
         return "<html>" + title + badges + "</html>";
     }
 
-    private int getPreferredSectionContentWidth(List<MHQCollapsiblePanel> sections) {
-        int preferredWidth = 0;
-        for (MHQCollapsiblePanel section : sections) {
-            preferredWidth = Math.max(preferredWidth, section.getContentPreferredWidth());
-        }
-        return preferredWidth;
-    }
-
     private int getPreferredSectionWidth(List<MHQCollapsiblePanel> sections) {
         int preferredWidth = 0;
         for (MHQCollapsiblePanel section : sections) {
             preferredWidth = Math.max(preferredWidth, section.getPreferredSize().width);
         }
         return preferredWidth;
+    }
+
+    private int getPreferredSectionStackWidth(List<MHQCollapsiblePanel> sections, JPanel sectionControls) {
+        if (sections.isEmpty()) {
+            return 0;
+        }
+
+        return Math.max(getPreferredSectionWidth(sections), sectionControls.getPreferredSize().width);
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
@@ -266,10 +272,19 @@ public class CampaignOptionsPagePanel extends JPanel {
         quotePanel.setOpaque(false);
         quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, 0, 0));
 
-        JLabel quote = new JLabel(String.format("<html><div style='width: %spx; text-align:center;'>%s</div></html>",
-              quoteWidth,
-              getTextAt(getCampaignOptionsResourceBundle(), quoteResourceName + ".border")));
-        quote.setName("lbl" + quoteResourceName + "Quote");
+                JEditorPane quote = new JEditorPane("text/html",
+                            formatQuoteText(getTextAt(getCampaignOptionsResourceBundle(), quoteResourceName + ".border")));
+                quote.setName("txt" + quoteResourceName + "Quote");
+                quote.setEditable(false);
+                quote.setFocusable(false);
+                quote.setOpaque(false);
+                quote.setBorder(BorderFactory.createEmptyBorder());
+                quote.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
+                setFontScaling(quote, false, 1);
+
+                Dimension quoteSize = getWrappedQuoteSize(quote, quoteWidth);
+                quote.setPreferredSize(quoteSize);
+                quote.setMinimumSize(quoteSize);
 
         GridBagConstraints quoteConstraints = new GridBagConstraints();
         quoteConstraints.gridx = GridBagConstraints.RELATIVE;
@@ -277,6 +292,16 @@ public class CampaignOptionsPagePanel extends JPanel {
         quotePanel.add(quote, quoteConstraints);
 
         return quotePanel;
+    }
+
+    private Dimension getWrappedQuoteSize(JEditorPane quote, int quoteWidth) {
+        quote.setSize(quoteWidth, Short.MAX_VALUE);
+        Dimension preferredSize = quote.getPreferredSize();
+        return new Dimension(quoteWidth, preferredSize.height);
+    }
+
+    private String formatQuoteText(String text) {
+        return "<html><body style='margin: 0; padding: 0; text-align: center;'>" + text + "</body></html>";
     }
 
     public static class Builder {

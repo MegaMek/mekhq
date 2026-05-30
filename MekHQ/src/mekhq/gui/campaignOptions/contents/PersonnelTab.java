@@ -35,9 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -45,8 +43,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import javax.swing.*;
 
 import megamek.Version;
@@ -57,16 +53,13 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code PersonnelTab} class represents the user interface components for
@@ -459,117 +452,39 @@ public class PersonnelTab {
      */
     public JPanel createGeneralTab() {
         // Header
-        generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
-                getImageDirectory() + "logo_clan_wolverine.png",
-                5);
+        String imageAddress = getImageDirectory() + "logo_clan_wolverine.png";
+        generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab", imageAddress, 5);
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
         pnlPersonnelCleanup = createPersonnelCleanUpPanel();
         pnlAdministrators = createAdministratorsPanel();
         pnlBlobCrew = createBlobCrewPanel();
-
-        MHQCollapsiblePanel generalSection = createSection("lblPersonnelGeneralTab.text",
-                "lblPersonnelGeneralTab.summary",
-                pnlPersonnelGeneralOptions);
-        MHQCollapsiblePanel cleanupSection = createSection("lblPersonnelCleanUpPanel.text",
-                "lblPersonnelCleanUpPanel.summary",
-                pnlPersonnelCleanup,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel administratorsSection = createSection("lblAdministratorsPanel.text",
-                "lblAdministratorsPanel.summary",
-                pnlAdministrators,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel temporaryCrewSection = createSection("lblBlobCrewPanel.text",
-                "lblBlobCrewPanel.summary",
-                pnlBlobCrew,
-                getMetadata(new Version(0, 50, 12)));
-
-        JPanel panelParent = createSectionedPanel("PersonnelGeneralTab",
-                generalHeader,
-                generalSection,
-                cleanupSection,
-                administratorsSection,
-                temporaryCrewSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralTab", "PersonnelGeneralTab", imageAddress)
+                .header(generalHeader)
+                .quote("personnelGeneralTab")
+                .section("lblPersonnelGeneralTab.text",
+                        "lblPersonnelGeneralTab.summary",
+                        pnlPersonnelGeneralOptions)
+                .section("lblPersonnelCleanUpPanel.text",
+                        "lblPersonnelCleanUpPanel.summary",
+                        pnlPersonnelCleanup,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblAdministratorsPanel.text",
+                        "lblAdministratorsPanel.summary",
+                        pnlAdministrators,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblBlobCrewPanel.text",
+                        "lblBlobCrewPanel.summary",
+                        pnlBlobCrew,
+                        getMetadata(new Version(0, 50, 12)))
+                .build();
 
         generalPageCreated = true;
         updateGeneralControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "PersonnelGeneralTab");
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-            MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
         return panel;
     }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-            @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
-        }
 
     /**
      * Creates the panel for general personnel options in the General Tab.
@@ -754,9 +669,8 @@ public class PersonnelTab {
      */
     public JPanel createAwardsTab() {
         // Header
-        awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab",
-                getImageDirectory() + "logo_outworld_alliance.png",
-                4);
+                String imageAddress = getImageDirectory() + "logo_outworld_alliance.png";
+                awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab", imageAddress, 4);
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -774,29 +688,23 @@ public class PersonnelTab {
         scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         JPanel pnlAwardSetFilter = createAwardSetFilterPanel(scrollAwardSetFilterList);
-
-        MHQCollapsiblePanel awardRulesSection = createSection("lblAwardsTab.text",
-                "lblAwardsTab.summary",
-                pnlAwardsGeneralOptions);
-        MHQCollapsiblePanel awardTrackingSection = createSection("lblAutoAwardsFilterPanel.text",
-                "lblAutoAwardsFilterPanel.summary",
-                pnlAutoAwardsFilter);
-        MHQCollapsiblePanel awardFilterSection = createSection("lblAwardsTabBottom.text",
-                "lblAwardsTabBottom.summary",
-                pnlAwardSetFilter,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-
-        JPanel panelParent = createSectionedPanel("AwardsTab",
-                awardsHeader,
-                awardRulesSection,
-                awardTrackingSection,
-                awardFilterSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("AwardsTab", "AwardsTab", imageAddress)
+                .header(awardsHeader)
+                .quote("awardsTab")
+                .section("lblAwardsTab.text", "lblAwardsTab.summary", pnlAwardsGeneralOptions)
+                .section("lblAutoAwardsFilterPanel.text",
+                        "lblAutoAwardsFilterPanel.summary",
+                        pnlAutoAwardsFilter)
+                .section("lblAwardsTabBottom.text",
+                        "lblAwardsTabBottom.summary",
+                        pnlAwardSetFilter,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT))
+                .build();
 
         awardsPageCreated = true;
         updateAwardsControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "AwardsTab");
+        return panel;
     }
 
     /**
@@ -932,9 +840,8 @@ public class PersonnelTab {
     public JPanel createMedicalTab() {
         // Header
         // start Medical Tab
-        medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
-                getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-                3);
+                String imageAddress = getImageDirectory() + "logo_duchy_of_tamarind_abbey.png";
+                medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab", imageAddress, 3);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical",
@@ -1037,28 +944,20 @@ public class PersonnelTab {
                 chkUseAlternativeAdvancedMedical,
                 chkUseKinderAlternativeAdvancedMedical,
                 chkUseRandomDiseases);
-
-        MHQCollapsiblePanel medicalCapacitySection = createSection("lblMedicalCapacityPanel.text",
-                "lblMedicalCapacityPanel.summary",
-                medicalCapacityPanel);
-        MHQCollapsiblePanel healingChecksSection = createSection("lblHealingChecksPanel.text",
-                "lblHealingChecksPanel.summary",
-                healingChecksPanel);
-        MHQCollapsiblePanel advancedMedicalSection = createSection("lblAdvancedMedicalRulesPanel.text",
-                "lblAdvancedMedicalRulesPanel.summary",
-                advancedMedicalRulesPanel);
-
-        JPanel panelParent = createSectionedPanel("MedicalTab",
-                medicalHeader,
-                medicalCapacitySection,
-                healingChecksSection,
-                advancedMedicalSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("MedicalTab", "MedicalTab", imageAddress)
+                .header(medicalHeader)
+                .quote("medicalTab")
+                .section("lblMedicalCapacityPanel.text", "lblMedicalCapacityPanel.summary", medicalCapacityPanel)
+                .section("lblHealingChecksPanel.text", "lblHealingChecksPanel.summary", healingChecksPanel)
+                .section("lblAdvancedMedicalRulesPanel.text",
+                        "lblAdvancedMedicalRulesPanel.summary",
+                        advancedMedicalRulesPanel)
+                .build();
 
         medicalPageCreated = true;
         updateMedicalControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "MedicalTab");
+        return panel;
     }
 
     /**
@@ -1070,9 +969,8 @@ public class PersonnelTab {
      */
     public JPanel createPersonnelInformationTab() {
         // Header
-        personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation",
-                getImageDirectory() + "logo_rasalhague_dominion.png",
-                3);
+                String imageAddress = getImageDirectory() + "logo_rasalhague_dominion.png";
+                personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation", imageAddress, 3);
 
         // Contents
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
@@ -1109,25 +1007,20 @@ public class PersonnelTab {
         personnelInformationPanel.addCheckBox(chkTrackTotalEarnings);
         personnelInformationPanel.addCheckBox(chkTrackTotalXPEarnings);
         personnelInformationPanel.addCheckBox(chkShowOriginFaction);
-
-        MHQCollapsiblePanel personnelInformationSection = createSection("lblPersonnelInformation.text",
-                "lblPersonnelInformation.summary",
-                personnelInformationPanel,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel personnelLogsSection = createSection("lblPersonnelLogsPanel.text",
-                "lblPersonnelLogsPanel.summary",
-                pnlPersonnelLogs);
-
-        JPanel panelParent = createSectionedPanel("PersonnelInformation",
-                personnelInformationHeader,
-                personnelInformationSection,
-                personnelLogsSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("PersonnelInformation", "PersonnelInformation", imageAddress)
+                .header(personnelInformationHeader)
+                .quote("personnelInformationTab")
+                .section("lblPersonnelInformation.text",
+                        "lblPersonnelInformation.summary",
+                        personnelInformationPanel,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblPersonnelLogsPanel.text", "lblPersonnelLogsPanel.summary", pnlPersonnelLogs)
+                .build();
 
         informationPageCreated = true;
         updateInformationControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "PersonnelInformation");
+        return panel;
     }
 
     /**
@@ -1207,33 +1100,31 @@ public class PersonnelTab {
      */
     public JPanel createPrisonersAndDependentsTab() {
         // Header
-        prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
-                getImageDirectory() + "logo_illyrian_palatinate.png",
-                6);
+        String imageAddress = getImageDirectory() + "logo_illyrian_palatinate.png";
+        prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab", imageAddress, 6);
 
         // Contents
         prisonerPanel = createPrisonersPanel();
         dependentsPanel = createDependentsPanel();
-
-        MHQCollapsiblePanel prisonersSection = createSection("lblPrisonersPanel.text",
-                "lblPrisonersPanel.summary",
-                prisonerPanel,
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
-        MHQCollapsiblePanel civiliansSection = createSection("lblDependentsPanel.text",
-                "lblDependentsPanel.summary",
-                dependentsPanel,
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
-
-        JPanel panel = createSectionedPanel("PrisonersAndDependentsTab",
-                prisonersAndDependentsHeader,
-                prisonersSection,
-                civiliansSection);
+        JPanel panel = CampaignOptionsPagePanel.builder("PrisonersAndDependentsTab",
+                        "PrisonersAndDependentsTab",
+                        imageAddress)
+                .header(prisonersAndDependentsHeader)
+                .quote("prisonersAndDependentsTab")
+                .section("lblPrisonersPanel.text",
+                        "lblPrisonersPanel.summary",
+                        prisonerPanel,
+                        getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED))
+                .section("lblDependentsPanel.text",
+                        "lblDependentsPanel.summary",
+                        dependentsPanel,
+                        getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED))
+                .build();
 
         prisonersAndDependentsPageCreated = true;
         updatePrisonersAndDependentsControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "PrisonersAndDependentsTab");
+        return panel;
     }
 
     /**
