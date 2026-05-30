@@ -124,6 +124,7 @@ public class RulesetsTab {
     private JCheckBox chkAutoConfigMunitions;
 
     private JPanel pnlScenarioModifiers;
+    private JCheckBox chkClansObeyBiddingRules;
     private JLabel lblEnemyFacilityModifierDieSize;
     private JSpinner spnEnemyFacilityModifierDieSize;
     private JLabel lblAlliedFacilityModifierDieSize;
@@ -247,6 +248,7 @@ public class RulesetsTab {
         chkAutoConfigMunitions = new JCheckBox();
 
         pnlScenarioModifiers = new JPanel();
+        chkClansObeyBiddingRules = new JCheckBox();
         lblEnemyFacilityModifierDieSize = new JLabel();
         spnEnemyFacilityModifierDieSize = new JSpinner();
         lblAlliedFacilityModifierDieSize = new JLabel();
@@ -561,6 +563,7 @@ public class RulesetsTab {
      */
     private JPanel createUniversalModifiersPanel() {
         //Content
+        chkClansObeyBiddingRules = new CampaignOptionsCheckBox("ClansObeyBiddingRules");
         lblEnemyFacilityModifierDieSize = new CampaignOptionsLabel("EnemyFacilityModifierDieSize");
         spnEnemyFacilityModifierDieSize = new CampaignOptionsSpinner("EnemyFacilityModifierDieSize",
               2, 0, 10, 1);
@@ -585,6 +588,10 @@ public class RulesetsTab {
         layout.gridx = 0;
         layout.gridy = 0;
         layout.gridwidth = 1;
+        panel.add(chkClansObeyBiddingRules, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblEnemyFacilityModifierDieSize, layout);
         layout.gridx++;
         panel.add(spnEnemyFacilityModifierDieSize, layout);
@@ -857,6 +864,8 @@ public class RulesetsTab {
         chkUseNoTornadoes.addMouseListener(createTipPanelUpdater(stratConHeader, "UseNoTornadoes"));
         lblFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
         spnFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
+        chkClansObeyBiddingRules.addMouseListener(createTipPanelUpdater(stratConHeader,
+              "EnemyFacilityModifierDieSize"));
         lblEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
               "EnemyFacilityModifierDieSize"));
         spnEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
@@ -1038,6 +1047,7 @@ public class RulesetsTab {
         options.setReinforcementBaseTargetNumber((int) spnReinforcementBaseTargetNumber.getValue());
         options.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
         options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
+        options.setClansObeyBiddingRules(chkClansObeyBiddingRules.isSelected());
         options.setEnemyFacilityModifierDieSize((int) spnEnemyFacilityModifierDieSize.getValue());
         options.setAlliedFacilityModifierDieSize((int) spnAlliedFacilityModifierDieSize.getValue());
         options.setScenarioModMax((int) spnScenarioModMax.getValue());
@@ -1106,6 +1116,7 @@ public class RulesetsTab {
         spnReinforcementBaseTargetNumber.setValue(options.getReinforcementBaseTargetNumber());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
         chkAutoConfigMunitions.setSelected(options.isAutoConfigMunitions());
+        chkClansObeyBiddingRules.setSelected(options.isClansObeyBiddingRules());
         spnEnemyFacilityModifierDieSize.setValue(options.getEnemyFacilityModifierDieSize());
         spnAlliedFacilityModifierDieSize.setValue(options.getAlliedFacilityModifierDieSize());
         spnScenarioModMax.setValue(options.getScenarioModMax());

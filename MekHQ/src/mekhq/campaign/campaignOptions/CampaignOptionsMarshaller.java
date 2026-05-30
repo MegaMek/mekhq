@@ -1170,6 +1170,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reinforcementBaseTargetNumber",
               campaignOptions.getReinforcementBaseTargetNumber());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clansObeyBiddingRules", campaignOptions.isClansObeyBiddingRules());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alliedFacilityModifierDieSize",
               campaignOptions.getAlliedFacilityModifierDieSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyFacilityModifierDieSize",
