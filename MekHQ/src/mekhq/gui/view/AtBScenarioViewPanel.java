@@ -184,7 +184,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         playerForceTree = new JTree() {
             @Override
             public Dimension getMinimumSize() {
-                return getPreferredSize();
+                return super.getPreferredSize();
             }
         };
 
@@ -484,7 +484,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             JTree tree = new JTree(top) {
                 @Override
                 public Dimension getMinimumSize() {
-                    return getPreferredSize();
+                    return super.getPreferredSize();
                 }
             };
             tree.collapsePath(new TreePath(top));
@@ -539,7 +539,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             JTree tree = new JTree(top) {
                 @Override
                 public Dimension getMinimumSize() {
-                    return getPreferredSize();
+                    return super.getPreferredSize();
                 }
             };
             tree.collapsePath(new TreePath(top));
