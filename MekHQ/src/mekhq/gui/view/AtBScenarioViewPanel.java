@@ -40,6 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -180,7 +181,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         JPanel statsSection = BriefingStyle.createSectionPanel(scenario.getName());
         panStats = new JPanel();
         txtDesc = new JTextArea();
-        playerForceTree = new JTree();
+        playerForceTree = new JTree() {
+            @Override
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+        };
 
         setLayout(new GridBagLayout());
 
@@ -196,6 +202,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -351,7 +358,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -419,7 +426,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -463,7 +470,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -474,14 +481,19 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             for (String entityName : attachedAllyStub) {
                 top.add(new DefaultMutableTreeNode(entityName));
             }
-            JTree tree = new JTree(top);
+            JTree tree = new JTree(top) {
+                @Override
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
             tree.collapsePath(new TreePath(top));
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = row++;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.weighty = 0.0;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -524,7 +536,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 }
             }
 
-            JTree tree = new JTree(top);
+            JTree tree = new JTree(top) {
+                @Override
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
             tree.collapsePath(new TreePath(top));
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             gridBagConstraints.gridx = 0;
@@ -532,7 +549,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.gridheight = 1;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.weighty = 0.0;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
