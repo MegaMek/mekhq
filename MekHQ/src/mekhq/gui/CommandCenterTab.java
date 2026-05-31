@@ -528,7 +528,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying the daily report log
      */
     private void initLogPanel() {
-        Dimension size = scaleForGUI(400, 100);
+        Dimension size = scaleForGUI(450, 100);
 
         pnlGeneralLog = new DailyReportLogPanel(getCampaignGui());
         pnlGeneralLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
