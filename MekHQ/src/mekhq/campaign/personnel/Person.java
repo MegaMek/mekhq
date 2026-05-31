@@ -5980,7 +5980,8 @@ public class Person {
             return true;
         }
 
-        return !isCombat() && campaignOptions.isUseSupportEdge();
+        boolean isSupport = !getPrimaryRole().isCombat() || !getSecondaryRole().isCombat();
+        return !isSupport && campaignOptions.isUseSupportEdge();
     }
 
     /**
