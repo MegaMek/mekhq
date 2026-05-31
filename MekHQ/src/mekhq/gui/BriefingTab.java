@@ -2531,6 +2531,7 @@ public final class BriefingTab extends CampaignGuiTab {
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
         refreshAssignmentsTabAvailability(getSelectedScenario());
+        updateMissionDeploymentCoverage();
     }
 
     private void updateMissionDeploymentCoverage() {
@@ -2759,7 +2760,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioDataScheduler.schedule();
         if (getCampaignOptions().isUseStratCon()) {
             lanceAssignmentScheduler.schedule();
-            updateMissionDeploymentCoverage();
         }
     }
 
@@ -2771,7 +2771,6 @@ public final class BriefingTab extends CampaignGuiTab {
         }
         if (getCampaignOptions().isUseStratCon()) {
             lanceAssignmentScheduler.schedule();
-            updateMissionDeploymentCoverage();
         }
     }
 
