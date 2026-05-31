@@ -34,17 +34,10 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,16 +45,13 @@ import javax.swing.JSpinner;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * Represents a tab in the campaign options UI used to configure settings
@@ -222,8 +212,8 @@ public class RepairAndMaintenanceTab {
     public JPanel createRepairTab() {
         // Header
         // start Repair Tab
-        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
-                getImageDirectory() + "logo_clan_burrock.png", 3);
+        String imageAddress = getImageDirectory() + "logo_clan_burrock.png";
+        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab", imageAddress);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
@@ -265,24 +255,20 @@ public class RepairAndMaintenanceTab {
         JPanel repairOptionsPanel = createRepairOptionsPanel();
         JPanel componentDamagePanel = createComponentDamagePanel();
 
-        MHQCollapsiblePanel repairOptionsSection = createSection("lblRepairTab.text",
-                "lblRepairTab.summary",
-                repairOptionsPanel);
-        MHQCollapsiblePanel componentDamageSection = createSection("lblRepairTabRight.text",
-                "lblRepairTabRight.summary",
-                componentDamagePanel,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-
-        final JPanel panelParent = createSectionedPanel("RepairTab",
-                repairHeader,
-                repairOptionsSection,
-                componentDamageSection);
-
         repairPageCreated = true;
         updateRepairControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "repairTab");
+        return CampaignOptionsPagePanel.builder("RepairTab", "RepairTab", imageAddress)
+                .header(repairHeader)
+                .quote("repairTab")
+                .section("lblRepairTab.text",
+                        "lblRepairTab.summary",
+                        repairOptionsPanel)
+                .section("lblRepairTabRight.text",
+                        "lblRepairTabRight.summary",
+                        componentDamagePanel,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .build();
     }
 
     private JPanel createRepairOptionsPanel() {
@@ -326,8 +312,8 @@ public class RepairAndMaintenanceTab {
     public JPanel createMaintenanceTab() {
         // Header
         // start Maintenance Tab
-        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
-                getImageDirectory() + "logo_magistracy_of_canopus.png", 6);
+        String imageAddress = getImageDirectory() + "logo_magistracy_of_canopus.png";
+        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab", imageAddress);
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
@@ -379,24 +365,20 @@ public class RepairAndMaintenanceTab {
         JPanel schedulePanel = createMaintenanceSchedulePanel();
         JPanel qualityPanel = createMaintenanceQualityPanel();
 
-        MHQCollapsiblePanel scheduleSection = createSection("lblMaintenanceTab.text",
-                "lblMaintenanceTab.summary",
-                schedulePanel);
-        MHQCollapsiblePanel qualitySection = createSection("lblMaintenanceQualityPanel.text",
-                "lblMaintenanceQualityPanel.summary",
-                qualityPanel,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-
-        final JPanel panelParent = createSectionedPanel("MaintenanceTab",
-                maintenanceHeader,
-                scheduleSection,
-                qualitySection);
-
         maintenancePageCreated = true;
         updateMaintenanceControlsFromModel();
 
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "maintenanceTab");
+        return CampaignOptionsPagePanel.builder("MaintenanceTab", "MaintenanceTab", imageAddress)
+                .header(maintenanceHeader)
+                .quote("maintenanceTab")
+                .section("lblMaintenanceTab.text",
+                        "lblMaintenanceTab.summary",
+                        schedulePanel)
+                .section("lblMaintenanceQualityPanel.text",
+                        "lblMaintenanceQualityPanel.summary",
+                        qualityPanel,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .build();
     }
 
     private JPanel createMaintenanceSchedulePanel() {
@@ -424,78 +406,6 @@ public class RepairAndMaintenanceTab {
         panel.addCheckBox(useUnofficialMaintenance);
 
         return panel;
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-            MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
-        return panel;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-            @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
     }
 
     /**

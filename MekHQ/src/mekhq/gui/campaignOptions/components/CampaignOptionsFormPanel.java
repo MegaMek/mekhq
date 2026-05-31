@@ -231,6 +231,68 @@ public class CampaignOptionsFormPanel extends JPanel {
         add(control, controlLayout);
     }
 
+    /**
+     * Adds a grid of label/control pairs, packing {@code pairsPerRow} pairs onto each row. Components are supplied as
+     * alternating {@code label, control, label, control, ...}. Every label column is sized to the form's label width
+     * and every control column to the control width, so all pairs line up regardless of individual label lengths. The
+     * control in the rightmost column stretches so its right edge aligns with the section's right edge (matching the
+     * single-control rows added via {@link #addRow}); the remaining columns keep their natural left-packed widths.
+     *
+     * @param pairsPerRow       the number of label/control pairs to place side by side on each row
+     * @param labelsAndControls alternating label and control components
+     */
+    public void addRowGrid(int pairsPerRow, JComponent... labelsAndControls) {
+        if (pairsPerRow <= 1) {
+            for (int index = 0; index + 1 < labelsAndControls.length; index += 2) {
+                addRow(labelsAndControls[index], labelsAndControls[index + 1]);
+            }
+            return;
+        }
+
+        int pairCount = labelsAndControls.length / 2;
+        int firstRow = row;
+        for (int pairIndex = 0; pairIndex < pairCount; pairIndex++) {
+            int columnPair = pairIndex % pairsPerRow;
+            int gridRow = firstRow + pairIndex / pairsPerRow;
+
+            JComponent label = labelsAndControls[pairIndex * 2];
+            JComponent control = labelsAndControls[pairIndex * 2 + 1];
+            setMinimumLabelWidth(label);
+            setMinimumControlWidth(control);
+
+            GridBagConstraints labelLayout = new GridBagConstraints();
+            labelLayout.gridx = columnPair * 2;
+            labelLayout.gridy = gridRow;
+            labelLayout.weightx = 0.0;
+            labelLayout.anchor = GridBagConstraints.WEST;
+            labelLayout.fill = GridBagConstraints.NONE;
+            labelLayout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, LABEL_RIGHT_PADDING);
+            add(label, labelLayout);
+
+            boolean lastColumn = (columnPair == pairsPerRow - 1);
+            GridBagConstraints controlLayout = new GridBagConstraints();
+            controlLayout.gridx = columnPair * 2 + 1;
+            controlLayout.gridy = gridRow;
+            controlLayout.anchor = GridBagConstraints.WEST;
+            if (lastColumn) {
+                // The rightmost control absorbs all horizontal slack so its right edge reaches the form's (and
+                // therefore the section's) right edge, aligning with the controls in single-column sections.
+                controlLayout.gridwidth = GridBagConstraints.REMAINDER;
+                controlLayout.weightx = 1.0;
+                controlLayout.fill = GridBagConstraints.HORIZONTAL;
+                controlLayout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, 0);
+            } else {
+                controlLayout.weightx = 0.0;
+                controlLayout.fill = GridBagConstraints.NONE;
+                controlLayout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, CHECK_BOX_COLUMN_GAP);
+            }
+            add(control, controlLayout);
+        }
+
+        int rowCount = (pairCount + pairsPerRow - 1) / pairsPerRow;
+        row += rowCount;
+    }
+
     private void addTrailingFiller(int rowIndex, int columnIndex) {
         JPanel filler = new JPanel();
         filler.setOpaque(false);

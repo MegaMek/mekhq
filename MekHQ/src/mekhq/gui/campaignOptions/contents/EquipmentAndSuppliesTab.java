@@ -34,18 +34,13 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -59,17 +54,14 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 
 /**
@@ -91,6 +83,9 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 public class EquipmentAndSuppliesTab {
     private static final int EQUIPMENT_LABEL_COLUMN_WIDTH = 300;
     private static final int EQUIPMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int AUTO_LOGISTICS_LABEL_COLUMN_WIDTH = 190;
+    private static final int AUTO_LOGISTICS_CONTROL_COLUMN_WIDTH = 90;
+    private static final int AUTO_LOGISTICS_PAIRS_PER_ROW = 2;
     private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
     private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
 
@@ -348,106 +343,28 @@ public class EquipmentAndSuppliesTab {
      */
     public JPanel createAcquisitionTab() {
         // Header
-        acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab",
-              getImageDirectory() + "logo_clan_cloud_cobra.png",
-              3);
+        String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
+        acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab", imageAddress);
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlAutoLogistics = createAutoLogisticsPanel();
-          JPanel pnlDelivery = createDeliveryPanel();
+        JPanel pnlDelivery = createDeliveryPanel();
         acquisitionPageCreated = true;
         updateAcquisitionControlsFromModel();
 
-          MHQCollapsiblePanel acquisitionsSection = createSection("lblAcquisitionPanel.text",
-              "lblAcquisitionPanel.summary",
-              pnlAcquisitions);
-          MHQCollapsiblePanel deliverySection = createSection("lblDeliveryPanel.text",
-              "lblDeliveryPanel.summary",
-              pnlDelivery);
-          MHQCollapsiblePanel autoLogisticsSection = createSection("lblAutoLogisticsPanel.text",
-              "lblAutoLogisticsPanel.summary",
-              pnlAutoLogistics);
-
-          JPanel panel = createSectionedPanel("AcquisitionTab",
-              acquisitionHeader,
-              acquisitionsSection,
-              deliverySection,
-              autoLogisticsSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "acquisitionsTab");
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-          MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
-        return panel;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-          @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
+        return CampaignOptionsPagePanel.builder("AcquisitionTab", "AcquisitionTab", imageAddress)
+                .header(acquisitionHeader)
+                .quote("acquisitionTab")
+                .section("lblAcquisitionPanel.text",
+                        "lblAcquisitionPanel.summary",
+                        pnlAcquisitions)
+                .section("lblDeliveryPanel.text",
+                        "lblDeliveryPanel.summary",
+                        pnlDelivery)
+                .section("lblAutoLogisticsPanel.text",
+                        "lblAutoLogisticsPanel.summary",
+                        pnlAutoLogistics)
+                .build();
     }
 
     /**
@@ -599,19 +516,20 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoLogisticsPanel",
-              EQUIPMENT_LABEL_COLUMN_WIDTH,
-              EQUIPMENT_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblAutoLogisticsMekHead, spnAutoLogisticsMekHead);
-        panel.addRow(lblAutoLogisticsMekLocation, spnAutoLogisticsMekLocation);
-        panel.addRow(lblAutoLogisticsNonRepairableLocation, spnAutoLogisticsNonRepairableLocation);
-        panel.addRow(lblAutoLogisticsHeatSink, spnAutoLogisticsHeatSink);
-        panel.addRow(lblAutoLogisticsArmor, spnAutoLogisticsArmor);
-        panel.addRow(lblAutoLogisticsAmmunition, spnAutoLogisticsAmmunition);
-        panel.addRow(lblAutoLogisticsActuators, spnAutoLogisticsActuators);
-        panel.addRow(lblAutoLogisticsJumpJets, spnAutoLogisticsJumpJets);
-        panel.addRow(lblAutoLogisticsEngines, spnAutoLogisticsEngines);
-        panel.addRow(lblAutoLogisticsWeapons, spnAutoLogisticsWeapons);
-        panel.addRow(lblAutoLogisticsOther, spnAutoLogisticsOther);
+              AUTO_LOGISTICS_LABEL_COLUMN_WIDTH,
+              AUTO_LOGISTICS_CONTROL_COLUMN_WIDTH);
+        panel.addRowGrid(AUTO_LOGISTICS_PAIRS_PER_ROW,
+              lblAutoLogisticsMekHead, spnAutoLogisticsMekHead,
+              lblAutoLogisticsMekLocation, spnAutoLogisticsMekLocation,
+              lblAutoLogisticsNonRepairableLocation, spnAutoLogisticsNonRepairableLocation,
+              lblAutoLogisticsHeatSink, spnAutoLogisticsHeatSink,
+              lblAutoLogisticsArmor, spnAutoLogisticsArmor,
+              lblAutoLogisticsAmmunition, spnAutoLogisticsAmmunition,
+              lblAutoLogisticsActuators, spnAutoLogisticsActuators,
+              lblAutoLogisticsJumpJets, spnAutoLogisticsJumpJets,
+              lblAutoLogisticsEngines, spnAutoLogisticsEngines,
+              lblAutoLogisticsWeapons, spnAutoLogisticsWeapons,
+              lblAutoLogisticsOther, spnAutoLogisticsOther);
 
         return panel;
     }
@@ -626,9 +544,8 @@ public class EquipmentAndSuppliesTab {
      */
     public JPanel createPlanetaryAcquisitionTab() {
         // Header
-        planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
-              getImageDirectory() + "logo_rim_worlds_republic.png",
-              12);
+        String imageAddress = getImageDirectory() + "logo_rim_worlds_republic.png";
+        planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab", imageAddress);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -636,20 +553,16 @@ public class EquipmentAndSuppliesTab {
         planetaryAcquisitionPageCreated = true;
         updatePlanetaryAcquisitionControlsFromModel();
 
-        MHQCollapsiblePanel optionsSection = createSection("lblPlanetaryAcquisitionTab.text",
-              "lblPlanetaryAcquisitionTab.summary",
-              options);
-        MHQCollapsiblePanel modifiersSection = createSection("lblModifiersPanel.text",
-              "lblModifiersPanel.summary",
-              modifiers);
-
-        JPanel panel = createSectionedPanel("PlanetaryAcquisitionTab",
-              planetaryAcquisitionHeader,
-              optionsSection,
-              modifiersSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "PlanetaryAcquisitionTab");
+        return CampaignOptionsPagePanel.builder("PlanetaryAcquisitionTab", "PlanetaryAcquisitionTab", imageAddress)
+                .header(planetaryAcquisitionHeader)
+                .quote("planetaryAcquisitionTab")
+                .section("lblPlanetaryAcquisitionTab.text",
+                        "lblPlanetaryAcquisitionTab.summary",
+                        options)
+                .section("lblModifiersPanel.text",
+                        "lblModifiersPanel.summary",
+                        modifiers)
+                .build();
     }
 
 
@@ -727,7 +640,7 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
 
-        final CampaignOptionsModifierTablePanel panel = new CampaignOptionsModifierTablePanel(
+        final CampaignOptionsModifierTablePanel tablePanel = new CampaignOptionsModifierTablePanel(
               "PlanetaryAcquisitionTabModifiers",
               MODIFIER_ROW_LABEL_COLUMN_WIDTH,
               MODIFIER_CONTROL_COLUMN_WIDTH,
@@ -738,12 +651,17 @@ public class EquipmentAndSuppliesTab {
         i = 0;
         for (PlanetarySophistication sophistication : PlanetarySophistication.values()) {
             int ratingIndex = getPlanetaryRatingIndex(sophistication.getName());
-            panel.addRow(createModifierRowLabel(sophistication.getName()),
+            tablePanel.addRow(createModifierRowLabel(sophistication.getName()),
                   spnPlanetAcquireTechBonus[i],
                   ratingIndex >= 0 ? spnPlanetAcquireIndustryBonus[ratingIndex] : null,
                   ratingIndex >= 0 ? spnPlanetAcquireOutputBonus[ratingIndex] : null);
             i++;
         }
+
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionTabModifiersPanel",
+              MODIFIER_ROW_LABEL_COLUMN_WIDTH,
+              MODIFIER_CONTROL_COLUMN_WIDTH);
+        panel.addFullWidthComponent(tablePanel);
 
         return panel;
     }
@@ -840,9 +758,8 @@ public class EquipmentAndSuppliesTab {
     public JPanel createTechLimitsTab() {
         // Header
         //start Tech Limits Tab
-        CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab",
-              getImageDirectory() + "logo_clan_ghost_bear.png",
-              2);
+        String imageAddress = getImageDirectory() + "logo_clan_ghost_bear.png";
+        CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab", imageAddress);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
         limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));
@@ -884,20 +801,16 @@ public class EquipmentAndSuppliesTab {
         techLimitsPageCreated = true;
         updateTechLimitsControlsFromModel();
 
-        MHQCollapsiblePanel techLevelSection = createSection("lblTechLimitsTab.text",
-              "lblTechLimitsTab.summary",
-              techLevelPanel);
-        MHQCollapsiblePanel purchaseRulesSection = createSection("lblTechPurchaseRulesPanel.text",
-              "lblTechPurchaseRulesPanel.summary",
-              purchaseRulesPanel);
-
-        JPanel panel = createSectionedPanel("TechLimitsTab",
-              techLimitsHeader,
-              techLevelSection,
-              purchaseRulesSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "TechLimitsTab");
+        return CampaignOptionsPagePanel.builder("TechLimitsTab", "TechLimitsTab", imageAddress)
+                .header(techLimitsHeader)
+                .quote("techLimitsTab")
+                .section("lblTechLimitsTab.text",
+                        "lblTechLimitsTab.summary",
+                        techLevelPanel)
+                .section("lblTechPurchaseRulesPanel.text",
+                        "lblTechPurchaseRulesPanel.summary",
+                        purchaseRulesPanel)
+                .build();
     }
 
     private JPanel createTechLevelPanel() {
