@@ -1177,6 +1177,7 @@ public enum PersonnelTableModelColumn {
     }
 
     public boolean isVisible(final Campaign campaign, final PersonnelTabView view, final JTable table) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         return switch (view) {
             case GRAPHIC -> {
                 table.setRowHeight(UIUtil.scaleForGUI(60));
@@ -1286,8 +1287,8 @@ public enum PersonnelTableModelColumn {
             };
             case BIOGRAPHICAL -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, HIGHEST_EDUCATION -> true;
-                case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
-                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
+                case ORIGIN_FACTION, ORIGIN_PLANET -> campaignOptions.isShowOriginFaction();
+                case SALARY -> campaignOptions.isPayForSalaries();
                 default -> false;
             };
             case FLUFF -> switch (this) {
@@ -1305,10 +1306,10 @@ public enum PersonnelTableModelColumn {
             };
             case DATES -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE, RETIREMENT_DATE -> true;
-                case RECRUITMENT_DATE -> campaign.getCampaignOptions().isUseTimeInService();
-                case LAST_RANK_CHANGE_DATE -> campaign.getCampaignOptions().isUseTimeInRank();
-                case DUE_DATE -> campaign.getCampaignOptions().isUseManualProcreation() ||
-                                       !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
+                case RECRUITMENT_DATE -> campaignOptions.isUseTimeInService();
+                case LAST_RANK_CHANGE_DATE -> campaignOptions.isUseTimeInRank();
+                case DUE_DATE -> campaignOptions.isUseManualProcreation() ||
+                                       !campaignOptions.getRandomProcreationMethod().isNone();
                 default -> false;
             };
             case FLAGS_A -> switch (this) {
@@ -1350,8 +1351,7 @@ public enum PersonnelTableModelColumn {
             };
             case PERSONALITY -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
-                case AGGRESSION, AMBITION, GREED, SOCIAL, REASONING ->
-                      campaign.getCampaignOptions().isUseRandomPersonalities();
+                case AGGRESSION, AMBITION, GREED, SOCIAL, REASONING -> campaignOptions.isUseRandomPersonalities();
                 default -> false;
             };
             case TRAITS -> switch (this) {
@@ -1370,7 +1370,7 @@ public enum PersonnelTableModelColumn {
                      INTELLIGENCE,
                      WILLPOWER,
                      CHARISMA -> true;
-                case EDGE -> campaign.getCampaignOptions().isUseEdge();
+                case EDGE -> campaignOptions.isUseEdge();
                 default -> false;
             };
             case EDUCATION -> switch (this) {
@@ -1386,13 +1386,13 @@ public enum PersonnelTableModelColumn {
             };
             case OTHER -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
-                case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
-                case FATIGUE -> campaign.getCampaignOptions().isUseFatigue();
-                case SPA_COUNT -> campaign.getCampaignOptions().isUseAbilities();
-                case IMPLANT_COUNT -> campaign.getCampaignOptions().isUseImplants();
-                case MODIFICATION_COUNT -> campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
-                case LOYALTY -> campaign.getCampaignOptions().isUseLoyaltyModifiers() &&
-                                      !campaign.getCampaignOptions().isUseHideLoyalty();
+                case TOUGHNESS -> campaignOptions.isUseToughness();
+                case FATIGUE -> campaignOptions.isUseFatigue();
+                case SPA_COUNT -> campaignOptions.isUseAbilities();
+                case IMPLANT_COUNT -> campaignOptions.isUseImplants();
+                case MODIFICATION_COUNT -> campaignOptions.isUseAlternativeAdvancedMedical();
+                case LOYALTY -> campaignOptions.isUseLoyaltyModifiers() &&
+                                      !campaignOptions.isUseHideLoyalty();
                 default -> false;
             };
         };

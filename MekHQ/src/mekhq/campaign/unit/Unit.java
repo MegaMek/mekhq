@@ -4880,7 +4880,7 @@ public class Unit implements ITechnology {
             setTacticsInitiativeBonus(commander);
         }
 
-        if (campaignOptions.isUseAbilities() || campaignOptions.isUseEdge() || campaignOptions.isUseImplants()) {
+        if (campaignOptions.isUseAbilities() || campaignOptions.isUseCombatEdge() || campaignOptions.isUseImplants()) {
             processUnitSPAs(commander);
         }
     }
@@ -5016,7 +5016,7 @@ public class Unit implements ITechnology {
                 if (campaignOptions.isUseImplants() &&
                           group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
                     cyberOptionNames.add(option.getName());
-                } else if (campaignOptions.isUseEdge() &&
+                } else if (campaignOptions.isUseCombatEdge() &&
                                  group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
                 } else if (campaignOptions.isUseAbilities() &&
@@ -5120,7 +5120,7 @@ public class Unit implements ITechnology {
 
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
-            if (campaignOptions.isUseEdge()) {
+            if (campaignOptions.isUseCombatEdge()) {
                 setEdgeForCrew(crewSize, commanderOnly);
             }
 
@@ -5159,7 +5159,7 @@ public class Unit implements ITechnology {
 
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
-            if (campaignOptions.isUseEdge()) {
+            if (campaignOptions.isUseCombatEdge()) {
                 setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), commanderOnly);
             }
         }

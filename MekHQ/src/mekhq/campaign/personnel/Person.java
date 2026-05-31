@@ -5955,6 +5955,35 @@ public class Person {
     // region edge
 
     /**
+     * Determines whether Edge should be used for this person based on the given campaign options.
+     *
+     * <p>Edge is used if any of the following conditions are met:
+     * <ul>
+     *     <li>Edge use is globally enabled via {@link CampaignOptions#isUseEdge()}</li>
+     *     <li>This is a combat role and combat Edge is enabled via {@link CampaignOptions#isUseCombatEdge()}</li>
+     *     <li>This is a support role and support Edge is enabled via {@link CampaignOptions#isUseSupportEdge()}</li>
+     * </ul>
+     *
+     * @param campaignOptions the campaign options defining Edge usage rules; must not be {@code null}
+     *
+     * @return {@code true} if Edge should be used, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean isUseEdge(CampaignOptions campaignOptions) {
+        if (campaignOptions.isUseEdge()) {
+            return true;
+        }
+
+        if (isCombat() && campaignOptions.isUseCombatEdge()) {
+            return true;
+        }
+
+        return !isCombat() && campaignOptions.isUseSupportEdge();
+    }
+
+    /**
      * Retrieves the edge value for the current person.
      *
      * <p><b>Usage:</b> This method gets the character's raw Edge score. Generally you likely want to use

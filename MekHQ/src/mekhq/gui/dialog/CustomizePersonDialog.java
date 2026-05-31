@@ -47,16 +47,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
@@ -81,6 +72,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -520,18 +512,18 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         allSystems = getPlanetarySystemsComboBoxModel();
         Faction originFaction = person.getOriginFaction();
         DefaultComboBoxModel<PlanetarySystem> initialSystems = (originFaction != null)
-              ? getPlanetarySystemsComboBoxModel(originFaction)
-              : allSystems;
+                                                                     ? getPlanetarySystemsComboBoxModel(originFaction)
+                                                                     : allSystems;
         // If the person already has an origin planet that the faction-filtered view excludes (e.g.,
         // a Tharkad-origin character whose faction is now FedSuns), fall back to the all-worlds view
         // so we don't silently drop their existing assignment when they click OK. Tracked back to the
         // checkbox state below via showAllWorldsInitial. (Copilot review on PR #8935.)
         PlanetarySystem existingOriginSystem = (person.getOriginPlanet() != null)
-              ? person.getOriginPlanet().getParentSystem()
-              : null;
+                                                     ? person.getOriginPlanet().getParentSystem()
+                                                     : null;
         boolean showAllWorldsInitial = false;
         if (existingOriginSystem != null && initialSystems != allSystems
-              && initialSystems.getIndexOf(existingOriginSystem) < 0) {
+                  && initialSystems.getIndexOf(existingOriginSystem) < 0) {
             initialSystems = allSystems;
             showAllWorldsInitial = true;
         }
@@ -1318,9 +1310,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(UIUtil.scaleForGUI(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills);
-        if (campaign.getCampaignOptions().isUseAbilities() ||
-                  campaign.getCampaignOptions().isUseEdge() ||
-                  campaign.getCampaignOptions().isUseImplants()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseAbilities() ||
+                  campaignOptions.isUseImplants() ||
+                  campaignOptions.isUseCombatEdge() && person.isCombat() ||
+                  campaignOptions.isUseSupportEdge() && !person.isCombat()) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions);
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"),
@@ -1421,11 +1415,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
-     * current selection across the swap. If there was no current selection (or the previously
-     * selected faction has been filtered out by the new model), the index is explicitly set to
-     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
-     * would silently assign an unintended origin when OK is clicked. (Copilot review on PR #8937.)
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the current selection
+     * across the swap. If there was no current selection (or the previously selected faction has been filtered out by
+     * the new model), the index is explicitly set to {@code -1} — otherwise Swing's combobox auto-selects the first
+     * item on a model swap, which would silently assign an unintended origin when OK is clicked. (Copilot review on PR
+     * #8937.)
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();
@@ -1526,7 +1520,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                      .filter(a -> !a.isConnector())
                                                      .filter(a -> {
                                                          Set<Faction> owners = cachedOwnersAt(a);
-                                                         return isInhabitedAt(owners) && isFactionMatch(owners, faction);
+                                                         return isInhabitedAt(owners) &&
+                                                                      isFactionMatch(owners, faction);
                                                      })
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
@@ -1538,10 +1533,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Returns {@link #ownersAt(PlanetarySystem, LocalDate)} cached per system for the dialog's
-     * current {@code birthdate}. The cache is invalidated when {@code birthdate} changes, so a
-     * single filter pass resolves each system at most once even when both the inhabited and
-     * faction filters apply.
+     * Returns {@link #ownersAt(PlanetarySystem, LocalDate)} cached per system for the dialog's current
+     * {@code birthdate}. The cache is invalidated when {@code birthdate} changes, so a single filter pass resolves each
+     * system at most once even when both the inhabited and faction filters apply.
      */
     private Set<Faction> cachedOwnersAt(PlanetarySystem system) {
         if (!java.util.Objects.equals(birthdate, ownersCacheBirthdate)) {
@@ -1552,13 +1546,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name
-     * with the resolved owner faction code(s) appended in brackets. Owner is computed by
-     * {@link #ownersAt(PlanetarySystem, LocalDate)} which applies to-the-victor citizenship rules,
-     * so a 3047-born character sees New Avalon as {@code [FS]} rather than the transitional
-     * {@code [FC]}. Multiple owners come out comma-separated, e.g. {@code "World [FACTA, FACTB]"}.
-     * Visible in both filtered and "Show All Worlds" modes — useful both for player context and
-     * for spotting data-side anomalies at a glance.
+     * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name with the resolved owner
+     * faction code(s) appended in brackets. Owner is computed by {@link #ownersAt(PlanetarySystem, LocalDate)} which
+     * applies to-the-victor citizenship rules, so a 3047-born character sees New Avalon as {@code [FS]} rather than the
+     * transitional {@code [FC]}. Multiple owners come out comma-separated, e.g. {@code "World [FACTA, FACTB]"}. Visible
+     * in both filtered and "Show All Worlds" modes — useful both for player context and for spotting data-side
+     * anomalies at a glance.
      */
     private String formatSystemForBirthdate(PlanetarySystem system) {
         String name = system.getName(birthdate);
@@ -1583,15 +1576,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      * Cache-bypassing point-in-time owner lookup with to-the-victor citizenship semantics.
      *
      * <p>{@link Planet#getFactionSet(LocalDate)} routes through {@code Planet.CurrentEvents}, a
-     * stateful per-planet event-stream cache that can return stale-forward state when warmed at a
-     * later date and queried at an earlier one (observed during #8934 testing — New Avalon at
-     * 3047-09-25 returning 3067-12-31's {@code DIS} marker because the cache had already advanced
-     * for a campaign-date render). We walk {@link Planet#getEvents()} directly (TreeMap-ordered,
-     * deterministic) instead.</p>
+     * stateful per-planet event-stream cache that can return stale-forward state when warmed at a later date and
+     * queried at an earlier one (observed during #8934 testing — New Avalon at 3047-09-25 returning 3067-12-31's
+     * {@code DIS} marker because the cache had already advanced for a campaign-date render). We walk
+     * {@link Planet#getEvents()} directly (TreeMap-ordered, deterministic) instead.</p>
      *
      * <p>BattleTech canon treats world-citizenship as defined by whoever ends up holding the world
-     * long-term, not by transient umbrella states or active disputes. We substitute the snapshot
-     * with the world's eventual stable owner when:</p>
+     * long-term, not by transient umbrella states or active disputes. We substitute the snapshot with the world's
+     * eventual stable owner when:</p>
      *
      * <ul>
      *   <li>The snapshot is a {@code DIS} (Disputed) marker — to the victor goes the spoils.</li>
@@ -1652,7 +1644,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             // and pollute the picker (Copilot review on PR #8935).
             java.util.List<String> displayed;
             if (snapshot != null && eventualOwner != null && !sameCodes(snapshot, eventualOwner)
-                  && (isDisputedOnly(snapshot) || anyDissolvesNear(snapshot, when))) {
+                      && (isDisputedOnly(snapshot) || anyDissolvesNear(snapshot, when))) {
                 displayed = eventualOwner;
             } else {
                 displayed = snapshot;
@@ -1711,10 +1703,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * @return {@code true} if {@code chosen} directly controls the world at the queried date OR is
-     *       lineage-compatible (predecessor/successor) with one of the actual owners. Excludes meta
-     *       umbrella codes ({@code IS}, {@code CLAN.IS}, {@code Periphery.*}, {@code CLAN.*}) so two
-     *       unrelated Inner Sphere factions don't match via the abstract IS umbrella.
+     * @return {@code true} if {@code chosen} directly controls the world at the queried date OR is lineage-compatible
+     *       (predecessor/successor) with one of the actual owners. Excludes meta umbrella codes ({@code IS},
+     *       {@code CLAN.IS}, {@code Periphery.*}, {@code CLAN.*}) so two unrelated Inner Sphere factions don't match
+     *       via the abstract IS umbrella.
      */
     private static boolean isFactionMatch(Set<Faction> owners, Faction chosen) {
         if (owners == null || owners.isEmpty()) {
@@ -1731,7 +1723,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
             String ownerCode = owner.getShortName();
             if (containsRealCode(owner.getAlternativeFactionCodes(), chosenCode)
-                  || containsRealCode(chosenAlts, ownerCode)) {
+                      || containsRealCode(chosenAlts, ownerCode)) {
                 return true;
             }
         }
@@ -1755,14 +1747,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private static boolean isMetaFactionCode(String code) {
         return "IS".equals(code) || "CLAN.IS".equals(code)
-              || code.startsWith("Periphery.") || code.startsWith("CLAN.");
+                     || code.startsWith("Periphery.") || code.startsWith("CLAN.");
     }
 
     /**
      * @return {@code true} if the resolved owner set has at least one real (non-abandoned) faction.
-     *       {@code ownersAt(...)} already drops the {@code ABN} marker when other factions are present;
-     *       a system whose ONLY faction is {@code ABN} would still come back non-empty here, so we
-     *       reject that case explicitly.
+     *       {@code ownersAt(...)} already drops the {@code ABN} marker when other factions are present; a system whose
+     *       ONLY faction is {@code ABN} would still come back non-empty here, so we reject that case explicitly.
      */
     private static boolean isInhabitedAt(Set<Faction> owners) {
         if (owners.isEmpty()) {
@@ -2124,21 +2115,28 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         c.ipadx = 0;
         c.ipady = 0;
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseAbilities = campaignOptions.isUseAbilities();
+        boolean isUseEdge = campaignOptions.isUseEdge();
+        boolean isUseImplants = campaignOptions.isUseImplants();
         for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
-            if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseAbilities()) {
+            String key = group.getKey();
+            if (key.equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES) &&
+                      !isUseAbilities) {
                 continue;
             }
 
-            if (group.getKey().equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseEdge()) {
+            if (key.equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES) && !isUseAbilities) {
                 continue;
             }
 
-            if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseImplants()) {
+            if (key.equalsIgnoreCase(PersonnelOptions.EDGE_ADVANTAGES) && !isUseEdge) {
+                continue;
+            }
+
+            if (key.equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES) && !isUseImplants) {
                 continue;
             }
 

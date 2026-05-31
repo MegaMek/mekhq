@@ -233,7 +233,7 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterVehicles;
     private boolean onlyCommandersMatterInfantry;
     private boolean onlyCommandersMatterBattleArmor;
-    private boolean useEdge;
+    private boolean useCombatEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
@@ -848,7 +848,7 @@ public class CampaignOptions {
         setOnlyCommandersMatterVehicles(false);
         setOnlyCommandersMatterInfantry(false);
         setOnlyCommandersMatterBattleArmor(false);
-        setUseEdge(false);
+        setUseCombatEdge(false);
         setUseSupportEdge(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
@@ -1701,11 +1701,15 @@ public class CampaignOptions {
     }
 
     public boolean isUseEdge() {
-        return useEdge;
+        return useCombatEdge || useSupportEdge;
     }
 
-    public void setUseEdge(final boolean useEdge) {
-        this.useEdge = useEdge;
+    public boolean isUseCombatEdge() {
+        return useCombatEdge;
+    }
+
+    public void setUseCombatEdge(final boolean useCombatEdge) {
+        this.useCombatEdge = useCombatEdge;
     }
 
     public boolean isUseSupportEdge() {
@@ -5802,7 +5806,7 @@ public class CampaignOptions {
         useToughness = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
         useArtillery = gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue();
         useAbilities = gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue();
-        useEdge = gameOptions.getOption(EDGE).booleanValue();
+        useCombatEdge = gameOptions.getOption(EDGE).booleanValue();
         useImplants = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
         useQuirks = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
         allowCanonOnly = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
@@ -5826,7 +5830,7 @@ public class CampaignOptions {
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);
         gameOptions.getOption(RPG_PILOT_ADVANTAGES).setValue(useAbilities);
-        gameOptions.getOption(EDGE).setValue(useEdge);
+        gameOptions.getOption(EDGE).setValue(useCombatEdge);
         gameOptions.getOption(RPG_MANEI_DOMINI).setValue(useImplants);
         gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).setValue(useQuirks);
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);

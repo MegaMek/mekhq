@@ -333,7 +333,9 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "onlyCommandersMatterBattleArmor" -> campaignOptions.setOnlyCommandersMatterBattleArmor(parseBoolean(
                   nodeContents));
-            case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
+            // <51.0 compatibility handler
+            case "useEdge" -> campaignOptions.setUseCombatEdge(parseBoolean(nodeContents));
+            case "useCombatEdge" -> campaignOptions.setUseCombatEdge(parseBoolean(nodeContents));
             case "useSupportEdge" -> campaignOptions.setUseSupportEdge(parseBoolean(nodeContents));
             case "useImplants" -> campaignOptions.setUseImplants(parseBoolean(nodeContents));
             case "alternativeQualityAveraging" -> campaignOptions.setAlternativeQualityAveraging(parseBoolean(

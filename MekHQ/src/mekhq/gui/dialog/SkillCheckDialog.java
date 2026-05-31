@@ -139,7 +139,7 @@ public class SkillCheckDialog {
               character,
               null,
               getInCharacterMessage(),
-              getButtons(character.getCurrentEdge() > 0, campaign.getCampaignOptions().isUseEdge()),
+              getButtons(character.getCurrentEdge() > 0, character.isUseEdge(campaign.getCampaignOptions())),
               getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"),
               null,
               false,

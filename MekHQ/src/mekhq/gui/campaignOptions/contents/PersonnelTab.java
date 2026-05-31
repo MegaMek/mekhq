@@ -110,7 +110,7 @@ public class PersonnelTab {
     private JCheckBox chkOnlyCommandersMatterVehicles;
     private JCheckBox chkOnlyCommandersMatterInfantry;
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
-    private JCheckBox chkUseEdge;
+    private JCheckBox chkUseCombatEdge;
     private JCheckBox chkUseSupportEdge;
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
@@ -392,7 +392,7 @@ public class PersonnelTab {
         chkOnlyCommandersMatterVehicles = new JCheckBox();
         chkOnlyCommandersMatterInfantry = new JCheckBox();
         chkOnlyCommandersMatterBattleArmor = new JCheckBox();
-        chkUseEdge = new JCheckBox();
+        chkUseCombatEdge = new JCheckBox();
         chkUseSupportEdge = new JCheckBox();
         chkUseImplants = new JCheckBox();
         chkUseAlternativeQualityAveraging = new JCheckBox();
@@ -504,8 +504,8 @@ public class PersonnelTab {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader,
               "OnlyCommandersMatterBattleArmor"));
-        chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
-        chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
+        chkUseCombatEdge = new CampaignOptionsCheckBox("UseCombatEdge");
+        chkUseCombatEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseCombatEdge"));
         chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
         chkUseSupportEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseSupportEdge"));
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
@@ -548,7 +548,7 @@ public class PersonnelTab {
         panel.add(chkOnlyCommandersMatterBattleArmor, layout);
 
         layout.gridy++;
-        panel.add(chkUseEdge, layout);
+        panel.add(chkUseCombatEdge, layout);
 
         layout.gridy++;
         panel.add(chkUseSupportEdge, layout);
@@ -646,15 +646,19 @@ public class PersonnelTab {
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobInfantry"));
         chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor", getMetadata(new Version(0, 50, 12)));
         chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmor"));
-        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround", getMetadata(new Version(0, 50, 12)));
+        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround",
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewGround.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewGround"));
-        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL", getMetadata(new Version(0, 50, 12)));
+        chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL",
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewVTOL.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewVTOL"));
-        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval", getMetadata(new Version(0, 50, 12)));
+        chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval",
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewNaval.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewNaval"));
         chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselPilot.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselPilot"));
-        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner", getMetadata(new Version(0, 50, 12)));
+        chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner",
+              getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselGunner.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselGunner"));
         chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew", getMetadata(new Version(0, 50, 12)));
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVesselCrew"));
@@ -925,7 +929,9 @@ public class PersonnelTab {
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
         chkUseAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader, "UseAdvancedMedical"));
 
         lblHealWaitingPeriod = new CampaignOptionsLabel("HealWaitingPeriod");
@@ -1269,7 +1275,9 @@ public class PersonnelTab {
         dependentsPanel = createDependentsPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersAndDependentsTab", true, "PrisonersAndDependentsTab",
+        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersAndDependentsTab",
+              true,
+              "PrisonersAndDependentsTab",
               getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
@@ -1466,7 +1474,7 @@ public class PersonnelTab {
         chkOnlyCommandersMatterVehicles.setSelected(options.isOnlyCommandersMatterVehicles());
         chkOnlyCommandersMatterInfantry.setSelected(options.isOnlyCommandersMatterInfantry());
         chkOnlyCommandersMatterBattleArmor.setSelected(options.isOnlyCommandersMatterBattleArmor());
-        chkUseEdge.setSelected(options.isUseEdge());
+        chkUseCombatEdge.setSelected(options.isUseCombatEdge());
         chkUseSupportEdge.setSelected(options.isUseSupportEdge());
         chkUseImplants.setSelected(options.isUseImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.isAlternativeQualityAveraging());
@@ -1576,7 +1584,7 @@ public class PersonnelTab {
         options.setOnlyCommandersMatterVehicles(chkOnlyCommandersMatterVehicles.isSelected());
         options.setOnlyCommandersMatterInfantry(chkOnlyCommandersMatterInfantry.isSelected());
         options.setOnlyCommandersMatterBattleArmor(chkOnlyCommandersMatterBattleArmor.isSelected());
-        options.setUseEdge(chkUseEdge.isSelected());
+        options.setUseCombatEdge(chkUseCombatEdge.isSelected());
         options.setUseSupportEdge(chkUseSupportEdge.isSelected());
         options.setUseImplants(chkUseImplants.isSelected());
         options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());

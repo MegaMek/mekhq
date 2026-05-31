@@ -334,7 +334,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private CampaignOptions getCampaignOptions() {
-        return getCampaign().getCampaignOptions();
+        return getCampaignOptions();
     }
 
     public static void connect(CampaignGUI gui, JTable personnelTable, PersonnelTableModel personnelModel,
@@ -1629,7 +1629,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 boolean isUseAdvancedMedical = getCampaignOptions().isUseAdvancedMedical();
                 int healingPeriod = getCampaignOptions().getNaturalHealingWaitingPeriod();
-                
+
                 selectedPerson.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
                       healingPeriod);
 
@@ -1765,7 +1765,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
-                    skillGenerator.generateAttributes(person, getCampaign().getCampaignOptions().isUseEdge());
+                    boolean isUseEdge = person.isUseEdge(getCampaignOptions());
+                    skillGenerator.generateAttributes(person, isUseEdge);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2055,7 +2056,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               JOptionPane.YES_NO_OPTION)) {
 
             if (isExecution) {
-                if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
+                if (getCampaignOptions().isTrackFactionStanding()) {
                     FactionStandings factionStandings = getCampaign().getFactionStandings();
 
                     List<Person> listOfPrisoners = Arrays.asList(prisoners);
@@ -2063,7 +2064,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           factionStandings.executePrisonersOfWar(getCampaign().getFaction().getShortName(),
                                 listOfPrisoners,
                                 getCampaign().getGameYear(),
-                                getCampaign().getCampaignOptions().getRegardMultiplier());
+                                getCampaignOptions().getRegardMultiplier());
 
                     for (String report : reports) {
                         getCampaign().addReport(PERSONNEL, report);
