@@ -36,6 +36,7 @@ package mekhq.campaign.personnel;
 import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static megamek.common.compute.Compute.d6;
@@ -202,6 +203,13 @@ public class Person {
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
+
+    /**
+     * Campaign Operations doesn't have a cap on Fatigue, but does stop tracking Fatigue at 17 points. With this in
+     * mind, we have opted to set a cap on fatigue of 30. This is to ensure the player isn't placed in a situation where
+     * a character could conceivably accumulate hundreds of Fatigue. At a certain point you can't get more tired
+     */
+    private static final int FATIGUE_CAP = 30;
 
 
     private PersonAwardController awardController;
@@ -2360,7 +2368,7 @@ public class Person {
             modifier += 2;
         }
 
-        return getFatigueDirect() + modifier;
+        return min(FATIGUE_CAP, getFatigueDirect() + modifier);
     }
 
     public void setFatigue(final int fatigue) {
@@ -2392,7 +2400,10 @@ public class Person {
             delta = (int) floor(delta * getFatigueMultiplier());
         }
 
-        this.fatigue = this.fatigue + MathUtility.roundAwayFromZero(delta);
+        fatigue += MathUtility.roundAwayFromZero(delta);
+
+        // Ensure we obey the fatigue cap
+        fatigue = min(FATIGUE_CAP, fatigue);
     }
 
     public boolean getIsRecoveringFromFatigue() {
