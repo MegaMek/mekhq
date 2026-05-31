@@ -194,6 +194,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(BriefingTab.class);
 
     private enum ScenarioQueueFilter {
+        ALL("briefingTab.scenarioFilter.all"),
         ALL_ACTIVE("briefingTab.scenarioFilter.allActive"),
         PRIORITY("briefingTab.scenarioFilter.priority"),
         CRISIS("briefingTab.scenarioFilter.crisis"),
@@ -317,6 +318,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioModel = new ScenarioTableModel(getCampaign());
         scenarioTable = createScenarioTable(scenarioModel);
         scenarioFilter = createScenarioFilterCombo("scenarioFilter", new ScenarioQueueFilter[] {
+              ScenarioQueueFilter.ALL,
               ScenarioQueueFilter.ALL_ACTIVE,
               ScenarioQueueFilter.PRIORITY,
               ScenarioQueueFilter.CRISIS,
@@ -697,7 +699,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private boolean matchesScenarioFilter(Scenario scenario, ScenarioQueueFilter filter) {
         return switch (filter) {
-            case ALL_ACTIVE, ALL_RESOLVED -> true;
+            case ALL, ALL_ACTIVE, ALL_RESOLVED -> true;
             case PRIORITY -> scenarioModel.isPriorityScenario(scenario);
             case CRISIS -> scenarioModel.isCrisisScenario(scenario);
             case STRATEGIC -> scenarioModel.isStrategicScenario(scenario);
@@ -2572,10 +2574,11 @@ public final class BriefingTab extends CampaignGuiTab {
     private void refreshScenarioTableData(boolean preserveResolvedSelection) {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
-              ScenarioQueueFilter.ALL_ACTIVE);
+              ScenarioQueueFilter.ALL);
         final Mission mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
         if (preserveResolvedSelection && (scenarioSelection >= 0) &&
+                  (selectedFilter != ScenarioQueueFilter.ALL) &&
                   (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
                   isResolvedScenario(visibleScenarios, scenarioSelection)) {
             scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
@@ -2585,7 +2588,9 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Scenario> filteredScenarios = new ArrayList<>();
 
         for (Scenario scenario : visibleScenarios) {
-            if (selectedFilter == ScenarioQueueFilter.ALL_RESOLVED) {
+            if (selectedFilter == ScenarioQueueFilter.ALL) {
+                filteredScenarios.add(scenario);
+            } else if (selectedFilter == ScenarioQueueFilter.ALL_RESOLVED) {
                 if (!scenario.getStatus().isCurrent()) {
                     filteredScenarios.add(scenario);
                 }
