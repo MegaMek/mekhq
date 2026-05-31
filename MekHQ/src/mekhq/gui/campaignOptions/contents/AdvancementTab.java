@@ -33,19 +33,15 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -58,17 +54,14 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code AdvancementTab} class is responsible for rendering and managing
@@ -87,6 +80,9 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class AdvancementTab {
     private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = 300;
     private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int RECRUITMENT_LABEL_COLUMN_WIDTH = 190;
+    private static final int RECRUITMENT_CONTROL_COLUMN_WIDTH = 90;
+    private static final int RECRUITMENT_PAIRS_PER_ROW = 2;
     private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
     private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
 
@@ -304,9 +300,8 @@ public class AdvancementTab {
      */
     public JPanel xpAwardsTab() {
         // Header
-        xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab",
-                getImageDirectory() + "logo_clan_steel_viper.png",
-                6);
+        String imageAddress = getImageDirectory() + "logo_clan_steel_viper.png";
+        xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab", imageAddress);
 
         // Contents
         JPanel xpAwardOptions = createXpAwardOptionsPanel();
@@ -317,107 +312,27 @@ public class AdvancementTab {
         xpAwardsPageCreated = true;
         updateXpAwardsControlsFromModel();
 
-        MHQCollapsiblePanel optionsSection = createSection("lblXpAwardsTab.text",
-                "lblXpAwardsTab.summary",
-                xpAwardOptions);
-        MHQCollapsiblePanel tasksSection = createSection("lblTasksPanel.text",
-                "lblTasksPanel.summary",
-                pnlTasks);
-        MHQCollapsiblePanel scenariosSection = createSection("lblScenariosPanel.text",
-                "lblScenariosPanel.summary",
-                pnlScenarios,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        MHQCollapsiblePanel missionsSection = createSection("lblMissionsPanel.text",
-                "lblMissionsPanel.summary",
-                pnlMissions);
-        MHQCollapsiblePanel administratorsSection = createSection("lblAdministratorsXpPanel.text",
-                "lblAdministratorsXpPanel.summary",
-                pnlAdministrators,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT,
-                        CampaignOptionFlag.RECOMMENDED));
-
-        JPanel panel = createSectionedPanel("XpAwardsTab",
-                xpAwardsHeader,
-                optionsSection,
-                tasksSection,
-                scenariosSection,
-                missionsSection,
-                administratorsSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "XpAwardsTab");
-    }
-
-    private JPanel createSectionedPanel(String name, CampaignOptionsHeaderPanel header,
-            MHQCollapsiblePanel... sections) {
-        JPanel sectionControls = createSectionControls(sections);
-
-        final JPanel panel = new CampaignOptionsStandardPanel(name);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.weightx = 1.0;
-        panel.add(header, layout);
-
-        layout.gridy++;
-        layout.anchor = GridBagConstraints.EAST;
-        panel.add(sectionControls, layout);
-
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            panel.add(section, layout);
-        }
-
-        return panel;
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content) {
-        return createSection(titleKey, summaryKey, content, null);
-    }
-
-    private MHQCollapsiblePanel createSection(String titleKey, String summaryKey, JPanel content,
-            @Nullable CampaignOptionsMetadata metadata) {
-        MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(titleKey, metadata), content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), summaryKey));
-        return section;
-    }
-
-    private String getSectionTitle(String titleKey, @Nullable CampaignOptionsMetadata metadata) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), titleKey);
-        String badges = formatBadges(metadata);
-        if (badges.isBlank()) {
-            return title;
-        }
-        return "<html>" + title + badges + "</html>";
-    }
-
-    private JPanel createSectionControls(MHQCollapsiblePanel... sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
-        expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
-        collapseAllButton.addActionListener(event -> setExpanded(false, sections));
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        controls.setOpaque(false);
-        controls.add(expandAllButton);
-        controls.add(collapseAllButton);
-
-        return controls;
-    }
-
-    private JButton createSectionActionButton(String resourceKey) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
-        return button;
-    }
-
-    private void setExpanded(boolean expanded, MHQCollapsiblePanel... sections) {
-        for (MHQCollapsiblePanel section : sections) {
-            section.setExpanded(expanded);
-        }
+        return CampaignOptionsPagePanel.builder("XpAwardsTab", "XpAwardsTab", imageAddress)
+                .header(xpAwardsHeader)
+                .section("lblXpAwardsTab.text",
+                        "lblXpAwardsTab.summary",
+                        xpAwardOptions)
+                .section("lblTasksPanel.text",
+                        "lblTasksPanel.summary",
+                        pnlTasks)
+                .section("lblScenariosPanel.text",
+                        "lblScenariosPanel.summary",
+                        pnlScenarios,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblMissionsPanel.text",
+                        "lblMissionsPanel.summary",
+                        pnlMissions)
+                .section("lblAdministratorsXpPanel.text",
+                        "lblAdministratorsXpPanel.summary",
+                        pnlAdministrators,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                                CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED))
+                .build();
     }
 
     private JPanel createXpAwardOptionsPanel() {
@@ -691,9 +606,8 @@ public class AdvancementTab {
      */
     public JPanel skillRandomizationTab() {
         // Header
-        skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
-                getImageDirectory() + "logo_republic_of_the_sphere.png",
-                11);
+        String imageAddress = getImageDirectory() + "logo_republic_of_the_sphere.png";
+        skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab", imageAddress);
 
         // Contents
         JPanel randomizationOptions = createSkillRandomizationOptionsPanel();
@@ -703,29 +617,22 @@ public class AdvancementTab {
         randomizationPageCreated = true;
         updateRandomizationControlsFromModel();
 
-        MHQCollapsiblePanel optionsSection = createSection("lblSkillRandomizationTab.text",
-                "lblSkillRandomizationTab.summary",
-                randomizationOptions);
-        MHQCollapsiblePanel phenotypeSection = createSection("lblPhenotypesPanel.text",
-                "lblPhenotypesPanel.summary",
-                pnlPhenotype);
-        MHQCollapsiblePanel experienceModifiersSection = createSection("lblExperienceLevelModifiersPanel.text",
-                "lblExperienceLevelModifiersPanel.summary",
-                pnlExperienceLevelModifiers,
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        MHQCollapsiblePanel specialSkillsSection = createSection("lblSpecialSkillModifiersPanel.text",
-                "lblSpecialSkillModifiersPanel.summary",
-                pnlSpecialSkillModifiers);
-
-        JPanel panel = createSectionedPanel("SkillRandomizationTab",
-                skillRandomizationHeader,
-                optionsSection,
-                phenotypeSection,
-                experienceModifiersSection,
-                specialSkillsSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "SkillRandomizationTab");
+        return CampaignOptionsPagePanel.builder("SkillRandomizationTab", "SkillRandomizationTab", imageAddress)
+                .header(skillRandomizationHeader)
+                .section("lblSkillRandomizationTab.text",
+                        "lblSkillRandomizationTab.summary",
+                        randomizationOptions)
+                .section("lblPhenotypesPanel.text",
+                        "lblPhenotypesPanel.summary",
+                        pnlPhenotype)
+                .section("lblExperienceLevelModifiersPanel.text",
+                        "lblExperienceLevelModifiersPanel.summary",
+                        pnlExperienceLevelModifiers,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT))
+                .section("lblSpecialSkillModifiersPanel.text",
+                        "lblSpecialSkillModifiersPanel.summary",
+                        pnlSpecialSkillModifiers)
+                .build();
     }
 
     private JPanel createSkillRandomizationOptionsPanel() {
@@ -817,7 +724,12 @@ public class AdvancementTab {
                 spnCommandSkillsLegendary,
                 spnUtilitySkillsLegendary);
 
-        return panel;
+        final CampaignOptionsFormPanel wrapper = new CampaignOptionsFormPanel("ExperienceLevelModifiersWrapperPanel",
+                MODIFIER_ROW_LABEL_COLUMN_WIDTH,
+                MODIFIER_CONTROL_COLUMN_WIDTH);
+        wrapper.addFullWidthComponent(panel);
+
+        return wrapper;
     }
 
     private void createAbilityModifierControls() {
@@ -954,9 +866,9 @@ public class AdvancementTab {
     public JPanel recruitmentBonusesTab() {
         // Header
         // start Recruitment Bonus Tab
+        String imageAddress = getImageDirectory() + "logo_calderon_protectorate.png";
         CampaignOptionsHeaderPanel recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
-                getImageDirectory() + "logo_calderon_protectorate.png",
-                0);
+                imageAddress);
 
         // Contents
         pnlRecruitmentBonusesCombat = createRecruitmentBonusesCombatPanel();
@@ -964,20 +876,15 @@ public class AdvancementTab {
         recruitmentBonusesPageCreated = true;
         updateRecruitmentBonusControlsFromModel();
 
-        MHQCollapsiblePanel combatRolesSection = createSection("lblRecruitmentBonusesCombatPanel.text",
-                "lblRecruitmentBonusesCombatPanel.summary",
-                pnlRecruitmentBonusesCombat);
-        MHQCollapsiblePanel supportRolesSection = createSection("lblRecruitmentBonusesSupportPanel.text",
-                "lblRecruitmentBonusesSupportPanel.summary",
-                pnlRecruitmentBonusesSupport);
-
-        JPanel panel = createSectionedPanel("RecruitmentBonusesTab",
-                recruitmentBonusesHeader,
-                combatRolesSection,
-                supportRolesSection);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "RecruitmentBonusesTab");
+        return CampaignOptionsPagePanel.builder("RecruitmentBonusesTab", "RecruitmentBonusesTab", imageAddress)
+                .header(recruitmentBonusesHeader)
+                .section("lblRecruitmentBonusesCombatPanel.text",
+                        "lblRecruitmentBonusesCombatPanel.summary",
+                        pnlRecruitmentBonusesCombat)
+                .section("lblRecruitmentBonusesSupportPanel.text",
+                        "lblRecruitmentBonusesSupportPanel.summary",
+                        pnlRecruitmentBonusesSupport)
+                .build();
     }
 
     /**
@@ -1002,14 +909,17 @@ public class AdvancementTab {
         spnRecruitmentBonusCombat = new JSpinner[roles.size()];
 
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RecruitmentBonusesCombatPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+                RECRUITMENT_LABEL_COLUMN_WIDTH,
+                RECRUITMENT_CONTROL_COLUMN_WIDTH);
 
+        JComponent[] labelsAndControls = new JComponent[roles.size() * 2];
         for (int i = 0; i < roles.size(); i++) {
             lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusCombat[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-            panel.addRow(lblRecruitmentBonusCombat[i], spnRecruitmentBonusCombat[i]);
+            labelsAndControls[i * 2] = lblRecruitmentBonusCombat[i];
+            labelsAndControls[i * 2 + 1] = spnRecruitmentBonusCombat[i];
         }
+        panel.addRowGrid(RECRUITMENT_PAIRS_PER_ROW, labelsAndControls);
 
         return panel;
     }
@@ -1036,14 +946,17 @@ public class AdvancementTab {
         spnRecruitmentBonusSupport = new JSpinner[roles.size()];
 
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RecruitmentBonusesSupportPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+                RECRUITMENT_LABEL_COLUMN_WIDTH,
+                RECRUITMENT_CONTROL_COLUMN_WIDTH);
 
+        JComponent[] labelsAndControls = new JComponent[roles.size() * 2];
         for (int i = 0; i < roles.size(); i++) {
             lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusSupport[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-            panel.addRow(lblRecruitmentBonusSupport[i], spnRecruitmentBonusSupport[i]);
+            labelsAndControls[i * 2] = lblRecruitmentBonusSupport[i];
+            labelsAndControls[i * 2 + 1] = spnRecruitmentBonusSupport[i];
         }
+        panel.addRowGrid(RECRUITMENT_PAIRS_PER_ROW, labelsAndControls);
 
         return panel;
     }

@@ -78,11 +78,23 @@ public class CampaignOptionsPagePanel extends JPanel {
         pageBody.setName("pnl" + builder.name + "PageBody");
         pageBody.setOpaque(false);
 
-        List<MHQCollapsiblePanel> sections = createSections(builder.sections, builder.sectionsExpandedByDefault);
+        // Render items preserve the order in which sections and raw components were added to the builder, so callers
+        // can place arbitrary components above, between, or below the collapsible sections.
+        List<Object> renderItems = new ArrayList<>();
+        List<MHQCollapsiblePanel> sections = new ArrayList<>();
+        for (Object bodyItem : builder.bodyItems) {
+            if (bodyItem instanceof Section section) {
+                MHQCollapsiblePanel sectionPanel = createSection(section, builder.sectionsExpandedByDefault);
+                sections.add(sectionPanel);
+                renderItems.add(sectionPanel);
+            } else if (bodyItem instanceof JComponent component) {
+                renderItems.add(component);
+            }
+        }
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
 
-        JPanel contentPanel = createContentPanel(builder, sections, sectionControls, sectionStackWidth);
+        JPanel contentPanel = createContentPanel(builder, renderItems, sections, sectionControls, sectionStackWidth);
         pageBody.add(contentPanel, BorderLayout.CENTER);
         int quoteWidth = sectionStackWidth > 0 ? sectionStackWidth : contentPanel.getPreferredSize().width;
         JComponent quotePanel = createQuotePanel(builder.quoteResourceName, quoteWidth);
@@ -121,7 +133,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         pageBody.setBounds(x, 0, contentWidth, preferredSize.height);
     }
 
-    private JPanel createContentPanel(Builder builder, List<MHQCollapsiblePanel> sections,
+    private JPanel createContentPanel(Builder builder, List<Object> renderItems, List<MHQCollapsiblePanel> sections,
           JPanel sectionControls, int sectionStackWidth) {
         CampaignOptionsHeaderPanel header = builder.headerPanel != null ? builder.headerPanel
               : new CampaignOptionsHeaderPanel(builder.headerResourceName,
@@ -147,17 +159,17 @@ public class CampaignOptionsPagePanel extends JPanel {
             panel.add(createIntroPanel(builder, introWidth), layout);
         }
 
-        if (!sections.isEmpty()) {
+        if (!renderItems.isEmpty()) {
             layout.gridy++;
             layout.anchor = GridBagConstraints.NORTHWEST;
-            panel.add(createSectionStackPanel(sections, sectionControls, sectionStackWidth), layout);
+            panel.add(createSectionStackPanel(renderItems, sections, sectionControls, sectionStackWidth), layout);
         }
 
         return panel;
     }
 
-    private JPanel createSectionStackPanel(List<MHQCollapsiblePanel> sections, JPanel sectionControls,
-          int stackWidth) {
+    private JPanel createSectionStackPanel(List<Object> renderItems, List<MHQCollapsiblePanel> sections,
+          JPanel sectionControls, int stackWidth) {
         JPanel stackPanel = new JPanel(new GridBagLayout()) {
             @Override
             public Dimension getPreferredSize() {
@@ -174,16 +186,30 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         GridBagConstraints layout = new GridBagConstraints();
         layout.gridx = 0;
-        layout.gridy = 0;
+        layout.gridy = -1;
         layout.weightx = 1.0;
         layout.fill = GridBagConstraints.HORIZONTAL;
-        layout.anchor = GridBagConstraints.EAST;
-        stackPanel.add(sectionControls, layout);
 
-        layout.anchor = GridBagConstraints.NORTHWEST;
-        for (MHQCollapsiblePanel section : sections) {
-            layout.gridy++;
-            stackPanel.add(section, layout);
+        boolean controlsAdded = false;
+        for (Object renderItem : renderItems) {
+            // The expand/collapse-all controls belong with the sections, so insert them immediately before the first
+            // section. Components placed before any section therefore render above the controls (a top action area),
+            // while components between sections stay inline.
+            if (renderItem instanceof MHQCollapsiblePanel section) {
+                if (!controlsAdded && !sections.isEmpty()) {
+                    layout.gridy++;
+                    layout.anchor = GridBagConstraints.EAST;
+                    stackPanel.add(sectionControls, layout);
+                    controlsAdded = true;
+                }
+                layout.gridy++;
+                layout.anchor = GridBagConstraints.NORTHWEST;
+                stackPanel.add(section, layout);
+            } else if (renderItem instanceof JComponent component) {
+                layout.gridy++;
+                layout.anchor = GridBagConstraints.NORTHWEST;
+                stackPanel.add(component, layout);
+            }
         }
 
         return stackPanel;
@@ -205,25 +231,17 @@ public class CampaignOptionsPagePanel extends JPanel {
         return Math.min(INTRO_HORIZONTAL_PADDING, Math.max(0, (introWidth - 1) / 2));
     }
 
-    private List<MHQCollapsiblePanel> createSections(List<Section> sectionDefinitions,
-          boolean sectionsExpandedByDefault) {
-        List<MHQCollapsiblePanel> sections = new ArrayList<>();
-        for (Section sectionDefinition : sectionDefinitions) {
-            sections.add(createSection(sectionDefinition, sectionsExpandedByDefault));
-        }
-        return sections;
-    }
-
     private MHQCollapsiblePanel createSection(Section sectionDefinition, boolean expandedByDefault) {
         MHQCollapsiblePanel section = new MHQCollapsiblePanel(getSectionTitle(sectionDefinition),
               sectionDefinition.content);
-        section.setSummary(getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.summaryKey));
+        section.setSummary(getSectionSummary(sectionDefinition));
         section.setExpanded(expandedByDefault);
         return section;
     }
 
     private String getSectionTitle(Section sectionDefinition) {
-        String title = getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.titleKey);
+        String title = sectionDefinition.literal ? sectionDefinition.titleKey
+              : getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.titleKey);
         String badges = formatBadges(sectionDefinition.metadata);
         if (badges.isBlank()) {
             return title;
@@ -232,6 +250,14 @@ public class CampaignOptionsPagePanel extends JPanel {
         // label only reserves the width of its longest word, so the title would wrap whenever the section content is
         // narrow, making the header width appear tied to the content width.
         return "<html><nobr>" + title + badges + "</nobr></html>";
+    }
+
+    private String getSectionSummary(Section sectionDefinition) {
+        if (sectionDefinition.summaryKey == null) {
+            return "";
+        }
+        return sectionDefinition.literal ? sectionDefinition.summaryKey
+              : getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.summaryKey);
     }
 
     private int getPreferredSectionWidth(List<MHQCollapsiblePanel> sections) {
@@ -333,7 +359,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         private final String name;
         private final String headerResourceName;
         private final String imageAddress;
-        private final List<Section> sections = new ArrayList<>();
+        private final List<Object> bodyItems = new ArrayList<>();
         private CampaignOptionsHeaderPanel headerPanel;
         private String quoteResourceName;
         private String introTextKey;
@@ -395,7 +421,32 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder section(String titleKey, String summaryKey, JComponent content,
               @Nullable CampaignOptionsMetadata metadata) {
-            sections.add(new Section(titleKey, summaryKey, content, metadata));
+            bodyItems.add(new Section(titleKey, summaryKey, content, metadata, false));
+            return this;
+        }
+
+        /**
+         * Adds a collapsible section whose title and summary are used verbatim rather than being resolved through the
+         * campaign options resource bundle. Use this for sections whose titles are only known at runtime (for example,
+         * one section per special ability).
+         *
+         * @param title   the literal section title
+         * @param summary the literal summary shown when the section is collapsed, or {@code null} for none
+         * @param content the section body
+         */
+        public Builder literalSection(String title, @Nullable String summary, JComponent content) {
+            bodyItems.add(new Section(title, summary, content, null, true));
+            return this;
+        }
+
+        /**
+         * Adds an arbitrary component to the page body. The component is rendered in the order it was added relative to
+         * sections, so it can sit above, between, or below them.
+         *
+         * @param component the component to add
+         */
+        public Builder component(JComponent component) {
+            bodyItems.add(component);
             return this;
         }
 
@@ -405,6 +456,6 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private record Section(String titleKey, String summaryKey, JComponent content,
-                           @Nullable CampaignOptionsMetadata metadata) {
+                           @Nullable CampaignOptionsMetadata metadata, boolean literal) {
     }
 }
