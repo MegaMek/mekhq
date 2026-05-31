@@ -7616,10 +7616,8 @@ public class Person {
      * @return {@code true} if there is at least one non-permanent injury present; {@code false} otherwise
      */
     public boolean needsAMFixing() {
-        ArrayList<Injury> allInjuries = new ArrayList<>(getInjuries());
-        allInjuries.removeAll(getPermanentInjuries());
-
-        return !allInjuries.isEmpty();
+        boolean ignorePermanentInjuries = true;
+        return hasInjuries(ignorePermanentInjuries);
     }
 
     /**
