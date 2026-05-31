@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -210,7 +211,7 @@ public class EscapeSkills {
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         if (useAdvancedMedical) {
             InjuryUtil.resolveCombatDamage(campaign, prisoner, injuries);
-            if (prisoner.getInjuries().size() > 5) {
+            if (prisoner.getTotalInjurySeverity() >= DEATH) {
                 prisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
             }
         } else {
