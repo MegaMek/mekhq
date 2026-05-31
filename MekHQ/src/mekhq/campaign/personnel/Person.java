@@ -7610,8 +7610,14 @@ public class Person {
         return getInjuryByLocation(location) != null;
     }
 
+    /**
+     * Determines whether this entity has any non-permanent injuries that require medical attention.
+     *
+     * @return {@code true} if there is at least one non-permanent injury present; {@code false} otherwise
+     */
     public boolean needsAMFixing() {
-        return !injuries.isEmpty();
+        boolean ignorePermanentInjuries = true;
+        return hasInjuries(ignorePermanentInjuries);
     }
 
     /**
