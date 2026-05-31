@@ -1926,12 +1926,10 @@ public class CampaignNewDayManager {
         int myomerProsthetics = 0;
         boolean hasPowerSupply = false;
 
-        for (Injury injury : person.getInjuries()) {
-            InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification()) {
-                prostheticMedicalReliance++;
-            }
+        for (Injury injury : person.getProstheticInjuries()) {
+            prostheticMedicalReliance++;
 
+            InjurySubType injurySubType = injury.getSubType();
             if (injurySubType.isMyomerProsthetic()) {
                 myomerProsthetics++;
             }
