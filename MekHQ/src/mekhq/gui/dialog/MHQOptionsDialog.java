@@ -112,6 +112,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
     private JCheckBox chkUnifiedDailyReport;
+    private JCheckBox chkEnableDailyReportAggregateTab;
     // endregion Personnel Tab
     // endregion Display
 
@@ -201,6 +202,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayVesselGunnerPoolNoRelease;
     private JCheckBox chkNewDayVesselCrewPoolFill;
     private JCheckBox chkNewDayVesselCrewPoolNoRelease;
+    private JCheckBox chkNewDayAutoLogistics;
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
     private JCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
@@ -472,6 +474,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkUnifiedDailyReport = new JCheckBox(resources.getString("chkUnifiedDailyReport.text"));
         chkUnifiedDailyReport.setToolTipText(resources.getString("chkUnifiedDailyReport.toolTipText"));
         chkUnifiedDailyReport.setName("chkUnifiedDailyReport");
+
+        chkEnableDailyReportAggregateTab = new JCheckBox(getText("chkEnableDailyReportAggregateTab.text"));
+        chkEnableDailyReportAggregateTab.setToolTipText(wordWrap(getText(
+              "chkEnableDailyReportAggregateTab.toolTipText")));
+        chkEnableDailyReportAggregateTab.setName("chkEnableDailyReportAggregateTab");
         // endregion Personnel Tab
 
         // Programmatically Assign Accessibility Labels
@@ -536,6 +543,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             GroupLayout.DEFAULT_SIZE,
                                                             40))
                                       .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                      .addComponent(chkEnableDailyReportAggregateTab)
                                       .addComponent(chkUnifiedDailyReport));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -573,6 +581,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(labelPersonnelFilterStyle)
                                                         .addComponent(optionPersonnelFilterStyle))
                                         .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                        .addComponent(chkEnableDailyReportAggregateTab)
                                         .addComponent(chkUnifiedDailyReport));
 
         return body;
@@ -1089,6 +1098,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
         chkNewDayMRMS.setName("chkNewDayMRMS");
 
+        chkNewDayAutoLogistics = new JCheckBox(getText("chkNewDayAutoLogistics.text"));
+        chkNewDayAutoLogistics.setToolTipText(wordWrap(getText("chkNewDayAutoLogistics.toolTipText")));
+        chkNewDayAutoLogistics.setName("chkNewDayAutoLogistics");
+
         chkNewDayOptimizeMedicalAssignments = new JCheckBox(resources.getString(
               "chkNewDayOptimizeMedicalAssignments.text"));
         chkNewDayOptimizeMedicalAssignments.setToolTipText(resources.getString(
@@ -1210,6 +1223,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayVesselGunnerPoolNoRelease)
                                       .addComponent(chkNewDayVesselCrewPoolFill)
                                       .addComponent(chkNewDayVesselCrewPoolNoRelease)
+                                      .addComponent(chkNewDayAutoLogistics)
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
                                       .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
@@ -1253,6 +1267,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayVesselGunnerPoolNoRelease)
                                         .addComponent(chkNewDayVesselCrewPoolFill)
                                         .addComponent(chkNewDayVesselCrewPoolNoRelease)
+                                        .addComponent(chkNewDayAutoLogistics)
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
                                         .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
@@ -1734,6 +1749,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         options.setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
         options.setUnifiedDailyReport(chkUnifiedDailyReport.isSelected());
+        options.setAggregateDailyReport(chkEnableDailyReportAggregateTab.isSelected());
 
         // Colours
         options.setDeployedForeground(optionDeployedForeground.getColour());
@@ -1799,6 +1815,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options.setNewDayAsTechPoolNoRelease(chkNewDayAsTechPoolNoRelease.isSelected());
         options.setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
         options.setNewDayMedicPoolNoRelease(chkNewDayMedicPoolNoRelease.isSelected());
+        options.setNewDayAutoLogistics(chkNewDayAutoLogistics.isSelected());
         options.setNewDayMRMS(chkNewDayMRMS.isSelected());
         options.setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
         options.setNewDaySoldierPoolFill(chkNewDaySoldierPoolFill.isSelected());
@@ -1957,6 +1974,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPersonnelFilterStyle.setSelectedItem(options.getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(options.getPersonnelFilterOnPrimaryRole());
         chkUnifiedDailyReport.setSelected(options.getUnifiedDailyReport());
+        chkEnableDailyReportAggregateTab.setSelected(options.isUseAggregateDailyReport());
 
         // Colours
         optionDeployedForeground.setColour(options.getDeployedForeground());
@@ -2051,6 +2069,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayVesselCrewPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill());
         chkNewDayVesselCrewPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDayVesselCrewPoolNoRelease());
         chkNewDayVesselCrewPoolNoRelease.setEnabled(chkNewDayVesselCrewPoolFill.isSelected());
+        chkNewDayAutoLogistics.setSelected(options.getNewDayAutoLogistics());
         chkNewDayMRMS.setSelected(options.getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(options.getNewDayOptimizeMedicalAssignments());
         chkNewDayAutomaticallyAssignUnmaintainedUnits.setSelected(options

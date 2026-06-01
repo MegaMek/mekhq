@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.mission.camOpsSalvage;
 
-import static java.lang.Math.max;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +61,7 @@ public record SalvageTechData(Person tech, UUID techId, String rank, int rankNum
               tech.getLastName(),
               tech.getCurrentEdge(),
               tech.getSkillLevel(campaign, isSecondaryTech, true).toString(),
-              max(tech.getHits(), tech.getInjuries().size()),
+              tech.getTotalInjurySeverity(),
               tech.getMinutesLeft());
     }
 }

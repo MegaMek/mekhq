@@ -54,6 +54,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
 import megamek.common.units.SpaceStation;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Hangar;
@@ -63,6 +64,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -158,6 +160,7 @@ public class TransportCostCalculations {
     private double additionalCargoSpaceRequired;
     private double cargoBayCost;
     private double tetrisMasterMultiplier = 1.0;
+    private boolean hasTransportNegotiatorSPA;
     private int requiredCargoDropShips;
 
     private int additionalSmallCraftBaysRequired;
@@ -195,6 +198,7 @@ public class TransportCostCalculations {
     private int lightVehicleCount;
     private int mekCount;
     private int asfCount;
+    private int lamCount;
     private int protoMekCount;
     private int battleArmorCount;
     private int infantryCount;
@@ -378,6 +382,14 @@ public class TransportCostCalculations {
         this.mekCount = mekCount;
     }
 
+    int getLAMCount() {
+        return lamCount;
+    }
+
+    public void setLAMCount(int lamCount) {
+        this.lamCount = lamCount;
+    }
+
     int getAsfCount() {
         return asfCount;
     }
@@ -439,7 +451,7 @@ public class TransportCostCalculations {
         this.crewExperienceLevel = crewExperienceLevel;
         this.allPersonnel = allPersonnel;
 
-        setTetrisMasterMultiplier();
+        setSPAValues();
     }
 
     /**
@@ -452,13 +464,23 @@ public class TransportCostCalculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private void setTetrisMasterMultiplier() {
+    private void setSPAValues() {
         Collection<Person> activePersonnel = allPersonnel.stream()
                                                    .filter(p -> p.getStatus().isActive())
                                                    .toList();
         for (Person person : activePersonnel) {
-            if (person.getOptions().booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
+            PersonnelOptions personnelOptions = person.getOptions();
+
+            boolean isTransportAdmin = person.hasRole(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+            boolean isLogisticsAdmin = person.hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+            if ((isTransportAdmin || isLogisticsAdmin) &&
+                      personnelOptions.booleanOption(PersonnelOptions.ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
+            }
+
+            if (isTransportAdmin &&
+                      personnelOptions.booleanOption(PersonnelOptions.UNOFFICIAL_TRANSPORT_NEGOTIATOR)) {
+                hasTransportNegotiatorSPA = true;
             }
         }
     }
@@ -513,6 +535,10 @@ public class TransportCostCalculations {
         calculateAdditionalJumpCollarsRequirements();
 
         adjustForCrewExperienceLevel();
+
+        if (hasTransportNegotiatorSPA) {
+            totalCost = totalCost.multipliedBy(1.05);
+        }
 
         totalCost = totalCost.round();
     }
@@ -621,13 +647,21 @@ public class TransportCostCalculations {
         // ASF (including Conv Fighters)
         int asfBays = getTotalASFBays() + smallCraftSpareCapacity;
         int asfBayUsage = asfBays - asfCount;
+
+        if (asfBays > asfCount) {
+            int spareCapacity = asfBays - asfCount;
+            int deduction = Math.min(spareCapacity, lamCount);
+            asfCount += deduction;
+            lamCount -= deduction;
+        }
+
         additionalASFBaysRequired = -min(0, asfBayUsage);
         additionalASFBaysCost = round(additionalASFBaysRequired * ASF_COST);
         totalCost = totalCost.plus(additionalASFBaysCost);
 
         // Meks
         int mekBays = getTotalMekBays();
-        int mekBayUsage = mekBays - mekCount;
+        int mekBayUsage = mekBays - (mekCount + lamCount);
         additionalMekBaysRequired = -min(0, mekBayUsage);
         additionalMekBaysCost = round(additionalMekBaysRequired * MEK_COST);
         totalCost = totalCost.plus(additionalMekBaysCost);
@@ -737,6 +771,8 @@ public class TransportCostCalculations {
                     dropShipCount += getAdditionalCollarNeeds(spaceStation);
                 } else if (entity.isSmallCraft()) {
                     smallCraftCount++;
+                } else if (entity instanceof LandAirMek) {
+                    lamCount++;
                 } else if (entity.isMek()) {
                     mekCount++;
                 } else if (entity.isFighter()) {

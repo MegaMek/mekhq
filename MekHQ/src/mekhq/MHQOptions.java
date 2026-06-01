@@ -244,6 +244,16 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
               .putBoolean(MHQConstants.USE_UNIFIED_DAILY_REPORT, value);
     }
+
+    public boolean isUseAggregateDailyReport() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, false);
+    }
+
+    public void setAggregateDailyReport(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, value);
+    }
     // endregion Personnel Tab
     // endregion Display Tab
 
@@ -1015,8 +1025,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_NO_RELEASE, value);
     }
 
+    public boolean getNewDayAutoLogistics() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_AUTO_LOGISTICS, false);
+    }
+
+    public void setNewDayAutoLogistics(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_AUTO_LOGISTICS, value);
+    }
+
     public boolean getNewDayMRMS() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_MRMS, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_AUTO_LOGISTICS, true);
     }
 
     public void setNewDayMRMS(final boolean value) {

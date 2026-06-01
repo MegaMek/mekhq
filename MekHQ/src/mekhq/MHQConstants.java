@@ -100,6 +100,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
     public static final String USE_UNIFIED_DAILY_REPORT = "useUnifiedDailyReport";
+    public static final String USE_AGGREGATE_DAILY_REPORT = "useAggregateDailyReport";
     // endregion Personnel Tab
     // endregion Display
 
@@ -192,6 +193,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_VESSEL_PILOT_POOL_NO_RELEASE = "newDayVesselPilotPoolNoRelease";
     public static final String NEW_DAY_VESSEL_GUNNER_POOL_NO_RELEASE = "newDayVesselGunnerPoolNoRelease";
     public static final String NEW_DAY_VESSEL_CREW_POOL_NO_RELEASE = "newDayVesselCrewPoolNoRelease";
+    public static final String NEW_DAY_AUTO_LOGISTICS = "newDayAutoLogistics";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
