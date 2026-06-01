@@ -70,7 +70,10 @@ import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 
 import java.awt.Color;
@@ -1892,6 +1895,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void replenishEdgeActin(Person person) {
         if (person.getUsedEdge() <= 0) {
             getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.none",
+                  spanOpeningWithCustomColor(getWarningColor()),
+                  CLOSING_SPAN_TAG,
                   person.getHyperlinkedName()));
             return;
         }
@@ -1903,7 +1908,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         int currentXp = person.getXP();
         if (currentXp < actualCost) {
-            getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.failure", person.getHyperlinkedName(),
+            getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.failure",
+                  person.getHyperlinkedName(),
+                  spanOpeningWithCustomColor(getNegativeColor()),
+                  CLOSING_SPAN_TAG,
                   actualCost));
             return;
         }
@@ -1913,6 +1921,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.success",
               person.getHyperlinkedName(),
+              spanOpeningWithCustomColor(getPositiveColor()),
+              CLOSING_SPAN_TAG,
               actualCost));
 
         getCampaign().personUpdated(person);
