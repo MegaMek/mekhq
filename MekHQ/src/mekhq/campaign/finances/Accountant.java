@@ -107,7 +107,7 @@ public record Accountant(Campaign campaign) {
         }
 
         // Add all temporary personnel (medics, astechs, temp crew)
-        salaries = salaries.plus(sumTempCrewPay());
+        salaries = salaries.plus(sumTempCrewPay(noInfantry));
 
         return salaries;
     }
@@ -621,7 +621,7 @@ public record Accountant(Campaign campaign) {
             payRollSummary.put(person, person.getSalary(campaign()));
         }
         // And pay our pool
-        payRollSummary.put(null, Money.of(sumTempCrewPay(getCampaignOptions().isInfantryDontCount())));
+        payRollSummary.put(null, Money.of(sumTempCrewPay()));
 
         return payRollSummary;
     }
