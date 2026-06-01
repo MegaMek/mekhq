@@ -37,6 +37,7 @@ import static megamek.common.enums.SkillLevel.VETERAN;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.universe.factionStanding.FactionCensureAction.FINE;
@@ -67,6 +68,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -165,6 +167,7 @@ public class FactionCensureEvent {
                                                ? PersonnelRole.MEKWARRIOR
                                                : PersonnelRole.MILITARY_LIAISON;
                     Person speaker = campaign.newPerson(role, censuringFaction.getShortName(), Gender.RANDOMIZE);
+                    AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
 
                     ImmersiveDialogWidth dialogWidth;
                     if (censureAction.equals(FINE) || censureAction.equals(FORMAL_WARNING)) {
