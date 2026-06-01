@@ -704,11 +704,7 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        // While this is happening to generate a character's background, it does not use the
-                        // simulated relationship history system. Therefore, 'isBackground' needs to == false,
-                        // otherwise any marriages will be voided the next time the campaign is loaded as the spouse
-                        // will not be added to the campaign
-                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson(), false);
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
