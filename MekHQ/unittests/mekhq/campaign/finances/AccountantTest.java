@@ -44,20 +44,30 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_GUNNER;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 public class AccountantTest {
 
@@ -818,5 +828,119 @@ public class AccountantTest {
 
         // Assert
         assertEquals(expected, actual);
+    }
+
+    /**
+     * tests {@link Accountant#getPayRollSummary()}
+     */
+    @Nested
+    class TestGetPayrollSummary {
+        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        Accountant accountant;
+        final int EXPECTEDPAY = 100;
+        final int CREWCOUNT = 5;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            campaignOptions = new CampaignOptions();
+            accountant = new Accountant(mockCampaign);
+        }
+
+
+        @Test
+        void testGetPayrollSummary_emptyCampaign() {
+            // Arrange
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+            // Act
+            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
+
+            // Assert
+            assertEquals(1, expectedMap.size());
+            assertTrue(expectedMap.containsKey(null));
+            assertEquals(Money.zero(), expectedMap.get(null));
+        }
+
+        @Test
+        void testGetPayrollSummary_onePerson() {
+            // Arrange
+            Person mockPerson = getMockPerson(EXPECTEDPAY);
+
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(mockPerson));
+
+            // Act
+            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
+
+            // Assert
+            assertEquals(2, expectedMap.size());
+            assertTrue(expectedMap.containsKey(null));
+            assertEquals(Money.zero(), expectedMap.get(null));
+            assertTrue(expectedMap.containsKey(mockPerson));
+            assertEquals(Money.of(EXPECTEDPAY), expectedMap.get(mockPerson));
+        }
+
+        @Test
+        void testGetAstechPoolPay() {
+            // Arrange
+            when(mockCampaign.getTemporaryAsTechPool()).thenReturn(5);
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+            // Act
+
+            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
+
+            // Assert
+            assertEquals(1, expectedMap.size());
+            assertTrue(expectedMap.containsKey(null));
+            assertEquals(Money.of(2000), expectedMap.get(null));
+        }
+
+        @Test
+        void testGetMedicPoolPay() {
+            // Arrange
+            when(mockCampaign.getTemporaryMedicPool()).thenReturn(5);
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+            // Act
+
+            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
+
+            // Assert
+            assertEquals(1, expectedMap.size());
+            assertTrue(expectedMap.containsKey(null));
+            assertEquals(Money.of(2000), expectedMap.get(null));
+        }
+
+        @ParameterizedTest
+        @EnumSource(names = { "SOLDIER", "BATTLE_ARMOUR", "VEHICLE_CREW_GROUND", "VEHICLE_CREW_VTOL",
+                              "VEHICLE_CREW_NAVAL", "VESSEL_PILOT", "VESSEL_GUNNER", "VESSEL_CREW" })
+        void testGetAllTempCrewPay(PersonnelRole role) {
+            // Arrange
+            when(mockCampaign.getTempCrewRoleKeys())
+                  .thenReturn(new HashSet<>(Collections.singleton(role)));
+            when(mockCampaign.getTempCrewPool(any())).thenReturn(CREWCOUNT);
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+            // Act
+            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
+
+            // Assert
+            assertEquals(1, expectedMap.size());
+            assertTrue(expectedMap.containsKey(null));
+            assertEquals(Money.of(CREWCOUNT *
+                                        campaignOptions.getRoleBaseSalaries()[role.ordinal()].getAmount()
+                                              .doubleValue()),
+                  expectedMap.get(null));
+        }
+
+        Person getMockPerson(int pay) {
+            Person mockPerson = mock(Person.class);
+
+            when(mockPerson.getSalary(mockCampaign)).thenReturn(Money.of(pay));
+            return mockPerson;
+        }
     }
 }

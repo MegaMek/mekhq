@@ -52,7 +52,9 @@ class RulesetsOptionsModel {
     boolean playerControlsAttachedUnits;
     boolean useAdvancedBuildingGunEmplacements;
     int spaUpgradeIntensity;
+    int reinforcementBaseTargetNumber;
     boolean autoConfigMunitions;
+    boolean clansObeyBiddingRules;
     int enemyFacilityModifierDieSize;
     int alliedFacilityModifierDieSize;
     int scenarioModMax;
@@ -93,7 +95,9 @@ class RulesetsOptionsModel {
         playerControlsAttachedUnits = options.isPlayerControlsAttachedUnits();
         useAdvancedBuildingGunEmplacements = options.isUseAdvancedBuildingGunEmplacements();
         spaUpgradeIntensity = options.getSpaUpgradeIntensity();
+        reinforcementBaseTargetNumber = options.getReinforcementBaseTargetNumber();
         autoConfigMunitions = options.isAutoConfigMunitions();
+        clansObeyBiddingRules = options.isClansObeyBiddingRules();
         enemyFacilityModifierDieSize = options.getEnemyFacilityModifierDieSize();
         alliedFacilityModifierDieSize = options.getAlliedFacilityModifierDieSize();
         scenarioModMax = options.getScenarioModMax();
@@ -135,7 +139,9 @@ class RulesetsOptionsModel {
         options.setPlayerControlsAttachedUnits(playerControlsAttachedUnits);
         options.setUseAdvancedBuildingGunEmplacements(useAdvancedBuildingGunEmplacements);
         options.setSpaUpgradeIntensity(spaUpgradeIntensity);
+        options.setReinforcementBaseTargetNumber(reinforcementBaseTargetNumber);
         options.setAutoConfigMunitions(autoConfigMunitions);
+        options.setClansObeyBiddingRules(clansObeyBiddingRules);
         options.setEnemyFacilityModifierDieSize(enemyFacilityModifierDieSize);
         options.setAlliedFacilityModifierDieSize(alliedFacilityModifierDieSize);
         options.setScenarioModMax(scenarioModMax);

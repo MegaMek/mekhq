@@ -65,6 +65,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.parts.PartEvent;
@@ -654,6 +655,11 @@ public final class HangarTab extends CampaignGuiTab {
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
         filterUnitScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        unitListScheduler.schedule();
     }
 
     @Subscribe

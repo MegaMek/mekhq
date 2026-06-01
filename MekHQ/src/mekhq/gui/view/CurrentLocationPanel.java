@@ -75,6 +75,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * A UI panel that displays the current location details.
@@ -98,7 +99,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     private final ScalingVerticalFillImage imgLocation = new ScalingVerticalFillImage();
     private final JLabel lblLocationPrimaryInfo = new JLabel();
     private final JLabel lblLocationSecondaryInfo = new JLabel();
-    private final RoundedJButton btnHiringHall = new RoundedJButton();
+    private final RoundedJButton btnRecruitment = new RoundedJButton();
 
     /**
      * Constructs a new {@code CurrentLocationPanel}.
@@ -143,11 +144,12 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         gridBagConstraints.weighty = 1;
         add(new JLabel(), gridBagConstraints);
 
-        btnHiringHall.addActionListener(e -> openRecruitmentDialog.run());
+        btnRecruitment.addActionListener(e -> openRecruitmentDialog.run());
+        btnRecruitment.setToolTipText(getTextAt("recruitment.tooltip"));
         gridBagConstraints.gridy++;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        add(btnHiringHall, gridBagConstraints);
+        add(btnRecruitment, gridBagConstraints);
 
         refresh();
         MekHQ.registerHandler(this);
@@ -176,28 +178,32 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
 
         if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
             // keep the legacy recruitment always available
-            btnHiringHall.setEnabled(true);
-            btnHiringHall.setText(getTextAt("recruitment.legacy"));
+            btnRecruitment.setEnabled(true);
+            btnRecruitment.setText(getTextAt("recruitment.legacy"));
         } else {
             String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
-            btnHiringHall.setEnabled(availabilityMessage.isBlank());
+            btnRecruitment.setEnabled(availabilityMessage.isBlank());
 
             HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
             if (!availabilityMessage.isBlank()) {
-                btnHiringHall.setText(availabilityMessage);
+                btnRecruitment.setText(availabilityMessage);
             } else if (hiringHallLevel.isNone()) {
-                btnHiringHall.setText(getTextAt("recruitment.hiringHall.none"));
+                btnRecruitment.setText(getTextAt("recruitment.hiringHall.none"));
             } else {
-                btnHiringHall.setText(getFormattedTextAt("recruitment.hiringHall.some",
+                btnRecruitment.setText(getFormattedTextAt("recruitment.hiringHall.some",
                       StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
             }
         }
         if (location.isOnPlanet()) {
             lblLocationPrimaryInfo.setText(getPlanetaryConditionsInfo());
+            lblLocationPrimaryInfo.setToolTipText(getTextAt("info.atmosphere.tooltip"));
             lblLocationSecondaryInfo.setText(getSocioIndustrialInfo());
+            lblLocationSecondaryInfo.setToolTipText(getTextAt("info.socioIndustrial.tooltip"));
         } else {
             lblLocationPrimaryInfo.setText(getCourseInfo());
+            lblLocationPrimaryInfo.setToolTipText(Strings.EMPTY);
             lblLocationSecondaryInfo.setText(getJumpCostInfo());
+            lblLocationSecondaryInfo.setToolTipText(Strings.EMPTY);
         }
     }
 

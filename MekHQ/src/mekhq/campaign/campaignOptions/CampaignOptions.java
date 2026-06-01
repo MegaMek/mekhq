@@ -680,6 +680,8 @@ public class CampaignOptions {
     private int fixedMapChance;
     private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
+    private int reinforcementBaseTargetNumber;
+    private boolean clansObeyBiddingRules;
     private int alliedFacilityModifierDieSize;
     private int enemyFacilityModifierDieSize;
     private int scenarioModMax;
@@ -1360,7 +1362,9 @@ public class CampaignOptions {
         setOpForLanceTypeVehicles(3);
         setFixedMapChance(25);
         setUseAdvancedBuildingGunEmplacements(false);
+        reinforcementBaseTargetNumber = 7;
         setSpaUpgradeIntensity(0);
+        clansObeyBiddingRules = true;
         setAlliedFacilityModifierDieSize(2);
         setEnemyFacilityModifierDieSize(2);
         regionalMekVariations = false;
@@ -5294,6 +5298,22 @@ public class CampaignOptions {
 
     public void setSpaUpgradeIntensity(final int spaUpgradeIntensity) {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
+    }
+
+    public int getReinforcementBaseTargetNumber() {
+        return reinforcementBaseTargetNumber;
+    }
+
+    public void setReinforcementBaseTargetNumber(final int reinforcementBaseTargetNumber) {
+        this.reinforcementBaseTargetNumber = reinforcementBaseTargetNumber;
+    }
+
+    public boolean isClansObeyBiddingRules() {
+        return clansObeyBiddingRules;
+    }
+
+    public void setClansObeyBiddingRules(final boolean clansObeyBiddingRules) {
+        this.clansObeyBiddingRules = clansObeyBiddingRules;
     }
 
     public int getAlliedFacilityModifierDieSize() {
