@@ -391,11 +391,6 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
-        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-
         Border innerBorder = BorderFactory.createCompoundBorder(
               new RoundedLineBorder(UIUtil.uiIndependentGray(), 1, 8),
               BorderFactory.createEmptyBorder(1, 3, 1, 3));
@@ -424,7 +419,6 @@ public class CampaignGUI extends JPanel {
         pnlTempPersonnel.add(pnlVehicleCrew);
         pnlTempPersonnel.add(pnlVesselCrew);
 
-        statusPanel.add(btnOvertime);
         statusPanel.add(pnlTempPersonnel);
         statusPanel.add(lblPartsAvailabilityRating);
     }
@@ -575,6 +569,10 @@ public class CampaignGUI extends JPanel {
 
     public @Nullable WarehouseTab getWarehouseTab() {
         return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
+    }
+
+    public @Nullable RepairTab getRepairBayTab() {
+        return (RepairTab) getTab(MHQTabType.REPAIR_BAY);
     }
 
     public boolean hasTab(MHQTabType tabType) {

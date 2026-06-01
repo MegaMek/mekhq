@@ -139,6 +139,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private RoundedMMToggleButton btnShowAllTechsWarehouse;
     private JLabel lblTargetNumWarehouse;
     private JTextArea textTargetWarehouse;
+    private RoundedMMToggleButton btnOvertime;
     private JLabel asTechPoolLabel;
     private JComboBox<String> choiceParts;
     private JComboBox<String> choicePartsView;
@@ -394,6 +395,21 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panelDoTask.add(scrollTechTable, gridBagConstraints);
 
+        btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
+        btnOvertime.addActionListener(evt -> {
+            getCampaign().setOvertime(btnOvertime.isSelected());
+            RepairTab repairBayTab = getCampaignGui().getRepairBayTab();
+            repairBayTab.refreshOvertimeStatus();
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panelDoTask.add(btnOvertime, gridBagConstraints);
+
         asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
                                            getCampaign().getAsTechPoolMinutes() +
                                            " (" +
@@ -402,10 +418,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         asTechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;;
         panelDoTask.add(asTechPoolLabel, gridBagConstraints);
 
         JSplitPane splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panSupplies, panelDoTask);
@@ -457,6 +473,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void refreshAll() {
         refreshTechsList();
         refreshPartsList();
+        refreshOvertimeStatus();
     }
 
     /*
@@ -660,6 +677,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 }
             }
         }
+    }
+
+    /**
+     * Updates 'Overtime Allowed' button state.
+     */
+    public void refreshOvertimeStatus() {
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
     }
 
     public void refreshPartsList() {
