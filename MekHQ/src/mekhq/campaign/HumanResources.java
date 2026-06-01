@@ -2183,7 +2183,7 @@ public class HumanResources {
         ResourceBundle resources = campaign.getResources();
 
         for (Person spouse : allSpouses) {
-            recruitPerson(campaign, spouse, PrisonerStatus.FREE, true, false, false);
+            recruitPerson(campaign, spouse, PrisonerStatus.FREE, true, false, false, true);
 
             if (currentSpouse == spouse) {
                 campaign.addReport(DailyReportType.PERSONNEL,
