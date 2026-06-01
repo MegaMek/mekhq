@@ -2235,7 +2235,7 @@ public class HumanResources {
                 specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
             }
 
-            recruitPerson(campaign, child, PrisonerStatus.FREE, true, false, false);
+            recruitPerson(campaign, child, PrisonerStatus.FREE, true, false, false, true);
 
             if (currentChildren.contains(child)) {
                 campaign.addReport(DailyReportType.PERSONNEL,
