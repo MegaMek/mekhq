@@ -1973,7 +1973,7 @@ public class HumanResources {
 
         String formerSurname = person.getSurname();
 
-        if (!personnel.containsValue(person)) {
+        if (!personnel.containsKey(person.getId())) {
             person.setJoinedCampaign(currentDay);
             personnel.put(person.getId(), person);
 
