@@ -71,6 +71,7 @@ import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
 import static mekhq.campaign.personnel.skills.QuickTrain.QuickTrainOptions.getQuickTrainOptionsForNewDay;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -165,6 +166,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.AttributeCheckUtility;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -398,6 +400,10 @@ public class CampaignNewDayManager {
         campaign.setTechnicalReportHTML("");
         campaign.getNewTechnicalReports().clear();
 
+        campaign.getAggregateReport().clear();
+        campaign.setAggregateReportHTML("");
+        campaign.getNewAggregateReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
         campaign.getPersonnelWhoAdvancedInXP().clear();
@@ -447,7 +453,7 @@ public class CampaignNewDayManager {
         }
 
         // Manage the Markets
-        campaign.refreshPersonnelMarkets(false);
+        campaign.refreshApplicants(false);
         if (isFirstOfMonth) {
             showRarePersonnelDialog(campaign, false);
         }
@@ -812,7 +818,9 @@ public class CampaignNewDayManager {
 
             person.checkForIlliterateRemoval();
 
-            AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+            if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+            }
 
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -901,6 +909,10 @@ public class CampaignNewDayManager {
                 if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
                     EscapeSkills.performEscapeAttemptCheck(campaign, person);
                 }
+
+                if (personnelOptions.booleanOption(UNOFFICIAL_EMBEZZLER)) {
+                    embezzleFunds(person);
+                }
             }
 
             if (today.getDayOfYear() == 1 && campaignOptions.isUseAlternativeAdvancedMedical()) {
@@ -952,6 +964,45 @@ public class CampaignNewDayManager {
                   campaign,
                   quickTrainOptions,
                   true);
+        }
+    }
+
+    /**
+     * Attempts to have the given person embezzle funds from the campaign.
+     *
+     * <p>Performs an Administration ({@code S_ADMIN}) skill check for the specified person. If the check succeeds, a
+     * small percentage of the current campaign balance is transferred out of campaign finances and paid directly to the
+     * person.</p>
+     *
+     * <p>The embezzled amount is calculated as 0.1% of the current campaign balance, rounded to the nearest whole
+     * unit. The debit is recorded as a {@link TransactionType#MISCELLANEOUS} transaction, and the result of the skill
+     * check (success or failure) is appended to the campaign report log.</p>
+     *
+     * @param person the {@link Person} attempting to embezzle funds; must not be {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private void embezzleFunds(Person person) {
+        String reason = getTextAt(RESOURCE_BUNDLE, "embezzle.roll");
+        SkillCheckUtility skillCheck = new SkillCheckUtility(reason, person, S_ADMIN, List.of(), 0, false, true);
+        String report = skillCheck.getResultsText();
+        campaign.addReport(SKILL_CHECKS, report);
+
+        if (skillCheck.isSuccess()) {
+            Money currentCampaignFunds = finances.getBalance();
+            double embezzlePercentile = 0.001;
+
+            Money embezzleAmount = currentCampaignFunds.multipliedBy(embezzlePercentile);
+            embezzleAmount = embezzleAmount.round();
+            if (embezzleAmount.isZero()) {
+                return;
+            }
+
+            finances.debit(TransactionType.MISCELLANEOUS, today, embezzleAmount,
+                  getTextAt(RESOURCE_BUNDLE, "embezzle.transaction"));
+
+            person.payPerson(embezzleAmount);
         }
     }
 
@@ -1387,10 +1438,8 @@ public class CampaignNewDayManager {
      * @since 0.50.06
      */
     private void performPersonnelCleanUp() {
-        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(today,
-              campaign.getPersonnel(),
-              campaignOptions.isUseRemovalExemptRetirees(),
-              campaignOptions.isUseRemovalExemptCemetery());
+        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(campaign.getHumanResources(), today,
+              campaignOptions.isUseRemovalExemptRetirees(), campaignOptions.isUseRemovalExemptCemetery());
 
         List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
         for (Person person : personnelToRemove) {
@@ -1877,12 +1926,10 @@ public class CampaignNewDayManager {
         int myomerProsthetics = 0;
         boolean hasPowerSupply = false;
 
-        for (Injury injury : person.getInjuries()) {
-            InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification()) {
-                prostheticMedicalReliance++;
-            }
+        for (Injury injury : person.getProstheticInjuries()) {
+            prostheticMedicalReliance++;
 
+            InjurySubType injurySubType = injury.getSubType();
             if (injurySubType.isMyomerProsthetic()) {
                 myomerProsthetics++;
             }
@@ -2131,6 +2178,9 @@ public class CampaignNewDayManager {
 
         // Third, on Mondays we generate new scenarios for the week
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+            // StratCon's scenario generation is handled in StratConRulesManager, not here. Though we can't just
+            // filter StratCon campaigns out of this call, because StratCon does do some processing in this method,
+            // just not related to scenario generation.
             AtBScenarioFactory.createScenariosForNewWeek(campaign);
         }
 

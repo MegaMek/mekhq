@@ -372,7 +372,7 @@ public class CamOpsSalvageUtilities {
 
             Person victim = ObjectUtility.getRandomItem(techs);
 
-            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0) {
+            if (campaignOptions.isUseEdge() && campaignOptions.isUseSupportEdge() && victim.getCurrentEdge() > 0) {
                 if (performEdgeReroll(campaign, victim)) {
                     continue;
                 }

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -43,15 +44,21 @@ import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Crew;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.eras.Era;
+import mekhq.campaign.universe.eras.Eras;
 
 /**
  * Generates a single special ability for a {@link Person}.
  */
 public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
+    private static final MMLogger LOGGER = MMLogger.create(SingleSpecialAbilityGenerator.class);
+
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
           final int expLvl) {
@@ -97,6 +104,10 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
               useAlternativeWeighting,
               ignoreEligibility,
               isVeterancyAward);
+        if (person.isClanPersonnel()) {
+            filterOutMeleeSPA(campaign.getLocalDate(), person.getOriginFaction(), abilityList);
+        }
+
         if (abilityList.isEmpty()) {
             return null;
         }
@@ -168,6 +179,43 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         }
 
         return displayName;
+    }
+
+    /**
+     * Filters out melee-related Special Personnel Abilities (SPAs) from the given list.
+     *
+     * <p>Melee SPAs ({@code "melee_specialist"} and {@code "melee_master"}) are removed if the origin faction is a
+     * Clan, and either:</p>
+     * <ul>
+     *     <li>the faction is a Homeworld Clan, or</li>
+     *     <li>the current date falls before the end of the Late Republic era ({@code "LREP"})</li>
+     * </ul>
+     *
+     * <p>The 'end of the Republic era' date was picked, as by the Dark Ages it appears the Clan dislike of melee
+     * has faded. At least among clans that had settled the Inner Sphere.</p>
+     *
+     * @param today         the current date, used to determine era eligibility
+     * @param originFaction the faction whose rules govern SPA eligibility
+     * @param abilityList   the mutable list of {@link SpecialAbility} objects to filter in-place
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static void filterOutMeleeSPA(LocalDate today, Faction originFaction, List<SpecialAbility> abilityList) {
+        Era lateRepublicEra = Eras.getInstance().getEra("LREP");
+        if (lateRepublicEra == null) {
+            LOGGER.error("Late Republic era (LREP) not found in Eras.getInstance()");
+            return;
+        }
+
+        LocalDate endDate = lateRepublicEra.getEnd();
+
+        if (originFaction.isClan()) {
+            if (originFaction.isHomeworldClan() || today.isBefore(endDate)) {
+                abilityList.removeIf(spa -> spa.getName().equalsIgnoreCase("melee_specialist"));
+                abilityList.removeIf(spa -> spa.getName().equalsIgnoreCase("melee_master"));
+            }
+        }
     }
 
     /**

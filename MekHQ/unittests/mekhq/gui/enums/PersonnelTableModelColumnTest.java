@@ -873,6 +873,7 @@ public class PersonnelTableModelColumnTest {
                      UNLUCKY,
                      BLOODMARK,
                      SPA_COUNT,
+                     MODIFICATION_COUNT,
                      IMPLANT_COUNT,
                      LOYALTY -> assertInstanceOf(IntegerStringSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
