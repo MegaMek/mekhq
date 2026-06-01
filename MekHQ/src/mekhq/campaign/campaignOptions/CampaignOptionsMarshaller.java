@@ -277,6 +277,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "onlyCommandersMatterBattleArmor",
               campaignOptions.isOnlyCommandersMatterBattleArmor());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "edgeRefreshPeriod",
+              campaignOptions.getEdgeRefreshPeriod().getLookupKey());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
