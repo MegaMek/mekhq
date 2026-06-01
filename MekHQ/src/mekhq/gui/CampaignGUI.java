@@ -37,39 +37,41 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
-import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.enums.MHQTabType.COMMAND_CENTER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 
-import megamek.Version;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.CopySystemDataAction;
-import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
-import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
-import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -78,7 +80,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.loaders.MULParser;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Dropship;
@@ -89,7 +90,6 @@ import megamek.logging.MMLogger;
 import mekhq.IconPackage;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
-import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -98,69 +98,38 @@ import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
-import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
-import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
-import mekhq.campaign.personnel.marriage.RandomMarriage;
-import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.RandomProcreation;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.report.CargoReport;
-import mekhq.campaign.report.HangarReport;
-import mekhq.campaign.report.PersonnelReport;
-import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
-import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
-import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
-import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
-import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
-import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.io.FileType;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import mekhq.gui.view.AdvanceTimePanel;
+import mekhq.gui.view.CommandSummaryPanel;
+import mekhq.gui.view.CurrentLocationPanel;
 
 /**
  * The application's main frame.
@@ -171,8 +140,15 @@ public class CampaignGUI extends JPanel {
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
     // region Variable Declarations
-    public static final int MAX_START_WIDTH = 1400;
-    public static final int MAX_START_HEIGHT = 900;
+    private static final int MAX_START_WIDTH = 1400;
+    private static final int MAX_START_HEIGHT = 900;
+    private static final int MIN_WINDOW_WIDTH = 1024;
+    private static final int MIN_WINDOW_HEIGHT = 768;
+    private static final int TOP_PANEL_HEIGHT = 90;
+    public static int THIN_GAP = 2;
+    public static int SMALL_GAP = 4;
+    public static int MEDIUM_GAP = 8;
+
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
     public static final int MAX_QUANTITY_SPINNER = 10000;
 
@@ -186,20 +162,12 @@ public class CampaignGUI extends JPanel {
     /* for the main panel */
     private EnhancedTabbedPane tabMain;
 
-    /* For the menu bar */
-    private JMenuBar menuBar;
-    private JMenu menuThemes;
-    private JMenuItem miRetirementDefectionDialog;
-    private JMenuItem miAwardEligibilityDialog;
-    private JMenuItem miCompanyGenerator;
-    private JMenuItem miPlanetarySystemEditor;
+    private MekHQMenuBar windowMenu;
 
     private final EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
-    private JLabel lblLocation;
-    private JLabel lblFunds;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblTempSoldiers;
@@ -207,39 +175,19 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempVehicleCrewGround;
     private JLabel lblTempVehicleCrewVTOL;
     private JLabel lblTempVehicleCrewNaval;
+    private JPanel pnlVehicleCrew;
     private JLabel lblTempVesselPilot;
     private JLabel lblTempVesselGunner;
     private JLabel lblTempVesselCrew;
+    private JPanel pnlVesselCrew;
     private JLabel lblPartsAvailabilityRating;
 
-    // Blob crew menu references for visibility control
-    private JMenu menuSoldierPool;
-    private JMenu menuBattleArmorPool;
-    private JMenu menuVehicleCrewGroundPool;
-    private JMenu menuVehicleCrewVTOLPool;
-    private JMenu menuVehicleCrewNavalPool;
-    private JMenu menuVesselPilotPool;
-    private JMenu menuVesselGunnerPool;
-    private JMenu menuVesselCrewPool;
-
-    /* for the top button panel */
+    /* Top Panel */
     private JPanel pnlTop;
-    private final RoundedJButton btnAdvanceMultipleDays = new RoundedJButton(resourceMap.getString(
-          "btnAdvanceMultipleDays.text"));
-    private final RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
-    private final RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
-    private final RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
-    private final RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
-    private final RoundedJButton btnCompanyGenerator = new RoundedJButton(resourceMap.getString(
-          "btnCompanyGenerator.text"));
-    private final RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
-    private final RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
+    private RoundedJButton btnCompanyGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
-    private final RoundedJButton btnPersonnelMarket =
-          new RoundedJButton(resourceMap.getString("btnPersonnelMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
-    private final RoundedJButton btnPartsMarket = new RoundedJButton(resourceMap.getString("btnPartsMarket.manual"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -345,7 +293,7 @@ public class CampaignGUI extends JPanel {
             }
         });
 
-        initTopButtons();
+        initTopPanel();
         initStatusBar();
 
         setLayout(new BorderLayout());
@@ -356,9 +304,8 @@ public class CampaignGUI extends JPanel {
 
         standardTabs.values().forEach(CampaignGuiTab::refreshAll);
 
-        refreshCalendar();
-        refreshFunds();
-        refreshLocation();
+        refreshWindowTitle();
+        refreshCampaignControlButtons();
         refreshTempAsTechs();
         refreshTempMedics();
         refreshTempSoldiers();
@@ -371,20 +318,23 @@ public class CampaignGUI extends JPanel {
         refreshTempVesselCrew();
         refreshPartsAvailability();
 
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension screenSize = getUsableScreenSize();
 
-        frame.setSize(Math.min(MAX_START_WIDTH, dim.width), Math.min(MAX_START_HEIGHT, dim.height));
+        frame.setSize(Math.min(MAX_START_WIDTH, screenSize.width), Math.min(MAX_START_HEIGHT, screenSize.height));
+        refreshGuiScale();
 
         // Determine the new location of the window
         int w = frame.getSize().width;
         int h = frame.getSize().height;
-        int x = (dim.width - w) / 2;
-        int y = (dim.height - h) / 2;
+        int x = (screenSize.width - w) / 2;
+        int y = (screenSize.height - h) / 2;
 
         // Move the window
         frame.setLocation(x, y);
-        initMenu();
-        frame.setJMenuBar(menuBar);
+
+        windowMenu = new MekHQMenuBar(getApplication(), this, resourceMap);
+        frame.setJMenuBar(windowMenu);
+
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.validate();
@@ -425,1156 +375,10 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    /**
-     * This is used to initialize the top menu bar. All the top level menu bar and {@link MHQTabType} mnemonics must be
-     * unique, as they are both accessed through the same GUI page. The following mnemonic keys are being used as of
-     * 30-MAR-2020: A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
-     * <p>
-     * Note 1: the slash is used for the help, as it is normally the same key as the ?
-     * <p>
-     * Note 2: the A mnemonic is used for the Advance Day button
-     * <p>
-     * Note 3: Only essential actions (Save, Load, New) have global Ctrl+key accelerators. All other menu items use
-     * mnemonics only (accessible via keyboard menu navigation) to avoid duplicate accelerator conflicts.
-     */
-    private void initMenu() {
-        // TODO : Implement "Export All" versions for Personnel and Parts
-        // See the JavaDoc comment for used mnemonic keys
-        menuBar = new JMenuBar();
-        menuBar.getAccessibleContext().setAccessibleName("Main Menu");
-
-        // region File Menu
-        // The File menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // C, E, H, I, L, M, N, R, S, T, U, X
-        JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text"));
-        menuFile.setMnemonic(KeyEvent.VK_F);
-
-        JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text"));
-        menuLoad.setMnemonic(KeyEvent.VK_L);
-        menuLoad.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
-        menuLoad.addActionListener(evt -> {
-            final File file = FileDialogs.openCampaign(frame).orElse(null);
-            if (file == null) {
-                return;
-            }
-            new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
-            // Unregister event handlers for CampaignGUI and tabs
-            for (int i = 0; i < tabMain.getTabCount(); i++) {
-                if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
-                    ((CampaignGuiTab) tabMain.getComponentAt(i)).disposeTab();
-                }
-            }
-            MekHQ.unregisterHandler(this);
-            // check for a loaded story arc and unregister that handler as well
-            if (null != getCampaign().getStoryArc()) {
-                MekHQ.unregisterHandler(getCampaign().getStoryArc());
-            }
-        });
-        menuFile.add(menuLoad);
-
-        JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text"));
-        menuSave.setMnemonic(KeyEvent.VK_S);
-        menuSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
-        menuSave.addActionListener(this::saveCampaign);
-        menuFile.add(menuSave);
-
-        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
-        menuNew.setMnemonic(KeyEvent.VK_N);
-        menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
-        menuNew.addActionListener(evt -> handleInAppNewCampaign());
-        menuFile.add(menuNew);
-
-        // region menuImport
-        // The Import menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // A, C, F, I, P
-        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text"));
-        menuImport.setMnemonic(KeyEvent.VK_I);
-
-        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
-        miImportPerson.setMnemonic(KeyEvent.VK_P);
-        miImportPerson.addActionListener(evt -> loadPersonFile());
-        menuImport.add(miImportPerson);
-
-        JMenuItem miImportIndividualRankSystem = new JMenuItem(resourceMap.getString("miImportIndividualRankSystem.text"));
-        miImportIndividualRankSystem.setToolTipText(resourceMap.getString("miImportIndividualRankSystem.toolTipText"));
-        miImportIndividualRankSystem.setName("miImportIndividualRankSystem");
-        miImportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
-        miImportIndividualRankSystem.addActionListener(evt -> getCampaign().setRankSystem(RankSystem.generateIndividualInstanceFromXML(
-              FileDialogs.openIndividualRankSystem(getFrame()).orElse(null))));
-        menuImport.add(miImportIndividualRankSystem);
-
-        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text"));
-        miImportParts.setMnemonic(KeyEvent.VK_A);
-        miImportParts.addActionListener(evt -> loadPartsFile());
-        menuImport.add(miImportParts);
-
-        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text"));
-        miLoadForces.setMnemonic(KeyEvent.VK_F);
-        miLoadForces.addActionListener(evt -> loadListFile(true));
-        menuImport.add(miLoadForces);
-
-        menuFile.add(menuImport);
-        // endregion menuImport
-
-        // region menuExport
-        // The Export menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // C, X, S
-        JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text"));
-        menuExport.setMnemonic(KeyEvent.VK_X);
-
-        // region CSV Export
-        // The CSV menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // F, P, U
-        JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text"));
-        miExportCSVFile.setMnemonic(KeyEvent.VK_C);
-
-        JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text"));
-        miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
-        miExportPersonCSV.addActionListener(evt -> {
-            try {
-                exportPersonnel(FileType.CSV,
-                      resourceMap.getString("dlgSavePersonnelCSV.text"),
-                      getCampaign().getLocalDate()
-                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())) + "_ExportedPersonnel");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
-        miExportCSVFile.add(miExportPersonCSV);
-
-        JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text"));
-        miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
-        miExportUnitCSV.addActionListener(evt -> {
-            try {
-                exportUnits(FileType.CSV,
-                      resourceMap.getString("dlgSaveUnitsCSV.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedUnits");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
-        miExportCSVFile.add(miExportUnitCSV);
-
-        JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
-        miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
-        miExportFinancesCSV.addActionListener(evt -> {
-            try {
-                exportFinances(FileType.CSV,
-                      resourceMap.getString("dlgSaveFinancesCSV.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedFinances");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
-        miExportCSVFile.add(miExportFinancesCSV);
-
-        menuExport.add(miExportCSVFile);
-        // endregion CSV Export
-
-        // region XML Export
-        // The XML menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // C, I, P, R
-        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text"));
-        miExportXMLFile.setMnemonic(KeyEvent.VK_X);
-
-        JMenuItem miExportRankSystems = new JMenuItem(resourceMap.getString("miExportRankSystems.text"));
-        miExportRankSystems.setName("miExportRankSystems");
-        miExportRankSystems.setMnemonic(KeyEvent.VK_R);
-        miExportRankSystems.addActionListener(evt -> Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(getFrame())
-                                                                                         .orElse(null),
-              getCampaign().getRankSystem()));
-        miExportXMLFile.add(miExportRankSystems);
-
-        JMenuItem miExportIndividualRankSystem = new JMenuItem(resourceMap.getString("miExportIndividualRankSystem.text"));
-        miExportIndividualRankSystem.setName("miExportIndividualRankSystem");
-        miExportIndividualRankSystem.setMnemonic(KeyEvent.VK_I);
-        miExportIndividualRankSystem.addActionListener(evt -> getCampaign().getRankSystem()
-                                                                    .writeToFile(FileDialogs.saveIndividualRankSystem(
-                                                                          getFrame()).orElse(null)));
-        miExportXMLFile.add(miExportIndividualRankSystem);
-
-        JMenuItem miExportPlanetsXML = new JMenuItem(resourceMap.getString("miExportPlanets.text"));
-        miExportPlanetsXML.setMnemonic(KeyEvent.VK_P);
-        miExportPlanetsXML.addActionListener(evt -> {
-            try {
-                exportPlanets(FileType.XML,
-                      resourceMap.getString("dlgSavePlanetsXML.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedPlanets");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
-        miExportXMLFile.add(miExportPlanetsXML);
-
-        menuExport.add(miExportXMLFile);
-        // endregion XML Export
-
-        JMenuItem miExportCampaignSubset = new JMenuItem(resourceMap.getString("miExportCampaignSubset.text"));
-        miExportCampaignSubset.setMnemonic(KeyEvent.VK_S);
-        miExportCampaignSubset.addActionListener(evt -> {
-            CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
-            cew.display(CampaignExportWizardState.ForceSelection);
-        });
-        menuExport.add(miExportCampaignSubset);
-
-        menuFile.add(menuExport);
-        // endregion menuExport
-
-        // region Menu Refresh
-        // The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
-        // A, C, D, F, P, R, U
-        JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
-        menuRefresh.setMnemonic(KeyEvent.VK_R);
-
-        JMenuItem miRefreshUnitCache = new JMenuItem(resourceMap.getString("miRefreshUnitCache.text"));
-        miRefreshUnitCache.setName("miRefreshUnitCache");
-        miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
-        miRefreshUnitCache.addActionListener(evt -> MekSummaryCache.refreshUnitData(false));
-        menuRefresh.add(miRefreshUnitCache);
-
-        JMenuItem miRefreshCamouflage = new JMenuItem(resourceMap.getString("miRefreshCamouflage.text"));
-        miRefreshCamouflage.setName("miRefreshCamouflage");
-        miRefreshCamouflage.setMnemonic(KeyEvent.VK_C);
-        miRefreshCamouflage.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshCamouflageDirectory();
-            refreshAllTabs();
-        });
-        menuRefresh.add(miRefreshCamouflage);
-
-        JMenuItem miRefreshPortraits = new JMenuItem(resourceMap.getString("miRefreshPortraits.text"));
-        miRefreshPortraits.setName("miRefreshPortraits");
-        miRefreshPortraits.setMnemonic(KeyEvent.VK_P);
-        miRefreshPortraits.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshPortraitDirectory();
-            refreshAllTabs();
-        });
-        menuRefresh.add(miRefreshPortraits);
-
-        JMenuItem miRefreshFormationIcons = new JMenuItem(resourceMap.getString("miRefreshFormationIcons.text"));
-        miRefreshFormationIcons.setName("miRefreshFormationIcons");
-        miRefreshFormationIcons.setMnemonic(KeyEvent.VK_F);
-        miRefreshFormationIcons.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshFormationIcons();
-            refreshAllTabs();
-        });
-        menuRefresh.add(miRefreshFormationIcons);
-
-        JMenuItem miRefreshAwards = new JMenuItem(resourceMap.getString("miRefreshAwards.text"));
-        miRefreshAwards.setName("miRefreshAwards");
-        miRefreshAwards.setMnemonic(KeyEvent.VK_A);
-        miRefreshAwards.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshAwardIcons();
-            refreshAllTabs();
-        });
-        menuRefresh.add(miRefreshAwards);
-
-        JMenuItem miRefreshStoryIcons = new JMenuItem(resourceMap.getString("miRefreshStoryIcons.text"));
-        miRefreshStoryIcons.setName("miRefreshAwards");
-        miRefreshStoryIcons.setMnemonic(KeyEvent.VK_A);
-        miRefreshStoryIcons.addActionListener(evt -> {
-            MHQStaticDirectoryManager.refreshStorySplash();
-            refreshAllTabs();
-        });
-        menuRefresh.add(miRefreshStoryIcons);
-
-        JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
-        miRefreshRanks.setName("miRefreshRanks");
-        miRefreshRanks.setMnemonic(KeyEvent.VK_R);
-        miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
-        menuRefresh.add(miRefreshRanks);
-
-        JMenuItem miRefreshFinancialInstitutions = new JMenuItem(resourceMap.getString(
-              "miRefreshFinancialInstitutions.text"));
-        miRefreshFinancialInstitutions.setToolTipText(resourceMap.getString("miRefreshFinancialInstitutions.toolTipText"));
-        miRefreshFinancialInstitutions.setName("miRefreshFinancialInstitutions");
-        miRefreshFinancialInstitutions.addActionListener(evt -> FinancialInstitutions.initializeFinancialInstitutions());
-        menuRefresh.add(miRefreshFinancialInstitutions);
-
-        menuFile.add(menuRefresh);
-        // endregion Menu Refresh
-
-        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
-        menuOptions.setMnemonic(KeyEvent.VK_C);
-        menuOptions.addActionListener(this::menuOptionsActionPerformed);
-        menuFile.add(menuOptions);
-
-        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
-        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
-        miMHQOptions.setName("miMHQOptions");
-        miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
-        menuFile.add(miMHQOptions);
-
-        final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
-        miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
-        miGameOptions.setName("miGameOptions");
-        miGameOptions.setMnemonic(KeyEvent.VK_M);
-        miGameOptions.addActionListener(evt -> {
-            final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
-            god.setEditable(true);
-            if (god.showDialog().isConfirmed()) {
-                getCampaign().setGameOptions(god.getOptions());
-                refreshCalendar();
-            }
-        });
-        menuFile.add(miGameOptions);
-
-        final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
-        miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
-        miMMClientOptions.setName("miMMClientOptions");
-        miMMClientOptions.setMnemonic(KeyEvent.VK_O);
-        miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(frame, null).setVisible(true));
-        menuFile.add(miMMClientOptions);
-
-        menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
-        menuThemes.setMnemonic(KeyEvent.VK_T);
-        refreshThemeChoices();
-        menuFile.add(menuThemes);
-
-        JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
-        menuExitItem.setMnemonic(KeyEvent.VK_E);
-        menuExitItem.addActionListener(evt -> getApplication().exit(true));
-        menuFile.add(menuExitItem);
-
-        menuBar.add(menuFile);
-        // endregion File Menu
-
-        // region Marketplace Menu
-        // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
-        // A, B, C, H, M, N, P, R, S, U
-        JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
-        menuMarket.setMnemonic(KeyEvent.VK_M);
-
-        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
-        miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
-        miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
-        miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
-        menuMarket.add(miPersonnelMarket);
-
-        JMenuItem miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
-        miContractMarket.setMnemonic(KeyEvent.VK_C);
-        miContractMarket.addActionListener(evt -> showContractMarket());
-        miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseStratCon());
-        menuMarket.add(miContractMarket);
-
-        JMenuItem miUnitMarket = new JMenuItem(resourceMap.getString("miUnitMarket.text"));
-        miUnitMarket.setMnemonic(KeyEvent.VK_U);
-        miUnitMarket.addActionListener(evt -> showUnitMarket());
-        miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
-        menuMarket.add(miUnitMarket);
-
-        JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text"));
-        miPurchaseUnit.setMnemonic(KeyEvent.VK_N);
-        miPurchaseUnit.addActionListener(evt -> {
-            UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
-            if (!MekSummaryCache.getInstance().isInitialized()) {
-                unitLoadingDialog.setVisible(true);
-            }
-            AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(),
-                  unitLoadingDialog,
-                  getCampaign(),
-                  true);
-            usd.setVisible(true);
-        });
-        menuMarket.add(miPurchaseUnit);
-
-        JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text"));
-        miBuyParts.setMnemonic(KeyEvent.VK_R);
-        miBuyParts.addActionListener(evt -> new PartsStoreDialog(true, this).setVisible(true));
-        menuMarket.add(miBuyParts);
-
-        JMenuItem miHireBulk = new JMenuItem(resourceMap.getString("miHireBulk.text"));
-        miHireBulk.setMnemonic(KeyEvent.VK_B);
-        miHireBulk.addActionListener(evt -> hireBulkPersonnel());
-        menuMarket.add(miHireBulk);
-
-        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
-        menuHire.setMnemonic(KeyEvent.VK_H);
-
-        JMenuItem menuHireBlank = new JMenuItem(resourceMap.getString("menuHire.blank"));
-        menuHireBlank.addActionListener(this::addBlankPerson);
-
-        JMenu menuHireCombat = new JMenu(resourceMap.getString("menuHire.combat"));
-        JMenu menuHireSupport = new JMenu(resourceMap.getString("menuHire.support"));
-        JMenu menuHireCivilian = new JMenu(resourceMap.getString("menuHire.civilian"));
-
-        PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().isClanCampaign());
-        for (PersonnelRole role : roles) {
-            // Dependent is handled speciality so that it's always at the top of the civilian category
-            if (role.isDependent()) {
-                continue;
-            }
-
-            JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
-            if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-                miHire.setMnemonic(role.getMnemonic());
-            }
-            miHire.setToolTipText(role.getDescription(getCampaign().isClanCampaign()));
-            miHire.setActionCommand(role.name());
-            miHire.addActionListener(this::hirePerson);
-
-            if (role.isCombat()) {
-                menuHireCombat.add(miHire);
-            } else if (role.isSupport(true)) {
-                menuHireSupport.add(miHire);
-            } else if (!role.isDependent()) {
-                menuHireCivilian.add(miHire);
-            }
-        }
-
-        JMenuItem miHire = new JMenuItem(PersonnelRole.DEPENDENT.getLabel(getCampaign().getFaction().isClan()));
-        if (PersonnelRole.DEPENDENT.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-            miHire.setMnemonic(PersonnelRole.DEPENDENT.getMnemonic());
-        }
-        miHire.setActionCommand(PersonnelRole.DEPENDENT.name());
-        miHire.addActionListener(this::hirePerson);
-        menuHireCivilian.insert(miHire, 0);
-
-        menuHire.add(menuHireBlank);
-        menuHire.add(menuHireCombat);
-        menuHire.add(menuHireSupport);
-        menuHire.add(menuHireCivilian);
-        menuMarket.add(menuHire);
-
-        // region Temp Pool
-        JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
-
-        JMenuItem miTempPoolFullStrength = new JMenuItem(resourceMap.getString("miTempPoolFullStrength.text"));
-        miTempPoolFullStrength.addActionListener(evt -> bringAllTempCrewsToFullStrength());
-        menuTempPool.add(miTempPoolFullStrength);
-
-        JMenuItem miTempPoolReleaseAll = new JMenuItem(resourceMap.getString("miTempPoolReleaseAll.text"));
-        miTempPoolReleaseAll.addActionListener(evt -> releaseAllTempCrews());
-        menuTempPool.add(miTempPoolReleaseAll);
-
-        JMenuItem miTempPoolReleaseSurplus = new JMenuItem(resourceMap.getString("miTempPoolReleaseSurplus.text"));
-        miTempPoolReleaseSurplus.addActionListener(evt -> releaseSurplusTempCrews());
-        menuTempPool.add(miTempPoolReleaseSurplus);
-
-        menuTempPool.addSeparator();
-
-        // region Astech Pool
-        // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
-        // B, E, F, H
-        JMenu menuAsTechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
-        menuAsTechPool.setMnemonic(KeyEvent.VK_A);
-
-        JMenuItem miHireAsTechs = new JMenuItem(resourceMap.getString("miHireAstechs.text"));
-        miHireAsTechs.setMnemonic(KeyEvent.VK_H);
-        miHireAsTechs.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireAstechsNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseAsTechPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuAsTechPool.add(miHireAsTechs);
-
-        JMenuItem miFireAsTechs = new JMenuItem(resourceMap.getString("miFireAstechs.text"));
-        miFireAsTechs.setMnemonic(KeyEvent.VK_E);
-        miFireAsTechs.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireAstechsNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTemporaryAsTechPool());
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuAsTechPool.add(miFireAsTechs);
-
-        JMenuItem miFullStrengthAsTechs = new JMenuItem(resourceMap.getString("miFullStrengthAstechs.text"));
-        miFullStrengthAsTechs.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthAsTechs.addActionListener(evt -> getCampaign().resetAsTechPool());
-        menuAsTechPool.add(miFullStrengthAsTechs);
-
-        JMenuItem miFireAllAsTechs = new JMenuItem(resourceMap.getString("miFireAllAstechs.text"));
-        miFireAllAsTechs.setMnemonic(KeyEvent.VK_R);
-        miFireAllAsTechs.addActionListener(evt -> getCampaign().emptyAsTechPool());
-        menuAsTechPool.add(miFireAllAsTechs);
-        menuTempPool.add(menuAsTechPool);
-        // endregion Astech Pool
-
-        // region Medic Pool
-        // The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
-        // B, E, H, R
-        JMenu menuMedicPool = new JMenu(resourceMap.getString("menuMedicPool.text"));
-        menuMedicPool.setMnemonic(KeyEvent.VK_M);
-
-        JMenuItem miHireMedics = new JMenuItem(resourceMap.getString("miHireMedics.text"));
-        miHireMedics.setMnemonic(KeyEvent.VK_H);
-        miHireMedics.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireMedicsNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseMedicPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuMedicPool.add(miHireMedics);
-
-        JMenuItem miFireMedics = new JMenuItem(resourceMap.getString("miFireMedics.text"));
-        miFireMedics.setMnemonic(KeyEvent.VK_E);
-        miFireMedics.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireMedicsNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTemporaryMedicPool());
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuMedicPool.add(miFireMedics);
-
-        JMenuItem miFullStrengthMedics = new JMenuItem(resourceMap.getString("miFullStrengthMedics.text"));
-        miFullStrengthMedics.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthMedics.addActionListener(evt -> getCampaign().resetMedicPool());
-        menuMedicPool.add(miFullStrengthMedics);
-
-        JMenuItem miFireAllMedics = new JMenuItem(resourceMap.getString("miFireAllMedics.text"));
-        miFireAllMedics.setMnemonic(KeyEvent.VK_R);
-        miFireAllMedics.addActionListener(evt -> getCampaign().emptyMedicPool());
-        menuMedicPool.add(miFireAllMedics);
-        menuTempPool.add(menuMedicPool);
-        // endregion Medic Pool
-
-        // region Soldier Pool
-        menuSoldierPool = new JMenu(resourceMap.getString("menuSoldierPool.text"));
-        menuSoldierPool.setMnemonic(KeyEvent.VK_S);
-        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
-
-        JMenuItem miHireSoldiers = new JMenuItem(resourceMap.getString("miHireSoldiers.text"));
-        miHireSoldiers.setMnemonic(KeyEvent.VK_H);
-        miHireSoldiers.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireSoldiersNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuSoldierPool.add(miHireSoldiers);
-
-        JMenuItem miFireSoldiers = new JMenuItem(resourceMap.getString("miFireSoldiers.text"));
-        miFireSoldiers.setMnemonic(KeyEvent.VK_E);
-        miFireSoldiers.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireSoldiersNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.SOLDIER));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.SOLDIER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuSoldierPool.add(miFireSoldiers);
-
-        JMenuItem miFullStrengthSoldiers = new JMenuItem(resourceMap.getString("miFullStrengthSoldiers.text"));
-        miFullStrengthSoldiers.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthSoldiers.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-        });
-        menuSoldierPool.add(miFullStrengthSoldiers);
-
-        JMenuItem miFireAllSoldiers = new JMenuItem(resourceMap.getString("miFireAllSoldiers.text"));
-        miFireAllSoldiers.setMnemonic(KeyEvent.VK_R);
-        miFireAllSoldiers.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.SOLDIER));
-        menuSoldierPool.add(miFireAllSoldiers);
-        menuTempPool.add(menuSoldierPool);
-        // endregion Soldier Pool
-
-        // region Battle Armor Pool
-        menuBattleArmorPool = new JMenu(resourceMap.getString("menuBattleArmorPool.text"));
-        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
-
-        JMenuItem miHireBattleArmor = new JMenuItem(resourceMap.getString("miHireBattleArmor.text"));
-        miHireBattleArmor.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireBattleArmorNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuBattleArmorPool.add(miHireBattleArmor);
-
-        JMenuItem miFireBattleArmor = new JMenuItem(resourceMap.getString("miFireBattleArmor.text"));
-        miFireBattleArmor.setMnemonic(KeyEvent.VK_E);
-        miFireBattleArmor.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireBattleArmorNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.BATTLE_ARMOUR, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuBattleArmorPool.add(miFireBattleArmor);
-
-        JMenuItem miFullStrengthBattleArmor = new JMenuItem(resourceMap.getString("miFullStrengthBattleArmor.text"));
-        miFullStrengthBattleArmor.setMnemonic(KeyEvent.VK_B);
-        miFullStrengthBattleArmor.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-        });
-        menuBattleArmorPool.add(miFullStrengthBattleArmor);
-
-        JMenuItem miFireAllBattleArmor = new JMenuItem(resourceMap.getString("miFireAllBattleArmor.text"));
-        miFireAllBattleArmor.setMnemonic(KeyEvent.VK_R);
-        miFireAllBattleArmor.addActionListener(evt -> getCampaign().emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR));
-        menuBattleArmorPool.add(miFireAllBattleArmor);
-        menuTempPool.add(menuBattleArmorPool);
-        // endregion Battle Armor Pool
-
-        // region Vehicle Crew Ground Pool
-        menuVehicleCrewGroundPool = new JMenu(resourceMap.getString("menuVehicleCrewGroundPool.text"));
-        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
-
-        JMenuItem miHireVehicleCrewGround = new JMenuItem(resourceMap.getString("miHireVehicleCrewGround.text"));
-        miHireVehicleCrewGround.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVehicleCrewGroundNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
-                      popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewGroundPool.add(miHireVehicleCrewGround);
-
-        JMenuItem miFireVehicleCrewGround = new JMenuItem(resourceMap.getString("miFireVehicleCrewGround.text"));
-        miFireVehicleCrewGround.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVehicleCrewGroundNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
-                      popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewGroundPool.add(miFireVehicleCrewGround);
-
-        JMenuItem miFullStrengthVehicleCrewGround = new JMenuItem(resourceMap.getString(
-              "miFullStrengthVehicleCrewGround.text"));
-        miFullStrengthVehicleCrewGround.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
-        });
-        menuVehicleCrewGroundPool.add(miFullStrengthVehicleCrewGround);
-
-        JMenuItem miFireAllVehicleCrewGround = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewGround.text"));
-        miFireAllVehicleCrewGround.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND,
-              0));
-        menuVehicleCrewGroundPool.add(miFireAllVehicleCrewGround);
-        menuTempPool.add(menuVehicleCrewGroundPool);
-        // endregion Vehicle Crew Ground Pool
-
-        // region Vehicle Crew VTOL Pool
-        menuVehicleCrewVTOLPool = new JMenu(resourceMap.getString("menuVehicleCrewVTOLPool.text"));
-        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
-
-        JMenuItem miHireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miHireVehicleCrewVTOL.text"));
-        miHireVehicleCrewVTOL.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVehicleCrewVTOLNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewVTOLPool.add(miHireVehicleCrewVTOL);
-
-        JMenuItem miFireVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFireVehicleCrewVTOL.text"));
-        miFireVehicleCrewVTOL.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVehicleCrewVTOLNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewVTOLPool.add(miFireVehicleCrewVTOL);
-
-        JMenuItem miFullStrengthVehicleCrewVTOL = new JMenuItem(resourceMap.getString(
-              "miFullStrengthVehicleCrewVTOL.text"));
-        miFullStrengthVehicleCrewVTOL.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
-        });
-        menuVehicleCrewVTOLPool.add(miFullStrengthVehicleCrewVTOL);
-
-        JMenuItem miFireAllVehicleCrewVTOL = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewVTOL.text"));
-        miFireAllVehicleCrewVTOL.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL,
-              0));
-        menuVehicleCrewVTOLPool.add(miFireAllVehicleCrewVTOL);
-        menuTempPool.add(menuVehicleCrewVTOLPool);
-        // endregion Vehicle Crew VTOL Pool
-
-        // region Vehicle Crew Naval Pool
-        menuVehicleCrewNavalPool = new JMenu(resourceMap.getString("menuVehicleCrewNavalPool.text"));
-        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
-
-        JMenuItem miHireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miHireVehicleCrewNaval.text"));
-        miHireVehicleCrewNaval.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVehicleCrewNavalNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewNavalPool.add(miHireVehicleCrewNaval);
-
-        JMenuItem miFireVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFireVehicleCrewNaval.text"));
-        miFireVehicleCrewNaval.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVehicleCrewNavalNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVehicleCrewNavalPool.add(miFireVehicleCrewNaval);
-
-        JMenuItem miFullStrengthVehicleCrewNaval = new JMenuItem(resourceMap.getString(
-              "miFullStrengthVehicleCrewNaval.text"));
-        miFullStrengthVehicleCrewNaval.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
-        });
-        menuVehicleCrewNavalPool.add(miFullStrengthVehicleCrewNaval);
-
-        JMenuItem miFireAllVehicleCrewNaval = new JMenuItem(resourceMap.getString("miFireAllVehicleCrewNaval.text"));
-        miFireAllVehicleCrewNaval.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL,
-              0));
-        menuVehicleCrewNavalPool.add(miFireAllVehicleCrewNaval);
-        menuTempPool.add(menuVehicleCrewNavalPool);
-        // endregion Vehicle Crew Naval Pool
-
-        // region Vessel Pilot Pool
-        menuVesselPilotPool = new JMenu(resourceMap.getString("menuVesselPilotPool.text"));
-        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
-
-        JMenuItem miHireVesselPilot = new JMenuItem(resourceMap.getString("miHireVesselPilot.text"));
-        miHireVesselPilot.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVesselPilotNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_PILOT, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselPilotPool.add(miHireVesselPilot);
-
-        JMenuItem miFireVesselPilot = new JMenuItem(resourceMap.getString("miFireVesselPilot.text"));
-        miFireVesselPilot.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVesselPilotNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_PILOT, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselPilotPool.add(miFireVesselPilot);
-
-        JMenuItem miFullStrengthVesselPilot = new JMenuItem(resourceMap.getString("miFullStrengthVesselPilot.text"));
-        miFullStrengthVesselPilot.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
-        });
-        menuVesselPilotPool.add(miFullStrengthVesselPilot);
-
-        JMenuItem miFireAllVesselPilot = new JMenuItem(resourceMap.getString("miFireAllVesselPilot.text"));
-        miFireAllVesselPilot.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_PILOT, 0));
-        menuVesselPilotPool.add(miFireAllVesselPilot);
-        menuTempPool.add(menuVesselPilotPool);
-        // endregion Vessel Pilot Pool
-
-        // region Vessel Gunner Pool
-        menuVesselGunnerPool = new JMenu(resourceMap.getString("menuVesselGunnerPool.text"));
-        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
-
-        JMenuItem miHireVesselGunner = new JMenuItem(resourceMap.getString("miHireVesselGunner.text"));
-        miHireVesselGunner.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVesselGunnerNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_GUNNER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselGunnerPool.add(miHireVesselGunner);
-
-        JMenuItem miFireVesselGunner = new JMenuItem(resourceMap.getString("miFireVesselGunner.text"));
-        miFireVesselGunner.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVesselGunnerNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_GUNNER, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselGunnerPool.add(miFireVesselGunner);
-
-        JMenuItem miFullStrengthVesselGunner = new JMenuItem(resourceMap.getString("miFullStrengthVesselGunner.text"));
-        miFullStrengthVesselGunner.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
-        });
-        menuVesselGunnerPool.add(miFullStrengthVesselGunner);
-
-        JMenuItem miFireAllVesselGunner = new JMenuItem(resourceMap.getString("miFireAllVesselGunner.text"));
-        miFireAllVesselGunner.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_GUNNER, 0));
-        menuVesselGunnerPool.add(miFireAllVesselGunner);
-        menuTempPool.add(menuVesselGunnerPool);
-        // endregion Vessel Gunner Pool
-
-        // region Vessel Crew Pool
-        menuVesselCrewPool = new JMenu(resourceMap.getString("menuVesselCrewPool.text"));
-        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
-
-        JMenuItem miHireVesselCrew = new JMenuItem(resourceMap.getString("miHireVesselCrew.text"));
-        miHireVesselCrew.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupHireVesselCrewNum.text"),
-                  1,
-                  0,
-                  CampaignGUI.MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(PersonnelRole.VESSEL_CREW, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselCrewPool.add(miHireVesselCrew);
-
-        JMenuItem miFireVesselCrew = new JMenuItem(resourceMap.getString("miFireVesselCrew.text"));
-        miFireVesselCrew.addActionListener(evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true,
-                  resourceMap.getString("popupFireVesselCrewNum.text"),
-                  1,
-                  0,
-                  getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW));
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, popupValueChoiceDialog.getValue());
-            }
-        });
-        menuVesselCrewPool.add(miFireVesselCrew);
-
-        JMenuItem miFullStrengthVesselCrew = new JMenuItem(resourceMap.getString("miFullStrengthVesselCrew.text"));
-        miFullStrengthVesselCrew.addActionListener(evt -> {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
-        });
-        menuVesselCrewPool.add(miFullStrengthVesselCrew);
-
-        JMenuItem miFireAllVesselCrew = new JMenuItem(resourceMap.getString("miFireAllVesselCrew.text"));
-        miFireAllVesselCrew.addActionListener(evt -> getCampaign().setTempCrewPool(PersonnelRole.VESSEL_CREW, 0));
-        menuVesselCrewPool.add(miFireAllVesselCrew);
-        menuTempPool.add(menuVesselCrewPool);
-        // endregion Vessel Crew Pool
-
-        menuMarket.add(menuTempPool);
-        // endregion Temp Pool
-
-        menuBar.add(menuMarket);
-        // endregion Marketplace Menu
-
-        // region Reports Menu
-        // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, H, P, T, U
-        JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text"));
-        menuReports.setMnemonic(KeyEvent.VK_E);
-
-        JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
-        miDragoonsRating.setMnemonic(KeyEvent.VK_U);
-        miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(
-              true));
-        menuReports.add(miDragoonsRating);
-
-        JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));
-        miPersonnelReport.setMnemonic(KeyEvent.VK_P);
-        miPersonnelReport.addActionListener(evt -> new PersonnelReportDialog(getFrame(),
-              new PersonnelReport(getCampaign())).setVisible(true));
-        menuReports.add(miPersonnelReport);
-
-        JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text"));
-        miHangarBreakdown.setMnemonic(KeyEvent.VK_H);
-        miHangarBreakdown.addActionListener(evt -> new HangarReportDialog(getFrame(),
-              new HangarReport(getCampaign())).setVisible(true));
-        menuReports.add(miHangarBreakdown);
-
-        JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text"));
-        miTransportReport.setMnemonic(KeyEvent.VK_T);
-        miTransportReport.addActionListener(evt -> new TransportReportDialog(getFrame(),
-              new TransportReport(getCampaign())).setVisible(true));
-        menuReports.add(miTransportReport);
-
-        JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text"));
-        miCargoReport.setMnemonic(KeyEvent.VK_C);
-        miCargoReport.addActionListener(evt -> new CargoReportDialog(getFrame(),
-              new CargoReport(getCampaign())).setVisible(true));
-        menuReports.add(miCargoReport);
-
-        menuBar.add(menuReports);
-        // endregion Reports Menu
-
-        // region View Menu
-        // The View menu uses the following Mnemonic keys as of 02-June-2020:
-        // H, R
-        JMenu menuView = new JMenu(resourceMap.getString("menuView.text"));
-        menuView.setMnemonic(KeyEvent.VK_V);
-
-        JMenuItem miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text"));
-        miHistoricalDailyReportDialog.setMnemonic(KeyEvent.VK_H);
-        miHistoricalDailyReportDialog.addActionListener(evt -> {
-            HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
-            histDailyReportDialog.setModal(true);
-            histDailyReportDialog.setVisible(true);
-            histDailyReportDialog.dispose();
-        });
-        menuView.add(miHistoricalDailyReportDialog);
-
-        miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
-        miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
-        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().isUseRandomRetirement());
-        miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
-        menuView.add(miRetirementDefectionDialog);
-
-        miAwardEligibilityDialog = new JMenuItem(resourceMap.getString("miAwardEligibilityDialog.text"));
-        miAwardEligibilityDialog.setMnemonic(KeyEvent.VK_R);
-        miAwardEligibilityDialog.setVisible(getCampaign().getCampaignOptions().isEnableAutoAwards());
-        miAwardEligibilityDialog.addActionListener(evt -> showAwardEligibilityDialog());
-        menuView.add(miAwardEligibilityDialog);
-
-        menuBar.add(menuView);
-        // endregion View Menu
-
-        // region Manage Campaign Menu
-        JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
-        menuManage.setMnemonic(KeyEvent.VK_C);
-        menuManage.setName("manageMenu");
-
-        JMenuItem miGMToolsDialog = new JMenuItem(resourceMap.getString("miGMToolsDialog.text"));
-        miGMToolsDialog.setMnemonic(KeyEvent.VK_G);
-        miGMToolsDialog.addActionListener(evt -> new GMToolsDialog(getFrame(), this, null).setVisible(true));
-        menuManage.add(miGMToolsDialog);
-
-        miPlanetarySystemEditor = new JMenuItem(resourceMap.getString("miPlanetarySystemEditor.text"));
-        miPlanetarySystemEditor.setMnemonic(KeyEvent.VK_P);
-        miPlanetarySystemEditor.setVisible(getCampaign().isGM());
-        miPlanetarySystemEditor.addActionListener(evt -> new PlanetarySystemEditorDialog(getFrame(), getCampaign())
-                                                               .setVisible(true));
-        menuManage.add(miPlanetarySystemEditor);
-
-        JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
-        miBloodnames.setMnemonic(KeyEvent.VK_B);
-        miBloodnames.addActionListener(evt -> {
-            for (final Person person : getCampaign().getPersonnel()) {
-                getCampaign().checkBloodnameAdd(person, false);
-            }
-        });
-        menuManage.add(miBloodnames);
-
-        JMenuItem miScenarioEditor = new JMenuItem(resourceMap.getString("miScenarioEditor.text"));
-        miScenarioEditor.setMnemonic(KeyEvent.VK_S);
-        miScenarioEditor.addActionListener(evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
-        menuManage.add(miScenarioEditor);
-
-        miCompanyGenerator = new JMenuItem(resourceMap.getString("miCompanyGenerator.text"));
-        miCompanyGenerator.setMnemonic(KeyEvent.VK_C);
-        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
-        miCompanyGenerator.addActionListener(evt -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(
-              true));
-        menuManage.add(miCompanyGenerator);
-
-        JMenuItem miAutoResolveBehaviorEditor = new JMenuItem(resourceMap.getString("miAutoResolveBehaviorSettings.text"));
-        miAutoResolveBehaviorEditor.setMnemonic(KeyEvent.VK_T);
-        miAutoResolveBehaviorEditor.addActionListener(evt -> {
-            var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
-            autoResolveBehaviorSettingsDialog.setVisible(true);
-            autoResolveBehaviorSettingsDialog.pack();
-        });
-
-        menuManage.add(miAutoResolveBehaviorEditor);
-
-        menuBar.add(menuManage);
-        // endregion Manage Campaign Menu
-
-        // region Help Menu
-        // The Help menu uses the following Mnemonic keys as of 19-March-2020:
-        // A
-        JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text"));
-        menuHelp.setMnemonic(KeyEvent.VK_SLASH);
-        menuHelp.setName("helpMenu");
-
-        menuHelp.addSeparator();
-
-        JMenuItem menuBugReportItem = new JMenuItem(resourceMap.getString("menuReportBug.text"));
-        menuBugReportItem.setName("ReportBug");
-        menuBugReportItem.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
-        menuHelp.add(menuBugReportItem);
-
-        menuHelp.add(new CopySystemDataAction(MHQConstants.PROJECT_NAME));
-
-        menuHelp.addSeparator();
-
-        JMenuItem menuAboutItem = new JMenuItem(resourceMap.getString("menuAbout.text"));
-        menuAboutItem.setMnemonic(KeyEvent.VK_A);
-        menuAboutItem.setName("aboutMenuItem");
-        menuAboutItem.addActionListener(evt -> new MekHQAboutDialog(getFrame()).show());
-        menuHelp.add(menuAboutItem);
-
-        menuBar.add(menuHelp);
-        // endregion Help Menu
-    }
-
-    /**
-     * Handles a new campaign event triggered from within an existing campaign.
-     * <p>
-     * This method performs the following actions in sequence:
-     * <ul>
-     * <li>Prompts the user to save any current progress through a confirmation
-     * dialog.</li>
-     * <li>If the user chooses to cancel or closes the dialog, the operation is
-     * aborted.</li>
-     * <li>If the user agrees to save and the save operation fails, the operation is
-     * aborted.</li>
-     * <li>Unregisters all event handlers associated with the current campaign,
-     * including those
-     * in the CampaignGUI and tabs.</li>
-     * <li>Starts a new campaign by displaying a data loading dialog.</li>
-     * </ul>
-     * </p>
-     */
-    private void handleInAppNewCampaign() {
-        int decision = new NewCampaignConfirmationDialog().YesNoOption();
-        if (decision != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        // Prompt the user to save
-        int savePrompt = JOptionPane.showConfirmDialog(null,
-              resourceMap.getString("savePrompt.text"),
-              resourceMap.getString("savePrompt.title"),
-              JOptionPane.YES_NO_CANCEL_OPTION,
-              JOptionPane.QUESTION_MESSAGE);
-
-        // Abort if the user cancels, closes the dialog, or fails to save
-        if (savePrompt == JOptionPane.CANCEL_OPTION ||
-                  savePrompt == JOptionPane.CLOSED_OPTION ||
-                  (savePrompt == JOptionPane.YES_OPTION && !app.getCampaigngui().saveCampaign(null))) {
-            return;
-        }
-
-        // Unregister handlers for campaign tabs
-        for (int i = 0; i < tabMain.getTabCount(); i++) {
-            Component tab = tabMain.getComponentAt(i);
-            if (tab instanceof CampaignGuiTab) {
-                ((CampaignGuiTab) tab).disposeTab();
-            }
-        }
-
-        // Unregister other handlers
-        MekHQ.unregisterHandler(this);
-
-        if (getCampaign().getStoryArc() != null) {
-            MekHQ.unregisterHandler(getCampaign().getStoryArc());
-        }
-
-        // Start a new campaign
-        new DataLoadingDialog(frame, app, null, null, true).setVisible(true);
-    }
-
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
         statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
-        lblFunds = new JLabel();
         lblTempAsTechs = new JLabel();
         lblTempMedics = new JLabel();
         lblTempSoldiers = new JLabel();
@@ -1587,17 +391,41 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        statusPanel.add(lblFunds);
-        statusPanel.add(lblTempAsTechs);
-        statusPanel.add(lblTempMedics);
-        statusPanel.add(lblTempSoldiers);
-        statusPanel.add(lblTempBattleArmor);
-        statusPanel.add(lblTempVehicleCrewGround);
-        statusPanel.add(lblTempVehicleCrewVTOL);
-        statusPanel.add(lblTempVehicleCrewNaval);
-        statusPanel.add(lblTempVesselPilot);
-        statusPanel.add(lblTempVesselGunner);
-        statusPanel.add(lblTempVesselCrew);
+        RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
+        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
+
+        Border innerBorder = BorderFactory.createCompoundBorder(
+              new RoundedLineBorder(UIUtil.uiIndependentGray(), 1, 8),
+              BorderFactory.createEmptyBorder(1, 3, 1, 3));
+
+        pnlVehicleCrew = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+        pnlVehicleCrew.setBorder(innerBorder);
+        pnlVehicleCrew.add(new JLabel(statusBarLabel("statusBar.pnlVehicleCrew.title")));
+        pnlVehicleCrew.add(lblTempVehicleCrewGround);
+        pnlVehicleCrew.add(lblTempVehicleCrewVTOL);
+        pnlVehicleCrew.add(lblTempVehicleCrewNaval);
+
+        pnlVesselCrew = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+        pnlVesselCrew.setBorder(innerBorder);
+        pnlVesselCrew.add(new JLabel(statusBarLabel("statusBar.pnlVesselCrew.title")));
+        pnlVesselCrew.add(lblTempVesselPilot);
+        pnlVesselCrew.add(lblTempVesselGunner);
+        pnlVesselCrew.add(lblTempVesselCrew);
+
+        JPanel pnlTempPersonnel = new JPanel(new FlowLayout(FlowLayout.LEADING, 8, 2));
+        pnlTempPersonnel.setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
+        pnlTempPersonnel.add(new JLabel(statusBarLabel("statusBar.pnlTempPersonnel.title")));
+        pnlTempPersonnel.add(lblTempAsTechs);
+        pnlTempPersonnel.add(lblTempMedics);
+        pnlTempPersonnel.add(lblTempSoldiers);
+        pnlTempPersonnel.add(lblTempBattleArmor);
+        pnlTempPersonnel.add(pnlVehicleCrew);
+        pnlTempPersonnel.add(pnlVesselCrew);
+
+        statusPanel.add(btnOvertime);
+        statusPanel.add(pnlTempPersonnel);
         statusPanel.add(lblPartsAvailabilityRating);
     }
 
@@ -1616,279 +444,108 @@ public class CampaignGUI extends JPanel {
      * <p>Accessibility names and layout constraints are assigned to ensure that the UI is properly arranged and
      * accessible.</p>
      */
-    private void initTopButtons() {
-        boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
-                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
+    private void initTopPanel() {
+        pnlTop = new JPanel();
+        pnlTop.setLayout(new BoxLayout(pnlTop, BoxLayout.X_AXIS));
 
-        lblLocation = new JLabel(getCampaign().getCurrentLocation()
-                                       .getReport(getCampaign().getLocalDate(),
-                                             isUseCommandCircuit,
-                                             getCampaign().getTransportCostCalculation(EXP_REGULAR)));
-        lblLocation.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("currentLocation.title")));
-
-        pnlTop = new JPanel(new GridBagLayout());
-        pnlTop.getAccessibleContext().setAccessibleName(getText("currentLocation.title"));
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 5);
-        pnlTop.add(lblLocation, gridBagConstraints);
-
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getMarketButtons(), gridBagConstraints);
-
-
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        pnlTop.add(getButtonPanel(), gridBagConstraints);
+        pnlTop.add(new CurrentLocationPanel(365, 420, TOP_PANEL_HEIGHT - 30,
+              getCampaign(), this::openRecruitmentDialog));
+        pnlTop.add(createMarketsPanel(95, 130));
+        pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
+        pnlTop.add(Box.createHorizontalGlue());
+        pnlTop.add(new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
+              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true)));
+        pnlTop.add(createCampaignControlPanel(140, 170));
     }
 
-    private JPanel getMarketButtons() {
-        JPanel pnlButton = new JPanel(new GridBagLayout());
-        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
+    private JPanel createMarketsPanel(int minWidth, int maxWidth) {
+        JPanel pnlMarkets = new ScalingWidthConstrainedPanel(minWidth, maxWidth);
+        pnlMarkets.setLayout(new GridBagLayout());
+        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
 
         btnContractMarket.addActionListener(e -> showContractMarket());
         btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnContractMarket, gridBagConstraints);
-
-        btnPersonnelMarket.addActionListener(e -> hirePersonMarket());
-        btnPersonnelMarket.setHorizontalTextPosition(SwingConstants.CENTER);
-        btnPersonnelMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnPersonnelMarket, gridBagConstraints);
+        pnlMarkets.add(btnContractMarket, gridBagConstraints);
 
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnUnitMarket, gridBagConstraints);
-
-        btnPartsMarket.addActionListener(e -> showPartsMarket());
-        btnPartsMarket.setHorizontalTextPosition(SwingConstants.CENTER);
-        btnPartsMarket.setVerticalTextPosition(SwingConstants.CENTER);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnPartsMarket, gridBagConstraints);
+        gridBagConstraints.insets = new Insets(SMALL_GAP, 0, 0, 0);
+        pnlMarkets.add(btnUnitMarket, gridBagConstraints);
 
         refreshMarketButtonLabels();
 
-        return pnlButton;
-    }
-
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshDynamicButtons() {
-        refreshMarketButtonLabels();
+        return pnlMarkets;
     }
 
     public void refreshMarketButtonLabels() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        String labelKey = campaignOptions.getContractMarketMethod().isNone()
-                                ? "manual" : "market";
+        String labelKey = campaignOptions.getContractMarketMethod().isNone() ? "manual" : "market";
         String label = resourceMap.getString("btnContractMarket." + labelKey);
 
         btnContractMarket.setText(label);
-
-        PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
-        labelKey = (marketStyle == PERSONNEL_MARKET_DISABLED && getCampaign().getPersonnelMarket().isNone())
-                         ? "manual" : "market";
-        label = resourceMap.getString("btnPersonnelMarket." + labelKey);
-        btnPersonnelMarket.setText(label);
 
         labelKey = getCampaign().getUnitMarket().getMethod().isNone() ? "manual" : "market";
         label = resourceMap.getString("btnUnitMarket." + labelKey);
         btnUnitMarket.setText(label);
     }
 
-    private JPanel getButtonPanel() {
-        JPanel pnlButton = new JPanel(new GridBagLayout());
-        pnlButton.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("campaignControls.title")));
+    private JPanel createCampaignControlPanel(int minWidth, int maxWidth) {
+        JPanel pnlButton = new ScalingWidthConstrainedPanel(minWidth, maxWidth);
+        pnlButton.setLayout(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
-        GridBagConstraints gridBagConstraints;
-        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+
+        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
+        btnCompanyGenerator.addActionListener(
+              e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnGlossary, gridBagConstraints);
-
-        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
-              getCampaign().getSecondInCommand()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnGoRogue, gridBagConstraints);
-
-        btnCompanyGenerator.addActionListener(e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(
-              true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
         pnlButton.add(btnCompanyGenerator, gridBagConstraints);
 
+        RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> {
             getCampaign().setGMMode(btnGMMode.isSelected());
-            refreshGMMenuItems();
+            windowMenu.refreshGMMenuItems();
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, 0, SMALL_GAP);
         pnlButton.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
-        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
-        pnlButton.add(btnOvertime, gridBagConstraints);
-
-        btnAdvanceMultipleDays.addActionListener(e -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnAdvanceMultipleDays, gridBagConstraints);
-
-        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
-        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-        pnlButton.add(btnMassTraining, gridBagConstraints);
-
-        // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        String padding = "       ";
-        RoundedJButton btnAdvanceDay = new RoundedJButton(padding +
-                                                                resourceMap.getString("btnAdvanceDay.text") +
-                                                                padding);
-        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
-        btnAdvanceDay.addActionListener(evt -> {
-            // We disable the button here, as we don't want the user to be able to advance
-            // day  again, until after Advance Day has completed.
-            btnAdvanceDay.setEnabled(false);
-            btnAdvanceMultipleDays.setEnabled(false);
-
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    getCampaignController().advanceDay();
-                } finally {
-                    btnAdvanceDay.setEnabled(true);
-                    btnAdvanceMultipleDays.setEnabled(true);
-                    setCursor(Cursor.getDefaultCursor());
-                }
-            });
-        });
-        btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 15, 3, 0);
-        pnlButton.add(btnAdvanceDay, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
+        RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
+        pnlButton.add(btnGlossary, gridBagConstraints);
+
+        RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
         btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new Insets(3, 15, 3, 15);
+        gridBagConstraints.weightx = 0.6;
+        gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
         pnlButton.add(btnBugReport, gridBagConstraints);
 
         return pnlButton;
     }
+
     // endregion Initialization
 
     public @Nullable CampaignGuiTab getTab(final MHQTabType tabType) {
@@ -2007,34 +664,22 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void showAwardEligibilityDialog() {
-        AutoAwardsController autoAwardsController = new AutoAwardsController();
-
-        autoAwardsController.ManualController(getCampaign(), true);
+    private void refreshGuiScale() {
+        Dimension screenSize = getUsableScreenSize();
+        int minWidth = Math.min(UIUtil.scaleForGUI(MIN_WINDOW_WIDTH), screenSize.width);
+        int minHeight = Math.min(UIUtil.scaleForGUI(MIN_WINDOW_HEIGHT), screenSize.height);
+        frame.setMinimumSize(new Dimension(minWidth, minHeight));
+        pnlTop.setMinimumSize(new Dimension(minWidth, UIUtil.scaleForGUI(TOP_PANEL_HEIGHT)));
+        pnlTop.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(TOP_PANEL_HEIGHT)));
     }
 
-    private void changeTheme(ActionEvent evt) {
-        MekHQ.getSelectedTheme().setValue(evt.getActionCommand());
-        refreshThemeChoices();
-    }
-
-    private void refreshThemeChoices() {
-        menuThemes.removeAll();
-        JCheckBoxMenuItem miPlaf;
-        for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
-            // intentionally only limits the themes in the menu; as a last resort for GUI problems, other laf can be
-            // used by hand-editing mhq.preferences
-            if (GUIPreferences.isSupportedLookAndFeel(laf)) {
-                miPlaf = new JCheckBoxMenuItem(laf.getName());
-                if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
-                    miPlaf.setSelected(true);
-                }
-
-                menuThemes.add(miPlaf);
-                miPlaf.setActionCommand(laf.getClassName());
-                miPlaf.addActionListener(this::changeTheme);
-            }
-        }
+    private static Dimension getUsableScreenSize() {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(gd.getDefaultConfiguration());
+        int usableScreenWidth = screenSize.width - screenInsets.left - screenInsets.right;
+        int usableScreenHeight = screenSize.height - screenInsets.top - screenInsets.bottom;
+        return new Dimension(usableScreenWidth, usableScreenHeight);
     }
 
     public void focusOnUnit(UUID id) {
@@ -2135,32 +780,15 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void addBlankPerson(final ActionEvent evt) {
-        Person person = new Person(getCampaign(), MERCENARY_FACTION_CODE);
-        person.setOriginPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
-        person.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
-
-        getCampaign().recruitPerson(person, true, true);
-    }
-
-    private void hirePerson(final ActionEvent evt) {
-        final NewRecruitDialog npd = new NewRecruitDialog(this,
-              true,
-              getCampaign().newPerson(PersonnelRole.valueOf(evt.getActionCommand())));
-        npd.setVisible(true);
-    }
-
     /**
-     * Opens the personnel market dialog to hire a person, using the appropriate market style based on campaign
-     * options.
+     * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign options.
      *
-     * <p>If the personnel market is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new personnel market dialog is shown according to the campaign's current market
-     * style.</p>
+     * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
+     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market style.</p>
      *
-     * <p>If no personnel market is enabled display the bulk hiring dialog, instead.</p>
+     * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
-    public void hirePersonMarket() {
+    public void openRecruitmentDialog() {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
 
@@ -2173,108 +801,13 @@ public class CampaignGUI extends JPanel {
                 getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         } else {
-            hireBulkPersonnel();
+            openBulkRecruitmentDialog();
         }
     }
 
-    private void hireBulkPersonnel() {
+    public void openBulkRecruitmentDialog() {
         HireBulkPersonnelDialog hireBulkPersonnelDialog = new HireBulkPersonnelDialog(getFrame(), true, getCampaign());
         hireBulkPersonnelDialog.setVisible(true);
-    }
-
-    private void bringAllTempCrewsToFullStrength() {
-        getCampaign().resetAsTechPool();
-        getCampaign().resetMedicPool();
-        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
-        }
-    }
-
-    private void releaseAllTempCrews() {
-        getCampaign().emptyAsTechPool();
-        getCampaign().emptyMedicPool();
-        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.SOLDIER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
-        }
-    }
-
-    private void releaseSurplusTempCrews() {
-        getCampaign().releaseSurplusAsTechPool();
-        getCampaign().releaseSurplusMedicPool();
-        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.SOLDIER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_CREW);
-        }
     }
 
     public void showContractMarket() {
@@ -2406,117 +939,6 @@ public class CampaignGUI extends JPanel {
         }
 
         return true;
-    }
-
-    /**
-     * @param evt the event triggering the opening of the Campaign Options Dialog
-     */
-    private void menuOptionsActionPerformed(final ActionEvent evt) {
-        final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
-        // We need to handle it like this for now, as the options above get written to currently
-        boolean atb = oldOptions.isUseStratCon();
-        boolean factionIntroDate = oldOptions.isFactionIntroDate();
-        final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
-        final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
-        final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
-
-        CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), getCampaign());
-        optionsDialog.setVisible(true);
-
-        final CampaignOptions newOptions = getCampaign().getCampaignOptions();
-
-        if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
-            getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
-        } else {
-            getCampaign().getDivorce().setUseClanPersonnelDivorce(newOptions.isUseClanPersonnelDivorce());
-            getCampaign().getDivorce().setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
-            getCampaign().getDivorce().setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
-            getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
-            getCampaign().getDivorce().setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
-            getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
-            if (getCampaign().getDivorce().getMethod().isDiceRoll()) {
-                ((RandomDivorce) getCampaign().getDivorce()).setDivorceDiceSize(newOptions.getRandomDivorceDiceSize());
-            }
-        }
-
-        if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
-            getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
-        } else {
-            getCampaign().getMarriage().setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
-            getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
-            getCampaign().getMarriage()
-                  .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
-            getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
-            if (getCampaign().getMarriage().getMethod().isDiceRoll()) {
-                ((RandomMarriage) getCampaign().getMarriage()).setMarriageDiceSize(newOptions.getRandomMarriageDiceSize());
-            }
-        }
-
-        if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
-            getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
-        } else {
-            getCampaign().getProcreation().setUseClanPersonnelProcreation(newOptions.isUseClanPersonnelProcreation());
-            getCampaign().getProcreation().setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
-            getCampaign().getProcreation()
-                  .setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
-            getCampaign().getProcreation()
-                  .setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
-            getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
-            if (getCampaign().getProcreation().getMethod().isDiceRoll()) {
-                ((RandomProcreation) getCampaign().getProcreation()).setRelationshipDieSize(newOptions.getRandomProcreationRelationshipDiceSize());
-                ((RandomProcreation) getCampaign().getProcreation()).setRelationshiplessDieSize(newOptions.getRandomProcreationRelationshiplessDiceSize());
-            }
-        }
-
-        // Clear Procreation Data if Disabled
-        if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
-            getCampaign().getPersonnel()
-                  .parallelStream()
-                  .filter(Person::isPregnant)
-                  .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
-        }
-
-        final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
-        if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
-            getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
-            getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
-        }
-
-        AbstractContractMarket contractMarket = getCampaign().getContractMarket();
-        if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
-            getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
-        }
-
-        if (atb != newOptions.isUseStratCon()) {
-            if (newOptions.isUseStratCon()) {
-                getCampaign().initAtB(false);
-                // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
-            }
-            if (newOptions.isUseStratCon()) {
-                int loops = 0;
-                while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                    try {
-                        Thread.sleep(50);
-                        if (++loops > 20) {
-                            // Wait for up to a second
-                            break;
-                        }
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-            } else {
-                getCampaign().shutdownAtB();
-            }
-        }
-
-        getCampaign().initTurnover();
-
-        if (factionIntroDate != newOptions.isFactionIntroDate()) {
-            getCampaign().updateTechFactionCode();
-        }
-        refreshCalendar();
-        getCampaign().reloadNews();
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
@@ -2724,278 +1146,6 @@ public class CampaignGUI extends JPanel {
         return techHash.get(s).getId();
     }
 
-    /**
-     * Exports Planets to a file (CSV, XML, etc.)
-     *
-     */
-    protected void exportPlanets(FileType format, String dialogTitle, String filename) {
-        // TODO: Fix this
-        /*
-         * GUI.fileDialogSave(
-         * frame,
-         * dialogTitle,
-         * format,
-         * MekHQ.getPlanetsDirectory().getValue(),
-         * "planets." + format.getRecommendedExtension())
-         * .ifPresent(f -> {
-         * MekHQ.getPlanetsDirectory().setValue(f.getParent());
-         * File file = checkFileEnding(f, format.getRecommendedExtension());
-         * checkToBackupFile(file, file.getPath());
-         * String report = Planets.getInstance().exportPlanets(file.getPath(),
-         * format.getRecommendedExtension());
-         * JOptionPane.showMessageDialog(mainPanel, report);
-         * });
-         *
-         * GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." +
-         * format.getRecommendedExtension()), format).ifPresent(f -> {
-         * File file = checkFileEnding(f, format.getRecommendedExtension());
-         * checkToBackupFile(file, file.getPath());
-         * String report = Planets.getInstance().exportPlanets(file.getPath(),
-         * format.getRecommendedExtension());
-         * JOptionPane.showMessageDialog(mainPanel, report);
-         * });
-         */
-    }
-
-    /**
-     * Exports Personnel to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
-     */
-    protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-        if (((PersonnelTab) getTab(MHQTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
-            GUI.fileDialogSave(frame,
-                  dialogTitle,
-                  format,
-                  MekHQ.getPersonnelDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getPersonnelDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = Utilities.exportTableToCSV(((PersonnelTab) getTab(MHQTabType.PERSONNEL)).getPersonnelTable(),
-                          file);
-                } else {
-                    report = "Unsupported FileType in Export Personnel";
-                }
-                JOptionPane.showMessageDialog(tabMain, report);
-            });
-        } else {
-            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoPersonnel.text"));
-        }
-    }
-
-    /**
-     * Exports Units to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
-     */
-    protected void exportUnits(FileType format, String dialogTitle, String filename) {
-        if (((HangarTab) getTab(MHQTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
-            GUI.fileDialogSave(frame,
-                  dialogTitle,
-                  format,
-                  MekHQ.getUnitsDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getUnitsDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = Utilities.exportTableToCSV(((HangarTab) getTab(MHQTabType.HANGAR)).getUnitTable(), file);
-                } else {
-                    report = "Unsupported FileType in Export Units";
-                }
-                JOptionPane.showMessageDialog(tabMain, report);
-            });
-        } else {
-            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoUnits.text"));
-        }
-    }
-
-    /**
-     * Exports Finances to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
-     */
-    protected void exportFinances(FileType format, String dialogTitle, String filename) {
-        if (!getCampaign().getFinances().getTransactions().isEmpty()) {
-            GUI.fileDialogSave(frame,
-                  dialogTitle,
-                  format,
-                  MekHQ.getFinancesDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getFinancesDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = getCampaign().getFinances()
-                                   .exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
-                } else {
-                    report = "Unsupported FileType in Export Finances";
-                }
-                JOptionPane.showMessageDialog(tabMain, report);
-            });
-        } else {
-            JOptionPane.showMessageDialog(tabMain, resourceMap.getString("dlgNoFinances.text"));
-        }
-    }
-
-    /**
-     * Checks if a file already exists, if so it makes a backup copy.
-     *
-     * @param file to determine if there is an existing file with that name
-     * @param path path to the file
-     */
-    private void checkToBackupFile(File file, String path) {
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
-    }
-
-    /**
-     * Checks to make sure the file has the appropriate ending / extension.
-     *
-     * @param file   the file to check
-     * @param format proper format for the ending/extension
-     *
-     * @return File with the appropriate ending/ extension
-     */
-    private File checkFileEnding(File file, String format) {
-        String path = file.getPath();
-        if (!path.endsWith('.' + format)) {
-            path += '.' + format;
-            file = new File(path);
-        }
-        return file;
-    }
-
-    protected void loadListFile(final boolean allowNewPilots) {
-        final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
-
-        PartQuality quality = PartQuality.QUALITY_D;
-
-        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
-            quality = Unit.getRandomUnitQuality(0);
-        }
-
-        if (unitFile != null) {
-            try {
-                for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
-                    getCampaign().addNewUnit(entity, allowNewPilots, 0, quality);
-                }
-            } catch (Exception e) {
-                logger.error("", e);
-            }
-        }
-    }
-
-    protected void loadPersonFile() {
-        File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
-
-        if (personnelFile != null) {
-            logger.info("Starting load of personnel file from XML...");
-            // Initialize variables.
-            Document xmlDoc;
-
-            // Open the file
-            try (InputStream is = new FileInputStream(personnelFile)) {
-                // Using factory get an instance of document builder
-                DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-                // Parse using builder to get DOM representation of the XML file
-                xmlDoc = db.parse(is);
-            } catch (Exception ex) {
-                logger.error("Cannot load person XML", ex);
-                return; // otherwise we NPE out in the next line
-            }
-
-            Element personnelEle = xmlDoc.getDocumentElement();
-            NodeList nl = personnelEle.getChildNodes();
-
-            // Get rid of empty text nodes and adjacent text nodes...
-            // Stupid weird parsing of XML. At least this cleans it up.
-            personnelEle.normalize();
-
-            final Version version = new Version(personnelEle.getAttribute("version"));
-
-            // we need to iterate through three times, the first time to collect
-            // any custom units that might not be written yet
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                // If it's not an element node, we ignore it.
-                if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    logger.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
-                    continue;
-                }
-
-                Person person = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if ((person != null) && (getCampaign().getPerson(person.getId()) != null)) {
-                    logger.error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
-                          person.getFullName(),
-                          person.getId());
-                    person = null;
-                }
-
-                if (person != null) {
-                    getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, person.isEmployed(),
-                          true);
-
-                    // Clear some values we no longer should have set in case this
-                    // has transferred campaigns or things in the campaign have
-                    // changed...
-                    person.setUnit(null);
-                    person.clearTechUnits();
-                }
-            }
-
-            // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export both members
-            // of the couple
-            // TODO : make it so that exports will automatically include both spouses
-            for (Person p : getCampaign().getActivePersonnel(true, true)) {
-                if (p.getGenealogy().hasSpouse() &&
-                          !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
-                    // If this happens, we need to clear the spouse
-                    if (p.getMaidenName() != null) {
-                        p.setSurname(p.getMaidenName());
-                    }
-
-                    p.getGenealogy().setSpouse(null);
-                }
-
-                if (p.isPregnant()) {
-                    String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
-                    UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-                    if ((fatherId != null) &&
-                              !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
-                        p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
-                    }
-                }
-            }
-
-            logger.info("Finished load of personnel file");
-        }
-    }
-
     public void savePersonFile() {
         File file = FileDialogs.savePersonnel(frame, getCampaign()).orElse(null);
         if (file == null) {
@@ -3072,68 +1222,6 @@ public class CampaignGUI extends JPanel {
                 backupFile.delete();
             }
         }
-    }
-
-    protected void loadPartsFile() {
-        Optional<File> maybeFile = FileDialogs.openParts(frame);
-
-        if (maybeFile.isEmpty()) {
-            return;
-        }
-
-        File partsFile = maybeFile.get();
-
-        logger.info("Starting load of parts file from XML...");
-        // Initialize variables.
-        Document xmlDoc;
-
-        // Open up the file.
-        try (InputStream is = new FileInputStream(partsFile)) {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(is);
-        } catch (Exception ex) {
-            logger.error("", ex);
-            return;
-        }
-
-        Element partsEle = xmlDoc.getDocumentElement();
-        NodeList nl = partsEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML. At least this cleans it up.
-        partsEle.normalize();
-
-        final Version version = new Version(partsEle.getAttribute("version"));
-
-        // we need to iterate through three times, the first time to collect
-        // any custom units that might not be written yet
-        List<Part> parts = new ArrayList<>();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("part")) {
-                // Error condition of sorts!
-                // Err, what should we do here?
-                logger.error("Unknown node type not loaded in Parts nodes: {}", wn2.getNodeName());
-                continue;
-            }
-
-            Part p = Part.generateInstanceFromXML(wn2, version);
-            if (p != null) {
-                parts.add(p);
-            }
-        }
-
-        getCampaign().importParts(parts);
-        logger.info("Finished load of parts file");
     }
 
     public void savePartsFile() {
@@ -3249,7 +1337,7 @@ public class CampaignGUI extends JPanel {
 
         final int selectedIndex = tabMain.getSelectedIndex();
         final Component selectedTab = ((selectedIndex >= 0) && (selectedIndex < tabMain.getTabCount())) ?
-                                             tabMain.getComponentAt(selectedIndex) : null;
+                                            tabMain.getComponentAt(selectedIndex) : null;
 
         EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
         int logsSelected = tabLogs.getSelectedIndex();
@@ -3277,6 +1365,7 @@ public class CampaignGUI extends JPanel {
                 case TECHNICAL -> commandCenterTab.getTechnicalLog();
                 case POLITICS -> commandCenterTab.getPoliticsLog();
                 case SKILL_CHECKS -> commandCenterTab.getSkillLog();
+                case AGGREGATE -> commandCenterTab.getAggregateLog();
             };
 
             if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
@@ -3315,35 +1404,26 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void refreshCalendar() {
+    public void refreshWindowTitle() {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
-    /**
-     * Refreshes the 'funds' display on the GUI.
-     */
-    private void refreshFunds() {
-        Money funds = getCampaign().getFunds();
-        String inDebt = "";
-        if (getCampaign().getFinances().isInDebt()) {
-            // FIXME : Localize
-            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
+    private String statusBarLabel(String key, Object... args) {
+        String label = getFormattedTextAt("mekhq.resources.CampaignGUI", key);
+        if (args.length == 0) {
+            return "<html><b>" + label + "</b></html>";
         }
-        // FIXME : Localize
-        String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
-        lblFunds.setText(text);
+        return "<html><b>" + label + "</b>: " + args[0] + "</html>";
     }
 
     private void refreshTempAsTechs() {
-        // FIXME : Localize
-        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getTemporaryAsTechPool() + "</html>";
-        lblTempAsTechs.setText(text);
+        lblTempAsTechs.setText(statusBarLabel("statusBar.lblTempAsTechs.text",
+              getCampaign().getTemporaryAsTechPool()));
     }
 
     private void refreshTempMedics() {
-        // FIXME : Localize
-        String text = "<html><b>Temp Medics</b>: " + getCampaign().getTemporaryMedicPool() + "</html>";
-        lblTempMedics.setText(text);
+        lblTempMedics.setText(statusBarLabel("statusBar.lblTempMedics.text",
+              getCampaign().getTemporaryMedicPool()));
     }
 
     private void refreshTempSoldiers() {
@@ -3352,9 +1432,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempSoldiers.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTempCrewPool(PersonnelRole.SOLDIER) + "</html>";
-        lblTempSoldiers.setText(text);
+        lblTempSoldiers.setText(statusBarLabel("statusBar.lblTempSoldiers.text",
+              getCampaign().getTempCrewPool(PersonnelRole.SOLDIER)));
     }
 
     private void refreshTempBattleArmor() {
@@ -3363,88 +1442,92 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempBattleArmor.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Battle Armor</b>: " + getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR) +
-                            "</html>";
-        lblTempBattleArmor.setText(text);
+        lblTempBattleArmor.setText(statusBarLabel("statusBar.lblTempBattleArmor.text",
+              getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR)));
     }
 
     private void refreshTempVehicleCrewGround() {
         if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
             lblTempVehicleCrewGround.setVisible(false);
+            refreshVehicleCrewPanelVisibility();
             return;
         }
         lblTempVehicleCrewGround.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (Ground)</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND) +
-                            "</html>";
-        lblTempVehicleCrewGround.setText(text);
+        lblTempVehicleCrewGround.setText(statusBarLabel("statusBar.lblTempVehicleCrewGround.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND)));
+        refreshVehicleCrewPanelVisibility();
     }
 
     private void refreshTempVehicleCrewVTOL() {
         if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
             lblTempVehicleCrewVTOL.setVisible(false);
+            refreshVehicleCrewPanelVisibility();
             return;
         }
         lblTempVehicleCrewVTOL.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (VTOL)</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL) +
-                            "</html>";
-        lblTempVehicleCrewVTOL.setText(text);
+        lblTempVehicleCrewVTOL.setText(statusBarLabel("statusBar.lblTempVehicleCrewVTOL.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL)));
+        refreshVehicleCrewPanelVisibility();
     }
 
     private void refreshTempVehicleCrewNaval() {
         if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
             lblTempVehicleCrewNaval.setVisible(false);
+            refreshVehicleCrewPanelVisibility();
             return;
         }
         lblTempVehicleCrewNaval.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (Naval)</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL) +
-                            "</html>";
-        lblTempVehicleCrewNaval.setText(text);
+        lblTempVehicleCrewNaval.setText(statusBarLabel("statusBar.lblTempVehicleCrewNaval.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL)));
+        refreshVehicleCrewPanelVisibility();
+    }
+
+    private void refreshVehicleCrewPanelVisibility() {
+        pnlVehicleCrew.setVisible(lblTempVehicleCrewGround.isVisible()
+                                        || lblTempVehicleCrewVTOL.isVisible()
+                                        || lblTempVehicleCrewNaval.isVisible());
     }
 
     private void refreshTempVesselPilot() {
         if (!getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
             lblTempVesselPilot.setVisible(false);
+            refreshVesselCrewPanelVisibility();
             return;
         }
         lblTempVesselPilot.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vessel Pilots</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT) +
-                            "</html>";
-        lblTempVesselPilot.setText(text);
+        lblTempVesselPilot.setText(statusBarLabel("statusBar.lblTempVesselPilot.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT)));
+        refreshVesselCrewPanelVisibility();
     }
 
     private void refreshTempVesselGunner() {
         if (!getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
             lblTempVesselGunner.setVisible(false);
+            refreshVesselCrewPanelVisibility();
             return;
         }
         lblTempVesselGunner.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vessel Gunners</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER) +
-                            "</html>";
-        lblTempVesselGunner.setText(text);
+        lblTempVesselGunner.setText(statusBarLabel("statusBar.lblTempVesselGunner.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER)));
+        refreshVesselCrewPanelVisibility();
     }
 
     private void refreshTempVesselCrew() {
         if (!getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
             lblTempVesselCrew.setVisible(false);
+            refreshVesselCrewPanelVisibility();
             return;
         }
         lblTempVesselCrew.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vessel Crew</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW) +
-                            "</html>";
-        lblTempVesselCrew.setText(text);
+        lblTempVesselCrew.setText(statusBarLabel("statusBar.lblTempVesselCrew.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW)));
+        refreshVesselCrewPanelVisibility();
+    }
+
+    private void refreshVesselCrewPanelVisibility() {
+        pnlVesselCrew.setVisible(lblTempVesselPilot.isVisible()
+                                       || lblTempVesselGunner.isVisible()
+                                       || lblTempVesselCrew.isVisible());
     }
 
     private void refreshPartsAvailability() {
@@ -3452,30 +1535,15 @@ public class CampaignGUI extends JPanel {
             lblPartsAvailabilityRating.setText("");
         } else {
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
-            // FIXME : Localize
-            lblPartsAvailabilityRating.setText(String.format("<html><b>Parts Availability Modifier</b>: %d</html>",
+            lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }
     }
 
-    private void refreshGMMenuItems() {
-        if (miPlanetarySystemEditor != null) {
-            miPlanetarySystemEditor.setVisible(getCampaign().isGM());
-        }
-    }
-
-    private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
-
-    public void refreshLocation() {
-        boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(getCampaign().isOverridingCommandCircuitRequirements(),
-                    getCampaign().isGM(), getCampaign().getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    getCampaign().getFactionStandings(), getCampaign().getFutureAtBContracts());
-
-        lblLocation.setText(getCampaign().getCurrentLocation()
-                                  .getReport(getCampaign().getLocalDate(),
-                                        isUseCommandCircuit,
-                                        getCampaign().getTransportCostCalculation(EXP_REGULAR)));
+    private void refreshCampaignControlButtons() {
+        boolean emptyHangar = getCampaign().getUnits().isEmpty();
+        boolean noPersonnel = getCampaign().getPersonnel().isEmpty();
+        btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
     }
 
     public int getTabIndexByName(String tabTitle) {
@@ -3620,21 +1688,6 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Handles changes to the campaign's current location.
-     *
-     * <p>Invokes an update to ensure the location information is current within the user interface and data model.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param locationChangedEvent the event indicating that the campaign location has changed
-     */
-    @Subscribe
-    public void handleLocationChanged(LocationChangedEvent locationChangedEvent) {
-        refreshLocation();
-    }
-
-    /**
      * Handles updates when a mission event occurs.
      *
      * <p>Refreshes the availability of parts to ensure inventory and options reflect the latest mission context.</p>
@@ -3711,8 +1764,6 @@ public class CampaignGUI extends JPanel {
         Campaign campaign = getCampaign();
         Money overdueAmount = campaign.getFinances().checkOverdueLoanPayments(campaign);
         if (overdueAmount.isPositive()) {
-            refreshFunds();
-
             String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogOverdueLoans.ic",
                   campaign.getCommanderAddress());
@@ -3791,9 +1842,8 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handleNewDay(NewDayEvent newDayEvent) {
-        refreshCalendar();
-        refreshLocation();
-        refreshFunds();
+        refreshWindowTitle();
+        refreshCampaignControlButtons();
         refreshPartsAvailability();
         refreshMarketButtonLabels();
 
@@ -3819,16 +1869,6 @@ public class CampaignGUI extends JPanel {
             addStandardTab(MHQTabType.STRAT_CON);
         }
 
-        // Update blob crew menu visibility based on campaign options
-        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
-        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
-        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
-        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
-        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
-        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
-        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
-        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
-
         // Update blob crew label visibility
         refreshTempSoldiers();
         refreshTempBattleArmor();
@@ -3840,11 +1880,7 @@ public class CampaignGUI extends JPanel {
         refreshTempVesselCrew();
 
         refreshAllTabs();
-        fundsScheduler.schedule();
         refreshPartsAvailability();
-
-        miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
-        miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
 
         boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
         int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
@@ -3867,7 +1903,6 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(TransactionEvent transactionEvent) {
-        fundsScheduler.schedule();
         refreshPartsAvailability();
     }
 
@@ -3883,23 +1918,7 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(LoanEvent loanEvent) {
-        fundsScheduler.schedule();
         refreshPartsAvailability();
-    }
-
-    /**
-     * Handles updates related to assets within the campaign.
-     *
-     * <p>Schedules a funds update to ensure the campaign's financial state is current when assets change.</p>
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param assetEvent the event indicating a change in assets
-     */
-    @Subscribe
-    public void handle(AssetEvent assetEvent) {
-        fundsScheduler.schedule();
     }
 
     /**
@@ -4055,7 +2074,10 @@ public class CampaignGUI extends JPanel {
     /**
      * Handles changes to general application options.
      *
-     * <p>Updates the visibility of the company generator menu item according to the new option settings.</p>
+     * <p>
+     * Updates the visibility of the company generator menu item according to the new option settings. Ensures that GUI
+     * scale changes are applied.
+     * </p>
      *
      * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
      * wrong.</p>
@@ -4064,7 +2086,7 @@ public class CampaignGUI extends JPanel {
      */
     @Subscribe
     public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
-        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
+        refreshGuiScale();
     }
     // endregion Subscriptions
 }

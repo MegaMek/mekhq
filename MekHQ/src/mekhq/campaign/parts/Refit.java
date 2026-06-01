@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -213,7 +213,10 @@ public class Refit extends Part implements IAcquisitionWork {
         campaign = oldUnit.getCampaign();
         calculate();
 
-        if (customJob) {
+        // Using Customize -> Refit/Customize... -> Customize to Model will pass in TRUE for "custom". We do not want
+        // to rename infantry if we're refitting to an existing model, but if we're editing in the MekLab tab we
+        // should propose a new name.
+        if (customJob && isSavingFile) {
             suggestNewName();
         }
     }

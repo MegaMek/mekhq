@@ -69,7 +69,9 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Canonica
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getNewDiseaseOutbreaks;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.getMilestone;
+import static mekhq.campaign.personnel.skills.QuickTrain.QuickTrainOptions.getQuickTrainOptionsForNewDay;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -105,6 +107,7 @@ import javax.swing.JOptionPane;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -163,6 +166,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.AttributeCheckUtility;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -249,52 +253,86 @@ public class CampaignNewDayManager {
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
-        // Refill Automated Pools, if the options are selected
-        if (MekHQ.getMHQOptions().getNewDayAsTechPoolFill()) {
-            campaign.resetAsTechPool();
+        // Refill Automated Pools, if the options are selected.
+        // When "no release" is also set, only hire to cover shortfalls (skip firing surplus).
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        if (mhqOptions.getNewDayAsTechPoolFill()) {
+            if (mhqOptions.getNewDayAsTechPoolNoRelease()) {
+                campaign.fillAsTechPool();
+            } else {
+                campaign.resetAsTechPool();
+            }
         }
 
-        if (MekHQ.getMHQOptions().getNewDayMedicPoolFill()) {
-            campaign.resetMedicPool();
+        if (mhqOptions.getNewDayMedicPoolFill()) {
+            if (mhqOptions.getNewDayMedicPoolNoRelease()) {
+                campaign.fillMedicPool();
+            } else {
+                campaign.resetMedicPool();
+            }
         }
 
-        if (MekHQ.getMHQOptions().getNewDaySoldierPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
+        if (mhqOptions.getNewDaySoldierPoolFill()) {
+            if (!mhqOptions.getNewDaySoldierPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.SOLDIER);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+        if (mhqOptions.getNewDayBattleArmorPoolFill()) {
+            if (!mhqOptions.getNewDayBattleArmorPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+        if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewGroundPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVehicleCrewVTOLPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+        if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewVTOLPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVehicleCrewNavalPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+        if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewNavalPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVesselPilotPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+        if (mhqOptions.getNewDayVesselPilotPoolFill()) {
+            if (!mhqOptions.getNewDayVesselPilotPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVesselGunnerPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+        if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
+            if (!mhqOptions.getNewDayVesselGunnerPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
         }
 
-        if (MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill()) {
-            campaign.resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+        if (mhqOptions.getNewDayVesselCrewPoolFill()) {
+            if (!mhqOptions.getNewDayVesselCrewPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+            }
+            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
             campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
         }
 
@@ -362,6 +400,10 @@ public class CampaignNewDayManager {
         campaign.setTechnicalReportHTML("");
         campaign.getNewTechnicalReports().clear();
 
+        campaign.getAggregateReport().clear();
+        campaign.setAggregateReportHTML("");
+        campaign.getNewAggregateReports().clear();
+
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
         campaign.getPersonnelWhoAdvancedInXP().clear();
@@ -411,7 +453,7 @@ public class CampaignNewDayManager {
         }
 
         // Manage the Markets
-        campaign.refreshPersonnelMarkets(false);
+        campaign.refreshApplicants(false);
         if (isFirstOfMonth) {
             showRarePersonnelDialog(campaign, false);
         }
@@ -776,7 +818,9 @@ public class CampaignNewDayManager {
 
             person.checkForIlliterateRemoval();
 
-            AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+            if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+                AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+            }
 
             // Weekly events
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -865,6 +909,10 @@ public class CampaignNewDayManager {
                 if (campaignOptions.isUseFunctionalEscapeArtist() && person.getStatus().isPoW()) {
                     EscapeSkills.performEscapeAttemptCheck(campaign, person);
                 }
+
+                if (personnelOptions.booleanOption(UNOFFICIAL_EMBEZZLER)) {
+                    embezzleFunds(person);
+                }
             }
 
             if (today.getDayOfYear() == 1 && campaignOptions.isUseAlternativeAdvancedMedical()) {
@@ -905,12 +953,58 @@ public class CampaignNewDayManager {
             new OptimizeInfirmaryAssignments(campaign);
         }
 
+        MHQOptions mekhqOptions = MekHQ.getMHQOptions();
         if (MekHQ.getMHQOptions().getNewMonthQuickTrain()) {
-            final int newMonthQuickTrainTargetLevel = 5;
-            QuickTrain.processQuickTraining(personnel, newMonthQuickTrainTargetLevel, campaign, true);
+
+            final int newMonthQuickTrainTargetLevel = mekhqOptions.getQuickTrainTarget();
+
+            QuickTrain.QuickTrainOptions quickTrainOptions = getQuickTrainOptionsForNewDay(mekhqOptions);
+            QuickTrain.processQuickTraining(personnel,
+                  newMonthQuickTrainTargetLevel,
+                  campaign,
+                  quickTrainOptions,
+                  true);
         }
     }
 
+    /**
+     * Attempts to have the given person embezzle funds from the campaign.
+     *
+     * <p>Performs an Administration ({@code S_ADMIN}) skill check for the specified person. If the check succeeds, a
+     * small percentage of the current campaign balance is transferred out of campaign finances and paid directly to the
+     * person.</p>
+     *
+     * <p>The embezzled amount is calculated as 0.1% of the current campaign balance, rounded to the nearest whole
+     * unit. The debit is recorded as a {@link TransactionType#MISCELLANEOUS} transaction, and the result of the skill
+     * check (success or failure) is appended to the campaign report log.</p>
+     *
+     * @param person the {@link Person} attempting to embezzle funds; must not be {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private void embezzleFunds(Person person) {
+        String reason = getTextAt(RESOURCE_BUNDLE, "embezzle.roll");
+        SkillCheckUtility skillCheck = new SkillCheckUtility(reason, person, S_ADMIN, List.of(), 0, false, true);
+        String report = skillCheck.getResultsText();
+        campaign.addReport(SKILL_CHECKS, report);
+
+        if (skillCheck.isSuccess()) {
+            Money currentCampaignFunds = finances.getBalance();
+            double embezzlePercentile = 0.001;
+
+            Money embezzleAmount = currentCampaignFunds.multipliedBy(embezzlePercentile);
+            embezzleAmount = embezzleAmount.round();
+            if (embezzleAmount.isZero()) {
+                return;
+            }
+
+            finances.debit(TransactionType.MISCELLANEOUS, today, embezzleAmount,
+                  getTextAt(RESOURCE_BUNDLE, "embezzle.transaction"));
+
+            person.payPerson(embezzleAmount);
+        }
+    }
 
     /**
      * Checks if the commander has any burned contacts, and if so, generates and records a report.
@@ -1344,10 +1438,8 @@ public class CampaignNewDayManager {
      * @since 0.50.06
      */
     private void performPersonnelCleanUp() {
-        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(today,
-              campaign.getPersonnel(),
-              campaignOptions.isUseRemovalExemptRetirees(),
-              campaignOptions.isUseRemovalExemptCemetery());
+        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(campaign.getHumanResources(), today,
+              campaignOptions.isUseRemovalExemptRetirees(), campaignOptions.isUseRemovalExemptCemetery());
 
         List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
         for (Person person : personnelToRemove) {
@@ -1834,12 +1926,10 @@ public class CampaignNewDayManager {
         int myomerProsthetics = 0;
         boolean hasPowerSupply = false;
 
-        for (Injury injury : person.getInjuries()) {
-            InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification()) {
-                prostheticMedicalReliance++;
-            }
+        for (Injury injury : person.getProstheticInjuries()) {
+            prostheticMedicalReliance++;
 
+            InjurySubType injurySubType = injury.getSubType();
             if (injurySubType.isMyomerProsthetic()) {
                 myomerProsthetics++;
             }
@@ -2088,6 +2178,9 @@ public class CampaignNewDayManager {
 
         // Third, on Mondays we generate new scenarios for the week
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+            // StratCon's scenario generation is handled in StratConRulesManager, not here. Though we can't just
+            // filter StratCon campaigns out of this call, because StratCon does do some processing in this method,
+            // just not related to scenario generation.
             AtBScenarioFactory.createScenariosForNewWeek(campaign);
         }
 
@@ -2202,7 +2295,7 @@ public class CampaignNewDayManager {
         }
     }
 
-    private void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
+    public static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
         if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
             return;
         }

@@ -842,7 +842,7 @@ public class HumanResources {
                  VESSEL_PILOT -> unit.getDriverRole() == role;
             case VESSEL_GUNNER -> unit.getGunnerRole() == role;
             case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter))
-                    && unit.canTakeMoreVesselCrew();
+                                      && unit.canTakeMoreVesselCrew();
             default -> false;
         };
     }
@@ -924,8 +924,8 @@ public class HumanResources {
     }
 
     /**
-     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
-     * If the pool is at or below the required amount, no change is made.
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool is at or below the
+     * required amount, no change is made.
      *
      * @param campaign the campaign
      */
@@ -937,8 +937,8 @@ public class HumanResources {
     }
 
     /**
-     * Releases surplus Medics from the pool, keeping only what is currently needed.
-     * If the pool is at or below the required amount, no change is made.
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool is at or below the
+     * required amount, no change is made.
      *
      * @param campaign the campaign
      */
@@ -953,8 +953,7 @@ public class HumanResources {
      * Releases surplus temp crew for a specific blob crew role.
      *
      * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
-     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
-     * emptied.</p>
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
      *
      * @param campaign the campaign
      * @param role     the personnel role to trim
@@ -998,26 +997,18 @@ public class HumanResources {
      * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
      * explicit at every call site.</p>
      */
-    private static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
+    public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
         return options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED;
     }
 
     /**
-     * Refreshes the personnel markets.
+     * Refreshes the applicants based on the current market style and the current date.
      *
-     * @param campaign the campaign
+     * @param campaign               the campaign
+     * @param bypassDateRestrictions {@code true} if we want the applicants to refresh at an unusual time, such as
+     *                               campaign start
      */
-    public void refreshPersonnelMarkets(Campaign campaign) {
-        refreshPersonnelMarkets(campaign, false);
-    }
-
-    /**
-     * Refreshes the personnel markets based on the current market style and the current date.
-     *
-     * @param campaign        the campaign
-     * @param isCampaignStart {@code true} if called at the start of the campaign
-     */
-    public void refreshPersonnelMarkets(Campaign campaign, boolean isCampaignStart) {
+    public void refreshApplicants(Campaign campaign, boolean bypassDateRestrictions) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
@@ -1026,7 +1017,7 @@ public class HumanResources {
                 personnelMarket.generatePersonnelForDay(campaign);
             }
         } else {
-            if (currentDay.getDayOfMonth() == 1 || isCampaignStart) {
+            if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
             }
         }
@@ -1436,7 +1427,11 @@ public class HumanResources {
         for (final Unit unit : units) {
             if (unit.isSelfCrewed() && !(unit.getEntity() instanceof Infantry) &&
                       (unit.getEngineer() != null)) {
-                techs.add(unit.getEngineer());
+                // As we're directly fetching the engineer, we need to make sure that we're not fetching twice;
+                // otherwise the engineer may appear multiple times in the array
+                if (!techs.contains(unit.getEngineer())) {
+                    techs.add(unit.getEngineer());
+                }
             }
         }
 
@@ -2488,7 +2483,7 @@ public class HumanResources {
             personnelMarket.writeToXML(writer, indent, campaign);
         }
 
-        // New personnel market is managed at campaign level (newPersonnelMarket) — not written here
+        // New recruitment is managed at campaign level (newPersonnelMarket) — not written here
         // as it writes at campaign info level
 
         // Retirement defection tracker

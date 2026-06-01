@@ -55,6 +55,7 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
@@ -445,6 +446,11 @@ public abstract class AbstractProcreation {
             baby.setPreNominal(""); // Stop babies being born with doctorates
             baby.setPostNominal(""); // Stop babies being born with post-nominal titles
 
+            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+                      baby.isChild(campaign.getLocalDate(), false)) {
+                baby.setPortrait(new Portrait());
+            }
+
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
@@ -605,6 +611,11 @@ public abstract class AbstractProcreation {
             baby.setDateOfBirth(mother.getDueDate());
             baby.removeAllSkills(); // Limit skills by age for children and adolescents
             baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT); // Babies can't have jobs
+
+            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+                      baby.isChild(campaign.getLocalDate(), false)) {
+                baby.setPortrait(new Portrait());
+            }
 
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
