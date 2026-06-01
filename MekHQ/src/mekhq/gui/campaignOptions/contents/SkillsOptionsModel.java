@@ -44,6 +44,7 @@ class SkillsOptionsModel {
 
     private final Map<String, SkillConfiguration> skillConfigurations = new HashMap<>();
     int edgeCost;
+    int attributeCost;
 
     SkillsOptionsModel(CampaignOptions options, Map<String, SkillType> presetSkillValues) {
         loadFrom(options, presetSkillValues);
@@ -68,6 +69,7 @@ class SkillsOptionsModel {
         }
 
         edgeCost = options.getEdgeCost();
+        attributeCost = options.getAttributeCost();
     }
 
     void applyTo(CampaignOptions options, Map<String, SkillType> presetSkills) {
@@ -89,5 +91,6 @@ class SkillsOptionsModel {
         }
 
         options.setEdgeCost(edgeCost);
+        options.setAttributeCost(attributeCost);
     }
 }

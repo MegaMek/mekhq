@@ -66,6 +66,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -84,7 +85,9 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.campaignOptions.components.AbilitySelectorDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.SectionHeaderControlProvider;
 import mekhq.gui.campaignOptions.components.SkillPrerequisitesDialog;
+import mekhq.utilities.ReportingUtilities;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
@@ -373,7 +376,7 @@ public class AbilitiesTab {
      * ability. Displays an enable checkbox, an inline XP cost spinner, the description, and editable
      * prerequisite/incompatible/removed ability lists.
      */
-    static class AbilityOptionPanel extends JPanel {
+    static class AbilityOptionPanel extends JPanel implements SectionHeaderControlProvider {
         /**
          * Fixed, unscaled content width for every ability panel. The description label is laid out at this width, and
          * {@link #getPreferredSize()} clamps the whole panel to it. Reporting a constant width for every ability on
@@ -386,11 +389,22 @@ public class AbilitiesTab {
         private static final int DESCRIPTION_WIDTH = 800;
 
         private final SpecialAbility ability;
+        private final CampaignOptionsAbilityInfo abilityInfo;
         private final Map<String, SpecialAbility> allSPAs;
         private final JPanel pnlPrerequisites = newColumnPanel();
         private final JPanel pnlSkills = newColumnPanel();
         private final JPanel pnlIncompatible = newColumnPanel();
         private final JPanel pnlRemoves = newColumnPanel();
+
+        /** Header-mounted toggle that enables or disables the ability; the sole enable control for the section. */
+        private final JCheckBox headerToggle = new JCheckBox();
+        /** Colored "Enabled"/"Disabled" chip shown in the section header so state is readable while collapsed. */
+        private final JLabel headerStatusLabel = new JLabel();
+        /** Trailing control mounted in the collapsible section header. */
+        private final JPanel headerControl = new JPanel();
+        /** Notified whenever the enabled state changes, so the section can restyle its (collapsed) title. */
+        private Runnable sectionStateListener;
+
 
         /**
          * Builds the control for a single ability.
@@ -401,14 +415,12 @@ public class AbilitiesTab {
         AbilityOptionPanel(CampaignOptionsAbilityInfo abilityInfo, Map<String, SpecialAbility> allSPAs) {
             super(new GridBagLayout());
             this.ability = abilityInfo.getAbility();
+            this.abilityInfo = abilityInfo;
             this.allSPAs = allSPAs;
             setOpaque(false);
             setName("pnl" + ability.getName() + "Ability");
 
-            JCheckBox chkAbility = new JCheckBox(getTextAt(getCampaignOptionsResourceBundle(), "abilityEnable.text"));
-            chkAbility.setName("chk" + ability.getName());
-            chkAbility.setSelected(abilityInfo.isEnabled());
-            chkAbility.addActionListener(e -> abilityInfo.setEnabled(chkAbility.isSelected()));
+            buildHeaderControl();
 
             // The cost resource is a formatted "XP Cost: %s" string; format with an empty value to reuse it as the
             // spinner's prefix label without introducing a new resource key.
@@ -420,13 +432,11 @@ public class AbilitiesTab {
             spnCost.addChangeListener(e -> ability.setCost((Integer) spnCost.getValue()));
             spnCost.setMaximumSize(spnCost.getPreferredSize());
 
-            // BoxLayout (not FlowLayout) so the enable checkbox lines up flush-left with the description and columns
+            // BoxLayout (not FlowLayout) so the XP cost label lines up flush-left with the description and columns
             // below it; FlowLayout would inset the first component by its horizontal gap.
             JPanel header = new JPanel();
             header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
             header.setOpaque(false);
-            header.add(chkAbility);
-            header.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(16)));
             header.add(lblCost);
             header.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
             header.add(spnCost);
@@ -456,25 +466,85 @@ public class AbilitiesTab {
             int gap = UIUtil.scaleForGUI(2);
             GridBagConstraints layout = new GridBagConstraints();
 
-            // Header row: enable checkbox and inline XP cost spinner.
+            // Description spanning the full width, shown first so the ability is explained before its cost.
             layout.gridx = 0;
             layout.gridy = 0;
             layout.gridwidth = 1;
             layout.weightx = 1.0;
             layout.fill = GridBagConstraints.HORIZONTAL;
             layout.anchor = GridBagConstraints.NORTHWEST;
-            layout.insets = new Insets(gap, gap, gap, gap);
-            add(header, layout);
-
-            // Description spanning the full width.
-            layout.gridy = 1;
             layout.insets = new Insets(UIUtil.scaleForGUI(6), gap, UIUtil.scaleForGUI(6), gap);
             add(lblDescription, layout);
 
+            // Inline XP cost spinner.
+            layout.gridy = 1;
+            layout.insets = new Insets(gap, gap, gap, gap);
+            add(header, layout);
+
             // Balanced editable columns.
             layout.gridy = 2;
-            layout.insets = new Insets(gap, gap, gap, gap);
             add(columns, layout);
+        }
+
+        /**
+         * Builds the control mounted in the collapsible section header: a colored enabled/disabled status chip and a
+         * bare checkbox, so the ability can be toggled and its state read without expanding the section.
+         */
+        private void buildHeaderControl() {
+            headerToggle.setName("chkHeader" + ability.getName());
+            headerToggle.setOpaque(false);
+            headerToggle.setSelected(abilityInfo.isEnabled());
+            headerToggle.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "abilityEnable.text"));
+            headerToggle.addActionListener(e -> setAbilityEnabled(headerToggle.isSelected()));
+
+            headerControl.setLayout(new BoxLayout(headerControl, BoxLayout.X_AXIS));
+            headerControl.setOpaque(false);
+            headerControl.add(headerStatusLabel);
+            headerControl.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
+            headerControl.add(headerToggle);
+
+            updateHeaderStatus();
+        }
+
+        /**
+         * Toggles this ability on or off from a single place: updates the backing data, keeps the header toggle in
+         * sync, refreshes the header status chip, and notifies the section so it can restyle its title.
+         *
+         * @param enabled the new enabled state
+         */
+        private void setAbilityEnabled(boolean enabled) {
+            abilityInfo.setEnabled(enabled);
+            if (headerToggle.isSelected() != enabled) {
+                headerToggle.setSelected(enabled);
+            }
+            updateHeaderStatus();
+            if (sectionStateListener != null) {
+                sectionStateListener.run();
+            }
+        }
+
+        /** Repaints the header status chip to match the current enabled state. */
+        private void updateHeaderStatus() {
+            boolean enabled = abilityInfo.isEnabled();
+            String color = enabled ? ReportingUtilities.getPositiveColor() : ReportingUtilities.getNegativeColor();
+            String text = getTextAt(getCampaignOptionsResourceBundle(),
+                  enabled ? "abilityStatusEnabled.text" : "abilityStatusDisabled.text");
+            headerStatusLabel.setText("<html><b><font color='" + color + "'>" + text + "</font></b></html>");
+        }
+
+        @Override
+        public @Nullable JComponent getSectionHeaderControl() {
+            return headerControl;
+        }
+
+        @Override
+        public boolean isSectionEnabled() {
+            return abilityInfo.isEnabled();
+        }
+
+        @Override
+        public void setSectionStateListener(@Nullable Runnable listener) {
+            this.sectionStateListener = listener;
         }
 
         /**

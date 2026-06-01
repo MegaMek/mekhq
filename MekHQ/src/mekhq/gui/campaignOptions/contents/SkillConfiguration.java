@@ -57,6 +57,26 @@ class SkillConfiguration {
         legendaryLevel = skillType.getLegendaryLevel();
     }
 
+    SkillConfiguration(SkillConfiguration other) {
+        copyFrom(other);
+    }
+
+    /**
+     * Copies every configurable value from {@code other} into this configuration, leaving {@code other} untouched.
+     *
+     * @param other the configuration to copy values from
+     */
+    void copyFrom(SkillConfiguration other) {
+        targetNumber = other.targetNumber;
+        costs = Arrays.copyOf(other.costs, other.costs.length);
+        greenLevel = other.greenLevel;
+        regularLevel = other.regularLevel;
+        veteranLevel = other.veteranLevel;
+        eliteLevel = other.eliteLevel;
+        heroicLevel = other.heroicLevel;
+        legendaryLevel = other.legendaryLevel;
+    }
+
     void applyTo(SkillType skillType) {
         skillType.setTarget(targetNumber);
         Integer[] targetCosts = skillType.getCosts();

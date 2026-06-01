@@ -236,6 +236,15 @@ public class CampaignOptionsPagePanel extends JPanel {
               sectionDefinition.content);
         section.setSummary(getSectionSummary(sectionDefinition));
         section.setExpanded(expandedByDefault);
+
+        // When the content exposes a header control (e.g. an enable toggle), mount it in the section header and mirror
+        // its enabled state onto the title so the section can be read and toggled without expanding it.
+        if (sectionDefinition.content instanceof SectionHeaderControlProvider provider) {
+            section.setTrailingComponent(provider.getSectionHeaderControl());
+            section.setTitleMuted(!provider.isSectionEnabled());
+            provider.setSectionStateListener(() -> section.setTitleMuted(!provider.isSectionEnabled()));
+        }
+
         return section;
     }
 

@@ -90,6 +90,7 @@ public class MHQCollapsiblePanel extends JPanel {
     private String title;
     private boolean expanded;
     private boolean headerHovered;
+    private boolean titleMuted;
 
     public MHQCollapsiblePanel(String title) {
         this(title, null);
@@ -124,6 +125,21 @@ public class MHQCollapsiblePanel extends JPanel {
     public void setSummary(String summary) {
         summaryLabel.setText(summary == null ? "" : summary);
         summaryLabel.setVisible(summary != null && !summary.isBlank());
+    }
+
+    /**
+     * Mutes or restores the section title color. A muted title is drawn in the theme's disabled foreground, letting a
+     * disabled section be spotted at a glance while the list is collapsed.
+     *
+     * @param muted {@code true} to draw the title in the disabled foreground color, {@code false} for the default
+     */
+    public void setTitleMuted(boolean muted) {
+        this.titleMuted = muted;
+        updateTitleForeground();
+    }
+
+    private void updateTitleForeground() {
+        titleLabel.setForeground(titleMuted ? UIManager.getColor("Label.disabledForeground") : null);
     }
 
     public void setTrailingComponent(@Nullable JComponent component) {
@@ -253,6 +269,7 @@ public class MHQCollapsiblePanel extends JPanel {
 
     private void updateHeader() {
         titleLabel.setText(title);
+        updateTitleForeground();
         iconLabel.setIcon(getDisclosureIcon());
         headerPanel.getAccessibleContext().setAccessibleName(title);
         headerPanel.getAccessibleContext()
