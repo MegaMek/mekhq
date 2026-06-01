@@ -1895,9 +1895,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void replenishEdgeActin(Person person) {
         if (person.getUsedEdge() <= 0) {
             getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.none",
-                  spanOpeningWithCustomColor(getWarningColor()),
-                  CLOSING_SPAN_TAG,
-                  person.getHyperlinkedName()));
+                  person.getHyperlinkedName(), spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
             return;
         }
 
