@@ -67,6 +67,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.wr
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -243,6 +244,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
     private static final String CMD_BUY_OFF_FLAW = "BUY_OFF_FLAW";
     private static final String CMD_REFUND_SKILL = "REFUND_SKILL";
+    private static final String CMD_REPLENISH_EDGE = "REPLENISH_EDGE";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
@@ -680,6 +682,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       skillName));
 
                 getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_REPLENISH_EDGE: {
+                for (Person person : people) {
+                    replenishEdgeActin(person);
+                }
                 break;
             }
             case CMD_REFUND_SKILL: {
@@ -1882,6 +1890,37 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
+    private void replenishEdgeActin(Person person) {
+        if (person.getUsedEdge() <= 0) {
+            getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.none",
+                  person.getHyperlinkedName()));
+            return;
+        }
+
+        double talentBasedXpCostMultiplier = person.getTalentBasedXpCostMultiplier(
+              getCampaignOptions().isUseReasoningXpMultiplier(), null);
+        int baseCost = getCampaignOptions().getEdgeRefreshCost();
+        int actualCost = (int) round(baseCost * talentBasedXpCostMultiplier);
+
+        int currentXp = person.getXP();
+        if (currentXp < actualCost) {
+            String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+            String thingy = getFormattedTextAt(RESOURCE_BUNDLE, "refreshEdge.failure", person.getHyperlinkedName(),
+                  actualCost);
+            getCampaign().addReport(PERSONNEL, thingy);
+            return;
+        }
+
+        person.spendXP(actualCost);
+        person.resetCurrentEdge();
+
+        getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.success",
+              person.getHyperlinkedName(),
+              actualCost));
+
+        getCampaign().personUpdated(person);
+    }
+
     /**
      * Handles the limb replacement procedure for the selected person. This method determines the suitable doctors,
      * calculates the cost of the procedure, and processes the surgery if the user accepts it.
@@ -2882,12 +2921,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion Education Menu
 
         // region Spend XP Menu
+        menu = new JMenu(resources.getString("spendXP.text"));
+        popup.add(menu);
+
+        final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
+        addEdgeRefreshOption(oneSelected, person, isUseReasoningMultiplier, menu);
+
         if (oneSelected && person.getStatus().isActiveFlexible()) {
-            final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
             final double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
             final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
 
-            menu = new JMenu(resources.getString("spendXP.text"));
             submenu = new JMenu(resources.getString("abilities.text"));
             menu.add(submenu);
             if (getCampaignOptions().isUseAbilities()) {
@@ -4370,6 +4413,29 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    private void addEdgeRefreshOption(boolean oneSelected, Person person, boolean isUseReasoningMultiplier,
+          JMenu menu) {
+        final boolean isUseEdge = getCampaignOptions().isUseEdge() || getCampaignOptions().isUseSupportEdge();
+        int replenishEdgeCost = getCampaignOptions().getEdgeRefreshCost();
+
+        JMenuItem replenishEdge = new JMenuItem();
+        if (oneSelected) {
+            double talentMultiplier = person.getTalentBasedXpCostMultiplier(isUseReasoningMultiplier, null);
+            replenishEdgeCost = (int) round(replenishEdgeCost * talentMultiplier);
+            replenishEdge.setText(getFormattedText("spendOnReplenishEdge.single", replenishEdgeCost));
+            replenishEdge.setEnabled(isUseEdge &&
+                                           person.getXP() >= replenishEdgeCost &&
+                                           person.getUsedEdge() != 0);
+        } else {
+            replenishEdge.setText(getFormattedText("spendOnReplenishEdge.multiple", replenishEdgeCost));
+            replenishEdge.setEnabled(isUseEdge);
+        }
+
+        replenishEdge.setActionCommand(makeCommand(CMD_REPLENISH_EDGE));
+        replenishEdge.addActionListener(this);
+        menu.add(replenishEdge);
     }
 
     /**

@@ -5773,6 +5773,12 @@ public class Person {
         final SkillType skillType = getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
+    public double getTalentBasedXpCostMultiplier(boolean useReasoning, @Nullable SkillType skillType) {
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
 
         if (options.booleanOption(FLAW_SLOW_LEARNER)) {
@@ -5783,7 +5789,7 @@ public class Person {
             multiplier -= 0.2;
         }
 
-        if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
+        if (skillType != null && skillType.isAffectedByGremlinsOrTechEmpathy()) {
             if (options.booleanOption(FLAW_GREMLINS)) {
                 multiplier += 0.1;
             }
@@ -5793,7 +5799,7 @@ public class Person {
             }
         }
 
-        return (int) round(cost * multiplier);
+        return multiplier;
     }
     // endregion skill
 
@@ -6021,12 +6027,19 @@ public class Person {
         return atowAttributes.getCurrentEdge();
     }
 
-    public void setEdgeUsed(final int edgeUsedThisRound) {
+    public void setEdgeUsedThisRound(final int edgeUsedThisRound) {
         this.edgeUsedThisRound = edgeUsedThisRound;
     }
 
-    public int getEdgeUsed() {
+    public int getEdgeUsedThisRound() {
         return edgeUsedThisRound;
+    }
+
+    public int getUsedEdge() {
+        int currentEdge = getCurrentEdge();
+        int maximumEdge = getAdjustedEdge();
+
+        return maximumEdge - currentEdge;
     }
 
     /**
