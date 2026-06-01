@@ -67,7 +67,6 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.wr
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -1904,10 +1903,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         int currentXp = person.getXP();
         if (currentXp < actualCost) {
-            String RESOURCE_BUNDLE = "mekhq.resources.GUI";
-            String thingy = getFormattedTextAt(RESOURCE_BUNDLE, "refreshEdge.failure", person.getHyperlinkedName(),
-                  actualCost);
-            getCampaign().addReport(PERSONNEL, thingy);
+            getCampaign().addReport(PERSONNEL, getFormattedText("refreshEdge.failure", person.getHyperlinkedName(),
+                  actualCost));
             return;
         }
 
