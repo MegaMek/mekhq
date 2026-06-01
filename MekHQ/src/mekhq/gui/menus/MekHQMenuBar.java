@@ -132,9 +132,10 @@ import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 public class MekHQMenuBar extends JMenuBar {
 
     private static final MMLogger logger = MMLogger.create(MekHQMenuBar.class);
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQMenuBar",
+          MekHQ.getMHQOptions().getLocale());
 
     private final CampaignGUI gui;
-    private final ResourceBundle resourceMap;
     private final MekHQ app;
 
     private JMenu menuThemes;
@@ -171,11 +172,10 @@ public class MekHQMenuBar extends JMenuBar {
      * Note 3: Only essential actions (Save, Load, New) have global Ctrl+key accelerators. All other menu items use
      * mnemonics only (accessible via keyboard menu navigation) to avoid duplicate accelerator conflicts.
      */
-    public MekHQMenuBar(MekHQ app, CampaignGUI gui, ResourceBundle resourceMap) {
+    public MekHQMenuBar(MekHQ app, CampaignGUI gui) {
         super();
         this.app = app;
         this.gui = gui;
-        this.resourceMap = resourceMap;
         initMenu();
     }
 

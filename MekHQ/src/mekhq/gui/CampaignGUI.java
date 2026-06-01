@@ -332,7 +332,7 @@ public class CampaignGUI extends JPanel {
         // Move the window
         frame.setLocation(x, y);
 
-        windowMenu = new MekHQMenuBar(getApplication(), this, resourceMap);
+        windowMenu = new MekHQMenuBar(getApplication(), this);
         frame.setJMenuBar(windowMenu);
 
         frame.getContentPane().setLayout(new BorderLayout());
