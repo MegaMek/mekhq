@@ -1650,8 +1650,7 @@ public class StratConRulesManager {
                     continue;
                 }
 
-                boolean isUseEdge = campaignOptions.isUseEdge();
-                isUseEdge = scout.getOptions().booleanOption(EDGE_RECON_FAIL);
+boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
