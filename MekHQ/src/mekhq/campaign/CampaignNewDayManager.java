@@ -151,7 +151,6 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -744,6 +743,11 @@ public class CampaignNewDayManager {
         RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(campaign, faction, campaign.getAtBUnitRatingMod());
         MedicalController medicalController = new MedicalController(campaign);
 
+        // Special New Week Processing
+        boolean isNewWeek = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        RandomDeath randomDeath = campaign.getRandomDeath();
+        processPersonnelWhoHaveDepartedCampaign(isNewWeek, randomDeath);
+
         // campaign list ensures we don't hit a concurrent modification error
         List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
 
@@ -775,18 +779,7 @@ public class CampaignNewDayManager {
         int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
-        boolean isNewWeek = today.getDayOfWeek() == DayOfWeek.MONDAY;
-        RandomDeath randomDeath = campaign.getRandomDeath();
         for (Person person : personnel) {
-            PersonnelStatus status = person.getStatus();
-            if (status.isDepartedUnit()) {
-                if (isNewWeek && status.isFollowAfterLeavingCampaign()) {
-                    randomDeath.processNewWeek(campaign, today, person);
-                }
-
-                continue;
-            }
-
             int age = person.getAge(today);
             person.setAgeForAttributeModifiers(isUseAgeEffects ? age : IGNORE_AGE);
 
@@ -973,6 +966,17 @@ public class CampaignNewDayManager {
                   campaign,
                   quickTrainOptions,
                   true);
+        }
+    }
+
+    private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
+        List<Person> departedPersonnel = campaign.getPersonnel().stream()
+                                               .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
+                                               .toList();
+        for (Person person : departedPersonnel) {
+            if (isNewWeek) {
+                randomDeath.processNewWeek(campaign, today, person);
+            }
         }
     }
 
