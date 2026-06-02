@@ -61,6 +61,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.QuickStripDialog;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.service.mrms.MRMSService;
 
@@ -107,14 +108,11 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (part.onBadHipOrShoulder() && !part.isSalvaging()) {
-                    if (0 != JOptionPane.showConfirmDialog(gui.getFrame(), """
-                          You are repairing/replacing a part on a limb with a bad shoulder or hip.
-                          You may continue, but this limb cannot be repaired and you will have to
-                          remove this equipment if you wish to scrap and then replace the limb.
-                          Do you wish to continue?""", "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
+                    boolean runMRMS = new QuickStripDialog(gui.getCampaign()).wasConfirmed();
+                    if (runMRMS) {
+                        MRMSService.performSingleLocationMRMS(gui.getCampaign(), p.getUnit(), p);
                     }
 
-                    MRMSService.performSingleLocationMRMS(gui.getCampaign(), p.getUnit(), p);
                     return;
                 }
 
