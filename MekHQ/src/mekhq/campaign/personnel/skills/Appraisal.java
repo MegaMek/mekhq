@@ -40,6 +40,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.time.LocalDate;
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -64,20 +65,26 @@ public class Appraisal {
      *
      * @param person     the {@link Person} performing the appraisal skill check
      * @param currentDay the current date of the appraisal check
+     * @param isUseEdge  {@code true} if an Edge reroll should be used for a failed check
      *
      * @return the calculated appraisal cost multiplier as a {@code double}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static double performAppraisalMultiplierCheck(Person person, LocalDate currentDay) {
+    public static double performAppraisalMultiplierCheck(@Nullable Person person, LocalDate currentDay,
+          boolean isUseEdge) {
+        if (person == null) {
+            return 1.0;
+        }
+
         SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
               getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"),
               person,
               SkillType.S_APPRAISAL,
               List.of(),
               0,
-              false,
+              isUseEdge,
               false,
               false,
               false,
