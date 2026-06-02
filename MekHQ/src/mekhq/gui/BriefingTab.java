@@ -171,6 +171,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private MMComboBox<ScenarioQueueFilter> scenarioFilter;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
+    private MissionViewPanel missionViewPanel;
     private JPanel panScenarioActions;
     private JButton btnAddScenario;
     private JButton btnEditMission;
@@ -412,6 +413,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setViewportView(null);
         scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         panLanceAssignment = new LanceAssignmentView(getCampaign());
+        panLanceAssignment.setAssignmentChangeListener(this::updateMissionDeploymentCoverage);
 
         scenarioWorkTabs = new JTabbedPane();
         styleBriefingTabs(scenarioWorkTabs);
@@ -2529,6 +2531,13 @@ public final class BriefingTab extends CampaignGuiTab {
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
         refreshAssignmentsTabAvailability(getSelectedScenario());
+        updateMissionDeploymentCoverage();
+    }
+
+    private void updateMissionDeploymentCoverage() {
+        if (missionViewPanel != null) {
+            missionViewPanel.updateDeploymentCoverage();
+        }
     }
 
     /*
@@ -2546,13 +2555,15 @@ public final class BriefingTab extends CampaignGuiTab {
         final Mission mission = comboMission.getSelectedItem();
         if (mission == null) {
             scrollMissionView.setViewportView(null);
+            missionViewPanel = null;
             btnEditMission.setEnabled(false);
             btnCompleteMission.setEnabled(false);
             btnDeleteMission.setEnabled(false);
             btnAddScenario.setEnabled(false);
             btnGMGenerateScenarios.setEnabled(false);
         } else {
-            scrollMissionView.setViewportView(new MissionViewPanel(mission, getCampaignGui()));
+            missionViewPanel = new MissionViewPanel(mission, getCampaignGui());
+            scrollMissionView.setViewportView(missionViewPanel);
             // This odd code is to make sure that the scrollbar stays at the top
             // I can't just call it here, because it ends up getting reset somewhere later
             SwingUtilities.invokeLater(() -> scrollMissionView.getVerticalScrollBar().setValue(0));

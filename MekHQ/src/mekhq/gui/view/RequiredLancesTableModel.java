@@ -97,7 +97,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
             int requiredRoleColumn = getColumnForRole(requiredRole);
             if (requiredRoleColumn >= 0) {
-                int assignedRoleElements = getAssignedCombatRoleCount(contract, requiredRole);
+                int assignedRoleElements = getAssignedCombatRoleCount(campaign, contract, requiredRole);
                 int requiredRoleElements = Math.max(requiredCombatElements / 2, 1);
                 if (assignedRoleElements < requiredRoleElements) {
                     contractShortfalls.add(columnNames[requiredRoleColumn] + ' ' + assignedRoleElements + '/' +
@@ -112,7 +112,33 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         return shortfalls;
     }
 
-    private int getAssignedCombatRoleCount(AtBContract contract, CombatRole requiredRole) {
+    /**
+     * Determines whether the given contract currently has any deployment shortfall, using the same criteria as the
+     * deployment requirements table: the total number of assigned combat elements must meet the contract requirement,
+     * and any contract-required combat role must have at least half of the required combat elements assigned to it.
+     *
+     * @param campaign the campaign the contract belongs to
+     * @param contract the contract to evaluate
+     *
+     * @return {@code true} if the contract is short on total coverage or on its required role, {@code false} otherwise
+     */
+    static boolean hasDeploymentShortfall(Campaign campaign, AtBContract contract) {
+        int assignedCombatElements = getAssignedCombatElementCount(campaign, contract);
+        int requiredCombatElements = contract.getRequiredCombatElements();
+        if (assignedCombatElements < requiredCombatElements) {
+            return true;
+        }
+
+        CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
+        if (getColumnForRole(requiredRole) >= 0) {
+            int assignedRoleElements = getAssignedCombatRoleCount(campaign, contract, requiredRole);
+            int requiredRoleElements = Math.max(requiredCombatElements / 2, 1);
+            return assignedRoleElements < requiredRoleElements;
+        }
+        return false;
+    }
+
+    private static int getAssignedCombatRoleCount(Campaign campaign, AtBContract contract, CombatRole requiredRole) {
         int assignedCombatElements = 0;
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             if (contract.equals(combatTeam.getContract(campaign)) &&
@@ -124,7 +150,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         return assignedCombatElements;
     }
 
-    private int getColumnForRole(CombatRole role) {
+    private static int getColumnForRole(CombatRole role) {
         if (role == null) {
             return -1;
         }
@@ -197,7 +223,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
         int requiredRoleColumn = getColumnForRole(requiredRole);
 
         if (column == requiredRoleColumn) {
-            int t = getAssignedCombatRoleCount(contract, requiredRole);
+            int t = getAssignedCombatRoleCount(campaign, contract, requiredRole);
             int required = Math.max(contract.getRequiredCombatElements() / 2, 1);
             if (t < required) {
                 return t + "/" + required;
