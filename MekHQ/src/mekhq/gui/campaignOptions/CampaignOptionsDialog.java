@@ -36,8 +36,8 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.util.ResourceBundle;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -47,13 +47,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 /**
  * The {@code CampaignOptionsDialog} class represents a dialog window for presenting and modifying the campaign options
@@ -74,6 +74,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
  * </ul>
  */
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
+    private static final int BUTTON_GAP = UIUtil.scaleForGUI(8);
+
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
     private final CampaignOptionsDialogMode mode;
@@ -192,31 +194,45 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      */
     @Override
     protected JPanel createButtonPanel() {
-        final JPanel pnlButtons = new JPanel(new GridLayout(1, 0));
+        final JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
 
         // Apply Settings
-        JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
-        btnApplySettings.addActionListener(evt -> processApplyAction());
-        pnlButtons.add(btnApplySettings);
+        pnlButtons.add(createDialogButton("ApplySettings", this::processApplyAction));
 
         // Save Preset
         if (mode != CampaignOptionsDialogMode.CAMPAIGN_UPGRADE && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
-            JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
-            btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
-            pnlButtons.add(btnSavePreset);
+            pnlButtons.add(createDialogButton("SavePreset", this::btnSaveActionPerformed));
         }
 
         // Load Preset
-        JButton btnLoadPreset = new CampaignOptionsButton("LoadPreset");
-        btnLoadPreset.addActionListener(evt -> btnLoadActionPerformed());
-        pnlButtons.add(btnLoadPreset);
+        pnlButtons.add(createDialogButton("LoadPreset", this::btnLoadActionPerformed));
 
         // Cancel
-        JButton btnCancel = new CampaignOptionsButton("Cancel");
-        btnCancel.addActionListener(evt -> dispose());
-        pnlButtons.add(btnCancel);
+        pnlButtons.add(createDialogButton("Cancel", this::dispose));
 
         return pnlButtons;
+    }
+
+    /**
+     * Creates a standard FlatLaf-styled dialog button whose text and tooltip are sourced from the campaign options
+     * resource bundle (keys {@code "lbl" + name + ".text"} and {@code "lbl" + name + ".tooltip"}).
+     *
+     * @param name   the resource name used to look up the button's text, tooltip, and internal name
+     * @param action the action to run when the button is pressed
+     *
+     * @return the configured button
+     */
+    private static JButton createDialogButton(String name, Runnable action) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+        button.setName("btn" + name);
+
+        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
+        if (!tooltipText.isEmpty()) {
+            button.setToolTipText(tooltipText);
+        }
+
+        button.addActionListener(evt -> action.run());
+        return button;
     }
 
     /**

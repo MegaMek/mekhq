@@ -48,6 +48,8 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -76,9 +78,14 @@ class CampaignOptionsNavigationPanel extends JPanel {
         this.routeSelectionListener = routeSelectionListener;
 
         setName("campaignOptionsNavigationPanel");
-        String navigationTitle = getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsNavigation.title");
-        setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createTitledBorder(navigationTitle),
+        // Match the content panel's scroll-pane border instead of a TitledBorder. A TitledBorder reserves vertical
+        // space for its caption and draws its top line at the caption's mid-height, which left the navigation frame
+        // sitting lower than the content frame on the right. Using the same border keeps both top edges aligned.
+        Border frameBorder = UIManager.getBorder("ScrollPane.border");
+        if (frameBorder == null) {
+            frameBorder = BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor"));
+        }
+        setBorder(BorderFactory.createCompoundBorder(frameBorder,
               BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         setPreferredSize(new Dimension(NAVIGATION_WIDTH, 1));
 
