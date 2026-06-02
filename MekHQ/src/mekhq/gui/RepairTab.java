@@ -463,7 +463,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
             WarehouseTab warehouseTab = getCampaignGui().getWarehouseTab();
-            warehouseTab.refreshOvertimeStatus();
+            if (warehouseTab != null) {
+                warehouseTab.refreshOvertimeStatus();
+            }
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
