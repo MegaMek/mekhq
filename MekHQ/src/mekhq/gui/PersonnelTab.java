@@ -44,6 +44,7 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
@@ -433,9 +434,9 @@ public final class PersonnelTab extends CampaignGuiTab {
                 }
 
                 // Search filter — stacks on top of dropdown
-                String personNameAsLowerCase = person.getFullTitleAndProfessions().toLowerCase();
+                String personNameAsLowerCase = person.getFullTitleAndProfessions().toLowerCase(Locale.ROOT);
                 String searchText = txtPersonSearch.getText().trim();
-                String searchAsLowerCase = searchText.toLowerCase();
+                String searchAsLowerCase = searchText.toLowerCase(Locale.ROOT);
                 if (!searchText.isEmpty()) {
                     return personNameAsLowerCase.contains(searchAsLowerCase);
                 }

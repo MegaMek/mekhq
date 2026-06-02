@@ -41,6 +41,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
@@ -568,9 +569,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 }
 
                 String searchText = txtPartsSearch.getText().trim();
-                String searchTextAsLowerCase = searchText.toLowerCase();
+                String searchTextAsLowerCase = searchText.toLowerCase(Locale.ROOT);
 
-                String partNameAsLowerCase = part.getName().toLowerCase();
+                String partNameAsLowerCase = part.getName().toLowerCase(Locale.ROOT);
 
                 boolean inSearch = searchText.isEmpty() || partNameAsLowerCase.contains(searchTextAsLowerCase);
 

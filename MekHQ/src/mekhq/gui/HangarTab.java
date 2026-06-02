@@ -42,6 +42,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
@@ -387,7 +388,7 @@ public final class HangarTab extends CampaignGuiTab {
     public void filterUnits() {
         final int nGroup = choiceUnit.getSelectedIndex() - 1;
         final boolean hideMothballed = chkHideMothballed.isSelected();
-        final String searchText = txtUnitSearch.getText().trim().toLowerCase();
+        final String searchText = txtUnitSearch.getText().trim().toLowerCase(Locale.ROOT);
 
         RowFilter<UnitTableModel, Integer> unitTypeFilter = new RowFilter<>() {
             @Override
@@ -398,7 +399,7 @@ public final class HangarTab extends CampaignGuiTab {
                 // Search filter
                 String unitName = unit.getName();
                 unitName = unitName + unit.getTypeDisplayableNameWithOmni();
-                unitName = unitName.toLowerCase();
+                unitName = unitName.toLowerCase(Locale.ROOT);
 
                 if (!searchText.isEmpty() && !unitName.contains(searchText)) {
                     return false;
