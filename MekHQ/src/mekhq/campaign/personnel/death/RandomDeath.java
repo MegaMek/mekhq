@@ -673,8 +673,17 @@ public class RandomDeath {
             String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
 
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            boolean isReportRetireeDeaths = campaignOptions.isAnnounceRetireeDeath();
+            boolean isReportMostDeaths = campaignOptions.isAnnounceRetireeDeathExpanded();
+
             PersonnelStatus status = person.getStatus();
-            if (status.isFollowAfterLeavingCampaign()) {
+            boolean isRetiredOrBackground = status.isRetired() || status.isBackground();
+            boolean announceDeath = isReportRetireeDeaths && isRetiredOrBackground;
+            boolean announceDeathExpanded = !isRetiredOrBackground &&
+                                                  (status.isFollowAfterLeavingCampaign() && isReportMostDeaths);
+
+            if (announceDeath || announceDeathExpanded) {
                 campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.departed",
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG, status.getLabel()));
             } else {

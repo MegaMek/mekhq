@@ -512,6 +512,9 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "announceOfficersOnly" -> campaignOptions.setAnnounceOfficersOnly(parseBoolean(nodeContents));
             case "announceChildBirthdays" -> campaignOptions.setAnnounceChildBirthdays(parseBoolean(nodeContents));
+            case "announceRetireeDeath" -> campaignOptions.setAnnounceRetireeDeath(parseBoolean(nodeContents));
+            case "announceRetireeDeathExpanded" ->
+                  campaignOptions.setAnnounceRetireeDeathExpanded(parseBoolean(nodeContents));
             case "showLifeEventDialogBirths" -> campaignOptions.setShowLifeEventDialogBirths(parseBoolean(
                   nodeContents));
             case "showLifeEventDialogComingOfAge" -> campaignOptions.setShowLifeEventDialogComingOfAge(parseBoolean(
