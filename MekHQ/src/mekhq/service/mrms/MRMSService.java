@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.rolls.TargetRoll;
@@ -233,6 +234,40 @@ public class MRMSService {
         }
 
         return String.format("Mass %s complete on %s.", actionDescriptor, unit.getName());
+    }
+
+    public static void performSingleLocationMRMS(Campaign campaign, Unit unit, IPartWork part) {
+        MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
+
+        List<Person> techs = campaign.getTechs(true);
+        for (int i = techs.size() - 1; i >= 0; i--) {
+            Person tech = techs.get(i);
+
+            if (!tech.canTech(unit.getEntity())) {
+                techs.remove(i);
+            }
+        }
+
+        List<MRMSOption> mrmsOptions = configuredOptions.getActiveMRMSOptions();
+        Map<PartRepairType, MRMSOption> mrmsOptionsByType = new HashMap<>();
+        for (MRMSOption mrmsOption : mrmsOptions) {
+            mrmsOptionsByType.put(mrmsOption.getType(), mrmsOption);
+        }
+
+        boolean performMoreRepairs = true;
+        while (performMoreRepairs) {
+            List<IPartWork> partsList = new ArrayList<>();
+            partsList.add(part);
+
+            MRMSUnitAction currentUnitAction = scrapLocationAndRemoveEquipment(campaign,
+                  unit,
+                  techs,
+                  mrmsOptionsByType,
+                  configuredOptions,
+                  partsList);
+
+            performMoreRepairs = currentUnitAction.getPartSet().isHasRepairs();
+        }
     }
 
     public static void mrmsAllUnits(Campaign campaign) {
@@ -502,11 +537,7 @@ public class MRMSService {
             return new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.NO_PARTS);
         }
 
-        for (IPartWork partWork : parts) {
-            if (partWork instanceof Part) {
-                ((Part) partWork).resetModeToNormal();
-            }
-        }
+        resetPartsModeToNormal(parts);
 
         // If we're performing an action on a unit, and we allow auto-scrapping of parts
         // that can't be fixed by an elite tech, let's first get rid of those parts and start with
@@ -625,53 +656,10 @@ public class MRMSService {
                 }
 
                 if (partsToBeRemoved.isEmpty()) {
-                    /*
-                     * We have no parts left on our unfixable locations, so
-                     * we'll just scrap those locations and rebuild the parts
-                     * list and reset back our normal repair mode
-                     */
-
-                    for (Part part : locationMap.values()) {
-                        if (part instanceof MekLocation) {
-                            campaign.addReport(TECHNICAL, part.scrap());
-                        }
-                    }
-
-                    scrappingLimbMode = false;
-
-                    if (!salvaging) {
-                        unit.setSalvage(false);
-                    }
-
+                    scrappingLimbMode = scrapEmptyLimb(locationMap, campaign, scrappingLimbMode, salvaging, unit);
                     parts = unit.getPartsNeedingService(true);
                 } else {
-                    for (int locId : countOfPartsPerLocation.keySet()) {
-                        boolean unfixable = false;
-                        Part loc = null;
-
-                        if (locationMap.containsKey(locId)) {
-                            loc = locationMap.get(locId);
-                            unfixable = (loc instanceof MekLocation);
-                        }
-
-                        if (unfixable) {
-                            campaign.addReport(TECHNICAL, String.format(
-                                  "<font color='" +
-                                        getWarningColor()
-                                        +
-                                        "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
-                                  loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
-                        } else {
-                            campaign.addReport(TECHNICAL, String.format(
-                                  "<font color='" +
-                                        getWarningColor()
-                                        +
-                                        "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
-                                  loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
-                                  countOfPartsPerLocation.get(locId)));
-                        }
-                    }
-
+                    processPartsInLocation(campaign, unit, countOfPartsPerLocation, locationMap);
                     parts = partsToBeRemoved;
                 }
             }
@@ -707,24 +695,7 @@ public class MRMSService {
         MRMSUnitAction unitAction = new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
 
         for (IPartWork partWork : parts) {
-            if (partWork instanceof Part) {
-                ((Part) partWork).resetModeToNormal();
-            }
-
-            List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, false, campaign);
-
-            if (validTechs.isEmpty()) {
-                unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
-                continue;
-            }
-
-            unitAction.addPartAction(repairPart(campaign,
-                  partWork,
-                  unit,
-                  validTechs,
-                  mrmsOptionsByType,
-                  configuredOptions,
-                  false));
+            performPartWork(campaign, unit, techs, mrmsOptionsByType, configuredOptions, partWork, unitAction);
         }
 
         if (scrappingLimbMode) {
@@ -738,6 +709,205 @@ public class MRMSService {
         }
 
         return unitAction;
+    }
+
+    private static @Nullable MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
+          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
+          MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
+
+        if (parts.isEmpty()) {
+            return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
+        }
+
+        if (techs.isEmpty()) {
+            return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.NO_TECHS);
+        }
+
+        resetPartsModeToNormal(parts);
+
+        // If we're a mek and we have a limb with a bad shoulder/hip, we're going to try to flip it to salvageable
+        // and remove all the parts so that we can nuke the limb. If we do this, when we're finally done we need to
+        // flip the mek back to repairable so that we don't accidentally strip everything off it.
+        boolean scrappingLimbMode = false;
+
+        // Pre-checking for hips/shoulders on repairable meks. If we have a bad hip or shoulder, we're not going to
+        // do anything until we get those parts out of the location and scrap it. Once we're at a happy place, we'll proceed.
+        boolean isSalvaging = unit.isSalvage();
+        if ((unit.getEntity() instanceof Mek)) {
+            Map<Integer, Part> locationMap = new HashMap<>();
+
+            for (IPartWork partWork : parts) {
+                if ((partWork instanceof MekLocation) && ((MekLocation) partWork).onBadHipOrShoulder()) {
+                    locationMap.put(((MekLocation) partWork).getLoc(), (MekLocation) partWork);
+                }
+            }
+
+            if (!locationMap.isEmpty()) {
+                // Find our parts in our bad locations. If we don't actually have, just scrap the limbs and move on
+                // with our normal work
+                scrappingLimbMode = true;
+
+                if (!isSalvaging) {
+                    unit.setSalvage(true);
+                }
+
+                List<IPartWork> partsTemp = unit.getPartsNeedingService(true);
+                List<IPartWork> partsToBeRemoved = new ArrayList<>();
+                Map<Integer, Integer> countOfPartsPerLocation = new HashMap<>();
+
+                for (IPartWork partWork : partsTemp) {
+                    if (!(partWork instanceof MekLocation) &&
+                              locationMap.containsKey(partWork.getLocation()) &&
+                              partWork.isSalvaging()) {
+                        partsToBeRemoved.add(partWork);
+
+                        int count = 0;
+
+                        if (countOfPartsPerLocation.containsKey(partWork.getLocation())) {
+                            count = countOfPartsPerLocation.get(partWork.getLocation());
+                        }
+
+                        count++;
+
+                        countOfPartsPerLocation.put(partWork.getLocation(), count);
+                    }
+                }
+
+                if (partsToBeRemoved.isEmpty()) {
+                    scrappingLimbMode = scrapEmptyLimb(locationMap,
+                          campaign,
+                          scrappingLimbMode,
+                          isSalvaging,
+                          unit);
+                } else {
+                    processPartsInLocation(campaign, unit, countOfPartsPerLocation, locationMap);
+
+                    parts = partsToBeRemoved;
+                }
+            }
+        }
+
+        boolean originalAllowCarryover = configuredOptions.isAllowCarryover();
+
+        // If we're scrapping limbs, we don't want salvage repairs to go into a ew day otherwise it can be confusing
+        // when trying to figure why a unit can't be repaired because 'salvage' repairs don't show up on the task
+        // list as scheduled if we're in 'repair' mode.
+        if (scrappingLimbMode) {
+            configuredOptions.setAllowCarryover(false);
+        }
+
+        // Filter our parts list to only those that aren't being worked on or those that meet our criteria as defined
+        // in the campaign configurations
+        parts = filterParts(parts, mrmsOptionsByType, techs, campaign);
+
+        if (parts.isEmpty()) {
+            if (scrappingLimbMode) {
+                unit.setSalvage(false);
+            }
+
+            return new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.NO_PARTS);
+        }
+
+        MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
+
+        for (IPartWork partWork : parts) {
+            performPartWork(campaign, unit, techs, mrmsOptionsByType, configuredOptions, partWork, unitAction);
+        }
+
+        if (scrappingLimbMode) {
+            unit.setSalvage(false);
+            configuredOptions.setAllowCarryover(originalAllowCarryover);
+        }
+
+        if (unitAction.getPartSet().isOnlyNoTechs()) {
+            unitAction.resetPartSet();
+            unitAction.setStatus(STATUS.NO_TECHS);
+        }
+
+        return unitAction;
+    }
+
+    private static void performPartWork(Campaign campaign, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, MRMSConfiguredOptions configuredOptions,
+          IPartWork partWork, MRMSUnitAction unitAction) {
+        if (partWork instanceof Part) {
+            ((Part) partWork).resetModeToNormal();
+        }
+
+        List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, false, campaign);
+
+        if (validTechs.isEmpty()) {
+            unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
+            return;
+        }
+
+        unitAction.addPartAction(repairPart(campaign,
+              partWork,
+              unit,
+              validTechs,
+              mrmsOptionsByType,
+              configuredOptions,
+              false));
+    }
+
+    private static void processPartsInLocation(Campaign campaign, Unit unit,
+          Map<Integer, Integer> countOfPartsPerLocation,
+          Map<Integer, Part> locationMap) {
+        for (int locId : countOfPartsPerLocation.keySet()) {
+            boolean unfixable = false;
+            Part loc = null;
+
+            if (locationMap.containsKey(locId)) {
+                loc = locationMap.get(locId);
+                unfixable = (loc instanceof MekLocation);
+            }
+
+            if (unfixable) {
+                campaign.addReport(TECHNICAL, String.format(
+                      "<font color='" +
+                            getWarningColor()
+                            +
+                            "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
+                      loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
+            } else {
+                campaign.addReport(TECHNICAL, String.format(
+                      "<font color='" +
+                            getWarningColor()
+                            +
+                            "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
+                      loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
+                      countOfPartsPerLocation.get(locId)));
+            }
+        }
+    }
+
+    /*
+     * We have no parts left on our unfixable locations, so we'll just scrap those locations and
+     * rebuild the parts list and reset back our normal repair mode
+     */
+    private static boolean scrapEmptyLimb(Map<Integer, Part> locationMap, Campaign campaign,
+          boolean scrappingLimbMode, boolean isSalvaging, Unit unit) {
+        for (Part part : locationMap.values()) {
+            if (part instanceof MekLocation) {
+                campaign.addReport(TECHNICAL, part.scrap());
+            }
+        }
+
+        scrappingLimbMode = false;
+
+        if (!isSalvaging) {
+            unit.setSalvage(false);
+        }
+
+        return scrappingLimbMode;
+    }
+
+    private static void resetPartsModeToNormal(List<IPartWork> parts) {
+        for (IPartWork partWork : parts) {
+            if (partWork instanceof Part) {
+                ((Part) partWork).resetModeToNormal();
+            }
+        }
     }
 
     private static MRMSPartAction repairPart(Campaign campaign, IPartWork partWork, Unit unit, List<Person> techs,

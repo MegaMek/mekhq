@@ -62,6 +62,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.TaskTableModel;
+import mekhq.service.mrms.MRMSService;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -112,6 +113,8 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                           remove this equipment if you wish to scrap and then replace the limb.
                           Do you wish to continue?""", "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
                     }
+
+                    MRMSService.performSingleLocationMRMS(gui.getCampaign(), p.getUnit(), p);
                     return;
                 }
 
