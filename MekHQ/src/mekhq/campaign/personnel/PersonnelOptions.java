@@ -58,6 +58,7 @@ public class PersonnelOptions extends PilotOptions {
     private static final MMLogger LOGGER = MMLogger.create(PersonnelOptions.class);
 
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
+    public static final String EDGE_ADVANCED_SURGERY = "edge_when_advanced_surgery_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
@@ -376,6 +377,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, MADNESS_BERSERKER, false);
 
         addOption(edge, EDGE_MEDICAL, true);
+        addOption(edge, EDGE_ADVANCED_SURGERY, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
