@@ -672,6 +672,16 @@ public class RandomDeath {
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
+
+            PersonnelStatus status = person.getStatus();
+            if (status.isFollowAfterLeavingCampaign()) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.departed",
+                      person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG, status.getLabel()));
+            } else {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.normal",
+                      person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
+            }
+
             campaign.addReport(PERSONNEL, String.format("%s has %s<b>died</b>%s.",
                   person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
 
