@@ -63,7 +63,8 @@ public class Appraisal {
      * Performs an appraisal skill check for a given person on the specified date and calculates the appraisal cost
      * multiplier based on the result.
      *
-     * @param person     the {@link Person} performing the appraisal skill check
+     * @param person     the {@link Person} performing the appraisal skill check; may be {@code null}, in which case no
+     *                   check is performed and the multiplier defaults to {@code 1.0}
      * @param currentDay the current date of the appraisal check
      * @param isUseEdge  {@code true} if an Edge reroll should be used for a failed check
      *
