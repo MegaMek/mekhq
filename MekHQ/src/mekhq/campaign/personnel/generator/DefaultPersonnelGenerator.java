@@ -144,7 +144,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
               campaignOptions.getInterestedInSameSexDiceSize(), campaignOptions.getInterestedInBothSexesDiceSize());
 
         int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
-        person.setTryingToConceive(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
+        person.setWantsChildren(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);

@@ -164,7 +164,7 @@ public class AbstractProcreationTest {
     //endregion Determination Methods
 
     @Test
-    public void testIsMale() {
+    public void testNotInterestInChildrenMale() {
         // Arrange
         AbstractProcreation procreation = new RandomProcreation(mockCampaignOptions);
 
@@ -172,6 +172,7 @@ public class AbstractProcreationTest {
         LocalDate date = LocalDate.of(3025, 1, 1);
 
         when(person.getGender()).thenReturn(Gender.MALE);
+        when(person.isWantsChildren()).thenReturn(false);
 
         // Act
         String result = procreation.canProcreate(date, person, false);
@@ -181,7 +182,7 @@ public class AbstractProcreationTest {
     }
 
     @Test
-    public void testNotInterestInChildren() {
+    public void testNotInterestInChildrenFemale() {
         // Arrange
         AbstractProcreation procreation = new RandomProcreation(mockCampaignOptions);
 
@@ -189,7 +190,7 @@ public class AbstractProcreationTest {
         LocalDate date = LocalDate.of(3025, 1, 1);
 
         when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(false);
+        when(person.isWantsChildren()).thenReturn(false);
 
         // Act
         String result = procreation.canProcreate(date, person, false);
@@ -206,8 +207,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(true);
 
         // Act
@@ -225,8 +225,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.STUDENT);
 
@@ -245,8 +244,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(true);
@@ -266,8 +264,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -288,8 +285,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -311,8 +307,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -335,8 +330,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -360,8 +354,7 @@ public class AbstractProcreationTest {
         Person person = mock(Person.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -386,8 +379,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -415,8 +407,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -446,8 +437,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -459,7 +449,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(false);
+        when(spouse.isWantsChildren()).thenReturn(false);
 
         // Act
         String result = procreation.canProcreate(date, person, true);
@@ -478,8 +468,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -491,7 +480,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.STUDENT);
 
         // Act
@@ -511,8 +500,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -524,7 +512,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(spouse.isDeployed()).thenReturn(true);
 
@@ -545,8 +533,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -558,7 +545,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(spouse.isDeployed()).thenReturn(false);
         when(spouse.isChild(date, true)).thenReturn(true);
@@ -580,8 +567,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -593,7 +579,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(spouse.isDeployed()).thenReturn(false);
         when(spouse.isChild(date, true)).thenReturn(false);
@@ -616,8 +602,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -629,7 +614,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(spouse.isDeployed()).thenReturn(false);
         when(spouse.isChild(date, true)).thenReturn(false);
@@ -653,8 +638,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -666,7 +650,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(spouse.isDeployed()).thenReturn(false);
         when(spouse.isChild(date, true)).thenReturn(false);
@@ -690,8 +674,7 @@ public class AbstractProcreationTest {
         Genealogy genealogy = mock(Genealogy.class);
         LocalDate date = LocalDate.of(3025, 1, 1);
 
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
+        when(person.isWantsChildren()).thenReturn(true);
         when(person.isPregnant()).thenReturn(false);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.isDeployed()).thenReturn(false);
@@ -703,7 +686,7 @@ public class AbstractProcreationTest {
         when(genealogy.hasSpouse()).thenReturn(true);
         when(genealogy.getSpouse()).thenReturn(spouse);
         when(spouse.getGender()).thenReturn(Gender.MALE);
-        when(spouse.isTryingToConceive()).thenReturn(true);
+        when(spouse.isWantsChildren()).thenReturn(true);
         when(spouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(spouse.isDeployed()).thenReturn(false);
         when(spouse.isChild(date, true)).thenReturn(false);
