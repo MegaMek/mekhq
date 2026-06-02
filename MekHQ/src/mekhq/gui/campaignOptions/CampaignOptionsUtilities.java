@@ -88,6 +88,12 @@ public class CampaignOptionsUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
     public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
+    /**
+     * Fixed content width for page-shell section bodies (tables, ability panels). Kept narrower than
+     * {@link #CAMPAIGN_OPTIONS_PANEL_WIDTH} so that, once the collapsible section's padding and insets are added, the
+     * content never reports a preferred width wider than the page can display (which would break the section layout).
+     */
+    public final static int CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH = scaleForGUI(860);
     private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
     private static Consumer<String> tipTextConsumer;
 

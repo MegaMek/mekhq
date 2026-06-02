@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -378,14 +379,6 @@ public class AbilitiesTab {
      * prerequisite/incompatible/removed ability lists.
      */
     static class AbilityOptionPanel extends JPanel implements SectionHeaderControlProvider {
-        /**
-         * Fixed, unscaled content width for every ability panel. The description label is laid out at this width, and
-         * {@link #getPreferredSize()} clamps the whole panel to it. Reporting a constant width for every ability on
-         * every category tab is what keeps the layout data-independent: a populated Incompatible/Removes list (common
-         * on flaws and origins) can never push a section wider than the page can show and collapse it.
-         */
-        private static final int PANEL_CONTENT_WIDTH = 860;
-
         /** Fixed wrapping width for the description label; kept narrower than the panel for comfortable reading. */
         private static final int DESCRIPTION_WIDTH = 800;
 
@@ -557,13 +550,13 @@ public class AbilitiesTab {
         @Override
         public Dimension getPreferredSize() {
             Dimension preferredSize = super.getPreferredSize();
-            return new Dimension(UIUtil.scaleForGUI(PANEL_CONTENT_WIDTH), preferredSize.height);
+            return new Dimension(CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH, preferredSize.height);
         }
 
         @Override
         public Dimension getMaximumSize() {
             Dimension maximumSize = super.getMaximumSize();
-            return new Dimension(UIUtil.scaleForGUI(PANEL_CONTENT_WIDTH), maximumSize.height);
+            return new Dimension(CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH, maximumSize.height);
         }
 
         private static JPanel newColumnPanel() {

@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -90,10 +91,9 @@ public class SkillsTab {
     private List<SkillsTableModel> tableModels;
     private SkillConfiguration storedConfiguration;
 
-    private JPanel pnlEdgeCost;
-    private JLabel lblEdgeCost;
+    // Only the spinners are read back (in load/apply); their labels and the containing panel are write-only locals
+    // built in createEdgeCostPanel().
     private JSpinner spnEdgeCost;
-    private JLabel lblAttributeCost;
     private JSpinner spnAttributeCost;
 
     /**
@@ -116,12 +116,6 @@ public class SkillsTab {
         createdCategoryTabs = new EnumMap<>(SkillSubType.class);
         tableModels = new ArrayList<>();
         storedConfiguration = null;
-
-        pnlEdgeCost = new JPanel();
-        lblEdgeCost = new JLabel();
-        spnEdgeCost = new JSpinner();
-        lblAttributeCost = new JLabel();
-        spnAttributeCost = new JSpinner();
     }
 
     /**
@@ -238,10 +232,9 @@ public class SkillsTab {
         layout.gridy = 0;
 
         if (category == COMBAT_GUNNERY) {
-            pnlEdgeCost = createEdgeCostPanel();
             layout.gridwidth = 5;
             layout.gridx = 0;
-            content.add(pnlEdgeCost, layout);
+            content.add(createEdgeCostPanel(), layout);
             layout.gridy++;
         }
 
@@ -301,7 +294,7 @@ public class SkillsTab {
         int rowCount = Math.max(1, table.getRowCount());
         int bodyHeight = table.getRowHeight() * rowCount;
         int headerHeight = table.getTableHeader().getPreferredSize().height;
-        int width = UIUtil.scaleForGUI(860);
+        int width = CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
         Dimension viewportSize = new Dimension(width, bodyHeight);
         Dimension scrollPaneSize = new Dimension(width, bodyHeight + headerHeight + UIUtil.scaleForGUI(4));
 
@@ -319,10 +312,10 @@ public class SkillsTab {
      * @return a {@link JPanel} containing the Edge and Attribute cost controls.
      */
     private JPanel createEdgeCostPanel() {
-        lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
+        JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
-        lblAttributeCost = new CampaignOptionsLabel("AttributeCost");
+        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost");
         spnAttributeCost = new CampaignOptionsSpinner("AttributeCost", 100, 0, 500, 1);
 
         // Borderless content panel with both cost controls side by side
@@ -410,10 +403,8 @@ public class SkillsTab {
 
         model = new SkillsOptionsModel(options, presetSkillValues);
 
-        if (tableModels != null) {
-            for (SkillsTableModel tableModel : tableModels) {
-                tableModel.setOptionsModel(model);
-            }
+        for (SkillsTableModel tableModel : tableModels) {
+            tableModel.setOptionsModel(model);
         }
 
         if (spnEdgeCost != null) {

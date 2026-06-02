@@ -36,6 +36,12 @@ import java.util.Arrays;
 
 import mekhq.campaign.personnel.skills.SkillType;
 
+/**
+ * A mutable, package-private data holder for one skill's editable values (target number, per-level XP costs, and the
+ * six experience milestones). Fields are intentionally exposed directly and accessed by the other Skills tab classes
+ * ({@code SkillsTab}, {@code SkillsTableModel}, {@code SkillAdvancedEditorDialog}); this is a plain DTO, not an
+ * encapsulated domain object, so it stays trivially copyable for the table's Copy/Paste feature.
+ */
 class SkillConfiguration {
     int targetNumber;
     Integer[] costs;
