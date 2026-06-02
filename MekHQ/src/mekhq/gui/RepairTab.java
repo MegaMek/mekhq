@@ -984,7 +984,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
      */
     public void refreshAsTechPool() {
-        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
             astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
         }
