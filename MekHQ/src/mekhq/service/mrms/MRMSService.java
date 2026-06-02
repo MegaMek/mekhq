@@ -789,7 +789,7 @@ public class MRMSService {
 
         boolean originalAllowCarryover = configuredOptions.isAllowCarryover();
 
-        // If we're scrapping limbs, we don't want salvage repairs to go into a ew day otherwise it can be confusing
+        // If we're scrapping limbs, we don't want salvage repairs to go into a new day otherwise it can be confusing
         // when trying to figure why a unit can't be repaired because 'salvage' repairs don't show up on the task
         // list as scheduled if we're in 'repair' mode.
         if (scrappingLimbMode) {
