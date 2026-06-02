@@ -40,6 +40,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
@@ -401,6 +402,8 @@ public class TrainingCombatTeams {
         final boolean isClanCampaign = campaign.isClanCampaign();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean useAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseEdge = campaignOptions.isUseEdge();
+        isUseEdge = isUseEdge && educator.getOptions().booleanOption(EDGE_TRAINING);
 
         SkillCheckUtility skillCheck = new SkillCheckUtility(
               getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"),
@@ -408,7 +411,7 @@ public class TrainingCombatTeams {
               S_TRAINING,
               new ArrayList<>(),
               0,
-              true,
+              isUseEdge,
               true,
               useAgingEffects,
               isClanCampaign,
