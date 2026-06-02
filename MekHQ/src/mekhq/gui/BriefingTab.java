@@ -2568,8 +2568,8 @@ public final class BriefingTab extends CampaignGuiTab {
             // I can't just call it here, because it ends up getting reset somewhere later
             SwingUtilities.invokeLater(() -> scrollMissionView.getVerticalScrollBar().setValue(0));
             btnEditMission.setEnabled(true);
-            btnCompleteMission.setEnabled(mission.getStatus().isActive());
-            btnDeleteMission.setEnabled(true);
+            btnCompleteMission.setEnabled(mission.getStatus().isActive() && getCampaign().isGM());
+            btnDeleteMission.setEnabled(getCampaign().isGM());
             btnAddScenario.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()));
             btnGMGenerateScenarios.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()) &&
                                                     getCampaign().isGM() &&
@@ -2810,5 +2810,8 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(GMModeEvent ev) {
         btnGMGenerateScenarios.setEnabled(ev.isGMMode());
+        final Mission mission = comboMission.getSelectedItem();
+        btnCompleteMission.setEnabled((mission != null) && mission.getStatus().isActive() && ev.isGMMode());
+        btnDeleteMission.setEnabled((mission != null) && ev.isGMMode());
     }
 }
