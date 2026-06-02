@@ -56,6 +56,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
@@ -1649,6 +1650,8 @@ public class StratConRulesManager {
                     continue;
                 }
 
+                boolean isUseEdge = campaignOptions.isUseEdge();
+                isUseEdge = scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
@@ -1687,7 +1690,7 @@ public class StratConRulesManager {
                               scoutData.skillName(),
                               List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
                               0,
-                              false,
+                              isUseEdge,
                               false,
                               false, // Irrelevant
                               false, // Irrelevant

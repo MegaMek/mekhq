@@ -45,6 +45,7 @@ import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
 import static mekhq.campaign.personnel.DiscretionarySpending.performExtremeExpenditure;
 import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
@@ -3459,6 +3460,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerReconFailure.text"));
+                cbMenuItem.setSelected(person.getOptions().booleanOption(EDGE_RECON_FAIL));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_RECON_FAIL));
+                if (!person.isCombat()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
                 // Support Edge
                 if (getCampaignOptions().isUseSupportEdge()) {
                     // Doctors
@@ -3579,6 +3589,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
+                menuItem = new JMenuItem(resources.getString("edgeTriggerReconFailure.text"));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_RECON_FAIL, TRUE));
+                menuItem.addActionListener(this);
+                submenu.add(menuItem);
+
                 if (getCampaignOptions().isUseSupportEdge()) {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerHealCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
@@ -3662,6 +3677,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerAeroTrnBayCrit.text"));
                 menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST, FALSE));
+                menuItem.addActionListener(this);
+                submenu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("edgeTriggerReconFailure.text"));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_RECON_FAIL, FALSE));
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
