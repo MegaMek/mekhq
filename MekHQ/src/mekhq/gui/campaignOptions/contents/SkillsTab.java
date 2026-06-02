@@ -37,7 +37,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -55,8 +54,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -85,7 +86,7 @@ public class SkillsTab {
     private final CampaignOptions campaignOptions;
 
     private SkillsOptionsModel model;
-    private Map<SkillSubType, JPanel> createdCategoryTabs;
+    private Map<SkillSubType, CampaignOptionsPagePanel> createdCategoryTabs;
     private List<SkillsTableModel> tableModels;
     private SkillConfiguration storedConfiguration;
 
@@ -131,15 +132,12 @@ public class SkillsTab {
      * @return a {@link JPanel} containing the skill table and supporting controls for the selected category.
      */
     public JPanel createSkillsTab(SkillSubType category) {
-        JPanel tab = createdCategoryTabs.computeIfAbsent(category, categoryKey -> new JPanel(new BorderLayout()));
-        if (tab.getComponentCount() == 0) {
-            tab.add(createSkillsPage(category), BorderLayout.CENTER);
-        }
-
-        return tab;
+        // The page never rebuilds in place (only its table models refresh), so the CampaignOptionsPagePanel can be
+        // cached and returned directly rather than wrapping it in a container.
+        return createdCategoryTabs.computeIfAbsent(category, this::createSkillsPage);
     }
 
-    private JPanel createSkillsPage(SkillSubType category) {
+    private CampaignOptionsPagePanel createSkillsPage(SkillSubType category) {
         // Header
         CampaignOptionsHeaderPanel headerPanel;
         String panelName;
@@ -211,6 +209,7 @@ public class SkillsTab {
 
         return CampaignOptionsPagePanel.builder(panelName, panelName, getImageDirectory())
                      .header(headerPanel)
+                     .showDetailsPanel(false)
                      .sectionsExpandedByDefault(true)
                      .section("lblSkillsSection.text", "lblSkillsSection.summary", sectionContent)
                      .build();
@@ -260,10 +259,6 @@ public class SkillsTab {
         return content;
     }
 
-    private static void panel(JPanel parent, JComponent child, GridBagConstraints layout) {
-        parent.add(child, layout);
-    }
-
     private JTable createSkillsTable(SkillsTableModel tableModel) {
         JTable table = new JTable(tableModel);
         table.setName("tblSkills");
@@ -273,19 +268,26 @@ public class SkillsTab {
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
         table.getColumnModel().getColumn(SkillsTableModel.SKILL_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(220));
+              .setPreferredWidth(UIUtil.scaleForGUI(180));
         table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(120));
+              .setPreferredWidth(UIUtil.scaleForGUI(50));
         table.getColumnModel().getColumn(SkillsTableModel.PROGRESSION_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(260));
-        table.getColumnModel().getColumn(SkillsTableModel.ADVANCED_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(120));
+              .setPreferredWidth(UIUtil.scaleForGUI(230));
+        table.getColumnModel().getColumn(SkillsTableModel.COST_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(330));
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(70));
 
-        String advancedText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
-        table.getColumnModel().getColumn(SkillsTableModel.ADVANCED_COLUMN)
-              .setCellRenderer(new ButtonRenderer(advancedText));
-        table.getColumnModel().getColumn(SkillsTableModel.ADVANCED_COLUMN)
-              .setCellEditor(new AdvancedButtonEditor(table, tableModel, advancedText));
+        // Left-align the target number so it reads as a value rather than a right-aligned figure.
+        DefaultTableCellRenderer leftAlignedRenderer = new DefaultTableCellRenderer();
+        leftAlignedRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+        table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN).setCellRenderer(leftAlignedRenderer);
+
+        String editText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
+              .setCellRenderer(new ButtonRenderer(editText));
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
+              .setCellEditor(new AdvancedButtonEditor(table, tableModel, editText));
 
         return table;
     }
@@ -299,7 +301,7 @@ public class SkillsTab {
         int rowCount = Math.max(1, table.getRowCount());
         int bodyHeight = table.getRowHeight() * rowCount;
         int headerHeight = table.getTableHeader().getPreferredSize().height;
-        int width = UIUtil.scaleForGUI(720);
+        int width = UIUtil.scaleForGUI(860);
         Dimension viewportSize = new Dimension(width, bodyHeight);
         Dimension scrollPaneSize = new Dimension(width, bodyHeight + headerHeight + UIUtil.scaleForGUI(4));
 
@@ -465,6 +467,26 @@ public class SkillsTab {
     }
 
     /**
+     * Builds a compact summary of a skill's per-level XP costs (levels 0 through 10). A cost of {@code -1} marks an
+     * unreachable level and is shown as an em dash.
+     *
+     * @param configuration the configuration to summarize
+     *
+     * @return a compact XP cost summary string
+     */
+    private static String buildCostSummary(SkillConfiguration configuration) {
+        StringBuilder summary = new StringBuilder();
+        for (int i = 0; i < configuration.costs.length; i++) {
+            if (i > 0) {
+                summary.append(" · ");
+            }
+            Integer cost = configuration.costs[i];
+            summary.append((cost == null || cost < 0) ? "—" : cost);
+        }
+        return summary.toString();
+    }
+
+    /**
      * Table model backing a single skill sub-type's table. It reads and writes the live {@link SkillConfiguration}
      * instances held by the {@link SkillsOptionsModel}, so edits made through the table (and the advanced editor) are
      * reflected immediately in the model.
@@ -473,8 +495,9 @@ public class SkillsTab {
         private static final int SKILL_COLUMN = 0;
         private static final int TARGET_COLUMN = 1;
         private static final int PROGRESSION_COLUMN = 2;
-        private static final int ADVANCED_COLUMN = 3;
-        private static final int COLUMN_COUNT = 4;
+        private static final int COST_COLUMN = 3;
+        private static final int EDIT_COLUMN = 4;
+        private static final int COLUMN_COUNT = 5;
 
         private final List<String> skillNames;
         private SkillsOptionsModel optionsModel;
@@ -517,7 +540,8 @@ public class SkillsTab {
                 case TARGET_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableTargetColumn.text");
                 case PROGRESSION_COLUMN ->
                       getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionColumn.text");
-                case ADVANCED_COLUMN ->
+                case COST_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableCostColumn.text");
+                case EDIT_COLUMN ->
                       getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableAdvancedColumn.text");
                 default -> throw new IllegalArgumentException("Unknown skill table column: " + column);
             };
@@ -533,7 +557,7 @@ public class SkillsTab {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == TARGET_COLUMN || columnIndex == ADVANCED_COLUMN;
+            return columnIndex == TARGET_COLUMN || columnIndex == EDIT_COLUMN;
         }
 
         @Override
@@ -543,7 +567,8 @@ public class SkillsTab {
                 case SKILL_COLUMN -> skillNames.get(rowIndex);
                 case TARGET_COLUMN -> configuration == null ? 0 : configuration.targetNumber;
                 case PROGRESSION_COLUMN -> configuration == null ? "" : buildProgressionSummary(configuration);
-                case ADVANCED_COLUMN -> "";
+                case COST_COLUMN -> configuration == null ? "" : buildCostSummary(configuration);
+                case EDIT_COLUMN -> "";
                 default -> throw new IllegalArgumentException("Unknown skill table column: " + columnIndex);
             };
         }

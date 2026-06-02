@@ -264,6 +264,7 @@ public class AbilitiesTab {
                     headerName,
                     imageAddress)
               .header(headerPanel)
+              .showDetailsPanel(false)
               .component(createAbilityButtonBar(abilityCategory));
 
         // Every special ability is selectable as a prerequisite/incompatible/removed entry, so build the lookup map

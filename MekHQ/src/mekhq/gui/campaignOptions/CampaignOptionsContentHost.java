@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import javax.swing.JPanel;
@@ -100,10 +101,35 @@ class CampaignOptionsContentHost extends JPanel {
     }
 
     private boolean shouldShowHelpPanel(Component content, boolean defaultShowHelpPanel) {
-        if (content instanceof CampaignOptionsPagePanel pagePanel) {
+        CampaignOptionsPagePanel pagePanel = findPagePanel(content);
+        if (pagePanel != null) {
             return pagePanel.shouldShowDetailsPanel();
         }
         return defaultShowHelpPanel;
+    }
+
+    /**
+     * Finds the {@link CampaignOptionsPagePanel} for the supplied content, whether it is the content itself or nested
+     * inside a wrapper panel (some tabs wrap their page in a {@link java.awt.BorderLayout} container so they can swap
+     * contents in place).
+     *
+     * @param content the content being displayed
+     *
+     * @return the page panel, or {@code null} if none is present
+     */
+    private static @Nullable CampaignOptionsPagePanel findPagePanel(Component content) {
+        if (content instanceof CampaignOptionsPagePanel pagePanel) {
+            return pagePanel;
+        }
+        if (content instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                CampaignOptionsPagePanel pagePanel = findPagePanel(child);
+                if (pagePanel != null) {
+                    return pagePanel;
+                }
+            }
+        }
+        return null;
     }
 
     private Component getDisplayContent(Component content, @Nullable String quoteResourceName) {

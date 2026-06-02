@@ -37,12 +37,12 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -52,7 +52,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.ui.FastJScrollPane;
 
 /**
  * A compact modal editor for the advanced configuration of a single skill: its per-level XP costs and the experience
@@ -116,41 +115,31 @@ class SkillAdvancedEditorDialog extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
 
+        // Lay the three logical groups (target number + milestones, low XP levels, high XP levels) out side by side so
+        // the dialog uses the available horizontal space instead of becoming a single tall column.
         JPanel content = new JPanel(new GridBagLayout());
         content.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
               UIUtil.scaleForGUI(12),
               UIUtil.scaleForGUI(8),
               UIUtil.scaleForGUI(12)));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3),
-              UIUtil.scaleForGUI(8));
+        GridBagConstraints columnConstraints = new GridBagConstraints();
+        columnConstraints.gridx = 0;
+        columnConstraints.gridy = 0;
+        columnConstraints.anchor = GridBagConstraints.PAGE_START;
+        columnConstraints.insets = new Insets(0, 0, 0, UIUtil.scaleForGUI(24));
 
-        addSectionHeader(content, gbc, "skillAdvancedEditor.targetNumber");
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "lblSkillPanelTargetNumber.text"),
-              spnTargetNumber);
+        content.add(createTargetAndMilestonesColumn(), columnConstraints);
 
-        addSectionHeader(content, gbc, "skillAdvancedEditor.milestones");
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.green"), spnGreen);
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.regular"), spnRegular);
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.veteran"), spnVeteran);
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.elite"), spnElite);
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.heroic"), spnHeroic);
-        addRow(content, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.legendary"),
-              spnLegendary);
-
-        addSectionHeader(content, gbc, "skillAdvancedEditor.costs");
         String costLabelTemplate = getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.costLevel");
-        for (int i = 0; i < SKILL_LEVEL_COUNT; i++) {
-            addRow(content, gbc, String.format(costLabelTemplate, i), spnCosts[i]);
-        }
+        columnConstraints.gridx++;
+        content.add(createCostsColumn(costLabelTemplate, 0, 5), columnConstraints);
 
-        FastJScrollPane scrollPane = new FastJScrollPane(content);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        columnConstraints.gridx++;
+        columnConstraints.insets = new Insets(0, 0, 0, 0);
+        content.add(createCostsColumn(costLabelTemplate, 6, MAX_LEVEL), columnConstraints);
+
+        getContentPane().add(content, BorderLayout.CENTER);
 
         JButton btnOK = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.ok"));
         btnOK.addActionListener(evt -> confirm());
@@ -160,8 +149,60 @@ class SkillAdvancedEditorDialog extends JDialog {
         buttonPanel.add(btnOK);
         buttonPanel.add(btnCancel);
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+    }
 
-        setPreferredSize(new Dimension(UIUtil.scaleForGUI(360), UIUtil.scaleForGUI(560)));
+    private JPanel createTargetAndMilestonesColumn() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = newColumnConstraints();
+
+        addSectionHeader(panel, gbc, "skillAdvancedEditor.targetNumber");
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "lblSkillPanelTargetNumber.text"),
+              spnTargetNumber);
+
+        addSectionHeader(panel, gbc, "skillAdvancedEditor.milestones");
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.green"), spnGreen);
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.regular"), spnRegular);
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.veteran"), spnVeteran);
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.elite"), spnElite);
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.heroic"), spnHeroic);
+        addRow(panel, gbc, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.legendary"),
+              spnLegendary);
+
+        return panel;
+    }
+
+    private JPanel createCostsColumn(String costLabelTemplate, int firstLevel, int lastLevel) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = newColumnConstraints();
+
+        // Drop the costs columns by one header + one row so the "XP Cost per Level" header lines up with the
+        // "Experience Milestones" header (and Level 0 with Green), leaving Base Target Number alone on the first row.
+        addSectionHeaderSpacer(panel, gbc);
+        addRowSpacer(panel, gbc);
+
+        // Only the first costs column carries the section header so the two halves read as one "XP Cost per Level"
+        // group spanning the right of the dialog.
+        if (firstLevel == 0) {
+            addSectionHeader(panel, gbc, "skillAdvancedEditor.costs");
+        } else {
+            addSectionHeaderSpacer(panel, gbc);
+        }
+
+        for (int level = firstLevel; level <= lastLevel; level++) {
+            addRow(panel, gbc, String.format(costLabelTemplate, level), spnCosts[level]);
+        }
+
+        return panel;
+    }
+
+    private GridBagConstraints newColumnConstraints() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3),
+              UIUtil.scaleForGUI(8));
+        return gbc;
     }
 
     private void addSectionHeader(JPanel panel, GridBagConstraints gbc, String resourceKey) {
@@ -170,12 +211,36 @@ class SkillAdvancedEditorDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(UIUtil.scaleForGUI(10), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3),
+        gbc.insets = new Insets(UIUtil.scaleForGUI(2), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
               UIUtil.scaleForGUI(8));
         panel.add(header, gbc);
         gbc.gridwidth = 1;
         gbc.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3),
               UIUtil.scaleForGUI(8));
+    }
+
+    private void addSectionHeaderSpacer(JPanel panel, GridBagConstraints gbc) {
+        // Reserve the same vertical space a header would take so this column's rows line up with the headed column.
+        JLabel spacer = new JLabel("<html><b>&nbsp;</b></html>");
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(UIUtil.scaleForGUI(2), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(6),
+              UIUtil.scaleForGUI(8));
+        panel.add(spacer, gbc);
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3), UIUtil.scaleForGUI(3),
+              UIUtil.scaleForGUI(8));
+    }
+
+    private void addRowSpacer(JPanel panel, GridBagConstraints gbc) {
+        // Reserve the vertical space of one label/spinner row so the costs columns drop into alignment with the
+        // milestones rows in the adjacent column.
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        panel.add(Box.createVerticalStrut(spnTargetNumber.getPreferredSize().height), gbc);
+        gbc.gridwidth = 1;
     }
 
     private void addRow(JPanel panel, GridBagConstraints gbc, String labelText, Component control) {
