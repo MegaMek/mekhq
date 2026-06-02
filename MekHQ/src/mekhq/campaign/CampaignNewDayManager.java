@@ -145,11 +145,13 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -773,8 +775,15 @@ public class CampaignNewDayManager {
         int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
+        boolean isNewWeek = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        RandomDeath randomDeath = campaign.getRandomDeath();
         for (Person person : personnel) {
-            if (person.getStatus().isDepartedUnit()) {
+            PersonnelStatus status = person.getStatus();
+            if (status.isDepartedUnit()) {
+                if (isNewWeek && status.isFollowAfterLeavingCampaign()) {
+                    randomDeath.processNewWeek(campaign, today, person);
+                }
+
                 continue;
             }
 
@@ -823,8 +832,8 @@ public class CampaignNewDayManager {
             }
 
             // Weekly events
-            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-                if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
+            if (isNewWeek) {
+                if (!randomDeath.processNewWeek(campaign, today, person)) {
                     // If the character has died, we don't need to process relationship events
                     processWeeklyRelationshipEvents(person);
                 }
