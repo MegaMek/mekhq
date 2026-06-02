@@ -62,6 +62,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
     public static final String EDGE_SALVAGE_ACCIDENTS = "edge_when_salvage_accident";
+    public static final String EDGE_COMMANDER_NEGOTIATION = "edge_when_commander_negotiation_fail";
 
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
     public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
