@@ -234,6 +234,7 @@ public class MekHQMenuBar extends JMenuBar {
                 }
             }
             MekHQ.unregisterHandler(this);
+            MekHQ.unregisterHandler(getGui());
             // check for a loaded story arc and unregister that handler as well
             if (null != getCampaign().getStoryArc()) {
                 MekHQ.unregisterHandler(getCampaign().getStoryArc());
@@ -1341,6 +1342,7 @@ public class MekHQMenuBar extends JMenuBar {
 
         // Unregister other handlers
         MekHQ.unregisterHandler(this);
+        MekHQ.unregisterHandler(getGui());
 
         if (getCampaign().getStoryArc() != null) {
             MekHQ.unregisterHandler(getCampaign().getStoryArc());
