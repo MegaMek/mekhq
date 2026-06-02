@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -400,9 +400,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
+            refreshAsTechPool();
             RepairTab repairBayTab = getCampaignGui().getRepairBayTab();
             if (repairBayTab != null) {
                 repairBayTab.refreshOvertimeStatus();
+                repairBayTab.refreshAsTechPool();
             }
         });
         gridBagConstraints = new GridBagConstraints();
@@ -412,12 +414,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelDoTask.add(btnOvertime, gridBagConstraints);
 
-        asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
-                                           getCampaign().getAsTechPoolMinutes() +
-                                           " (" +
-                                           getCampaign().getNumberAsTechs() +
-                                           " AsTechs)</html>");
-        asTechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        asTechPoolLabel = new JLabel();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -435,6 +432,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
+
+        refreshAsTechPool();
     }
 
     /**
@@ -654,16 +653,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
     }
 
-    public void refreshTechsList() {
+    private void refreshTechsList() {
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
         techsModel.setData(getCampaign().getTechs(true));
-        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
-        }
-        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
-        refreshAsTechPool(astechString);
+        refreshAsTechPool();
 
         // If requested, switch to top entry
         if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech()) &&
@@ -679,6 +673,18 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 }
             }
         }
+    }
+
+    /**
+     * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
+     */
+    public void refreshAsTechPool() {
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
+        if (getCampaign().isOvertimeAllowed()) {
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
+        }
+        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
+        asTechPoolLabel.setText(astechString);
     }
 
     /**
@@ -759,10 +765,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return null;
         }
         return partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
-    }
-
-    public void refreshAsTechPool(String astechString) {
-        asTechPoolLabel.setText(astechString);
     }
 
     private final ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
