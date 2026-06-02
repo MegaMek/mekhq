@@ -101,8 +101,18 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
         if (command.equalsIgnoreCase("SCRAP")) {
             for (IPartWork p : parts) {
-                if (!(p instanceof Part)) {
+                if (!(p instanceof Part part)) {
                     continue;
+                }
+
+                if (part.onBadHipOrShoulder() && !part.isSalvaging()) {
+                    if (0 != JOptionPane.showConfirmDialog(gui.getFrame(), """
+                          You are repairing/replacing a part on a limb with a bad shoulder or hip.
+                          You may continue, but this limb cannot be repaired and you will have to
+                          remove this equipment if you wish to scrap and then replace the limb.
+                          Do you wish to continue?""", "Busted Hip/Shoulder", JOptionPane.YES_NO_OPTION)) {
+                    }
+                    return;
                 }
 
                 if (((Part) p).checkScrappable() != null) {
