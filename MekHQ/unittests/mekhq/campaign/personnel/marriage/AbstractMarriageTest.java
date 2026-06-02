@@ -515,9 +515,6 @@ public class AbstractMarriageTest {
         doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), eq(true), eq(true));
 
         final Person mockPerson = mock(Person.class);
-        when(mockPerson.isPrefersMen()).thenReturn(false);
-        when(mockPerson.isPrefersWomen()).thenReturn(true);
-
         final List<Person> mockPersonnel = new ArrayList<>();
         when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
 
