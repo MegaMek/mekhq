@@ -691,9 +691,6 @@ public class RandomDeath {
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
             }
 
-            campaign.addReport(PERSONNEL, String.format("%s has %s<b>died</b>%s.",
-                  person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
-
             person.changeStatus(campaign, today, getCause(person, ageGroup, age));
 
             return true;
