@@ -1251,7 +1251,7 @@ public class CampaignOptions {
         missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
         edgeCost = 10;
-        edgeRefreshCost = 20; // Taken from ATOW
+        edgeRefreshCost = 20; // ATOW 3rd printing, p.43, 'edge recovery'
         attributeCost = 100;
         // endregion Experience Tab
 
