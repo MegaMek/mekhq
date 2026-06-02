@@ -381,7 +381,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
         addOption(edge, EDGE_SALVAGE_ACCIDENTS, true);
-        addOption(edge, EDGE_RECON_FAIL, true);
+        addOption(edge, EDGE_RECON_FAIL, false);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
         for (CustomOption option : customs) {
