@@ -3463,9 +3463,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerEscapeAttempt.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_ESCAPE_ATTEMPTS));
-                if (!person.isCombat()) {
-                    cbMenuItem.setForeground(new Color(150, 150, 150));
-                }
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
