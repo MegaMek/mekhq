@@ -1233,14 +1233,14 @@ public class HumanResources {
     }
 
     /**
-     * Returns the highest-ranking doctor from {@code people}.
+     * Returns the highest-ranking characer from {@code people}.
      *
      * @param people          the collection of people to search
      * @param campaignOptions the campaign options
      * @param isClanCampaign  whether this is a Clan campaign
      * @param today           the current in-game date
      *
-     * @return the senior medical person, or {@code null} if none found
+     * @return the senior person, or {@code null} if none found
      */
     public static @Nullable Person getSeniorPerson(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
@@ -1409,7 +1409,7 @@ public class HumanResources {
     }
 
     public List<Person> getTechPersonnel(boolean expanded) {
-        return getPersonnel().stream()
+        return getActivePersonnel(false, false).stream()
                      .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()))
                      .toList();
     }

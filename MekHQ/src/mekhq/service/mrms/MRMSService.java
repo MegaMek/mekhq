@@ -34,6 +34,7 @@ package mekhq.service.mrms;
 
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -46,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.rolls.TargetRoll;
@@ -166,8 +166,8 @@ public class MRMSService {
             return msg;
         } else if ((!unit.isSalvage() && !configuredOptions.useRepair()) ||
                          (unit.isSalvage() && !configuredOptions.useSalvage())) {
-            String msg = MessageFormat.format(resources.getString("MRMS.CompleteTypeDisabled.report"),
-                  unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
+            String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
+                  unit.isSalvage() ? getTextAt(RESOURCE_BUNDLE, "Salvage") : getTextAt(RESOURCE_BUNDLE, "Repair"));
             campaign.addReport(TECHNICAL, msg);
             return msg;
         } else if (campaign.requiresAdditionalAsTechs()) {
@@ -238,8 +238,21 @@ public class MRMSService {
 
     public static void performSingleLocationMRMS(Campaign campaign, Unit unit, IPartWork part) {
         MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
-
         List<Person> techs = campaign.getTechs(true);
+        if (!configuredOptions.isEnabled()) {
+            campaign.addReport(TECHNICAL, getTextAt(RESOURCE_BUNDLE, "MRMS.CompleteDisabled.report"));
+            return;
+        } else if (!configuredOptions.useSalvage()) {
+            String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
+                  getTextAt(RESOURCE_BUNDLE, "Salvage"));
+            campaign.addReport(TECHNICAL, msg);
+            return;
+        } else if (campaign.requiresAdditionalAsTechs()) {
+            String message = getTextAt(RESOURCE_BUNDLE, "MRMS.InsufficientAstechs.report");
+            campaign.addReport(TECHNICAL, message);
+            return;
+        }
+
         for (int i = techs.size() - 1; i >= 0; i--) {
             Person tech = techs.get(i);
 
@@ -711,7 +724,7 @@ public class MRMSService {
         return unitAction;
     }
 
-    private static @Nullable MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
+    private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
           List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
           MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
 
