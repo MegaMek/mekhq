@@ -686,7 +686,7 @@ public class RandomDeath {
             if (announceDeath || announceDeathExpanded) {
                 campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.departed",
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG, status.getLabel()));
-            } else {
+            } else if (!status.isDepartedUnit()) {
                 campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.normal",
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
             }
