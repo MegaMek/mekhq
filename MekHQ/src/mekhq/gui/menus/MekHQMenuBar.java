@@ -1037,7 +1037,7 @@ public class MekHQMenuBar extends JMenuBar {
                       resourceMap.getString("dlgSavePersonnelCSV.text"));
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            logger.error("Error exporting personnel to CSV", ex);
         }
     }
 
@@ -1055,7 +1055,7 @@ public class MekHQMenuBar extends JMenuBar {
                       resourceMap.getString("dlgSaveUnitsCSV.text"));
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            logger.error("Error exporting units to CSV", ex);
         }
     }
 
@@ -1074,7 +1074,7 @@ public class MekHQMenuBar extends JMenuBar {
                       resourceMap.getString("dlgSaveFinancesCSV.text"));
             }
         } catch (Exception ex) {
-            logger.error("", ex);
+            logger.error("Error exporting finances to CSV", ex);
         }
     }
 
