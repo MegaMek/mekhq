@@ -1648,11 +1648,6 @@ public abstract class AbstractCompanyGenerator {
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         Money loan = Money.zero();
 
-        // Process Initial Contract Payment
-        if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
-            startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
-        }
-
         if (getOptions().isPayForSetup()) {
             // Calculate the total costs of setup
             final Money costs = calculateHiringCosts(campaign, trackers)
@@ -1731,7 +1726,7 @@ public abstract class AbstractCompanyGenerator {
     private Money rollRandomStartingCash() {
         return getOptions().isRandomizeStartingCash()
                      ? Money.of(Math.pow(10, 6))
-                       .multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
+                             .multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
                      : Money.zero();
     }
 

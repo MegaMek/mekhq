@@ -646,24 +646,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     }
     // endregion Spares
 
-    // region Contracts
-    public JCheckBox getChkSelectStartingContract() {
-        return chkSelectStartingContract;
-    }
-
-    public void setChkSelectStartingContract(final JCheckBox chkSelectStartingContract) {
-        this.chkSelectStartingContract = chkSelectStartingContract;
-    }
-
-    public JCheckBox getChkStartCourseToContractPlanet() {
-        return chkStartCourseToContractPlanet;
-    }
-
-    public void setChkStartCourseToContractPlanet(final JCheckBox chkStartCourseToContractPlanet) {
-        this.chkStartCourseToContractPlanet = chkStartCourseToContractPlanet;
-    }
-    // endregion Contracts
-
     // region Finances
     public JCheckBox getChkProcessFinances() {
         return chkProcessFinances;
@@ -703,14 +685,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
 
     public void setSpnMinimumStartingFloat(final JSpinner spnMinimumStartingFloat) {
         this.spnMinimumStartingFloat = spnMinimumStartingFloat;
-    }
-
-    public JCheckBox getChkIncludeInitialContractPayment() {
-        return chkIncludeInitialContractPayment;
-    }
-
-    public void setChkIncludeInitialContractPayment(final JCheckBox chkIncludeInitialContractPayment) {
-        this.chkIncludeInitialContractPayment = chkIncludeInitialContractPayment;
     }
 
     public JCheckBox getChkStartingLoan() {
@@ -769,32 +743,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         this.chkPayForAmmunition = chkPayForAmmunition;
     }
     // endregion Finances
-
-    // region Surprises
-    public JCheckBox getChkGenerateSurprises() {
-        return chkGenerateSurprises;
-    }
-
-    public void setChkGenerateSurprises(final JCheckBox chkGenerateSurprises) {
-        this.chkGenerateSurprises = chkGenerateSurprises;
-    }
-
-    public JCheckBox getChkGenerateMysteryBoxes() {
-        return chkGenerateMysteryBoxes;
-    }
-
-    public void setChkGenerateMysteryBoxes(final JCheckBox chkGenerateMysteryBoxes) {
-        this.chkGenerateMysteryBoxes = chkGenerateMysteryBoxes;
-    }
-
-    public Map<MysteryBoxType, JCheckBox> getChkGenerateMysteryBoxTypes() {
-        return chkGenerateMysteryBoxTypes;
-    }
-
-    public void setChkGenerateMysteryBoxTypes(final Map<MysteryBoxType, JCheckBox> chkGenerateMysteryBoxTypes) {
-        this.chkGenerateMysteryBoxTypes = chkGenerateMysteryBoxTypes;
-    }
-    // endregion Surprises
     // endregion Getters/Setters
 
     // region Determination Methods
@@ -836,15 +784,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         gbc.gridy++;
         add(createSparesPanel(), gbc);
 
-        gbc.gridx++;
-        add(createContractsPanel(), gbc);
-
         gbc.gridx = 0;
         gbc.gridy++;
         add(createFinancesPanel(), gbc);
-
-        gbc.gridx++;
-        add(createSurprisesPanel(), gbc);
     }
 
     private JPanel createBaseInformationPanel() {
@@ -1453,7 +1395,8 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
             final boolean selected = getChkGenerateFormationIcons().isSelected();
             getChkUseSpecifiedFactionToGenerateFormationIcons().setEnabled(selected);
             getChkGenerateOriginNodeFormationIcon().setEnabled(selected);
-            getChkUseOriginNodeFormationIconLogo().setEnabled(selected && getChkGenerateOriginNodeFormationIcon().isSelected());
+            getChkUseOriginNodeFormationIconLogo().setEnabled(selected &&
+                                                                    getChkGenerateOriginNodeFormationIcon().isSelected());
             forceWeightLimitsPanel.setEnabled(selected);
         });
 
@@ -1463,12 +1406,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
               "chkUseSpecifiedFactionToGenerateFormationIcons.toolTipText"));
         getChkUseSpecifiedFactionToGenerateFormationIcons().setName("chkUseSpecifiedFactionToGenerateFormationIcons");
 
-        setChkGenerateOriginNodeFormationIcon(new JCheckBox(resources.getString("chkGenerateOriginNodeFormationIcon.text")));
+        setChkGenerateOriginNodeFormationIcon(new JCheckBox(resources.getString(
+              "chkGenerateOriginNodeFormationIcon.text")));
         getChkGenerateOriginNodeFormationIcon().setToolTipText(resources.getString(
               "chkGenerateOriginNodeFormationIcon.toolTipText"));
         getChkGenerateOriginNodeFormationIcon().setName("chkGenerateOriginNodeFormationIcon");
         getChkGenerateOriginNodeFormationIcon().addActionListener(evt -> getChkUseOriginNodeFormationIconLogo().setEnabled(
-              getChkGenerateOriginNodeFormationIcon().isEnabled() && getChkGenerateOriginNodeFormationIcon().isSelected()));
+              getChkGenerateOriginNodeFormationIcon().isEnabled() &&
+                    getChkGenerateOriginNodeFormationIcon().isSelected()));
 
         setChkUseOriginNodeFormationIconLogo(new JCheckBox(resources.getString("chkUseOriginNodeFormationIconLogo.text")));
         getChkUseOriginNodeFormationIconLogo().setToolTipText(resources.getString(
@@ -1670,54 +1615,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         return panel;
     }
 
-    private JPanel createContractsPanel() {
-        // Create Panel Components
-        setChkSelectStartingContract(new JCheckBox(resources.getString("chkSelectStartingContract.text")));
-        getChkSelectStartingContract().setToolTipText(resources.getString("chkSelectStartingContract.toolTipText"));
-        getChkSelectStartingContract().setName("chkSelectStartingContract");
-        getChkSelectStartingContract().addActionListener(evt -> {
-            final boolean selected = getChkSelectStartingContract().isSelected();
-            getChkStartCourseToContractPlanet().setEnabled(selected);
-            if (getChkIncludeInitialContractPayment() != null) {
-                getChkIncludeInitialContractPayment().setEnabled(selected);
-            }
-        });
-
-        setChkStartCourseToContractPlanet(new JCheckBox(resources.getString("chkStartCourseToContractPlanet.text")));
-        getChkStartCourseToContractPlanet().setToolTipText(resources.getString(
-              "chkStartCourseToContractPlanet.toolTipText"));
-        getChkStartCourseToContractPlanet().setName("chkStartCourseToContractPlanet");
-
-        // Disable Panel by Default
-        getChkSelectStartingContract().setSelected(true);
-        getChkSelectStartingContract().doClick();
-
-        // Layout the UI
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("contractsPanel.title")));
-        panel.setName("contractsPanel");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                                      .addComponent(getChkSelectStartingContract())
-                                      .addComponent(getChkStartCourseToContractPlanet()));
-
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(getChkSelectStartingContract())
-                                        .addComponent(getChkStartCourseToContractPlanet()));
-
-        // TODO : Wave 5 : Company Generation GUI
-        panel.setEnabled(false);
-        getChkSelectStartingContract().setEnabled(false);
-        getChkStartCourseToContractPlanet().setEnabled(false);
-
-        return panel;
-    }
-
     private JPanel createFinancesPanel() {
         // Initialize Components Used in ActionListeners
         final JPanel financialCreditsPanel = new JDisableablePanel("financialCreditsPanel");
@@ -1735,8 +1632,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
             if (selected) {
                 getChkRandomizeStartingCash().setSelected(!getChkRandomizeStartingCash().isSelected());
                 getChkRandomizeStartingCash().doClick();
-
-                getChkIncludeInitialContractPayment().setEnabled(getChkSelectStartingContract().isSelected());
 
                 getChkPayForSetup().setSelected(!getChkPayForSetup().isSelected());
                 getChkPayForSetup().doClick();
@@ -1815,11 +1710,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         getSpnMinimumStartingFloat().setToolTipText(resources.getString("lblMinimumStartingFloat.toolTipText"));
         getSpnMinimumStartingFloat().setName("spnMinimumStartingFloat");
 
-        setChkIncludeInitialContractPayment(new JCheckBox(resources.getString("chkIncludeInitialContractPayment.text")));
-        getChkIncludeInitialContractPayment().setToolTipText(resources.getString(
-              "chkIncludeInitialContractPayment.toolTipText"));
-        getChkIncludeInitialContractPayment().setName("chkIncludeInitialContractPayment");
-
         setChkStartingLoan(new JCheckBox(resources.getString("chkStartingLoan.text")));
         getChkStartingLoan().setToolTipText(resources.getString("chkStartingLoan.toolTipText"));
         getChkStartingLoan().setName("chkStartingLoan");
@@ -1852,7 +1742,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(lblMinimumStartingFloat)
                                                       .addComponent(getSpnMinimumStartingFloat(), Alignment.LEADING))
-                                      .addComponent(getChkIncludeInitialContractPayment())
                                       .addComponent(getChkStartingLoan()));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -1866,7 +1755,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(lblMinimumStartingFloat)
                                                         .addComponent(getSpnMinimumStartingFloat()))
-                                        .addComponent(getChkIncludeInitialContractPayment())
                                         .addComponent(getChkStartingLoan()));
     }
 
@@ -1930,77 +1818,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
                                         .addComponent(getChkPayForParts())
                                         .addComponent(getChkPayForArmour())
                                         .addComponent(getChkPayForAmmunition()));
-    }
-
-    private JPanel createSurprisesPanel() {
-        // Initialize Components Used in ActionListeners
-        final JPanel mysteryBoxPanel = new JDisableablePanel("mysteryBoxPanel");
-
-        // Create Panel Components
-        setChkGenerateSurprises(new JCheckBox(resources.getString("chkGenerateSurprises.text")));
-        getChkGenerateSurprises().setToolTipText(resources.getString("chkGenerateSurprises.toolTipText"));
-        getChkGenerateSurprises().setName("chkGenerateSurprises");
-        getChkGenerateSurprises().addActionListener(evt -> {
-            final boolean selected = getChkGenerateSurprises().isSelected();
-            getChkGenerateMysteryBoxes().setEnabled(selected);
-            mysteryBoxPanel.setEnabled(selected && getChkGenerateMysteryBoxes().isSelected());
-        });
-
-        setChkGenerateMysteryBoxes(new JCheckBox(resources.getString("chkGenerateMysteryBoxes.text")));
-        getChkGenerateMysteryBoxes().setToolTipText(resources.getString("chkGenerateMysteryBoxes.toolTipText"));
-        getChkGenerateMysteryBoxes().setName("chkGenerateMysteryBoxes");
-        getChkGenerateMysteryBoxes().addActionListener(evt -> mysteryBoxPanel.setEnabled(getChkGenerateMysteryBoxes().isSelected()));
-
-        createMysteryBoxPanel(mysteryBoxPanel);
-
-        // Disable Panel by Default
-        getChkGenerateSurprises().setSelected(true);
-        getChkGenerateSurprises().doClick();
-
-        // Layout the UI
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("surprisesPanel.title")));
-        panel.setToolTipText(resources.getString("surprisesPanel.toolTipText"));
-        panel.setName("surprisesPanel");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                                      .addComponent(getChkGenerateSurprises())
-                                      .addComponent(getChkGenerateMysteryBoxes())
-                                      .addComponent(mysteryBoxPanel));
-
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(getChkGenerateSurprises())
-                                        .addComponent(getChkGenerateMysteryBoxes())
-                                        .addComponent(mysteryBoxPanel));
-
-        // TODO : Wave 7 : Surprises
-        panel.setEnabled(false);
-        getChkGenerateSurprises().setEnabled(false);
-        getChkGenerateMysteryBoxes().setEnabled(false);
-        mysteryBoxPanel.setEnabled(false);
-
-        return panel;
-    }
-
-    private void createMysteryBoxPanel(final JPanel panel) {
-        // Create Panel
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("mysteryBoxPanel.title")));
-        panel.setToolTipText(resources.getString("mysteryBoxPanel.toolTipText"));
-        panel.setLayout(new GridLayout(0, 1));
-
-        // Create Panel Components
-        setChkGenerateMysteryBoxTypes(new HashMap<>());
-        for (final MysteryBoxType type : MysteryBoxType.values()) {
-            getChkGenerateMysteryBoxTypes().put(type, new JCheckBox(type.toString()));
-            getChkGenerateMysteryBoxTypes().get(type).setToolTipText(type.getToolTipText());
-            getChkGenerateMysteryBoxTypes().get(type).setName("chk" + type.name());
-            panel.add(getChkGenerateMysteryBoxTypes().get(type));
-        }
     }
     // endregion Initialization
 
@@ -2115,12 +1932,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         getSpnNumberReloadsPerWeapon().setValue(options.getNumberReloadsPerWeapon());
         getChkGenerateFractionalMachineGunAmmunition().setSelected(options.isGenerateFractionalMachineGunAmmunition());
 
-        // Contracts
-        if (getChkSelectStartingContract().isSelected() != options.isSelectStartingContract()) {
-            getChkSelectStartingContract().doClick();
-        }
-        getChkStartCourseToContractPlanet().setSelected(options.isStartCourseToContractPlanet());
-
         // Finances
         if (getChkProcessFinances().isSelected() != options.isProcessFinances()) {
             getChkProcessFinances().doClick();
@@ -2131,7 +1942,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         }
         getSpnRandomStartingCashDiceCount().setValue(options.getRandomStartingCashDiceCount());
         getSpnMinimumStartingFloat().setValue(options.getMinimumStartingFloat());
-        getChkIncludeInitialContractPayment().setSelected(options.isIncludeInitialContractPayment());
         getChkStartingLoan().setSelected(options.isStartingLoan());
         if (getChkPayForSetup().isSelected() != options.isPayForSetup()) {
             getChkPayForSetup().doClick();
@@ -2141,19 +1951,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         getChkPayForParts().setSelected(options.isPayForParts());
         getChkPayForArmour().setSelected(options.isPayForArmour());
         getChkPayForAmmunition().setSelected(options.isPayForAmmunition());
-
-        // Surprises
-        if (getChkGenerateSurprises().isSelected() != options.isGenerateSurprises()) {
-            getChkGenerateSurprises().doClick();
-        }
-
-        if (getChkGenerateMysteryBoxes().isSelected() != options.isGenerateMysteryBoxes()) {
-            getChkGenerateMysteryBoxes().doClick();
-        }
-
-        for (final Entry<MysteryBoxType, JCheckBox> entry : getChkGenerateMysteryBoxTypes().entrySet()) {
-            entry.getValue().setSelected(options.getGenerateMysteryBoxTypes().getOrDefault(entry.getKey(), false));
-        }
     }
 
     /**
@@ -2238,17 +2035,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         options.setNumberReloadsPerWeapon((Integer) getSpnNumberReloadsPerWeapon().getValue());
         options.setGenerateFractionalMachineGunAmmunition(getChkGenerateFractionalMachineGunAmmunition().isSelected());
 
-        // Contracts
-        options.setSelectStartingContract(getChkSelectStartingContract().isSelected());
-        options.setStartCourseToContractPlanet(getChkStartCourseToContractPlanet().isSelected());
-
         // Finances
         options.setProcessFinances(getChkProcessFinances().isSelected());
         options.setStartingCash((Integer) getSpnStartingCash().getValue());
         options.setRandomizeStartingCash(getChkRandomizeStartingCash().isSelected());
         options.setRandomStartingCashDiceCount((Integer) getSpnRandomStartingCashDiceCount().getValue());
         options.setMinimumStartingFloat((Integer) getSpnMinimumStartingFloat().getValue());
-        options.setIncludeInitialContractPayment(getChkIncludeInitialContractPayment().isSelected());
         options.setStartingLoan(getChkStartingLoan().isSelected());
         options.setPayForSetup(getChkPayForSetup().isSelected());
         options.setPayForPersonnel(getChkPayForPersonnel().isSelected());
@@ -2256,14 +2048,6 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         options.setPayForParts(getChkPayForParts().isSelected());
         options.setPayForArmour(getChkPayForArmour().isSelected());
         options.setPayForAmmunition(getChkPayForAmmunition().isSelected());
-
-        // Surprises
-        options.setGenerateSurprises(getChkGenerateSurprises().isSelected());
-        options.setGenerateMysteryBoxes(getChkGenerateMysteryBoxes().isSelected());
-        options.setGenerateMysteryBoxTypes(new HashMap<>());
-        for (final Entry<MysteryBoxType, JCheckBox> entry : getChkGenerateMysteryBoxTypes().entrySet()) {
-            options.getGenerateMysteryBoxTypes().put(entry.getKey(), entry.getValue().isSelected());
-        }
 
         return options;
     }
