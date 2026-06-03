@@ -785,7 +785,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
         add(createSparesPanel(), gbc);
 
         gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridx++;
         add(createFinancesPanel(), gbc);
     }
 
