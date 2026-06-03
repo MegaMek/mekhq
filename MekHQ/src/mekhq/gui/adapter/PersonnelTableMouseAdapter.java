@@ -487,6 +487,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_PREGNANCY: {
                 Stream.of(people)
+                      .filter(person -> person.getGender().isFemale())
                       .filter(person -> (getCampaign().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), person, false) == null))
                       .forEach(person -> {
@@ -3900,8 +3901,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               Person::setQuickTrainIgnore);
         addFlagMenuItem(menu, selected, "miSalvageSupervisor", null, Person::isSalvageSupervisor,
               Person::setSalvageSupervisor);
-        addFlagMenuItem(menu, selected, "miTryingToConceive", null, Person::isTryingToConceive,
-              Person::setTryingToConceive);
+        addFlagMenuItem(menu, selected, "miWantsChildren", null, Person::isWantsChildren,
+              Person::setWantsChildren);
         addFlagMenuItem(menu, selected, "neverAssignMaintenanceAutomatically", null,
               Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
@@ -4191,6 +4192,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected)
+                          .filter(p -> p.getGender().isFemale())
                           .anyMatch(p -> getCampaign().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), p, false) == null)) {
                     menuItem = new JMenuItem(resources.getString(oneSelected ?
