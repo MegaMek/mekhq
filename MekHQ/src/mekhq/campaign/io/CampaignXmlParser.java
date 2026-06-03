@@ -1669,16 +1669,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                       && stage != EducationStage.DROPPING_OUT) {
                 continue;
             }
-            if (person.hasLocation()) {
-                continue;
-            }
-
-            // Persons at campus (EDUCATION / GRADUATING / DROPPING_OUT) on old saves have no
-            // campus in the location tree. Reconnect them so getEduAcademySystem() works.
+            // Campus stages: Set the location's parent.
+            // This covers EDUCATION, GRADUATING, and DROPPING_OUT.
             if (stage == EducationStage.EDUCATION
                       || stage == EducationStage.GRADUATING
                       || stage == EducationStage.DROPPING_OUT) {
-                String systemId = person.getEduAcademySystem();
+                String systemId = resolveAcademySystemId(campaign, person);
                 if (systemId == null) {
                     continue;
                 }
@@ -1690,47 +1686,61 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            PlanetarySystem targetSystem;
-            if (stage == EducationStage.JOURNEY_TO_CAMPUS) {
-                String systemId = person.getEduAcademySystem();
-                if (systemId == null) {
-                    continue;
-                }
-                targetSystem = campaign.getSystemById(systemId);
-                if (targetSystem == null) {
-                    continue;
-                }
-                double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
-                CurrentLocation travelLoc = new CurrentLocation(targetSystem, transitTime);
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
-                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-                if (campusLoc != null) {
-                    travelLoc.setParent(campusLoc);
-                }
-                person.setParent(travelLoc);
-                campaign.addLocation(travelLoc);
-            } else {
-                String systemId = person.getEduAcademySystem();
-                if (systemId == null) {
-                    continue;
-                }
-                targetSystem = campaign.getSystemById(systemId);
-                if (targetSystem == null) {
-                    continue;
-                }
-                double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
-                CurrentLocation returnLoc = new CurrentLocation(targetSystem, transitTime);
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
-                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-                if (campusLoc != null) {
-                    returnLoc.setParent(campusLoc);
-                } else {
-                    returnLoc.setParent(campaign);
-                }
-                person.setParent(returnLoc);
-                campaign.addLocation(returnLoc);
+            // Journey stages: skip if already under a CurrentLocation — reconnectPersonsToTravelLocations
+            // already placed this person (post-refactor saves). Legacy saves have mainForcePersonnel as parent.
+            LocationNode parentNode = person.getLocationNode().getParent();
+            if (parentNode != null && parentNode.getLocatable() instanceof CurrentLocation) {
+                continue;
             }
+
+            String systemId = resolveAcademySystemId(campaign, person);
+            if (systemId == null) {
+                continue;
+            }
+            PlanetarySystem targetSystem = campaign.getSystemById(systemId);
+            if (targetSystem == null) {
+                continue;
+            }
+            double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
+            CurrentLocation travelLoc = new CurrentLocation(targetSystem, transitTime);
+            AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                  person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+            if (campusLoc != null) {
+                travelLoc.setParent(campusLoc);
+            } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
+                travelLoc.setParent(campaign);
+            }
+            person.setParent(travelLoc);
+            campaign.addLocation(travelLoc);
         }
+    }
+
+    /**
+     * Resolves the planetary system ID for a person's academy attendance.
+     *
+     * <p>Tries the location-tree-aware method first (works for new saves where the person is
+     * already under an {@link AcademyCampusLocation}, or when {@code legacyEduAcademySystem} was populated from an
+     * {@code <eduAcademySystem>} XML tag). Falls back to parsing the system name from the trailing {@code (SystemName)}
+     * in {@code eduAcademyName}, which is the format written by enrollment for non-local, non-homeschool
+     * academies.</p>
+     */
+    private static @Nullable String resolveAcademySystemId(Campaign campaign, Person person) {
+        String systemId = person.getEduAcademySystem();
+        if (systemId != null) {
+            return systemId;
+        }
+        String academyName = person.getEduAcademyName();
+        if (academyName == null || academyName.isBlank()) {
+            return null;
+        }
+        int lastOpen = academyName.lastIndexOf('(');
+        int lastClose = academyName.lastIndexOf(')');
+        if (lastOpen < 0 || lastClose <= lastOpen) {
+            return null;
+        }
+        String systemName = academyName.substring(lastOpen + 1, lastClose).trim();
+        PlanetarySystem system = campaign.getSystemByName(systemName);
+        return system != null ? system.getId() : null;
     }
 
     private static void processSkillTypeNodes(Node wn, Version version) {

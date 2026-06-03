@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.Version;
 import megamek.common.TechConstants;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
@@ -1722,6 +1723,7 @@ public class PersonTest {
             when(faction.getShortName()).thenReturn("MERC");
             when(campaign.getFaction()).thenReturn(faction);
             when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+            when(campaign.getVersion()).thenReturn(new Version(0, 51, 1));
 
             return Person.generateInstanceFromXML(
                   doc.getDocumentElement(), campaign, new megamek.Version("0.51.0"));
