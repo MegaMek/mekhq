@@ -40,6 +40,7 @@ public enum PersonnelTabView {
     //region Enum Declarations
     GRAPHIC("PersonnelTabView.GRAPHIC.text", "PersonnelTabView.GRAPHIC.toolTipText"),
     GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText"),
+    COMBAT("PersonnelTabView.COMBAT.text", "PersonnelTabView.COMBAT.toolTipText"),
     GUNNERY_PILOT_SKILLS("PersonnelTabView.GUNNERY_PILOT_SKILLS.text",
           "PersonnelTabView.GUNNERY_PILOT_SKILLS.toolTipText"),
     GUNNERY_PILOT_SKILLS_II("PersonnelTabView.GUNNERY_PILOT_SKILLS_II.text",

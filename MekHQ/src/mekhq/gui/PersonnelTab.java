@@ -39,6 +39,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -79,6 +80,7 @@ import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.QuickTrainDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
@@ -102,7 +104,6 @@ public final class PersonnelTab extends CampaignGuiTab {
     private MMComboBox<PersonnelTabView> choicePersonView;
     private JScrollPane scrollPersonnelView;
     private JCheckBox chkGroupByUnit;
-    private RoundedJButton btnQuickTrain;
 
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
@@ -217,28 +218,37 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
 
-        btnQuickTrain = new RoundedJButton(resourceMap.getString("btnQuickTrain.text"));
+        // Action buttons: Quick, and Mass training
+        RoundedJButton btnQuickTrain = new RoundedJButton(resourceMap.getString("btnQuickTrain.text"));
         btnQuickTrain.setToolTipText(resourceMap.getString("btnQuickTrain.toolTipText"));
         btnQuickTrain.addActionListener(e -> {
             List<Person> selectedPersons = getSelectedPersons();
-            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty());
+            QuickTrain.QuickTrainOptions options = QuickTrain.QuickTrainOptions.buildQuickTrainOptions(
+                  getCampaignOptions());
+            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty(), options);
             if (!dialog.isCancel()) {
                 int targetSkillLevel = dialog.getSpinnerValue();
+                options = dialog.getSelectedOptions();
+
                 QuickTrain.processQuickTraining(selectedPersons,
                       targetSkillLevel,
                       getCampaign(),
+                      options,
                       dialog.isContinuousTraining());
             }
         });
+        RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
+        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
+        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+
+        // Group action buttons
+        JPanel panActions = new JPanel(new GridLayout(1, 2, 5, 0));
+        panActions.add(btnQuickTrain);
+        panActions.add(btnMassTraining);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(btnQuickTrain, gridBagConstraints);
+        add(panActions, gridBagConstraints);
 
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);

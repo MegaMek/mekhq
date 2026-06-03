@@ -314,6 +314,10 @@ public class Injury {
         return type.getSubType();
     }
 
+    public boolean isDisease() {
+        return type.getSubType().isDisease();
+    }
+
     public Collection<Modifier> getModifiers() {
         return type.getModifiers(this);
     }

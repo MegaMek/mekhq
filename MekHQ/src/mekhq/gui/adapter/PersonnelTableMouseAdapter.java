@@ -33,7 +33,6 @@
 package mekhq.gui.adapter;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.compute.Compute.d6;
@@ -57,7 +56,6 @@ import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLA
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ARTILLERY;
@@ -489,6 +487,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_PREGNANCY: {
                 Stream.of(people)
+                      .filter(person -> person.getGender().isFemale())
                       .filter(person -> (getCampaign().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), person, false) == null))
                       .forEach(person -> {
@@ -985,6 +984,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Person person : people) {
                     if (person.getPrisonerStatus().isPrisonerDefector()) {
                         person.setPrisonerStatus(getCampaign(), PrisonerStatus.FREE, true);
+
+                        // You need to set the prisoner-defector to ACTIVE, otherwise they will be recruited as a
+                        // Camp Follower.
+                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
                     }
                 }
                 break;
@@ -1622,6 +1625,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       getCampaign(),
                       selectedPerson);
                 editPersonnelInjuriesDialog.setVisible(true);
+
+                boolean isUseAdvancedMedical = getCampaignOptions().isUseAdvancedMedical();
+                int healingPeriod = getCampaignOptions().getNaturalHealingWaitingPeriod();
+
+                selectedPerson.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                      healingPeriod);
+
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
@@ -3330,7 +3340,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(attribute),
                       String.valueOf(attributeCost)));
                 menuItem.addActionListener(this);
-                int attributeCap = min(person.getPhenotype().getAttributeCap(attribute), MAXIMUM_ATTRIBUTE_SCORE);
+                int attributeCap = person.getAttributeCap(attribute);
                 menuItem.setEnabled(target <= attributeCap && person.getXP() >= attributeCost);
                 attributesMenuIncrease.add(menuItem);
             }
@@ -3891,8 +3901,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               Person::setQuickTrainIgnore);
         addFlagMenuItem(menu, selected, "miSalvageSupervisor", null, Person::isSalvageSupervisor,
               Person::setSalvageSupervisor);
-        addFlagMenuItem(menu, selected, "miTryingToConceive", null, Person::isTryingToConceive,
-              Person::setTryingToConceive);
+        addFlagMenuItem(menu, selected, "miWantsChildren", null, Person::isWantsChildren,
+              Person::setWantsChildren);
         addFlagMenuItem(menu, selected, "neverAssignMaintenanceAutomatically", null,
               Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
@@ -4182,6 +4192,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected)
+                          .filter(p -> p.getGender().isFemale())
                           .anyMatch(p -> getCampaign().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), p, false) == null)) {
                     menuItem = new JMenuItem(resources.getString(oneSelected ?

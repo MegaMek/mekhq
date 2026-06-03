@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,7 +48,6 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -133,7 +132,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         // set SPAs
         if (expLvl >= EXP_ULTRA_GREEN) {
             AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+            specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
             specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
         }
 
@@ -145,7 +144,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
               campaignOptions.getInterestedInSameSexDiceSize(), campaignOptions.getInterestedInBothSexesDiceSize());
 
         int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
-        person.setTryingToConceive(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
+        person.setWantsChildren(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);

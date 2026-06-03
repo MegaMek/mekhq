@@ -60,6 +60,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getManualUnitRatingModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clampReputationPayMultiplier",
               campaignOptions.isClampReputationPayMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requireSupportForceTransportation",
+              campaignOptions.isRequireSupportForceTransportation());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "reduceReputationPerformanceModifier",
@@ -1166,6 +1168,9 @@ public class CampaignOptionsMarshaller {
               "useAdvancedBuildingGunEmplacements",
               campaignOptions.isUseAdvancedBuildingGunEmplacements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reinforcementBaseTargetNumber",
+              campaignOptions.getReinforcementBaseTargetNumber());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clansObeyBiddingRules", campaignOptions.isClansObeyBiddingRules());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alliedFacilityModifierDieSize",
               campaignOptions.getAlliedFacilityModifierDieSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyFacilityModifierDieSize",

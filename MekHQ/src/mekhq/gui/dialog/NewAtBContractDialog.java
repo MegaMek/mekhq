@@ -34,12 +34,15 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -49,6 +52,7 @@ import javax.swing.*;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -75,6 +79,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
  */
 public class NewAtBContractDialog extends NewContractDialog {
     private static final MMLogger LOGGER = MMLogger.create(NewAtBContractDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.NewContractDialog";
 
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
@@ -533,24 +538,38 @@ public class NewAtBContractDialog extends NewContractDialog {
             return;
         }
 
+        String missingFieldTitle = getTextAt(RESOURCE_BUNDLE,
+              "NewAtBContractDialog.newContract.ContractMissingField.title");
         if (getCurrentEmployerCode() == null) {
             JOptionPane.showMessageDialog(rootPane,
-                  "Make sure you set Employer!",
-                  "Contract is Missing Field",
+                  getTextAt(RESOURCE_BUNDLE, "NewAtBContractDialog.newContract.MissingEmployer.text"),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
         if (getCurrentEnemyCode() == null) {
             JOptionPane.showMessageDialog(rootPane,
-                  "Make sure you set Enemy!",
-                  "Contract is Missing Field",
+                  getTextAt(RESOURCE_BUNDLE, "NewAtBContractDialog.newContract.MissingEnemy.text"),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (cbPlanets.getSelectedItem() == null) {
+        String planetName = getSelectedPlanetName();
+        if (planetName.isEmpty()) {
             JOptionPane.showMessageDialog(rootPane,
-                  "Make sure you set the Planet!",
-                  "Contract is Missing Field",
+                  getTextAt(RESOURCE_BUNDLE, "NewAtBContractDialog.newContract.MissingPlanet.text"),
+                  missingFieldTitle,
+                  JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        PlanetarySystem selectedSystem = resolvePlanetName(planetName, campaign.getLocalDate(),
+              Systems.getInstance());
+        if (selectedSystem == null) {
+            JOptionPane.showMessageDialog(rootPane,
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "NewAtBContractDialog.newContract.UnknownSystem.text",
+                        planetName),
+                  missingFieldTitle,
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -558,11 +577,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract) this.contract;
 
         contract.setName(txtName.getText());
-        if (!chkShowAllPlanets.isSelected()) {
-            contract.setSystemId((Systems.getInstance()
-                                        .getSystemByName((String) cbPlanets.getSelectedItem(),
-                                              campaign.getLocalDate())).getId());
-        }
+        contract.setSystemId(selectedSystem.getId());
         contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
         contract.setDesc(txtDesc.getText());
@@ -680,5 +695,32 @@ public class NewAtBContractDialog extends NewContractDialog {
         super.doUpdateContract(source);
 
         addAllListeners();
+    }
+
+    /**
+     * Returns the planet/system name from whichever planet-entry widget is currently active.
+     *
+     * <p>When "Show All Planets" is selected, the user types into {@code suggestPlanet}; otherwise they pick from
+     * {@code cbPlanets}. The previous implementation only consulted {@code cbPlanets}, which produced spurious "Make
+     * sure you set the Planet!" warnings whenever the user populated the suggest-field via "Show All Planets" or when
+     * {@code cbPlanets} had no options for a planetless faction (see issues #5445 and #8547).</p>
+     *
+     * @return the trimmed planet/system name, or an empty string if no selection is present
+     */
+    private String getSelectedPlanetName() {
+        if (chkShowAllPlanets.isSelected()) {
+            String text = suggestPlanet.getText();
+            return text == null ? "" : text.trim();
+        }
+        Object selected = cbPlanets.getSelectedItem();
+        return selected == null ? "" : selected.toString().trim();
+    }
+
+    static @Nullable PlanetarySystem resolvePlanetName(String planetName, LocalDate date, Systems systems) {
+        if (planetName == null || planetName.isEmpty()) {
+            return null;
+        }
+
+        return systems.getSystemByName(planetName, date);
     }
 }

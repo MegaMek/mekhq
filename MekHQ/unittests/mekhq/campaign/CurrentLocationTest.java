@@ -39,10 +39,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,13 +60,22 @@ import java.util.List;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.Collections;
 
 import mekhq.campaign.personnel.Person;
+import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Node;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 
 public class CurrentLocationTest {
 
@@ -169,8 +183,22 @@ public class CurrentLocationTest {
         @Test
         void setTransitTime_updatesValue() {
             CurrentLocation loc = new CurrentLocation(system, 0.0);
-            loc.setTransitTime(7.0);
-            assertEquals(7.0, loc.getTransitTime(), 1e-9);
+            assertTrue(loc.isOnPlanet());
+            assertFalse(loc.isAtJumpPoint());
+            assertFalse(loc.isInTransit());
+            assertEquals(1.0, loc.getPercentageTransit());
+
+            loc.setTransitTime(TIME_TO_JP / 2); // 50% of getTimeToJumpPoint
+            assertFalse(loc.isOnPlanet());
+            assertFalse(loc.isAtJumpPoint());
+            assertTrue(loc.isInTransit());
+            assertEquals(5.0, loc.getTransitTime(), 1e-9);
+
+            loc.setTransitTime(TIME_TO_JP);// 100% of getTimeToJumpPoint
+            assertFalse(loc.isOnPlanet());
+            assertTrue(loc.isAtJumpPoint());
+            assertFalse(loc.isInTransit());
+            assertEquals(0.0, loc.getPercentageTransit(), 1e-9);
         }
 
         @Test
@@ -199,8 +227,11 @@ public class CurrentLocationTest {
         void setJumpPath_updatesValue() {
             CurrentLocation loc = new CurrentLocation(system, 0.0);
             JumpPath path = mock(JumpPath.class);
-            loc.setJumpPath(path);
-            assertSame(path, loc.getJumpPath());
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(path);
+                assertSame(path, loc.getJumpPath());
+                mekHQ.verify(() -> MekHQ.triggerEvent(any()), times(1));
+            }
         }
     }
 
@@ -218,6 +249,7 @@ public class CurrentLocationTest {
             today = LocalDate.of(3025, 1, 1);
             campaign = mock(Campaign.class);
             when(system.getRechargeTime(today, false)).thenReturn(176.0);
+            when(campaign.getLocalDate()).thenReturn(today);
         }
 
         @Test
@@ -236,6 +268,26 @@ public class CurrentLocationTest {
             loc.applyRechargeForHours(campaign, today, false, 24.0, false);
             // Two reports: spending hours + fully charged
             verify(campaign, times(2)).addReport(eq(GENERAL), anyString());
+        }
+
+        @Test
+        void testChargeFully() {
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.chargeFully(campaign);
+                assertEquals(176.0, loc.getRechargeTime());
+                mekHQ.verify(() -> MekHQ.triggerEvent(any()), times(1));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
+            }
+        }
+
+        @Test
+        void testIsRecharging() {
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            when(campaign.isUseCommandCircuit()).thenReturn(false);
+            assertTrue(loc.isRecharging(campaign));
+            when(system.getRechargeTime(today, false)).thenReturn(0.0);
+            assertFalse(loc.isRecharging(campaign));
         }
     }
 
@@ -285,6 +337,136 @@ public class CurrentLocationTest {
             assertFalse(baos.toString().contains("jumpPath"));
         }
     }
+
+
+    /**
+     * Tests for {@link CurrentLocation#newDay(Campaign)}
+     */
+    @Nested
+    class NewDay {
+
+        final LocalDate today = LocalDate.of(2474, 11, 1);
+        CurrentLocation currentLocation;
+        Campaign campaign;
+
+        @BeforeEach
+        void setUp() {
+            when(system.getPrimaryPlanet()).thenReturn(new Planet());
+            when(system.getPrintableName(today)).thenReturn("Test");
+            when(system.getRechargeTime(today, false)).thenReturn(176.0);
+
+            campaign = mock(Campaign.class);
+            when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            when(campaign.getLocalDate()).thenReturn(today);
+            when(campaign.isUseCommandCircuit()).thenReturn(false);
+            when(campaign.getAutomatedMothballUnits()).thenReturn(Collections.emptyList());
+            when(campaign.getFutureContracts()).thenReturn(Collections.emptyList());
+
+            currentLocation = new CurrentLocation(system, 0.0);
+        }
+
+        @Test
+        void testNewDayNoTransitRecharge() {
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                currentLocation.newDay(campaign);
+                assertEquals(24.0, currentLocation.getRechargeTime());
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("recharging drives"));
+                for (int i = 0; i < 9; i++) {
+                    currentLocation.newDay(campaign);
+                }
+                assertEquals(176.0, currentLocation.getRechargeTime()); // do not charge past maximum
+                mekHQ.verify(() -> MekHQ.triggerEvent(any()), never());
+            }
+        }
+
+        @Test
+        void testNewDayTransitToJumpPoint() {
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(jumpPath.size()).thenReturn(2);
+            when(jumpPath.isEmpty()).thenReturn(false);
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(2.5);
+
+            assertEquals(0.0, currentLocation.getTransitTime());
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                currentLocation.setJumpPath(jumpPath);
+                mekHQ.clearInvocations();
+
+                currentLocation.newDay(campaign);
+
+                assertEquals(1.0, currentLocation.getTransitTime());
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("hours in transit"));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
+
+                currentLocation.newDay(campaign);
+                assertEquals(2.0, currentLocation.getTransitTime());
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(2));
+                currentLocation.newDay(campaign);
+                assertEquals(2.5, currentLocation.getTransitTime()); // limited by getTimeToJumpPoint
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(3));
+
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(LocationChangedEvent.class)), never());
+            }
+        }
+
+        @Test
+        void testNewDayJumpToNextSystem() {
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(2.5);
+            PlanetarySystem nextSystem = mock(PlanetarySystem.class);
+            when(nextSystem.getTimeToJumpPoint(1.0)).thenReturn(4.0);
+            when(nextSystem.getPrintableName(today)).thenReturn("Next-System");
+
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(jumpPath.size()).thenReturn(2);
+            when(jumpPath.isEmpty()).thenReturn(false);
+            when(jumpPath.get(1)).thenReturn(nextSystem);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                // get ready for the jump
+                currentLocation.setJumpPath(jumpPath);
+                currentLocation.chargeFully(campaign);
+                mekHQ.clearInvocations();
+                currentLocation.setTransitTime(2.0); // (2.5 - 2) days of transit remaining
+
+                currentLocation.newDay(campaign);
+
+                // verify the jump
+                verify(jumpPath).removeFirstSystem();
+                assertEquals(nextSystem, currentLocation.getCurrentSystem());
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(LocationChangedEvent.class)), times(1));
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("Jumping to Next-System"));
+
+                // verify transit status change
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
+                assertEquals(4.0, currentLocation.getTransitTime());
+                // only 12 hours because we were 0.5 days from the jump point
+                assertEquals(12.0, currentLocation.getRechargeTime());
+            }
+        }
+
+        @Test
+        void testNewDayTransitToPlanet() {
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(jumpPath.size()).thenReturn(1);
+            when(jumpPath.isEmpty()).thenReturn(false);
+            when(jumpPath.getLastSystem()).thenReturn(system);
+            currentLocation.setTransitTime(0.5); // 12 hours from the planet
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                currentLocation.setJumpPath(jumpPath);
+                mekHQ.clearInvocations();
+
+                currentLocation.newDay(campaign);
+
+                assertEquals(0.0, currentLocation.getTransitTime());
+                assertNull(currentLocation.getJumpPath());
+                assertTrue(currentLocation.isOnPlanet());
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("Test reached."));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(LocationChangedEvent.class)), never());
+            }
+        }
+    }
+
 
     @Nested
     class PersonChildSerialization {

@@ -35,6 +35,7 @@ package mekhq.campaign.mission.camOpsSalvage;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
@@ -86,6 +87,7 @@ import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
+import org.jspecify.annotations.NonNull;
 
 public class CamOpsSalvageUtilities {
     private static final MMLogger LOGGER = MMLogger.create(CamOpsSalvageUtilities.class);
@@ -359,61 +361,27 @@ public class CamOpsSalvageUtilities {
         final int fatigueRate = campaignOptions.getFatigueRate();
         final boolean useInjuryFatigue = campaignOptions.isUseInjuryFatigue();
 
-        int injuryEvents = 0;
-        for (int i = 0; i < numberOfSalvagedUnits; i++) {
-            int roll = d6(2);
-            if (roll == 2) {
-                injuryEvents++;
-            }
-        }
+        int injuryEvents = getInjuryEventsCount(numberOfSalvagedUnits);
 
-        List<Person> techs = new ArrayList<>();
-        for (UUID uuid : techUUIDs) {
-            Person tech = campaign.getPerson(uuid);
-            if (tech == null) {
-                LOGGER.error("null tech was passed into risky salvage");
-                continue;
-            }
-
-            techs.add(tech);
-        }
+        List<Person> techs = getValidTechs(campaign, techUUIDs);
 
         boolean didAccidentOccur = false;
         for (int i = 0; i < injuryEvents; i++) {
-            if (techUUIDs.isEmpty()) {
+            if (techs.isEmpty()) {
                 break;
             }
+
             Person victim = ObjectUtility.getRandomItem(techs);
 
-            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0) {
-                if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS)) {
-                    campaign.addReport(PERSONNEL,
-                          getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
-                                victim.getHyperlinkedName()));
-                    victim.changeCurrentEdge(-1);
-
-                    int roll = d6(2);
-                    if (roll != 2) {
-                        continue;
-                    }
+            if (campaignOptions.isUseEdge() && campaignOptions.isUseSupportEdge() && victim.getCurrentEdge() > 0) {
+                if (performEdgeReroll(campaign, victim)) {
+                    continue;
                 }
             }
 
-            int newHits = d6(1);
+            injuryVictim(campaign, victim, useInjuryFatigue, fatigueRate, isUseAdvancedMedical);
 
-            newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
-
-            if (isUseAdvancedMedical) {
-                InjuryUtil.resolveCombatDamage(campaign, victim, newHits);
-            } else {
-                int priorHits = victim.getHits();
-                victim.setHits(priorHits + newHits);
-            }
-
-            if (victim.getInjuries().size() > 5 || victim.getHits() > 5) {
-                victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
-                techs.remove(victim); // We're nice enough that we only kill each tech once
-            }
+            testForDeath(campaign, victim, techs);
 
             MekHQ.triggerEvent(new PersonChangedEvent(victim));
             didAccidentOccur = true;
@@ -424,6 +392,65 @@ public class CamOpsSalvageUtilities {
                   getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident",
                         spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
         }
+    }
+
+    private static void testForDeath(Campaign campaign, Person victim, List<Person> techs) {
+        if (victim.getTotalInjurySeverity() >= DEATH) {
+            victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
+            techs.remove(victim); // We're nice enough that we only kill each tech once
+        }
+    }
+
+    private static void injuryVictim(Campaign campaign, Person victim, boolean useInjuryFatigue, int fatigueRate,
+          boolean isUseAdvancedMedical) {
+        int newHits = d6(1);
+        newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
+
+        if (isUseAdvancedMedical) {
+            InjuryUtil.resolveCombatDamage(campaign, victim, newHits);
+        } else {
+            int priorHits = victim.getHits();
+            victim.setHits(priorHits + newHits);
+        }
+    }
+
+    private static boolean performEdgeReroll(Campaign campaign, Person victim) {
+        if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS)) {
+            campaign.addReport(PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
+                        victim.getHyperlinkedName()));
+            victim.changeCurrentEdge(-1);
+
+            int roll = d6(2);
+            return roll != 2;
+        }
+
+        return false;
+    }
+
+    private static @NonNull List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
+        List<Person> techs = new ArrayList<>();
+        for (UUID uuid : techUUIDs) {
+            Person tech = campaign.getPerson(uuid);
+            if (tech == null) {
+                LOGGER.error("null tech was passed into risky salvage");
+                continue;
+            }
+
+            techs.add(tech);
+        }
+        return techs;
+    }
+
+    private static int getInjuryEventsCount(int numberOfSalvagedUnits) {
+        int injuryEvents = 0;
+        for (int i = 0; i < numberOfSalvagedUnits; i++) {
+            int roll = d6(2);
+            if (roll == 2) {
+                injuryEvents++;
+            }
+        }
+        return injuryEvents;
     }
 
     /**

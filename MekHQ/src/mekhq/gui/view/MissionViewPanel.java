@@ -33,31 +33,21 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -65,8 +55,8 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -80,7 +70,6 @@ public class MissionViewPanel extends JScrollablePanel {
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
-    protected JPanel pnlTutorial;
     protected JTextPane txtDesc;
 
     /* Basic Mission Parameters */
@@ -108,70 +97,66 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtSalvageValueMerc;
     private JLabel lblSalvageValueEmployer;
     private JLabel txtSalvageValueEmployer;
-
-    protected JTable scenarioTable;
+    private JLabel txtDeploymentCoverage;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
+    public MissionViewPanel(Mission m, CampaignGUI gui) {
         super();
         this.mission = m;
-        this.scenarioTable = scenarioTable;
         this.gui = gui;
         initComponents();
+    }
+
+    /**
+     * Recomputes and updates the Deployment Coverage label so it reflects the current assignment state without needing
+     * to rebuild the whole panel. Has no effect when the panel does not display a deployment coverage value (e.g. for
+     * non-AtB contracts, when StratCon is disabled, or when the contract is not currently active).
+     */
+    public void updateDeploymentCoverage() {
+        if ((txtDeploymentCoverage == null) || !(mission instanceof AtBContract contract)) {
+            return;
+        }
+
+        Campaign campaign = gui.getCampaign();
+        if (!campaign.getCampaignOptions().isUseStratCon() || !contract.isActiveOn(campaign.getLocalDate())) {
+            return;
+        }
+
+        int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, contract);
+        int requiredCombatElements = contract.getRequiredCombatElements();
+        txtDeploymentCoverage.setText(assignedCombatElements + " / " + requiredCombatElements);
+        if (RequiredLancesTableModel.hasDeploymentShortfall(campaign, contract)) {
+            txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+        } else {
+            txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getFontColorPositive());
+        }
     }
 
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
+        JPanel statsSection = BriefingStyle.createSectionPanel(mission.getName());
         pnlStats = new JPanel();
-        pnlTutorial = new JPanel();
         txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
 
-        pnlStats.setMaximumSize(UIUtil.scaleForGUI(200, Integer.MAX_VALUE));
+        statsSection.setMaximumSize(UIUtil.scaleForGUI(200, Integer.MAX_VALUE));
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
         fillStats();
+        statsSection.add(pnlStats, BorderLayout.CENTER);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(pnlStats, gridBagConstraints);
-
-        if (mission instanceof AtBContract) {
-            pnlStats.setName("pnlTutorial");
-            pnlStats.setBorder(RoundedLineBorder.createRoundedLineBorder(mission.getName()));
-            fillTutorial();
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.weightx = 2.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlTutorial, gridBagConstraints);
-        }
-
-        JScrollPane scrollScenarioTable = new FastJScrollPane(scenarioTable);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 10, 10, 10);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 2;
-        add(scrollScenarioTable, gridBagConstraints);
+        add(statsSection, gridBagConstraints);
     }
 
     private void fillStats() {
@@ -262,20 +247,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtType, gridBagConstraints);
         }
 
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(false);
-        txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(mission.getDescription()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtDesc, gridBagConstraints);
+        addDescriptionPane(mission.getDescription(), 3);
     }
 
     private void fillStatsContract() {
@@ -570,20 +542,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
         i++;
-        txtDesc.setName("txtDesc");
-        txtDesc.setEditable(false);
-        txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = i;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtDesc, gridBagConstraints);
+        addDescriptionPane(contract.getDescription(), i);
 
     }
 
@@ -623,6 +582,8 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel txtSharePct = new JLabel();
         JLabel lblCargoRequirement = new JLabel();
         JLabel txtCargoRequirement = new JLabel();
+        JLabel lblDeploymentCoverage = new JLabel();
+        txtDeploymentCoverage = new JLabel();
         JLabel lblScore = new JLabel();
         JLabel txtScore = new JLabel();
         JLabel lblSupportPoints = new JLabel();
@@ -1036,6 +997,38 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtCargoRequirement, gridBagConstraints);
 
+            if (contract.isActiveOn(campaign.getLocalDate())) {
+                String deploymentCoverageTooltip = wordWrap(resourceMap.getString("txtDeploymentCoverage.tooltip"));
+                lblDeploymentCoverage.setName("lblDeploymentCoverage");
+                lblDeploymentCoverage.setText(resourceMap.getString("lblDeploymentCoverage.text"));
+                lblDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblDeploymentCoverage, gridBagConstraints);
+
+                int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, contract);
+                int requiredCombatElements = contract.getRequiredCombatElements();
+                txtDeploymentCoverage.setName("txtDeploymentCoverage");
+                txtDeploymentCoverage.setText(assignedCombatElements + " / " + requiredCombatElements);
+                txtDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
+                if (RequiredLancesTableModel.hasDeploymentShortfall(campaign, contract)) {
+                    txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+                } else {
+                    txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getFontColorPositive());
+                }
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = y++;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(txtDeploymentCoverage, gridBagConstraints);
+            }
+
             lblScore.setName("lblScore");
             lblScore.setText(resourceMap.getString("lblScore.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1084,13 +1077,22 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtSupport, gridBagConstraints);
         }
 
+        addDescriptionPane(contract.getDescription(), y);
+    }
+
+    private void addDescriptionPane(String description, int gridY) {
+        if ((description == null) || description.isBlank()) {
+            return;
+        }
+
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        txtDesc.setText(MarkdownRenderer.getRenderedHtml(contract.getDescription()));
-        gridBagConstraints = new GridBagConstraints();
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(description));
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -1100,46 +1102,4 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtDesc, gridBagConstraints);
     }
 
-    /**
-     * Initializes and populates the tutorial panel with formatted HTML content inside a {@link JEditorPane}, applies
-     * font scaling and styling, wraps the editor in a scroll pane with appropriate padding, and adds it to the main
-     * tutorial panel with a visual border and size constraints.
-     *
-     * <p>The content is sourced from a resource bundle and displayed using an HTML/CSS styled {@code JEditorPane}
-     * for enhanced presentation.</p>
-     *
-     * <p>The method ensures the scroll position starts at the top of the content.</p>
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private void fillTutorial() {
-        JEditorPane editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setFocusable(false);
-        editorPane.setBorder(BorderFactory.createEmptyBorder());
-
-        String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format("<div style='width: %s; %s padding:%spx;'>%s</div>",
-              scaleForGUI(590),
-              fontStyle,
-              scaleForGUI(5),
-              resourceMap.getString("txtStratConTutorial.text")));
-        setFontScaling(editorPane, false, 1.1);
-
-        JScrollPane scrollPane = new JScrollPane(editorPane);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
-
-        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
-        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
-
-        pnlTutorial = new JPanel(new BorderLayout());
-
-        pnlTutorial.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        pnlTutorial.setPreferredSize(new Dimension(600, 0));
-        pnlTutorial.setMinimumSize(new Dimension(600, 0));
-        pnlTutorial.add(scrollPane, BorderLayout.CENTER);
-    }
 }

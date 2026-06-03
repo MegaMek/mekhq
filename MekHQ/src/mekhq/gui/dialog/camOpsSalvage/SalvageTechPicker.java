@@ -56,13 +56,16 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.camOpsSalvage.SalvageTechData;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.sorter.LevelSorter;
@@ -91,6 +94,7 @@ public class SalvageTechPicker extends JDialog {
 
     private boolean wasConfirmed;
     private final SalvageTechTableModel tableModel;
+    private static boolean isUseEdge = true;
 
     /**
      * Checks whether the user confirmed their tech selection.
@@ -127,18 +131,22 @@ public class SalvageTechPicker extends JDialog {
      *                             instructions and a Cancel button are shown.
      * @param alreadySelectedTechs list of tech UUIDs that should start as pre-selected.
      * @param isClanCampaign       {@code true} if the campaign is Clan affiliated
+     * @param fieldControl         who controls the field at the end of the scenario
+     * @param isUseEdge            determines if the Edge column should be visible or not
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign) {
+    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign,
+          ScenarioTemplate.BattlefieldControlType fieldControl, boolean isUseEdge) {
+        SalvageTechPicker.isUseEdge = isUseEdge;
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
 
         // Instructions at the top
         JPanel instructionsPanel = new JPanel(new BorderLayout());
-        JTextArea instructionsLabel = new JTextArea(getInstructions());
+        JTextArea instructionsLabel = new JTextArea(getInstructions(fieldControl));
         instructionsLabel.setLineWrap(true);
         instructionsLabel.setWrapStyleWord(true);
         instructionsLabel.setEditable(false);
@@ -241,6 +249,16 @@ public class SalvageTechPicker extends JDialog {
               .setPreferredWidth(WIDTH_100);
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_UNITS)
               .setPreferredWidth(WIDTH_40);
+        if (isUseEdge) {
+            table.getColumnModel().getColumn(SalvageTechTableModel.COL_EDGE)
+                  .setPreferredWidth(WIDTH_40);
+        } else {
+            //hide this column when edge is not in use by setting all widths to zero
+            TableColumn columnToHide = table.getColumnModel().getColumn(SalvageTechTableModel.COL_EDGE);
+            columnToHide.setMinWidth(0);
+            columnToHide.setMaxWidth(0);
+            columnToHide.setPreferredWidth(0);
+        }
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_SKILL_LEVEL)
               .setPreferredWidth(WIDTH_60);
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_INJURIES)
@@ -307,6 +325,8 @@ public class SalvageTechPicker extends JDialog {
                   new NaturalOrderComparator());
             sorter.setComparator(SalvageTechTableModel.COL_SECONDARY_PROFESSION,
                   new NaturalOrderComparator());
+            sorter.setComparator(SalvageTechTableModel.COL_EDGE,
+                  Comparator.comparingInt(i -> ((int) i)));
             sorter.setComparator(SalvageTechTableModel.COL_INJURIES,
                   Comparator.comparingInt(i -> ((int) i)));
             sorter.setComparator(SalvageTechTableModel.COL_UNITS,
@@ -325,13 +345,25 @@ public class SalvageTechPicker extends JDialog {
     /**
      * Localized instructional text for the dialog header.
      *
+     * @param fieldControl the field control type to use for the instructions text
+     *
      * @return the localized instructions string
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getInstructions() {
-        return getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.instructions");
+    private static String getInstructions(@Nullable ScenarioTemplate.BattlefieldControlType fieldControl) {
+        String instructions = getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.instructions");
+
+        if (fieldControl != null) {
+            String controlText = getText("ResolveDialog.control." + fieldControl.name());
+
+            return instructions + ' ' + controlText;
+        }
+
+        String unknownFieldControlText = getTextAt(RESOURCE_BUNDLE,
+              "SalvageTechPicker.instructions.fieldControlUnknown");
+        return instructions + ' ' + unknownFieldControlText;
     }
 
     /**
@@ -382,12 +414,14 @@ public class SalvageTechPicker extends JDialog {
         private static final int COL_PRIMARY_PROFESSION = 5;
         /** Column index for secondary profession. */
         private static final int COL_SECONDARY_PROFESSION = 6;
+        /** Column index for current/total edge. */
+        private static final int COL_EDGE = 7;
         /** Column index for maintained unit count. */
-        private static final int COL_UNITS = 7;
+        private static final int COL_UNITS = 8;
         /** Column index for injury count. */
-        private static final int COL_INJURIES = 8;
+        private static final int COL_INJURIES = 9;
         /** Column index for available minutes. */
-        private static final int COL_MINUTES_AVAILABLE = 9;
+        private static final int COL_MINUTES_AVAILABLE = 10;
 
         private final List<SalvageTechData> techs;
         private final boolean[] selected;
@@ -401,6 +435,7 @@ public class SalvageTechPicker extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.skill"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.profession.primary"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.profession.secondary"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.edge"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.techUnits"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.injuries"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.minutes")
@@ -452,7 +487,7 @@ public class SalvageTechPicker extends JDialog {
                 case COL_SELECT -> Boolean.class;
                 case COL_RANK, COL_FIRST_NAME, COL_LAST_NAME, COL_SKILL_LEVEL, COL_PRIMARY_PROFESSION,
                      COL_SECONDARY_PROFESSION -> String.class;
-                case COL_INJURIES, COL_MINUTES_AVAILABLE, COL_UNITS -> Integer.class;
+                case COL_INJURIES, COL_MINUTES_AVAILABLE, COL_UNITS, COL_EDGE -> Integer.class;
                 default -> Object.class;
             };
         }
@@ -474,6 +509,7 @@ public class SalvageTechPicker extends JDialog {
                 case COL_SKILL_LEVEL -> data.skillLevelName();
                 case COL_PRIMARY_PROFESSION -> data.primaryRole().getLabel(isClanCampaign);
                 case COL_SECONDARY_PROFESSION -> data.secondaryRole().getLabel(isClanCampaign);
+                case COL_EDGE -> data.edge();
                 case COL_UNITS -> data.techUnits().size();
                 case COL_INJURIES -> data.injuries();
                 case COL_MINUTES_AVAILABLE -> data.minutesAvailable();

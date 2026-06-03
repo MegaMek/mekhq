@@ -34,6 +34,7 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -206,6 +207,18 @@ public class Person implements ILocation {
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
+
+    /**
+     * Campaign Operations doesn't have a cap on Fatigue, but does stop tracking Fatigue at 17 points. With this in
+     * mind, we have opted to set a cap on fatigue of 30. This is to ensure the player isn't placed in a situation where
+     * a character could conceivably accumulate hundreds of Fatigue. At a certain point you can't get more tired
+     */
+    private static final int FATIGUE_CAP = 30;
+    /**
+     * Some modifiers can reduce Fatigue below 0, but fatigue cannot directly be reduced to below zero. We use this
+     * constant to ensure this is the case.
+     */
+    private static final int FATIGUE_MINIMUM = 0;
 
 
     private PersonAwardController awardController;
@@ -421,7 +434,7 @@ public class Person implements ILocation {
     private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
-    private boolean tryingToConceive;
+    private boolean wantsChildren;
     private boolean hidePersonality;
     // endregion Flags
 
@@ -658,7 +671,7 @@ public class Person implements ILocation {
         setQuickTrainIgnore(false);
         setPrefersMen(false);
         setPrefersWomen(false);
-        setTryingToConceive(true);
+        setWantsChildren(true);
         // endregion Flags
 
         extraData = new ExtraData();
@@ -2365,7 +2378,8 @@ public class Person implements ILocation {
             modifier += 2;
         }
 
-        return getFatigueDirect() + modifier;
+        int adjustedFatigue = fatigue + modifier;
+        return clamp(adjustedFatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
 
     public void setFatigue(final int fatigue) {
@@ -2397,7 +2411,9 @@ public class Person implements ILocation {
             delta = (int) floor(delta * getFatigueMultiplier());
         }
 
-        this.fatigue = this.fatigue + MathUtility.roundAwayFromZero(delta);
+        fatigue += MathUtility.roundAwayFromZero(delta);
+
+        fatigue = clamp(fatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -2881,7 +2897,7 @@ public class Person implements ILocation {
      *                                   ensure it remains within the valid range.
      */
     public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = Math.clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
+        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
     Aggression getStoredAggression() {
@@ -2919,7 +2935,7 @@ public class Person implements ILocation {
      *                                 it remains within the valid range.
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
+        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     Ambition getStoredAmbition() {
@@ -2957,7 +2973,7 @@ public class Person implements ILocation {
      *                              remains within the valid range.
      */
     public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = Math.clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
+        this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
     Greed getStoredGreed() {
@@ -2995,7 +3011,7 @@ public class Person implements ILocation {
      *                               remains within the valid range.
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = Math.clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
+        this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     Social getStoredSocial() {
@@ -3033,7 +3049,7 @@ public class Person implements ILocation {
      *                                         ensure it remains within the valid range.
      */
     public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
-        this.personalityQuirkDescriptionIndex = Math.clamp(personalityQuirkDescriptionIndex,
+        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
               0,
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
@@ -3277,13 +3293,9 @@ public class Person implements ILocation {
         this.prefersWomen = prefersWomen;
     }
 
-    public boolean isTryingToConceive() {
-        return tryingToConceive;
-    }
+    public boolean isWantsChildren() {return wantsChildren;}
 
-    public void setTryingToConceive(final boolean tryingToConceive) {
-        this.tryingToConceive = tryingToConceive;
-    }
+    public void setWantsChildren(final boolean wantsChildren) {this.wantsChildren = wantsChildren;}
 
     public boolean isHidePersonality() {
         return hidePersonality;
@@ -3860,7 +3872,7 @@ public class Person implements ILocation {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wantsChildren", wantsChildren);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
 
@@ -4502,8 +4514,10 @@ public class Person implements ILocation {
                     person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
                     person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
-                    person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) { // <51.0 compatibility handler
+                    person.setWantsChildren(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("wantsChildren")) {
+                    person.setWantsChildren(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
                     person.setHidePersonality(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("extraData")) {
@@ -4569,7 +4583,46 @@ public class Person implements ILocation {
             person = null;
         }
 
+        if (person != null) {
+            // < 0.51.00 compatibility handler
+            if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                int healingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
+                boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+
+                if (isUseAdvancedMedical) {
+                    person.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                          healingPeriod);
+                }
+            }
+        }
+
         return person;
+    }
+
+    /**
+     * In 0.51.0 we introduced a change that removed characters who only have permanent injuries from the assignments.
+     * This method exists to avoid 'ghost patients', patients that take up doctor patient assignments but aren't visible
+     * in the Infirmary UI.
+     *
+     * @param isUseAdvancedMedical        whether Advanced Medical (or Alternate Advanced Medical) are enabled. Used to
+     *                                    facilitate an early exit to avoid unassigning doctors in campaigns that only
+     *                                    use TW-scale 'Hits'.
+     * @param naturalHealingWaitingPeriod the waiting period (in days) between healing checks
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public void clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(boolean isUseAdvancedMedical,
+          int naturalHealingWaitingPeriod) {
+        if (!isUseAdvancedMedical) {
+            return;
+        }
+
+        List<Injury> nonPermanentInjuries = getNonPermanentInjuries();
+        if (nonPermanentInjuries.isEmpty()) {
+            setDoctorId(null, naturalHealingWaitingPeriod);
+        }
     }
 
     /**
@@ -5225,7 +5278,11 @@ public class Person implements ILocation {
      */
     public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
           final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions,
+              isClanCampaign,
+              today,
+              secondary,
+              excludeInjuryEffects) + 1];
     }
 
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
@@ -5662,7 +5719,7 @@ public class Person implements ILocation {
      * Returns the experience level for the specified skill using pre-built modifier data, or {@code -1} if the skill is
      * not present.
      *
-     * @param skillName        the name of the skill to query
+     * @param skillName         the name of the skill to query
      * @param skillModifierData pre-computed modifier data to apply to the skill level
      *
      * @return the experience level of the skill, or {@code -1} if the skill is not found
@@ -6963,11 +7020,11 @@ public class Person implements ILocation {
 
         modifiers += getDarkSecretModifier(false);
 
-        return Math.clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public void setConnections(final int connections) {
-        this.connections = Math.clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     /**
@@ -6980,7 +7037,7 @@ public class Person implements ILocation {
      */
     public void changeConnections(final int delta) {
         int newValue = connections + delta;
-        connections = Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -6988,7 +7045,7 @@ public class Person implements ILocation {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = Math.clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
@@ -7001,7 +7058,7 @@ public class Person implements ILocation {
      */
     public void changeWealth(final int delta) {
         int newValue = wealth + delta;
-        wealth = Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     public boolean isHasPerformedExtremeExpenditure() {
@@ -7048,7 +7105,7 @@ public class Person implements ILocation {
      * @since 0.50.10
      */
     public void setExtraIncomeFromTraitLevel(final int traitLevel) {
-        int newExtraIncomeTraitLevel = Math.clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
         extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
     }
 
@@ -7120,11 +7177,11 @@ public class Person implements ILocation {
 
         modifiers += getDarkSecretModifier(true);
 
-        return Math.clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
-        this.reputation = Math.clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     /**
@@ -7137,7 +7194,7 @@ public class Person implements ILocation {
      */
     public void changeReputation(final int delta) {
         int newValue = reputation + delta;
-        reputation = Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -7145,12 +7202,12 @@ public class Person implements ILocation {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = Math.clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
-        unlucky = Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public int getBloodmark() {
@@ -7162,12 +7219,12 @@ public class Person implements ILocation {
     }
 
     public void setBloodmark(final int unlucky) {
-        this.bloodmark = Math.clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public void changeBloodmark(final int delta) {
         int newValue = bloodmark + delta;
-        bloodmark = Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public List<LocalDate> getBloodhuntSchedule() {
@@ -7490,6 +7547,12 @@ public class Person implements ILocation {
                      .collect(Collectors.toList());
     }
 
+    public List<Injury> getNonPermanentInjuries() {
+        return injuries.stream()
+                     .filter(i -> !i.isPermanent())
+                     .collect(Collectors.toList());
+    }
+
     /**
      * Removes all non-prosthetic injuries from this person.
      *
@@ -7612,8 +7675,14 @@ public class Person implements ILocation {
         return getInjuryByLocation(location) != null;
     }
 
+    /**
+     * Determines whether this entity has any non-permanent injuries that require medical attention.
+     *
+     * @return {@code true} if there is at least one non-permanent injury present; {@code false} otherwise
+     */
     public boolean needsAMFixing() {
-        return !injuries.isEmpty();
+        boolean ignorePermanentInjuries = true;
+        return hasInjuries(ignorePermanentInjuries);
     }
 
     /**
@@ -7728,7 +7797,30 @@ public class Person implements ILocation {
         return false;
     }
 
-    public boolean hasOnlyHealedPermanentInjuries() {
+    /**
+     * Determines whether the character has any permanent, non-prosthetic injuries.
+     *
+     * <p>If {@code isUseAlternateAdvancedMedical} is {@code true} we check whether the character has
+     * non-prosthetic permanent injuries. Otherwise we use legacy testing that just checks for permanent injuries.</p>
+     *
+     * @return Returns {@code true} if the character has no non-permanent injuries, has at least one permanent injury,
+     *       and that injury is not a permanent modification, such as an implant.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean hasNonProstheticPermanentInjuries(boolean isUseAlternateAdvancedMedical) {
+        if (isUseAlternateAdvancedMedical) {
+            if (getNonPermanentInjurySeverity() > 0) {
+                return false;
+            }
+
+            ArrayList<Injury> relevantInjuries = new ArrayList<>(injuries);
+            relevantInjuries.removeAll(getProstheticInjuries());
+
+            return !relevantInjuries.isEmpty();
+        }
+
         return !injuries.isEmpty() &&
                      injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }

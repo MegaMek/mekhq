@@ -179,7 +179,8 @@ public class Fatigue {
         int effectiveFatigue = getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
               person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
 
-        if (!campaign.getCampaignOptions().isUseFatigue()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isUseFatigue()) {
             return;
         }
 
@@ -213,8 +214,22 @@ public class Fatigue {
             person.setIsRecoveringFromFatigue(true);
         }
 
-        if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
-                  && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
+        int fatigueThreshold = campaignOptions.getFatigueLeaveThreshold();
+        boolean hasThreshold = fatigueThreshold != 0;
+
+        boolean isFatigued = effectiveFatigue >= fatigueThreshold;
+        boolean isCampFollower = person.getStatus().isCampFollower();
+        boolean isFree = !person.isBusy();
+
+        int nonPermanentInjuryCount = person.getNonPermanentInjuries().size();
+        int hits = person.getHits();
+        boolean isInjured = nonPermanentInjuryCount > 0 || hits > 0;
+
+        if (hasThreshold &&
+                  isFatigued &&
+                  isFree &&
+                  !isInjured &&
+                  !isCampFollower) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }
@@ -360,10 +375,6 @@ public class Fatigue {
             }
 
             person.changeFatigue(-fatigueAdjustment);
-
-            if (person.getFatigueDirect() < 0) {
-                person.setFatigue(0);
-            }
         }
 
         if (campaign.getCampaignOptions().isUseFatigue()) {

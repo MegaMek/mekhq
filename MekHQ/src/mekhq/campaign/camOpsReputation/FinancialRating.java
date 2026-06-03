@@ -50,7 +50,7 @@ public class FinancialRating {
      * @return a map of the financial rating.
      */
     protected static Map<String, Integer> calculateFinancialRating(Finances finances) {
-        boolean hasLoan = finances.isInDebt();
+        boolean hasLoan = finances.hasActiveLoans();
         boolean inDebt = finances.getBalance().isNegative();
 
         Map<String, Integer> financeMap = Map.of(

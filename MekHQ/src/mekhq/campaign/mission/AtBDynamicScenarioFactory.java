@@ -57,6 +57,7 @@ import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.stratCon.StratConRulesManager.scenarioModifierShouldBeBlocked;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -1992,10 +1993,15 @@ public class AtBDynamicScenarioFactory {
      * Randomly generates the number of scenario modifiers for a scenario, for each random scenario in the count a
      * random modifier is applied to the scenario.
      *
-     * @param campaignOptions The prior defined campaign options
-     * @param scenario        The scenario to receive the modifiers.
+     * @param campaignOptions         The prior defined campaign options
+     * @param scenario                The scenario to receive the modifiers.
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
      */
-    public static void setScenarioModifiers(CampaignOptions campaignOptions, AtBDynamicScenario scenario) {
+    public static void setScenarioModifiers(CampaignOptions campaignOptions, AtBDynamicScenario scenario,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         int numMods = 0;
         boolean addMods = true;
         int modMax = campaignOptions.getScenarioModMax();
@@ -2016,6 +2022,9 @@ public class AtBDynamicScenarioFactory {
 
             for (int x = 0; x < numMods; x++) {
                 AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
+                if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, scenarioMod)) {
+                    continue;
+                }
 
                 scenario.addScenarioModifier(scenarioMod);
 
@@ -3568,7 +3577,7 @@ public class AtBDynamicScenarioFactory {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getBVBudgetForStratConSingles(Campaign campaign, boolean forceStandardBattleValue) {
+    public static int getBVBudgetForStratConSingles(Campaign campaign, boolean forceStandardBattleValue) {
         int defaultBVBudget = 10000; // We use this value if the player has no valid forces
 
         int totalForces = 0;
@@ -5085,7 +5094,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Faction code.
      */
-    static String getPlanetOwnerFaction(AtBContract contract, LocalDate currentDate) {
+    public static String getPlanetOwnerFaction(AtBContract contract, LocalDate currentDate) {
         String factionCode = "MERC";
 
         // planet owner is the first of the factions that owns the current planet.
@@ -5112,7 +5121,8 @@ public class AtBDynamicScenarioFactory {
      *
      * @return ForceAlignment.
      */
-    static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, LocalDate currentDate) {
+    public static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode,
+          LocalDate currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer
         // or op for. If it's not, third-party.
         if (contract.getSystem().getFactions(currentDate).contains(factionCode)) {

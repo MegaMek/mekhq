@@ -105,7 +105,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
-        setLowPopulationRecruitmentDivider(10000000);
+        setLowPopulationRecruitmentDivider(7500000);
         setUnitReputationRecruitmentCutoff(-25);
 
         PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();

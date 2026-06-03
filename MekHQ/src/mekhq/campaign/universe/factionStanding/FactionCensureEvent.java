@@ -34,6 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
@@ -339,7 +340,7 @@ public class FactionCensureEvent {
         int secondInCommandInjuries = isSuccessful ? randomInt(3) + 1 : randomInt(6) + 1;
         if (useAdvancedMedical) {
             InjuryUtil.resolveCombatDamage(campaign, commander, commanderInjuries);
-            if (commander.getInjuries().size() > 5) {
+            if (commander.getTotalInjurySeverity() >= DEATH) {
                 commander.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
             }
 

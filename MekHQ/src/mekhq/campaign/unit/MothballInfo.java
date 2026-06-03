@@ -34,7 +34,9 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import megamek.Version;
@@ -43,6 +45,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -64,6 +67,7 @@ public class MothballInfo {
     private final List<UUID> vesselCrewIds = new ArrayList<>();
     private UUID techOfficerId;
     private UUID navigatorId;
+    private final Map<PersonnelRole, Integer> tempCrewMap = new HashMap<>();
 
     /**
      * Parameterless constructor, used for deserialization.
@@ -124,6 +128,13 @@ public class MothballInfo {
         if (navigator != null) {
             navigatorId = navigator.getId();
         }
+
+        for (PersonnelRole role : unit.getTempCrewRoles()) {
+            int count = unit.getTempCrewByPersonnelRole(role);
+            if (count > 0) {
+                tempCrewMap.put(role, count);
+            }
+        }
     }
 
     /**
@@ -172,6 +183,17 @@ public class MothballInfo {
         Person navigator = campaign.getPerson(navigatorId);
         if ((navigator != null) && (navigator.getStatus().isActive()) && (navigator.getUnit() == null)) {
             unit.setNavigator(navigator);
+        }
+
+        // Restore temp crew from the pool, up to the saved amounts.
+        for (Map.Entry<PersonnelRole, Integer> entry : tempCrewMap.entrySet()) {
+            PersonnelRole role = entry.getKey();
+            int saved = entry.getValue();
+            int available = campaign.getAvailableTempCrewPool(role);
+            int toRestore = Math.min(saved, available);
+            if (toRestore > 0) {
+                unit.setTempCrew(role, toRestore);
+            }
         }
 
         // Attempt to return the unit to its last force assignment.
@@ -233,6 +255,18 @@ public class MothballInfo {
         if (techOfficerId != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficerId);
         }
+
+        if (!tempCrewMap.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "tempCrewMap");
+            for (Map.Entry<PersonnelRole, Integer> entry : tempCrewMap.entrySet()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "tempCrew");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "role", entry.getKey().name());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "count", entry.getValue());
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "tempCrew");
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "tempCrewMap");
+        }
+
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
     }
 
@@ -264,6 +298,27 @@ public class MothballInfo {
                     retVal.techOfficerId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorID")) {
                     retVal.navigatorId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("tempCrewMap")) {
+                    NodeList tempCrewNodes = wn2.getChildNodes();
+                    for (int y = 0; y < tempCrewNodes.getLength(); y++) {
+                        Node tempCrewNode = tempCrewNodes.item(y);
+                        if (tempCrewNode.getNodeName().equalsIgnoreCase("tempCrew")) {
+                            PersonnelRole role = null;
+                            int count = 0;
+                            NodeList entryNodes = tempCrewNode.getChildNodes();
+                            for (int z = 0; z < entryNodes.getLength(); z++) {
+                                Node entryNode = entryNodes.item(z);
+                                if (entryNode.getNodeName().equalsIgnoreCase("role")) {
+                                    role = PersonnelRole.valueOf(entryNode.getTextContent());
+                                } else if (entryNode.getNodeName().equalsIgnoreCase("count")) {
+                                    count = Integer.parseInt(entryNode.getTextContent());
+                                }
+                            }
+                            if (role != null && count > 0) {
+                                retVal.tempCrewMap.put(role, count);
+                            }
+                        }
+                    }
                 }
             }
         } catch (Exception ex) {

@@ -35,7 +35,7 @@ package mekhq.gui.dialog.markets.personnelMarket;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
- * Defines the columns for the personnel market applicant table in the GUI.
+ * Defines the columns for the applicant table in the Recruitment GUI.
  *
  * <p>Each column corresponds to a visible property for an applicant (e.g., full name, profession). Provides
  * localization for column headers.</p>

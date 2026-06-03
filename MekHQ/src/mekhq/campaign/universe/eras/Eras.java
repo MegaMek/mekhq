@@ -85,6 +85,26 @@ public class Eras {
     public Era getEra(final LocalDate today) {
         return getEras().ceilingEntry(today).getValue();
     }
+
+    /**
+     * Retrieves an {@link Era} by its code, using a case-insensitive match.
+     *
+     * @param code the era code to search for (e.g., {@code "LREP"})
+     *
+     * @return the matching {@link Era}, or {@code null} if no era with the given code exists
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public @Nullable Era getEra(final String code) {
+        for (final Era era : getEras().values()) {
+            if (era.getCode().equalsIgnoreCase(code)) {
+                return era;
+            }
+        }
+
+        return null;
+    }
     //endregion Getters/Setters
 
     //region File I/O
