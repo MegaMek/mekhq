@@ -63,11 +63,13 @@ import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 public class CampaignOptionsPagePanel extends JPanel {
     private static final int INTRO_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int QUOTE_TOP_PADDING = UIUtil.scaleForGUI(12);
+    private static final int QUOTE_BOTTOM_PADDING = UIUtil.scaleForGUI(8);
     private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int DEFAULT_HEADER_IMAGE_SIZE = 64;
 
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
+    private final String sectionSearchText;
 
     private CampaignOptionsPagePanel(Builder builder) {
         super(null);
@@ -82,15 +84,18 @@ public class CampaignOptionsPagePanel extends JPanel {
         // can place arbitrary components above, between, or below the collapsible sections.
         List<Object> renderItems = new ArrayList<>();
         List<MHQCollapsiblePanel> sections = new ArrayList<>();
+        StringBuilder searchTextBuilder = new StringBuilder();
         for (Object bodyItem : builder.bodyItems) {
             if (bodyItem instanceof Section section) {
                 MHQCollapsiblePanel sectionPanel = createSection(section, builder.sectionsExpandedByDefault);
                 sections.add(sectionPanel);
                 renderItems.add(sectionPanel);
+                appendSectionSearchText(searchTextBuilder, section);
             } else if (bodyItem instanceof JComponent component) {
                 renderItems.add(component);
             }
         }
+        sectionSearchText = searchTextBuilder.toString().trim();
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
 
@@ -113,6 +118,31 @@ public class CampaignOptionsPagePanel extends JPanel {
         return showDetailsPanel;
     }
 
+    /**
+     * Returns the concatenated, resolved title and summary text of every collapsible section on this page. This is used
+     * by the navigation filter so a search can match a section title or summary, not only the page (tab) title.
+     *
+     * @return the section search text, or an empty string if the page has no sections
+     */
+    public String getSectionSearchText() {
+        return sectionSearchText;
+    }
+
+    private static void appendSectionSearchText(StringBuilder builder, Section section) {
+        appendResolvedText(builder, section.titleKey(), section.literal());
+        appendResolvedText(builder, section.summaryKey(), section.literal());
+    }
+
+    private static void appendResolvedText(StringBuilder builder, @Nullable String key, boolean literal) {
+        if (key == null) {
+            return;
+        }
+        String text = literal ? key : getTextAt(getCampaignOptionsResourceBundle(), key);
+        if (text != null && !text.isBlank()) {
+            builder.append(' ').append(text);
+        }
+    }
+
     @Override
     public Dimension getPreferredSize() {
         Dimension preferredSize = pageBody.getPreferredSize();
@@ -127,8 +157,11 @@ public class CampaignOptionsPagePanel extends JPanel {
     @Override
     public void doLayout() {
         Dimension preferredSize = pageBody.getPreferredSize();
-        int contentWidth = Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH);
-        contentWidth = Math.min(contentWidth, getWidth());
+        // Give the page body its full content width, even when that exceeds the viewport. Squeezing the inner
+        // GridBagLayout below its content width makes the section stack collapse to its zero minimum width and the
+        // header text wrap vertically, which wipes the whole page. Letting any overflow clip on the right keeps the
+        // header on one line and the sections visible, which is a far better failure mode than a blank page.
+        int contentWidth = preferredSize.width;
         int x = Math.max(0, (getWidth() - contentWidth) / 2);
         pageBody.setBounds(x, 0, contentWidth, preferredSize.height);
     }
@@ -325,7 +358,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         quotePanel.setOpaque(false);
         quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING,
               quoteHorizontalPadding,
-              0,
+              QUOTE_BOTTOM_PADDING,
               quoteHorizontalPadding));
 
         JEditorPane quote = new JEditorPane("text/html",

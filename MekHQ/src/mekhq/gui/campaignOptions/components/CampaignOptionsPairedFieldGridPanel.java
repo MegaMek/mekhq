@@ -99,7 +99,7 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
         JPanel pairPanel = new JPanel(new GridBagLayout());
         pairPanel.setOpaque(false);
 
-        setMinimumWidth(control, controlWidth);
+        setPreferredWidth(control, controlWidth);
         alignLabel(label);
 
         GridBagConstraints labelLayout = new GridBagConstraints();
@@ -141,13 +141,6 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
         if (component instanceof JLabel label) {
             label.setHorizontalAlignment(SwingConstants.LEADING);
         }
-    }
-
-    private void setMinimumWidth(JComponent component, int minimumWidth) {
-        Dimension preferredSize = component.getPreferredSize();
-        Dimension adjustedSize = new Dimension(Math.max(preferredSize.width, minimumWidth), preferredSize.height);
-        component.setPreferredSize(adjustedSize);
-        component.setMinimumSize(adjustedSize);
     }
 
     private void setPreferredWidth(JComponent component, int preferredWidth) {

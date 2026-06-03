@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.time.LocalDate;
@@ -52,6 +53,7 @@ import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.CampaignPreset;
@@ -70,7 +72,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -389,7 +390,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     private JPanel createStartupPanel() {
         // Initialize Components Used in ActionListeners
-        final RoundedJButton btnDate = new RoundedJButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
+        final JButton btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()));
 
         // Create Panel Components
         setChkSpecifyDate(new JCheckBox(resources.getString("chkSpecifyDate.text")));
@@ -534,7 +535,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
               "chkSpecifyCompanyGenerationOptions.toolTipText"));
         getChkSpecifyCompanyGenerationOptions().setName("chkSpecifyCompanyGenerationOptions");
 
-        final RoundedJButton btnCompanyGenerationOptions = new RoundedJButton(resources.getString(
+        final JButton btnCompanyGenerationOptions = new JButton(resources.getString(
               "btnCompanyGenerationOptions.text"));
         btnCompanyGenerationOptions.setName("btnCompanyGenerationOptions");
         btnCompanyGenerationOptions.setToolTipText(resources.getString("btnCompanyGenerationOptions.toolTipText"));
@@ -625,7 +626,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkSpecifyGameOptions().setToolTipText(resources.getString("chkSpecifyGameOptions.toolTipText"));
         getChkSpecifyGameOptions().setName("chkSpecifyGameOptions");
 
-        final RoundedJButton btnGameOptions = new RoundedJButton(resources.getString("btnGameOptions.text"));
+        final JButton btnGameOptions = new JButton(resources.getString("btnGameOptions.text"));
         btnGameOptions.setName("btnGameOptions");
         btnGameOptions.setToolTipText(resources.getString("btnGameOptions.toolTipText"));
         btnGameOptions.addActionListener(evt -> {
@@ -711,6 +712,32 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     //endregion Initialization
 
     //region Button Actions
+    @Override
+    protected JPanel createButtonPanel() {
+        final int gap = UIUtil.scaleForGUI(8);
+        final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, gap, gap));
+
+        setOkButton(new JButton(resources.getString("Ok.text")));
+        getOkButton().setName("okButton");
+        getOkButton().setToolTipText(resources.getString("Ok.toolTipText"));
+        getOkButton().addActionListener(this::okButtonActionPerformed);
+        panel.add(getOkButton());
+
+        final JButton validateButton = new JButton(resources.getString("Validate.text"));
+        validateButton.setName("validateButton");
+        validateButton.setToolTipText(resources.getString("Validate.toolTipText"));
+        validateButton.addActionListener(this::validateButtonActionPerformed);
+        panel.add(validateButton);
+
+        final JButton cancelButton = new JButton(resources.getString("Cancel.text"));
+        cancelButton.setName("cancelButton");
+        cancelButton.setToolTipText(resources.getString("Cancel.toolTipText"));
+        cancelButton.addActionListener(this::cancelActionPerformed);
+        panel.add(cancelButton);
+
+        return panel;
+    }
+
     @Override
     protected void okAction() {
         if (!getState().isSuccess()) {

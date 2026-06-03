@@ -754,10 +754,11 @@ public class PersonnelTab {
                 PERSONNEL_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAwardBonusStyle, comboAwardBonusStyle);
         panel.addRow(lblAwardTierSize, spnAwardTierSize);
-        panel.addCheckBox(chkEnableAutoAwards);
-        panel.addCheckBox(chkIssuePosthumousAwards);
-        panel.addCheckBox(chkIssueBestAwardOnly);
-        panel.addCheckBox(chkIgnoreStandardSet);
+        panel.addCheckBoxGrid(2,
+                chkEnableAutoAwards,
+                chkIssuePosthumousAwards,
+                chkIssueBestAwardOnly,
+                chkIgnoreStandardSet);
 
         return panel;
     }
@@ -921,9 +922,10 @@ public class PersonnelTab {
                 PERSONNEL_LABEL_COLUMN_WIDTH,
                 PERSONNEL_CONTROL_COLUMN_WIDTH);
         medicalCapacityPanel.addRow(lblMaximumPatients, spnMaximumPatients);
-        medicalCapacityPanel.addCheckBox(chkDoctorsUseAdministration);
-        medicalCapacityPanel.addCheckBox(chkUseUsefulMedics);
-        medicalCapacityPanel.addCheckBox(chkUseMASHTheatres);
+        medicalCapacityPanel.addCheckBoxGrid(2,
+                chkDoctorsUseAdministration,
+                chkUseUsefulMedics,
+                chkUseMASHTheatres);
         medicalCapacityPanel.addRow(lblMASHTheatreCapacity, spnMASHTheatreCapacity);
 
         final CampaignOptionsFormPanel healingChecksPanel = new CampaignOptionsFormPanel("HealingChecksPanel",
@@ -1000,13 +1002,15 @@ public class PersonnelTab {
                 "PersonnelInformation",
                 PERSONNEL_LABEL_COLUMN_WIDTH,
                 PERSONNEL_CONTROL_COLUMN_WIDTH);
-        personnelInformationPanel.addCheckBox(chkUseTimeInService);
+        personnelInformationPanel.addCheckBoxGrid(2,
+                chkUseTimeInService,
+                chkUseTimeInRank);
         personnelInformationPanel.addRow(lblTimeInServiceDisplayFormat, comboTimeInServiceDisplayFormat);
-        personnelInformationPanel.addCheckBox(chkUseTimeInRank);
         personnelInformationPanel.addRow(lblTimeInRankDisplayFormat, comboTimeInRankDisplayFormat);
-        personnelInformationPanel.addCheckBox(chkTrackTotalEarnings);
-        personnelInformationPanel.addCheckBox(chkTrackTotalXPEarnings);
-        personnelInformationPanel.addCheckBox(chkShowOriginFaction);
+        personnelInformationPanel.addCheckBoxGrid(2,
+                chkTrackTotalEarnings,
+                chkTrackTotalXPEarnings,
+                chkShowOriginFaction);
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelInformation", "PersonnelInformation", imageAddress)
                 .header(personnelInformationHeader)
                 .quote("personnelInformationTab")
@@ -1168,8 +1172,9 @@ public class PersonnelTab {
                 PERSONNEL_LABEL_COLUMN_WIDTH,
                 PERSONNEL_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblPrisonerCaptureStyle, comboPrisonerCaptureStyle);
-        panel.addCheckBox(chkUseFunctionalEscapeArtist);
-        panel.addCheckBox(chkResetTemporaryPrisonerCapacity);
+        panel.addCheckBoxGrid(2,
+                chkUseFunctionalEscapeArtist,
+                chkResetTemporaryPrisonerCapacity);
 
         return panel;
     }
@@ -1212,8 +1217,9 @@ public class PersonnelTab {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DependentsPanel",
                 PERSONNEL_LABEL_COLUMN_WIDTH,
                 PERSONNEL_CONTROL_COLUMN_WIDTH);
-        panel.addCheckBox(chkUseRandomDependentAddition);
-        panel.addCheckBox(chkUseRandomDependentRemoval);
+        panel.addCheckBoxGrid(2,
+                chkUseRandomDependentAddition,
+                chkUseRandomDependentRemoval);
         panel.addRow(lblDependentProfessionDieSize, spnDependentProfessionDieSize);
         panel.addRow(lblCivilianProfessionDieSize, spnCivilianProfessionDieSize);
 

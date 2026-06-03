@@ -95,6 +95,7 @@ public class CampaignOptionsUtilities {
      */
     public final static int CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH = scaleForGUI(860);
     private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
+    private static final int QUOTE_BOTTOM_PADDING = scaleForGUI(8);
     private static Consumer<String> tipTextConsumer;
 
 
@@ -206,7 +207,7 @@ public class CampaignOptionsUtilities {
         int quoteWidth = Math.max(1, Math.min(getQuoteReferenceWidth(content), CAMPAIGN_OPTIONS_PANEL_WIDTH));
 
         JPanel quotePanel = new JPanel(new GridBagLayout());
-        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, 0, 0));
+        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, QUOTE_BOTTOM_PADDING, 0));
         JLabel quote = new JLabel(String.format(
               "<html><div style='width: %spx; text-align:center;'>%s</div></html>",
               quoteWidth,

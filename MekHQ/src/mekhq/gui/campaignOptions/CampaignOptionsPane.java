@@ -62,6 +62,7 @@ import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
@@ -81,6 +82,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 
@@ -123,6 +125,7 @@ public class CampaignOptionsPane extends JPanel {
     private final List<CampaignOptionsRoute> navigationTargets = new ArrayList<>();
     private final Map<String, Supplier<Component>> directPageFactories = new HashMap<>();
     private final Map<String, Component> directPageCache = new HashMap<>();
+    private boolean searchIndexInitialized = false;
 
     private CampaignOptionsContentHost activeContentHost;
     private CampaignOptionsNavigationPanel navigationPanel;
@@ -192,6 +195,7 @@ public class CampaignOptionsPane extends JPanel {
 
     private CampaignOptionsNavigationPanel createNavigationPanel() {
         navigationPanel = new CampaignOptionsNavigationPanel(navigationTargets, this::selectedNavigationTarget);
+        navigationPanel.setSearchIndexInitializer(this::ensureSearchIndexBuilt);
         return navigationPanel;
     }
 
@@ -391,7 +395,60 @@ public class CampaignOptionsPane extends JPanel {
 
         directPage = directPageFactory.get();
         directPageCache.putIfAbsent(routeId, directPage);
-        return directPageCache.get(routeId);
+        Component cachedPage = directPageCache.get(routeId);
+        harvestSectionSearchText(routeId, cachedPage);
+        return cachedPage;
+    }
+
+    /**
+     * Copies the resolved section titles and summaries of a freshly built page into its matching route so the
+     * navigation filter can match section headings. This is a no-op when the page has no sections or has already been
+     * harvested.
+     *
+     * @param routeId the id of the route that owns the page
+     * @param page    the built page content
+     */
+    private void harvestSectionSearchText(String routeId, Component page) {
+        if (!(page instanceof CampaignOptionsPagePanel pagePanel)) {
+            return;
+        }
+
+        String sectionSearchText = pagePanel.getSectionSearchText();
+        if (sectionSearchText.isBlank()) {
+            return;
+        }
+
+        for (CampaignOptionsRoute navigationTarget : navigationTargets) {
+            if (navigationTarget.getId().equals(routeId)) {
+                navigationTarget.setSectionSearchText(sectionSearchText);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Builds every direct page once, on demand, so section titles and summaries become searchable across all pages
+     * rather than only the pages the user has already visited. Pages are built progressively, one per Swing event, to
+     * keep the dialog responsive, and the built pages are cached so later navigation is instant. Runs at most once.
+     */
+    void ensureSearchIndexBuilt() {
+        if (searchIndexInitialized) {
+            return;
+        }
+        searchIndexInitialized = true;
+        buildSearchIndexStep(new ArrayList<>(directPageFactories.keySet()), 0);
+    }
+
+    private void buildSearchIndexStep(List<String> routeIds, int index) {
+        if (index >= routeIds.size()) {
+            if (navigationPanel != null) {
+                navigationPanel.refreshFilter();
+            }
+            return;
+        }
+
+        getDirectPage(routeIds.get(index));
+        SwingUtilities.invokeLater(() -> buildSearchIndexStep(routeIds, index + 1));
     }
 
     private CampaignOptionsRoute getDefaultDirectRoute(CampaignOptionsRoute route) {

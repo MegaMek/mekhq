@@ -90,8 +90,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * spanning multiple tabs.
  */
 public class SalariesTab {
-    private static final int FORM_LABEL_COLUMN_WIDTH = 260;
-    private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
+    private static final int FORM_LABEL_COLUMN_WIDTH = 300;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 300;
     private static final int FORM_LABEL_CONTROL_GAP = 12;
     private static final int SECTION_CONTENT_WIDTH = FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP
           + FORM_CONTROL_COLUMN_WIDTH;
@@ -271,13 +271,14 @@ public class SalariesTab {
               "SpecialistInfantrySalary"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalaryMultipliersPanel",
-              FORM_LABEL_COLUMN_WIDTH,
-              FORM_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblAntiMekSalary, spnAntiMekSalary);
-        panel.addRow(lblSpecialistInfantrySalary, spnSpecialistInfantrySalary);
+        JComponent[] labels = { lblAntiMekSalary, lblSpecialistInfantrySalary };
+        JComponent[] controls = { spnAntiMekSalary, spnSpecialistInfantrySalary };
 
-        return panel;
+        return createPairedFieldGridPanel("SalaryMultipliersPanel",
+              labels,
+              controls,
+              2,
+              GRID_CONTROL_COLUMN_WIDTH);
     }
 
     /**

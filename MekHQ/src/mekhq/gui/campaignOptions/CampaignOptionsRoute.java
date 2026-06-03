@@ -43,6 +43,7 @@ class CampaignOptionsRoute {
     private final List<String> titleResourceNames;
     private final boolean showHelpPanel;
     private final String searchableText;
+    private String sectionSearchText = "";
 
     CampaignOptionsRoute(String id, List<String> path, List<String> titleResourceNames) {
         this(id, path, titleResourceNames, true);
@@ -81,13 +82,23 @@ class CampaignOptionsRoute {
         return titleResourceNames.size() == 1;
     }
 
+    /**
+     * Adds resolved section title and summary text to this route's search index so the navigation filter can match a
+     * section heading, not only the page (tab) title.
+     *
+     * @param text the raw section text to index; ignored when {@code null} or blank
+     */
+    void setSectionSearchText(String text) {
+        this.sectionSearchText = text == null ? "" : normalizeSearchText(text);
+    }
+
     boolean matches(String normalizedFilter) {
         if (normalizedFilter.isBlank()) {
             return true;
         }
 
         for (String token : normalizedFilter.split("\\s+")) {
-            if (!token.isBlank() && !searchableText.contains(token)) {
+            if (!token.isBlank() && !searchableText.contains(token) && !sectionSearchText.contains(token)) {
                 return false;
             }
         }

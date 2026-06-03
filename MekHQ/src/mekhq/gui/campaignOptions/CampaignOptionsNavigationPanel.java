@@ -41,8 +41,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -70,6 +73,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
     private final JTree navigationTree;
     private CampaignOptionsRoute currentRoute;
     private boolean isSyncingSelection;
+    private Runnable searchIndexInitializer;
 
     CampaignOptionsNavigationPanel(List<CampaignOptionsRoute> routes,
           Consumer<CampaignOptionsRoute> routeSelectionListener) {
@@ -116,6 +120,13 @@ class CampaignOptionsNavigationPanel extends JPanel {
         filterStatusLabel.setHorizontalAlignment(SwingConstants.LEADING);
         filterStatusLabel.setVisible(false);
 
+        JButton legendButton = new JButton("\u24D8");
+        legendButton.setName("btnCampaignOptionsLegend");
+        legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsLegend.tooltip"));
+        legendButton.putClientProperty("JButton.buttonType", "toolBarButton");
+        legendButton.setFocusable(false);
+        legendButton.addActionListener(evt -> showLegend(legendButton));
+
         navigationTree = new JTree();
         navigationTree.setName("campaignOptionsNavigationTree");
         navigationTree.setRootVisible(false);
@@ -128,15 +139,37 @@ class CampaignOptionsNavigationPanel extends JPanel {
         navigationScrollPane.setName("campaignOptionsNavigationScrollPane");
         navigationScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
+        JPanel filterRow = new JPanel(new BorderLayout(4, 0));
+        filterRow.setName("campaignOptionsFilterRow");
+        filterRow.add(filterField, BorderLayout.CENTER);
+        filterRow.add(legendButton, BorderLayout.EAST);
+
         JPanel filterPanel = new JPanel(new BorderLayout(0, 4));
         filterPanel.setName("campaignOptionsFilterPanel");
-        filterPanel.add(filterField, BorderLayout.NORTH);
+        filterPanel.add(filterRow, BorderLayout.NORTH);
         filterPanel.add(filterStatusLabel, BorderLayout.SOUTH);
 
         add(filterPanel, BorderLayout.NORTH);
         add(navigationScrollPane, BorderLayout.CENTER);
 
         buildNavigationTree("");
+    }
+
+    private void showLegend(JComponent anchor) {
+        JLabel legend = new JLabel("<html><body>"
+              + getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralIconLegend.text")
+              + "</body></html>");
+        legend.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+        JPopupMenu legendPopup = new JPopupMenu();
+        legendPopup.setName("campaignOptionsLegendPopup");
+        legendPopup.setLayout(new BorderLayout());
+        legendPopup.add(legend, BorderLayout.CENTER);
+
+        Dimension popupSize = legendPopup.getPreferredSize();
+        // Anchor the popup so its right edge lines up with the button, opening downward beneath the icon.
+        int x = anchor.getWidth() - popupSize.width;
+        legendPopup.show(anchor, x, anchor.getHeight());
     }
 
     void selectRoute(CampaignOptionsRoute route) {
@@ -171,6 +204,27 @@ class CampaignOptionsNavigationPanel extends JPanel {
     }
 
     private void filterNavigation() {
+        if (searchIndexInitializer != null && !filterField.getText().isBlank()) {
+            searchIndexInitializer.run();
+        }
+        buildNavigationTree(filterField.getText());
+    }
+
+    /**
+     * Sets a one-time callback that builds the section search index the first time the user types a non-empty filter.
+     * The callback is expected to guard against running more than once.
+     *
+     * @param searchIndexInitializer the index-building callback, invoked on the first non-empty filter
+     */
+    void setSearchIndexInitializer(Runnable searchIndexInitializer) {
+        this.searchIndexInitializer = searchIndexInitializer;
+    }
+
+    /**
+     * Rebuilds the navigation tree using the current filter text. Used to refresh results after the section search
+     * index has been populated asynchronously.
+     */
+    void refreshFilter() {
         buildNavigationTree(filterField.getText());
     }
 
