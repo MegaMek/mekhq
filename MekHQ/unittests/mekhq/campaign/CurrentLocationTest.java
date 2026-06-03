@@ -56,26 +56,25 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.util.Collections;
 
-import mekhq.campaign.personnel.Person;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Node;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.w3c.dom.Node;
 
 public class CurrentLocationTest {
 
@@ -368,11 +367,11 @@ public class CurrentLocationTest {
         @Test
         void testNewDayNoTransitRecharge() {
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
                 assertEquals(24.0, currentLocation.getRechargeTime());
                 verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("recharging drives"));
                 for (int i = 0; i < 9; i++) {
-                    currentLocation.newDay(campaign);
+                    currentLocation.newDay(campaign, false);
                 }
                 assertEquals(176.0, currentLocation.getRechargeTime()); // do not charge past maximum
                 mekHQ.verify(() -> MekHQ.triggerEvent(any()), never());
@@ -391,16 +390,16 @@ public class CurrentLocationTest {
                 currentLocation.setJumpPath(jumpPath);
                 mekHQ.clearInvocations();
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
 
                 assertEquals(1.0, currentLocation.getTransitTime());
                 verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("hours in transit"));
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
                 assertEquals(2.0, currentLocation.getTransitTime());
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(2));
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
                 assertEquals(2.5, currentLocation.getTransitTime()); // limited by getTimeToJumpPoint
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(3));
 
@@ -427,7 +426,7 @@ public class CurrentLocationTest {
                 mekHQ.clearInvocations();
                 currentLocation.setTransitTime(2.0); // (2.5 - 2) days of transit remaining
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
 
                 // verify the jump
                 verify(jumpPath).removeFirstSystem();
@@ -455,7 +454,7 @@ public class CurrentLocationTest {
                 currentLocation.setJumpPath(jumpPath);
                 mekHQ.clearInvocations();
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
 
                 assertEquals(0.0, currentLocation.getTransitTime());
                 assertNull(currentLocation.getJumpPath());
