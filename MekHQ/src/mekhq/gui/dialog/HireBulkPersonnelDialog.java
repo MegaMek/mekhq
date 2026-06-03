@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.HumanResources.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
@@ -400,6 +401,10 @@ public class HireBulkPersonnelDialog extends JDialog {
             SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
             reRollLoyalty(person, actualSkillLevel);
             reRollAdvantages(campaign, person, actualSkillLevel);
+
+            // We need to override Veterancy eligibility to factor in any fixed experience level generation that
+            // might have occurred via GM Mode or age restrictions.
+            setVeterancyAwardEligibility(campaign, person);
 
             if (!campaign.recruitPerson(person, isGmHire, true)) {
                 number = 0;
