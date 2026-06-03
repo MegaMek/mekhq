@@ -6515,9 +6515,6 @@ public class Campaign implements ITechManager, ILocation {
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
-        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
-            return target;
-        }
 
         target.append(partWork.getAllMods(tech));
 
@@ -6534,9 +6531,9 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
-        if (minutes <= 0) {
+        if (!(partWork instanceof Refit) && minutes <= 0) {
             LOGGER.error("Attempting to get the target number for a part with zero time left.");
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No part repair time remaining.");
         }
 
         int helpMod;
