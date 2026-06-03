@@ -62,7 +62,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -282,18 +281,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void generateSparePersonnel(CompanyGenerationOptions options) {
         Person person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
 
-        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
-
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
-              campaignOptions.isDoctorsUseAdministration(),
-              campaignOptions.isTechsUseAdministration(),
-              campaignOptions.isUseArtillery(),
-              useExtraRandomness,
-              person,
-              PersonnelRole.MEKWARRIOR,
-              SkillLevel.GREEN);
+        boolean checkVeterancyEligibility = true;
+        overrideSkills(campaign, person, PersonnelRole.MEKWARRIOR, SkillLevel.GREEN, checkVeterancyEligibility);
 
         SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
         reRollLoyalty(person, actualSkillLevel);

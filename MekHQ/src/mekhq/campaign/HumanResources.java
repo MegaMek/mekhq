@@ -38,10 +38,10 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -1744,24 +1744,6 @@ public class HumanResources {
 
         return person;
     }
-
-    /**
-     * Determines and sets a person's eligibility for the Veterancy Award (SPA).
-     *
-     * <p>A person is eligible if their current experience level is below {@link SkillType#EXP_VETERAN}, meaning they
-     * have not yet reached veteran status.</p>
-     *
-     * @param campaign the current {@link Campaign}, used to evaluate the person's experience level in context
-     * @param person   the {@link Person} whose veterancy award eligibility is being assessed and updated
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    public static void setVeterancyAwardEligibility(Campaign campaign, Person person) {
-        boolean isEligibleForVeterancyAward = person.getExperienceLevel(campaign, false) < EXP_VETERAN;
-        person.setHasGainedVeterancySPA(isEligibleForVeterancyAward);
-    }
-
 
     /**
      * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank.
