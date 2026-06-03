@@ -6484,7 +6484,7 @@ public class Campaign implements ITechManager, ILocation {
         final int techTime = isOvertimeAllowed() ?
                                    tech.getMinutesLeft() + tech.getOvertimeLeft() :
                                    tech.getMinutesLeft();
-        if (techTime <= 0) {
+        if (!(partWork instanceof Refit) && (techTime <= 0)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
 
@@ -6513,6 +6513,9 @@ public class Campaign implements ITechManager, ILocation {
         }
         final TargetRoll target = new TargetRoll(value, SkillType.getExperienceLevelName(effectiveSkillLevel));
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+            return target;
+        }
+        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             return target;
         }
 
