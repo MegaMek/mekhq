@@ -6484,7 +6484,7 @@ public class Campaign implements ITechManager, ILocation {
         final int techTime = isOvertimeAllowed() ?
                                    tech.getMinutesLeft() + tech.getOvertimeLeft() :
                                    tech.getMinutesLeft();
-        if (!(partWork instanceof Refit) && (techTime <= 0)) {
+        if (techTime <= 0) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
 
