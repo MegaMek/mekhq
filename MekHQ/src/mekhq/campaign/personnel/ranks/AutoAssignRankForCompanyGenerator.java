@@ -244,6 +244,10 @@ public final class AutoAssignRankForCompanyGenerator {
             return RE_MIN;
         }
 
+        if (person == null) {
+            return startIndex;
+        }
+
         int rankIndex = startIndex;
         person.setRank(rankIndex);
 
@@ -269,6 +273,10 @@ public final class AutoAssignRankForCompanyGenerator {
      * @since 0.51.0
      */
     public static void assignAscendingRank(Person person, int startIndex) {
+        if (person == null) {
+            return;
+        }
+
         int rankIndex = startIndex;
         person.setRank(rankIndex);
 
