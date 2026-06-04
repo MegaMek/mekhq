@@ -473,8 +473,8 @@ public abstract class Part implements IPartWork, ITechnology {
                 if (campaign.getQuartermaster() != null) {
                     inStock = campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType());
                 }
-            } else if (campaign.getWarehouse() != null) {
-                inStock = campaign.getWarehouse().getSparePartsCount(this);
+            } else if (getWarehouse() != null) {
+                inStock = getWarehouse().getSparePartsCount(this);
             }
             String inStockText = inStock == 0 ?
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
@@ -1465,9 +1465,9 @@ public abstract class Part implements IPartWork, ITechnology {
         quantity = Math.max(number, 0);
         if (quantity == 0) {
             for (Part childPart : childParts) {
-                campaign.getWarehouse().removePart(childPart);
+                getWarehouse().removePart(childPart);
             }
-            campaign.getWarehouse().removePart(this);
+            getWarehouse().removePart(this);
         }
     }
 
@@ -1982,7 +1982,7 @@ public abstract class Part implements IPartWork, ITechnology {
     public void fixReferences(Campaign campaign) {
         if (replacementPart instanceof PartRef) {
             int id = replacementPart.getId();
-            replacementPart = campaign.getWarehouse().getPart(id);
+            replacementPart = getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
                 LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
@@ -1990,7 +1990,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (parentPart instanceof PartRef) {
             int id = parentPart.getId();
-            parentPart = campaign.getWarehouse().getPart(id);
+            parentPart = getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
                 LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
@@ -1999,7 +1999,7 @@ public abstract class Part implements IPartWork, ITechnology {
         for (int ii = childParts.size() - 1; ii >= 0; --ii) {
             Part childPart = childParts.get(ii);
             if (childPart instanceof PartRef) {
-                Part realPart = campaign.getWarehouse().getPart(childPart.getId());
+                Part realPart = getWarehouse().getPart(childPart.getId());
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {
