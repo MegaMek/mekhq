@@ -34,6 +34,7 @@ package mekhq.campaign.personnel;
 
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -42,9 +43,11 @@ import java.util.List;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 
@@ -127,6 +130,12 @@ public class PersonUtility {
      * and campaign preferences. The chosen skills are then assigned to the person, with optional randomization of their
      * levels if specified.</p>
      *
+     * <p><b>Usage:</b> Generally you want to use
+     * {@link #overrideSkills(Campaign, Person, PersonnelRole, SkillLevel, boolean)} instead of directly calling this
+     * method. The cited overload also includes a call to {@link #setVeterancyAwardEligibility(Campaign, Person)} which
+     * is needed to ensure ineligible characters aren't given Veterancy awards (or worse, eligible characters
+     * <b>not</b> being given them).</p>
+     *
      * @param isAdminsHaveNegotiation    if {@code true}, administrators are assigned the Negotiation skill.
      * @param isDoctorsUseAdministration if {@code true}, doctors are given the Administration skill.
      * @param isTechsUseAdministration   if {@code true}, technicians are given the Administration skill.
@@ -136,7 +145,7 @@ public class PersonUtility {
      * @param primaryRole                the {@link PersonnelRole} used to determine which skills to assign.
      * @param skillLevel                 the {@link SkillLevel} to use as a baseline for assigned skills.
      */
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
+    private static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
           boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseExtraRandom, Person person,
           PersonnelRole primaryRole, SkillLevel skillLevel) {
         List<String> skills = primaryRole.getSkillsForProfession(isAdminsHaveNegotiation,
@@ -147,6 +156,68 @@ public class PersonUtility {
         if (!skills.isEmpty()) {
             addSkillsAndRandomize(person, skills, skillLevel, isUseExtraRandom);
         }
+    }
+
+    /**
+     * Assigns and overrides the skills of a {@link Person} based on their role, experience level, and campaign-specific
+     * settings.
+     *
+     * <p>This method acts as a convenience wrapper that extracts the relevant skill and randomization preferences
+     * from the provided {@link Campaign} before delegating to the internal
+     * {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)} overload.
+     * After skills are assigned, the person's eligibility for the Veterancy Award (SPA) is evaluated and updated via
+     * {@link #setVeterancyAwardEligibility(Campaign, Person)}.</p>
+     *
+     * @param campaign                  the {@link Campaign} from which skill configuration and randomization
+     *                                  preferences are derived; must not be {@code null}
+     * @param person                    the {@link Person} whose skills will be overridden; must not be {@code null}
+     * @param personnelRole             the {@link PersonnelRole} used to determine which skills to assign
+     * @param skillLevel                the {@link SkillLevel} to use as a baseline for assigned skills
+     * @param checkVeterancyEligibility if {@code true} veterancy award eligibility should be checked. Generally, this
+     *                                  should only be done for the characters' primary profession.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static void overrideSkills(Campaign campaign, Person person, PersonnelRole personnelRole,
+          SkillLevel skillLevel, boolean checkVeterancyEligibility) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isAdminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
+        boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+        boolean isTechsUseAdministration = campaignOptions.isTechsUseAdministration();
+        boolean isUseArtillery = campaignOptions.isUseArtillery();
+
+        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
+        boolean isUseExtraRandom = randomSkillPreferences.randomizeSkill();
+
+        overrideSkills(isAdminsHaveNegotiation, isDoctorsUseAdministration, isTechsUseAdministration, isUseArtillery,
+              isUseExtraRandom, person, personnelRole, skillLevel);
+
+        if (checkVeterancyEligibility) {
+            setVeterancyAwardEligibility(campaign, person);
+        }
+    }
+
+    /**
+     * Determines and sets a person's eligibility for the Veterancy Award (SPA).
+     *
+     * <p>A person is eligible if their current experience level is below {@link SkillType#EXP_VETERAN}, meaning they
+     * have not yet reached veteran status.</p>
+     *
+     * @param campaign the current {@link Campaign}, used to evaluate the person's experience level in context
+     * @param person   the {@link Person} whose veterancy award eligibility is being assessed and updated
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static void setVeterancyAwardEligibility(Campaign campaign, Person person) {
+        boolean useSecondaryProfession = false;
+        boolean excludeInjuryEffects = true;
+        int experienceLevel = person.getExperienceLevel(campaign, useSecondaryProfession, excludeInjuryEffects);
+
+        boolean isEligibleForVeterancyAward = experienceLevel < EXP_VETERAN;
+
+        person.setHasGainedVeterancySPA(isEligibleForVeterancyAward);
     }
 
     /**

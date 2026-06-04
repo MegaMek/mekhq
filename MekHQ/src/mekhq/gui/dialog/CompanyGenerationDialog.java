@@ -285,18 +285,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void generateSparePersonnel(CompanyGenerationOptions options) {
         Person person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
 
-        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
-
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
-              campaignOptions.isDoctorsUseAdministration(),
-              campaignOptions.isTechsUseAdministration(),
-              campaignOptions.isUseArtillery(),
-              useExtraRandomness,
-              person,
-              PersonnelRole.MEKWARRIOR,
-              SkillLevel.GREEN);
+        boolean checkVeterancyEligibility = true;
+        overrideSkills(campaign, person, PersonnelRole.MEKWARRIOR, SkillLevel.GREEN, checkVeterancyEligibility);
 
         SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
         reRollLoyalty(person, actualSkillLevel);
