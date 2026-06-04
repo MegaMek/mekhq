@@ -61,6 +61,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -80,6 +81,12 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 public class AdvancementTab {
     private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = 300;
     private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int ADVANCEMENT_LABEL_CONTROL_GAP = 12;
+    private static final int ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH = 100;
+    private static final int ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH = ADVANCEMENT_LABEL_COLUMN_WIDTH
+            + ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH + ADVANCEMENT_LABEL_CONTROL_GAP;
+    private static final int ADVANCEMENT_GRID_NARROW_PAIR_COLUMN_WIDTH = 240;
+    private static final int ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH = 290;
     private static final int RECRUITMENT_LABEL_COLUMN_WIDTH = 190;
     private static final int RECRUITMENT_CONTROL_COLUMN_WIDTH = 90;
     private static final int RECRUITMENT_PAIRS_PER_ROW = 2;
@@ -350,6 +357,23 @@ public class AdvancementTab {
         return panel;
     }
 
+    private CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
+            JComponent[] controls) {
+        return createAdvancementPairedGrid(name, labels, controls, ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH);
+    }
+
+    private CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
+            JComponent[] controls, int pairColumnWidth) {
+        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+                pairColumnWidth,
+                pairColumnWidth,
+                ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH,
+                2);
+        panel.addPairs(labels, controls);
+
+        return panel;
+    }
+
     /**
      * Creates and returns the Tasks panel, which allows users to configure settings
      * for task-related experience awards,
@@ -384,15 +408,10 @@ public class AdvancementTab {
         spnMistakeXP = new CampaignOptionsSpinner("MistakeXP", 0, 0, 20, 1);
         spnMistakeXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "MistakeXP"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TasksPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblTaskXP, spnTaskXP);
-        panel.addRow(lblNTasksXP, spnNTasksXP);
-        panel.addRow(lblSuccessXP, spnSuccessXP);
-        panel.addRow(lblMistakeXP, spnMistakeXP);
+        JComponent[] labels = { lblTaskXP, lblNTasksXP, lblSuccessXP, lblMistakeXP };
+        JComponent[] controls = { spnTaskXP, spnNTasksXP, spnSuccessXP, spnMistakeXP };
 
-        return panel;
+        return createAdvancementPairedGrid("TasksPanel", labels, controls);
     }
 
     /**
@@ -419,14 +438,10 @@ public class AdvancementTab {
         spnKills = new CampaignOptionsSpinner("Kills", 0, 0, 100, 1);
         spnKills.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "Kills"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ScenariosPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblScenarioXP, spnScenarioXP);
-        panel.addRow(lblKillXP, spnKillXP);
-        panel.addRow(lblKills, spnKills);
+        JComponent[] labels = { lblScenarioXP, lblKillXP, lblKills };
+        JComponent[] controls = { spnScenarioXP, spnKillXP, spnKills };
 
-        return panel;
+        return createAdvancementPairedGrid("ScenariosPanel", labels, controls);
     }
 
     /**
@@ -470,17 +485,12 @@ public class AdvancementTab {
         spnMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater(xpAwardsHeader,
                 "MissionXpOutstandingSuccess"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MissionsPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblVocationalXP, spnVocationalXP);
-        panel.addRow(lblVocationalXPFrequency, spnVocationalXPFrequency);
-        panel.addRow(lblVocationalXPTargetNumber, spnVocationalXPTargetNumber);
-        panel.addRow(lblMissionXpFail, spnMissionXpFail);
-        panel.addRow(lblMissionXpSuccess, spnMissionXpSuccess);
-        panel.addRow(lblMissionXpOutstandingSuccess, spnMissionXpOutstandingSuccess);
+        JComponent[] labels = { lblVocationalXP, lblVocationalXPFrequency, lblVocationalXPTargetNumber,
+                lblMissionXpFail, lblMissionXpSuccess, lblMissionXpOutstandingSuccess };
+        JComponent[] controls = { spnVocationalXP, spnVocationalXPFrequency, spnVocationalXPTargetNumber,
+                spnMissionXpFail, spnMissionXpSuccess, spnMissionXpOutstandingSuccess };
 
-        return panel;
+        return createAdvancementPairedGrid("MissionsPanel", labels, controls);
     }
 
     /**
@@ -509,14 +519,10 @@ public class AdvancementTab {
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP", 0, 0, 20, 1);
         spnContractNegotiationXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ContractNegotiationXP"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AdministratorsXpPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblAdminWeeklyXP, spnAdminWeeklyXP);
-        panel.addRow(lblAdminWeeklyXPPeriod, spnAdminWeeklyXPPeriod);
-        panel.addRow(lblContractNegotiationXP, spnContractNegotiationXP);
+        JComponent[] labels = { lblAdminWeeklyXP, lblAdminWeeklyXPPeriod, lblContractNegotiationXP };
+        JComponent[] controls = { spnAdminWeeklyXP, spnAdminWeeklyXPPeriod, spnContractNegotiationXP };
 
-        return panel;
+        return createAdvancementPairedGrid("AdministratorsXpPanel", labels, controls);
     }
 
     /**
@@ -662,10 +668,6 @@ public class AdvancementTab {
         phenotypeLabels = new JLabel[phenotypes.size()];
         phenotypeSpinners = new JSpinner[phenotypes.size()];
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PhenotypesPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
-
         for (int i = 0; i < phenotypes.size(); i++) {
             phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getLabel());
             phenotypeLabels[i].addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
@@ -675,11 +677,10 @@ public class AdvancementTab {
             phenotypeSpinners[i].addMouseListener(createTipPanelUpdater(skillRandomizationHeader,
                     null,
                     phenotypes.get(i).getTooltip()));
-
-            panel.addRow(phenotypeLabels[i], phenotypeSpinners[i]);
         }
 
-        return panel;
+        return createAdvancementPairedGrid("PhenotypesPanel", phenotypeLabels, phenotypeSpinners,
+                ADVANCEMENT_GRID_NARROW_PAIR_COLUMN_WIDTH);
     }
 
     private JPanel createExperienceLevelModifiersPanel() {
@@ -788,19 +789,13 @@ public class AdvancementTab {
         createArtilleryControls();
         createSmallArmsControls();
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SpecialSkillModifiersPanel",
-                ADVANCEMENT_LABEL_COLUMN_WIDTH,
-                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblRoleplaySkillsModifier, spnRoleplaySkillsModifier);
-        panel.addRow(lblAntiMekSkill, spnAntiMekSkill);
-        panel.addRow(lblSecondProb, spnSecondProb);
-        panel.addRow(lblSecondBonus, spnSecondBonus);
-        panel.addRow(lblArtyProb, spnArtyProb);
-        panel.addRow(lblArtyBonus, spnArtyBonus);
-        panel.addRow(lblCombatSA, spnCombatSA);
-        panel.addRow(lblSupportSA, spnSupportSA);
+        JComponent[] labels = { lblRoleplaySkillsModifier, lblAntiMekSkill, lblSecondProb, lblSecondBonus,
+                lblArtyProb, lblArtyBonus, lblCombatSA, lblSupportSA };
+        JComponent[] controls = { spnRoleplaySkillsModifier, spnAntiMekSkill, spnSecondProb, spnSecondBonus,
+                spnArtyProb, spnArtyBonus, spnCombatSA, spnSupportSA };
 
-        return panel;
+        return createAdvancementPairedGrid("SpecialSkillModifiersPanel", labels, controls,
+                ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH);
     }
 
     private void createSecondarySkillControls() {

@@ -42,12 +42,21 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
+import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -55,12 +64,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
@@ -81,7 +97,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * <p>Each skill sub-type (Gunnery, Piloting, Support, Utility, Roleplay) is presented as a single table listing every
  * skill in that category alongside its base target number and a summary of its experience milestones. Per-level XP
  * costs and the milestone thresholds are edited through a dedicated "Advanced" pop-up so the main view stays compact.
- * Copy and Paste buttons transfer a row's full configuration onto one or more selected rows.</p>
+ * Ctrl+C copies the selected row's full configuration and Ctrl+V applies it onto one or more selected rows.</p>
  */
 public class SkillsTab {
     private final CampaignOptions campaignOptions;
@@ -210,8 +226,8 @@ public class SkillsTab {
     }
 
     /**
-     * Builds the body for the skills section: the optional Misc Costs row (Gunnery only), the Copy/Paste action row,
-     * and the skills table.
+     * Builds the body for the skills section: the optional Misc Costs row (Gunnery only), the keyboard-shortcut hint
+     * row, and the skills table.
      *
      * @param category   the skill sub-type being displayed
      * @param table      the skills table
@@ -223,11 +239,9 @@ public class SkillsTab {
         final JPanel content = new CampaignOptionsStandardPanel("SkillsSectionContent", false);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(content);
 
-        JButton copyButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
-        copyButton.addActionListener(e -> copySelectedSkill(table, tableModel));
+        installCopyPasteBindings(table, tableModel);
 
-        JButton pasteButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
-        pasteButton.addActionListener(e -> pasteToSelectedSkills(table, tableModel));
+        JLabel hintLabel = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableHint.text"));
 
         layout.gridy = 0;
 
@@ -238,13 +252,10 @@ public class SkillsTab {
             layout.gridy++;
         }
 
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        content.add(copyButton, layout);
-        layout.gridx++;
-        content.add(pasteButton, layout);
-
         layout.gridwidth = 5;
+        layout.gridx = 0;
+        content.add(hintLabel, layout);
+
         layout.gridx = 0;
         layout.gridy++;
         content.add(createTableScrollPane(table), layout);
@@ -259,6 +270,8 @@ public class SkillsTab {
         table.setShowVerticalLines(false);
         table.setRowHeight(Math.max(table.getRowHeight(), UIUtil.scaleForGUI(24)));
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        // Allow Ctrl/Shift selection of several rows so a copied configuration can be pasted onto all of them.
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         table.getColumnModel().getColumn(SkillsTableModel.SKILL_COLUMN)
               .setPreferredWidth(UIUtil.scaleForGUI(180));
@@ -275,6 +288,36 @@ public class SkillsTab {
         DefaultTableCellRenderer leftAlignedRenderer = new DefaultTableCellRenderer();
         leftAlignedRenderer.setHorizontalAlignment(SwingConstants.LEFT);
         table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN).setCellRenderer(leftAlignedRenderer);
+
+        // Auto-select the existing value when editing a TN cell, so clicking a cell then typing a number replaces it.
+        JTextField targetEditorField = new JTextField();
+        targetEditorField.setHorizontalAlignment(SwingConstants.LEFT);
+        ((AbstractDocument) targetEditorField.getDocument()).setDocumentFilter(new DigitOnlyDocumentFilter());
+        DefaultCellEditor targetEditor = new DefaultCellEditor(targetEditorField) {
+            @Override
+            public boolean isCellEditable(EventObject anEvent) {
+                // Let Ctrl/Shift clicks extend the row selection instead of starting an edit, so multiple rows can be
+                // selected (and pasted onto) even when clicking within the TN column.
+                if (anEvent instanceof MouseEvent mouseEvent
+                          && (mouseEvent.isControlDown() || mouseEvent.isShiftDown())) {
+                    return false;
+                }
+                return super.isCellEditable(anEvent);
+            }
+
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+                  int column) {
+                Component editor = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+                SwingUtilities.invokeLater(targetEditorField::selectAll);
+                return editor;
+            }
+        };
+        targetEditor.setClickCountToStart(1);
+        table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN).setCellEditor(targetEditor);
+        // Mirror the row copy/paste shortcuts onto the TN editor field so Ctrl+C/Ctrl+V still copy the whole row even
+        // when a TN cell is in edit mode (the field would otherwise consume them as a plain text copy/paste).
+        registerRowCopyPasteShortcuts(targetEditorField, JComponent.WHEN_FOCUSED, table, tableModel);
 
         String editText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
         table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
@@ -334,6 +377,60 @@ public class SkillsTab {
         content.add(spnAttributeCost, layout);
 
         return content;
+    }
+
+    /**
+     * Registers Ctrl+C / Ctrl+V key bindings on the skills table so a row's full configuration can be copied from the
+     * selected row and pasted onto one or more selected rows without dedicated buttons.
+     *
+     * @param table      the skills table to bind the shortcuts to
+     * @param tableModel the model backing the table
+     */
+    private void installCopyPasteBindings(JTable table, SkillsTableModel tableModel) {
+        registerRowCopyPasteShortcuts(table, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, table, tableModel);
+    }
+
+    /**
+     * Registers the Ctrl+C / Ctrl+V row copy/paste actions on the given component. This is also applied to the TN cell
+     * editor so the shortcuts work while a TN cell is being edited (otherwise the editor would consume the keystrokes
+     * as a plain text copy/paste and the row configuration would never be captured).
+     *
+     * @param component  the component whose input/action maps receive the shortcuts
+     * @param condition  the input map condition (e.g. {@link JComponent#WHEN_FOCUSED})
+     * @param table      the skills table the actions operate on
+     * @param tableModel the model backing the table
+     */
+    private void registerRowCopyPasteShortcuts(JComponent component, int condition, JTable table,
+          SkillsTableModel tableModel) {
+        InputMap inputMap = component.getInputMap(condition);
+        ActionMap actionMap = component.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copySkill");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "pasteSkill");
+
+        actionMap.put("copySkill", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopEditing(table);
+                copySelectedSkill(table, tableModel);
+            }
+        });
+        actionMap.put("pasteSkill", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopEditing(table);
+                pasteToSelectedSkills(table, tableModel);
+            }
+        });
+    }
+
+    private void stopEditing(JTable table) {
+        if (table.isEditing()) {
+            TableCellEditor editor = table.getCellEditor();
+            if (editor != null) {
+                editor.stopCellEditing();
+            }
+        }
     }
 
     private void copySelectedSkill(JTable table, SkillsTableModel tableModel) {
@@ -597,10 +694,43 @@ public class SkillsTab {
     }
 
     /**
+     * A {@link DocumentFilter} that only permits digit characters, used to keep the TN cell editor numeric. The table
+     * model still clamps the final value to its valid range when editing stops.
+     */
+    private static final class DigitOnlyDocumentFilter extends DocumentFilter {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+              throws BadLocationException {
+            if (isDigitsOnly(string)) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+              throws BadLocationException {
+            if (isDigitsOnly(text)) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+
+        private static boolean isDigitsOnly(String text) {
+            if (text == null) {
+                return true;
+            }
+            for (int i = 0; i < text.length(); i++) {
+                if (!Character.isDigit(text.charAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
      * A table cell renderer that paints a button. Used to give every skill row an "Advanced" affordance.
      */
-    private static final class ButtonRenderer extends JButton implements TableCellRenderer {
-        private ButtonRenderer(String text) {
+    private static final class ButtonRenderer extends JButton implements TableCellRenderer {        private ButtonRenderer(String text) {
             super(text);
             setOpaque(true);
         }
