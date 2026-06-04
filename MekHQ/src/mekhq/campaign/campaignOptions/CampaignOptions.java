@@ -233,6 +233,7 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterVehicles;
     private boolean onlyCommandersMatterInfantry;
     private boolean onlyCommandersMatterBattleArmor;
+    private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -848,6 +849,7 @@ public class CampaignOptions {
         setUseAbilities(false);
         setOnlyCommandersMatterVehicles(false);
         setOnlyCommandersMatterInfantry(false);
+        edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
         setUseSupportEdge(false);
@@ -1700,6 +1702,14 @@ public class CampaignOptions {
 
     public void setOnlyCommandersMatterBattleArmor(final boolean onlyCommandersMatterBattleArmor) {
         this.onlyCommandersMatterBattleArmor = onlyCommandersMatterBattleArmor;
+    }
+
+    public EdgeRefreshPeriod getEdgeRefreshPeriod() {
+        return edgeRefreshPeriod;
+    }
+
+    public void setEdgeRefreshPeriod(final EdgeRefreshPeriod edgeRefreshPeriod) {
+        this.edgeRefreshPeriod = edgeRefreshPeriod;
     }
 
     public boolean isUseEdge() {

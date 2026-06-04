@@ -54,6 +54,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
+import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
@@ -112,6 +113,8 @@ public class PersonnelTab {
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseSupportEdge;
+    private JLabel lblEdgeRefreshPeriod;
+    private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JLabel lblEdgeRefreshCost;
     private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
@@ -396,6 +399,8 @@ public class PersonnelTab {
         chkOnlyCommandersMatterBattleArmor = new JCheckBox();
         chkUseEdge = new JCheckBox();
         chkUseSupportEdge = new JCheckBox();
+        lblEdgeRefreshPeriod = new JLabel();
+        comboEdgeRefreshPeriod = new MMComboBox<>("comboEdgeRefreshPeriod", EdgeRefreshPeriod.values());
         lblEdgeRefreshCost = new JLabel();
         spnEdgeRefreshCost = new JSpinner();
         chkUseImplants = new JCheckBox();
@@ -512,6 +517,22 @@ public class PersonnelTab {
         chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
         chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
         chkUseSupportEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseSupportEdge"));
+
+        lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
+        lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshPeriod"));
+        comboEdgeRefreshPeriod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof EdgeRefreshPeriod) {
+                    list.setToolTipText(wordWrap(((EdgeRefreshPeriod) value).getTooltip()));
+                }
+                return this;
+            }
+        });
+        comboEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshPeriod"));
+
         lblEdgeRefreshCost = new CampaignOptionsLabel("EdgeRefreshCost", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshCost.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshCost"));
         spnEdgeRefreshCost = new CampaignOptionsSpinner("EdgeRefreshCost", 20, 0, 100, 1);
@@ -569,8 +590,11 @@ public class PersonnelTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkUseImplants, layout);
+        panel.add(lblEdgeRefreshPeriod, layout);
+        layout.gridx++;
+        panel.add(comboEdgeRefreshPeriod, layout);
 
+        layout.gridx = 0;
         layout.gridy++;
         panel.add(chkUseImplants, layout);
 
@@ -1490,6 +1514,7 @@ public class PersonnelTab {
         chkOnlyCommandersMatterBattleArmor.setSelected(options.isOnlyCommandersMatterBattleArmor());
         chkUseEdge.setSelected(options.isUseEdge());
         chkUseSupportEdge.setSelected(options.isUseSupportEdge());
+        comboEdgeRefreshPeriod.setSelectedItem(options.getEdgeRefreshPeriod());
         spnEdgeRefreshCost.setValue(options.getEdgeRefreshCost());
         chkUseImplants.setSelected(options.isUseImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.isAlternativeQualityAveraging());
@@ -1601,6 +1626,7 @@ public class PersonnelTab {
         options.setOnlyCommandersMatterBattleArmor(chkOnlyCommandersMatterBattleArmor.isSelected());
         options.setUseEdge(chkUseEdge.isSelected());
         options.setUseSupportEdge(chkUseSupportEdge.isSelected());
+        options.setEdgeRefreshPeriod(comboEdgeRefreshPeriod.getSelectedItem());
         options.setEdgeRefreshCost((int) spnEdgeRefreshCost.getValue());
         options.setUseImplants(chkUseImplants.isSelected());
         options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
