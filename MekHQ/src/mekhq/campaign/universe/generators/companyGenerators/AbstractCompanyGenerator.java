@@ -1648,11 +1648,6 @@ public abstract class AbstractCompanyGenerator {
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         Money loan = Money.zero();
 
-        // Process Initial Contract Payment
-        if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
-            startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
-        }
-
         if (getOptions().isPayForSetup()) {
             // Calculate the total costs of setup
             final Money costs = calculateHiringCosts(campaign, trackers)
