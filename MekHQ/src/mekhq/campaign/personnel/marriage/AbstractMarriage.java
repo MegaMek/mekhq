@@ -290,13 +290,11 @@ public abstract class AbstractMarriage {
     /**
      * Processes new day random marriage for an individual.
      *
-     * @param campaign     the campaign to process
-     * @param today        the current day
-     * @param person       the person to process
-     * @param isBackground whether the marriage occurred in a character's background
+     * @param campaign the campaign to process
+     * @param today    the current day
+     * @param person   the person to process
      */
-    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person,
-          boolean isBackground) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
         if (canMarry(today, person, true) != null) {
             return;
         }
@@ -311,7 +309,7 @@ public abstract class AbstractMarriage {
                 isInterUnit = true;
             }
 
-            marryRandomSpouse(campaign, today, person, isInterUnit, isBackground);
+            marryRandomSpouse(campaign, today, person, isInterUnit, false);
         }
     }
 

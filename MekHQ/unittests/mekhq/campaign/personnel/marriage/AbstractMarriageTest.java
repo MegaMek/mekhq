@@ -491,19 +491,19 @@ public class AbstractMarriageTest {
     //region New Week
     @Test
     public void testProcessNewWeek() {
-        doCallRealMethod().when(mockMarriage).processNewWeek(any(), any(), any(), anyBoolean());
-        doNothing().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean(), eq(true));
+        doCallRealMethod().when(mockMarriage).processNewWeek(any(), any(), any());
+        doNothing().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean(), eq(false));
 
         final Person mockPerson = mock(Person.class);
 
         when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn("Married");
-        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(0)).randomMarriage();
         verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean());
 
         when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn(null);
         when(mockMarriage.randomMarriage()).thenReturn(true);
-        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(1)).randomMarriage();
         verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean());
     }

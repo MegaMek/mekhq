@@ -1666,7 +1666,7 @@ public class CampaignNewDayManager {
     private void processWeeklyRelationshipEvents(Person person) {
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
             campaign.getDivorce().processNewWeek(campaign, today, person, false);
-            campaign.getMarriage().processNewWeek(campaign, today, person, false);
+            campaign.getMarriage().processNewWeek(campaign, today, person);
             campaign.getProcreation().processNewWeek(campaign, today, person);
         }
     }

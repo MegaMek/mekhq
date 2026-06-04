@@ -704,7 +704,7 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson(), true);
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
@@ -1731,7 +1731,7 @@ public abstract class AbstractCompanyGenerator {
     private Money rollRandomStartingCash() {
         return getOptions().isRandomizeStartingCash()
                      ? Money.of(Math.pow(10, 6))
-                       .multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
+                             .multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
                      : Money.zero();
     }
 
