@@ -61,6 +61,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -125,7 +126,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1309,15 +1310,7 @@ public class AtBContract extends Contract {
     public void createEmployerLiaison(Campaign campaign) {
         employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
 
-        final RankSystem rankSystem = getEmployerFaction().getRankSystem();
-
-        final RankValidator rankValidator = new RankValidator();
-        if (!rankValidator.validate(rankSystem, false)) {
-            return;
-        }
-
-        employerLiaison.setRankSystem(rankValidator, rankSystem);
-        employerLiaison.setRank(Rank.RWO_MIN);
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(employerLiaison, RO_MIN);
     }
 
     public Person getClanOpponent() {
@@ -1338,6 +1331,8 @@ public class AtBContract extends Contract {
             clanOpponent.setBloodname(bloodname.getName());
         }
 
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(employerLiaison, RO_MIN);
+
         final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
 
         final RankValidator rankValidator = new RankValidator();
@@ -1346,7 +1341,9 @@ public class AtBContract extends Contract {
         }
 
         clanOpponent.setRankSystem(rankValidator, rankSystem);
-        clanOpponent.setRank(38);
+
+        int targetClanRank = 38;
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(clanOpponent, targetClanRank);
     }
 
     public String getEmployerCode() {

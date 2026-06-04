@@ -33,6 +33,8 @@
 package mekhq.campaign.personnel.ranks;
 
 import static java.lang.Math.max;
+import static mekhq.campaign.personnel.ranks.Rank.RE_MIN;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MAX;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -70,7 +72,6 @@ public final class AutoAssignRankForCompanyGenerator {
     private static final int CLAN_RANK = 4;
     private static final int COMSTAR_RANK = 4;
 
-    private static final int MIN_RANK_INDEX = 0;
     private static final int COMMANDER_RANK_INDEX = 12;
     private static final int LEADER_STARTING_RANK_INDEX = COMMANDER_RANK_INDEX - 1;
     private static final int NORMAL_STARTING_RANK_INDEX = LEADER_STARTING_RANK_INDEX;
@@ -222,32 +223,32 @@ public final class AutoAssignRankForCompanyGenerator {
      * Attempts to assign the highest valid rank at or below {@code startIndex} to the given {@link Person}.
      *
      * <p>Beginning at {@code startIndex}, the method decrements the candidate rank index until it finds a rank that
-     * resolves to a non-empty, non-placeholder name, or until {@link #MIN_RANK_INDEX} is reached. This handles gaps in
-     * rank tables where certain indices map to missing or blank entries.</p>
+     * resolves to a non-empty, non-placeholder name, or until {@link Rank#RE_MIN} is reached. This handles gaps in rank
+     * tables where certain indices map to missing or blank entries.</p>
      *
-     * <p>If {@code startIndex} is already at or below {@link #MIN_RANK_INDEX}, no assignment is attempted and
-     * {@link #MIN_RANK_INDEX} is returned immediately.</p>
+     * <p>If {@code startIndex} is already at or below {@link Rank#RE_MIN}, no assignment is attempted and
+     * {@link Rank#RE_MIN} is returned immediately.</p>
      *
      * @param person     the {@link Person} to receive the rank assignment
      * @param startIndex the highest rank index to try first; the method will walk downward from this value if
      *                   necessary
      *
-     * @return the rank index that was ultimately set on the person, or {@link #MIN_RANK_INDEX} if no valid rank could
-     *       be found
+     * @return the rank index that was ultimately set on the person, or {@link Rank#RE_MIN} if no valid rank could be
+     *       found
      *
      * @author Illiani
      * @since 0.51.0
      */
     private static int assignNormalRank(Person person, int startIndex) {
-        if (startIndex <= MIN_RANK_INDEX) {
-            return MIN_RANK_INDEX;
+        if (startIndex <= RE_MIN) {
+            return RE_MIN;
         }
 
         int rankIndex = startIndex;
         person.setRank(rankIndex);
 
         boolean noRank = hasNoRank(person);
-        while (rankIndex > MIN_RANK_INDEX && noRank) {
+        while (rankIndex > RE_MIN && noRank) {
             rankIndex--;
             person.setRank(rankIndex);
 
@@ -255,6 +256,29 @@ public final class AutoAssignRankForCompanyGenerator {
         }
 
         return rankIndex;
+    }
+
+    /**
+     * Assigns the lowest valid rank to the given person, starting from the specified index and ascending until a valid
+     * rank is found or {@link Rank#RO_MAX} is reached.
+     *
+     * @param person     the {@link Person} to assign a rank to; must not be {@code null}
+     * @param startIndex the rank value to begin searching from (inclusive)
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static void assignAscendingRank(Person person, int startIndex) {
+        int rankIndex = startIndex;
+        person.setRank(rankIndex);
+
+        boolean noRank = hasNoRank(person);
+        while (rankIndex <= RO_MAX && noRank) {
+            rankIndex++;
+            person.setRank(rankIndex);
+
+            noRank = hasNoRank(person);
+        }
     }
 
     /**
@@ -275,5 +299,16 @@ public final class AutoAssignRankForCompanyGenerator {
         return StringUtility.isNullOrBlank(rankName) ||
                      rankName.equalsIgnoreCase(NO_RANK) ||
                      rankName.equalsIgnoreCase(MISSING_RANK);
+    }
+
+    public static void assignRankSystemFromFaction(Person person, int rankLevel) {
+        RankSystem rankSystem = person.getOriginFaction().getRankSystem();
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+        person.setRankSystem(rankValidator, rankSystem);
+
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(person, rankLevel);
     }
 }

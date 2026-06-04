@@ -487,6 +487,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_PREGNANCY: {
                 Stream.of(people)
+                      .filter(person -> person.getGender().isFemale())
                       .filter(person -> (getCampaign().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), person, false) == null))
                       .forEach(person -> {
@@ -3599,6 +3600,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
 
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerFatalAccident.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_SALVAGE_ACCIDENTS,
+                          TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
                     menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
                           PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL,
@@ -3681,6 +3689,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerFailedRefit.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
                           PersonnelOptions.EDGE_REPAIR_FAILED_REFIT,
+                          FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerFatalAccident.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_SALVAGE_ACCIDENTS,
                           FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
@@ -3900,8 +3915,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               Person::setQuickTrainIgnore);
         addFlagMenuItem(menu, selected, "miSalvageSupervisor", null, Person::isSalvageSupervisor,
               Person::setSalvageSupervisor);
-        addFlagMenuItem(menu, selected, "miTryingToConceive", null, Person::isTryingToConceive,
-              Person::setTryingToConceive);
+        addFlagMenuItem(menu, selected, "miWantsChildren", null, Person::isWantsChildren,
+              Person::setWantsChildren);
         addFlagMenuItem(menu, selected, "neverAssignMaintenanceAutomatically", null,
               Person::isNeverAssignMaintenanceAutomatically, Person::setNeverAssignMaintenanceAutomatically);
 
@@ -4191,6 +4206,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected)
+                          .filter(p -> p.getGender().isFemale())
                           .anyMatch(p -> getCampaign().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), p, false) == null)) {
                     menuItem = new JMenuItem(resources.getString(oneSelected ?
