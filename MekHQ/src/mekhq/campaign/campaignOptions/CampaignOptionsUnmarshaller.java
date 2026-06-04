@@ -894,7 +894,6 @@ public class CampaignOptionsUnmarshaller {
             case "opForLanceTypeMixed" -> campaignOptions.setOpForLanceTypeMixed(parseInt(nodeContents));
             case "opForLanceTypeVehicles" -> campaignOptions.setOpForLanceTypeVehicles(parseInt(nodeContents));
             case "useDropShips" -> campaignOptions.setUseDropShips(parseBoolean(nodeContents));
-            case "mercSizeLimited" -> campaignOptions.setMercSizeLimited(parseBoolean(nodeContents));
             case "moraleVictoryEffect" -> campaignOptions.setMoraleVictoryEffect(parseInt(nodeContents));
             case "moraleDecisiveVictoryEffect" ->
                   campaignOptions.setMoraleDecisiveVictoryEffect(parseInt(nodeContents));
