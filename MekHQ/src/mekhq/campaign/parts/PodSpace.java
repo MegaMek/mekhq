@@ -45,6 +45,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -301,6 +302,11 @@ public class PodSpace implements IPartWork {
     @Override
     public Person getTech() {
         return tech;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        return campaign.getWarehouse();
     }
 
     @Override

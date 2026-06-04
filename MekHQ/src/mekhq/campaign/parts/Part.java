@@ -64,6 +64,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -251,6 +252,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public Campaign getCampaign() {
         return campaign;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        return campaign.getWarehouse();
     }
 
     public String getName() {

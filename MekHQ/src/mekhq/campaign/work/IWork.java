@@ -35,6 +35,7 @@ package mekhq.campaign.work;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.personnel.Person;
 
 public interface IWork {
@@ -64,4 +65,10 @@ public interface IWork {
     default WorkTime getMode() {
         return WorkTime.NORMAL;
     }
+
+    /**
+     * @return the {@code Warehouse} relevant to this work
+     */
+    @Nullable
+    Warehouse getWarehouse();
 }
