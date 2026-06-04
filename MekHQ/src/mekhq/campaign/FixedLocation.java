@@ -79,6 +79,10 @@ public class FixedLocation extends AbstractLocation {
                     if (p == null) {
                         logger.error("Couldn't find system: {}", wn2.getTextContent());
                         p = campaign.getSystemByName("Terra");
+                        if (p == null) {
+                            logger.error("Couldn't find Terra fallback; using first available system");
+                            p = campaign.getSystems().getFirst();
+                        }
                     }
                     retVal.currentSystem = p;
                 } else if (wn2.getNodeName().equalsIgnoreCase("locationNodeChildren")) {

@@ -237,6 +237,7 @@ public class CampaignNewDayManager {
         this.warehouse = campaign.getWarehouse();
         this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
+        this.updatedLocation = campaign.getCurrentLocation();
     }
 
     /**
@@ -436,6 +437,7 @@ public class CampaignNewDayManager {
         updateFacilities();
 
         processNewDayPersonnel();
+        campaign.pruneEmptyLocations();
 
         if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
             PlanetarySystem currentSystem = updatedLocation.getCurrentSystem();

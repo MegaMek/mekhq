@@ -1756,6 +1756,38 @@ public class Campaign implements ITechManager, ILocation {
         locations.remove(l);
     }
 
+    /**
+     * Removes any {@link AbstractLocation} entries in {@link #locations} that have no personnel
+     * at any depth in their subtree, excluding the campaign's own current location.
+     *
+     * <p>This handles two leak paths: {@link CurrentLocation} travel nodes whose passengers all
+     * died or were removed before arriving, and {@link FixedLocation}/{@link AcademyCampusLocation}
+     * pairs that were never cleaned up after the last student graduated.</p>
+     *
+     * <p>Call this once per day after all personnel processing has completed.</p>
+     */
+    public void pruneEmptyLocations() {
+        AbstractLocation mainLoc = getCurrentLocation();
+        locations.removeIf(loc -> {
+            if (loc == mainLoc) {
+                return false;
+            }
+            if (!loc.getPersonnelAtLocation().isEmpty()) {
+                return false;
+            }
+            if (loc instanceof CurrentLocation) {
+                loc.setParent(null);
+            } else if (loc instanceof FixedLocation) {
+                for (LocationNode child : new ArrayList<>(loc.getLocationNode().getChildren())) {
+                    if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                        campus.setParent(null);
+                    }
+                }
+            }
+            return true;
+        });
+    }
+
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
     }
@@ -1783,26 +1815,6 @@ public class Campaign implements ITechManager, ILocation {
         LocationNode.LocationManager.setLocation(campus, fixedLocation);
         locations.add(fixedLocation);
         return campus;
-    }
-
-    /**
-     * Removes the {@link FixedLocation} whose {@link AcademyCampusLocation} child matches the given academy set, name,
-     * and system.
-     */
-    public void removeCampusLocation(String academySet, String academyName, String systemId) {
-        locations.removeIf(loc -> {
-            if (!(loc instanceof FixedLocation fixedLoc)) {
-                return false;
-            }
-            if (!fixedLoc.getCurrentSystem().getId().equals(systemId)) {
-                return false;
-            }
-            return fixedLoc.getLocationNode().getChildren().stream()
-                         .anyMatch(child ->
-                                         child.getLocatable() instanceof AcademyCampusLocation c
-                                               && academySet.equals(c.getAcademySet())
-                                               && academyName.equals(c.getAcademyName()));
-        });
     }
 
     /**

@@ -33,7 +33,6 @@
 
 package mekhq.campaign;
 
-import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -48,7 +47,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -59,11 +57,9 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -189,16 +185,16 @@ public abstract class AbstractLocation implements ILocation {
      * @return the number of hours actually used for recharging
      */
     protected double applyRechargeForHours(Campaign campaign, LocalDate today, boolean isUseCommandCircuit,
-          double availableHours, boolean suppressReports) {
+          double availableHours, boolean isSilentProcessing) {
         double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
         double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
         if (usedRechargeTime > 0) {
-            if (!suppressReports) {
+            if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
                                                   Math.round(100.0 * usedRechargeTime) / 100.0));
             }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
-            if (getRechargeTime() >= neededRechargeTime && !suppressReports) {
+            if (getRechargeTime() >= neededRechargeTime && !isSilentProcessing) {
                 campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.recharge.complete"));
             }
         }
@@ -206,11 +202,11 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     // recharge even if there is no jump path because JumpShips don't go anywhere
-    public void newDay(Campaign campaign, boolean suppressReports) {
+    public void newDay(Campaign campaign, boolean isSilentProcessing) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0,
-              suppressReports);
+              isSilentProcessing);
     }
 
     void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {

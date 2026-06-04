@@ -49,8 +49,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
@@ -202,7 +202,7 @@ public class CurrentLocation extends AbstractLocation {
      * Check for a jump path and if found, do whatever needs to be done to move forward
      */
     @Override
-    public void newDay(Campaign campaign, boolean suppressReports) {
+    public void newDay(Campaign campaign, boolean isSilentProcessing) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -213,13 +213,13 @@ public class CurrentLocation extends AbstractLocation {
         double neededRechargeTime = currentSystem.getRechargeTime(today, campaign.isUseCommandCircuit());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
-            if (!suppressReports) {
+            if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, "JumpShips spent " +
                                                   (Math.round(100.0 * usedRechargeTime) / 100.0) +
                                                   " hours recharging drives");
             }
             rechargeTime += usedRechargeTime;
-            if (rechargeTime >= neededRechargeTime && !suppressReports) {
+            if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
                 campaign.addReport(GENERAL, "JumpShip drives fully charged");
             }
         }
@@ -233,7 +233,7 @@ public class CurrentLocation extends AbstractLocation {
             double usedTransitTime = Math.min(hours, 24.0 * (currentSystem.getTimeToJumpPoint(1.0) - transitTime));
             if (usedTransitTime > 0) {
                 transitTime += usedTransitTime / 24.0;
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "DropShips spent " +
                                                       (Math.round(100.0 * usedTransitTime) / 100.0) +
                                                       " hours in transit to jump point");
@@ -247,7 +247,7 @@ public class CurrentLocation extends AbstractLocation {
                 if (campaignOptions.isUseAbilities()) {
                     checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
                 }
                 currentSystem = jumpPath.get(1);
@@ -262,13 +262,13 @@ public class CurrentLocation extends AbstractLocation {
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
                 if (usedRechargeTime > 0) {
-                    if (!suppressReports) {
+                    if (!isSilentProcessing) {
                         campaign.addReport(GENERAL, "JumpShips spent " +
                                                           (Math.round(100.0 * usedRechargeTime) / 100.0) +
                                                           " hours recharging drives");
                     }
                     rechargeTime += usedRechargeTime;
-                    if (rechargeTime >= neededRechargeTime && !suppressReports) {
+                    if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
                         campaign.addReport(GENERAL, "JumpShip drives fully charged");
                     }
                 }
@@ -277,14 +277,14 @@ public class CurrentLocation extends AbstractLocation {
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
-            if (!suppressReports) {
+            if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, "DropShips spent " +
                                                   (Math.round(100.0 * usedTransitTime) / 100.0) +
                                                   " hours transiting into system");
             }
             transitTime -= usedTransitTime / 24.0;
             if (transitTime <= 0) {
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     campaign.addReport(GENERAL,
                           jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
                 }
@@ -313,7 +313,7 @@ public class CurrentLocation extends AbstractLocation {
             }
 
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     Inoculations.triggerInoculationPrompt(campaign, false);
                 } else {
                     Inoculations.autoInoculateAll(campaign, this);

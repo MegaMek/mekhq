@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
@@ -1578,6 +1579,8 @@ public class PersonTest {
                 PlanetarySystem currentSystem = mock(PlanetarySystem.class);
                 when(currentSystem.getId()).thenReturn("CurrentSystem");
                 when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+                when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+                      .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
             }
 
             @Test

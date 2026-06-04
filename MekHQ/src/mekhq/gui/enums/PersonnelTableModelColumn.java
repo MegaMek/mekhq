@@ -755,10 +755,9 @@ public enum PersonnelTableModelColumn {
                 yield scenario.getName();
             }
             case DESTINATION_NAME -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                AbstractLocation loc = getPersonLocation(person);
                 if (loc instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var destination = cl.getJumpPath().getLastSystem();
                     LocationNode clNode = cl.getLocationNode();
                     if (clNode != null) {
@@ -768,7 +767,7 @@ public enum PersonnelTableModelColumn {
                                 LocationNode fixedLocNode = parent.getParent();
                                 if (fixedLocNode != null
                                           && fixedLocNode.getLocatable() instanceof AbstractLocation campusLoc
-                                          && campusLoc.getCurrentSystem() == destination) {
+                                          && campusLoc.getCurrentSystem().equals(destination)) {
                                     yield campus.getAcademyName();
                                 }
                                 yield campaign.getName();
@@ -780,10 +779,9 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case DESTINATION_PLANET -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                AbstractLocation loc = getPersonLocation(person);
                 if (loc instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var dest = cl.getJumpPath().getLastSystem();
                     if (dest != null) {
                         Planet planet = dest.getPrimaryPlanet();
@@ -793,10 +791,9 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case DESTINATION_SYSTEM -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                AbstractLocation loc = getPersonLocation(person);
                 if (loc instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var dest = cl.getJumpPath().getLastSystem();
                     yield dest != null ? dest.getPrintableName(today) : "-";
                 }
@@ -845,10 +842,10 @@ public enum PersonnelTableModelColumn {
             case LAST_RANK_CHANGE_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
             case LEADERSHIP -> skillValue.apply(SkillType.S_LEADER);
             case LOCATION_NAME -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                AbstractLocation loc = getPersonLocation(person);
                 boolean isTraveling = loc instanceof CurrentLocation cl
-                                            && cl.getJumpPath() != null && cl.getJumpPath().size() > 0;
+                                            && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
+                LocationNode node = person.getLocationNode();
                 if (node != null) {
                     LocationNode parent = node.getParent();
                     while (parent != null) {
@@ -892,8 +889,7 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case LOCATION_PLANET -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                AbstractLocation loc = getPersonLocation(person);
                 if (loc != null) {
                     Planet planet = loc.getPlanet();
                     yield planet != null ? planet.getPrintableName(today) : "-";
@@ -901,8 +897,7 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case LOCATION_SYSTEM -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
+                AbstractLocation loc = getPersonLocation(person);
                 if (loc != null) {
                     var system = loc.getCurrentSystem();
                     yield system != null ? system.getPrintableName(today) : "-";
@@ -1095,6 +1090,11 @@ public enum PersonnelTableModelColumn {
             case XP -> Integer.toString(person.getXP());
             case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
         };
+    }
+
+    private static @Nullable AbstractLocation getPersonLocation(Person person) {
+        LocationNode node = person.getLocationNode();
+        return node != null ? node.getNearestAbstractLocation() : null;
     }
 
     private static String getAggregateSkillDisplay(Person person, PersonnelRole primaryProfession,
