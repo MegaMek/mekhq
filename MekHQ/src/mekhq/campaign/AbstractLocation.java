@@ -33,7 +33,6 @@
 
 package mekhq.campaign;
 
-import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -48,7 +47,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -59,11 +57,9 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -76,6 +72,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import org.w3c.dom.Node;
 
 /**
  * Abstract implementation of a specific location. An {@code AbstractLocation} is expected as the
@@ -297,6 +294,16 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     public abstract void writeToXML(PrintWriter writer, int indent);
+
+    public static @Nullable AbstractLocation generateInstanceFromXML(Node wn, Campaign campaign) {
+        return switch (wn.getNodeName().toLowerCase()) {
+            case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
+            default -> {
+                logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
+                yield null;
+            }
+        };
+    }
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {
         private final Campaign campaign;

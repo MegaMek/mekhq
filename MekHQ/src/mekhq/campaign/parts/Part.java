@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -66,6 +67,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -105,7 +108,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements IPartWork, ITechnology {
+public abstract class Part implements IPartWork, ITechnology, ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
@@ -124,6 +127,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     protected String name;
     protected int id;
+    private LocationNode locationNode = new LocationNode(this);
 
     /**
      * This is the unitTonnage which needs to be tracked for some parts even when off the unit. Actual tonnage is
@@ -2136,6 +2140,16 @@ public abstract class Part implements IPartWork, ITechnology {
         private PartPersonRef(UUID id) {
             super(id);
         }
+    }
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public Set<Part> getPartsAtLocation() {
+        return Set.of(this);
     }
 
     public static class PartUnitRef extends Unit {
