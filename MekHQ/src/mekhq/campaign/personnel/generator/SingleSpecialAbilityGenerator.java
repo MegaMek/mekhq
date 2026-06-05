@@ -304,14 +304,21 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
                 SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                if (spa == null) {
+                    LOGGER.error("Missing ability: {}", ability.getName());
+                    continue;
+                }
+
                 if (isVeterancyAward && spa.getOriginOnly()) {
                     continue;
                 }
 
-                if ((spa == null) || (spa.getWeight() <= 0)
-                          || (!spa.isEligible(person.isClanPersonnel(), person.getSkills(), person.getOptions()))) {
+                boolean isIneligible = !spa.isEligible(person.isClanPersonnel(), person.getSkills(),
+                      person.getOptions());
+                if (spa.getWeight() <= 0 || isIneligible) {
                     continue;
                 }
+
                 eligible.add(spa);
             }
         }
