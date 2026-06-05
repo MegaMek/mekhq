@@ -34,8 +34,8 @@ package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
@@ -931,7 +931,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             for (String report : reports) {
                 if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(GENERAL, report);
+                    getCampaign().addReport(POLITICS, report);
                 }
             }
         }
