@@ -32,16 +32,19 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
-
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.mission.Contract.OH_NONE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+
+import java.util.List;
+
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBContractType;
 
 /**
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
@@ -60,8 +63,8 @@ public class PityContracts {
      * Generates pity contracts for the supplied campaign.
      *
      * <p>The number of generated contracts is based on the number of successful completed contracts already present
-     * in the campaign. If the campaign already has at least a number of successful completed contracts in excess of
-     * the pity contract count, no pity contracts are generated.</p>
+     * in the campaign. If the campaign already has at least a number of successful completed contracts in excess of the
+     * pity contract count, no pity contracts are generated.</p>
      *
      * @param campaign the campaign for which pity contracts are generated
      *
@@ -125,6 +128,15 @@ public class PityContracts {
         contract.setEnemySkill(GREEN);
 
         updateEnemyFaction(campaign, contract);
+
+        // We need to rebuild the difficulty estimate as otherwise it will still be reporting for the contract's
+        // original enemy
+        boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
+        List<Entity> combatUnits = campaign.getAllCombatEntities();
+        int difficulty = contract.calculateContractDifficulty(campaign.getGameYear(),
+              isUseGenericBattleValue,
+              combatUnits);
+        contract.setDifficulty(difficulty);
 
         if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
             overrideContractTermsForPityContracts(contract);
