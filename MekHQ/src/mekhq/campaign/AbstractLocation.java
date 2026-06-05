@@ -57,7 +57,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Injury;
@@ -78,7 +78,7 @@ import org.w3c.dom.Node;
  * Abstract implementation of a specific location. An {@code AbstractLocation} is expected as the
  * {@link ILocation ILocation locatable} of the root {@link LocationNode} in a {@code LocationNode} tree.
  */
-public abstract class AbstractLocation implements ILocation {
+public abstract class AbstractLocation implements IPlace {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
