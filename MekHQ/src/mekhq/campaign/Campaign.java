@@ -555,6 +555,8 @@ public class Campaign implements ITechManager, ILocation {
         this.setParent(startLocation);
         if (startLocation != null) {
             mainForcePersonnel.setParent(this);
+            units.setParent(this);
+            parts.setParent(this);
         }
         reputation = reputationController;
         this.factionStandings = factionStandings;
