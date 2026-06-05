@@ -127,10 +127,6 @@ public final class AutoAssignRankForCompanyGenerator {
         }
 
         for (Person person : crew) {
-            if (person == null) {
-                continue;
-            }
-
             // Skip anyone who already has a rank
             if (!hasNoRank(person)) {
                 continue;
@@ -243,13 +239,9 @@ public final class AutoAssignRankForCompanyGenerator {
      * @author Illiani
      * @since 0.51.0
      */
-    private static int assignNormalRank(@Nullable Person person, int startIndex) {
+    private static int assignNormalRank(Person person, int startIndex) {
         if (startIndex <= RE_MIN) {
             return RE_MIN;
-        }
-
-        if (person == null) {
-            return startIndex;
         }
 
         int rankIndex = startIndex;
@@ -277,9 +269,9 @@ public final class AutoAssignRankForCompanyGenerator {
      * @since 0.51.0
      */
     public static void assignAscendingRank(@Nullable Person person, int startIndex) {
-        if (person == null) {
-            return;
-        }
+        //        if (person == null) {
+        //            return;
+        //        }
 
         int rankIndex = startIndex;
         person.setRank(rankIndex);

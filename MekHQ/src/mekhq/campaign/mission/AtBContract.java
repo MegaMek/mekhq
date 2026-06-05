@@ -1331,7 +1331,7 @@ public class AtBContract extends Contract {
             clanOpponent.setBloodname(bloodname.getName());
         }
 
-        AutoAssignRankForCompanyGenerator.assignAscendingRank(employerLiaison, RO_MIN);
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(clanOpponent, RO_MIN);
 
         final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
 
