@@ -243,7 +243,8 @@ public enum AtBContractType {
      * modifier is only applied when StratCon and "restrict parts by mission" are both enabled.</p>
      *
      * <p>Values range from {@code 2} for deep covert operations cut off behind enemy lines (worst availability) down
-     * to {@code -2} for garrison-style postings plugged into the employer's supply network (best availability).</p>
+     * to {@code -2} (best availability). The {@code -2} value is the {@code default} branch, applied to garrison-style
+     * postings and to any other contract type that lacks a more restrictive case.</p>
      *
      * @return the parts availability modifier for the current contract type, where higher values mean worse
      *       availability
