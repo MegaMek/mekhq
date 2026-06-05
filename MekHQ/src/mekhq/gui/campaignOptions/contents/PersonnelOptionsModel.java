@@ -37,6 +37,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
+import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 
@@ -52,6 +53,8 @@ class PersonnelOptionsModel {
     boolean onlyCommandersMatterBattleArmor;
     boolean useEdge;
     boolean useSupportEdge;
+    EdgeRefreshPeriod edgeRefreshPeriod;
+    int edgeRefreshCost;
     boolean useImplants;
     boolean alternativeQualityAveraging;
     boolean usePersonnelRemoval;
@@ -139,6 +142,8 @@ class PersonnelOptionsModel {
         onlyCommandersMatterBattleArmor = options.isOnlyCommandersMatterBattleArmor();
         useEdge = options.isUseEdge();
         useSupportEdge = options.isUseSupportEdge();
+        edgeRefreshPeriod = options.getEdgeRefreshPeriod();
+        edgeRefreshCost = options.getEdgeRefreshCost();
         useImplants = options.isUseImplants();
         alternativeQualityAveraging = options.isAlternativeQualityAveraging();
         usePersonnelRemoval = options.isUsePersonnelRemoval();
@@ -227,6 +232,8 @@ class PersonnelOptionsModel {
         options.setOnlyCommandersMatterBattleArmor(onlyCommandersMatterBattleArmor);
         options.setUseEdge(useEdge);
         options.setUseSupportEdge(useSupportEdge);
+        options.setEdgeRefreshPeriod(edgeRefreshPeriod);
+        options.setEdgeRefreshCost(edgeRefreshCost);
         options.setUseImplants(useImplants);
         options.setAlternativeQualityAveraging(alternativeQualityAveraging);
         options.setUsePersonnelRemoval(usePersonnelRemoval);

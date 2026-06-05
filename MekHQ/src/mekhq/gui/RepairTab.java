@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -122,6 +122,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
     private JTextPane txtResult;
+    private RoundedMMToggleButton btnOvertime;
     private JLabel asTechPoolLabel;
     private JComboBox<String> choiceLocation;
     private RoundedJButton btnAcquisitions;
@@ -456,18 +457,30 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weighty = 1.0;
         panTechs.add(scrollTechTable, gridBagConstraints);
 
-        asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
-                                           getCampaign().getAsTechPoolMinutes() +
-                                           " (" +
-                                           getCampaign().getNumberAsTechs() +
-                                           " AsTechs)</html>");
-        asTechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        asTechPoolLabel.setName("asTechPoolLabel");
+        btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
+        btnOvertime.addActionListener(evt -> {
+            getCampaign().setOvertime(btnOvertime.isSelected());
+            refreshAsTechPool();
+            WarehouseTab warehouseTab = getCampaignGui().getWarehouseTab();
+            if (warehouseTab != null) {
+                warehouseTab.refreshAsTechPool();
+                warehouseTab.refreshOvertimeStatus();
+            }
+        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panTechs.add(btnOvertime, gridBagConstraints);
+
+        asTechPoolLabel = new JLabel();
+        asTechPoolLabel.setName("asTechPoolLabel");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(asTechPoolLabel, gridBagConstraints);
 
@@ -485,6 +498,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         add(pnlTutorial, BorderLayout.SOUTH);
 
         filterTechs();
+        refreshAsTechPool();
     }
 
     private RoundedJButton getBtnMRMSInstantAll() {
@@ -568,6 +582,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         refreshTaskList();
         refreshPartsAcquisition();
         refreshTechsList();
+        refreshOvertimeStatus();
     }
 
     /*
@@ -930,19 +945,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * @throws IllegalArgumentException if an invalid row index is provided to the selection methods. This exception is
      *                                  prevented by validating indices against updated row counts.
      */
-    public void refreshTechsList() {
+    private void refreshTechsList() {
         int selected = techTable.getSelectedRow();
         // Get all techs who have more than 0 minutes free, and sort by skill descending (elites at bottom)
         List<Person> techs = getCampaign().getTechs(true);
         techsModel.setData(techs);
         filterTechs();
 
-        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
-        }
-        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
-        asTechPoolLabel.setText(astechString);
+        refreshAsTechPool();
 
         // Ensuring valid row selection after refresh
         if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
@@ -969,6 +979,26 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             techTable.clearSelection(); // Clear selection if there's no valid option
         }
     }
+
+    /**
+     * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
+     */
+    public void refreshAsTechPool() {
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
+        if (getCampaign().isOvertimeAllowed()) {
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
+        }
+        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
+        asTechPoolLabel.setText(astechString);
+    }
+
+    /**
+     * Updates 'Overtime Allowed' button state.
+     */
+    public void refreshOvertimeStatus() {
+        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
+    }
+
 
     public void refreshPartsAcquisition() {
         refreshPartsAcquisitionService(true);

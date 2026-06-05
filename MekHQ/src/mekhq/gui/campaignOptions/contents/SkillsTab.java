@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
@@ -78,6 +79,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import megamek.Version;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -358,7 +360,7 @@ public class SkillsTab {
         JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
-        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost");
+        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version(0, 51, 0)));
         spnAttributeCost = new CampaignOptionsSpinner("AttributeCost", 100, 0, 500, 1);
 
         // Borderless content panel with both cost controls side by side

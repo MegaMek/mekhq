@@ -332,7 +332,7 @@ public class CampaignGUI extends JPanel {
         // Move the window
         frame.setLocation(x, y);
 
-        windowMenu = new MekHQMenuBar(getApplication(), this, resourceMap);
+        windowMenu = new MekHQMenuBar(getApplication(), this);
         frame.setJMenuBar(windowMenu);
 
         frame.getContentPane().setLayout(new BorderLayout());
@@ -391,11 +391,6 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
-        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-
         Border innerBorder = BorderFactory.createCompoundBorder(
               new RoundedLineBorder(UIUtil.uiIndependentGray(), 1, 8),
               BorderFactory.createEmptyBorder(1, 3, 1, 3));
@@ -424,7 +419,6 @@ public class CampaignGUI extends JPanel {
         pnlTempPersonnel.add(pnlVehicleCrew);
         pnlTempPersonnel.add(pnlVesselCrew);
 
-        statusPanel.add(btnOvertime);
         statusPanel.add(pnlTempPersonnel);
         statusPanel.add(lblPartsAvailabilityRating);
     }
@@ -461,19 +455,21 @@ public class CampaignGUI extends JPanel {
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
         JPanel pnlMarkets = new ScalingWidthConstrainedPanel(minWidth, maxWidth);
         pnlMarkets.setLayout(new GridBagLayout());
-        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
+        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlMarkets.title")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
 
+        btnContractMarket.setToolTipText(resourceMap.getString("btnContractMarket.toolTipText"));
         btnContractMarket.addActionListener(e -> showContractMarket());
         btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridy = 0;
         pnlMarkets.add(btnContractMarket, gridBagConstraints);
 
+        btnUnitMarket.setToolTipText(resourceMap.getString("btnUnitMarket.toolTipText"));
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
@@ -509,6 +505,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
         btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
+        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
         btnCompanyGenerator.addActionListener(
               e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
@@ -532,12 +529,14 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+        btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
         btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
         pnlButton.add(btnGlossary, gridBagConstraints);
 
         RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
+        btnBugReport.setToolTipText(resourceMap.getString("btnBugReport.toolTipText"));
         btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
         gridBagConstraints.weightx = 0.6;
         gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
@@ -570,6 +569,10 @@ public class CampaignGUI extends JPanel {
 
     public @Nullable WarehouseTab getWarehouseTab() {
         return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
+    }
+
+    public @Nullable RepairTab getRepairBayTab() {
+        return (RepairTab) getTab(MHQTabType.REPAIR_BAY);
     }
 
     public boolean hasTab(MHQTabType tabType) {

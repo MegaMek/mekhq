@@ -218,11 +218,11 @@ public class StratConConvoyCampaignOptionsChangedConfirmationDialog extends JDia
                 }
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
 
-                if (isAutomaticallyAssignRanks) {
-                    if (unit != null) {
+                if (unit != null) {
+                    if (isAutomaticallyAssignRanks) {
                         AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
-                        units.add(unit);
                     }
+                    units.add(unit);
                 }
             } catch (Exception e) {
                 LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",

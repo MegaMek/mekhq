@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,21 +33,24 @@
 package mekhq.gui;
 
 import static java.lang.Math.round;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -95,6 +98,7 @@ import mekhq.gui.view.PersonViewPanel;
  */
 public final class PersonnelTab extends CampaignGuiTab {
     private static final MMLogger LOGGER = MMLogger.create(PersonnelTab.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(700);
 
@@ -102,6 +106,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     private JTable personnelTable;
     private MMComboBox<PersonnelFilter> choicePerson;
     private MMComboBox<PersonnelTabView> choicePersonView;
+    private JTextField txtPersonSearch;
     private JScrollPane scrollPersonnelView;
     private JCheckBox chkGroupByUnit;
 
@@ -202,6 +207,44 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choicePersonView, gridBagConstraints);
 
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 10, 0, 0);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "lblPersonSearch.text")), gridBagConstraints);
+
+        txtPersonSearch = new JTextField(15);
+        txtPersonSearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "lblPersonSearch.tooltip"));
+        txtPersonSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                filterPersonnel();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                filterPersonnel();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                filterPersonnel();
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(txtPersonSearch, gridBagConstraints);
+
         chkGroupByUnit = new JCheckBox(resourceMap.getString("chkGroupByUnit.text"));
         chkGroupByUnit.setToolTipText(resourceMap.getString("chkGroupByUnit.toolTipText"));
         chkGroupByUnit.addActionListener(e -> {
@@ -209,10 +252,10 @@ public final class PersonnelTab extends CampaignGuiTab {
             personModel.refreshData();
         });
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
@@ -237,18 +280,28 @@ public final class PersonnelTab extends CampaignGuiTab {
                       dialog.isContinuousTraining());
             }
         });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(btnQuickTrain, gridBagConstraints);
+
         RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
         btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
         btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
-
-        // Group action buttons
-        JPanel panActions = new JPanel(new GridLayout(1, 2, 5, 0));
-        panActions.add(btnQuickTrain);
-        panActions.add(btnMassTraining);
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 0;
-        add(panActions, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(btnMassTraining, gridBagConstraints);
 
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
@@ -296,7 +349,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 9;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -372,8 +425,23 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()),
-                      getCampaignGui().getCampaign().getLocalDate());
+                Person person = entry.getModel().getPerson(entry.getIdentifier());
+
+                // Existing dropdown filter
+                if (!filter.getFilteredInformation(person,
+                      getCampaignGui().getCampaign().getLocalDate())) {
+                    return false;
+                }
+
+                // Search filter — stacks on top of dropdown
+                String personNameAsLowerCase = person.getFullTitleAndProfessions().toLowerCase(Locale.ROOT);
+                String searchText = txtPersonSearch.getText().trim();
+                String searchAsLowerCase = searchText.toLowerCase(Locale.ROOT);
+                if (!searchText.isEmpty()) {
+                    return personNameAsLowerCase.contains(searchAsLowerCase);
+                }
+
+                return true;
             }
         });
     }

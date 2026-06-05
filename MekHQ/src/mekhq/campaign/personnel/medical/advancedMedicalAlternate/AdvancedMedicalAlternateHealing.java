@@ -111,12 +111,13 @@ public class AdvancedMedicalAlternateHealing {
         Set<BodyLocation> prostheticPenalties = getProstheticPenalties(patient);
 
         // Healing
+        boolean isUseEdge = campaign.getCampaignOptions().isUseSupportEdge();
         if (doctor == null) {
-            boolean patientUsesEdge = patient.getOptions().booleanOption(EDGE_MEDICAL);
+            boolean patientUsesEdge = isUseEdge && patient.getOptions().booleanOption(EDGE_MEDICAL);
             performUnassistedHealingCheck(today, isUseFatigue, fatigueRate, patient, modifiers, prostheticPenalties,
                   patientUsesEdge);
         } else {
-            boolean doctorUsesEdge = doctor.getOptions().booleanOption(EDGE_MEDICAL);
+            boolean doctorUsesEdge = isUseEdge && doctor.getOptions().booleanOption(EDGE_MEDICAL);
             performAssistedHealingCheck(today, isUseFatigue, fatigueRate, patient, doctor, modifiers,
                   prostheticPenalties, doctorUsesEdge);
         }

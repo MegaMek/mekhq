@@ -37,6 +37,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static megamek.common.options.PilotOptions.MD_ADVANTAGES;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
@@ -929,7 +930,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void checkForDeath() {
-        if (patient.getTotalInjurySeverity() > 5) {
+        if (patient.getTotalInjurySeverity() >= DEATH) {
             patient.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
         }
     }
