@@ -524,6 +524,16 @@ public class Skill {
             }
         }
 
+        // Administration
+        if (Objects.equals(S_ART_COOKING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SPICE_IS_RIGHT)) {
+                modifier += 2;
+            }
+            if (characterOptions.booleanOption(UNOFFICIAL_KITCHEN_MENACE)) {
+                modifier -= 2;
+            }
+        }
+
         return modifier;
     }
 
