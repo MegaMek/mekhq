@@ -1070,7 +1070,7 @@ public class FactionStandings {
 
         // Build final report
         String deltaDirection;
-        if (newRegard > originalRegard) {
+        if (newRegard >= originalRegard) {
             reportingColor = getPositiveColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
         } else {
