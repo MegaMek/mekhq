@@ -795,6 +795,15 @@ public class BiographyTab {
         chkExtraRandomOrigin = new CampaignOptionsCheckBox("ExtraRandomOrigin");
         chkExtraRandomOrigin.addMouseListener(createTipPanelUpdater(backgroundHeader, "ExtraRandomOrigin"));
 
+        // The system/planet combos are backed by the whole universe, so an unprototyped
+        // combo would size itself to
+        // the widest entry and stretch this section wider than the other Biography
+        // sub-tabs. Pin them to the control
+        // column and surface the full selected value as a tooltip (it remains fully
+        // visible in the dropdown).
+        capComboWidthWithTooltip(comboSpecifiedSystem);
+        capComboWidthWithTooltip(comboSpecifiedPlanet);
+
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomOriginOptionsPanel",
             FORM_LABEL_COLUMN_WIDTH,
@@ -811,6 +820,46 @@ public class BiographyTab {
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, chkAllowClanOrigins, chkExtraRandomOrigin);
 
         return panel;
+    }
+
+    /**
+     * Pins {@code combo}'s preferred width to the form's control column so a
+     * long-content model (such as the full list
+     * of planetary systems or planets) cannot stretch the section wider than its
+     * siblings. The combo still fills the
+     * control column through the form's horizontal-fill layout, and the full
+     * selected value stays available as a
+     * tooltip (and in the dropdown). Without this, an unprototyped
+     * {@link javax.swing.JComboBox} measures every model
+     * entry and adopts the widest, which made the Backgrounds page noticeably wider
+     * than the other Biography sub-tabs.
+     *
+     * @param combo the combo box to constrain and decorate with a full-value
+     *              tooltip
+     */
+    private void capComboWidthWithTooltip(MMComboBox<?> combo) {
+        combo.setPreferredSize(new Dimension(FORM_CONTROL_COLUMN_WIDTH, combo.getPreferredSize().height));
+        updateComboTooltip(combo);
+        combo.addActionListener(evt -> updateComboTooltip(combo));
+    }
+
+    /**
+     * Sets {@code combo}'s tooltip to the full, date-aware name of its selected
+     * planetary system or planet, so a value
+     * that is truncated with an ellipsis in the collapsed field can still be read
+     * in full on hover.
+     *
+     * @param combo the combo box whose tooltip should reflect its current selection
+     */
+    private void updateComboTooltip(MMComboBox<?> combo) {
+        final Object selected = combo.getSelectedItem();
+        if (selected instanceof PlanetarySystem system) {
+            combo.setToolTipText(system.getName(generalTab.getDate()));
+        } else if (selected instanceof Planet planet) {
+            combo.setToolTipText(planet.getName(generalTab.getDate()));
+        } else {
+            combo.setToolTipText(null);
+        }
     }
 
     /**

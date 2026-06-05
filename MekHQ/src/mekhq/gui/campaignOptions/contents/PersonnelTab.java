@@ -655,7 +655,6 @@ public class PersonnelTab {
                 getMetadata(new Version(0, 50, 12)));
         chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobBattleArmor"));
         chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround",
-        chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround",
                 getMetadata(new Version(0, 50, 12)));
         chkUseBlobVehicleCrewGround
                 .addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobVehicleCrewGround"));
@@ -1290,7 +1289,6 @@ public class PersonnelTab {
         model = new PersonnelOptionsModel(options);
         updateCreatedControlsFromModel();
     }
-    }
 
     /**
      * Applies the modified personnel tab settings to the repository's campaign
@@ -1311,7 +1309,6 @@ public class PersonnelTab {
 
         updateModelFromCreatedControls();
         model.applyTo(campaign, options);
-    }
     }
 
     private void updateCreatedControlsFromModel() {
