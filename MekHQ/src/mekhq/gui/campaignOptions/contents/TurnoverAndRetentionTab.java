@@ -40,7 +40,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -57,7 +56,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -92,8 +90,6 @@ public class TurnoverAndRetentionTab {
 
     private static final int TURNOVER_LABEL_COLUMN_WIDTH = 300;
     private static final int TURNOVER_CONTROL_COLUMN_WIDTH = 220;
-    private static final int TURNOVER_LABEL_CONTROL_GAP = 12;
-    private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
 
     private final CampaignOptions campaignOptions;
     private TurnoverAndRetentionOptionsModel model;
@@ -370,16 +366,11 @@ public class TurnoverAndRetentionTab {
     }
 
     private JPanel createFatigueAutomationPanel() {
-        JComponent[] labels = { lblFatigueUndeploymentThreshold, lblFatigueLeaveThreshold };
-        JComponent[] controls = { spnFatigueUndeploymentThreshold, spnFatigueLeaveThreshold };
-
-        CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(
-                "FatigueAutomationPanel",
-                TURNOVER_LABEL_COLUMN_WIDTH + TURNOVER_LABEL_CONTROL_GAP,
-                TURNOVER_CONTROL_COLUMN_WIDTH,
-                GRID_CONTROL_COLUMN_WIDTH,
-                2);
-        panel.addPairs(labels, controls);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueAutomationPanel",
+                TURNOVER_LABEL_COLUMN_WIDTH,
+                TURNOVER_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblFatigueUndeploymentThreshold, spnFatigueUndeploymentThreshold);
+        panel.addRow(lblFatigueLeaveThreshold, spnFatigueLeaveThreshold);
 
         return panel;
     }

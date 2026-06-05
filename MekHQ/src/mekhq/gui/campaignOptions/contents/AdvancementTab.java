@@ -85,7 +85,6 @@ public class AdvancementTab {
     private static final int ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH = 100;
     private static final int ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH = ADVANCEMENT_LABEL_COLUMN_WIDTH
             + ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH + ADVANCEMENT_LABEL_CONTROL_GAP;
-    private static final int ADVANCEMENT_GRID_NARROW_PAIR_COLUMN_WIDTH = 240;
     private static final int ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH = 290;
     private static final int RECRUITMENT_LABEL_COLUMN_WIDTH = 190;
     private static final int RECRUITMENT_CONTROL_COLUMN_WIDTH = 90;
@@ -411,7 +410,14 @@ public class AdvancementTab {
         JComponent[] labels = { lblTaskXP, lblNTasksXP, lblSuccessXP, lblMistakeXP };
         JComponent[] controls = { spnTaskXP, spnNTasksXP, spnSuccessXP, spnMistakeXP };
 
-        return createAdvancementPairedGrid("TasksPanel", labels, controls);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TasksPanel",
+                ADVANCEMENT_LABEL_COLUMN_WIDTH,
+                ADVANCEMENT_CONTROL_COLUMN_WIDTH);
+        for (int index = 0; index < labels.length; index++) {
+            panel.addRow(labels[index], controls[index]);
+        }
+
+        return panel;
     }
 
     /**
@@ -680,7 +686,7 @@ public class AdvancementTab {
         }
 
         return createAdvancementPairedGrid("PhenotypesPanel", phenotypeLabels, phenotypeSpinners,
-                ADVANCEMENT_GRID_NARROW_PAIR_COLUMN_WIDTH);
+                ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH);
     }
 
     private JPanel createExperienceLevelModifiersPanel() {
