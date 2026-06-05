@@ -52,6 +52,7 @@ import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
@@ -568,7 +569,7 @@ public class AtBContract extends Contract {
                 String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
                       regardMultiplier, getLength());
                 if (report != null) {
-                    campaign.addReport(GENERAL, report);
+                    campaign.addReport(POLITICS, report);
                 }
             }
         }

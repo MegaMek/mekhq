@@ -40,6 +40,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
@@ -2109,7 +2110,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 getCampaign().getCampaignOptions().getRegardMultiplier());
 
                     for (String report : reports) {
-                        getCampaign().addReport(PERSONNEL, report);
+                        getCampaign().addReport(POLITICS, report);
                     }
                 }
 
