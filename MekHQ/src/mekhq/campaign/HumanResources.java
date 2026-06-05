@@ -1978,6 +1978,7 @@ public class HumanResources {
         if (!personnel.containsValue(person)) {
             person.setJoinedCampaign(currentDay);
             personnel.put(person.getId(), person);
+            person.setParent(campaign.getMainForcePersonnel());
 
             if (!bypassSimulateRelationships && campaign.getCampaignOptions().isUseSimulatedRelationships()) {
                 if ((prisonerStatus.isFree()) &&
@@ -2294,6 +2295,7 @@ public class HumanResources {
         }
 
         personnel.remove(person.getId());
+        person.setParent(null);
 
         if (person.isAstech()) {
             asTechPoolMinutes = max(0, asTechPoolMinutes - Person.PRIMARY_ROLE_SUPPORT_TIME);
