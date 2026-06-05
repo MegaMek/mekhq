@@ -2286,9 +2286,9 @@ public class AtBContract extends Contract {
                 // Removing this check will break things, see the other comments.
                 continue;
             }
-            // TODO implement getGBV(int index) in UnitTable to simplify this?
+
             // getMekSummary(int index) is NULL for salvage.
-            int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
+            int genericBattleValue = unitTable.getMekSummary(i).getGenericBattleValue();
             int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
 
             totalBattleValue += battleValue * weight;
