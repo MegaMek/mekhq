@@ -356,15 +356,16 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void selectRoute(CampaignOptionsRoute route) {
+        // Group/parent routes have no page of their own, so resolve them to their first
+        // child's page. We intentionally
+        // do NOT move the tree highlight onto that child here: re-selecting it would
+        // trap keyboard navigation, because
+        // pressing Up onto a group row would immediately bounce the selection back down
+        // to the group's first child.
+        // Leaving the highlight where the user put it lets Up/Down move one row at a
+        // time in both directions.
         CampaignOptionsRoute effectiveRoute = getDefaultDirectRoute(route);
-        if (effectiveRoute != route) {
-            navigationPanel.selectRoute(effectiveRoute);
-            route = effectiveRoute;
-        }
-
-        if (showDirectRoute(route)) {
-            return;
-        }
+        showDirectRoute(effectiveRoute);
     }
 
     private boolean showDirectRoute(CampaignOptionsRoute route) {

@@ -81,10 +81,14 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 public class AdvancementTab {
     private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = 300;
     private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = 220;
-    private static final int ADVANCEMENT_LABEL_CONTROL_GAP = 12;
     private static final int ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH = 100;
-    private static final int ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH = ADVANCEMENT_LABEL_COLUMN_WIDTH
-            + ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH + ADVANCEMENT_LABEL_CONTROL_GAP;
+    // Pair-column width for the XP-award paired grids
+    // (Scenarios/Missions/Administrators). Sized so the two-column
+    // grid's content (~620px) stays within the shared page-width floor rather than
+    // ballooning to ~820px, while still
+    // fitting the longest label ("Outstanding Success (StratCon)", ~183px) plus the
+    // spinner column.
+    private static final int ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH = 310;
     private static final int ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH = 290;
     private static final int RECRUITMENT_LABEL_COLUMN_WIDTH = 190;
     private static final int RECRUITMENT_CONTROL_COLUMN_WIDTH = 90;

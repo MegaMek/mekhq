@@ -66,6 +66,13 @@ public class CampaignOptionsPagePanel extends JPanel {
     private static final int QUOTE_BOTTOM_PADDING = UIUtil.scaleForGUI(8);
     private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int DEFAULT_HEADER_IMAGE_SIZE = 64;
+    // Shared minimum width every sectioned page is floored to, so form pages render
+    // at a consistent width across the
+    // dialog. Comfortably covers a 2-column form section (label column + long
+    // right-column control/checkbox) and stays
+    // well under the page width cap, so wider table pages and the 950 cap are
+    // unaffected.
+    private static final int UNIFORM_SECTION_STACK_WIDTH = UIUtil.scaleForGUI(640);
 
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
@@ -315,7 +322,15 @@ public class CampaignOptionsPagePanel extends JPanel {
             return 0;
         }
 
-        return Math.max(getPreferredSectionWidth(sections), sectionControls.getPreferredSize().width);
+        int contentWidth = Math.max(getPreferredSectionWidth(sections), sectionControls.getPreferredSize().width);
+        // Floor every sectioned page to a shared width so form pages render at a
+        // consistent width across the dialog
+        // instead of each page shrinking to its own widest section. Pages whose content
+        // is naturally wider than the
+        // floor (e.g. table-based pages) keep their larger width; this only grows
+        // narrower pages up to the floor, so it
+        // never clips. Tune UNIFORM_SECTION_STACK_WIDTH to adjust the shared width.
+        return Math.max(contentWidth, UNIFORM_SECTION_STACK_WIDTH);
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
