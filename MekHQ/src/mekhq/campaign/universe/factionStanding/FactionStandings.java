@@ -1186,6 +1186,13 @@ public class FactionStandings {
             }
         }
 
+        // We saw a lot of player confusion with players not realizing that annual regard decay was a thing. This
+        // notice was added to try and mitigate that.
+        if (!regardChangeReports.isEmpty()) {
+            String decayNotice = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decay");
+            regardChangeReports.addFirst(decayNotice);
+        }
+
         return regardChangeReports;
     }
 
