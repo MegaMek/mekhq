@@ -535,20 +535,19 @@ public class AtBContract extends Contract {
 
         // Update the Batchall information
         batchallAccepted = true;
-        Faction faction = getEnemy();
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && faction.performsBatchalls()) {
+        if (campaign.getCampaignOptions().isUseGenericBattleValue() && enemyFaction.performsBatchalls()) {
             boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
             FactionStandings factionStandings = campaign.getFactionStandings();
 
             boolean allowBatchalls = true;
             if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
-                double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                double regard = factionStandings.getRegardForFaction(enemyFaction.getShortName(), true);
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
             double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
             String campaignFactionCode = campaign.getFaction().getShortName();
-            if (faction.performsBatchalls() && allowBatchalls) {
+            if (enemyFaction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
 
                 batchallAccepted = batchallDialog.isBatchallAccepted();
@@ -565,7 +564,7 @@ public class AtBContract extends Contract {
 
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
-                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
+                String report = factionStandings.processContractAccept(campaignFactionCode, enemyFaction, today,
                       regardMultiplier, getLength());
                 if (report != null) {
                     campaign.addReport(GENERAL, report);
