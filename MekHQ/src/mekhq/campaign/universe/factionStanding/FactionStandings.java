@@ -791,7 +791,7 @@ public class FactionStandings {
             return null;
         }
 
-        double regard = getRegardForFaction(factionCode, true);
+        double regard = getRegardForFaction(factionCode, false);
         FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
