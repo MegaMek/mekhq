@@ -136,6 +136,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionXpOutstandingSuccess",
               campaignOptions.getMissionXpOutstandingSuccess());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeCost", campaignOptions.getEdgeCost());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeRefreshCost", campaignOptions.getEdgeRefreshCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attributeCost", campaignOptions.getAttributeCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitByYear", campaignOptions.isLimitByYear());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disallowExtinctStuff", campaignOptions.isDisallowExtinctStuff());
@@ -277,6 +278,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "onlyCommandersMatterBattleArmor",
               campaignOptions.isOnlyCommandersMatterBattleArmor());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "edgeRefreshPeriod",
+              campaignOptions.getEdgeRefreshPeriod().getLookupKey());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
