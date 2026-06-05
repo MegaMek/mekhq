@@ -3306,7 +3306,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_EXTRA_INCOME && person.getXP() >= traitCost);
+            menuItem.setEnabled(target >= MINIMUM_EXTRA_INCOME);
             traitsMenu.add(menuItem);
 
             menu.add(traitsMenu);
