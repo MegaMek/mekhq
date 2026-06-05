@@ -269,9 +269,9 @@ public final class AutoAssignRankForCompanyGenerator {
      * @since 0.51.0
      */
     public static void assignAscendingRank(@Nullable Person person, int startIndex) {
-        //        if (person == null) {
-        //            return;
-        //        }
+        if (person == null) {
+            return;
+        }
 
         int rankIndex = startIndex;
         person.setRank(rankIndex);
