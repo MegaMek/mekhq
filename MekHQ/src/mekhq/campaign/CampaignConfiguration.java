@@ -34,6 +34,8 @@
 package mekhq.campaign;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.UUID;
 
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.common.Player;
@@ -50,6 +52,7 @@ import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
@@ -104,6 +107,7 @@ public class CampaignConfiguration {
 
     private RandomEventLibraries randomEventLibraries;
     private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private Map<UUID, LifePath> lifePathLibrary;
     private RetirementDefectionTracker retirementDefectionTracker;
 
     private ReputationController reputation;
@@ -140,6 +144,7 @@ public class CampaignConfiguration {
      * @param finances                 Default
      * @param randomEvents             Default RandomEventsLibraries
      * @param ultimatums               Default
+     * @param lifePaths                Default
      * @param retDefTracker            RetirementDefectionTracker instance
      * @param autosave                 Autosave service instance
      * @param behaviorSettings         Default behavior settings
@@ -164,6 +169,7 @@ public class CampaignConfiguration {
           Finances finances,
           RandomEventLibraries randomEvents,
           FactionStandingUltimatumsLibrary ultimatums,
+          Map<UUID, LifePath> lifePaths,
           RetirementDefectionTracker retDefTracker,
           AutosaveService autosave,
           BehaviorSettings behaviorSettings,
@@ -187,6 +193,7 @@ public class CampaignConfiguration {
         this.finances = finances;
         this.randomEventLibraries = randomEvents;
         this.factionStandingUltimatumsLibrary = ultimatums;
+        this.lifePathLibrary = lifePaths;
         this.retirementDefectionTracker = retDefTracker;
         this.autosaveService = autosave;
         this.autoResolveBehaviorSettings = behaviorSettings;
@@ -226,6 +233,7 @@ public class CampaignConfiguration {
      * @param finances                 Default
      * @param randomEvents             Default RandomEventsLibraries
      * @param ultimatums               Default
+     * @param lifePaths                Default
      * @param retDefTracker            RetirementDefectionTracker instance
      * @param autosave                 Autosave service instance
      * @param behaviorSettings         Default behavior settings
@@ -260,6 +268,7 @@ public class CampaignConfiguration {
           Finances finances,
           RandomEventLibraries randomEvents,
           FactionStandingUltimatumsLibrary ultimatums,
+          Map<UUID, LifePath> lifePaths,
           RetirementDefectionTracker retDefTracker,
           AutosaveService autosave,
           BehaviorSettings behaviorSettings,
@@ -292,6 +301,7 @@ public class CampaignConfiguration {
         this.finances = finances;
         this.randomEventLibraries = randomEvents;
         this.factionStandingUltimatumsLibrary = ultimatums;
+        this.lifePathLibrary = lifePaths;
         this.retirementDefectionTracker = retDefTracker;
         this.autosaveService = autosave;
         this.autoResolveBehaviorSettings = behaviorSettings;
@@ -389,6 +399,10 @@ public class CampaignConfiguration {
 
     public FactionStandingUltimatumsLibrary getUltimatums() {
         return this.factionStandingUltimatumsLibrary;
+    }
+
+    public Map<UUID, LifePath> getLifePaths() {
+        return this.lifePathLibrary;
     }
 
     public RetirementDefectionTracker getRetDefTracker() {
@@ -516,6 +530,10 @@ public class CampaignConfiguration {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void setFactionStandingUltimatumsLibrary(FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary) {
         this.factionStandingUltimatumsLibrary = factionStandingUltimatumsLibrary;
+    }
+
+    public void setLifePathLibrary(Map<UUID, LifePath> lifePathLibrary) {
+        this.lifePathLibrary = lifePathLibrary;
     }
 
     public void setRetirementDefectionTracker(RetirementDefectionTracker retirementDefectionTracker) {

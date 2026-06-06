@@ -34,7 +34,9 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -65,5 +67,19 @@ class LifePathEntryDataTraitLookupTest {
     public void testFromLookupName_EmptyLookupName() {
         LifePathEntryDataTraitLookup result = LifePathEntryDataTraitLookup.fromLookupName("");
         assertNull(result, "Empty lookup should return null.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(LifePathEntryDataTraitLookup.class)
+    void testGetDisplayName_isValidKey(LifePathEntryDataTraitLookup trait) {
+        assertTrue(MHQInternationalization.isResourceKeyValid(trait.getDisplayName()),
+              "Invalid key for " + trait.name());
+    }
+
+    @ParameterizedTest
+    @EnumSource(LifePathEntryDataTraitLookup.class)
+    void testGetDescription_isValidKey(LifePathEntryDataTraitLookup trait) {
+        assertTrue(MHQInternationalization.isResourceKeyValid(trait.getDescription()),
+              "Invalid key for " + trait.name());
     }
 }

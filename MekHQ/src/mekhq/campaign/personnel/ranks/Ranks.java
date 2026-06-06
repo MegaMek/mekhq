@@ -69,7 +69,7 @@ import org.w3c.dom.NodeList;
  * custom one there.
  */
 public class Ranks {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.Ranks";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Legal";
     private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
     // region Variable Declarations
@@ -131,7 +131,7 @@ public class Ranks {
             writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
             String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
-            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Ranks.legalStatement", year);
+            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Legal.mmData.legalStatement", year);
             writer.println(legalStatement.trim());
 
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rankSystems", "version", MHQConstants.VERSION);

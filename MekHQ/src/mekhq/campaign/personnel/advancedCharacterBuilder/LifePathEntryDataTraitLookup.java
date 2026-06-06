@@ -32,11 +32,13 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
 /**
- * Enumerates the supported trait types for {@link LifePathEntryData}, providing lookup functionality by name for use in
+ * Enumerates the supported trait types for {@link LifePath} objects, providing lookup functionality by name for use in
  * the advanced character builder.
  *
  * <p>Each trait is identified by a unique string, which is used for matching and data serialization.</p>
@@ -47,15 +49,29 @@ import megamek.logging.MMLogger;
 public enum LifePathEntryDataTraitLookup {
     BLOODMARK("BLOODMARK"),
     CONNECTIONS("CONNECTIONS"),
-    //    ENEMY("ENEMY"), TODO IMPLEMENT
-    //    EXTRA_INCOME("EXTRA_INCOME"), TODO IMPLEMENT
-    //    PROPERTY("PROPERTY"), TODO IMPLEMENT
+    DEPENDENTS("DEPENDENTS"), // character creation only
+    ENEMY("ENEMY"),
+    EQUIPPED("EQUIPPED"),
+    EXTRA_INCOME("EXTRA_INCOME"),
+    LOST_LIMB("LOST_LIMB"), // character creation only
+    OWNED_VEHICLE("OWNED_VEHICLE"), // character creation only
+    PROPERTY("PROPERTY"),
     REPUTATION("REPUTATION"),
-    //    TITLE("TITLE"), TODO IMPLEMENT
+    TITLE("TITLE"),
     UNLUCKY("UNLUCKY"),
     WEALTH("WEALTH");
 
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathEntryDataTraitLookup";
     private static final MMLogger LOGGER = MMLogger.create(LifePathEntryDataTraitLookup.class);
+
+    public static final int MINIMUM_DEPENDENTS = -Integer.MAX_VALUE;
+    public static final int MAXIMUM_DEPENDENTS = 0;
+    public static final int MINIMUM_EQUIPPED = -1;
+    public static final int MAXIMUM_EQUIPPED = 8;
+    public static final int MINIMUM_LOST_LIMB = -5;
+    public static final int MAXIMUM_LOST_LIMB = 0;
+    public static final int MINIMUM_OWNED_VEHICLE = 0;
+    public static final int MAXIMUM_OWNED_VEHICLE = 12;
 
     private final String lookupName;
 
@@ -84,6 +100,32 @@ public enum LifePathEntryDataTraitLookup {
     }
 
     /**
+     * Returns the display name for this object by looking up the ".label" key in the resource bundle associated with
+     * this class.
+     *
+     * @return the localized display name for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
+    }
+
+    /**
+     * Returns the description for this object by looking up the ".description" key in the resource bundle associated
+     * with this class.
+     *
+     * @return the localized description for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
+    }
+
+    /**
      * Resolves a {@link LifePathEntryDataTraitLookup} from a lookup string, performing a case-insensitive match.
      *
      * @param lookup the string lookup key (case-insensitive)
@@ -108,5 +150,10 @@ public enum LifePathEntryDataTraitLookup {
 
         LOGGER.warn("Unknown lookup name: {}", lookup);
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getLookupName();
     }
 }
