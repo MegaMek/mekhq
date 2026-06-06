@@ -86,6 +86,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.campaignOptions.components.AbilitySelectorDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.SectionHeaderControlProvider;
 import mekhq.gui.campaignOptions.components.SkillPrerequisitesDialog;
 import mekhq.utilities.ReportingUtilities;
@@ -422,6 +423,7 @@ public class AbilitiesTab {
                                       .trim();
             JLabel lblCost = new JLabel(costPrefix);
             JSpinner spnCost = new JSpinner(new SpinnerNumberModel(ability.getCost(), -100000, 100000, 1));
+            CampaignOptionsSpinner.installSelectAllOnFocus(spnCost);
             spnCost.setName("spnCost" + ability.getName());
             spnCost.addChangeListener(e -> ability.setCost((Integer) spnCost.getValue()));
             spnCost.setMaximumSize(spnCost.getPreferredSize());

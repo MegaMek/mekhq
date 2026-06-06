@@ -68,10 +68,20 @@ import javax.swing.SwingConstants;
  * </p>
  */
 public class CampaignOptionsFormPanel extends JPanel {
+    /**
+     * The standard label-column width for campaign option form sections, shared across the dialog so every page's
+     * labels and controls line up at the same x-positions. Use this unless a section genuinely needs something
+     * different (for example, unusually long labels). It comfortably fits the longest checkbox/label text on the
+     * standard pages, which is also why a two-column checkbox grid aligns with a labelled row at this width.
+     */
+    public static final int DEFAULT_LABEL_WIDTH = 300;
+
+    /** The standard control-column width for campaign option form sections. */
+    public static final int DEFAULT_CONTROL_WIDTH = 220;
+
     private static final int LABEL_RIGHT_PADDING = 12;
     private static final int ROW_VERTICAL_PADDING = 5;
     private static final int CHECK_BOX_COLUMN_GAP = 32;
-    private static final int DEFAULT_CONTROL_WIDTH = 220;
 
     private final int labelWidth;
     private final int controlWidth;

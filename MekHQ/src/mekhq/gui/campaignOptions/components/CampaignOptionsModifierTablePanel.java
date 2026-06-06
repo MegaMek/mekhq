@@ -64,6 +64,15 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
     private final int rowLabelWidth;
     private final int controlWidth;
     private final int columnCount;
+    /**
+     * Minimum width of each data column, indexed by column. Computed from the
+     * header row as {@code max(controlWidth,
+     * header width)} so a wide header (e.g. "Random SPA Chances") cannot clip,
+     * while the same per-column width is
+     * reused for the data rows so every column lines up across the header and data
+     * rows when they stretch.
+     */
+    private final int[] columnWidths;
     private int row;
 
     /**
@@ -94,6 +103,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
         this.rowLabelWidth = rowLabelWidth;
         this.controlWidth = controlWidth;
         this.columnCount = columnHeaders.length;
+        this.columnWidths = new int[columnCount];
 
         setName("pnl" + name);
         setOpaque(false);
@@ -120,57 +130,73 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
         JPanel rowPanel = createRowPanel(row % 2 == 0);
         setMinimumWidth(rowLabel, rowLabelWidth);
         setLabelAlignment(rowLabel, SwingConstants.TRAILING);
-        rowPanel.add(rowLabel, createCellLayout(0, GridBagConstraints.EAST, ROW_LABEL_RIGHT_PADDING));
+        rowPanel.add(rowLabel, createCellLayout(0, GridBagConstraints.EAST, ROW_LABEL_RIGHT_PADDING, 0.0));
 
         for (int column = 0; column < columnCount; column++) {
             JComponent cell = cells[column] == null ? createPlaceholder() : cells[column];
-            setMinimumWidth(cell, controlWidth);
+            setMinimumWidth(cell, columnWidths[column]);
             rowPanel.add(cell,
-                  createCellLayout(column + 1, GridBagConstraints.CENTER, getColumnRightPadding(column)));
+                    createCellLayout(column + 1, GridBagConstraints.CENTER, getColumnRightPadding(column), 1.0));
         }
-                rowPanel.add(createSpacer(TRAILING_RAIL_WIDTH),
-              createCellLayout(columnCount + 1, GridBagConstraints.CENTER, 0));
+        rowPanel.add(createSpacer(TRAILING_RAIL_WIDTH),
+                        createCellLayout(columnCount + 1, GridBagConstraints.CENTER, 0, 0.0));
 
         addTableRow(rowPanel);
     }
 
     private void addHeaderRow(JComponent... columnHeaders) {
+        // Style the headers first so we can measure their (bold) preferred widths, then
+        // size each data column to
+        // max(controlWidth, header width). Reusing the same per-column width for the
+        // data rows below keeps the
+        // columns aligned once they stretch, and guarantees a wide header (e.g. "Random
+        // SPA Chances") never clips.
+        for (int column = 0; column < columnHeaders.length; column++) {
+            JComponent header = columnHeaders[column];
+            styleHeader(header);
+            setLabelAlignment(header, SwingConstants.CENTER);
+            columnWidths[column] = Math.max(controlWidth, header.getPreferredSize().width);
+        }
+
         JPanel headerPanel = createRowPanel(false);
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, 1, 0, getGridColor()),
               BorderFactory.createEmptyBorder(0, ROW_HORIZONTAL_PADDING, HEADER_BOTTOM_PADDING,
                     ROW_HORIZONTAL_PADDING)));
         headerPanel.add(createSpacer(rowLabelWidth),
-              createCellLayout(0, GridBagConstraints.CENTER, ROW_LABEL_RIGHT_PADDING));
+                createCellLayout(0, GridBagConstraints.CENTER, ROW_LABEL_RIGHT_PADDING, 0.0));
 
         for (int column = 0; column < columnHeaders.length; column++) {
             JComponent header = columnHeaders[column];
-            styleHeader(header);
-            setMinimumWidth(header, controlWidth);
-            setLabelAlignment(header, SwingConstants.CENTER);
+            setMinimumWidth(header, columnWidths[column]);
+            // Let the header label fill its (wider, stretched) cell rather than sitting at
+            // its frozen preferred
+            // width. With FlatLaf font scaling the painted bold text can be wider than the
+            // build-time measurement,
+            // so a non-filling label would clip ("Random SPA Chanc..."); filling guarantees
+            // the centred text fits.
             headerPanel.add(header,
-                  createCellLayout(column + 1, GridBagConstraints.CENTER, getColumnRightPadding(column)));
+                    createCellLayout(column + 1, GridBagConstraints.CENTER, getColumnRightPadding(column), 1.0,
+                            GridBagConstraints.HORIZONTAL));
         }
         headerPanel.add(createSpacer(TRAILING_RAIL_WIDTH),
-              createCellLayout(columnCount + 1, GridBagConstraints.CENTER, 0));
+                createCellLayout(columnCount + 1, GridBagConstraints.CENTER, 0, 0.0));
 
         addTableRow(headerPanel);
     }
 
     private void addMatrixPanel() {
+        // Let the matrix fill the section width so the data columns can share the
+        // available space (the rows give
+        // their data cells weight); this keeps headers from clipping and lets the
+        // centred headers spread out.
         GridBagConstraints matrixLayout = new GridBagConstraints();
         matrixLayout.gridx = 0;
         matrixLayout.gridy = 0;
+        matrixLayout.weightx = 1.0;
         matrixLayout.anchor = GridBagConstraints.WEST;
-        matrixLayout.fill = GridBagConstraints.NONE;
+        matrixLayout.fill = GridBagConstraints.HORIZONTAL;
         add(matrixPanel, matrixLayout);
-
-        GridBagConstraints fillerLayout = new GridBagConstraints();
-        fillerLayout.gridx = 1;
-        fillerLayout.gridy = 0;
-        fillerLayout.weightx = 1.0;
-        fillerLayout.fill = GridBagConstraints.HORIZONTAL;
-        add(createSpacer(1), fillerLayout);
     }
 
     private JPanel createRowPanel(boolean banded) {
@@ -190,18 +216,23 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
         GridBagConstraints layout = new GridBagConstraints();
         layout.gridx = 0;
         layout.gridy = row++;
-        layout.weightx = 0.0;
+        layout.weightx = 1.0;
         layout.anchor = GridBagConstraints.WEST;
-        layout.fill = GridBagConstraints.NONE;
+        layout.fill = GridBagConstraints.HORIZONTAL;
         matrixPanel.add(rowPanel, layout);
     }
 
-    private GridBagConstraints createCellLayout(int gridX, int anchor, int rightPadding) {
+    private GridBagConstraints createCellLayout(int gridX, int anchor, int rightPadding, double weightX) {
+        return createCellLayout(gridX, anchor, rightPadding, weightX, GridBagConstraints.NONE);
+    }
+
+    private GridBagConstraints createCellLayout(int gridX, int anchor, int rightPadding, double weightX, int fill) {
         GridBagConstraints layout = new GridBagConstraints();
         layout.gridx = gridX;
         layout.gridy = 0;
+        layout.weightx = weightX;
         layout.anchor = anchor;
-        layout.fill = GridBagConstraints.NONE;
+        layout.fill = fill;
         layout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, rightPadding);
         return layout;
     }

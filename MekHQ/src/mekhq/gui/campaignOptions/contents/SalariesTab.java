@@ -90,7 +90,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * spanning multiple tabs.
  */
 public class SalariesTab {
-    private static final int FORM_LABEL_COLUMN_WIDTH = 300;
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    // Wider than the default control column so the salary-amount spinners have room for large figures.
     private static final int FORM_CONTROL_COLUMN_WIDTH = 300;
     private static final int FORM_LABEL_CONTROL_GAP = 12;
     private static final int SECTION_CONTENT_WIDTH = FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP
@@ -388,6 +389,7 @@ public class SalariesTab {
 
         DefaultEditor editor = (DefaultEditor) spinner.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+        CampaignOptionsSpinner.installSelectAllOnFocus(spinner);
 
         return spinner;
     }

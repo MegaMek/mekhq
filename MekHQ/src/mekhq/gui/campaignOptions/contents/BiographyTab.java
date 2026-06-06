@@ -104,7 +104,8 @@ import mekhq.gui.panes.RankSystemsPane;
  * tab in the campaign options dialog.
  */
 public class BiographyTab {
-    private static final int FORM_LABEL_COLUMN_WIDTH = 300;
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    // Wider than the default control column because the Biography combo boxes need the extra room.
     private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
     private static final int RANK_SYSTEMS_PANEL_WIDTH = 860;

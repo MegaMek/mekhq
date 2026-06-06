@@ -75,8 +75,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * </p>
  */
 public class RepairAndMaintenanceTab {
-    private static final int FORM_LABEL_COLUMN_WIDTH = 300;
-    private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private final CampaignOptions campaignOptions;

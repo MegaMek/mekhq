@@ -81,8 +81,8 @@ import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
  * options and labels.
  */
 public class EquipmentAndSuppliesTab {
-    private static final int EQUIPMENT_LABEL_COLUMN_WIDTH = 300;
-    private static final int EQUIPMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int EQUIPMENT_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int EQUIPMENT_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int AUTO_LOGISTICS_LABEL_COLUMN_WIDTH = 190;
     private static final int AUTO_LOGISTICS_CONTROL_COLUMN_WIDTH = 90;
     private static final int AUTO_LOGISTICS_PAIRS_PER_ROW = 2;
@@ -681,6 +681,7 @@ public class EquipmentAndSuppliesTab {
     private JSpinner createModifierSpinner(String tipKey) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
         spinner.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, tipKey));
+        CampaignOptionsSpinner.installSelectAllOnFocus(spinner);
         return spinner;
     }
 

@@ -88,8 +88,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  */
 public class TurnoverAndRetentionTab {
 
-    private static final int TURNOVER_LABEL_COLUMN_WIDTH = 300;
-    private static final int TURNOVER_CONTROL_COLUMN_WIDTH = 220;
+    private static final int TURNOVER_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int TURNOVER_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private final CampaignOptions campaignOptions;
     private TurnoverAndRetentionOptionsModel model;

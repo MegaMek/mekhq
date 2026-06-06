@@ -96,6 +96,8 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
+    // Intentional exception to the shared CampaignOptionsFormPanel default widths: the landing page uses a narrow
+    // label column and a wide control column to fit the faction and date pickers.
     private static final int FORM_LABEL_COLUMN_WIDTH = 150;
     private static final int FORM_CONTROL_COLUMN_WIDTH = 360;
     private static final int GENERAL_HEADER_IMAGE_SIZE = 200;

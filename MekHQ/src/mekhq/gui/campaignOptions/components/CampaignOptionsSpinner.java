@@ -41,6 +41,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
+
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 import megamek.common.annotations.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
@@ -222,5 +226,37 @@ public class CampaignOptionsSpinner extends JSpinner {
         // Align text in the spinner editor to the left
         DefaultEditor editor = (DefaultEditor) this.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+
+        installSelectAllOnFocus(this);
+    }
+
+    /**
+     * Makes a spinner select its whole value when its editor gains focus, so a user
+     * can click and immediately type a
+     * replacement instead of clearing the field first. Use this on raw
+     * {@link JSpinner}s in the campaign options
+     * dialogs that are not {@link CampaignOptionsSpinner} instances;
+     * {@code CampaignOptionsSpinner} applies it
+     * automatically.
+     *
+     * <p>
+     * The select-all is deferred to the end of the event queue because a mouse
+     * click positions the caret (clearing
+     * any selection) after {@code focusGained} fires; running afterwards keeps the
+     * value selected.
+     * </p>
+     *
+     * @param spinner the spinner whose editor should auto-select its value on focus
+     */
+    public static void installSelectAllOnFocus(JSpinner spinner) {
+        if (spinner.getEditor() instanceof DefaultEditor editor) {
+            JTextField textField = editor.getTextField();
+            textField.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent event) {
+                    SwingUtilities.invokeLater(textField::selectAll);
+                }
+            });
+        }
     }
 }

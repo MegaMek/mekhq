@@ -79,8 +79,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * @since 0.50.07
  */
 public class SystemsTab {
-    private static final int FORM_LABEL_COLUMN_WIDTH = 220;
-    private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private final Campaign campaign;

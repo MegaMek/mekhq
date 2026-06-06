@@ -96,8 +96,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </ul>
  */
 public class RulesetsTab {
-        private static final int FORM_LABEL_COLUMN_WIDTH = 240;
-        private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+        private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+        private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
         private static final int CHECKBOX_GRID_COLUMNS = 2;
 
     private final CampaignOptions campaignOptions;

@@ -109,8 +109,8 @@ import mekhq.module.api.PersonnelMarketMethod;
  * </p>
  */
 public class MarketsTab {
-      private static final int FORM_LABEL_COLUMN_WIDTH = 300;
-      private static final int FORM_CONTROL_COLUMN_WIDTH = 220;
+      private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+      private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
       private static final int FORM_LABEL_CONTROL_GAP = 12;
       private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
       private static final int CHECKBOX_GRID_COLUMNS = 2;
@@ -396,6 +396,7 @@ public class MarketsTab {
 
                   DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
                   editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+                  CampaignOptionsSpinner.installSelectAllOnFocus(jSpinner);
 
                   spnPersonnelMarketRandomRemovalTargets.put(skillLevel, jSpinner);
             }

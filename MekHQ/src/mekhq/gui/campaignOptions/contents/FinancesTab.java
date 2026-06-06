@@ -40,6 +40,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -60,6 +61,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -73,8 +75,21 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * modularity and clarity.
  */
 public class FinancesTab {
-    private static final int FINANCES_LABEL_COLUMN_WIDTH = 300;
-    private static final int FINANCES_CONTROL_COLUMN_WIDTH = 220;
+    private static final int FINANCES_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FINANCES_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int FINANCES_LABEL_CONTROL_GAP = 12;
+    // Paired (4-column) grid widths for the Price Multipliers sections. The first
+    // pair column is the label column plus
+    // the form's label/control gap, so a two-column grid's column 3 sits where the
+    // control column of 2-column form
+    // sections does. The following pair is sized so the two-column grid's content
+    // lands on the shared page-width floor
+    // (measured: 312 + 303 -> 640px section). The control width keeps the spinners
+    // uniform.
+    private static final int FINANCES_GRID_FIRST_PAIR_COLUMN_WIDTH = FINANCES_LABEL_COLUMN_WIDTH
+            + FINANCES_LABEL_CONTROL_GAP;
+    private static final int FINANCES_GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
+    private static final int FINANCES_GRID_CONTROL_COLUMN_WIDTH = 100;
 
     private final CampaignOptions campaignOptions;
     private FinancesOptionsModel model;
@@ -702,17 +717,14 @@ public class FinancesTab {
                 "MixedTechUnitPriceMultiplier"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralMultipliersPanel",
-                FINANCES_LABEL_COLUMN_WIDTH,
-                FINANCES_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblCommonPartPriceMultiplier, spnCommonPartPriceMultiplier);
-        panel.addRow(lblMixedTechUnitPriceMultiplier, spnMixedTechUnitPriceMultiplier);
-        panel.addRow(lblInnerSphereUnitPriceMultiplier, spnInnerSphereUnitPriceMultiplier);
-        panel.addRow(lblInnerSpherePartPriceMultiplier, spnInnerSpherePartPriceMultiplier);
-        panel.addRow(lblClanUnitPriceMultiplier, spnClanUnitPriceMultiplier);
-        panel.addRow(lblClanPartPriceMultiplier, spnClanPartPriceMultiplier);
+        JComponent[] labels = { lblCommonPartPriceMultiplier, lblMixedTechUnitPriceMultiplier,
+                lblInnerSphereUnitPriceMultiplier, lblInnerSpherePartPriceMultiplier,
+                lblClanUnitPriceMultiplier, lblClanPartPriceMultiplier };
+        JComponent[] controls = { spnCommonPartPriceMultiplier, spnMixedTechUnitPriceMultiplier,
+                spnInnerSphereUnitPriceMultiplier, spnInnerSpherePartPriceMultiplier,
+                spnClanUnitPriceMultiplier, spnClanPartPriceMultiplier };
 
-        return panel;
+        return createPriceMultiplierGridPanel("GeneralMultipliersPanel", labels, controls);
     }
 
     /**
@@ -752,17 +764,18 @@ public class FinancesTab {
 
             DefaultEditor editor = (DefaultEditor) spnUsedPartPriceMultipliers[ordinal].getEditor();
             editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+            CampaignOptionsSpinner.installSelectAllOnFocus(spnUsedPartPriceMultipliers[ordinal]);
         }
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UsedPartsMultiplierPanel",
-                FINANCES_LABEL_COLUMN_WIDTH,
-                FINANCES_CONTROL_COLUMN_WIDTH);
+        JComponent[] labels = new JComponent[spnUsedPartPriceMultipliers.length];
+        JComponent[] controls = new JComponent[spnUsedPartPriceMultipliers.length];
         for (int index = 0; index < spnUsedPartPriceMultipliers.length; index++) {
-            panel.addRow(lblUsedPartPriceMultipliers[index], spnUsedPartPriceMultipliers[index]);
+            labels[index] = lblUsedPartPriceMultipliers[index];
+            controls[index] = spnUsedPartPriceMultipliers[index];
         }
 
-        return panel;
+        return createPriceMultiplierGridPanel("UsedPartsMultiplierPanel", labels, controls);
     }
 
     /**
@@ -811,12 +824,36 @@ public class FinancesTab {
                 "CancelledOrderRefundMultiplier"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("OtherMultipliersPanel",
-                FINANCES_LABEL_COLUMN_WIDTH,
-                FINANCES_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblDamagedPartsValueMultiplier, spnDamagedPartsValueMultiplier);
-        panel.addRow(lblUnrepairablePartsValueMultiplier, spnUnrepairablePartsValueMultiplier);
-        panel.addRow(lblCancelledOrderRefundMultiplier, spnCancelledOrderRefundMultiplier);
+        JComponent[] labels = { lblDamagedPartsValueMultiplier, lblUnrepairablePartsValueMultiplier,
+                lblCancelledOrderRefundMultiplier };
+        JComponent[] controls = { spnDamagedPartsValueMultiplier, spnUnrepairablePartsValueMultiplier,
+                spnCancelledOrderRefundMultiplier };
+
+        return createPriceMultiplierGridPanel("OtherMultipliersPanel", labels, controls);
+    }
+
+    /**
+     * Builds a Price Multipliers section as a two-column
+     * ({@code label/control, label/control}) aligned grid. The pair
+     * widths are shared by every Price Multipliers section so their columns line
+     * up, and are sized so the section stays
+     * within the dialog's common page width.
+     *
+     * @param name     the section's base name; the Swing component name becomes
+     *                 {@code "pnl" + name}
+     * @param labels   the label components, one per field, in row-major order
+     * @param controls the control components, matching {@code labels} by index
+     *
+     * @return the assembled paired-field grid panel
+     */
+    private CampaignOptionsPairedFieldGridPanel createPriceMultiplierGridPanel(String name, JComponent[] labels,
+            JComponent[] controls) {
+        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+                FINANCES_GRID_FIRST_PAIR_COLUMN_WIDTH,
+                FINANCES_GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
+                FINANCES_GRID_CONTROL_COLUMN_WIDTH,
+                2);
+        panel.addPairs(labels, controls);
 
         return panel;
     }

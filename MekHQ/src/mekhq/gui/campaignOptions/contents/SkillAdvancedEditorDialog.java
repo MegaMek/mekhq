@@ -52,6 +52,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 
 import megamek.client.ui.util.UIUtil;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
  * A compact modal editor for the advanced configuration of a single skill: its per-level XP costs and the experience
@@ -108,7 +109,9 @@ class SkillAdvancedEditorDialog extends JDialog {
 
     private static JSpinner createSpinner(int value, int min, int max) {
         int clamped = Math.max(min, Math.min(max, value));
-        return new JSpinner(new SpinnerNumberModel(clamped, min, max, 1));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(clamped, min, max, 1));
+        CampaignOptionsSpinner.installSelectAllOnFocus(spinner);
+        return spinner;
     }
 
     private void initComponents() {

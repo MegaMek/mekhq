@@ -79,16 +79,21 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * </p>
  */
 public class AdvancementTab {
-    private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = 300;
-    private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = 220;
+    private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int ADVANCEMENT_LABEL_CONTROL_GAP = 12;
     private static final int ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH = 100;
-    // Pair-column width for the XP-award paired grids
-    // (Scenarios/Missions/Administrators). Sized so the two-column
-    // grid's content (~620px) stays within the shared page-width floor rather than
-    // ballooning to ~820px, while still
-    // fitting the longest label ("Outstanding Success (StratCon)", ~183px) plus the
-    // spinner column.
-    private static final int ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH = 310;
+    // First pair column = label column + the form's label/control gap, so a
+    // two-column grid's column 3 lines up with
+    // the control column of the 2-column form sections on the same page (e.g. XP
+    // Award Options sits above the XP-award
+    // grids). The following pair is narrower so the whole grid still stays within
+    // the shared page-width floor
+    // (measured: 312 + 303 -> 640px section, exactly the floor; column 3 lands at
+    // x=312, matching the 2-column control).
+    private static final int ADVANCEMENT_GRID_FIRST_PAIR_COLUMN_WIDTH = ADVANCEMENT_LABEL_COLUMN_WIDTH
+            + ADVANCEMENT_LABEL_CONTROL_GAP;
+    private static final int ADVANCEMENT_GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
     private static final int ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH = 290;
     private static final int RECRUITMENT_LABEL_COLUMN_WIDTH = 190;
     private static final int RECRUITMENT_CONTROL_COLUMN_WIDTH = 90;
@@ -362,7 +367,14 @@ public class AdvancementTab {
 
     private CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
             JComponent[] controls) {
-        return createAdvancementPairedGrid(name, labels, controls, ADVANCEMENT_GRID_PAIR_COLUMN_WIDTH);
+        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+                ADVANCEMENT_GRID_FIRST_PAIR_COLUMN_WIDTH,
+                ADVANCEMENT_GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
+                ADVANCEMENT_GRID_CONTROL_COLUMN_WIDTH,
+                2);
+        panel.addPairs(labels, controls);
+
+        return panel;
     }
 
     private CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
@@ -921,6 +933,7 @@ public class AdvancementTab {
         for (int i = 0; i < roles.size(); i++) {
             lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusCombat[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
+            CampaignOptionsSpinner.installSelectAllOnFocus(spnRecruitmentBonusCombat[i]);
             labelsAndControls[i * 2] = lblRecruitmentBonusCombat[i];
             labelsAndControls[i * 2 + 1] = spnRecruitmentBonusCombat[i];
         }
@@ -958,6 +971,7 @@ public class AdvancementTab {
         for (int i = 0; i < roles.size(); i++) {
             lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusSupport[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
+            CampaignOptionsSpinner.installSelectAllOnFocus(spnRecruitmentBonusSupport[i]);
             labelsAndControls[i * 2] = lblRecruitmentBonusSupport[i];
             labelsAndControls[i * 2 + 1] = spnRecruitmentBonusSupport[i];
         }
