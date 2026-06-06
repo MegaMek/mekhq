@@ -279,7 +279,7 @@ class StratConRulesManagerTest {
 
         // processForceDeployment needs LocalDate and Hangar
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
-        when(campaign.getHangar()).thenReturn(mock(Hangar.class));
+        when(campaign.getAllHangar()).thenReturn(mock(Hangar.class));
 
         // Track setup for processForceDeployment
         when(track.getAssignedCoordForces()).thenReturn(new HashMap<>());

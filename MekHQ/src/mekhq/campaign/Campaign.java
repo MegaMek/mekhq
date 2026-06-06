@@ -2052,6 +2052,14 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
+     * @return all hangars across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     */
+    public Hangar getAllHangar() {
+        return units;
+    }
+
+    /**
      * Gets statistics related to units in the hangar.
      */
     public HangarStatistics getHangarStatistics() {
@@ -2438,6 +2446,13 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
+     * @return all personnel across all locations associated with this campaign.
+     */
+    public Collection<Person> getAllPersonnel() {
+        return humanResources.getPersonnel();
+    }
+
+    /**
      * Retrieves a list of personnel, excluding those whose status indicates they have left the unit.
      *
      * @return a {@code List} of {@link Person} objects who have not left the unit
@@ -2658,6 +2673,14 @@ public class Campaign implements ITechManager, IPlace {
      * Gets the Warehouse which stores parts.
      */
     public Warehouse getWarehouse() {
+        return parts;
+    }
+
+    /**
+     * @return all warehouses across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     */
+    public Warehouse getAllWarehouse() {
         return parts;
     }
 

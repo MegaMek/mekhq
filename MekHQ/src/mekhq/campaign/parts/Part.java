@@ -258,11 +258,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         return campaign;
     }
 
-    @Override
-    public Warehouse getWarehouse() {
-        return campaign.getWarehouse();
-    }
-
     public String getName() {
         return name;
     }
@@ -936,6 +931,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     @Override
     public WorkTime getMode() {
         return mode;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        return campaign.getWarehouse();
     }
 
     public void setMode(WorkTime wt) {

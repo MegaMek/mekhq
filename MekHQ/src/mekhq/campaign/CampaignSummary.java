@@ -150,7 +150,7 @@ public class CampaignSummary {
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for (Unit u : campaign.getHangar().getUnits()) {
+        for (Unit u : campaign.getAllHangar().getUnits()) {
             Entity e = u.getEntity();
             if (u.isUnmanned() ||
                       u.isSalvage() ||
@@ -441,7 +441,7 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
-        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
+        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(campaign.getAllHangar(), false);
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
             fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),

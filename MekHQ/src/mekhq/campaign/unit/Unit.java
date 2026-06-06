@@ -7097,7 +7097,7 @@ public class Unit implements ITechnology, ILocation {
             part.setUnit(null);
 
             if (campaign != null) {
-                campaign.getWarehouse().removePart(part);
+                getWarehouse().removePart(part);
             }
         }
 
