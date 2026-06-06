@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -236,13 +236,18 @@ public enum AtBContractType {
     }
 
     /**
-     * Determines the availability level of parts and units based on the type of operation being conducted.
+     * Determines the parts availability level for the current contract type.
      *
-     * <p>The availability level is represented as an integer and varies depending on the specific
-     * mission type. Higher values indicate worse availability, while lower values signify more restricted access to
-     * parts.
+     * <p>The returned value is a modifier added to the target number of procurement checks, so a higher value makes
+     * parts harder to acquire and a lower (negative) value makes them easier. In other words, higher is worse. The
+     * modifier is only applied when StratCon and "restrict parts by mission" are both enabled.</p>
      *
-     * @return an integer representing the availability level of parts for the current mission type.
+     * <p>Values range from {@code 2} for deep covert operations cut off behind enemy lines (worst availability) down
+     * to {@code -2} (best availability). The {@code -2} value is the {@code default} branch, applied to garrison-style
+     * postings and to any other contract type that lacks a more restrictive case.</p>
+     *
+     * @return the parts availability modifier for the current contract type, where higher values mean worse
+     *       availability
      */
     public int calculatePartsAvailabilityLevel() {
         return switch (this) {

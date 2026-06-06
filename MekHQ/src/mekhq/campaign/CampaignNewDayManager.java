@@ -422,7 +422,7 @@ public class CampaignNewDayManager {
                   campaign.getFactionStandings().processRegardDegradation(faction.getShortName(),
                         today.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
-                campaign.addReport(GENERAL, report);
+                campaign.addReport(POLITICS, report);
             }
         }
 

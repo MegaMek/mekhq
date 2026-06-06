@@ -380,7 +380,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tabChanged(); // Make sure the right buttons are active.
 
         setMinimumSize(UIUtil.scaleForGUI(850, 600));
-        setPreferredSize(UIUtil.scaleForGUI(850, 1000));
+        setPreferredSize(UIUtil.scaleForGUI(850, 700));
     }
 
     // region Make Unit Status
