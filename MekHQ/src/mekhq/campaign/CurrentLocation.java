@@ -267,10 +267,6 @@ public class CurrentLocation extends AbstractLocation {
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
             }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
-            }
         }
 
         if (wasTraveling || jumpPath != null) {
@@ -284,6 +280,10 @@ public class CurrentLocation extends AbstractLocation {
             // This should be before inoculations so that we can correctly read the TO&E
             if (!campaign.getAutomatedMothballUnits().isEmpty()) {
                 performAutomatedActivation(campaign);
+            }
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
             }
 
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
