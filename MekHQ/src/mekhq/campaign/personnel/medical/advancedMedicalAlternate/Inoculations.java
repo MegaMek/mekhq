@@ -235,7 +235,7 @@ public class Inoculations {
         LocalDate today = campaign.getLocalDate();
 
         Set<Person> personnel = new HashSet<>();
-        for (Person person : location.getPersonnelAtLocation()) {
+        for (Person person : location.fetchPersonnelAtLocation()) {
             if (!person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
                 personnel.add(person);
             }

@@ -92,11 +92,11 @@ class EducationControllerTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Warehouse warehouse = mock(Warehouse.class);
         when(warehouse.getParts()).thenReturn(Collections.emptyList());
-        when(campaign.getWarehouse()).thenReturn(warehouse);
+        when(campaign.getAllWarehouse()).thenReturn(warehouse);
 
         when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
 

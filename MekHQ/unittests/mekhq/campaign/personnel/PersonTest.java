@@ -1568,11 +1568,11 @@ public class PersonTest {
                 when(campaign.getCampaignOptions()).thenReturn(options);
 
                 Hangar hangar = mock(Hangar.class);
-                when(campaign.getHangar()).thenReturn(hangar);
+                when(campaign.getAllHangar()).thenReturn(hangar);
 
                 Warehouse warehouse = mock(Warehouse.class);
                 when(warehouse.getParts()).thenReturn(Collections.emptyList());
-                when(campaign.getWarehouse()).thenReturn(warehouse);
+                when(campaign.getAllWarehouse()).thenReturn(warehouse);
 
                 when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
 
@@ -1644,11 +1644,11 @@ public class PersonTest {
                 when(campaign.getCampaignOptions()).thenReturn(options);
 
                 Hangar hangar = mock(Hangar.class);
-                when(campaign.getHangar()).thenReturn(hangar);
+                when(campaign.getAllHangar()).thenReturn(hangar);
 
                 Warehouse warehouse = mock(Warehouse.class);
                 when(warehouse.getParts()).thenReturn(Collections.emptyList());
-                when(campaign.getWarehouse()).thenReturn(warehouse);
+                when(campaign.getAllWarehouse()).thenReturn(warehouse);
 
                 when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
             }
@@ -1774,14 +1774,14 @@ public class PersonTest {
         }
 
         @Test
-        void getPersonnelAtLocation_returnsSelf() {
-            Set<Person> result = person.getPersonnelAtLocation();
+        void fetchPersonnelAtLocation_returnsSelf() {
+            Set<Person> result = person.fetchPersonnelAtLocation();
             assertTrue(result.contains(person));
         }
 
         @Test
-        void getPersonnelAtLocation_returnsExactlyOnePerson() {
-            assertEquals(1, person.getPersonnelAtLocation().size());
+        void fetchPersonnelAtLocation_returnsExactlyOnePerson() {
+            assertEquals(1, person.fetchPersonnelAtLocation().size());
         }
 
         @Nested
@@ -1829,22 +1829,22 @@ public class PersonTest {
             }
 
             @Test
-            void campus_getPersonnelAtLocation_includesPersonAtCampus() {
+            void campus_fetchPersonnelAtLocation_includesPersonAtCampus() {
                 person.setParent(campus);
-                assertTrue(campus.getPersonnelAtLocation().contains(person));
+                assertTrue(campus.fetchPersonnelAtLocation().contains(person));
             }
 
             @Test
-            void campus_getPersonnelAtLocation_excludesPersonAfterDetach() {
+            void campus_fetchPersonnelAtLocation_excludesPersonAfterDetach() {
                 person.setParent(campus);
                 person.setParent(null);
-                assertFalse(campus.getPersonnelAtLocation().contains(person));
+                assertFalse(campus.fetchPersonnelAtLocation().contains(person));
             }
 
             @Test
-            void fixed_getPersonnelAtLocation_includesPersonViaCampus() {
+            void fixed_fetchPersonnelAtLocation_includesPersonViaCampus() {
                 person.setParent(campus);
-                assertTrue(fixed.getPersonnelAtLocation().contains(person));
+                assertTrue(fixed.fetchPersonnelAtLocation().contains(person));
             }
         }
 

@@ -393,7 +393,6 @@ public class Campaign implements ITechManager, IPlace {
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
     private final Personnel mainForcePersonnel = new Personnel();
-    private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -1777,7 +1776,7 @@ public class Campaign implements ITechManager, IPlace {
             if (loc == mainLoc) {
                 return false;
             }
-            if (!loc.getPersonnelAtLocation().isEmpty()) {
+            if (!loc.fetchPersonnelAtLocation().isEmpty()) {
                 return false;
             }
             if (loc instanceof CurrentLocation) {

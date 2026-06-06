@@ -311,7 +311,7 @@ public abstract class AbstractLocation implements IPlace {
      *
      * @return the deserialized location, or {@code null} if the node name is unrecognized
      */
-    public static @Nullalbe AbstractLocation generateInstanceFromXML(Node wn, Campaign campaign) {
+    public static @Nullable AbstractLocation generateInstanceFromXML(Node wn, Campaign campaign) {
         return switch (wn.getNodeName().toLowerCase()) {
             case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
             case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);

@@ -93,9 +93,4 @@ public class Personnel extends LinkedHashMap<UUID, Person> implements ILocation 
             }
         }
     }
-
-    @Override
-    public LocationNode getLocationNode() {
-        return locationNode;
-    }
 }
