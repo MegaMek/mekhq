@@ -434,7 +434,9 @@ public class AdvancedMedicalAlternateHealing {
         int marginOfSuccess = surgery.getMarginOfSuccess();
 
         // Edge
-        if (marginOfSuccess <= -6 && useEdge) { // Permanent injury
+        if (marginOfSuccess <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
+            // manually update edge because if we pass useEdge == true, the doctor will get one free roll
+            doctor.changeCurrentEdge(-1);
             SkillCheckUtility edgeReroll = new SkillCheckUtility(
                   getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.edge"),
                   doctor,
