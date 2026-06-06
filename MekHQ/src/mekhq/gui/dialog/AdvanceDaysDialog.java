@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.enums.DailyReportType.*;
+import static mekhq.gui.CommandCenterTab.addDailyReportTab;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -297,26 +298,16 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         getAggregateLogPanel().refreshLog(commandCenterTab.getAggregateLog().getLogText(), AGGREGATE);
 
         EnhancedTabbedPane dailyReportTab = new EnhancedTabbedPane();
-        dailyReportTab.addTab(GENERAL.getIconString(), getDailyLogPanel());
-        dailyReportTab.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
-        dailyReportTab.addTab(BATTLE.getIconString(), getBattleLogPanel());
-        dailyReportTab.setToolTipTextAt(BATTLE.getTabIndex(), BATTLE.getTooltip());
-        dailyReportTab.addTab(PERSONNEL.getIconString(), getPersonnelLogPanel());
-        dailyReportTab.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
-        dailyReportTab.addTab(MEDICAL.getIconString(), getMedicalLogPanel());
-        dailyReportTab.setToolTipTextAt(MEDICAL.getTabIndex(), MEDICAL.getTooltip());
-        dailyReportTab.addTab(FINANCES.getIconString(), getFinancesLogPanel());
-        dailyReportTab.setToolTipTextAt(FINANCES.getTabIndex(), FINANCES.getTooltip());
-        dailyReportTab.addTab(ACQUISITIONS.getIconString(), getAcquisitionsLogPanel());
-        dailyReportTab.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
-        dailyReportTab.addTab(TECHNICAL.getIconString(), getTechnicalLogPanel());
-        dailyReportTab.setToolTipTextAt(TECHNICAL.getTabIndex(), TECHNICAL.getTooltip());
-        dailyReportTab.addTab(POLITICS.getIconString(), getPoliticsLogPanel());
-        dailyReportTab.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
-        dailyReportTab.addTab(SKILL_CHECKS.getIconString(), getSkillLogPanel());
-        dailyReportTab.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
-        dailyReportTab.addTab(AGGREGATE.getIconString(), getSkillLogPanel());
-        dailyReportTab.setToolTipTextAt(AGGREGATE.getTabIndex(), AGGREGATE.getTooltip());
+        addDailyReportTab(dailyReportTab, getDailyLogPanel(), GENERAL);
+        addDailyReportTab(dailyReportTab, getBattleLogPanel(), BATTLE);
+        addDailyReportTab(dailyReportTab, getPersonnelLogPanel(), PERSONNEL);
+        addDailyReportTab(dailyReportTab, getMedicalLogPanel(), MEDICAL);
+        addDailyReportTab(dailyReportTab, getFinancesLogPanel(), FINANCES);
+        addDailyReportTab(dailyReportTab, getAcquisitionsLogPanel(), ACQUISITIONS);
+        addDailyReportTab(dailyReportTab, getTechnicalLogPanel(), TECHNICAL);
+        addDailyReportTab(dailyReportTab, getPoliticsLogPanel(), POLITICS);
+        addDailyReportTab(dailyReportTab, getSkillLogPanel(), SKILL_CHECKS);
+        addDailyReportTab(dailyReportTab, getAggregateLogPanel(), AGGREGATE);
 
         // Layout the Panel
         final JPanel panel = new JPanel();

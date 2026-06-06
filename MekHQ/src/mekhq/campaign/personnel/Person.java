@@ -34,6 +34,7 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -215,6 +216,18 @@ public class Person {
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
+
+    /**
+     * Campaign Operations doesn't have a cap on Fatigue, but does stop tracking Fatigue at 17 points. With this in
+     * mind, we have opted to set a cap on fatigue of 30. This is to ensure the player isn't placed in a situation where
+     * a character could conceivably accumulate hundreds of Fatigue. At a certain point you can't get more tired
+     */
+    private static final int FATIGUE_CAP = 30;
+    /**
+     * Some modifiers can reduce Fatigue below 0, but fatigue cannot directly be reduced to below zero. We use this
+     * constant to ensure this is the case.
+     */
+    private static final int FATIGUE_MINIMUM = 0;
 
 
     private PersonAwardController awardController;
@@ -428,7 +441,7 @@ public class Person {
     private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
-    private boolean tryingToConceive;
+    private boolean wantsChildren;
     private boolean hidePersonality;
     // endregion Flags
 
@@ -666,7 +679,7 @@ public class Person {
         setQuickTrainIgnore(false);
         setPrefersMen(false);
         setPrefersWomen(false);
-        setTryingToConceive(true);
+        setWantsChildren(true);
         // endregion Flags
 
         extraData = new ExtraData();
@@ -2373,7 +2386,8 @@ public class Person {
             modifier += 2;
         }
 
-        return getFatigueDirect() + modifier;
+        int adjustedFatigue = fatigue + modifier;
+        return clamp(adjustedFatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
 
     public void setFatigue(final int fatigue) {
@@ -2405,7 +2419,9 @@ public class Person {
             delta = (int) floor(delta * getFatigueMultiplier());
         }
 
-        this.fatigue = this.fatigue + MathUtility.roundAwayFromZero(delta);
+        fatigue += MathUtility.roundAwayFromZero(delta);
+
+        fatigue = clamp(fatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -2841,7 +2857,7 @@ public class Person {
      *                                   ensure it remains within the valid range.
      */
     public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = Math.clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
+        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
     Aggression getStoredAggression() {
@@ -2879,7 +2895,7 @@ public class Person {
      *                                 it remains within the valid range.
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
+        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     Ambition getStoredAmbition() {
@@ -2917,7 +2933,7 @@ public class Person {
      *                              remains within the valid range.
      */
     public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = Math.clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
+        this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
     Greed getStoredGreed() {
@@ -2955,7 +2971,7 @@ public class Person {
      *                               remains within the valid range.
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = Math.clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
+        this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     Social getStoredSocial() {
@@ -2993,7 +3009,7 @@ public class Person {
      *                                         ensure it remains within the valid range.
      */
     public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
-        this.personalityQuirkDescriptionIndex = Math.clamp(personalityQuirkDescriptionIndex,
+        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
               0,
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
@@ -3237,13 +3253,9 @@ public class Person {
         this.prefersWomen = prefersWomen;
     }
 
-    public boolean isTryingToConceive() {
-        return tryingToConceive;
-    }
+    public boolean isWantsChildren() {return wantsChildren;}
 
-    public void setTryingToConceive(final boolean tryingToConceive) {
-        this.tryingToConceive = tryingToConceive;
-    }
+    public void setWantsChildren(final boolean wantsChildren) {this.wantsChildren = wantsChildren;}
 
     public boolean isHidePersonality() {
         return hidePersonality;
@@ -3824,7 +3836,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wantsChildren", wantsChildren);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
 
@@ -4464,8 +4476,10 @@ public class Person {
                     person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
                     person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
-                    person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) { // <51.0 compatibility handler
+                    person.setWantsChildren(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("wantsChildren")) {
+                    person.setWantsChildren(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
                     person.setHidePersonality(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("extraData")) {
@@ -5770,6 +5784,12 @@ public class Person {
         final SkillType skillType = getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
+    public double getTalentBasedXpCostMultiplier(boolean useReasoning, @Nullable SkillType skillType) {
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
 
         if (options.booleanOption(FLAW_SLOW_LEARNER)) {
@@ -5780,7 +5800,7 @@ public class Person {
             multiplier -= 0.2;
         }
 
-        if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
+        if (skillType != null && skillType.isAffectedByGremlinsOrTechEmpathy()) {
             if (options.booleanOption(FLAW_GREMLINS)) {
                 multiplier += 0.1;
             }
@@ -5790,7 +5810,7 @@ public class Person {
             }
         }
 
-        return (int) round(cost * multiplier);
+        return multiplier;
     }
     // endregion skill
 
@@ -6018,12 +6038,19 @@ public class Person {
         return atowAttributes.getCurrentEdge();
     }
 
-    public void setEdgeUsed(final int edgeUsedThisRound) {
+    public void setEdgeUsedThisRound(final int edgeUsedThisRound) {
         this.edgeUsedThisRound = edgeUsedThisRound;
     }
 
-    public int getEdgeUsed() {
+    public int getEdgeUsedThisRound() {
         return edgeUsedThisRound;
+    }
+
+    public int getUsedEdge() {
+        int currentEdge = getCurrentEdge();
+        int maximumEdge = getAdjustedEdge();
+
+        return maximumEdge - currentEdge;
     }
 
     /**
@@ -6968,11 +6995,11 @@ public class Person {
 
         modifiers += getDarkSecretModifier(false);
 
-        return Math.clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public void setConnections(final int connections) {
-        this.connections = Math.clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     /**
@@ -6985,7 +7012,7 @@ public class Person {
      */
     public void changeConnections(final int delta) {
         int newValue = connections + delta;
-        connections = Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -6993,7 +7020,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = Math.clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
@@ -7006,7 +7033,7 @@ public class Person {
      */
     public void changeWealth(final int delta) {
         int newValue = wealth + delta;
-        wealth = Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     public boolean isHasPerformedExtremeExpenditure() {
@@ -7053,7 +7080,7 @@ public class Person {
      * @since 0.50.10
      */
     public void setExtraIncomeFromTraitLevel(final int traitLevel) {
-        int newExtraIncomeTraitLevel = Math.clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
         extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
     }
 
@@ -7125,11 +7152,11 @@ public class Person {
 
         modifiers += getDarkSecretModifier(true);
 
-        return Math.clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
-        this.reputation = Math.clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     /**
@@ -7142,7 +7169,7 @@ public class Person {
      */
     public void changeReputation(final int delta) {
         int newValue = reputation + delta;
-        reputation = Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -7150,12 +7177,12 @@ public class Person {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = Math.clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
-        unlucky = Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public int getBloodmark() {
@@ -7167,12 +7194,12 @@ public class Person {
     }
 
     public void setBloodmark(final int unlucky) {
-        this.bloodmark = Math.clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public void changeBloodmark(final int delta) {
         int newValue = bloodmark + delta;
-        bloodmark = Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public List<LocalDate> getBloodhuntSchedule() {
@@ -7623,8 +7650,14 @@ public class Person {
         return getInjuryByLocation(location) != null;
     }
 
+    /**
+     * Determines whether this entity has any non-permanent injuries that require medical attention.
+     *
+     * @return {@code true} if there is at least one non-permanent injury present; {@code false} otherwise
+     */
     public boolean needsAMFixing() {
-        return !injuries.isEmpty();
+        boolean ignorePermanentInjuries = true;
+        return hasInjuries(ignorePermanentInjuries);
     }
 
     /**

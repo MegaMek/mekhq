@@ -528,7 +528,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * Initialize the panel for displaying the daily report log
      */
     private void initLogPanel() {
-        Dimension size = scaleForGUI(400, 100);
+        Dimension size = scaleForGUI(450, 100);
 
         pnlGeneralLog = new DailyReportLogPanel(getCampaignGui());
         pnlGeneralLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panLog.title")));
@@ -582,31 +582,41 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         tabLogs = new EnhancedTabbedPane();
         tabLogs.setName("dailyReportTabs");
-        tabLogs.addTab(GENERAL.getIconString(), pnlGeneralLog);
-        tabLogs.setToolTipTextAt(GENERAL.getTabIndex(), GENERAL.getTooltip());
-        tabLogs.addTab(BATTLE.getIconString(), pnlBattleLog);
-        tabLogs.setToolTipTextAt(BATTLE.getTabIndex(), BATTLE.getTooltip());
-        tabLogs.addTab(PERSONNEL.getIconString(), pnlPersonnelLog);
-        tabLogs.setToolTipTextAt(PERSONNEL.getTabIndex(), PERSONNEL.getTooltip());
-        tabLogs.addTab(MEDICAL.getIconString(), pnlMedicalLog);
-        tabLogs.setToolTipTextAt(MEDICAL.getTabIndex(), MEDICAL.getTooltip());
-        tabLogs.addTab(FINANCES.getIconString(), pnlFinancesLog);
-        tabLogs.setToolTipTextAt(FINANCES.getTabIndex(), FINANCES.getTooltip());
-        tabLogs.addTab(ACQUISITIONS.getIconString(), pnlAcquisitionsLog);
-        tabLogs.setToolTipTextAt(ACQUISITIONS.getTabIndex(), ACQUISITIONS.getTooltip());
-        tabLogs.addTab(TECHNICAL.getIconString(), pnlTechnicalLog);
-        tabLogs.setToolTipTextAt(TECHNICAL.getTabIndex(), TECHNICAL.getTooltip());
-        tabLogs.addTab(POLITICS.getIconString(), pnlPoliticsLog);
-        tabLogs.setToolTipTextAt(POLITICS.getTabIndex(), POLITICS.getTooltip());
-        tabLogs.addTab(SKILL_CHECKS.getIconString(), pnlSkillLog);
-        tabLogs.setToolTipTextAt(SKILL_CHECKS.getTabIndex(), SKILL_CHECKS.getTooltip());
-        tabLogs.addTab(AGGREGATE.getIconString(), pnlAggregateLog);
-        tabLogs.setToolTipTextAt(AGGREGATE.getTabIndex(), AGGREGATE.getTooltip());
+        addDailyReportTab(tabLogs, pnlGeneralLog, GENERAL);
+        addDailyReportTab(tabLogs, pnlBattleLog, BATTLE);
+        addDailyReportTab(tabLogs, pnlPersonnelLog, PERSONNEL);
+        addDailyReportTab(tabLogs, pnlMedicalLog, MEDICAL);
+        addDailyReportTab(tabLogs, pnlFinancesLog, FINANCES);
+        addDailyReportTab(tabLogs, pnlAcquisitionsLog, ACQUISITIONS);
+        addDailyReportTab(tabLogs, pnlTechnicalLog, TECHNICAL);
+        addDailyReportTab(tabLogs, pnlPoliticsLog, POLITICS);
+        addDailyReportTab(tabLogs, pnlSkillLog, SKILL_CHECKS);
+        addDailyReportTab(tabLogs, pnlAggregateLog, AGGREGATE);
 
         tabLogs.addChangeListener(evt -> {
             int selectedIndex = tabLogs.getSelectedIndex();
             clearDailyReportNag(selectedIndex);
         });
+    }
+
+    /**
+     * Sets a named {@link JLabel} as the tab component for the given {@link DailyReportType}, allowing it to be
+     * retrieved and shown/hidden later via {@link JTabbedPane#getTabComponentAt(int)}.
+     *
+     * @param tabbedPane the tabbed pane to set the component on
+     * @param panel      the {@link JPanel} associated with the tab
+     * @param type       the {@link DailyReportType} whose tab should receive the component
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static void addDailyReportTab(EnhancedTabbedPane tabbedPane, JPanel panel, DailyReportType type) {
+        tabbedPane.addTab(type.getIconString(), panel);
+        tabbedPane.setToolTipTextAt(type.getTabIndex(), type.getTooltip());
+
+        JLabel label = new JLabel(type.getIconString());
+        label.setName(type.name());
+        tabbedPane.setTabComponentAt(type.getTabIndex(), label);
     }
 
     public void clearDailyReportNag(int selectedIndex) {

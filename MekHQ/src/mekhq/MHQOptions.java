@@ -1034,7 +1034,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayMRMS() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_AUTO_LOGISTICS, true);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_MRMS, true);
     }
 
     public void setNewDayMRMS(final boolean value) {

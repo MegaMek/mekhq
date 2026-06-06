@@ -791,7 +791,7 @@ public class FactionStandings {
             return null;
         }
 
-        double regard = getRegardForFaction(factionCode, true);
+        double regard = getRegardForFaction(factionCode, false);
         FactionStandingLevel factionStanding = FactionStandingUtilities.calculateFactionStandingLevel(regard);
 
         if (factionStanding.getStandingLevel() >= FactionJudgment.THRESHOLD_FOR_ACCOLADE) {
@@ -1070,7 +1070,7 @@ public class FactionStandings {
 
         // Build final report
         String deltaDirection;
-        if (newRegard > originalRegard) {
+        if (newRegard >= originalRegard) {
             reportingColor = getPositiveColor();
             deltaDirection = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.increased");
         } else {
@@ -1184,6 +1184,13 @@ public class FactionStandings {
                     regardChangeReports.add(report);
                 }
             }
+        }
+
+        // We saw a lot of player confusion with players not realizing that annual regard decay was a thing. This
+        // notice was added to try and mitigate that.
+        if (!regardChangeReports.isEmpty()) {
+            String decayNotice = getTextAt(RESOURCE_BUNDLE, "factionStandings.change.decay");
+            regardChangeReports.addFirst(decayNotice);
         }
 
         return regardChangeReports;
