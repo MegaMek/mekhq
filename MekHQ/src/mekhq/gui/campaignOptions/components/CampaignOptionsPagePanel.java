@@ -58,7 +58,26 @@ import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 
 /**
- * Standard page shell for Campaign Options screens.
+ * Standard page shell for Campaign Options screens, assembled through its
+ * fluent {@link Builder}.
+ *
+ * <p>
+ * A page stacks, from top to bottom: a {@link CampaignOptionsHeaderPanel}
+ * header, an optional intro paragraph, a
+ * stack of collapsible {@link MHQCollapsiblePanel} sections (with shared
+ * expand/collapse-all controls), and an optional
+ * quote footer. Arbitrary components can also be interleaved with the sections.
+ * Every sectioned page is floored to a
+ * shared width ({@link #UNIFORM_SECTION_STACK_WIDTH}) so the dialog's pages
+ * render at a consistent width, while pages
+ * whose content is naturally wider keep their size up to the page-width cap.
+ * </p>
+ *
+ * <p>
+ * Section titles and summaries are concatenated into
+ * {@link #getSectionSearchText()} so the navigation filter can
+ * match on a section heading, not only the page title.
+ * </p>
  */
 public class CampaignOptionsPagePanel extends JPanel {
     private static final int INTRO_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
@@ -68,10 +87,11 @@ public class CampaignOptionsPagePanel extends JPanel {
     private static final int DEFAULT_HEADER_IMAGE_SIZE = 64;
     // Shared minimum width every sectioned page is floored to, so form pages render
     // at a consistent width across the
-    // dialog. Comfortably covers a 2-column form section (label column + long
-    // right-column control/checkbox) and stays
-    // well under the page width cap, so wider table pages and the 950 cap are
-    // unaffected.
+    // dialog instead of each page shrinking to its own widest section. Comfortably
+    // covers a two-column form section
+    // (label column plus a long right-column control or checkbox) and stays well
+    // under the page width cap, so wider
+    // table pages and the 950 cap are unaffected.
     private static final int UNIFORM_SECTION_STACK_WIDTH = UIUtil.scaleForGUI(640);
 
     private final JPanel pageBody;

@@ -66,10 +66,29 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
     private final int columnCount;
     private int row;
 
+    /**
+     * Creates a modifier table with the default row-label and control column
+     * widths.
+     *
+     * @param name          the panel's base name; the Swing component name becomes
+     *                      {@code "pnl" + name}
+     * @param columnHeaders the header component for each data column; the column
+     *                      count is taken from this array
+     */
     public CampaignOptionsModifierTablePanel(String name, JComponent... columnHeaders) {
         this(name, DEFAULT_ROW_LABEL_WIDTH, DEFAULT_CONTROL_WIDTH, columnHeaders);
     }
 
+    /**
+     * Creates a modifier table with explicit row-label and control column widths.
+     *
+     * @param name          the panel's base name; the Swing component name becomes
+     *                      {@code "pnl" + name}
+     * @param rowLabelWidth the minimum width of the leading row-label column
+     * @param controlWidth  the minimum width of each data column
+     * @param columnHeaders the header component for each data column; the column
+     *                      count is taken from this array
+     */
     public CampaignOptionsModifierTablePanel(String name, int rowLabelWidth, int controlWidth,
           JComponent... columnHeaders) {
         this.rowLabelWidth = rowLabelWidth;

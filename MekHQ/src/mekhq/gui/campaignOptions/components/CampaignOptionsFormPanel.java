@@ -42,7 +42,30 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 /**
- * A compact two-column form panel for campaign option pages.
+ * A compact, vertically stacked form panel for campaign option pages.
+ *
+ * <p>
+ * The panel arranges content as a sequence of rows using a
+ * {@link GridBagLayout}, exposing higher-level helpers so
+ * callers describe <em>what</em> to add (a labelled row, a checkbox, a grid of
+ * checkboxes) rather than managing
+ * {@link GridBagConstraints} themselves. Rows are appended top to bottom; an
+ * internal row counter is shared across every
+ * {@code add*} method, so different row styles can be freely interleaved and
+ * they stack in call order.
+ * </p>
+ *
+ * <p>
+ * Two fixed column widths drive alignment. The optional {@code labelWidth}
+ * sizes the left (label) column so labels
+ * line up across rows; a {@code labelWidth} of {@code 0} disables label-column
+ * sizing. The {@code controlWidth} sets the
+ * minimum width of the right (control) column. Single-control rows added
+ * through {@link #addRow(JComponent, JComponent)}
+ * stretch their control to the panel's right edge so it aligns with the
+ * section's right edge, while grid helpers keep
+ * their inner columns left-packed and only stretch the rightmost column.
+ * </p>
  */
 public class CampaignOptionsFormPanel extends JPanel {
     private static final int LABEL_RIGHT_PADDING = 12;
@@ -54,14 +77,39 @@ public class CampaignOptionsFormPanel extends JPanel {
     private final int controlWidth;
     private int row;
 
+    /**
+     * Creates a form panel with no fixed label-column width and the default
+     * control-column width.
+     *
+     * @param name the panel's base name; the Swing component name becomes
+     *             {@code "pnl" + name}
+     */
     public CampaignOptionsFormPanel(String name) {
         this(name, 0, DEFAULT_CONTROL_WIDTH);
     }
 
+    /**
+     * Creates a form panel with a fixed label-column width and the default
+     * control-column width.
+     *
+     * @param name       the panel's base name; the Swing component name becomes
+     *                   {@code "pnl" + name}
+     * @param labelWidth the minimum width of the label column, or {@code 0} to
+     *                   leave labels at their natural width
+     */
     public CampaignOptionsFormPanel(String name, int labelWidth) {
         this(name, labelWidth, DEFAULT_CONTROL_WIDTH);
     }
 
+    /**
+     * Creates a form panel with explicit label- and control-column widths.
+     *
+     * @param name         the panel's base name; the Swing component name becomes
+     *                     {@code "pnl" + name}
+     * @param labelWidth   the minimum width of the label column, or {@code 0} to
+     *                     leave labels at their natural width
+     * @param controlWidth the minimum width of the control column
+     */
     public CampaignOptionsFormPanel(String name, int labelWidth, int controlWidth) {
         this.labelWidth = labelWidth;
         this.controlWidth = controlWidth;
@@ -70,6 +118,11 @@ public class CampaignOptionsFormPanel extends JPanel {
         setLayout(new GridBagLayout());
     }
 
+    /**
+     * Appends a single checkbox spanning the full width of the form on its own row.
+     *
+     * @param checkBox the checkbox to add
+     */
     public void addCheckBox(JCheckBox checkBox) {
         alignCheckBoxToStart(checkBox);
 
@@ -86,6 +139,13 @@ public class CampaignOptionsFormPanel extends JPanel {
         addTrailingFiller(currentRow, 2);
     }
 
+    /**
+     * Appends a component that spans the full width of the form on its own row,
+     * stretching horizontally to fill the
+     * available space.
+     *
+     * @param component the component to add
+     */
     public void addFullWidthComponent(JComponent component) {
         int currentRow = row++;
         GridBagConstraints layout = new GridBagConstraints();
@@ -99,6 +159,19 @@ public class CampaignOptionsFormPanel extends JPanel {
         add(component, layout);
     }
 
+    /**
+     * Appends a grid of components, packing {@code columnCount} components onto
+     * each row in call order. When the label
+     * width is set, the first column of each row is sized to it so the grid lines
+     * up with labelled rows. The component
+     * in the rightmost column stretches to the form's right edge; the remaining
+     * columns keep their natural width. A
+     * {@code columnCount} of {@code 1} or less falls back to one full-width
+     * component per row.
+     *
+     * @param columnCount the number of components to place side by side on each row
+     * @param components  the components to add, in row-major order
+     */
     public void addComponentGrid(int columnCount, JComponent... components) {
         if (columnCount <= 1) {
             for (JComponent component : components) {
@@ -120,8 +193,8 @@ public class CampaignOptionsFormPanel extends JPanel {
             layout.insets = new Insets(ROW_VERTICAL_PADDING,
                     0,
                     ROW_VERTICAL_PADDING,
-                    getComponentGridRightPadding(column, columnCount));
-            setMinimumComponentGridWidth(components[index], column);
+                    getGridColumnRightPadding(column, columnCount));
+            setMinimumFirstColumnWidth(components[index], column);
             add(components[index], layout);
         }
 
@@ -133,6 +206,16 @@ public class CampaignOptionsFormPanel extends JPanel {
         row += rowCount;
     }
 
+    /**
+     * Appends a grid of checkboxes, packing {@code columnCount} checkboxes onto
+     * each row in call order. When the label
+     * width is set, the first column is sized to it so the grid lines up with
+     * labelled rows. A {@code columnCount} of
+     * {@code 1} or less falls back to one full-width checkbox per row.
+     *
+     * @param columnCount the number of checkboxes to place side by side on each row
+     * @param checkBoxes  the checkboxes to add, in row-major order
+     */
     public void addCheckBoxGrid(int columnCount, JCheckBox... checkBoxes) {
         if (columnCount <= 1) {
             for (JCheckBox checkBox : checkBoxes) {
@@ -155,8 +238,8 @@ public class CampaignOptionsFormPanel extends JPanel {
             layout.insets = new Insets(ROW_VERTICAL_PADDING,
                     0,
                     ROW_VERTICAL_PADDING,
-                    getCheckBoxGridRightPadding(column, columnCount));
-            setMinimumCheckBoxGridWidth(checkBoxes[index], column);
+                    getGridColumnRightPadding(column, columnCount));
+            setMinimumFirstColumnWidth(checkBoxes[index], column);
             add(checkBoxes[index], layout);
         }
 
@@ -168,14 +251,24 @@ public class CampaignOptionsFormPanel extends JPanel {
         row += rowCount;
     }
 
-    private int getComponentGridRightPadding(int column, int columnCount) {
+    /**
+     * Returns the right-hand inset for a grid cell: zero for the last column,
+     * otherwise the label-to-control gap when a
+     * label width is configured, or the wider inter-checkbox gap when it is not.
+     */
+    private int getGridColumnRightPadding(int column, int columnCount) {
         if (column == columnCount - 1) {
             return 0;
         }
         return labelWidth > 0 ? LABEL_RIGHT_PADDING : CHECK_BOX_COLUMN_GAP;
     }
 
-    private void setMinimumComponentGridWidth(JComponent component, int column) {
+    /**
+     * Sizes the first column of a grid row to the configured label width so grids
+     * line up with labelled rows. Does
+     * nothing when no label width is set or the cell is not in the first column.
+     */
+    private void setMinimumFirstColumnWidth(JComponent component, int column) {
         if (labelWidth <= 0 || column != 0) {
             return;
         }
@@ -183,25 +276,21 @@ public class CampaignOptionsFormPanel extends JPanel {
         setMinimumWidth(component, labelWidth);
     }
 
-    private int getCheckBoxGridRightPadding(int column, int columnCount) {
-        if (column == columnCount - 1) {
-            return 0;
-        }
-        return labelWidth > 0 ? LABEL_RIGHT_PADDING : CHECK_BOX_COLUMN_GAP;
-    }
-
-    private void setMinimumCheckBoxGridWidth(JCheckBox checkBox, int column) {
-        if (labelWidth <= 0 || column != 0) {
-            return;
-        }
-
-        setMinimumWidth(checkBox, labelWidth);
-    }
-
     private void alignCheckBoxToStart(JCheckBox checkBox) {
         checkBox.setHorizontalAlignment(SwingConstants.LEADING);
     }
 
+    /**
+     * Appends a labelled row: a label in the left column and a control in the right
+     * column. The control stretches to
+     * the form's right edge so it aligns with controls in other single-control rows
+     * and sections. When a label width is
+     * set, the label column is sized to it; the control is given the configured
+     * minimum control width.
+     *
+     * @param label   the label component for the left column
+     * @param control the control component for the right column
+     */
     public void addRow(JComponent label, JComponent control) {
         setMinimumLabelWidth(label);
         setMinimumControlWidth(control);

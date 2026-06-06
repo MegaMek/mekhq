@@ -42,7 +42,28 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 /**
- * A dense field grid for sections with many label/control pairs.
+ * A dense, column-aligned grid of label/control pairs for sections that hold
+ * many short fields.
+ *
+ * <p>
+ * Each label/control pair is laid out in its own fixed-width sub-panel, and the
+ * sub-panels are arranged into
+ * {@code columnCount} columns using a {@link GridBagLayout}. Because every pair
+ * sub-panel is given the same width
+ * (per column position), the control columns line up vertically regardless of
+ * individual label lengths &mdash; the key
+ * difference from packing pairs with a plain row grid. Pairs are filled
+ * row-major (left to right, then top to bottom),
+ * and a trailing filler absorbs any extra horizontal space so the grid stays
+ * left-aligned within a wider section.
+ * </p>
+ *
+ * <p>
+ * The first column can be given a different width from the following columns
+ * (via {@code firstPairWidth} versus
+ * {@code followingPairWidth}); each control is pinned to {@code controlWidth}
+ * so the controls are uniform.
+ * </p>
  */
 public class CampaignOptionsPairedFieldGridPanel extends JPanel {
     private static final int LABEL_CONTROL_GAP = 8;
@@ -53,6 +74,23 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
     private final int controlWidth;
     private final int columnCount;
 
+    /**
+     * Creates a paired-field grid.
+     *
+     * @param name               the panel's base name; the Swing component name
+     *                           becomes {@code "pnl" + name}
+     * @param firstPairWidth     the total width of each pair sub-panel in the first
+     *                           column (label + gap + control)
+     * @param followingPairWidth the total width of each pair sub-panel in every
+     *                           column after the first
+     * @param controlWidth       the fixed width applied to every control so
+     *                           controls line up
+     * @param columnCount        the number of pair columns; must be at least
+     *                           {@code 1}
+     *
+     * @throws IllegalArgumentException if {@code columnCount} is less than
+     *                                  {@code 1}
+     */
     public CampaignOptionsPairedFieldGridPanel(String name, int firstPairWidth, int followingPairWidth,
           int controlWidth, int columnCount) {
         if (columnCount < 1) {
@@ -69,6 +107,17 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
         setLayout(new GridBagLayout());
     }
 
+    /**
+     * Adds every label/control pair to the grid in row-major order and appends the
+     * trailing filler. The two arrays are
+     * matched by index, so {@code labels[i]} is paired with {@code controls[i]}.
+     *
+     * @param labels   the label components, one per pair
+     * @param controls the control components, one per pair, matching {@code labels}
+     *                 by index
+     *
+     * @throws IllegalArgumentException if the two arrays have different lengths
+     */
     public void addPairs(JComponent[] labels, JComponent[] controls) {
         if (labels.length != controls.length) {
             throw new IllegalArgumentException("Paired field grids require one control per label.");

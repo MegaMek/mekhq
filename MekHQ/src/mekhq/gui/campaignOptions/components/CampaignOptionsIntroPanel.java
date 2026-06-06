@@ -45,6 +45,15 @@ import javax.swing.JPanel;
  * Optional explanatory text shown before a sectioned campaign-options page.
  */
 public class CampaignOptionsIntroPanel extends JPanel {
+    /**
+     * Creates an intro panel that renders the given HTML text, wrapped to the
+     * supplied width.
+     *
+     * @param name      the panel's base name; the Swing component name becomes
+     *                  {@code "pnl" + name}
+     * @param text      the intro text; may contain HTML markup
+     * @param textWidth the width to wrap the text to, in pixels
+     */
     public CampaignOptionsIntroPanel(String name, String text, int textWidth) {
         setName("pnl" + name);
         setOpaque(false);
