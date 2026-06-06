@@ -1,5 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
+0.51.01
+
 0.51.0 (2026-06-06 1600 UTC) - First version requiring Java 21
 ## What's Changed
 * Fix: Parts reserved for refits now count as "In Use" in Parts Report (#6697) by @VicenteCartas in https://github.com/MegaMek/mekhq/pull/8846
