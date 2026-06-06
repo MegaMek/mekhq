@@ -259,6 +259,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         return campaign;
     }
 
+    @Override
+    public Warehouse getWarehouse() {
+        return campaign.getWarehouse();
+    }
+
     public String getName() {
         return name;
     }
