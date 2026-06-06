@@ -234,8 +234,8 @@ public class CampaignNewDayManager {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.faction = campaign.getFaction();
-        this.hangar = campaign.getHangar();
-        this.warehouse = campaign.getWarehouse();
+        this.hangar = campaign.getAllHangar();
+        this.warehouse = campaign.getAllWarehouse();
         this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
         this.updatedLocation = campaign.getCurrentLocation();
@@ -423,7 +423,7 @@ public class CampaignNewDayManager {
                   campaign.getFactionStandings().processRegardDegradation(faction.getShortName(),
                         today.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
-                campaign.addReport(GENERAL, report);
+                campaign.addReport(POLITICS, report);
             }
         }
 

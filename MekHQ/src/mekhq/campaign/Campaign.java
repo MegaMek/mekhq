@@ -164,7 +164,7 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
-import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
@@ -266,7 +266,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Taharqa
  */
-public class Campaign implements ITechManager, ILocation {
+public class Campaign implements ITechManager, IPlace {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
@@ -392,6 +392,7 @@ public class Campaign implements ITechManager, ILocation {
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
+    private final Personnel mainForcePersonnel = new Personnel();
     private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
@@ -556,6 +557,8 @@ public class Campaign implements ITechManager, ILocation {
         this.setParent(startLocation);
         if (startLocation != null) {
             mainForcePersonnel.setParent(this);
+            units.setParent(this);
+            parts.setParent(this);
         }
         reputation = reputationController;
         this.factionStandings = factionStandings;
@@ -2132,6 +2135,14 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     /**
+     * @return all hangars across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     */
+    public Hangar getAllHangar() {
+        return units;
+    }
+
+    /**
      * Gets statistics related to units in the hangar.
      */
     public HangarStatistics getHangarStatistics() {
@@ -2518,6 +2529,13 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     /**
+     * @return all personnel across all locations associated with this campaign.
+     */
+    public Collection<Person> getAllPersonnel() {
+        return humanResources.getPersonnel();
+    }
+
+    /**
      * Retrieves a list of personnel, excluding those whose status indicates they have left the unit.
      *
      * @return a {@code List} of {@link Person} objects who have not left the unit
@@ -2738,6 +2756,14 @@ public class Campaign implements ITechManager, ILocation {
      * Gets the Warehouse which stores parts.
      */
     public Warehouse getWarehouse() {
+        return parts;
+    }
+
+    /**
+     * @return all warehouses across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     */
+    public Warehouse getAllWarehouse() {
         return parts;
     }
 
@@ -5633,7 +5659,7 @@ public class Campaign implements ITechManager, ILocation {
         finances.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
         for (AbstractLocation loc : locations) {
-            // Skip locations parented to a campus — they are serialized inside their parent's XML.
+            // Skip locations parented to another node — they are serialized inside their parent's XML.
             if (loc.getLocationNode().getParent() != null) {
                 continue;
             }

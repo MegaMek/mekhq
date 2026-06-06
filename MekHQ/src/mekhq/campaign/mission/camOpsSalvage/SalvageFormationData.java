@@ -74,7 +74,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         int salvageCapableUnits = 0;
         boolean hasTug = false;
 
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             if (!unit.isFullyCrewed()) {
                 continue;
@@ -167,7 +167,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
     }
 
     public String getAllCrewTechTooltip(Campaign campaign, Formation formation) {
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
 
         StringBuilder tooltip = new StringBuilder();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {

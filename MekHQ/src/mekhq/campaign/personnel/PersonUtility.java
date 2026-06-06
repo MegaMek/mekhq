@@ -215,9 +215,9 @@ public class PersonUtility {
         boolean excludeInjuryEffects = true;
         int experienceLevel = person.getExperienceLevel(campaign, useSecondaryProfession, excludeInjuryEffects);
 
-        boolean isEligibleForVeterancyAward = experienceLevel < EXP_VETERAN;
+        boolean isIneligibleForVeterancyAward = experienceLevel >= EXP_VETERAN;
 
-        person.setHasGainedVeterancySPA(isEligibleForVeterancyAward);
+        person.setHasGainedVeterancySPA(isIneligibleForVeterancyAward);
     }
 
     /**

@@ -459,7 +459,7 @@ public class Finances {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
                     if (campaignOptions.isUseLoyaltyModifiers()) {
-                        for (Person person : campaign.getPersonnel()) {
+                        for (Person person : campaign.getAllPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
                             }

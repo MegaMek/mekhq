@@ -57,6 +57,11 @@ public class Personnel extends LinkedHashMap<UUID, Person> implements ILocation 
 
     private final LocationNode locationNode = new LocationNode(this);
 
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
     public void writeToXML(PrintWriter writer, int indent, Campaign campaign) {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "personnel");
         for (Person person : values()) {

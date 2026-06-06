@@ -471,7 +471,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        campaign.getHangar().forEachUnit(unit -> {
+        campaign.getAllHangar().forEachUnit(unit -> {
             // Also, the unit should have its campaign set.
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
@@ -526,7 +526,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         boolean skipAllDeprecationChecks = false;
         boolean refundAllDeprecatedSkills = false;
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             // skill types might need resetting
             person.resetSkillTypes();
 
@@ -579,7 +579,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
-        campaign.getHangar().forEachUnit(unit -> {
+        campaign.getAllHangar().forEachUnit(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
             // should
             // correct that by setting a new C3UUID
@@ -606,7 +606,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // ok, once we are sure that campaign has been set for all units, we can
         // now go through and initializeParts and run diagnostics
         List<Unit> removeUnits = new ArrayList<>();
-        campaign.getHangar().forEachUnit(unit -> {
+        campaign.getAllHangar().forEachUnit(unit -> {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)
             unit.initializeParts(true);
@@ -634,7 +634,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("[Campaign Load] Units initialized in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             person.fixReferences(campaign);
         }
 
@@ -673,7 +673,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // unload any ammo bins in the warehouse
         List<AmmoBin> binsToUnload = new ArrayList<>();
-        campaign.getWarehouse().forEachSparePart(prt -> {
+        campaign.getAllWarehouse().forEachSparePart(prt -> {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
             }
@@ -687,7 +687,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Check all parts that are reserved for refit and if the refit id unit
         // is not refitting or is gone then un-reserve
-        for (Part part : campaign.getWarehouse().getParts()) {
+        for (Part part : campaign.getAllWarehouse().getParts()) {
             if (part.isReservedForRefit()) {
                 Unit u = part.getRefitUnit();
                 if ((null == u) || !u.isRefitting()) {
@@ -701,7 +701,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
-        for (Part part : campaign.getWarehouse().getParts()) {
+        for (Part part : campaign.getAllWarehouse().getParts()) {
             // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
             if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
                 LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
@@ -730,7 +730,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         campaign.setUnitRating(null);
 
         // this is used to handle characters from pre-50.01 campaigns
-        campaign.getPersonnel().stream().filter(person -> person.getJoinedCampaign() == null).forEach(person -> {
+        campaign.getAllPersonnel().stream().filter(person -> person.getJoinedCampaign() == null).forEach(person -> {
             if (person.getRecruitment() != null) {
                 person.setJoinedCampaign(person.getRecruitment());
                 LOGGER.info(
@@ -748,7 +748,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Fix sexual preferences
         if (version.isLowerThan(new Version("0.50.10"))) {
-            correctSexualPreferencesForCurrentSpouse(campaign.getPersonnel());
+            correctSexualPreferencesForCurrentSpouse(campaign.getAllPersonnel());
+        }
+
+        // Reconnect all persons to the main-force personnel node. Persons whose location was
+        // serialized inside a travel or campus node will be re-parented during reconnectChildren.
+        for (Person person : campaign.getAllPersonnel()) {
+            person.setParent(campaign.getMainForcePersonnel());
         }
 
         reconnectPersonsToTravelLocations(campaign);
@@ -1518,14 +1524,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Personnel.loadFromXML(wn, campaign, version);
 
         // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             performEdgeConversion(campaign, person);
         }
 
         // this block verifies all in-use academies are valid
         List<String> missingList = new ArrayList<>();
 
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             String academySet = person.getEduAcademySet();
             String academyNameInSet = person.getEduAcademyNameInSet();
 
