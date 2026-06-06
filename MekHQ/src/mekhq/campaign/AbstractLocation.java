@@ -33,7 +33,6 @@
 
 package mekhq.campaign;
 
-import static java.lang.Math.ceil;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -48,7 +47,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -59,11 +57,9 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -73,7 +69,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -226,11 +221,14 @@ public abstract class AbstractLocation implements ILocation {
         for (InjuryType disease : activeDiseases) {
             String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter",
                   campaign.getCommanderAddress());
+            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter",
+                  currentSystem.getName(today), disease.getSimpleName());
             centerMessage += availableCures.contains(disease)
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
-            new ImmersiveDialogNotification(campaign, centerMessage, true);
+            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+                  centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
     }
 
