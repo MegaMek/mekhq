@@ -290,13 +290,11 @@ public abstract class AbstractMarriage {
     /**
      * Processes new day random marriage for an individual.
      *
-     * @param campaign     the campaign to process
-     * @param today        the current day
-     * @param person       the person to process
-     * @param isBackground whether the marriage occurred in a character's background
+     * @param campaign the campaign to process
+     * @param today    the current day
+     * @param person   the person to process
      */
-    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person,
-          boolean isBackground) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
         if (canMarry(today, person, true) != null) {
             return;
         }
@@ -311,7 +309,7 @@ public abstract class AbstractMarriage {
                 isInterUnit = true;
             }
 
-            marryRandomSpouse(campaign, today, person, isInterUnit, isBackground);
+            marryRandomSpouse(campaign, today, person, isInterUnit, false);
         }
     }
 
@@ -353,9 +351,6 @@ public abstract class AbstractMarriage {
      */
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today, final Person person,
           boolean isInterUnit, boolean isBackground) {
-        boolean prefersMen = person.isPrefersMen();
-        boolean prefersWomen = person.isPrefersWomen();
-
         List<Person> potentialSpouses;
         Person spouse = null;
 
@@ -375,12 +370,11 @@ public abstract class AbstractMarriage {
         }
 
         if (!isInterUnit && campaign.getCurrentLocation().isOnPlanet()) {
-            List<Gender> possibleGenders = new ArrayList<>();
-            if (prefersMen) {
-                possibleGenders.add(Gender.MALE);
-            } else {
-                possibleGenders.add(Gender.FEMALE);
+            List<Gender> possibleGenders = getPossibleGenders(person);
+            if (possibleGenders.isEmpty()) {
+                return;
             }
+
             Gender spouseGender = ObjectUtility.getRandomItem(possibleGenders);
             spouse = createExternalSpouse(campaign, today, person, spouseGender);
         }
@@ -390,6 +384,19 @@ public abstract class AbstractMarriage {
         }
 
         marry(campaign, today, person, spouse, MergingSurnameStyle.WEIGHTED, isBackground);
+    }
+
+    private static List<Gender> getPossibleGenders(Person person) {
+        List<Gender> possibleGenders = new ArrayList<>();
+        if (person.isPrefersMen()) {
+            possibleGenders.add(Gender.MALE);
+        }
+
+        if (person.isPrefersWomen()) {
+            possibleGenders.add(Gender.FEMALE);
+        }
+
+        return possibleGenders;
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.universe.factionStanding.FactionAccoladeLevel.*;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
@@ -64,6 +65,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -178,10 +180,13 @@ public class FactionAccoladeEvent {
             }
 
             Person speaker = getSpeaker(campaign, accoladingFaction, accoladeLevel);
-            if (speaker != null &&
-                      isCashReward &&
-                      accoladingFaction.getShortName().equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
-                speaker = null;
+
+            if (speaker != null) {
+                AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+                if (isCashReward &&
+                          accoladingFaction.getShortName().equals(PIRACY_SUCCESS_INDEX_FACTION_CODE)) {
+                    speaker = null;
+                }
             }
 
             FactionJudgmentDialog initialDialog = new FactionJudgmentDialog(campaign, speaker, commander, lookupName,
