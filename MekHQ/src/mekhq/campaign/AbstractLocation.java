@@ -69,7 +69,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import org.w3c.dom.Node;
@@ -223,11 +222,14 @@ public abstract class AbstractLocation implements ILocation {
         for (InjuryType disease : activeDiseases) {
             String centerMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter",
                   campaign.getCommanderAddress());
-            centerMessage += availableCures.contains(disease)
+            String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter",
+                  currentSystem.getName(today), disease.getSimpleName());
+            bottomMessage += availableCures.contains(disease)
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
-            new ImmersiveDialogNotification(campaign, centerMessage, true);
+            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+                  centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
     }
 

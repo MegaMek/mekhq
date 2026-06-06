@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -476,10 +477,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             }
             String inStockText = inStock == 0 ?
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorNegativeHexColor(),
+                                                                                           .getFontColorNegativeHexColor(),
                                              "None in stock") :
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorPositiveHexColor(),
+                                                                                           .getFontColorPositiveHexColor(),
                                              inStock + " in stock");
 
             toReturn.append("<br>").append(inStockText).append("<br>");
@@ -497,6 +498,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             if (getMode() != WorkTime.NORMAL) {
                 toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
             }
+        } else {
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                  MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                  getText("Part.damaged.beyond.repair")));
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -1499,8 +1504,8 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     /**
-     * Returns the base quantity of this part for Parts In Use reporting, without checking whether the part
-     * is reserved or in use.
+     * Returns the base quantity of this part for Parts In Use reporting, without checking whether the part is reserved
+     * or in use.
      *
      * <p>Returns {@code 1} if the part is assigned to a unit, or the part's stored quantity otherwise.</p>
      *
