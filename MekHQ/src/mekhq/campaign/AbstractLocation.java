@@ -223,7 +223,7 @@ public abstract class AbstractLocation implements ILocation {
                   campaign.getCommanderAddress());
             String bottomMessage = getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter",
                   currentSystem.getName(today), disease.getSimpleName());
-            centerMessage += availableCures.contains(disease)
+            bottomMessage += availableCures.contains(disease)
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
