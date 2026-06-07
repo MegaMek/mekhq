@@ -68,12 +68,12 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.w3c.dom.Node;
 
@@ -271,6 +271,30 @@ public class CurrentLocationTest {
         }
 
         @Test
+        void testChargeFully() {
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.chargeFully(campaign);
+                assertEquals(176.0, loc.getRechargeTime());
+                mekHQ.verify(() -> MekHQ.triggerEvent(any()), times(1));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
+            }
+        }
+
+        @Test
+        void testIsRecharging() {
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            when(campaign.isUseCommandCircuit()).thenReturn(false);
+            assertTrue(loc.isRecharging(campaign));
+            when(system.getRechargeTime(today, false)).thenReturn(0.0);
+            assertFalse(loc.isRecharging(campaign));
+        }
+    }
+
+    /** Tests for {@link CurrentLocation#writeToXML(java.io.PrintWriter, int)}. */
+    @Nested
+    class WriteToXml {
+        @Test
         void containsExpectedFields() {
             when(system.getId()).thenReturn("Outreach");
             CurrentLocation loc = new CurrentLocation(system, 5.5);
@@ -312,26 +336,6 @@ public class CurrentLocationTest {
 
             assertFalse(baos.toString().contains("jumpPath"));
         }
-
-        @Test
-        void testChargeFully() {
-            CurrentLocation loc = new CurrentLocation(system, 0.0);
-            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
-                loc.chargeFully(campaign);
-                assertEquals(176.0, loc.getRechargeTime());
-                mekHQ.verify(() -> MekHQ.triggerEvent(any()), times(1));
-                mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
-            }
-        }
-
-        @Test
-        void testIsRecharging() {
-            CurrentLocation loc = new CurrentLocation(system, 0.0);
-            when(campaign.isUseCommandCircuit()).thenReturn(false);
-            assertTrue(loc.isRecharging(campaign));
-            when(system.getRechargeTime(today, false)).thenReturn(0.0);
-            assertFalse(loc.isRecharging(campaign));
-        }
     }
 
 
@@ -364,11 +368,11 @@ public class CurrentLocationTest {
         @Test
         void testNewDayNoTransitRecharge() {
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
                 assertEquals(24.0, currentLocation.getRechargeTime());
                 verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("recharging drives"));
                 for (int i = 0; i < 9; i++) {
-                    currentLocation.newDay(campaign);
+                    currentLocation.newDay(campaign, false);
                 }
                 assertEquals(176.0, currentLocation.getRechargeTime()); // do not charge past maximum
                 mekHQ.verify(() -> MekHQ.triggerEvent(any()), never());
@@ -387,16 +391,16 @@ public class CurrentLocationTest {
                 currentLocation.setJumpPath(jumpPath);
                 mekHQ.clearInvocations();
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
 
                 assertEquals(1.0, currentLocation.getTransitTime());
                 verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("hours in transit"));
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(1));
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
                 assertEquals(2.0, currentLocation.getTransitTime());
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(2));
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
                 assertEquals(2.5, currentLocation.getTransitTime()); // limited by getTimeToJumpPoint
                 mekHQ.verify(() -> MekHQ.triggerEvent(isA(TransitStatusChangedEvent.class)), times(3));
 
@@ -423,7 +427,7 @@ public class CurrentLocationTest {
                 mekHQ.clearInvocations();
                 currentLocation.setTransitTime(2.0); // (2.5 - 2) days of transit remaining
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
 
                 // verify the jump
                 verify(jumpPath).removeFirstSystem();
@@ -451,7 +455,7 @@ public class CurrentLocationTest {
                 currentLocation.setJumpPath(jumpPath);
                 mekHQ.clearInvocations();
 
-                currentLocation.newDay(campaign);
+                currentLocation.newDay(campaign, false);
 
                 assertEquals(0.0, currentLocation.getTransitTime());
                 assertNull(currentLocation.getJumpPath());
@@ -463,7 +467,72 @@ public class CurrentLocationTest {
         }
     }
 
+    @Nested
+    class PersonChildSerialization {
+
+        @Test
+        void writeToXML_includesPersonIdTagForPersonChild() {
+            when(system.getId()).thenReturn("Outreach");
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            Person person = new Person("First", "Last", null, "MERC");
+            person.setParent(loc);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            loc.writeToXML(new PrintWriter(baos, true), 0);
+
+            assertTrue(baos.toString().contains("<personId>" + person.getId() + "</personId>"));
+        }
+
+        @Test
+        void writeToXML_omitsPersonIdWhenNoPersonChildren() {
+            when(system.getId()).thenReturn("Outreach");
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            loc.writeToXML(new PrintWriter(baos, true), 0);
+
+            assertFalse(baos.toString().contains("personId"));
+        }
+
+        @Test
+        void generateInstanceFromXML_populatesPendingPersonIds() throws Exception {
+            UUID personId = UUID.randomUUID();
+            String xml = "<location><system>Outreach</system><transitTime>0.0</transitTime>"
+                               + "<personId>" + personId + "</personId></location>";
+            Node node = parseXml(xml);
+
+            Campaign mockCampaign = mock(Campaign.class);
+            when(mockCampaign.getSystemById("Outreach")).thenReturn(mock(PlanetarySystem.class));
+
+            CurrentLocation loc = CurrentLocation.generateInstanceFromXML(node, mockCampaign);
+            assertNotNull(loc);
+
+            List<UUID> ids = loc.drainPendingPersonIds();
+            assertEquals(1, ids.size());
+            assertEquals(personId, ids.get(0));
+        }
+
+        @Test
+        void drainPendingPersonIds_clearsListOnSecondCall() throws Exception {
+            UUID personId = UUID.randomUUID();
+            String xml = "<location><system>Outreach</system><transitTime>0.0</transitTime>"
+                               + "<personId>" + personId + "</personId></location>";
+            Node node = parseXml(xml);
+
+            Campaign mockCampaign = mock(Campaign.class);
+            when(mockCampaign.getSystemById("Outreach")).thenReturn(mock(PlanetarySystem.class));
+            CurrentLocation loc = CurrentLocation.generateInstanceFromXML(node, mockCampaign);
+
+            loc.drainPendingPersonIds();
+            assertTrue(loc.drainPendingPersonIds().isEmpty());
+        }
+
+        private Node parseXml(String xml) throws Exception {
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
+        }
     }
+}
 
     @Nested
     class PersonChildSerialization {

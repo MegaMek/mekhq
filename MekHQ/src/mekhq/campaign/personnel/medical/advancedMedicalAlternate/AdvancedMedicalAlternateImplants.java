@@ -256,7 +256,7 @@ public class AdvancedMedicalAlternateImplants {
         int prostheticThreshold = 3;
         int eligibleProstheticsCount = 0;
 
-        for (Injury injury : person.getInjuries()) {
+        for (Injury injury : person.getProstheticInjuries()) {
             ProstheticType prostheticType = getProstheticTypeFromInjuryType(injury.getType());
 
             if (prostheticType != null) {
@@ -360,7 +360,7 @@ public class AdvancedMedicalAlternateImplants {
     }
 
     public static void checkForDermalEligibility(Person person) {
-        List<Injury> injuries = person.getInjuries();
+        List<Injury> injuries = person.getProstheticInjuries();
 
         int dermalArmorCount = 0;
         int dermalCamoCount = 0;

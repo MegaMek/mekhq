@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.Version;
 import megamek.common.TechConstants;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
@@ -656,8 +658,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -681,8 +683,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -768,8 +770,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -792,8 +794,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1023,8 +1025,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1048,8 +1050,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1134,8 +1136,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1158,8 +1160,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1244,8 +1246,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1268,8 +1270,8 @@ public class PersonTest {
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
         when(mockFaction.getShortName()).thenReturn("MERC");
         when(mockCampaign.getLocalDate()).thenReturn(currentDate);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getAllWarehouse()).thenReturn(mockWarehouse);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         Person person = new Person(mockCampaign);
@@ -1373,8 +1375,8 @@ public class PersonTest {
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
-        when(mockCampaign.getHangar()).thenReturn(new Hangar());
-        when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
+        when(mockCampaign.getAllHangar()).thenReturn(new Hangar());
+        when(mockCampaign.getAllWarehouse()).thenReturn(new Warehouse());
 
         Faction mockFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
@@ -1418,8 +1420,8 @@ public class PersonTest {
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
         // Couple prereqs for removeAllTechJobs this test doesn't otherwise exercise
-        when(mockCampaign.getHangar()).thenReturn(new Hangar());
-        when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
+        when(mockCampaign.getAllHangar()).thenReturn(new Hangar());
+        when(mockCampaign.getAllWarehouse()).thenReturn(new Warehouse());
 
         Faction mockFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
@@ -1566,17 +1568,19 @@ public class PersonTest {
                 when(campaign.getCampaignOptions()).thenReturn(options);
 
                 Hangar hangar = mock(Hangar.class);
-                when(campaign.getHangar()).thenReturn(hangar);
+                when(campaign.getAllHangar()).thenReturn(hangar);
 
                 Warehouse warehouse = mock(Warehouse.class);
                 when(warehouse.getParts()).thenReturn(Collections.emptyList());
-                when(campaign.getWarehouse()).thenReturn(warehouse);
+                when(campaign.getAllWarehouse()).thenReturn(warehouse);
 
                 when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
 
                 PlanetarySystem currentSystem = mock(PlanetarySystem.class);
                 when(currentSystem.getId()).thenReturn("CurrentSystem");
                 when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+                when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+                      .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
             }
 
             @Test
@@ -1640,11 +1644,11 @@ public class PersonTest {
                 when(campaign.getCampaignOptions()).thenReturn(options);
 
                 Hangar hangar = mock(Hangar.class);
-                when(campaign.getHangar()).thenReturn(hangar);
+                when(campaign.getAllHangar()).thenReturn(hangar);
 
                 Warehouse warehouse = mock(Warehouse.class);
                 when(warehouse.getParts()).thenReturn(Collections.emptyList());
-                when(campaign.getWarehouse()).thenReturn(warehouse);
+                when(campaign.getAllWarehouse()).thenReturn(warehouse);
 
                 when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
             }
@@ -1722,6 +1726,7 @@ public class PersonTest {
             when(faction.getShortName()).thenReturn("MERC");
             when(campaign.getFaction()).thenReturn(faction);
             when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+            when(campaign.getVersion()).thenReturn(new Version(0, 51, 1));
 
             return Person.generateInstanceFromXML(
                   doc.getDocumentElement(), campaign, new megamek.Version("0.51.0"));
@@ -1769,14 +1774,14 @@ public class PersonTest {
         }
 
         @Test
-        void getPersonnelAtLocation_returnsSelf() {
-            Set<Person> result = person.getPersonnelAtLocation();
+        void fetchPersonnelAtLocation_returnsSelf() {
+            Set<Person> result = person.fetchPersonnelAtLocation();
             assertTrue(result.contains(person));
         }
 
         @Test
-        void getPersonnelAtLocation_returnsExactlyOnePerson() {
-            assertEquals(1, person.getPersonnelAtLocation().size());
+        void fetchPersonnelAtLocation_returnsExactlyOnePerson() {
+            assertEquals(1, person.fetchPersonnelAtLocation().size());
         }
 
         @Nested
@@ -1824,22 +1829,22 @@ public class PersonTest {
             }
 
             @Test
-            void campus_getPersonnelAtLocation_includesPersonAtCampus() {
+            void campus_fetchPersonnelAtLocation_includesPersonAtCampus() {
                 person.setParent(campus);
-                assertTrue(campus.getPersonnelAtLocation().contains(person));
+                assertTrue(campus.fetchPersonnelAtLocation().contains(person));
             }
 
             @Test
-            void campus_getPersonnelAtLocation_excludesPersonAfterDetach() {
+            void campus_fetchPersonnelAtLocation_excludesPersonAfterDetach() {
                 person.setParent(campus);
                 person.setParent(null);
-                assertFalse(campus.getPersonnelAtLocation().contains(person));
+                assertFalse(campus.fetchPersonnelAtLocation().contains(person));
             }
 
             @Test
-            void fixed_getPersonnelAtLocation_includesPersonViaCampus() {
+            void fixed_fetchPersonnelAtLocation_includesPersonViaCampus() {
                 person.setParent(campus);
-                assertTrue(fixed.getPersonnelAtLocation().contains(person));
+                assertTrue(fixed.fetchPersonnelAtLocation().contains(person));
             }
         }
 

@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -113,7 +114,7 @@ public class LocationNode {
             if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
             }
-            // Person, Unit, and Part children are written by each ILocation's own writeToXML.
+            // Future: Additional objects that need to be saved in a location-context other than the main force
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }

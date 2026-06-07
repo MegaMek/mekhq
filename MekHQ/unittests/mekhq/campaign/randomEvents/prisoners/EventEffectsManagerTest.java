@@ -60,6 +60,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -545,6 +547,11 @@ class EventEffectsManagerTest {
         when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
         when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
 
+        Hangar mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+
         EventResult eventResult = new EventResult(FATIGUE_ONE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
               List.of(eventResult),
@@ -580,6 +587,11 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
         when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
+
+        Hangar mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
 
         EventResult eventResult = new EventResult(FATIGUE_ALL, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
@@ -782,6 +794,11 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseFatigue()).thenReturn(true);
         when(mockCampaignOptions.getFatigueRate()).thenReturn(1);
+
+        Hangar mockHangar = mock(Hangar.class);
+        when(mockCampaign.getHangar()).thenReturn(mockHangar);
+        Warehouse mockWarehouse = mock(Warehouse.class);
+        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
 
         EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
         PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,

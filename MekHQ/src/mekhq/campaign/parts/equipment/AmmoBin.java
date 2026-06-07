@@ -312,6 +312,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             mounted.setShotsLeft(shots);
         }
 
+        // Reset fired, mainly for One-Shot weapons
+        try {
+            mounted.getLinkedBy().setFired(false);
+        } catch (Exception ignored) {
+            LOGGER.error("Unable to reset fired state for mounted {}", mounted);
+        }
+
         shotsNeeded -= shots;
     }
 
@@ -423,7 +430,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         super.remove(salvage);
 
         // We don't keep around ammo bins anymore
-        getCampaign().getWarehouse().removePart(this);
+        getWarehouse().removePart(this);
     }
 
     @Override

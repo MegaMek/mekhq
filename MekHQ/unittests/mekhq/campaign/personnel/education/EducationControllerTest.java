@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -91,11 +92,11 @@ class EducationControllerTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Warehouse warehouse = mock(Warehouse.class);
         when(warehouse.getParts()).thenReturn(Collections.emptyList());
-        when(campaign.getWarehouse()).thenReturn(warehouse);
+        when(campaign.getAllWarehouse()).thenReturn(warehouse);
 
         when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
 
@@ -127,6 +128,11 @@ class EducationControllerTest {
             person.setEduAcademySystem("TestSystem");
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
             campaign = mock(Campaign.class);
+            PlanetarySystem destSystem = mock(PlanetarySystem.class);
+            when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
+            when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(2);
+            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+                  .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
         @Test
@@ -165,8 +171,8 @@ class EducationControllerTest {
 
         @Test
         void onArrival_stageTransitionsToEducation() {
-            person.setEduJourneyTime(1);
-            person.setEduDaysOfTravel(0);
+            person.setEduJourneyTime(2);
+            person.setEduDaysOfTravel(1);
 
             try (MockedStatic<AcademyFactory> mockFactory = mockStatic(AcademyFactory.class)) {
                 AcademyFactory factory = mock(AcademyFactory.class);
@@ -219,6 +225,8 @@ class EducationControllerTest {
             campaign = mock(Campaign.class);
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(5);
+            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+                  .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
         @Test
@@ -296,6 +304,8 @@ class EducationControllerTest {
         @BeforeEach
         void setUp() {
             campaign = buildMinimalCampaignMock();
+            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+                  .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
         @Test

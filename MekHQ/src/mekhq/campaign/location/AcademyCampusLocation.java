@@ -110,9 +110,9 @@ public class AcademyCampusLocation implements ILocation {
         String academySet = null;
         String academyName = null;
         List<UUID> personIds = new ArrayList<>();
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+        NodeList nodeList = wn.getChildNodes();
+        for (int x = 0; x < nodeList.getLength(); x++) {
+            Node wn2 = nodeList.item(x);
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }

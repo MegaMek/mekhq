@@ -51,6 +51,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -182,12 +183,13 @@ public class PersonnelTableModel extends DataTableModel<Person> {
 
             // Colouring - determine color and collect ALL applicable color reasons
             boolean personIsDamaged;
-            if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+            final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            if (campaignOptions.isUseAdvancedMedical()) {
                 personIsDamaged = person.hasInjuries(true);
             } else {
                 personIsDamaged = person.getHits() > 0;
             }
-            boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
+            boolean personIsFatigued = (campaignOptions.isUseFatigue()
                                               &&
                                               (getEffectiveFatigue(person.getAdjustedFatigue(),
                                                     person.getPermanentFatigue(),
@@ -198,6 +200,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             // Collect all applicable color reasons for tooltip
             List<String> colorReasonKeys = new ArrayList<>();
 
+            boolean isUseAlternateAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
             if (!isSelected) {
                 // Set color based on priority (first match wins for display color)
                 // But collect ALL applicable reasons for tooltip
@@ -222,7 +225,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 } else if (personIsFatigued) {
                     setForeground(MekHQ.getMHQOptions().getFatiguedForeground());
                     setBackground(MekHQ.getMHQOptions().getFatiguedBackground());
-                } else if (person.hasOnlyHealedPermanentInjuries()) {
+                } else if (person.hasNonProstheticPermanentInjuries(isUseAlternateAdvancedMedical)) {
                     setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
                     setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 } else {
@@ -249,7 +252,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 if (personIsFatigued) {
                     colorReasonKeys.add("colorReason.personnel.fatigued");
                 }
-                if (person.hasOnlyHealedPermanentInjuries()) {
+                if (person.hasNonProstheticPermanentInjuries(isUseAlternateAdvancedMedical)) {
                     colorReasonKeys.add("colorReason.personnel.healedInjuries");
                 }
             }

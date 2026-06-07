@@ -36,6 +36,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -137,6 +138,7 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -474,7 +476,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        campaign.getHangar().forEachUnit(unit -> {
+        campaign.getAllHangar().forEachUnit(unit -> {
             // Also, the unit should have its campaign set.
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
@@ -560,7 +562,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         boolean skipAllDeprecationChecks = false;
         boolean refundAllDeprecatedSkills = false;
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             // skill types might need resetting
             person.resetSkillTypes();
 
@@ -613,7 +615,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
-        campaign.getHangar().forEachUnit(unit -> {
+        campaign.getAllHangar().forEachUnit(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
             // should
             // correct that by setting a new C3UUID
@@ -640,7 +642,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // ok, once we are sure that campaign has been set for all units, we can
         // now go through and initializeParts and run diagnostics
         List<Unit> removeUnits = new ArrayList<>();
-        campaign.getHangar().forEachUnit(unit -> {
+        campaign.getAllHangar().forEachUnit(unit -> {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)
             unit.initializeParts(true);
@@ -668,7 +670,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("[Campaign Load] Units initialized in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             person.fixReferences(campaign);
         }
 
@@ -707,7 +709,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // unload any ammo bins in the warehouse
         List<AmmoBin> binsToUnload = new ArrayList<>();
-        campaign.getWarehouse().forEachSparePart(prt -> {
+        campaign.getAllWarehouse().forEachSparePart(prt -> {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
             }
@@ -721,7 +723,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Check all parts that are reserved for refit and if the refit id unit
         // is not refitting or is gone then un-reserve
-        for (Part part : campaign.getWarehouse().getParts()) {
+        for (Part part : campaign.getAllWarehouse().getParts()) {
             if (part.isReservedForRefit()) {
                 Unit u = part.getRefitUnit();
                 if ((null == u) || !u.isRefitting()) {
@@ -735,7 +737,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Build a new, clean warehouse from the current parts
         Warehouse warehouse = new Warehouse();
-        for (Part part : campaign.getWarehouse().getParts()) {
+        for (Part part : campaign.getAllWarehouse().getParts()) {
             // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
             if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
                 LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
@@ -764,7 +766,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         campaign.setUnitRating(null);
 
         // this is used to handle characters from pre-50.01 campaigns
-        campaign.getPersonnel().stream().filter(person -> person.getJoinedCampaign() == null).forEach(person -> {
+        campaign.getAllPersonnel().stream().filter(person -> person.getJoinedCampaign() == null).forEach(person -> {
             if (person.getRecruitment() != null) {
                 person.setJoinedCampaign(person.getRecruitment());
                 LOGGER.info(
@@ -782,7 +784,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Fix sexual preferences
         if (version.isLowerThan(new Version("0.50.10"))) {
-            correctSexualPreferencesForCurrentSpouse(campaign.getPersonnel());
+            correctSexualPreferencesForCurrentSpouse(campaign.getAllPersonnel());
+        }
+
+        // Reconnect all persons to the main-force personnel node. Persons whose location was
+        // serialized inside a travel or campus node will be re-parented during reconnectChildren.
+        for (Person person : campaign.getAllPersonnel()) {
+            person.setParent(campaign.getMainForcePersonnel());
         }
 
         reconnectPersonsToTravelLocations(campaign);
@@ -970,6 +978,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
                         if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
                             campaign.getPoliticsReport().add(wn2.getTextContent());
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("aggregateReport")) {
+                    // First, get all the child nodes;
+                    NodeList nl2 = childNode.getChildNodes();
+
+                    // Then, make sure the report is empty. *just* in case.
+                    // ...That is, creating a new campaign throws in a date line
+                    // for us...
+                    // So make sure it's cleared out.
+                    campaign.getAggregateReport().clear();
+
+                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+                        Node wn2 = nl2.item(x2);
+
+                        if (wn2.getParentNode() != childNode) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
+                            campaign.getAggregateReport().add(wn2.getTextContent());
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("personnelReport")) {
@@ -1239,6 +1268,20 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
         campaign.setNewPoliticsReports(newPoliticsReports);
 
+        campaign.setAggregateReportHTML(Utilities.combineString(campaign.getAggregateReport(),
+              Campaign.REPORT_LINEBREAK));
+        List<String> newAggregateReports = new ArrayList<>(campaign.getAggregateReport().size() * 2);
+        boolean firstAggregateReport = true;
+        for (String report : campaign.getAggregateReport()) {
+            if (firstAggregateReport) {
+                firstAggregateReport = false;
+            } else {
+                newAggregateReports.add(Campaign.REPORT_LINEBREAK);
+            }
+            newAggregateReports.add(report);
+        }
+        campaign.setNewAggregateReports(newAggregateReports);
+
         campaign.setPersonnelReportHTML(Utilities.combineString(campaign.getPersonnelReport(),
               Campaign.REPORT_LINEBREAK));
         List<String> newPersonnelReports = new ArrayList<>(campaign.getPersonnelReport().size() * 2);
@@ -1411,15 +1454,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            AbstractLocation loc = AbstractLocation.generateInstanceFromXML(child, campaign);
-            if (loc == null) {
+            AbstractLocation location = AbstractLocation.generateInstanceFromXML(child, campaign);
+            if (location == null) {
                 continue;
             }
             if (first) {
-                campaign.setLocation(loc);
+                campaign.setLocation(location);
                 first = false;
             } else {
-                campaign.addLocation(loc);
+                campaign.addLocation(location);
             }
         }
     }
@@ -1545,14 +1588,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         Personnel.loadFromXML(wn, campaign, version);
 
         // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             performEdgeConversion(campaign, person);
         }
 
         // this block verifies all in-use academies are valid
         List<String> missingList = new ArrayList<>();
 
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             String academySet = person.getEduAcademySet();
             String academyNameInSet = person.getEduAcademyNameInSet();
 
@@ -1702,7 +1745,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 for (UUID personId : currentLoc.drainPendingPersonIds()) {
                     Person person = campaign.getPerson(personId);
                     if (person != null) {
-                        person.setParent(currentLoc);
+                        person.setParent(currentLocation);
                     }
                 }
 
@@ -1724,15 +1767,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
 
             // Persons at campus — parented directly under AcademyCampusLocation (no CurrentLocation)
-            if (loc instanceof FixedLocation fixedLoc) {
-                for (LocationNode campusNode : fixedLoc.getLocationNode().getChildren()) {
-                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLoc)) {
+            if (location instanceof FixedLocation fixedLocation) {
+                for (LocationNode campusNode : fixedLocation.getLocationNode().getChildren()) {
+                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation)) {
                         continue;
                     }
-                    for (UUID personId : campusLoc.drainPendingPersonIds()) {
+                    for (UUID personId : campusLocation.drainPendingPersonIds()) {
                         Person person = campaign.getPerson(personId);
                         if (person != null) {
-                            person.setParent(campusLoc);
+                            person.setParent(campusLocation);
                         }
                     }
                 }
@@ -1789,68 +1832,106 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                       && stage != EducationStage.DROPPING_OUT) {
                 continue;
             }
-            if (person.hasLocation()) {
-                continue;
-            }
-
-            // Persons at campus (EDUCATION / GRADUATING / DROPPING_OUT) on old saves have no
-            // campus in the location tree. Reconnect them so getEduAcademySystem() works.
+            // Campus stages: Set the location's parent.
+            // This covers EDUCATION, GRADUATING, and DROPPING_OUT.
             if (stage == EducationStage.EDUCATION
                       || stage == EducationStage.GRADUATING
                       || stage == EducationStage.DROPPING_OUT) {
-                String systemId = person.getEduAcademySystem();
+                String systemId = resolveAcademySystemId(campaign, person);
                 if (systemId == null) {
                     continue;
                 }
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                       person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-                if (campusLoc != null) {
-                    person.setParent(campusLoc);
+                if (campusLocation != null) {
+                    person.setParent(campusLocation);
                 }
                 continue;
             }
 
-            PlanetarySystem targetSystem;
-            if (stage == EducationStage.JOURNEY_TO_CAMPUS) {
-                String systemId = person.getEduAcademySystem();
-                if (systemId == null) {
-                    continue;
-                }
-                targetSystem = campaign.getSystemById(systemId);
-                if (targetSystem == null) {
-                    continue;
-                }
-                double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
-                CurrentLocation travelLoc = new CurrentLocation(targetSystem, transitTime);
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
-                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-                if (campusLoc != null) {
-                    travelLoc.setParent(campusLoc);
-                }
-                person.setParent(travelLoc);
-                campaign.addLocation(travelLoc);
-            } else {
-                String systemId = person.getEduAcademySystem();
-                if (systemId == null) {
-                    continue;
-                }
-                targetSystem = campaign.getSystemById(systemId);
-                if (targetSystem == null) {
-                    continue;
-                }
-                double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
-                CurrentLocation returnLoc = new CurrentLocation(targetSystem, transitTime);
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
-                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-                if (campusLoc != null) {
-                    returnLoc.setParent(campusLoc);
-                } else {
-                    returnLoc.setParent(campaign);
-                }
-                person.setParent(returnLoc);
-                campaign.addLocation(returnLoc);
+            // Journey stages: skip if already under a CurrentLocation — reconnectPersonsToTravelLocations
+            // already placed this person (post-refactor saves). Legacy saves have mainForcePersonnel as parent.
+            LocationNode parentNode = person.getLocationNode().getParent();
+            if (parentNode != null && parentNode.getLocatable() instanceof CurrentLocation) {
+                continue;
             }
+
+            String systemId = resolveAcademySystemId(campaign, person);
+            if (systemId == null) {
+                continue;
+            }
+            PlanetarySystem targetSystem = campaign.getSystemById(systemId);
+            if (targetSystem == null) {
+                continue;
+            }
+            double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
+            CurrentLocation travelLocation = new CurrentLocation(targetSystem, transitTime);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
+                  person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+            if (campusLocation != null) {
+                travelLocation.setParent(campusLocation);
+            } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
+                travelLocation.setParent(campaign);
+            }
+            person.setParent(travelLocation);
+            campaign.addLocation(travelLocation);
         }
+    }
+
+    /**
+     * Resolves the planetary system ID for a person's academy attendance.
+     *
+     * <p>Tries the location-tree-aware method first (works for new saves where the person is
+     * already under an {@link AcademyCampusLocation}, or when {@code legacyEduAcademySystem} was populated from an
+     * {@code <eduAcademySystem>} XML tag). Falls back to parsing the system name from the trailing {@code (SystemName)}
+     * in {@code eduAcademyName}, which is the format written by enrollment for non-local, non-homeschool
+     * academies.</p>
+     */
+    private static @Nullable String resolveAcademySystemId(Campaign campaign, Person person) {
+        String systemId = person.getEduAcademySystem();
+        if (systemId != null) {
+            return systemId;
+        }
+        String academyName = person.getEduAcademyName();
+        if (academyName == null || academyName.isBlank()) {
+            return null;
+        }
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+        if ((academy != null) &&
+                  !(academy.isLocal() || academy.isHomeSchool()) &&
+                  !academy.getLocationSystems().isEmpty()) {
+
+            systemId = academy.getLocationSystems().getFirst();
+            if (academy.getLocationSystems().size() == 1) {
+                LOGGER.warn("Could not resolve Academy System ID for person {}. Returning only location for " +
+                                  "non-homeschool, non-local academy: {}", person, systemId);
+            } else {
+                LOGGER.warn("Could not resolve Academy System ID for person {} for non-homeschool, " +
+                                  "non-local academy with multiple locations, returning first : {}", person, systemId);
+            }
+            return systemId;
+
+        }
+
+        if (academy != null && campaign.getCurrentSystem() != null) {
+            LOGGER.warn("Could not resolve Academy System ID for person {}. for homeschool, " +
+                              "or local academy returning campaign's location : {}", person, systemId);
+            return campaign.getCurrentSystem().getId();
+        }
+
+        // This is bad if we reach here. This resolution attempt will fail for academy's at systems with parenthesis
+        // in the name. But if we've reached here we've run out of other options for getting the academy's location
+        // and have to guess based on the limited information we have.
+        LOGGER.warn("Could not resolve Academy System ID for person: {}. Guessing based on Academy name.",
+              person);
+        int lastOpen = academyName.lastIndexOf('(');
+        int lastClose = academyName.lastIndexOf(')');
+        if (lastOpen < 0 || lastClose <= lastOpen) {
+            return null;
+        }
+        String systemName = academyName.substring(lastOpen + 1, lastClose).trim();
+        PlanetarySystem system = campaign.getSystemByName(systemName);
+        return system != null ? system.getId() : null;
     }
 
     private static void processSkillTypeNodes(Node wn, Version version) {

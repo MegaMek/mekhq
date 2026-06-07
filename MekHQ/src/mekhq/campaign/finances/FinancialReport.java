@@ -162,35 +162,35 @@ public class FinancialReport {
     }
 
     public static FinancialReport calculate(Campaign campaign) {
-        FinancialReport r = new FinancialReport();
+        FinancialReport financialReport = new FinancialReport();
 
-        r.cash = campaign.getFinances().getBalance();
-        r.loans = campaign.getFinances().getLoanBalance();
-        r.assets = campaign.getFinances().getTotalAssetValue();
-        r.rentals = campaign.getTotalRentFeesExcludingBays();
+        financialReport.cash = campaign.getFinances().getBalance();
+        financialReport.loans = campaign.getFinances().getLoanBalance();
+        financialReport.assets = campaign.getFinances().getTotalAssetValue();
+        financialReport.rentals = campaign.getTotalRentFeesExcludingBays();
 
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getAllHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mek) {
-                r.mek = r.mek.plus(value);
+                financialReport.mek = financialReport.mek.plus(value);
             } else if (u.getEntity() instanceof Tank) {
-                r.vee = r.vee.plus(value);
+                financialReport.vee = financialReport.vee.plus(value);
             } else if (u.getEntity() instanceof BattleArmor) {
-                r.ba = r.ba.plus(value);
+                financialReport.ba = financialReport.ba.plus(value);
             } else if (u.getEntity() instanceof Infantry) {
-                r.infantry = r.infantry.plus(value);
+                financialReport.infantry = financialReport.infantry.plus(value);
             } else if (u.getEntity() instanceof Dropship
                              || u.getEntity() instanceof Jumpship) {
-                r.largeCraft = r.largeCraft.plus(value);
+                financialReport.largeCraft = financialReport.largeCraft.plus(value);
             } else if (u.getEntity() instanceof Aero) {
-                r.smallCraft = r.smallCraft.plus(value);
+                financialReport.smallCraft = financialReport.smallCraft.plus(value);
             } else if (u.getEntity() instanceof ProtoMek) {
-                r.proto = r.proto.plus(value);
+                financialReport.proto = financialReport.proto.plus(value);
             }
         });
 
-        r.spareParts = r.spareParts.plus(
-              campaign.getWarehouse().streamSpareParts()
+        financialReport.spareParts = financialReport.spareParts.plus(
+              campaign.getAllWarehouse().streamSpareParts()
                     .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                     .collect(Collectors.toList()));
 
@@ -198,25 +198,25 @@ public class FinancialReport {
         Accountant accountant = campaign.getAccountant();
 
         if (campaignOptions.isPayForMaintain()) {
-            r.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
+            financialReport.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
         }
         if (campaignOptions.isPayForSalaries()) {
-            r.salaries = accountant.getPayRoll();
+            financialReport.salaries = accountant.getPayRoll();
         }
         if (campaignOptions.isPayForOverhead()) {
-            r.overhead = accountant.getOverheadExpenses();
+            financialReport.overhead = accountant.getOverheadExpenses();
         }
         if (campaignOptions.isUsePeacetimeCost()) {
-            r.coSpareParts = accountant.getMonthlySpareParts();
-            r.coAmmo = accountant.getMonthlyAmmo();
-            r.coFuel = accountant.getMonthlyFuel();
+            financialReport.coSpareParts = accountant.getMonthlySpareParts();
+            financialReport.coAmmo = accountant.getMonthlyAmmo();
+            financialReport.coFuel = accountant.getMonthlyFuel();
         }
 
-        r.contracts = r.contracts.plus(
+        financialReport.contracts = financialReport.contracts.plus(
               campaign.getActiveContracts()
                     .stream().map(Contract::getMonthlyPayOut)
                     .collect(Collectors.toList()));
 
-        return r;
+        return financialReport;
     }
 }

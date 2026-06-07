@@ -287,7 +287,7 @@ public class EventEffectsManager {
         // this event, they will never actually die.
         int wounds = max(magnitude, 1);
 
-        int priorHits = max(target.getHits(), target.getInjuries().size());
+        int priorHits = target.getTotalInjurySeverity();
 
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target,
               campaign.getCampaignOptions().isUseInjuryFatigue(),
@@ -347,7 +347,7 @@ public class EventEffectsManager {
 
             int wounds = Math.clamp(d6(), 1, 5);
 
-            int priorHits = max(target.getHits(), target.getInjuries().size());
+            int priorHits = target.getTotalInjurySeverity();
 
             wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target, isUseInjuryFatigue, fatigueRate, wounds);
 

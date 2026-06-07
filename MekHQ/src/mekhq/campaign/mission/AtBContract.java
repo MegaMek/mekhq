@@ -52,6 +52,7 @@ import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
@@ -61,6 +62,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -125,7 +127,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -503,10 +505,10 @@ public class AtBContract extends Contract {
     /**
      * Updates the enemy faction and enemy bot name for this contract.
      *
-     * @param campaign The current campaign.
-     * @param today    The current LocalDate object.
-     * @param enemyCode {@code Nullable} the code for the new faction, if {@code null} an appropriate random
-     *                                    faction will be used
+     * @param campaign  The current campaign.
+     * @param today     The current LocalDate object.
+     * @param enemyCode {@code Nullable} the code for the new faction, if {@code null} an appropriate random faction
+     *                  will be used
      */
     public void updateEnemy(Campaign campaign, LocalDate today, @Nullable String enemyCode) {
         if (enemyCode == null) {
@@ -567,7 +569,7 @@ public class AtBContract extends Contract {
                 String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
                       regardMultiplier, getLength());
                 if (report != null) {
-                    campaign.addReport(GENERAL, report);
+                    campaign.addReport(POLITICS, report);
                 }
             }
         }
@@ -818,7 +820,7 @@ public class AtBContract extends Contract {
 
         if (campaign.getLocalDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
-                partsAvailabilityLevel++;
+                partsAvailabilityLevel--;
                 priorLogisticsFailure = false;
             }
 
@@ -857,7 +859,7 @@ public class AtBContract extends Contract {
                     switch (d6()) {
                         case 1:
                             text += "Major logistics problem: parts availability level for the rest of the contract becomes one level lower.";
-                            partsAvailabilityLevel--;
+                            partsAvailabilityLevel++;
                             break;
                         case 2:
                             text += "Transport: Player is abandoned in the field by employer transports; if he loses a Base Attack battle he loses all Meks on repair.";
@@ -889,7 +891,7 @@ public class AtBContract extends Contract {
                 case LOGISTICS_FAILURE:
                     campaign.addReport(GENERAL,
                           "<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
-                    partsAvailabilityLevel--;
+                    partsAvailabilityLevel++;
                     priorLogisticsFailure = true;
                     break;
                 case REINFORCEMENTS:
@@ -920,7 +922,7 @@ public class AtBContract extends Contract {
                             break;
                         case 3:
                             text += "ComStar Interdict: Base availability level decreases one level for the rest of the contract.";
-                            partsAvailabilityLevel--;
+                            partsAvailabilityLevel++;
                             break;
                         case 4:
                             text += "Defectors: Next Enemy Morale roll gets a -1 modifier.";
@@ -928,7 +930,7 @@ public class AtBContract extends Contract {
                             break;
                         case 5:
                             text += "Free Trader: Base availability level increases one level for the rest of the contract.";
-                            partsAvailabilityLevel++;
+                            partsAvailabilityLevel--;
                             break;
                         case 6:
                             final String unitName = campaign.getUnitMarket()
@@ -1309,15 +1311,7 @@ public class AtBContract extends Contract {
     public void createEmployerLiaison(Campaign campaign) {
         employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
 
-        final RankSystem rankSystem = getEmployerFaction().getRankSystem();
-
-        final RankValidator rankValidator = new RankValidator();
-        if (!rankValidator.validate(rankSystem, false)) {
-            return;
-        }
-
-        employerLiaison.setRankSystem(rankValidator, rankSystem);
-        employerLiaison.setRank(Rank.RWO_MIN);
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(employerLiaison, RO_MIN);
     }
 
     public Person getClanOpponent() {
@@ -1338,6 +1332,8 @@ public class AtBContract extends Contract {
             clanOpponent.setBloodname(bloodname.getName());
         }
 
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(clanOpponent, RO_MIN);
+
         final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
 
         final RankValidator rankValidator = new RankValidator();
@@ -1346,7 +1342,9 @@ public class AtBContract extends Contract {
         }
 
         clanOpponent.setRankSystem(rankValidator, rankSystem);
-        clanOpponent.setRank(38);
+
+        int targetClanRank = 38;
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(clanOpponent, targetClanRank);
     }
 
     public String getEmployerCode() {
@@ -2288,9 +2286,9 @@ public class AtBContract extends Contract {
                 // Removing this check will break things, see the other comments.
                 continue;
             }
-            // TODO implement getGBV(int index) in UnitTable to simplify this?
+
             // getMekSummary(int index) is NULL for salvage.
-            int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
+            int genericBattleValue = unitTable.getMekSummary(i).getGenericBattleValue();
             int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
 
             totalBattleValue += battleValue * weight;

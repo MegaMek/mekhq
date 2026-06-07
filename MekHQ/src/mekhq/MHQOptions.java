@@ -130,14 +130,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setCommandCenterUseUnitMarket(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, value);
     }
-
-    public boolean getCommandCenterMRMS() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_MRMS, false);
-    }
-
-    public void setCommandCenterMRMS(boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_MRMS, value);
-    }
     // endregion Command Center Tab
 
     // region Interstellar Map Tab
@@ -251,6 +243,16 @@ public final class MHQOptions extends SuiteOptions {
     public void setUnifiedDailyReport(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
               .putBoolean(MHQConstants.USE_UNIFIED_DAILY_REPORT, value);
+    }
+
+    public boolean isUseAggregateDailyReport() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, false);
+    }
+
+    public void setAggregateDailyReport(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_AGGREGATE_DAILY_REPORT, value);
     }
     // endregion Personnel Tab
     // endregion Display Tab
@@ -872,7 +874,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDaySoldierPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_SOLDIER_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_SOLDIER_POOL_FILL, false);
     }
 
     public void setNewDaySoldierPoolFill(final boolean value) {
@@ -880,7 +883,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayBattleArmorPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_FILL, false);
     }
 
     public void setNewDayBattleArmorPoolFill(final boolean value) {
@@ -888,31 +892,38 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayVehicleCrewGroundPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL, false);
     }
 
     public void setNewDayVehicleCrewGroundPoolFill(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL, value);
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_FILL, value);
     }
 
     public boolean getNewDayVehicleCrewVTOLPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL, false);
     }
 
     public void setNewDayVehicleCrewVTOLPoolFill(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL, value);
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_FILL, value);
     }
 
     public boolean getNewDayVehicleCrewNavalPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL, false);
     }
 
     public void setNewDayVehicleCrewNavalPoolFill(final boolean value) {
-        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL, value);
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_FILL, value);
     }
 
     public boolean getNewDayVesselPilotPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VESSEL_PILOT_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VESSEL_PILOT_POOL_FILL, false);
     }
 
     public void setNewDayVesselPilotPoolFill(final boolean value) {
@@ -920,7 +931,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayVesselGunnerPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VESSEL_GUNNER_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VESSEL_GUNNER_POOL_FILL, false);
     }
 
     public void setNewDayVesselGunnerPoolFill(final boolean value) {
@@ -928,11 +940,117 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayVesselCrewPoolFill() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_FILL, false);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_FILL, false);
     }
 
     public void setNewDayVesselCrewPoolFill(final boolean value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_FILL, value);
+    }
+
+    public boolean getNewDayAsTechPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_AS_TECH_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayAsTechPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_AS_TECH_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayMedicPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_MEDIC_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayMedicPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_MEDIC_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDaySoldierPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_SOLDIER_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDaySoldierPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_SOLDIER_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayBattleArmorPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayBattleArmorPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_BATTLE_ARMOR_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayVehicleCrewGroundPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayVehicleCrewGroundPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_GROUND_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayVehicleCrewVTOLPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayVehicleCrewVTOLPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_VTOL_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayVehicleCrewNavalPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayVehicleCrewNavalPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VEHICLE_CREW_NAVAL_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayVesselPilotPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VESSEL_PILOT_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayVesselPilotPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VESSEL_PILOT_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayVesselGunnerPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VESSEL_GUNNER_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayVesselGunnerPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VESSEL_GUNNER_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayVesselCrewPoolNoRelease() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_NO_RELEASE, false);
+    }
+
+    public void setNewDayVesselCrewPoolNoRelease(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_VESSEL_CREW_POOL_NO_RELEASE, value);
+    }
+
+    public boolean getNewDayAutoLogistics() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_AUTO_LOGISTICS, false);
+    }
+
+    public void setNewDayAutoLogistics(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_AUTO_LOGISTICS, value);
     }
 
     public boolean getNewDayMRMS() {
@@ -973,6 +1091,74 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
     }
 
+    public int getQuickTrainTarget() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getInt(MHQConstants.NEW_DAY_QUICK_TRAIN_TARGET, 5);
+    }
+
+    public void setQuickTrainTarget(final int value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putInt(MHQConstants.NEW_DAY_QUICK_TRAIN_TARGET, value);
+    }
+
+    public boolean getLevelArtillery() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_ARTILLERY, false);
+    }
+
+    public void setLevelArtillery(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_ARTILLERY, value);
+    }
+
+    public boolean getLevelScouting() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_SCOUTING, false);
+    }
+
+    public void setLevelScouting(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_SCOUTING, value);
+    }
+
+    public boolean getLevelEscape() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_ESCAPE, false);
+    }
+
+    public void setLevelEscape(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_ESCAPE, value);
+    }
+
+    public boolean getLevelLeadership() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_LEADERSHIP, false);
+    }
+
+    public void setLevelLeadership(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_LEADERSHIP, value);
+    }
+
+    public boolean getLevelTraining() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_TRAINING, false);
+    }
+
+    public void setLevelTraining(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_TRAINING, value);
+    }
+
+    public boolean getLevelOtherCommand() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_OTHER_COMMAND, false);
+    }
+
+    public void setLevelOtherCommand(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_OTHER_COMMAND, value);
+    }
+
     public boolean getSelfCorrectMaintenance() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, true);
@@ -995,8 +1181,8 @@ public final class MHQOptions extends SuiteOptions {
 
     public FormationIconOperationalStatusStyle getNewDayFormationIconOperationalStatusStyle() {
         return FormationIconOperationalStatusStyle.valueOf(userPreferences.node(MHQConstants.NEW_DAY_NODE)
-                                                             .get(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE,
-                                                                   FormationIconOperationalStatusStyle.BORDER.name()));
+                                                                 .get(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE,
+                                                                       FormationIconOperationalStatusStyle.BORDER.name()));
     }
 
     public void setNewDayFormationIconOperationalStatusStyle(final FormationIconOperationalStatusStyle value) {
@@ -1116,8 +1302,8 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     /**
-     * This sets the path where one saves their layered formation icon during export, as this is not required for any data
-     * but improves UX.
+     * This sets the path where one saves their layered formation icon during export, as this is not required for any
+     * data but improves UX.
      *
      * @param value the path where the person saved their last layered formation icon export
      */

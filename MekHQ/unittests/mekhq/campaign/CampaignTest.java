@@ -569,6 +569,23 @@ public class CampaignTest {
             when(unit.getActiveCrew()).thenReturn(activeCrew);
             when(unit.getFullCrewSize()).thenReturn(crewSize);
 
+            // Mock vessel-specific role methods for getRoleSpecificNeeds
+            switch (role) {
+                case VESSEL_PILOT -> {
+                    doReturn(activeCrew).when(unit).getDrivers();
+                    doReturn(crewSize).when(unit).getTotalDriverNeeds();
+                }
+                case VESSEL_GUNNER -> {
+                    doReturn(new HashSet<>(activeCrew)).when(unit).getGunners();
+                    doReturn(crewSize).when(unit).getTotalGunnerNeeds();
+                }
+                case VESSEL_CREW -> {
+                    doReturn(activeCrew).when(unit).getVesselCrew();
+                    doReturn(crewSize).when(unit).getTotalCrewNeeds();
+                }
+                default -> { /* non-vessel: getActiveCrew() + getFullCrewSize() covers default case */ }
+            }
+
             // Mock role methods so unitCanUseTempCrewRole returns true
             switch (role) {
                 case SOLDIER, BATTLE_ARMOUR, VEHICLE_CREW_GROUND,
@@ -996,7 +1013,9 @@ public class CampaignTest {
             PersonnelRole role = PersonnelRole.VESSEL_PILOT;
             enableBlobCrewForRole(role);
             Unit unit = createMockUnitForRole(role, false); // fullSize=2
-            doReturn(List.of(mock(Person.class), mock(Person.class))).when(unit).getActiveCrew();
+            List<Person> fullPilotCrew = List.of(mock(Person.class), mock(Person.class));
+            doReturn(fullPilotCrew).when(unit).getActiveCrew();
+            doReturn(fullPilotCrew).when(unit).getDrivers();
             unit.setTempCrew(role, 1); // 2 real + 1 temp = 3 total; need 2, excess = 1
             testCampaign.importUnit(unit);
 

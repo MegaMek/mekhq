@@ -40,6 +40,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.campaign.enums.DailyReportType.AGGREGATE;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -55,6 +56,7 @@ import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
@@ -69,7 +71,9 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
 import java.io.IOException;
@@ -161,7 +165,7 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
-import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -212,6 +216,7 @@ import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.MASHCapacity;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.Appraisal;
@@ -252,6 +257,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
+import mekhq.gui.dialog.StartingSystemConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.MHQXMLUtility;
@@ -262,7 +268,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Taharqa
  */
-public class Campaign implements ITechManager, ILocation {
+public class Campaign implements ITechManager, IPlace {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
@@ -361,6 +367,10 @@ public class Campaign implements ITechManager, ILocation {
     private final ArrayList<String> politicsReport;
     private transient String politicsReportHTML;
     private transient List<String> newPoliticsReports;
+
+    private final ArrayList<String> aggregateReport;
+    private transient String aggregateReportHTML;
+    private transient List<String> newAggregateReports;
 
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
@@ -465,8 +475,11 @@ public class Campaign implements ITechManager, ILocation {
         COMMAND, LOGISTICS, TRANSPORT, HR
     }
 
+    @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
           MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     private HumanResources humanResources = new HumanResources();
 
@@ -527,6 +540,7 @@ public class Campaign implements ITechManager, ILocation {
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce, AbstractMarriage marriage,
           AbstractProcreation procreation) {
+        MHQOptions mekhqOptions = MekHQ.getMHQOptions();
 
         // Essential state
         id = UUID.randomUUID();
@@ -545,6 +559,8 @@ public class Campaign implements ITechManager, ILocation {
         this.setParent(startLocation);
         if (startLocation != null) {
             mainForcePersonnel.setParent(this);
+            units.setParent(this);
+            parts.setParent(this);
         }
         reputation = reputationController;
         this.factionStandings = factionStandings;
@@ -599,7 +615,7 @@ public class Campaign implements ITechManager, ILocation {
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
-        topUpWeekly = false;
+        topUpWeekly = mekhqOptions.getNewDayAutoLogistics();
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
@@ -639,6 +655,10 @@ public class Campaign implements ITechManager, ILocation {
         politicsReport = new ArrayList<>();
         politicsReportHTML = "";
         newPoliticsReports = new ArrayList<>();
+
+        aggregateReport = new ArrayList<>();
+        aggregateReportHTML = "";
+        newAggregateReports = new ArrayList<>();
 
         // Secondary initialization from passed / derived values
         news = new News(getGameYear(), id.getLeastSignificantBits());
@@ -1743,6 +1763,38 @@ public class Campaign implements ITechManager, ILocation {
         locations.remove(l);
     }
 
+    /**
+     * Removes any {@link AbstractLocation} entries in {@link #locations} that have no personnel
+     * at any depth in their subtree, excluding the campaign's own current location.
+     *
+     * <p>This handles two leak paths: {@link CurrentLocation} travel nodes whose passengers all
+     * died or were removed before arriving, and {@link FixedLocation}/{@link AcademyCampusLocation}
+     * pairs that were never cleaned up after the last student graduated.</p>
+     *
+     * <p>Call this once per day after all personnel processing has completed.</p>
+     */
+    public void pruneEmptyLocations() {
+        AbstractLocation mainLocation = getCurrentLocation();
+        locations.removeIf(location -> {
+            if (location == mainLocation) {
+                return false;
+            }
+            if (!location.fetchPersonnelAtLocation().isEmpty()) {
+                return false;
+            }
+            if (location instanceof CurrentLocation) {
+                location.setParent(null);
+            } else if (location instanceof FixedLocation) {
+                for (LocationNode child : new ArrayList<>(location.getLocationNode().getChildren())) {
+                    if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                        campus.setParent(null);
+                    }
+                }
+            }
+            return true;
+        });
+    }
+
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
     }
@@ -1791,39 +1843,19 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     /**
-     * Removes the {@link FixedLocation} whose {@link AcademyCampusLocation} child matches the given academy set, name,
-     * and system.
-     */
-    public void removeCampusLocation(String academySet, String academyName, String systemId) {
-        locations.removeIf(loc -> {
-            if (!(loc instanceof FixedLocation fixedLoc)) {
-                return false;
-            }
-            if (!fixedLoc.getCurrentSystem().getId().equals(systemId)) {
-                return false;
-            }
-            return fixedLoc.getLocationNode().getChildren().stream()
-                         .anyMatch(child ->
-                                         child.getLocatable() instanceof AcademyCampusLocation c
-                                               && academySet.equals(c.getAcademySet())
-                                               && academyName.equals(c.getAcademyName()));
-        });
-    }
-
-    /**
      * Returns the existing {@link AcademyCampusLocation} for the given campus, creating it on demand if it does not yet
      * exist.
      */
     public AcademyCampusLocation getOrCreateCampusLocation(String academySet,
           String academyName, String systemId) {
         for (AbstractLocation loc : locations) {
-            if (!(loc instanceof FixedLocation fixedLoc)) {
+            if (!(loc instanceof FixedLocation fixedLocation)) {
                 continue;
             }
-            if (!fixedLoc.getCurrentSystem().getId().equals(systemId)) {
+            if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {
                 continue;
             }
-            for (LocationNode child : fixedLoc.getLocationNode().getChildren()) {
+            for (LocationNode child : fixedLocation.getLocationNode().getChildren()) {
                 if (child.getLocatable() instanceof AcademyCampusLocation campus
                           && academySet.equals(campus.getAcademySet())
                           && academyName.equals(campus.getAcademyName())) {
@@ -2123,6 +2155,14 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     /**
+     * @return all hangars across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     */
+    public Hangar getAllHangar() {
+        return units;
+    }
+
+    /**
      * Gets statistics related to units in the hangar.
      */
     public HangarStatistics getHangarStatistics() {
@@ -2328,11 +2368,15 @@ public class Campaign implements ITechManager, ILocation {
      * Recruits a person into the campaign roster using their current prisoner status, assuming recruitment is not
      * performed by a game master that recruitment actions should be logged, and the character should be employed.
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person the person to recruit; must not be {@code null}
      *
      * @return {@code true} if recruitment was successful and the person was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person) {
         return humanResources.recruitPerson(this, person);
@@ -2354,6 +2398,9 @@ public class Campaign implements ITechManager, ILocation {
      * upon recruitment.
      * </p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person the person to recruit; must not be {@code null}
      * @param gmAdd  if {@code true}, recruitment is performed by a game master (bypassing funds check)
      * @param employ if {@code true}, the person is marked as employed in the campaign
@@ -2361,6 +2408,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, boolean gmAdd, boolean employ) {
         return humanResources.recruitPerson(this, person, gmAdd, employ);
@@ -2381,6 +2429,9 @@ public class Campaign implements ITechManager, ILocation {
      * actions should be logged. If successful, the person is marked as employed based on the given flag.
      * </p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person         the person to recruit; must not be {@code null}
      * @param prisonerStatus the prison status to assign to the person
      * @param employ         if {@code true}, the person is marked as employed in the campaign
@@ -2388,6 +2439,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} otherwise
      *
      * @see #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean employ) {
         return humanResources.recruitPerson(this, person, prisonerStatus, employ);
@@ -2400,6 +2452,9 @@ public class Campaign implements ITechManager, ILocation {
      * {@link #recruitPerson(Person, PrisonerStatus, boolean, boolean, boolean, boolean)} with
      * {@code bypassSimulateRelationships} set to {@code false}.</p>
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person         the {@link Person} to recruit
      * @param prisonerStatus the {@link PrisonerStatus} applied to the recruited person
      * @param gmAdd          if {@code true}, the person is added in GM Mode
@@ -2409,6 +2464,7 @@ public class Campaign implements ITechManager, ILocation {
      * @return {@code true} if the person was successfully recruited; {@code false} otherwise
      *
      * @author Illiani
+     * @see #importPerson(Person)
      * @since 0.50.07
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
@@ -2428,6 +2484,9 @@ public class Campaign implements ITechManager, ILocation {
      * Recruits a person into the campaign roster, handling employment status, prisoner status, finances, logging, and
      * optional relationship simulation.
      *
+     * <p><b>Notes:</b> for unit testing, consider if you need to go through the entire recruitment process, or
+     * whether you can get away with just using {@link #importPerson(Person)}.</p>
+     *
      * @param person                      the person to recruit; must not be {@code null}
      * @param prisonerStatus              the prison status to assign to the person
      * @param gmAdd                       if {@code true}, indicates the recruitment is being performed by a game master
@@ -2438,6 +2497,8 @@ public class Campaign implements ITechManager, ILocation {
      *
      * @return {@code true} if recruitment was successful and personnel was added or employed; {@code false} on failure
      *       or insufficient funds
+     *
+     * @see #importPerson(Person)
      */
     public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log,
           boolean employ, boolean bypassSimulateRelationships) {
@@ -2476,7 +2537,13 @@ public class Campaign implements ITechManager, ILocation {
     /**
      * Imports a {@link Person} into a campaign.
      *
+     * <p><b>Notes:</b> This is a super lightweight way of adding a character to the campaign. It doesn't include
+     * all the extra steps that the various {@link #recruitPerson(Person)} methods need to go through. That makes this
+     * method particularly useful for inclusion in Unit Tests.</p>
+     *
      * @param person A {@link Person} to import into the campaign.
+     *
+     * @see #recruitPerson(Person)
      */
     public void importPerson(Person person) {
         humanResources.importPerson(person);
@@ -2488,6 +2555,13 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public Collection<Person> getPersonnel() {
+        return humanResources.getPersonnel();
+    }
+
+    /**
+     * @return all personnel across all locations associated with this campaign.
+     */
+    public Collection<Person> getAllPersonnel() {
         return humanResources.getPersonnel();
     }
 
@@ -2712,6 +2786,14 @@ public class Campaign implements ITechManager, ILocation {
      * Gets the Warehouse which stores parts.
      */
     public Warehouse getWarehouse() {
+        return parts;
+    }
+
+    /**
+     * @return all warehouses across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     */
+    public Warehouse getAllWarehouse() {
         return parts;
     }
 
@@ -2976,6 +3058,32 @@ public class Campaign implements ITechManager, ILocation {
         List<String> oldPoliticsReports = newPoliticsReports;
         setNewPoliticsReports(new ArrayList<>());
         return oldPoliticsReports;
+    }
+
+    public List<String> getAggregateReport() {
+        return aggregateReport;
+    }
+
+    public void setAggregateReportHTML(String html) {
+        aggregateReportHTML = html;
+    }
+
+    public String getAggregateReportHTML() {
+        return aggregateReportHTML;
+    }
+
+    public List<String> getNewAggregateReports() {
+        return newAggregateReports;
+    }
+
+    public void setNewAggregateReports(List<String> reports) {
+        newAggregateReports = reports;
+    }
+
+    public List<String> fetchAndClearNewAggregateReports() {
+        List<String> oldAggregateReports = newAggregateReports;
+        setNewAggregateReports(new ArrayList<>());
+        return oldAggregateReports;
     }
 
     /**
@@ -3968,7 +4076,7 @@ public class Campaign implements ITechManager, ILocation {
                     roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
-                        tech.setEdgeUsed(tech.getEdgeUsed() - 1);
+                        tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() - 1);
                     }
                     report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
                 }
@@ -4192,7 +4300,7 @@ public class Campaign implements ITechManager, ILocation {
                 roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
                 // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
-                    tech.setEdgeUsed(tech.getEdgeUsed() + 1);
+                    tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() + 1);
                 }
                 report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " +
                                 roll +
@@ -4451,6 +4559,9 @@ public class Campaign implements ITechManager, ILocation {
                   && chosenFaction.isMercenaryOrganization()) {
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MERCHANT : PersonnelRole.MILITARY_LIAISON;
             Person speaker = newPerson(role, chosenFaction.getShortName(), Gender.RANDOMIZE);
+
+            AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+
             new FactionJudgmentDialog(this, speaker, getCommander(),
                   "HELLO", chosenFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
@@ -4459,22 +4570,17 @@ public class Campaign implements ITechManager, ILocation {
         }
     }
 
-    /** Use {@link #refreshPersonnelMarkets(boolean)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void refreshPersonnelMarkets() {
-        humanResources.refreshPersonnelMarkets(this);
-    }
-
     /**
-     * Refreshes the personnel markets based on the current market style and the current date.
+     * Refreshes the applicants available for recruiting based on the current recruitment style and the current date.
      *
-     * @param isCampaignStart {@code true} if campaign method is being called at the start of the campaign
+     * @param bypassDateRestrictions {@code true} if we want the applicants to refresh at an unusual time, such as
+     *                               campaign start
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void refreshPersonnelMarkets(boolean isCampaignStart) {
-        humanResources.refreshPersonnelMarkets(this, isCampaignStart);
+    public void refreshApplicants(boolean bypassDateRestrictions) {
+        humanResources.refreshApplicants(this, bypassDateRestrictions);
     }
 
     public int getInitiativeBonus() {
@@ -5097,6 +5203,10 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         addReportInternal(type, report);
+
+        if (type != AGGREGATE && MekHQ.getMHQOptions().isUseAggregateDailyReport()) {
+            addReportInternal(AGGREGATE, report);
+        }
     }
 
     private void addReportInternal(final DailyReportType type, final String report) {
@@ -5199,6 +5309,17 @@ public class Campaign implements ITechManager, ILocation {
                 }
 
                 newPoliticsReports.add(report);
+            }
+            case AGGREGATE -> {
+                aggregateReport.add(report);
+                if (!aggregateReportHTML.isEmpty()) {
+                    aggregateReportHTML = aggregateReportHTML + REPORT_LINEBREAK + report;
+                    newAggregateReports.add(REPORT_LINEBREAK);
+                } else {
+                    aggregateReportHTML = report;
+                }
+
+                newAggregateReports.add(report);
             }
         }
         MekHQ.triggerEvent(new ReportEvent(this, report));
@@ -5540,6 +5661,13 @@ public class Campaign implements ITechManager, ILocation {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "politicsReport");
 
+        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "aggregateReport");
+        for (String report : aggregateReport) {
+            // This cannot use the MHQXMLUtility as it cannot be escaped
+            writer.println(MHQXMLUtility.indentStr(indent) + "<reportLine><![CDATA[" + report + "]]></reportLine>");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "aggregateReport");
+
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "info");
         // endregion Basic Campaign Info
 
@@ -5547,6 +5675,17 @@ public class Campaign implements ITechManager, ILocation {
         if (getCampaignOptions() != null) {
             CampaignOptionsMarshaller.writeCampaignOptionsToXML(getCampaignOptions(), writer, indent);
         }
+
+        // We've had instances where game options aren't loaded correctly from player campaigns, potentially due to
+        // age. This safeguards against that occurance, preventing players entering a state where they cannot
+        // continue their campaigns.
+        if (gameOptions == null) {
+            gameOptions = new GameOptions();
+            LOGGER.errorDialog(new NullPointerException(),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.body"),
+                  getTextAt(RESOURCE_BUNDLE, "gameOptions.save.failure.title"));
+        }
+
         getGameOptions().writeToXML(writer, indent);
         // endregion Options
 
@@ -5570,12 +5709,12 @@ public class Campaign implements ITechManager, ILocation {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
-        for (AbstractLocation loc : locations) {
-            // Skip locations parented to a campus — they are serialized inside their parent's XML.
-            if (loc.getLocationNode().getParent() != null) {
+        for (AbstractLocation location : locations) {
+            // Skip locations parented to another node — they are serialized inside their parent's XML.
+            if (location.getLocationNode().getParent() != null) {
                 continue;
             }
-            loc.writeToXML(writer, indent);
+            location.writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "playerBases");
@@ -6574,9 +6713,9 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
-        if (minutes <= 0) {
+        if (!(partWork instanceof Refit) && minutes <= 0) {
             LOGGER.error("Attempting to get the target number for a part with zero time left.");
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No part repair time remaining.");
         }
 
         int helpMod;
@@ -7224,26 +7363,7 @@ public class Campaign implements ITechManager, ILocation {
      * @param role the personnel role to fill
      */
     public void fillTempCrewPoolForRole(PersonnelRole role) {
-        if (!isBlobCrewEnabled(role)) {
-            return;
-        }
-
-        int need = 0;
-        for (Unit unit : getUnits()) {
-            if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-                int totalCurrentCrew = currentCrew + currentTempCrew;
-                if (fullCrew > totalCurrentCrew) {
-                    need += (fullCrew - totalCurrentCrew);
-                }
-            }
-        }
-
-        if (need > 0) {
-            increaseTempCrewPool(role, need);
-        }
+        humanResources.fillTempCrewPoolForRole(this, getCampaignOptions(), role);
     }
 
     /**
@@ -7258,16 +7378,16 @@ public class Campaign implements ITechManager, ILocation {
 
 
     /**
-     * Releases surplus AsTechs from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus AsTechs from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusAsTechPool() {
         humanResources.releaseSurplusAsTechPool(this);
     }
 
     /**
-     * Releases surplus Medics from the pool, keeping only what is currently needed.
-     * If the pool already has fewer than needed, no change is made.
+     * Releases surplus Medics from the pool, keeping only what is currently needed. If the pool already has fewer than
+     * needed, no change is made.
      */
     public void releaseSurplusMedicPool() {
         humanResources.releaseSurplusMedicPool(this);
@@ -7277,8 +7397,7 @@ public class Campaign implements ITechManager, ILocation {
      * Releases surplus temp crew for a specific blob crew role.
      *
      * <p>For each unit, any assigned temp crew beyond what the unit needs (i.e., where real crew
-     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then
-     * emptied.</p>
+     * already fills or exceeds {@code fullCrewSize}) is removed. The unassigned pool is then emptied.</p>
      *
      * @param role the personnel role to trim
      */
@@ -7293,17 +7412,7 @@ public class Campaign implements ITechManager, ILocation {
      * @param role the personnel role to clear
      */
     public void clearBlobCrewForRole(PersonnelRole role) {
-        // Clear temp crew from all units for this specific role
-        for (Unit unit : getUnits()) {
-            if (unit.getTempCrewByPersonnelRole(role) > 0) {
-                unit.setTempCrew(role, 0);
-            }
-        }
-
-        // Empty the campaign pool for this specific role
-        if (getTempCrewPool(role) > 0) {
-            setTempCrewPool(role, 0);
-        }
+        humanResources.clearBlobCrewForRole(this, role);
     }
 
     /**
@@ -7314,85 +7423,18 @@ public class Campaign implements ITechManager, ILocation {
      */
     @Deprecated
     public void clearBlobCrew() {
-        // Clear temp crew from all units
-        for (Unit unit : getUnits()) {
-            for (PersonnelRole role : PersonnelRole.values()) {
-                if (unit.getTempCrewByPersonnelRole(role) > 0) {
-                    unit.setTempCrew(role, 0);
-                }
-            }
-        }
-
-        // Empty all campaign pools
         for (PersonnelRole role : PersonnelRole.values()) {
-            if (getTempCrewPool(role) > 0) {
-                setTempCrewPool(role, 0);
-            }
+            clearBlobCrewForRole(role);
         }
     }
 
     /**
-     * Checks if a unit can use temp crew of a specific personnel role. A unit must have at least one person to use temp
-     * crew - checks if the commander is null
-     *
-     * @param unit the unit to check
-     * @param role the personnel role
-     *
-     * @return true if the unit can use this type of temp crew
-     */
-    private boolean unitCanUseTempCrewRole(Unit unit, PersonnelRole role) {
-        if (unit.getCommander() == null || unit.getEntity() == null) {
-            return false;
-        }
-
-        return switch (role) {
-            case SOLDIER,
-                 BATTLE_ARMOUR,
-                 VEHICLE_CREW_GROUND,
-                 VEHICLE_CREW_VTOL,
-                 VEHICLE_CREW_NAVAL,
-                 VESSEL_PILOT -> unit.getDriverRole() == role;
-            case VESSEL_GUNNER -> unit.getGunnerRole() == role;
-            case VESSEL_CREW -> (unit.getEntity() instanceof Aero aero && !(aero instanceof ConvFighter)) &&
-                                      unit.canTakeMoreVesselCrew();
-            default -> false;
-        };
-    }
-
-    /**
-     * Distributes temp crew from the pool to units that need crew for a specific personnel role. Each unit can be
-     * filled up to (fullCrewSize - 1) with temp crew, ensuring at least one real Person.
+     * Distributes temp crew from the pool to units that need crew for a specific personnel role.
      *
      * @param role the personnel role to distribute
      */
     public void distributeTempCrewPoolToUnits(PersonnelRole role) {
-        if (!isBlobCrewEnabled(role)) {
-            return;
-        }
-
-        int availablePool = getAvailableTempCrewPool(role);
-        for (Unit unit : getUnits()) {
-            if (availablePool <= 0) {
-                break;
-            }
-
-            if (unitCanUseTempCrewRole(unit, role)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTempCrewByPersonnelRole(role);
-                int fullCrew = unit.getFullCrewSize();
-
-                int totalCurrentCrew = currentCrew + unit.getTotalTempCrew();
-                int needed = fullCrew - totalCurrentCrew;
-
-                if (needed > 0) {
-                    int toAssign = Math.min(needed, availablePool);
-                    unit.setTempCrew(role, currentTempCrew + toAssign);
-                    availablePool -= toAssign;
-                }
-            }
-        }
-        // Note: No need to decrease the total pool - it's tracked by units automatically
-        // The pool represents the TOTAL, and "in use" is calculated from units
+        humanResources.distributeTempCrewPoolToUnits(this, getCampaignOptions(), role);
     }
 
 
@@ -8919,8 +8961,8 @@ public class Campaign implements ITechManager, ILocation {
      * fallback scenarios.
      *
      * <p>This method first checks if the campaign is classified as a mercenary or pirate campaign. If so, it
-     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String)}, which implements
-     * special logic to handle those campaign types.</p>
+     * delegates responsibility to {@link #getMercenaryOrPirateStartingPlanet(Factions, String, boolean)}, which
+     * implements special logic to handle those campaign types.</p>
      *
      * <p>For all other campaign types, it uses the current campaign's faction to attempt to retrieve that faction’s
      * canonical starting system for the current game date. If no valid system can be found (due to, for example, the
@@ -8946,7 +8988,8 @@ public class Campaign implements ITechManager, ILocation {
         PlanetarySystem startingSystem;
 
         if (isMercenaryCampaign() || isPirateCampaign()) {
-            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID);
+            boolean useRandomStartLocation = StartingSystemConfirmationDialog.getStartingSystemConfirmationDialog(this);
+            return getMercenaryOrPirateStartingPlanet(factions, TERRA_ID, useRandomStartLocation);
         }
 
         // Default for non-merc/pirate campaigns
@@ -8994,23 +9037,25 @@ public class Campaign implements ITechManager, ILocation {
      * valid system is found, the logic falls back to Terra, ensuring that the campaign always has a valid starting
      * world even in case of missing data.</p>
      *
-     * @param factions The {@link Factions} manager supplying access to all faction data.
-     * @param TERRA_ID The globally unique identifier for the planet Terra, used for the ultimate fallback.
+     * @param factions               The {@link Factions} manager supplying access to all faction data.
+     * @param TERRA_ID               The globally unique identifier for the planet Terra, used for the ultimate
+     *                               fallback.
+     * @param useRandomStartLocation {@code true} if the campaign can start on a random faction's capital, {@code false}
+     *                               to limit starting location to the current campaign's capital
      *
      * @return the {@link Planet} used as the campaign start location.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID) {
-        final String TORTUGA_CODE = "TD";
-
+    private Planet getMercenaryOrPirateStartingPlanet(Factions factions, String TERRA_ID,
+          boolean useRandomStartLocation) {
         PlanetarySystem startingSystem;
         Faction startingFaction;
         // Determine fallback faction for merc/pirate
         startingFaction = isMercenaryCampaign()
                                 ? factions.getFaction(MERCENARY_FACTION_CODE)
-                                : factions.getFaction(TORTUGA_CODE);
+                                : factions.getFaction(TORTUGA_DOMINIONS_FACTION_CODE);
 
         // If pirate fallback is unavailable at the campaign's start date, use the default faction
         if (isPirateCampaign() && !startingFaction.validIn(currentDay)) {
@@ -9018,7 +9063,7 @@ public class Campaign implements ITechManager, ILocation {
         }
 
         // 33% chance to start in fallback faction's capital
-        if (randomInt(3) != 0) {
+        if (useRandomStartLocation && randomInt(3) != 0) {
             // Pick a random, eligible recruiting faction
             List<Faction> recruitingFactions = new ArrayList<>();
             for (Faction possibleFaction : factions.getActiveFactions(currentDay)) {

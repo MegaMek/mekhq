@@ -836,7 +836,7 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         Image baseImage;
-        if (campaign.getPersonnel().contains(speaker)) {
+        if (campaign.getAllPersonnel().contains(speaker)) {
             Portrait portrait = speaker.getPortrait();
 
             if (portrait == null ||

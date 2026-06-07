@@ -112,7 +112,12 @@ public class ScenarioTemplate implements Cloneable {
         /**
          * Battlefield control is always assigned to the enemy.
          */
-        ENEMY
+        ENEMY,
+
+        /**
+         * Battlefield control has not been defined
+         */
+        UNDEFINED
     }
 
     @Override

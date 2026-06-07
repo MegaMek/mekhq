@@ -34,7 +34,15 @@
 package mekhq.campaign.campaignOptions;
 
 import static megamek.common.TechConstants.getSimpleLevel;
-import static megamek.common.options.OptionsConstants.*;
+import static megamek.common.options.OptionsConstants.ADVANCED_STRATOPS_QUIRKS;
+import static megamek.common.options.OptionsConstants.ALLOWED_CANON_ONLY;
+import static megamek.common.options.OptionsConstants.ALLOWED_TECH_LEVEL;
+import static megamek.common.options.OptionsConstants.EDGE;
+import static megamek.common.options.OptionsConstants.RPG_ARTILLERY_SKILL;
+import static megamek.common.options.OptionsConstants.RPG_COMMAND_INIT;
+import static megamek.common.options.OptionsConstants.RPG_MANEI_DOMINI;
+import static megamek.common.options.OptionsConstants.RPG_PILOT_ADVANTAGES;
+import static megamek.common.options.OptionsConstants.RPG_TOUGHNESS;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
@@ -225,6 +233,7 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterVehicles;
     private boolean onlyCommandersMatterInfantry;
     private boolean onlyCommandersMatterBattleArmor;
+    private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -571,6 +580,7 @@ public class CampaignOptions {
 
     private int attributeCost;
     private int edgeCost;
+    private int edgeRefreshCost;
     // endregion Experience Tab
 
     // region Skills Tab
@@ -672,6 +682,8 @@ public class CampaignOptions {
     private int fixedMapChance;
     private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
+    private int reinforcementBaseTargetNumber;
+    private boolean clansObeyBiddingRules;
     private int alliedFacilityModifierDieSize;
     private int enemyFacilityModifierDieSize;
     private int scenarioModMax;
@@ -837,6 +849,7 @@ public class CampaignOptions {
         setUseAbilities(false);
         setOnlyCommandersMatterVehicles(false);
         setOnlyCommandersMatterInfantry(false);
+        edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
         setUseSupportEdge(false);
@@ -1240,6 +1253,7 @@ public class CampaignOptions {
         missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
         edgeCost = 10;
+        edgeRefreshCost = 20; // ATOW 3rd printing, p.43, 'edge recovery'
         attributeCost = 100;
         // endregion Experience Tab
 
@@ -1352,7 +1366,9 @@ public class CampaignOptions {
         setOpForLanceTypeVehicles(3);
         setFixedMapChance(25);
         setUseAdvancedBuildingGunEmplacements(false);
+        reinforcementBaseTargetNumber = 7;
         setSpaUpgradeIntensity(0);
+        clansObeyBiddingRules = true;
         setAlliedFacilityModifierDieSize(2);
         setEnemyFacilityModifierDieSize(2);
         regionalMekVariations = false;
@@ -1686,6 +1702,14 @@ public class CampaignOptions {
 
     public void setOnlyCommandersMatterBattleArmor(final boolean onlyCommandersMatterBattleArmor) {
         this.onlyCommandersMatterBattleArmor = onlyCommandersMatterBattleArmor;
+    }
+
+    public EdgeRefreshPeriod getEdgeRefreshPeriod() {
+        return edgeRefreshPeriod;
+    }
+
+    public void setEdgeRefreshPeriod(final EdgeRefreshPeriod edgeRefreshPeriod) {
+        this.edgeRefreshPeriod = edgeRefreshPeriod;
     }
 
     public boolean isUseEdge() {
@@ -4518,6 +4542,14 @@ public class CampaignOptions {
         this.edgeCost = edgeCost;
     }
 
+    public int getEdgeRefreshCost() {
+        return edgeRefreshCost;
+    }
+
+    public void setEdgeRefreshCost(final int edgeRefreshCost) {
+        this.edgeRefreshCost = edgeRefreshCost;
+    }
+
     public int getAttributeCost() {
         return attributeCost;
     }
@@ -5288,6 +5320,22 @@ public class CampaignOptions {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
     }
 
+    public int getReinforcementBaseTargetNumber() {
+        return reinforcementBaseTargetNumber;
+    }
+
+    public void setReinforcementBaseTargetNumber(final int reinforcementBaseTargetNumber) {
+        this.reinforcementBaseTargetNumber = reinforcementBaseTargetNumber;
+    }
+
+    public boolean isClansObeyBiddingRules() {
+        return clansObeyBiddingRules;
+    }
+
+    public void setClansObeyBiddingRules(final boolean clansObeyBiddingRules) {
+        this.clansObeyBiddingRules = clansObeyBiddingRules;
+    }
+
     public int getAlliedFacilityModifierDieSize() {
         return alliedFacilityModifierDieSize;
     }
@@ -5771,7 +5819,6 @@ public class CampaignOptions {
      */
     public void updateCampaignOptionsFromGameOptions(GameOptions gameOptions) {
         useTactics = gameOptions.getOption(RPG_COMMAND_INIT).booleanValue();
-        useInitiativeBonus = gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).booleanValue();
         useToughness = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
         useArtillery = gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue();
         useAbilities = gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue();
@@ -5795,7 +5842,6 @@ public class CampaignOptions {
      * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
      */
     public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
-        gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
         gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics || useInitiativeBonus);
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
         gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);

@@ -34,6 +34,7 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 
@@ -51,10 +52,10 @@ import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -220,7 +221,7 @@ public class CurrentLocation extends AbstractLocation {
      * Check for a jump path and if found, do whatever needs to be done to move forward
      */
     @Override
-    public void newDay(Campaign campaign, boolean suppressReports) {
+    public void newDay(Campaign campaign, boolean isSilentProcessing) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -231,13 +232,13 @@ public class CurrentLocation extends AbstractLocation {
         double neededRechargeTime = currentSystem.getRechargeTime(today, campaign.isUseCommandCircuit());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
-            if (!suppressReports) {
+            if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, "JumpShips spent " +
                                                   (Math.round(100.0 * usedRechargeTime) / 100.0) +
                                                   " hours recharging drives");
             }
             rechargeTime += usedRechargeTime;
-            if (rechargeTime >= neededRechargeTime && !suppressReports) {
+            if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
                 campaign.addReport(GENERAL, "JumpShip drives fully charged");
             }
         }
@@ -251,7 +252,7 @@ public class CurrentLocation extends AbstractLocation {
             double usedTransitTime = Math.min(hours, 24.0 * (currentSystem.getTimeToJumpPoint(1.0) - transitTime));
             if (usedTransitTime > 0) {
                 transitTime += usedTransitTime / 24.0;
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "DropShips spent " +
                                                       (Math.round(100.0 * usedTransitTime) / 100.0) +
                                                       " hours in transit to jump point");
@@ -265,7 +266,7 @@ public class CurrentLocation extends AbstractLocation {
                 if (campaignOptions.isUseAbilities()) {
                     checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
                 }
                 currentSystem = jumpPath.get(1);
@@ -280,13 +281,13 @@ public class CurrentLocation extends AbstractLocation {
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
                 if (usedRechargeTime > 0) {
-                    if (!suppressReports) {
+                    if (!isSilentProcessing) {
                         campaign.addReport(GENERAL, "JumpShips spent " +
                                                           (Math.round(100.0 * usedRechargeTime) / 100.0) +
                                                           " hours recharging drives");
                     }
                     rechargeTime += usedRechargeTime;
-                    if (rechargeTime >= neededRechargeTime && !suppressReports) {
+                    if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
                         campaign.addReport(GENERAL, "JumpShip drives fully charged");
                     }
                 }
@@ -295,14 +296,14 @@ public class CurrentLocation extends AbstractLocation {
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
-            if (!suppressReports) {
+            if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, "DropShips spent " +
                                                   (Math.round(100.0 * usedTransitTime) / 100.0) +
                                                   " hours transiting into system");
             }
             transitTime -= usedTransitTime / 24.0;
             if (transitTime <= 0) {
-                if (!suppressReports) {
+                if (!isSilentProcessing) {
                     campaign.addReport(GENERAL,
                           jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
                 }
@@ -310,10 +311,6 @@ public class CurrentLocation extends AbstractLocation {
                 transitTime = 0;
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
-            }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
             }
         }
 
@@ -330,8 +327,13 @@ public class CurrentLocation extends AbstractLocation {
                 performAutomatedActivation(campaign);
             }
 
+            // TODO: Remove?
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                if (!suppressReports) {
+                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
+            }
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                if (!isSilentProcessing) {
                     Inoculations.triggerInoculationPrompt(campaign, false);
                 } else {
                     Inoculations.autoInoculateAll(campaign, this);
@@ -339,6 +341,12 @@ public class CurrentLocation extends AbstractLocation {
             }
 
             testForEarlyArrival(campaign);
+
+            // We've just stopped traveling, so we should see if there are any local applicants.
+            if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
+                campaign.refreshApplicants(true);
+                CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+            }
         }
     }
 
@@ -407,13 +415,5 @@ public class CurrentLocation extends AbstractLocation {
         }
 
         return retVal;
-    }
-
-    public static String getFormattedTextAt(String key, Object... args) {
-        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
-    }
-
-    public static String getTextAt(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 }

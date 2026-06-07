@@ -55,8 +55,8 @@ import mekhq.utilities.MHQXMLUtility;
  * Represents a hangar which contains zero or more units.
  */
 public class Hangar implements ILocation {
-    private final LocationNode locationNode = new LocationNode(this);
     private final Map<UUID, Unit> units = new LinkedHashMap<>();
+    private final LocationNode locationNode = new LocationNode(this);
 
     @Override
     public LocationNode getLocationNode() {
@@ -85,6 +85,7 @@ public class Hangar implements ILocation {
         }
 
         units.put(unit.getId(), unit);
+        unit.setParent(this);
     }
 
     /**
@@ -185,7 +186,11 @@ public class Hangar implements ILocation {
      * @return true if the unit was removed, otherwise false.
      */
     public boolean removeUnit(UUID id) {
-        return null != units.remove(id);
+        Unit unit = units.remove(id);
+        if (unit != null) {
+            unit.setParent(null);
+        }
+        return unit != null;
     }
 
     public void writeToXML(final PrintWriter pw, final int indent, final String tag) {

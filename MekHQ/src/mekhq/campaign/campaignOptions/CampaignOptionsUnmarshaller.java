@@ -154,6 +154,7 @@ public class CampaignOptionsUnmarshaller {
             case "missionXpOutstandingSuccess" -> campaignOptions.setMissionXpOutstandingSuccess(parseInt(
                   nodeContents));
             case "edgeCost" -> campaignOptions.setEdgeCost(parseInt(nodeContents));
+            case "edgeRefreshCost" -> campaignOptions.setEdgeRefreshCost(parseInt(nodeContents));
             case "attributeCost" -> campaignOptions.setAttributeCost(parseInt(nodeContents));
             case "waitingPeriod" -> campaignOptions.setWaitingPeriod(parseInt(nodeContents));
             case "acquisitionSkill" -> {
@@ -333,6 +334,8 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "onlyCommandersMatterBattleArmor" -> campaignOptions.setOnlyCommandersMatterBattleArmor(parseBoolean(
                   nodeContents));
+            case "edgeRefreshPeriod" ->
+                  campaignOptions.setEdgeRefreshPeriod(EdgeRefreshPeriod.fromString(nodeContents));
             case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
             case "useSupportEdge" -> campaignOptions.setUseSupportEdge(parseBoolean(nodeContents));
             case "useImplants" -> campaignOptions.setUseImplants(parseBoolean(nodeContents));
@@ -924,7 +927,10 @@ public class CampaignOptionsUnmarshaller {
             case "useAdvancedBuildingGunEmplacements" ->
                   campaignOptions.setUseAdvancedBuildingGunEmplacements(parseBoolean(
                         nodeContents));
+            case "reinforcementBaseTargetNumber" ->
+                  campaignOptions.setReinforcementBaseTargetNumber(parseInt(nodeContents));
             case "spaUpgradeIntensity" -> campaignOptions.setSpaUpgradeIntensity(parseInt(nodeContents));
+            case "clansObeyBiddingRules" -> campaignOptions.setClansObeyBiddingRules(parseBoolean(nodeContents));
             case "alliedFacilityModifierDieSize" ->
                   campaignOptions.setAlliedFacilityModifierDieSize(parseInt(nodeContents));
             case "enemyFacilityModifierDieSize" ->

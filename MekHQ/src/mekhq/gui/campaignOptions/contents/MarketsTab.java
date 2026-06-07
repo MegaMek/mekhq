@@ -196,25 +196,25 @@ public class MarketsTab {
     }
 
     /**
-     * Initializes the market-related options tabs by setting up configurations for the Personnel Market, Unit Market,
-     * and Contract Market.
+     * Initializes the market-related options tabs by setting up configurations for the Personnel Recruitment,
+     * Unit Market, and Contract Market.
      * <p>
      * This method is invoked internally within the constructor to prepare the various market configurations for use in
      * the UI.
      */
     private void initialize() {
-        initializePersonnelMarket();
+        initializePersonnelRecruitment();
         initializeUnitMarket();
         initializeContractMarket();
     }
 
     /**
-     * Initializes the settings and UI components related to the Personnel Market.
+     * Initializes the settings and UI components related to the Personnel Recruitment.
      * <p>
-     * This includes setting up labels, combo boxes for selecting the personnel market type, checkboxes for additional
+     * This includes setting up labels, combo boxes for selecting the recruitment style, checkboxes for additional
      * options, and spinners for configuring removal targets.
      */
-    private void initializePersonnelMarket() {
+    private void initializePersonnelRecruitment() {
         pnlPersonnelMarketGeneralOptions = new JPanel();
         lblPersonnelMarketType = new JLabel();
         comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());

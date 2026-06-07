@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.location;
 
+import static java.lang.Math.max;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -68,9 +70,15 @@ public final class LocationDispatch {
      *
      * <p>Mirrors the travel logic in {@code EducationController.enrollPerson()}.</p>
      *
+     * <p>Sets {@code eduJourneyTime} on each person.</p>
+     *
+     * @param people         the students to dispatch; must not be {@code null}
+     * @param academySet     the academy set name; must not be {@code null}
+     * @param academyName    the academy name within the set; must not be {@code null}
+     * @param campusSystemId the ID of the planetary system hosting the campus; must not be {@code null}
      * @param people      the people to dispatch; must not be {@code null}
      * @param destination the target {@link ILocation}; must not be {@code null}
-     * @param campaign    the active campaign; must not be {@code null}
+     * @param campaign       the active campaign; must not be {@code null}
      */
     public static void dispatchToLocation(Collection<Person> people,
           ILocation destination,
@@ -199,9 +207,12 @@ public final class LocationDispatch {
      * {@code destination}) so that location columns show in-transit status. Same-system dispatches skip the travel
      * node.</p>
      *
+     * <p>Sets {@code eduJourneyTime} and resets {@code eduDaysOfTravel} to zero on each person.</p>
+     *
+     * @param people   the students to send home; must not be {@code null}
      * @param parts       the parts to dispatch; should all be spare parts; must not be {@code null}
      * @param destination the target {@link ILocation}; must not be {@code null}
-     * @param campaign    the active campaign; must not be {@code null}
+     * @param campaign the active campaign; must not be {@code null}
      */
     public static void dispatchPartsToLocation(Collection<Part> parts,
           ILocation destination,

@@ -251,7 +251,7 @@ public class CombatTeam {
         }
 
         for (UUID unitId : formation.getAllUnits(true)) {
-            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getHangar(), unitId);
+            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getAllHangar(), unitId);
 
             if (entity == null) {
                 continue;

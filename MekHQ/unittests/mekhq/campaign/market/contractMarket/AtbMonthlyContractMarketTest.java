@@ -92,7 +92,7 @@ class AtbMonthlyContractMarketTest {
         try (MockedStatic<ContractTypePicker> contractTypePicker = mockStatic(ContractTypePicker.class);
               MockedStatic<ContractUtilities> contractUtilities = mockStatic(ContractUtilities.class);
               MockedStatic<CombatTeam> combatTeam = mockStatic(CombatTeam.class)) {
-            contractTypePicker.when(() -> ContractTypePicker.findMissionType(context.employerFaction, 0, 0))
+            contractTypePicker.when(() -> ContractTypePicker.findMissionType(context.employerFaction, 0))
                   .thenReturn(AtBContractType.GARRISON_DUTY);
             contractUtilities.when(ContractUtilities::calculateVarianceFactor).thenReturn(1.0);
             contractUtilities.when(() -> ContractUtilities.calculateBaseNumberOfRequiredLances(context.campaign,
@@ -165,7 +165,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             when(campaign.getReputation()).thenReturn(reputation);
             when(campaign.getAccountant()).thenReturn(accountant);
-            when(campaign.getHangar()).thenReturn(hangar);
+            when(campaign.getAllHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
             when(campaign.getFutureAtBContracts()).thenReturn(List.of());
         }
@@ -187,7 +187,8 @@ class AtbMonthlyContractMarketTest {
             factionsByCode.put("REB", mockFaction("REB", "Rebels"));
 
             Factions factions = mock(Factions.class);
-            doAnswer(invocation -> factionsByCode.get(invocation.getArgument(0))).when(factions).getFaction(anyString());
+            doAnswer(invocation -> factionsByCode.get(invocation.getArgument(0))).when(factions)
+                  .getFaction(anyString());
             Factions.setInstance(factions);
         }
 

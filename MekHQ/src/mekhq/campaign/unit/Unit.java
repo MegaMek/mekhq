@@ -189,6 +189,7 @@ public class Unit implements ITechnology, ILocation {
     private UUID id;
     private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
+    private LocationNode locationNode = new LocationNode(this);
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -4873,14 +4874,6 @@ public class Unit implements ITechnology, ILocation {
 
     public void resetPilotAndEntity() {
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
-                                              (entity instanceof Tank || entity instanceof ConvFighter);
-        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
-                                              entity instanceof Infantry &&
-                                              !(entity instanceof BattleArmor);
-        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
-                                                 entity instanceof BattleArmor;
-        boolean isOnlyCommandersMatter = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
         // Reset transient data
         getCampaign().clearGameData(entity);
@@ -4892,7 +4885,7 @@ public class Unit implements ITechnology, ILocation {
         entity.setStartingPos(START_NONE);
 
         // Update crew data
-        updateCrew(isOnlyCommandersMatter);
+        updateCrew(isOnlyCommandersMatter(campaignOptions));
 
         // commander can be null at this point, but that's ok because both of the following calls include null
         // handling built into their methods.
@@ -4905,6 +4898,12 @@ public class Unit implements ITechnology, ILocation {
         if (campaignOptions.isUseAbilities() || campaignOptions.isUseEdge() || campaignOptions.isUseImplants()) {
             processUnitSPAs(commander);
         }
+    }
+
+    public boolean isOnlyCommandersMatter(CampaignOptions campaignOptions) {
+        return (isVehicle() && campaignOptions.isOnlyCommandersMatterVehicles()) ||
+                     (isConventionalInfantry() && campaignOptions.isOnlyCommandersMatterInfantry()) ||
+                     (isBattleArmor() && campaignOptions.isOnlyCommandersMatterBattleArmor());
     }
 
     private void updateCrew(boolean isOnlyCommandersMatter) {
@@ -5048,19 +5047,12 @@ public class Unit implements ITechnology, ILocation {
             }
         }
 
-        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
-                                              (entity instanceof Tank || entity instanceof ConvFighter);
-        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
-                                              entity instanceof Infantry &&
-                                              !(entity instanceof BattleArmor);
-        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
-                                                 entity instanceof BattleArmor;
-        boolean commanderOnly = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
+        boolean onlyCommandersMatter = isOnlyCommandersMatter(campaignOptions);
 
         // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
         // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
         // TODO : Mobile structures, large naval support vehicles
-        if (!commanderOnly &&
+        if (!onlyCommandersMatter &&
                   (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
                          entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
                          entity.hasETypeFlag(Entity.ETYPE_TANK) ||
@@ -5143,7 +5135,7 @@ public class Unit implements ITechnology, ILocation {
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
-                setEdgeForCrew(crewSize, commanderOnly);
+                setEdgeForCrew(crewSize, onlyCommandersMatter);
             }
 
             // Reset the composite technician used by spacecraft and infantry
@@ -5182,7 +5174,7 @@ public class Unit implements ITechnology, ILocation {
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
-                setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), commanderOnly);
+                setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), onlyCommandersMatter);
             }
         }
     }
@@ -6325,6 +6317,8 @@ public class Unit implements ITechnology, ILocation {
             for (Person p : getCrew()) {
                 remove(p, true);
             }
+            // Release temp crew back to the available pool; MothballInfo already captured them.
+            tempPersonnelRoleMap.clear();
             resetPilotAndEntity();
         } else {
             // start maintenance cycle over again
@@ -7168,7 +7162,7 @@ public class Unit implements ITechnology, ILocation {
             part.setUnit(null);
 
             if (campaign != null) {
-                campaign.getWarehouse().removePart(part);
+                getWarehouse().removePart(part);
             }
         }
 
@@ -7214,6 +7208,13 @@ public class Unit implements ITechnology, ILocation {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    /**
+     * @return true if the unit is vehicle, otherwise false
+     */
+    public boolean isVehicle() {
+        return (getEntity() != null) && getEntity().isVehicle();
     }
 
     /**
@@ -8032,5 +8033,13 @@ public class Unit implements ITechnology, ILocation {
         }
     }
 
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
 
+    @Override
+    public Set<Unit> fetchUnitsAtLocation() {
+        return Set.of(this);
+    }
 }

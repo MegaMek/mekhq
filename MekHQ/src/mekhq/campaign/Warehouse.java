@@ -65,6 +65,12 @@ public class Warehouse implements ILocation {
 
     private final LocationNode locationNode = new LocationNode(this);
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
+    private final LocationNode locationNode = new LocationNode(this);
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
 
     @Override
     public LocationNode getLocationNode() {
@@ -129,6 +135,7 @@ public class Warehouse implements ILocation {
         boolean isNewPart = !parts.containsKey(part.getId());
 
         parts.put(part.getId(), part);
+        part.setParent(this);
 
         if (isNewPart) {
             MekHQ.triggerEvent(new PartNewEvent(part));
@@ -182,6 +189,7 @@ public class Warehouse implements ILocation {
         boolean didRemove = (parts.remove(part.getId()) != null);
 
         if (didRemove) {
+            part.setParent(null);
             MekHQ.triggerEvent(new PartRemovedEvent(part));
         }
 

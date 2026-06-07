@@ -66,6 +66,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.Academy;
@@ -177,7 +178,7 @@ public enum PersonnelTableModelColumn {
     QUICK_TRAIN_IGNORE("PersonnelTableModelColumn.QUICK_TRAIN_IGNORE.text"),
     SALVAGE_SUPERVISOR("PersonnelTableModelColumn.SALVAGE_SUPERVISOR.text"),
     SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
-    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
+    WANTS_CHILDREN("PersonnelTableModelColumn.WANTS_CHILDREN.text"),
     UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
     COVER_MEDICAL_EXPENSES("PersonnelTableModelColumn.COVER_MEDICAL_EXPENSES.text"),
     BLOCK_MATERNITY_LEAVE("PersonnelTableModelColumn.BLOCK_MATERNITY_LEAVE.text"),
@@ -190,6 +191,7 @@ public enum PersonnelTableModelColumn {
     BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
     FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
+    MODIFICATION_COUNT("PersonnelTableModelColumn.MODIFICATION_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
     LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
     HIGHEST_EDUCATION("PersonnelTableModelColumn.HIGHEST_EDUCATION.text"),
@@ -515,9 +517,7 @@ public enum PersonnelTableModelColumn {
         return this == DIVORCEABLE;
     }
 
-    public boolean isTryingToConceive() {
-        return this == TRYING_TO_CONCEIVE;
-    }
+    public boolean isWantsChildren() {return this == WANTS_CHILDREN;}
 
     public boolean isImmortal() {
         return this == IMMORTAL;
@@ -756,10 +756,9 @@ public enum PersonnelTableModelColumn {
                 yield scenario.getName();
             }
             case DESTINATION_NAME -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-                if (loc instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                AbstractLocation location = getPersonLocation(person);
+                if (location instanceof CurrentLocation cl
+                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var destination = cl.getJumpPath().getLastSystem();
                     LocationNode clNode = cl.getLocationNode();
                     if (clNode != null) {
@@ -769,10 +768,10 @@ public enum PersonnelTableModelColumn {
                                 yield base.getDisplayName();
                             }
                             if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
-                                LocationNode fixedLocNode = parent.getParent();
-                                if (fixedLocNode != null
-                                          && fixedLocNode.getLocatable() instanceof AbstractLocation campusLoc
-                                          && campusLoc.getCurrentSystem() == destination) {
+                                LocationNode fixedLocationNode = parent.getParent();
+                                if (fixedLocationNode != null
+                                          && fixedLocationNode.getLocatable() instanceof AbstractLocation campusLocation
+                                          && campusLocation.getCurrentSystem().equals(destination)) {
                                     yield campus.getAcademyName();
                                 }
                                 yield campaign.getName();
@@ -784,10 +783,9 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case DESTINATION_PLANET -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-                if (loc instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                AbstractLocation location = getPersonLocation(person);
+                if (location instanceof CurrentLocation cl
+                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var dest = cl.getJumpPath().getLastSystem();
                     if (dest != null) {
                         Planet planet = dest.getPrimaryPlanet();
@@ -797,10 +795,9 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case DESTINATION_SYSTEM -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-                if (loc instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && cl.getJumpPath().size() > 0) {
+                AbstractLocation location = getPersonLocation(person);
+                if (location instanceof CurrentLocation cl
+                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var dest = cl.getJumpPath().getLastSystem();
                     yield dest != null ? dest.getPrintableName(today) : "-";
                 }
@@ -839,6 +836,7 @@ public enum PersonnelTableModelColumn {
             case IMMORTAL -> resources.getString(person.getStatus().isDead() ? "NA.text"
                                                        : (convertBooleanToYesNo(person.isImmortal())));
             case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
+            case MODIFICATION_COUNT -> Integer.toString(person.getProstheticInjuries().size());
             case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
                                    ? Integer.toString(person.getInjuries().size())
                                    : Integer.toString(person.getHits());
@@ -848,10 +846,10 @@ public enum PersonnelTableModelColumn {
             case LAST_RANK_CHANGE_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
             case LEADERSHIP -> skillValue.apply(SkillType.S_LEADER);
             case LOCATION_NAME -> {
+                AbstractLocation location = getPersonLocation(person);
+                boolean isTraveling = location instanceof CurrentLocation cl
+                                            && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
                 LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-                boolean isTraveling = loc instanceof CurrentLocation cl
-                                            && cl.getJumpPath() != null && cl.getJumpPath().size() > 0;
                 if (node != null) {
                     LocationNode parent = node.getParent();
                     while (parent != null) {
@@ -868,12 +866,13 @@ public enum PersonnelTableModelColumn {
                     }
                 }
                 if (isTraveling) {
-                    CurrentLocation currentLoc = (CurrentLocation) loc;
-                    JumpPath path = currentLoc.getJumpPath();
-                    PlanetarySystem sys = currentLoc.getCurrentSystem();
-                    if (path.size() > 1 && currentLoc.isAtJumpPoint()) {
-                        double neededHours = sys.getRechargeTime(today, currentLoc.computeIsUseCommandCircuit(campaign));
-                        double remainingHours = neededHours - currentLoc.getRechargeTime();
+                    CurrentLocation currentLocation = (CurrentLocation) location;
+                    JumpPath path = currentLocation.getJumpPath();
+                    PlanetarySystem sys = currentLocation.getCurrentSystem();
+                    if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
+                        double neededHours = sys.getRechargeTime(today,
+                              currentLocation.computeIsUseCommandCircuit(campaign));
+                        double remainingHours = neededHours - currentLocation.getRechargeTime();
                         if (remainingHours > 0) {
                             int days = (int) Math.ceil(remainingHours / 24.0);
                             yield String.format(
@@ -883,12 +882,12 @@ public enum PersonnelTableModelColumn {
                         }
                         yield resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
                     } else if (path.size() == 1) {
-                        int days = (int) Math.ceil(currentLoc.getTransitTime());
+                        int days = (int) Math.ceil(currentLocation.getTransitTime());
                         yield String.format(
                               resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text"),
                               days);
                     } else {
-                        double daysToJP = sys.getTimeToJumpPoint(1.0) - currentLoc.getTransitTime();
+                        double daysToJP = sys.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
                         int days = (int) Math.ceil(daysToJP);
                         yield String.format(
                               resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text"),
@@ -898,19 +897,17 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case LOCATION_PLANET -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-                if (loc != null) {
-                    Planet planet = loc.getPlanet();
+                AbstractLocation location = getPersonLocation(person);
+                if (location != null) {
+                    Planet planet = location.getPlanet();
                     yield planet != null ? planet.getPrintableName(today) : "-";
                 }
                 yield "-";
             }
             case LOCATION_SYSTEM -> {
-                LocationNode node = person.getLocationNode();
-                AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-                if (loc != null) {
-                    var system = loc.getCurrentSystem();
+                AbstractLocation location = getPersonLocation(person);
+                if (location != null) {
+                    var system = location.getCurrentSystem();
                     yield system != null ? system.getPrintableName(today) : "-";
                 }
                 yield "-";
@@ -1010,10 +1007,8 @@ public enum PersonnelTableModelColumn {
             case TECH_VESSEL -> skillValue.apply(SkillType.S_TECH_VESSEL);
             case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
             case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
-            case TRYING_TO_CONCEIVE -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                                 person.getGender().isFemale() ?
-                                                                 (convertBooleanToYesNo(person.isTryingToConceive())) :
-                                                                 "NA.text");
+            case WANTS_CHILDREN -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
+                                                             convertBooleanToYesNo(person.isWantsChildren()));
             case UNDER_PROTECTION -> resources.getString(convertBooleanToYesNo(person.isUnderProtection()));
             case COVER_MEDICAL_EXPENSES ->
                   resources.getString(convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses()));
@@ -1103,6 +1098,11 @@ public enum PersonnelTableModelColumn {
             case XP -> Integer.toString(person.getXP());
             case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
         };
+    }
+
+    private static @Nullable AbstractLocation getPersonLocation(Person person) {
+        LocationNode node = person.getLocationNode();
+        return node != null ? node.getNearestAbstractLocation() : null;
     }
 
     private static String getAggregateSkillDisplay(Person person, PersonnelRole primaryProfession,
@@ -1249,6 +1249,13 @@ public enum PersonnelTableModelColumn {
                 return person.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
             case IMPLANT_COUNT:
                 return person.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+            case MODIFICATION_COUNT:
+                StringBuilder modificationCount = new StringBuilder("<html>");
+                for (Injury injury : person.getProstheticInjuries()) {
+                    modificationCount.append(injury.getName()).append("<br>");
+                }
+                modificationCount.append("</html>");
+                return modificationCount.toString();
             default:
                 return null;
         }
@@ -1463,7 +1470,7 @@ public enum PersonnelTableModelColumn {
                      PREFERS_MEN,
                      PREFERS_WOMEN,
                      COVER_MEDICAL_EXPENSES,
-                     TRYING_TO_CONCEIVE,
+                     WANTS_CHILDREN,
                      BLOCK_MATERNITY_LEAVE -> true;
                 default -> false;
             };
@@ -1533,6 +1540,7 @@ public enum PersonnelTableModelColumn {
                 case FATIGUE -> campaign.getCampaignOptions().isUseFatigue();
                 case SPA_COUNT -> campaign.getCampaignOptions().isUseAbilities();
                 case IMPLANT_COUNT -> campaign.getCampaignOptions().isUseImplants();
+                case MODIFICATION_COUNT -> campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
                 case LOYALTY -> campaign.getCampaignOptions().isUseLoyaltyModifiers() &&
                                       !campaign.getCampaignOptions().isUseHideLoyalty();
                 default -> false;
@@ -1589,6 +1597,7 @@ public enum PersonnelTableModelColumn {
                  BLOODMARK,
                  SPA_COUNT,
                  IMPLANT_COUNT,
+                 MODIFICATION_COUNT,
                  LOYALTY -> new IntegerStringSorter();
             case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE ->
                   new AttributeScoreSorter();

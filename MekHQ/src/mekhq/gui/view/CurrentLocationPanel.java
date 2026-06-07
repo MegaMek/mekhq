@@ -33,8 +33,6 @@
 
 package mekhq.gui.view;
 
-import static mekhq.campaign.CurrentLocation.getFormattedTextAt;
-import static mekhq.campaign.CurrentLocation.getTextAt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
@@ -45,7 +43,6 @@ import java.awt.Insets;
 import java.io.File;
 import java.time.LocalDate;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import megamek.common.Configuration;
@@ -54,65 +51,76 @@ import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.enums.HiringHallLevel;
-import mekhq.gui.baseComponents.VerticalFillImage;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.ScalingVerticalFillImage;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * A UI panel that displays the current location details.
  * <p>
- * Visually represents whether the player is currently on a planet, in transit, or at a jump point,
- * provides relevant planetary statistics (e.g. atmosphere, gravity, socio-industrial data) or
- * travel progress, and includes an entry point to the personnel market.
+ * Visually represents whether the player is currently on a planet, in transit, or at a jump point, provides relevant
+ * planetary statistics (e.g. atmosphere, gravity, socio-industrial data) or travel progress, and includes an entry
+ * point to the personnel market.
+ * </p>
+ * <p>
+ * This panel subscribes to the global event bus updates to stay synchronized with changes in the campaign's current
+ * location and transit status.
  * </p>
  */
-public class CurrentLocationPanel extends JPanel {
+public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
-    private static final int THIN_GAP = 2;
-    private static final int MEDIUM_GAP = 8;
     private static final File JUMP_SHIP_IMAGE = new File(Configuration.unitImagesDir(), "jumpships/invader.png");
 
     private final Campaign campaign;
 
     // UI components
-    private final VerticalFillImage imgLocation = new VerticalFillImage();
+    private final ScalingVerticalFillImage imgLocation = new ScalingVerticalFillImage();
     private final JLabel lblLocationPrimaryInfo = new JLabel();
     private final JLabel lblLocationSecondaryInfo = new JLabel();
-    private final RoundedJButton btnHiringHall = new RoundedJButton();
+    private final RoundedJButton btnRecruitment = new RoundedJButton();
 
     /**
-     * Constructs a new CurrentLocationPanel.
+     * Constructs a new {@code CurrentLocationPanel}.
      *
-     * @param campaign            the active {@link Campaign} instance
-     * @param openPersonnelMarket a {@link Runnable} that triggers the opening of the Personnel Market UI
+     * @param minWidth              the minimum enforced width of the panel in pixels
+     * @param maxWidth              the maximum enforced width of the panel in pixels
+     * @param iconMaxHeight         the maximum enforced height of the location image in pixels
+     * @param campaign              the active {@link Campaign} instance
+     * @param openRecruitmentDialog a {@link Runnable} that triggers the opening of the Recruitment Dialog UI
      */
-    public CurrentLocationPanel(Campaign campaign, Runnable openPersonnelMarket) {
-        super();
+    public CurrentLocationPanel(int minWidth, int maxWidth, int iconMaxHeight,
+          Campaign campaign, Runnable openRecruitmentDialog) {
+        super(minWidth, maxWidth);
         this.campaign = campaign;
 
         setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(0, THIN_GAP, 0, MEDIUM_GAP);
+        gridBagConstraints.insets = new Insets(0, CampaignGUI.THIN_GAP, 0, CampaignGUI.MEDIUM_GAP);
 
-        imgLocation.setMaxHeight(60);
+        imgLocation.setMaxHeight(iconMaxHeight);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 4;
@@ -125,6 +133,7 @@ public class CurrentLocationPanel extends JPanel {
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(0, 0, 0, CampaignGUI.SMALL_GAP);
         add(lblLocationPrimaryInfo, gridBagConstraints);
 
         gridBagConstraints.gridy++;
@@ -136,19 +145,20 @@ public class CurrentLocationPanel extends JPanel {
         gridBagConstraints.weighty = 1;
         add(new JLabel(), gridBagConstraints);
 
-        btnHiringHall.addActionListener(e -> openPersonnelMarket.run());
+        btnRecruitment.addActionListener(e -> openRecruitmentDialog.run());
+        btnRecruitment.setToolTipText(getTextAt("recruitment.tooltip"));
         gridBagConstraints.gridy++;
         gridBagConstraints.weighty = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        add(btnHiringHall, gridBagConstraints);
+        add(btnRecruitment, gridBagConstraints);
 
         refresh();
         MekHQ.registerHandler(this);
     }
 
     /**
-     * Updates the location title, dynamic images, planetary/transit info text, and the
-     * visibility and state of the Hiring Hall button based on the current location context.
+     * Updates the location title, dynamic images, planetary/transit info text, and the visibility and state of the
+     * Hiring Hall button based on the current location context.
      */
     private void refresh() {
         CampaignOptions options = campaign.getCampaignOptions();
@@ -167,30 +177,34 @@ public class CurrentLocationPanel extends JPanel {
         float scale = location.isAtJumpPoint() ? 1 : (float) (location.getPercentageTransit() * 1.3 + 0.1);
         imgLocation.setImage(locationImage, scale);
 
-        HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
-        if (hiringHallLevel.isNone()) {
-            btnHiringHall.setText(getTextAt("hiringHall.none"));
+        if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
+            // keep the legacy recruitment always available
+            btnRecruitment.setEnabled(true);
+            btnRecruitment.setText(getTextAt("recruitment.legacy"));
         } else {
-            btnHiringHall.setText(getFormattedTextAt("hiringHall.some",
-                  StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+            String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
+            btnRecruitment.setEnabled(availabilityMessage.isBlank());
+
+            HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
+            if (!availabilityMessage.isBlank()) {
+                btnRecruitment.setText(availabilityMessage);
+            } else if (hiringHallLevel.isNone()) {
+                btnRecruitment.setText(getTextAt("recruitment.hiringHall.none"));
+            } else {
+                btnRecruitment.setText(getFormattedTextAt("recruitment.hiringHall.some",
+                      StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+            }
         }
         if (location.isOnPlanet()) {
             lblLocationPrimaryInfo.setText(getPlanetaryConditionsInfo());
+            lblLocationPrimaryInfo.setToolTipText(getTextAt("info.atmosphere.tooltip"));
             lblLocationSecondaryInfo.setText(getSocioIndustrialInfo());
-            btnHiringHall.setVisible(true);
-            if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
-                btnHiringHall.setEnabled(!options.isUsePersonnelHireHiringHallOnly() || system.isHiringHall(date));
-            } else {
-                String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
-                btnHiringHall.setEnabled(availabilityMessage.isBlank());
-                if (!availabilityMessage.isBlank()) {
-                    btnHiringHall.setText(availabilityMessage);
-                }
-            }
+            lblLocationSecondaryInfo.setToolTipText(getTextAt("info.socioIndustrial.tooltip"));
         } else {
             lblLocationPrimaryInfo.setText(getCourseInfo());
+            lblLocationPrimaryInfo.setToolTipText(Strings.EMPTY);
             lblLocationSecondaryInfo.setText(getJumpCostInfo());
-            btnHiringHall.setVisible(false);
+            lblLocationSecondaryInfo.setToolTipText(Strings.EMPTY);
         }
     }
 
@@ -248,7 +262,7 @@ public class CurrentLocationPanel extends JPanel {
      *   <li>Temperature.</li>
      *   <li>Gravity.</li>
      * </ul>
-     *
+     * <p>
      * Each characteristic is colored dynamically based on the severity of the penalties it causes.
      *
      * @return a formatted HTML string representing the planetary conditions
@@ -306,8 +320,8 @@ public class CurrentLocationPanel extends JPanel {
     /**
      * Generates a description for the current travel course.
      *
-     * @return a formatted HTML string detailing the final destination system and remaining jumps,
-     * or an empty/fallback string if the player is not currently traveling.
+     * @return a formatted HTML string detailing the final destination system and remaining jumps, or an empty/fallback
+     *       string if the player is not currently traveling.
      */
     public String getCourseInfo() {
         JumpPath jumpPath = campaign.getCurrentLocation().getJumpPath();
@@ -324,7 +338,7 @@ public class CurrentLocationPanel extends JPanel {
      * Generates jump cost summary line.
      *
      * @return a formatted HTML string with remaining (or weekly average in case of traveling to a planet) jump cost,
-     *         information, or an empty string if not traveling
+     *       information, or an empty string if not traveling
      */
     public String getJumpCostInfo() {
         AbstractLocation location = campaign.getCurrentLocation();
@@ -345,6 +359,7 @@ public class CurrentLocationPanel extends JPanel {
     }
 
     // TODO: reuse the calculation logic from Maintenance::getTargetForMaintenance
+
     /**
      * Generates a status line detailing the socio-industrial conditions of the current planet.
      *
@@ -355,7 +370,7 @@ public class CurrentLocationPanel extends JPanel {
      *   <li>Raw material output.</li>
      *   <li>Total population.</li>
      * </ul>
-     *
+     * <p>
      * Each metric is color-coded based on its rating.
      *
      * @return a formatted HTML string containing the socio-industrial status
@@ -421,15 +436,30 @@ public class CurrentLocationPanel extends JPanel {
         return MHQOptions.convertFontColorToHexColor(color == null ? Color.WHITE : color);
     }
 
-    // Handle current location and travel status change events
+    private static String getFormattedTextAt(String key, Object... args) {
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
+    }
+
+    private static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
+    }
+
+    // ======================================
+    // Event handlers for UI synchronization
+    // ======================================
 
     @Subscribe
-    public void handleLocationChanged(LocationChangedEvent e) {
+    public void handle(LocationChangedEvent event) {
         refresh();
     }
 
     @Subscribe
-    public void handleTransitStatusChanged(TransitStatusChangedEvent e) {
+    public void handle(TransitStatusChangedEvent event) {
+        refresh();
+    }
+
+    @Subscribe
+    public void handle(MissionEvent event) {
         refresh();
     }
 
