@@ -112,7 +112,9 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     public boolean factionHasCensure(final String factionCode) {
-        return factionCensures.containsKey(factionCode);
+        FactionCensureLevel censureLevel = getCensureLevelForFaction(factionCode);
+        
+        return censureLevel.getSeverity() == MIN_CENSURE_SEVERITY;
     }
 
     /**
