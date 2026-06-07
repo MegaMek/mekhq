@@ -114,6 +114,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
+import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -1186,7 +1187,7 @@ public class PersonViewPanel extends JScrollablePanel {
                             // ...otherwise, dive on in to the system view!
                             gui.getMapTab().switchPlanetaryMap(person.getOriginPlanet());
                         }
-                        gui.setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
+                        gui.setSelectedTab(gui.getMapTab());
                     }
                 });
             } else {
@@ -2376,6 +2377,18 @@ public class PersonViewPanel extends JScrollablePanel {
             lblWealth.setToolTipText(wordWrap(resourceMap.getString("lblWealth.tooltip")));
         }
 
+        JLabel lblExtraIncome = null;
+        ExtraIncome extraIncome = person.getExtraIncome();
+        int traitLevel = extraIncome.getTraitLevel();
+        boolean isUseBetterExtraIncome = campaignOptions.isUseBetterExtraIncome();
+        Money incomeAmount = extraIncome.getMonthlyIncomeAdjusted(isUseBetterExtraIncome);
+        if (traitLevel != 0) {
+            String extraIncomeLabel = getFormattedTextAt(RESOURCE_BUNDLE, "lblExtraIncome.text",
+                  traitLevel, incomeAmount.toAmountString());
+            lblExtraIncome = new JLabel(extraIncomeLabel);
+            lblExtraIncome.setToolTipText(wordWrap(resourceMap.getString("lblExtraIncome.tooltip")));
+        }
+
         JLabel lblReputation = null;
         int baseReputation = person.getReputation();
         int adjustedReputation = person.getAdjustedReputation(campaignOptions.isUseAgeEffects(),
@@ -2517,6 +2530,9 @@ public class PersonViewPanel extends JScrollablePanel {
         }
         if (lblWealth != null) {
             components.add(lblWealth);
+        }
+        if (lblExtraIncome != null) {
+            components.add(lblExtraIncome);
         }
         if (lblReputation != null) {
             components.add(lblReputation);

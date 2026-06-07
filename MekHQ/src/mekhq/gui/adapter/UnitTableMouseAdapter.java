@@ -110,7 +110,6 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -497,18 +496,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         }
 
                         Campaign campaign = gui.getCampaign();
-                        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-                        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
-
-                        // We don't care about admin, doctor or tech settings, as they're not going to spawn here
-                        overrideSkills(false,
-                              false,
-                              false,
-                              campaign.getCampaignOptions().isUseArtillery(),
-                              useExtraRandomness,
-                              person,
-                              person.getPrimaryRole(),
-                              skillLevel);
+                        boolean checkVeterancyEligibility = true;
+                        overrideSkills(campaign, person, person.getPrimaryRole(), VETERAN, checkVeterancyEligibility);
                     }
                 }
             }
@@ -557,8 +546,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
-            ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(gui.getTabMain().getTabCount() - 1);
+            gui.getMekLabTab().loadUnit(selectedUnit);
+            gui.setSelectedTab(gui.getMekLabTab());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -1153,7 +1142,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                if (oneSelected && gui.hasTab(MHQTabType.MEK_LAB)) {
+                if (oneSelected) {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);

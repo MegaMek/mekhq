@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -145,7 +145,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     // region Constructors
     public RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
     }
     // endregion Constructors
@@ -459,13 +458,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
+            refreshAsTechPool();
             WarehouseTab warehouseTab = getCampaignGui().getWarehouseTab();
-            if (warehouseTab != null) {
-                warehouseTab.refreshOvertimeStatus();
-            }
+            warehouseTab.refreshAsTechPool();
+            warehouseTab.refreshOvertimeStatus();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -473,11 +471,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(btnOvertime, gridBagConstraints);
 
-        asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
-                                           getCampaign().getAsTechPoolMinutes() +
-                                           " (" +
-                                           getCampaign().getNumberAsTechs() +
-                                           " AsTechs)</html>");
+        asTechPoolLabel = new JLabel();
         asTechPoolLabel.setName("asTechPoolLabel");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -500,6 +494,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         add(pnlTutorial, BorderLayout.SOUTH);
 
         filterTechs();
+        refreshAsTechPool();
     }
 
     private RoundedJButton getBtnMRMSInstantAll() {
@@ -946,19 +941,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * @throws IllegalArgumentException if an invalid row index is provided to the selection methods. This exception is
      *                                  prevented by validating indices against updated row counts.
      */
-    public void refreshTechsList() {
+    private void refreshTechsList() {
         int selected = techTable.getSelectedRow();
         // Get all techs who have more than 0 minutes free, and sort by skill descending (elites at bottom)
         List<Person> techs = getCampaign().getTechs(true);
         techsModel.setData(techs);
         filterTechs();
 
-        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
-        }
-        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
-        asTechPoolLabel.setText(astechString);
+        refreshAsTechPool();
 
         // Ensuring valid row selection after refresh
         if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
@@ -984,6 +974,18 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         } else {
             techTable.clearSelection(); // Clear selection if there's no valid option
         }
+    }
+
+    /**
+     * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
+     */
+    public void refreshAsTechPool() {
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
+        if (getCampaign().isOvertimeAllowed()) {
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
+        }
+        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
+        asTechPoolLabel.setText(astechString);
     }
 
     /**

@@ -55,7 +55,7 @@ public class PersonIdReference extends Person {
     // endregion Constructors
 
     public static void fixPersonIdReferences(final Campaign campaign) {
-        for (final Person person : campaign.getPersonnel()) {
+        for (final Person person : campaign.getAllPersonnel()) {
             fixGenealogyReferences(campaign, person);
         }
     }

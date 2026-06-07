@@ -114,6 +114,8 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -164,7 +166,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Unit implements ITechnology {
+public class Unit implements ITechnology, ILocation {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
 
@@ -185,6 +187,7 @@ public class Unit implements ITechnology {
     private boolean salvaged;
     private UUID id;
     private String fluffName;
+    private LocationNode locationNode = new LocationNode(this);
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -4851,14 +4854,6 @@ public class Unit implements ITechnology {
 
     public void resetPilotAndEntity() {
         final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
-                                              (entity instanceof Tank || entity instanceof ConvFighter);
-        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
-                                              entity instanceof Infantry &&
-                                              !(entity instanceof BattleArmor);
-        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
-                                                 entity instanceof BattleArmor;
-        boolean isOnlyCommandersMatter = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
 
         // Reset transient data
         getCampaign().clearGameData(entity);
@@ -4870,7 +4865,7 @@ public class Unit implements ITechnology {
         entity.setStartingPos(START_NONE);
 
         // Update crew data
-        updateCrew(isOnlyCommandersMatter);
+        updateCrew(isOnlyCommandersMatter(campaignOptions));
 
         // commander can be null at this point, but that's ok because both of the following calls include null
         // handling built into their methods.
@@ -4883,6 +4878,12 @@ public class Unit implements ITechnology {
         if (campaignOptions.isUseAbilities() || campaignOptions.isUseEdge() || campaignOptions.isUseImplants()) {
             processUnitSPAs(commander);
         }
+    }
+
+    public boolean isOnlyCommandersMatter(CampaignOptions campaignOptions) {
+        return (isVehicle() && campaignOptions.isOnlyCommandersMatterVehicles()) ||
+                     (isConventionalInfantry() && campaignOptions.isOnlyCommandersMatterInfantry()) ||
+                     (isBattleArmor() && campaignOptions.isOnlyCommandersMatterBattleArmor());
     }
 
     private void updateCrew(boolean isOnlyCommandersMatter) {
@@ -5026,19 +5027,12 @@ public class Unit implements ITechnology {
             }
         }
 
-        boolean commanderOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles() &&
-                                              (entity instanceof Tank || entity instanceof ConvFighter);
-        boolean commanderOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry() &&
-                                              entity instanceof Infantry &&
-                                              !(entity instanceof BattleArmor);
-        boolean commanderOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor() &&
-                                                 entity instanceof BattleArmor;
-        boolean commanderOnly = commanderOnlyVehicles || commanderOnlyInfantry || commanderOnlyBattleArmor;
+        boolean onlyCommandersMatter = isOnlyCommandersMatter(campaignOptions);
 
         // For crew-served units, let's look at the abilities of the group. If more than half the crew (gunners
         // and pilots only, for spacecraft) have an ability, grant the benefit to the unit
         // TODO : Mobile structures, large naval support vehicles
-        if (!commanderOnly &&
+        if (!onlyCommandersMatter &&
                   (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT) ||
                          entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
                          entity.hasETypeFlag(Entity.ETYPE_TANK) ||
@@ -5121,7 +5115,7 @@ public class Unit implements ITechnology {
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
-                setEdgeForCrew(crewSize, commanderOnly);
+                setEdgeForCrew(crewSize, onlyCommandersMatter);
             }
 
             // Reset the composite technician used by spacecraft and infantry
@@ -5160,7 +5154,7 @@ public class Unit implements ITechnology {
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
             if (campaignOptions.isUseEdge()) {
-                setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), commanderOnly);
+                setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), onlyCommandersMatter);
             }
         }
     }
@@ -7094,7 +7088,7 @@ public class Unit implements ITechnology {
             part.setUnit(null);
 
             if (campaign != null) {
-                campaign.getWarehouse().removePart(part);
+                getWarehouse().removePart(part);
             }
         }
 
@@ -7140,6 +7134,13 @@ public class Unit implements ITechnology {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    /**
+     * @return true if the unit is vehicle, otherwise false
+     */
+    public boolean isVehicle() {
+        return (getEntity() != null) && getEntity().isVehicle();
     }
 
     /**
@@ -7958,5 +7959,13 @@ public class Unit implements ITechnology {
         }
     }
 
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
 
+    @Override
+    public Set<Unit> fetchUnitsAtLocation() {
+        return Set.of(this);
+    }
 }

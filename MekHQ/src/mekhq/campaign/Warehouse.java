@@ -49,6 +49,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartNewEvent;
 import mekhq.campaign.events.parts.PartRemovedEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -57,10 +59,16 @@ import mekhq.utilities.MHQXMLUtility;
 /**
  * Stores parts for a Campaign.
  */
-public class Warehouse {
+public class Warehouse implements ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Warehouse.class);
 
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
+    private final LocationNode locationNode = new LocationNode(this);
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
 
     /**
      * Adds a part to the warehouse.
@@ -115,6 +123,7 @@ public class Warehouse {
         boolean isNewPart = !parts.containsKey(part.getId());
 
         parts.put(part.getId(), part);
+        part.setParent(this);
 
         if (isNewPart) {
             MekHQ.triggerEvent(new PartNewEvent(part));
@@ -168,6 +177,7 @@ public class Warehouse {
         boolean didRemove = (parts.remove(part.getId()) != null);
 
         if (didRemove) {
+            part.setParent(null);
             MekHQ.triggerEvent(new PartRemovedEvent(part));
         }
 
