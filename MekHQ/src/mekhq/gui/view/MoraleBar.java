@@ -71,6 +71,25 @@ public class MoraleBar extends JComponent {
     private static final int FADED_ALPHA = 55;
     private static final int BORDER_ALPHA = 60;
 
+    /**
+     * Anchor colors for the morale gradient, ordered from the most favourable
+     * morale for the player (deep green) to the
+     * most dangerous (deep red). The colors are deliberately deep and well
+     * separated so that adjacent segments remain
+     * easy to tell apart. Segment colors are interpolated across these anchors, so
+     * the gauge works for any number of
+     * morale levels.
+     */
+    private static final Color[] MORALE_GRADIENT = {
+            new Color(0x12, 0x7C, 0x1E), // deep green - most favourable for the player
+            new Color(0x36, 0xB3, 0x2B), // green
+            new Color(0x8C, 0xC6, 0x1A), // lime
+            new Color(0xE8, 0xC4, 0x0A), // gold
+            new Color(0xF2, 0x86, 0x00), // orange
+            new Color(0xD2, 0x44, 0x10), // red-orange
+            new Color(0xA8, 0x12, 0x12) // deep red - most dangerous for the player
+    };
+
     private AtBMoraleLevel moraleLevel;
 
     /**
@@ -156,18 +175,41 @@ public class MoraleBar extends JComponent {
     }
 
     /**
-     * Computes the fixed gradient color for the segment at the given index,
-     * interpolating the hue from green (favorable
-     * for the player) at the lowest morale to red (dangerous for the player) at the
-     * highest.
+     * Computes the color for the segment at the given index by interpolating across
+     * the deep, well-separated
+     * {@link #MORALE_GRADIENT} anchors, from green (favorable for the player) at
+     * the lowest morale to red (dangerous
+     * for the player) at the highest.
      *
      * @param index the zero-based segment index, from lowest to highest morale
      *
      * @return the color for the segment
      */
     private static Color segmentColor(final int index) {
-        final float fraction = (SEGMENT_COUNT <= 1) ? 0f : (float) index / (SEGMENT_COUNT - 1);
-        final float hue = (120f * (1f - fraction)) / 360f; // 120 degrees (green) down to 0 degrees (red)
-        return Color.getHSBColor(hue, 0.85f, 0.80f);
+        if (SEGMENT_COUNT <= 1) {
+            return MORALE_GRADIENT[0];
+        }
+
+        final float fraction = (float) index / (SEGMENT_COUNT - 1);
+        final float scaled = fraction * (MORALE_GRADIENT.length - 1);
+        final int lower = (int) Math.floor(scaled);
+        final int upper = Math.min(lower + 1, MORALE_GRADIENT.length - 1);
+        return interpolate(MORALE_GRADIENT[lower], MORALE_GRADIENT[upper], scaled - lower);
+    }
+
+    /**
+     * Linearly interpolates between two colors.
+     *
+     * @param from the color at {@code t == 0}
+     * @param to   the color at {@code t == 1}
+     * @param t    the interpolation factor, in the range {@code [0, 1]}
+     *
+     * @return the interpolated color
+     */
+    private static Color interpolate(final Color from, final Color to, final float t) {
+        final int red = Math.round(from.getRed() + (to.getRed() - from.getRed()) * t);
+        final int green = Math.round(from.getGreen() + (to.getGreen() - from.getGreen()) * t);
+        final int blue = Math.round(from.getBlue() + (to.getBlue() - from.getBlue()) * t);
+        return new Color(red, green, blue);
     }
 }
