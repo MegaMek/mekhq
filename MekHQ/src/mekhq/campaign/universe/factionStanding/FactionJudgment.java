@@ -113,7 +113,7 @@ public class FactionJudgment {
      */
     public boolean factionHasCensure(final String factionCode) {
         FactionCensureLevel censureLevel = getCensureLevelForFaction(factionCode);
-        
+
         return censureLevel.getSeverity() == MIN_CENSURE_SEVERITY;
     }
 
@@ -175,7 +175,6 @@ public class FactionJudgment {
             CensureEntry censureEntry = entry.getValue();
 
             if (censureEntry.hasExpired(today)) {
-                FactionCensureLevel oldLevel = censureEntry.level();
                 decreaseCensureForFaction(factionCode, today);
                 Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
                 String factionName = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.faction");
