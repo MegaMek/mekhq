@@ -575,6 +575,10 @@ public class CampaignGUI extends JPanel {
         return (RepairTab) getTab(MHQTabType.REPAIR_BAY);
     }
 
+    public @Nullable HangarTab getHangarTab() {
+        return (HangarTab) getTab(MHQTabType.HANGAR);
+    }
+
     public boolean hasTab(MHQTabType tabType) {
         return standardTabs.containsKey(tabType);
     }

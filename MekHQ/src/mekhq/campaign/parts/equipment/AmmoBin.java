@@ -53,13 +53,11 @@ import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
-import megamek.common.equipment.WeaponMounted;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Jumpship;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
-import megamek.common.weapons.Weapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -432,7 +430,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         super.remove(salvage);
 
         // We don't keep around ammo bins anymore
-        getCampaign().getWarehouse().removePart(this);
+        getWarehouse().removePart(this);
     }
 
     @Override

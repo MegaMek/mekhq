@@ -1170,7 +1170,8 @@ public class Utilities {
      * @param table the table to save to csv
      * @param file  the file to save to
      *
-     * @return a csv formatted export of the table
+     * @return a report summarizing how many rows were written if the operation succeeded
+     *         or an error report otherwise
      */
     public static String exportTableToCSV(JTable table, File file) {
         TableModel model = table.getModel();

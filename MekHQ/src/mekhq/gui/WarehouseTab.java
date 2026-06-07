@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -40,10 +41,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -109,6 +113,7 @@ import mekhq.service.enums.MRMSMode;
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     // parts filter groups
     private static final int SG_ALL = 0;
@@ -143,6 +148,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private JLabel asTechPoolLabel;
     private JComboBox<String> choiceParts;
     private JComboBox<String> choicePartsView;
+    private JTextField txtPartsSearch;
 
     private PartsTableModel partsModel;
     private TechTableModel techsModel;
@@ -233,7 +239,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         choicePartsView.setSelectedIndex(0);
         choicePartsView.addActionListener(ev -> filterParts());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -243,7 +249,45 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panSupplies.add(choicePartsView, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 0);
+        panSupplies.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "lblPartsSearch.text")), gridBagConstraints);
+
+        txtPartsSearch = new JTextField(15);
+        txtPartsSearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "txtPartsSearch.tooltip"));
+        txtPartsSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                filterParts();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                filterParts();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                filterParts();
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panSupplies.add(txtPartsSearch, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -253,9 +297,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panSupplies.add(btnPartsReport, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0; // expand for layout padding
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -263,7 +307,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panSupplies.add(btnMassRepair, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridx = 9;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0; // expand for layout padding
         gridBagConstraints.weighty = 0.0;
@@ -300,7 +344,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridwidth = 10;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -400,9 +444,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
+            refreshAsTechPool();
             RepairTab repairBayTab = getCampaignGui().getRepairBayTab();
             if (repairBayTab != null) {
                 repairBayTab.refreshOvertimeStatus();
+                repairBayTab.refreshAsTechPool();
             }
         });
         gridBagConstraints = new GridBagConstraints();
@@ -412,12 +458,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelDoTask.add(btnOvertime, gridBagConstraints);
 
-        asTechPoolLabel = new JLabel("<html><b>AsTech Pool Minutes:</> " +
-                                           getCampaign().getAsTechPoolMinutes() +
-                                           " (" +
-                                           getCampaign().getNumberAsTechs() +
-                                           " AsTechs)</html>");
-        asTechPoolLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        asTechPoolLabel = new JLabel();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -435,6 +476,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
         add(pnlTutorial, BorderLayout.SOUTH);
+
+        refreshAsTechPool();
     }
 
     /**
@@ -542,7 +585,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 } else if (nGroupView == SV_DAMAGED) {
                     inView = part.needsFixing();
                 }
-                return (inGroup && inView);
+
+                String searchText = txtPartsSearch.getText().trim();
+                String searchTextAsLowerCase = searchText.toLowerCase(Locale.ROOT);
+
+                String partNameAsLowerCase = part.getName().toLowerCase(Locale.ROOT);
+
+                boolean inSearch = searchText.isEmpty() || partNameAsLowerCase.contains(searchTextAsLowerCase);
+
+                return (inGroup && inView && inSearch);
             }
         };
         partsSorter.setRowFilter(partsTypeFilter);
@@ -654,16 +705,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
     }
 
-    public void refreshTechsList() {
+    private void refreshTechsList() {
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
         techsModel.setData(getCampaign().getTechs(true));
-        String astechString = "<html><b>AsTech Pool Minutes:</> " + getCampaign().getAsTechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
-        }
-        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
-        refreshAsTechPool(astechString);
+        refreshAsTechPool();
 
         // If requested, switch to top entry
         if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech()) &&
@@ -679,6 +725,18 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 }
             }
         }
+    }
+
+    /**
+     * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
+     */
+    public void refreshAsTechPool() {
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
+        if (getCampaign().isOvertimeAllowed()) {
+            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
+        }
+        astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
+        asTechPoolLabel.setText(astechString);
     }
 
     /**
@@ -759,10 +817,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return null;
         }
         return partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
-    }
-
-    public void refreshAsTechPool(String astechString) {
-        asTechPoolLabel.setText(astechString);
     }
 
     private final ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);

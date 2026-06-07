@@ -55,6 +55,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.universe.Atmosphere;
@@ -454,6 +455,11 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
 
     @Subscribe
     public void handle(TransitStatusChangedEvent event) {
+        refresh();
+    }
+
+    @Subscribe
+    public void handle(MissionEvent event) {
         refresh();
     }
 

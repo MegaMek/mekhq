@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -41,10 +42,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -97,6 +101,7 @@ import mekhq.gui.view.UnitViewPanel;
  */
 public final class HangarTab extends CampaignGuiTab {
     private static final MMLogger LOGGER = MMLogger.create(HangarTab.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     public static final int UNIT_VIEW_WIDTH = 600;
 
@@ -113,6 +118,7 @@ public final class HangarTab extends CampaignGuiTab {
     private JTable unitTable;
     private JComboBox<String> choiceUnit;
     private JComboBox<String> choiceUnitView;
+    private JTextField txtUnitSearch;
     private JCheckBox chkHideMothballed;
     private JButton btnAssignTechs;
     private JScrollPane scrollUnitView;
@@ -206,16 +212,52 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 10, 0, 0);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "lblUnitSearch.text")), gridBagConstraints);
+
+        txtUnitSearch = new JTextField(15);
+        txtUnitSearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "lblUnitSearch.tooltip"));
+        txtUnitSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                filterUnits();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                filterUnits();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                filterUnits();
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(txtUnitSearch, gridBagConstraints);
 
         btnAssignTechs = new RoundedJButton(resourceMap.getString("btnAssignTechs.text"));
         btnAssignTechs.setToolTipText(resourceMap.getString("btnAssignTechs.toolTipText"));
         btnAssignTechs.addActionListener(ev -> quickAssignTechs());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
@@ -279,7 +321,7 @@ public final class HangarTab extends CampaignGuiTab {
         splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -346,11 +388,22 @@ public final class HangarTab extends CampaignGuiTab {
     public void filterUnits() {
         final int nGroup = choiceUnit.getSelectedIndex() - 1;
         final boolean hideMothballed = chkHideMothballed.isSelected();
+        final String searchText = txtUnitSearch.getText().trim().toLowerCase(Locale.ROOT);
+
         RowFilter<UnitTableModel, Integer> unitTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends UnitTableModel, ? extends Integer> entry) {
                 UnitTableModel unitModel = entry.getModel();
                 Unit unit = unitModel.getUnit(entry.getIdentifier());
+
+                // Search filter
+                String unitName = unit.getName();
+                unitName = unitName + unit.getTypeDisplayableNameWithOmni();
+                unitName = unitName.toLowerCase(Locale.ROOT);
+
+                if (!searchText.isEmpty() && !unitName.contains(searchText)) {
+                    return false;
+                }
 
                 // Apply "Hide Mothballed" checkbox filter first
                 if (hideMothballed && unit.isMothballed()) {
