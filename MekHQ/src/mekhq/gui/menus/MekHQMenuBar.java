@@ -34,6 +34,34 @@
 
 package mekhq.gui.menus;
 
+import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.xml.parsers.DocumentBuilder;
+
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.CopySystemDataAction;
@@ -57,6 +85,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -84,9 +113,6 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.CampaignGuiTab;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.GUI;
-import mekhq.gui.HangarTab;
-import mekhq.gui.PersonnelTab;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -101,33 +127,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.xml.parsers.DocumentBuilder;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 
 public class MekHQMenuBar extends JMenuBar {
 
@@ -230,7 +229,7 @@ public class MekHQMenuBar extends JMenuBar {
             // Unregister event handlers for CampaignGUI and tabs
             for (int i = 0; i < getTabMain().getTabCount(); i++) {
                 if (getTabMain().getComponentAt(i) instanceof CampaignGuiTab) {
-                    ((CampaignGuiTab) getTabMain().getComponentAt(i)).disposeTab();
+                    ((CampaignGuiTab) getTabMain().getComponentAt(i)).deactivateTab();
                 }
             }
             MekHQ.unregisterHandler(this);
@@ -357,51 +356,17 @@ public class MekHQMenuBar extends JMenuBar {
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text"));
         miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
-        miExportPersonCSV.addActionListener(evt -> {
-            try {
-                exportPersonnel(FileType.CSV,
-                      resourceMap.getString("dlgSavePersonnelCSV.text"),
-                      getCampaign().getLocalDate()
-                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())) + "_ExportedPersonnel");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
+        miExportPersonCSV.addActionListener(evt -> exportPersonnel());
         miExportCSVFile.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text"));
         miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
-        miExportUnitCSV.addActionListener(evt -> {
-            try {
-                exportUnits(FileType.CSV,
-                      resourceMap.getString("dlgSaveUnitsCSV.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedUnits");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
+        miExportUnitCSV.addActionListener(evt -> exportUnits());
         miExportCSVFile.add(miExportUnitCSV);
 
         JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
         miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
-        miExportFinancesCSV.addActionListener(evt -> {
-            try {
-                exportFinances(FileType.CSV,
-                      resourceMap.getString("dlgSaveFinancesCSV.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedFinances");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
+        miExportFinancesCSV.addActionListener(evt -> exportFinances());
         miExportCSVFile.add(miExportFinancesCSV);
 
         menuExport.add(miExportCSVFile);
@@ -1054,132 +1019,45 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * Exports Personnel to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
+     * Exports Personnel to a CSV file.
      */
-    protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-        if (((PersonnelTab) getGui().getTab(MHQTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
-            GUI.fileDialogSave(getFrame(),
-                  dialogTitle,
-                  format,
-                  MekHQ.getPersonnelDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getPersonnelDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = Utilities.exportTableToCSV(
-                          ((PersonnelTab) getGui().getTab(MHQTabType.PERSONNEL)).getPersonnelTable(), file);
-                } else {
-                    report = "Unsupported FileType in Export Personnel";
-                }
-                JOptionPane.showMessageDialog(getFrame(), report);
-            });
-        } else {
+    private void exportPersonnel() {
+        JTable table = getGui().getPersonnelTab().getPersonnelTable();
+        if (table.getRowCount() == 0) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoPersonnel.text"));
+            return;
         }
+        FileDialogs.savePersonnelCSV(getFrame(), getCampaign())
+              .map(file -> Utilities.exportTableToCSV(table, file))
+              .ifPresent(status -> JOptionPane.showMessageDialog(getFrame(), status));
     }
 
     /**
-     * Exports Units to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
+     * Exports Units to a CSV file.
      */
-    protected void exportUnits(FileType format, String dialogTitle, String filename) {
-        if (((HangarTab) getGui().getTab(MHQTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
-            GUI.fileDialogSave(getFrame(),
-                  dialogTitle,
-                  format,
-                  MekHQ.getUnitsDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getUnitsDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = Utilities.exportTableToCSV(
-                          ((HangarTab) getGui().getTab(MHQTabType.HANGAR)).getUnitTable(), file);
-                } else {
-                    report = "Unsupported FileType in Export Units";
-                }
-                JOptionPane.showMessageDialog(getFrame(), report);
-            });
-        } else {
+    private void exportUnits() {
+        JTable table = getGui().getHangarTab().getUnitTable();
+        if (table.getRowCount() == 0) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoUnits.text"));
+            return;
         }
+        FileDialogs.saveUnitsCSV(getFrame(), getCampaign())
+              .map(file -> Utilities.exportTableToCSV(table, file))
+              .ifPresent(status -> JOptionPane.showMessageDialog(getFrame(), status));
     }
 
     /**
-     * Exports Finances to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
+     * Exports Finances to a CSV file.
      */
-    protected void exportFinances(FileType format, String dialogTitle, String filename) {
-        if (!getCampaign().getFinances().getTransactions().isEmpty()) {
-            GUI.fileDialogSave(getFrame(),
-                  dialogTitle,
-                  format,
-                  MekHQ.getFinancesDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getFinancesDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = getCampaign().getFinances()
-                                   .exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
-                } else {
-                    report = "Unsupported FileType in Export Finances";
-                }
-                JOptionPane.showMessageDialog(getFrame(), report);
-            });
-        } else {
+    private void exportFinances() {
+        Finances finances = getCampaign().getFinances();
+        if (finances.getTransactions().isEmpty()) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoFinances.text"));
+            return;
         }
-    }
-
-
-    /**
-     * Checks if a file already exists, if so it makes a backup copy.
-     *
-     * @param file to determine if there is an existing file with that name
-     * @param path path to the file
-     */
-    private void checkToBackupFile(File file, String path) {
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
-    }
-
-    /**
-     * Checks to make sure the file has the appropriate ending / extension.
-     *
-     * @param file   the file to check
-     * @param format proper format for the ending/extension
-     *
-     * @return File with the appropriate ending/ extension
-     */
-    private File checkFileEnding(File file, String format) {
-        String path = file.getPath();
-        if (!path.endsWith('.' + format)) {
-            path += '.' + format;
-            file = new File(path);
-        }
-        return file;
+        FileDialogs.saveFinancesCSV(getFrame(), getCampaign())
+              .map(file -> finances.exportFinancesToCSV(file.getPath(), FileType.CSV.getRecommendedExtension()))
+              .ifPresent(status -> JOptionPane.showMessageDialog(getFrame(), status));
     }
 
     protected void loadListFile(final boolean allowNewPilots) {
@@ -1336,7 +1214,7 @@ public class MekHQMenuBar extends JMenuBar {
         for (int i = 0; i < getTabMain().getTabCount(); i++) {
             Component tab = getTabMain().getComponentAt(i);
             if (tab instanceof CampaignGuiTab) {
-                ((CampaignGuiTab) tab).disposeTab();
+                ((CampaignGuiTab) tab).deactivateTab();
             }
         }
 

@@ -5575,12 +5575,12 @@ public class Campaign implements ITechManager, IPlace {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
-        for (AbstractLocation loc : locations) {
+        for (AbstractLocation location : locations) {
             // Skip locations parented to another node — they are serialized inside their parent's XML.
-            if (loc.getLocationNode().getParent() != null) {
+            if (location.getLocationNode().getParent() != null) {
                 continue;
             }
-            loc.writeToXML(writer, indent);
+            location.writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
         locationNode.writeToXML(writer, indent);
