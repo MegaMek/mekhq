@@ -766,16 +766,16 @@ public class InterstellarMapPanel extends JPanel {
                         if (system.equals(InterstellarMapPanel.this.campaign.getCurrentSystem())) {
                             // let's try rings
                             g2.setPaint(Color.ORANGE);
-                            arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
+                            arc.setArcByCenter(x, y, size * 3.4, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                             g2.setPaint(Color.BLACK);
-                            arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                            arc.setArcByCenter(x, y, size * 2.9, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                             g2.setPaint(Color.ORANGE);
-                            arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
+                            arc.setArcByCenter(x, y, size * 2.4, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                             g2.setPaint(Color.BLACK);
-                            arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
+                            arc.setArcByCenter(x, y, size * 1.9, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
                         if ((null != selectedSystem) && selectedSystem.equals(system)) {
@@ -1366,8 +1366,8 @@ public class InterstellarMapPanel extends JPanel {
      */
 
     /**
-    * Opens the GM-only planetary system editor pre-selected on the given system. Refreshes and repaints the map after
-    * the dialog closes so saved planetary overrides are drawn from the campaign overlay.
+     * Opens the GM-only planetary system editor pre-selected on the given system. Refreshes and repaints the map after
+     * the dialog closes so saved planetary overrides are drawn from the campaign overlay.
      */
     private void openPlanetarySystemEditor(PlanetarySystem system) {
         if ((system == null) || !campaign.isGM()) {
