@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.stratCon;
 
+import static mekhq.campaign.personnel.skills.SkillType.S_SENSOR_OPERATIONS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,22 +44,16 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
+import megamek.common.TargetRollModifier;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
@@ -70,19 +65,29 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
+import mekhq.utilities.EntityUtilities;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * Tests for {@link StratConRulesManager}
@@ -161,9 +166,9 @@ class StratConRulesManagerTest {
         ScenarioTemplate template = mock(ScenarioTemplate.class);
         StratConFacility facility = new StratConFacility();
 
-        try (MockedStatic<StratConScenarioFactory> scenarioFactory = Mockito.mockStatic(StratConScenarioFactory.class);
-              MockedStatic<StratConFacilityFactory> facilityFactory = Mockito.mockStatic(StratConFacilityFactory.class);
-              MockedStatic<StratConRulesManager> rulesManager = Mockito.mockStatic(StratConRulesManager.class,
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConFacilityFactory> facilityFactory = mockStatic(StratConFacilityFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
                     CALLS_REAL_METHODS)) {
             scenarioFactory.when(() -> StratConScenarioFactory.getSpecificScenario("objective-template.xml"))
                   .thenReturn(template);
@@ -225,8 +230,8 @@ class StratConRulesManagerTest {
         facility.setOwner(ScenarioForceTemplate.ForceAlignment.Allied);
         track.addFacility(coords, facility);
 
-        try (MockedStatic<StratConScenarioFactory> scenarioFactory = Mockito.mockStatic(StratConScenarioFactory.class);
-              MockedStatic<StratConRulesManager> rulesManager = Mockito.mockStatic(StratConRulesManager.class,
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
                     CALLS_REAL_METHODS)) {
             scenarioFactory.when(() -> StratConScenarioFactory.getFacilityScenario(true)).thenReturn(null);
 
@@ -454,7 +459,7 @@ class StratConRulesManagerTest {
         Set<Integer> forceIDs = new LinkedHashSet<>(List.of(42));
 
         try (MockedStatic<StratConRulesManager> mockedManager =
-                   Mockito.mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
+                   mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
             // Mock setupScenario to return our controlled Official Challenge scenario
             mockedManager.when(() -> StratConRulesManager.setupScenario(
                   any(), any(), any(), any(), any(), any(), anyBoolean(), any()
@@ -496,7 +501,7 @@ class StratConRulesManagerTest {
         Set<Integer> forceIDs = new LinkedHashSet<>(List.of(42));
 
         try (MockedStatic<StratConRulesManager> mockedManager =
-                   Mockito.mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
+                   mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
             mockedManager.when(() -> StratConRulesManager.setupScenario(
                   any(), any(), any(), any(), any(), any(), anyBoolean(), any()
             )).thenReturn(mockScenario);
@@ -660,5 +665,252 @@ class StratConRulesManagerTest {
               (Campaign) mocks[2], MapLocation.AllGroundTerrain);
 
         assertFalse(result);
+    }
+
+    @Nested
+    class ScoutingRules {
+
+        @BeforeAll
+        static void beforeAll() {
+            SkillType.initializeTypes();
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "20.0, 0", "55.0, 0", "55.1, 2", "75.0, 2", "75.1, 4", "100.0, 4", "100.1, 6", "150.0, 6" })
+        void testGetUnitWeightModifier(double weight, int expectedModifier) {
+            TargetRollModifier modifier = StratConRulesManager.getUnitWeightModifier(weight);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Unit Weight Modifier", modifier.description());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "0, 1", "3, 1", "4, 0", "7, 0", "8, -1", "15, -1" })
+        void testGetUnitSpeedModifier(int speed, int expectedModifier) {
+            TargetRollModifier modifier = StratConRulesManager.getUnitSpeedModifier(speed);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Unit Speed Modifier", modifier.description());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true, -1", "false, 0" })
+        void testGetUnitEquipmentModifier(boolean hasSensorEquipment, int expectedModifier) {
+            TargetRollModifier modifier = StratConRulesManager.getUnitEquipmentModifier(hasSensorEquipment);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Unit Sensor Equipment Modifier", modifier.description());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "false, false, 0", "true, false, -1",  "false, true, 0",  "true, true, 0" })
+        void testGetScoutComplementarySPAModifier(boolean hasEagleEyes, boolean hasSensorEquipment,
+              int expectedModifier) {
+            TargetRollModifier modifier =
+                  StratConRulesManager.getScoutComplementarySPAModifier(hasEagleEyes, hasSensorEquipment);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Scout Complementary SPA Modifier", modifier.description());
+        }
+
+        @Test
+        void testGetAllScoutRollModifiers() {
+            // 60t (weight mod: 2), speed 8 (speed mod: -1)
+            // has sensor quipment (equip mod: -1), Eagle Eyes (SPA mod: 0 since it doesn't stack)
+            List<TargetRollModifier> modifiers = StratConRulesManager.getAllScoutRollModifiers(60, 8, true, true);
+
+            assertEquals(4, modifiers.size());
+            assertEquals(2, modifiers.get(0).value());  // weight
+            assertEquals(-1, modifiers.get(1).value()); // speed
+            assertEquals(-1, modifiers.get(2).value()); // equipment
+            assertEquals(0, modifiers.get(3).value());  // SPA
+        }
+
+        @Test
+        void testBuildScoutMap_NullFormation() {
+            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(
+                  null, mock(Hangar.class), mock(CampaignOptions.class));
+            assertNotNull(scouts);
+            assertTrue(scouts.isEmpty());
+        }
+
+        @Test
+        void testBuildScoutMap_SingleCrewMember() {
+            Person person = mockPerson(4, true);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person), 45, 5, true, false);
+
+            assertEquals(person, bestScout.scout());
+            assertEquals(S_SENSOR_OPERATIONS, bestScout.bestScoutSkillName());
+            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(45.0, bestScout.unitWeight());
+            assertEquals(5, bestScout.unitSpeed());
+            assertTrue(bestScout.scoutHasEagleEyes());
+            assertTrue(bestScout.unitHasSensorEquipment());
+        }
+
+        @Test
+        void testBuildScoutMap_Sorting_EqualTN() {
+            Person person1 = mockPerson(1, false);
+            Person person2 = mockPerson(1, false);
+            Person person3 = mockPerson(1, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person1, person2, person3), 45, 5, false, false);
+            assertEquals(person1, bestScout.scout()); // choose first
+        }
+
+        @Test
+        void testBuildScoutMap_Sorting_DifferentTNs() {
+            Person person1 = mockPerson(3, false);
+            Person person2 = mockPerson(2, false);
+            Person person3 = mockPerson(1, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person1, person2, person3), 45, 5, false, false);
+            assertEquals(person3, bestScout.scout()); // choose highest
+        }
+
+        @Test
+        void testBuildScoutMap_UnitSorting() {
+            Person person1 = mockPerson(3, false);
+            Person person2 = mockPerson(1, false);
+            Person person3 = mockPerson(2, false);
+            List<ScoutRecord> bestScouts = getBestScoutsForUnits(List.of(person1, person2, person3), false, false);
+            // sort according to TNs
+            assertEquals(3, bestScouts.size());
+            assertEquals(person2, bestScouts.get(0).scout());
+            assertEquals(person3, bestScouts.get(1).scout());
+            assertEquals(person1, bestScouts.get(2).scout());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_NoEagleEyes() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, false);
+            assertEquals(4, bestScout.targetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, false);
+            assertEquals(3, bestScout.targetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_AP() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, true);
+            assertEquals(3, bestScout.targetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_IS() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, true, false);
+            assertEquals(3, bestScout.targetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_IS_AP() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, true, true);
+            assertEquals(3, bestScout.targetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_UnitSpeed() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 9, false, false);
+            assertEquals(3, bestScout.targetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_EmptyCrewSkipsUnit() {
+            Formation formation = mock(Formation.class);
+            Hangar hangar = mock(Hangar.class);
+            Unit unit = mock(Unit.class);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(new ArrayList<>());
+
+            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(
+                  formation, hangar, mock(CampaignOptions.class));
+            assertTrue(scouts.isEmpty());
+        }
+
+        private Person mockPerson(int sensorOperationsSkill, boolean hasEagleEye) {
+            Person person = mock(Person.class);
+            PersonnelOptions options = mock(PersonnelOptions.class);
+            Skill skill = mock(Skill.class);
+            SkillModifierData skillModData = mock(SkillModifierData.class);
+
+            when(person.hasSkill(S_SENSOR_OPERATIONS)).thenReturn(true);
+            when(person.getSkill(S_SENSOR_OPERATIONS)).thenReturn(skill);
+            when(person.getSkillModifierData()).thenReturn(skillModData);
+            when(person.getSkillModifierData(anyBoolean())).thenReturn(skillModData);
+            when(person.getSkillModifierData(
+                  anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(skillModData);
+            when(person.getSkillModifierData(
+                  anyBoolean(), anyBoolean(), any(LocalDate.class), anyBoolean())).thenReturn(skillModData);
+            when(skill.getFinalSkillValue(skillModData)).thenReturn(sensorOperationsSkill);
+            when(person.getOptions()).thenReturn(options);
+            when(options.booleanOption(OptionsConstants.MISC_EAGLE_EYES)).thenReturn(hasEagleEye);
+
+            return person;
+        }
+
+        /**
+         * Mocks a single unit with multiple crew members and gets the best scout
+         */
+        private ScoutRecord getBestScoutForUnit(List<Person> crew,
+              double unitWeight, int unitSpeed, boolean hasImprovedSensors, boolean hasActiveProbe) {
+            Formation formation = mock(Formation.class);
+            Hangar hangar = mock(Hangar.class);
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(crew);
+            when(unit.getEntity()).thenReturn(entity);
+            when(entity.getWeight()).thenReturn(unitWeight);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
+                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class);
+                  MockedStatic<ScoutingSkills> scoutingSkills = mockStatic(ScoutingSkills.class)) {
+
+                scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(unitSpeed);
+                entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
+                entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
+                crew.forEach(crewMember -> scoutingSkills.when(() ->
+                                                                     ScoutingSkills.getBestScoutingSkill(crewMember))
+                                                 .thenReturn(S_SENSOR_OPERATIONS));
+
+                List<ScoutRecord> scouts =
+                      StratConRulesManager.buildScoutMap(formation, hangar, mock(CampaignOptions.class));
+                assertEquals(1, scouts.size());
+
+                return scouts.getFirst();
+            }
+        }
+
+        /**
+         * Mocks multiple units with a single crew member each and gets the best scouts
+         */
+        private List<ScoutRecord> getBestScoutsForUnits(List<Person> crews,
+              boolean hasImprovedSensors, boolean hasActiveProbe) {
+            Formation formation = mock(Formation.class);
+            Hangar hangar = mock(Hangar.class);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
+                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class);
+                  MockedStatic<ScoutingSkills> scoutingSkills = mockStatic(ScoutingSkills.class)) {
+
+                List<Unit> units = crews.stream().map(crew -> {
+                    Unit unit = mock(Unit.class);
+                    Entity entity = mock(Entity.class);
+                    when(unit.getCrew()).thenReturn(List.of(crew));
+                    when(unit.getEntity()).thenReturn(entity);
+                    when(entity.getWeight()).thenReturn(45.0);
+                    scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(5);
+                    entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
+                    entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
+                    scoutingSkills.when(() -> ScoutingSkills.getBestScoutingSkill(crew)).thenReturn(S_SENSOR_OPERATIONS);
+                    return unit;
+                }).toList();
+                when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(units);
+
+                List<ScoutRecord> scouts =
+                      StratConRulesManager.buildScoutMap(formation, hangar, mock(CampaignOptions.class));
+
+                return scouts;
+            }
+        }
     }
 }
