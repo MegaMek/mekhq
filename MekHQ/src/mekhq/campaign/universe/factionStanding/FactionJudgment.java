@@ -173,14 +173,25 @@ public class FactionJudgment {
             CensureEntry censureEntry = entry.getValue();
 
             if (censureEntry.hasExpired(today)) {
+                FactionCensureLevel oldLevel = censureEntry.level();
                 decreaseCensureForFaction(factionCode, today);
                 Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
                 String factionName = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.faction");
                 if (relevantFaction != null) {
                     factionName = relevantFaction.getFullName(today.getYear());
-                    String report = getFormattedTextAt(RESOURCE_BUNDLE, "FactionJudgment.censureDecay", factionName);
-                    reports.add(report);
                 }
+
+                FactionCensureLevel censureLevel = getCensureLevelForFaction(factionCode);
+
+                String reportKey;
+                if (censureLevel.getSeverity() == MIN_CENSURE_SEVERITY) {
+                    reportKey = "FactionJudgment.censureDecay.ended";
+                } else {
+                    reportKey = "FactionJudgment.censureDecay.continuing";
+                }
+
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, reportKey, factionName);
+                reports.add(report);
             }
         }
 
@@ -214,6 +225,10 @@ public class FactionJudgment {
             FactionCensureLevel newCensureLevel = FactionCensureLevel.getCensureLevelFromSeverity(currentSeverity);
 
             setCensureForFaction(factionCode, newCensureLevel, today);
+        }
+
+        if (currentSeverity == MIN_CENSURE_SEVERITY) {
+            factionCensures.remove(factionCode);
         }
     }
 
