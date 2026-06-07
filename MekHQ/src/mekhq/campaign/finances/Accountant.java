@@ -106,13 +106,8 @@ public record Accountant(Campaign campaign) {
             }
         }
 
-        // And pay our pool
-        salaries = salaries.plus(campaign().getCampaignOptions()
-                                       .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
-                                       .doubleValue() * campaign().getTemporaryAsTechPool());
-        salaries = salaries.plus(campaign().getCampaignOptions()
-                                       .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                       campaign().getTemporaryMedicPool());
+        // Add all temporary personnel (medics, astechs, temp crew)
+        salaries = salaries.plus(sumTempCrewPay(noInfantry));
 
         return salaries;
     }
@@ -632,18 +627,24 @@ public record Accountant(Campaign campaign) {
     }
 
     private double sumTempCrewPay() {
+        return sumTempCrewPay(false);
+    }
+
+    private double sumTempCrewPay(boolean noInfantry) {
         double tempCrewPay = 0.0;
         tempCrewPay += getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool());
-        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign.getTemporaryMedicPool());
+        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign().getTemporaryMedicPool());
 
         for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
-            tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            if (!(noInfantry && personnelRole.isSoldier())) {
+                tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            }
         }
 
         return tempCrewPay;
     }
 
-     private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
+    private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
         return campaign().getCampaignOptions()
                      .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() *
                      tempPersonnelPool;

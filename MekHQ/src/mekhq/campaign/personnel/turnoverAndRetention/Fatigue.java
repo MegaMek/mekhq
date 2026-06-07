@@ -375,10 +375,6 @@ public class Fatigue {
             }
 
             person.changeFatigue(-fatigueAdjustment);
-
-            if (person.getFatigueDirect() < 0) {
-                person.setFatigue(0);
-            }
         }
 
         if (campaign.getCampaignOptions().isUseFatigue()) {

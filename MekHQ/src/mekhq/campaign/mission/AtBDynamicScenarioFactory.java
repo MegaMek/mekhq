@@ -57,6 +57,7 @@ import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.stratCon.StratConRulesManager.scenarioModifierShouldBeBlocked;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -985,10 +986,12 @@ public class AtBDynamicScenarioFactory {
                     LOGGER.info("This is a combat challenge, skipping culling");
                 }
 
+                boolean ignoreC3 = false;
+                boolean ignoreCrew = false;
                 for (Entity entity : generatedEntities) {
                     if (isClan || isOfficialChallenge) {
                         forceComposition.add(entity);
-                        int battleValue = getBattleValue(campaign, entity, false);
+                        int battleValue = getBattleValue(campaign, entity, false, ignoreC3, ignoreCrew);
                         forceBV += battleValue;
 
                         continue;
@@ -1000,7 +1003,7 @@ public class AtBDynamicScenarioFactory {
                         continue;
                     }
 
-                    int battleValue = getBattleValue(campaign, entity, false);
+                    int battleValue = getBattleValue(campaign, entity, false, ignoreC3, ignoreCrew);
 
                     if (forceBV > forceBVBudget) {
                         LOGGER.info("Culled {} ({} {} BV) - too expensive to consider",
@@ -1177,6 +1180,11 @@ public class AtBDynamicScenarioFactory {
                 ArrayList<Entity> forceComposition = new ArrayList<>();
                 Collections.shuffle(generatedEntities);
 
+                // We used to include C3 and Crew but that led to fighting the Clans becoming too easy when
+                // Batchalling. We discard these values now to retain some kind of challenge. This can be seen as a
+                // handicap to account for player skill v. princess' capabilities.
+                boolean ignoreC3 = true;
+                boolean ignoreCrew = true;
                 for (Entity entity : generatedEntities) {
                     // As before, we count transported units and their transporters as one unit when building a force.
                     // This prevents issues where we cull an APC, leaving infantry stranded.
@@ -1184,7 +1192,7 @@ public class AtBDynamicScenarioFactory {
                         continue;
                     }
 
-                    int battleValue = getBattleValue(campaign, entity, true);
+                    int battleValue = getBattleValue(campaign, entity, true, ignoreC3, ignoreCrew);
 
                     if (forceBV > forceBVBudget) {
                         bidAwayForces.add(entity);
@@ -1410,12 +1418,15 @@ public class AtBDynamicScenarioFactory {
      * When calculating Battle Value, the method also considers any Entities loaded in the transporters of the base
      * Entity, adding their respective Battle Values to the total.
      *
-     * @param campaign The current campaign.
-     * @param entity   The Entity for which the Battle Value is being calculated.
+     * @param campaign   The current campaign.
+     * @param entity     The Entity for which the Battle Value is being calculated.
+     * @param ignoreC3   {@code true} if the BV2 calculation should ignore C3
+     * @param ignoreCrew {@code true} if the BV2 calculation should ignore crew
      *
      * @return The calculated Battle Value as integer.
      */
-    private static int getBattleValue(Campaign campaign, Entity entity, boolean forceStandardBV) {
+    private static int getBattleValue(Campaign campaign, Entity entity, boolean forceStandardBV, boolean ignoreC3,
+          boolean ignoreCrew) {
         int battleValue;
         if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBV) {
             battleValue = entity.getGenericBattleValue();
@@ -1430,7 +1441,7 @@ public class AtBDynamicScenarioFactory {
 
             for (Transporter transporter : entity.getTransports()) {
                 for (Entity loadedEntity : transporter.getLoadedUnits()) {
-                    battleValue += loadedEntity.calculateBattleValue();
+                    battleValue += loadedEntity.calculateBattleValue(ignoreC3, ignoreCrew);
                 }
             }
         }
@@ -1992,10 +2003,15 @@ public class AtBDynamicScenarioFactory {
      * Randomly generates the number of scenario modifiers for a scenario, for each random scenario in the count a
      * random modifier is applied to the scenario.
      *
-     * @param campaignOptions The prior defined campaign options
-     * @param scenario        The scenario to receive the modifiers.
+     * @param campaignOptions         The prior defined campaign options
+     * @param scenario                The scenario to receive the modifiers.
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
      */
-    public static void setScenarioModifiers(CampaignOptions campaignOptions, AtBDynamicScenario scenario) {
+    public static void setScenarioModifiers(CampaignOptions campaignOptions, AtBDynamicScenario scenario,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         int numMods = 0;
         boolean addMods = true;
         int modMax = campaignOptions.getScenarioModMax();
@@ -2016,6 +2032,9 @@ public class AtBDynamicScenarioFactory {
 
             for (int x = 0; x < numMods; x++) {
                 AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
+                if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, scenarioMod)) {
+                    continue;
+                }
 
                 scenario.addScenarioModifier(scenarioMod);
 

@@ -140,6 +140,9 @@ public class StratConRulesManager {
 
     private static final MMLogger LOGGER = MMLogger.create(StratConRulesManager.class);
 
+    private static final int NO_FACILITY_MODIFIER = 0;
+    private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
+
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
      */
@@ -1604,13 +1607,10 @@ public class StratConRulesManager {
 
         // Build a map of scouts and their information
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isCommandersOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles();
-        boolean isCommandersOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry();
-        boolean isCommandersOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor();
         Formation formation = campaign.getFormation(forceID);
         Hangar hangar = campaign.getHangar();
         List<ScoutRecord> scouts = formation == null ? new ArrayList<>() : buildScoutMap(formation, hangar,
-              isCommandersOnlyVehicles, isCommandersOnlyInfantry, isCommandersOnlyBattleArmor);
+              campaignOptions);
 
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
@@ -1822,14 +1822,9 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation                   the {@link Formation} containing units to evaluate
-     * @param hangar                      the {@link Hangar} used to help retrieve units from the force
-     * @param isCommandersOnlyVehicles    {@code true} to only use the skills possessed by the unit commander (if
-     *                                    vehicle)
-     * @param isCommandersOnlyInfantry    {@code true} to only use the skills possessed by the unit commander (if
-     *                                    conventional infantry)
-     * @param isCommandersOnlyBattleArmor {@code true} to only use the skills possessed by the unit commander (if battle
-     *                                    armor)
+     * @param formation       the {@link Formation} containing units to evaluate
+     * @param hangar          the {@link Hangar} used to help retrieve units from the force
+     * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1837,8 +1832,7 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    private static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, boolean isCommandersOnlyVehicles,
-          boolean isCommandersOnlyInfantry, boolean isCommandersOnlyBattleArmor) {
+    private static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions) {
         List<ScoutRecord> scouts = new ArrayList<>();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             List<Person> unitCrew = unit.getCrew();
@@ -1854,16 +1848,7 @@ public class StratConRulesManager {
                 boolean hasActiveProbe = EntityUtilities.hasActiveProbe(entity);
                 hasSensorEquipment = hasImprovedSensors || hasActiveProbe;
 
-                boolean useCommanderOnly = false;
-                if (entity.isVehicle() && isCommandersOnlyVehicles) {
-                    useCommanderOnly = true;
-                } else if (entity.isConventionalInfantry() && isCommandersOnlyInfantry) {
-                    useCommanderOnly = true;
-                } else if (entity.isBattleArmor() && isCommandersOnlyBattleArmor) {
-                    useCommanderOnly = true;
-                }
-
-                if (useCommanderOnly) {
+                if (unit.isOnlyCommandersMatter(campaignOptions)) {
                     Person commander = unit.getCommander();
                     if (commander == null) {
                         LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());
@@ -2553,16 +2538,37 @@ public class StratConRulesManager {
         scenario.setRequiredPlayerLances(1);
 
         // do any facility or global modifiers
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isClansObeyBiddingRules = campaignOptions.isClansObeyBiddingRules();
+        boolean isBatchallAccepted = contract.isBatchallAccepted();
+
+        boolean restrictAlliedModifiers = isClansObeyBiddingRules &&
+                                                isBatchallAccepted &&
+                                                contract.getEmployerFaction().isClan();
+        boolean restrictEnemyModifiers = isClansObeyBiddingRules &&
+                                               isBatchallAccepted &&
+                                               contract.getEnemy().isClan();
+
         if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
-            CampaignOptions campaignOptions = campaign.getCampaignOptions();
             int alliedFacilityModifierChance = campaignOptions.getAlliedFacilityModifierDieSize();
             int enemyFacilityModifierChance = campaignOptions.getEnemyFacilityModifierDieSize();
 
-            applyFacilityModifiers(scenario, track, coords, alliedFacilityModifierChance, enemyFacilityModifierChance);
+            applyFacilityModifiers(scenario,
+                  track,
+                  coords,
+                  alliedFacilityModifierChance,
+                  enemyFacilityModifierChance,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
         }
-        applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
-        AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(), scenario.getBackingScenario());
+        applyGlobalModifiers(scenario,
+              contract.getStratconCampaignState(),
+              restrictAlliedModifiers,
+              restrictEnemyModifiers);
+
+        AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(), scenario.getBackingScenario(),
+              restrictAlliedModifiers, restrictEnemyModifiers);
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
 
         if (daysTilDeployment == null) {
@@ -2590,9 +2596,25 @@ public class StratConRulesManager {
     }
 
     /**
-     * Apply global scenario modifiers from campaign state to given scenario.
+     * Applies global scenario modifiers from the campaign state to the given scenario, with optional restrictions on
+     * modifiers for allied and enemy forces.
+     *
+     * <p>Iterates over all global scenario modifiers defined in the campaign state. For each modifier, if it
+     * includes a force definition, it is subject to modifier restrictions: allied force modifiers are skipped if
+     * {@code restrictAlliedModifiers} is {@code true}, and enemy force modifiers are skipped if
+     * {@code restrictEnemyModifiers} is {@code true}. Modifiers that are not found in the registry are logged as errors
+     * and skipped.</p>
+     *
+     * @param scenario                the {@link StratConScenario} to which modifiers will be applied
+     * @param campaignState           the {@link StratConCampaignState} providing the list of global scenario modifier
+     *                                names
+     * @param restrictAlliedModifiers if {@code true}, skips any modifier that has a force definition and benefits the
+     *                                player (allied)
+     * @param restrictEnemyModifiers  if {@code true}, skips any modifier that has a force definition and does not
+     *                                benefit the player (enemy)
      */
-    private static void applyGlobalModifiers(StratConScenario scenario, StratConCampaignState campaignState) {
+    private static void applyGlobalModifiers(StratConScenario scenario, StratConCampaignState campaignState,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         for (String modifierName : campaignState.getGlobalScenarioModifiers()) {
             AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierName);
 
@@ -2601,8 +2623,49 @@ public class StratConRulesManager {
                 continue;
             }
 
+            if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
+                continue;
+            }
+
             scenario.getBackingScenario().addScenarioModifier(modifier);
         }
+    }
+
+    /**
+     * Determines whether a scenario modifier should be blocked based on facility modifier restrictions and which side
+     * the modifier benefits.
+     *
+     * <p>A modifier is only subject to blocking if it includes a force definition. In that case, modifiers
+     * benefiting the player are blocked by {@code restrictAlliedModifiers}, and modifiers benefiting the enemy are
+     * blocked by {@code restrictEnemyModifiers}. Modifiers without a force definition are never blocked.</p>
+     *
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
+     * @param modifier                the {@link AtBScenarioModifier} to evaluate, if {@code null}, returns
+     *                                {@code true}
+     *
+     * @return {@code true} if the modifier should be blocked, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static boolean scenarioModifierShouldBeBlocked(boolean restrictAlliedModifiers,
+          boolean restrictEnemyModifiers, @Nullable AtBScenarioModifier modifier) {
+        if (modifier == null) {
+            return true;
+        }
+
+        if (modifier.getForceDefinition() != null) {
+            if (modifier.getBenefitsPlayer()) {
+                return restrictAlliedModifiers;
+            } else {
+                return restrictEnemyModifiers;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -2614,17 +2677,22 @@ public class StratConRulesManager {
      * contribute shared modifiers to the scenario.</p>
      *
      * <p>Facilities that provide modifiers are marked unavailable by
-     * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean)} and will not be selected again until
-     * made available elsewhere.</p>
+     * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean, boolean, boolean)} and will not be
+     * selected again until made available elsewhere.</p>
      *
      * @param scenario                     the scenario receiving facility-provided modifiers
      * @param track                        the track containing facilities that may influence the scenario
      * @param coords                       the coordinates where the scenario is being generated
      * @param alliedFacilityModifierChance the 1-in-n chance an allied facility will add a modifier
      * @param enemyFacilityModifierChance  the 1-in-n chance an enemy facility will add a modifier
+     * @param restrictAlliedModifiers      {@code true} if facility modifiers which add forces that benefit the player
+     *                                     should be blocked
+     * @param restrictEnemyModifiers       {@code true} if facility modifiers which add forces that benefit the enemy
+     *                                     should be blocked
      */
     private static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
-          StratConCoords coords, int alliedFacilityModifierChance, int enemyFacilityModifierChance) {
+          StratConCoords coords, int alliedFacilityModifierChance, int enemyFacilityModifierChance,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
 
         boolean rollForAllied = true;
@@ -2634,7 +2702,11 @@ public class StratConRulesManager {
         boolean scenarioAtFacility = localFacility != null;
         if (scenarioAtFacility) {
             final boolean isLocalFacility = true;
-            getFacilityModifiers(scenario, localFacility, isLocalFacility);
+            getFacilityModifiers(scenario,
+                  localFacility,
+                  isLocalFacility,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
 
             if (localFacility.isOwnerAlliedToPlayer()) {
                 rollForAllied = false;
@@ -2648,11 +2720,19 @@ public class StratConRulesManager {
         filterAvailableFacilities(allFacilities, availableAlliedFacilities, availableEnemyFacilities);
 
         if (rollForAllied && !availableAlliedFacilities.isEmpty()) {
-            rollForFacilityModifier(scenario, alliedFacilityModifierChance, availableAlliedFacilities);
+            rollForFacilityModifier(scenario,
+                  alliedFacilityModifierChance,
+                  availableAlliedFacilities,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
         }
 
         if (rollForEnemy && !availableEnemyFacilities.isEmpty()) {
-            rollForFacilityModifier(scenario, enemyFacilityModifierChance, availableEnemyFacilities);
+            rollForFacilityModifier(scenario,
+                  enemyFacilityModifierChance,
+                  availableEnemyFacilities,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
         }
     }
 
@@ -2663,28 +2743,39 @@ public class StratConRulesManager {
      * {@code 1 / facilityModifierChance} chance of success. On success, one facility is selected at random from
      * {@code availableFacilities} and its shared modifiers are applied as remote facility effects.</p>
      *
-     * @param scenario               the scenario receiving the facility modifiers
-     * @param facilityModifierChance the roll chance denominator; {@code 0} disables the roll, {@code 1} guarantees
-     *                               success, and values greater than {@code 1} succeed when a random roll returns
-     *                               {@code 0}
-     * @param availableFacilities    facilities eligible to provide remote shared modifiers
+     * @param scenario                the scenario receiving the facility modifiers
+     * @param facilityModifierChance  the roll chance denominator; {@code 0} disables the roll, {@code 1} guarantees
+     *                                success, and values greater than {@code 1} succeed when a random roll returns
+     *                                {@code 0}
+     * @param availableFacilities     facilities eligible to provide remote shared modifiers
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
      */
     private static void rollForFacilityModifier(StratConScenario scenario, int facilityModifierChance,
-          Map<StratConCoords, StratConFacility> availableFacilities) {
-        boolean autoFailRoll = facilityModifierChance == 0;
+          Map<StratConCoords, StratConFacility> availableFacilities, boolean restrictAlliedModifiers,
+          boolean restrictEnemyModifiers) {
+        boolean autoFailRoll = facilityModifierChance == NO_FACILITY_MODIFIER;
         if (autoFailRoll) {
             return;
         }
 
-        boolean autoSuccess = facilityModifierChance == 1;
-        if (autoSuccess || randomInt(facilityModifierChance) == 0) {
+        boolean autoSuccess = facilityModifierChance == AUTOMATIC_FACILITY_MODIFIER;
+        boolean successfullyRolledForFacility = autoSuccess || randomInt(facilityModifierChance) == 0;
+
+        if (successfullyRolledForFacility) {
             final StratConFacility randomFacility = ObjectUtility.getRandomItem(availableFacilities.values());
             if (randomFacility == null) {
                 return;
             }
 
             final boolean isLocalFacility = false;
-            getFacilityModifiers(scenario, randomFacility, isLocalFacility);
+            getFacilityModifiers(scenario,
+                  randomFacility,
+                  isLocalFacility,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
         }
     }
 
@@ -2698,16 +2789,20 @@ public class StratConRulesManager {
      *
      * <p>Then, the facility is marked as unavailable.</p>
      *
-     * @param scenario the scenario receiving the modifiers
-     * @param facility the facility providing modifier effects
-     * @param isLocal  {@code true} if the scenario occurs at the facility location; {@code false} if the facility is
-     *                 being used remotely for shared modifiers
+     * @param scenario                the scenario receiving the modifiers
+     * @param facility                the facility providing modifier effects
+     * @param isLocal                 {@code true} if the scenario occurs at the facility location; {@code false} if the
+     *                                facility is being used remotely for shared modifiers
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
      *
      * @author Illiani
      * @since 0.51.0
      */
     private static void getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
-          boolean isLocal) {
+          boolean isLocal, boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         List<String> relevantModifiers = new ArrayList<>();
         List<String> localModifiers = facility.getLocalModifiers();
         List<String> globalModifiers = facility.getSharedModifiers();
@@ -2719,6 +2814,11 @@ public class StratConRulesManager {
         }
 
         for (String modifierID : relevantModifiers) {
+            AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
+            if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
+                continue;
+            }
+
             applyModifierToScenario(scenario, facility, modifierID);
         }
 

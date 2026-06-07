@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -110,7 +110,6 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -121,6 +120,7 @@ import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.unit.actions.RestoreUnitAction;
 import mekhq.campaign.unit.actions.StripUnitAction;
 import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
+import mekhq.campaign.unit.actions.UnloadAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
@@ -425,15 +425,15 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (!toRemove.isEmpty()) {
-                String title = String.format(resources.getString("deleteUnitsCount.text"), toRemove.size());
+                String title = String.format(getText("deleteUnitsCount.text"), toRemove.size());
                 if (toRemove.size() == 1) {
                     title = toRemove.getFirst().getName();
                 }
 
                 if (0 ==
                           JOptionPane.showConfirmDialog(null,
-                                String.format(resources.getString("confirmRemove.text"), title),
-                                resources.getString("removeQ.title"),
+                                String.format(getText("confirmRemove.text"), title),
+                                getText("removeQ.title"),
                                 JOptionPane.YES_NO_OPTION)) {
                     for (Unit unit : toRemove) {
                         gui.getCampaign().removeUnit(unit.getId());
@@ -496,18 +496,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         }
 
                         Campaign campaign = gui.getCampaign();
-                        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-                        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
-
-                        // We don't care about admin, doctor or tech settings, as they're not going to spawn here
-                        overrideSkills(false,
-                              false,
-                              false,
-                              campaign.getCampaignOptions().isUseArtillery(),
-                              useExtraRandomness,
-                              person,
-                              person.getPrimaryRole(),
-                              skillLevel);
+                        boolean checkVeterancyEligibility = true;
+                        overrideSkills(campaign, person, person.getPrimaryRole(), VETERAN, checkVeterancyEligibility);
                     }
                 }
             }
@@ -640,7 +630,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 if (tech != null) {
-                    if ((!selectedUnit.getActiveCrew().isEmpty()) || (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
+                    if ((!selectedUnit.getActiveCrew().isEmpty()) ||
+                              (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
                         Campaign campaign = gui.getCampaign();
                         ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
                               tech,
@@ -759,7 +750,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             for (Unit unit : units) {
                 if (!unit.requiresMaintenance()) {
-                    campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceAdHoc.noNeed"),
+                    campaign.addReport(TECHNICAL, String.format(getText("maintenanceAdHoc.noNeed"),
                           unit.getHyperlinkedName()));
                     continue;
                 }
@@ -960,7 +951,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // swap ammo
             if (oneSelected) {
                 if (unit.getEntity().usesWeaponBays()) {
-                    menuItem = new JMenuItem("Swap ammo...");
+                    menuItem = new JMenuItem(getText("swapAmmo.text") + "...");
                     menuItem.setActionCommand(COMMAND_LC_SWAP_AMMO);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
@@ -973,15 +964,21 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               .stream()
                               .anyMatch(m -> (m.getType() instanceof InfantryWeapon) &&
                                                    ((InfantryWeapon) m.getType()).hasInfernoAmmo())) {
-                        menuItem = new JMenuItem("Swap ammo...");
+                        menuItem = new JMenuItem(getText("swapAmmo.text") + "...");
                         menuItem.setActionCommand(COMMAND_SMALL_SV_SWAP_AMMO);
                         menuItem.addActionListener(this);
                         popup.add(menuItem);
                     }
                 } else {
-                    menu = new JMenu("Swap ammo");
+                    menu = new JMenu(getText("swapAmmo.text"));
                     for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
                         JMenu ammoMenu = new JMenu(ammo.getType().getDesc());
+                        cbMenuItem = new JCheckBoxMenuItem(getText("unloadAllAmmo.text"));
+                        cbMenuItem.addActionListener(evt -> {
+                            IUnitAction unloadAmmoTypeAction = new UnloadAmmoTypeAction(ammo);
+                            unloadAmmoTypeAction.execute(gui.getCampaign(), unit);
+                        });
+                        ammoMenu.add(cbMenuItem);
                         AmmoType curType = ammo.getType();
                         for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
                               curType,
@@ -1059,7 +1056,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // maintenance and
             // isn't mothballed or being mothballed
             if (gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
-                menuItem = new JMenu(resources.getString("maintenanceExtraTime.text"));
+                menuItem = new JMenu(getText("maintenanceExtraTime.text"));
 
                 for (int x = 1; x <= 4; x++) {
                     JMenuItem maintenanceMultiplierItem = new JCheckBoxMenuItem("x" + x);
@@ -1078,7 +1075,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 popup.add(menuItem);
 
-                menuItem = new JMenuItem(resources.getString("maintenanceAdHoc.text"));
+                menuItem = new JMenuItem(getText("maintenanceAdHoc.text"));
                 menuItem.setActionCommand(COMMAND_PERFORM_AD_HOC_MAINTENANCE);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(oneSelected && unit.getDaysSinceMaintenance() != 0);
@@ -1172,7 +1169,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // fill with personnel
             if (gui.getCampaign().getCampaignOptions().getPersonnelMarketStyle() != MEKHQ) {
                 if (oneAvailableUnitBelowMaxCrew) {
-                    menuItem = new JMenuItem(resources.getString("hireMinimumComplement.text"));
+                    menuItem = new JMenuItem(getText("hireMinimumComplement.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
@@ -1188,20 +1185,20 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 // Determine why filling might not be possible
                 String fillDisabledReason = null;
                 if (currentCrew == 0) {
-                    fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.noCommander");
+                    fillDisabledReason = getText("tempCrew.fillWithTempCrew.noCommander");
                 } else if (currentCrew + currentTempCrew >= fullCrew) {
-                    fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.atFullStrength");
+                    fillDisabledReason = getText("tempCrew.fillWithTempCrew.atFullStrength");
                 } else {
                     PersonnelRole crewRole = unit.getDriverRole();
                     boolean hasPool = crewRole != null
-                          && gui.getCampaign().isBlobCrewEnabled(crewRole)
-                          && gui.getCampaign().getAvailableTempCrewPool(crewRole) > 0;
+                                            && gui.getCampaign().isBlobCrewEnabled(crewRole)
+                                            && gui.getCampaign().getAvailableTempCrewPool(crewRole) > 0;
                     if (!hasPool) {
-                        fillDisabledReason = resources.getString("tempCrew.fillWithTempCrew.noPoolAvailable");
+                        fillDisabledReason = getText("tempCrew.fillWithTempCrew.noPoolAvailable");
                     }
                 }
 
-                menuItem = new JMenuItem(resources.getString("tempCrew.fillWithTempCrew"));
+                menuItem = new JMenuItem(getText("tempCrew.fillWithTempCrew"));
                 menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
                 menuItem.addActionListener(this);
                 if (fillDisabledReason != null) {
@@ -1210,12 +1207,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 popup.add(menuItem);
 
-                menuItem = new JMenuItem(resources.getString("tempCrew.removeTempCrew"));
+                menuItem = new JMenuItem(getText("tempCrew.removeTempCrew"));
                 menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
                 menuItem.addActionListener(this);
                 if (currentTempCrew == 0) {
                     menuItem.setEnabled(false);
-                    menuItem.setToolTipText(resources.getString("tempCrew.removeTempCrew.noTempCrew"));
+                    menuItem.setToolTipText(getText("tempCrew.removeTempCrew.noTempCrew"));
                 }
                 popup.add(menuItem);
             }
@@ -1332,34 +1329,34 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (oneAvailableUnitBelowMaxCrew) {
-                    JMenu menuMinimumComplement = new JMenu(resources.getString("addMinimumComplement.text"));
+                    JMenu menuMinimumComplement = new JMenu(getText("addMinimumComplement.text"));
 
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplementRandom.text"));
+                    menuItem = new JMenuItem(getText("addMinimumComplementRandom.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplementElite.text"));
+                    menuItem = new JMenuItem(getText("addMinimumComplementElite.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_ELITE);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplementVeteran.text"));
+                    menuItem = new JMenuItem(getText("addMinimumComplementVeteran.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_VETERAN);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplementRegular.text"));
+                    menuItem = new JMenuItem(getText("addMinimumComplementRegular.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_REGULAR);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplementGreen.text"));
+                    menuItem = new JMenuItem(getText("addMinimumComplementGreen.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_GREEN);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplementUltraGreen.text"));
+                    menuItem = new JMenuItem(getText("addMinimumComplementUltraGreen.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_ULTRA_GREEN);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);

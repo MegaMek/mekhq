@@ -32,9 +32,11 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,7 +64,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -353,24 +354,15 @@ public class HireBulkPersonnelDialog extends JDialog {
         final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate, today.minusYears(minAgeVal)));
 
         while (number > 0) {
-            Person person = campaign.newPerson(selectedItem.getRole());
+            PersonnelRole selectedRole = selectedItem.getRole();
+            Person person = campaign.newPerson(selectedRole);
 
             // Dependents & 'None' don't have skills
-            PersonnelRole selectedRole = selectedItem.getRole();
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
             if (useSkill && !selectedRole.isDependent() && !selectedRole.isNone()) {
                 if (skillLevel.getSelectedItem() != null) {
-                    RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-                    boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
-
-                    overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
-                          campaignOptions.isDoctorsUseAdministration(),
-                          campaignOptions.isTechsUseAdministration(),
-                          campaignOptions.isUseArtillery(),
-                          useExtraRandomness,
-                          person,
-                          selectedItem.getRole(),
-                          skillLevel.getSelectedItem());
+                    boolean checkVeterancyEligibility = false;
+                    overrideSkills(campaign, person, selectedRole, VETERAN, checkVeterancyEligibility);
                 }
             }
 
@@ -400,6 +392,10 @@ public class HireBulkPersonnelDialog extends JDialog {
             SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
             reRollLoyalty(person, actualSkillLevel);
             reRollAdvantages(campaign, person, actualSkillLevel);
+
+            // We need to override Veterancy eligibility to factor in any fixed experience level generation that
+            // might have occurred via GM Mode or age restrictions.
+            setVeterancyAwardEligibility(campaign, person);
 
             if (!campaign.recruitPerson(person, isGmHire, true)) {
                 number = 0;

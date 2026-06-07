@@ -233,6 +233,7 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterVehicles;
     private boolean onlyCommandersMatterInfantry;
     private boolean onlyCommandersMatterBattleArmor;
+    private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
     private boolean useSupportEdge;
     private boolean useImplants;
@@ -579,6 +580,7 @@ public class CampaignOptions {
 
     private int attributeCost;
     private int edgeCost;
+    private int edgeRefreshCost;
     // endregion Experience Tab
 
     // region Skills Tab
@@ -681,6 +683,7 @@ public class CampaignOptions {
     private boolean useAdvancedBuildingGunEmplacements;
     private int spaUpgradeIntensity;
     private int reinforcementBaseTargetNumber;
+    private boolean clansObeyBiddingRules;
     private int alliedFacilityModifierDieSize;
     private int enemyFacilityModifierDieSize;
     private int scenarioModMax;
@@ -846,6 +849,7 @@ public class CampaignOptions {
         setUseAbilities(false);
         setOnlyCommandersMatterVehicles(false);
         setOnlyCommandersMatterInfantry(false);
+        edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
         setUseSupportEdge(false);
@@ -1249,6 +1253,7 @@ public class CampaignOptions {
         missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
         edgeCost = 10;
+        edgeRefreshCost = 20; // ATOW 3rd printing, p.43, 'edge recovery'
         attributeCost = 100;
         // endregion Experience Tab
 
@@ -1363,6 +1368,7 @@ public class CampaignOptions {
         setUseAdvancedBuildingGunEmplacements(false);
         reinforcementBaseTargetNumber = 7;
         setSpaUpgradeIntensity(0);
+        clansObeyBiddingRules = true;
         setAlliedFacilityModifierDieSize(2);
         setEnemyFacilityModifierDieSize(2);
         regionalMekVariations = false;
@@ -1696,6 +1702,14 @@ public class CampaignOptions {
 
     public void setOnlyCommandersMatterBattleArmor(final boolean onlyCommandersMatterBattleArmor) {
         this.onlyCommandersMatterBattleArmor = onlyCommandersMatterBattleArmor;
+    }
+
+    public EdgeRefreshPeriod getEdgeRefreshPeriod() {
+        return edgeRefreshPeriod;
+    }
+
+    public void setEdgeRefreshPeriod(final EdgeRefreshPeriod edgeRefreshPeriod) {
+        this.edgeRefreshPeriod = edgeRefreshPeriod;
     }
 
     public boolean isUseEdge() {
@@ -4528,6 +4542,14 @@ public class CampaignOptions {
         this.edgeCost = edgeCost;
     }
 
+    public int getEdgeRefreshCost() {
+        return edgeRefreshCost;
+    }
+
+    public void setEdgeRefreshCost(final int edgeRefreshCost) {
+        this.edgeRefreshCost = edgeRefreshCost;
+    }
+
     public int getAttributeCost() {
         return attributeCost;
     }
@@ -5304,6 +5326,14 @@ public class CampaignOptions {
 
     public void setReinforcementBaseTargetNumber(final int reinforcementBaseTargetNumber) {
         this.reinforcementBaseTargetNumber = reinforcementBaseTargetNumber;
+    }
+
+    public boolean isClansObeyBiddingRules() {
+        return clansObeyBiddingRules;
+    }
+
+    public void setClansObeyBiddingRules(final boolean clansObeyBiddingRules) {
+        this.clansObeyBiddingRules = clansObeyBiddingRules;
     }
 
     public int getAlliedFacilityModifierDieSize() {

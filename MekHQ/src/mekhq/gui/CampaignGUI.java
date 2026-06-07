@@ -60,6 +60,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -68,6 +69,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
@@ -173,9 +175,11 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTempVehicleCrewGround;
     private JLabel lblTempVehicleCrewVTOL;
     private JLabel lblTempVehicleCrewNaval;
+    private JPanel pnlVehicleCrew;
     private JLabel lblTempVesselPilot;
     private JLabel lblTempVesselGunner;
     private JLabel lblTempVesselCrew;
+    private JPanel pnlVesselCrew;
     private JLabel lblPartsAvailabilityRating;
 
     /* Top Panel */
@@ -328,7 +332,7 @@ public class CampaignGUI extends JPanel {
         // Move the window
         frame.setLocation(x, y);
 
-        windowMenu = new MekHQMenuBar(getApplication(), this, resourceMap);
+        windowMenu = new MekHQMenuBar(getApplication(), this);
         frame.setJMenuBar(windowMenu);
 
         frame.getContentPane().setLayout(new BorderLayout());
@@ -387,22 +391,35 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        RoundedMMToggleButton btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
-        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
-        btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
+        Border innerBorder = BorderFactory.createCompoundBorder(
+              new RoundedLineBorder(UIUtil.uiIndependentGray(), 1, 8),
+              BorderFactory.createEmptyBorder(1, 3, 1, 3));
 
-        statusPanel.add(btnOvertime);
-        statusPanel.add(lblTempAsTechs);
-        statusPanel.add(lblTempMedics);
-        statusPanel.add(lblTempSoldiers);
-        statusPanel.add(lblTempBattleArmor);
-        statusPanel.add(lblTempVehicleCrewGround);
-        statusPanel.add(lblTempVehicleCrewVTOL);
-        statusPanel.add(lblTempVehicleCrewNaval);
-        statusPanel.add(lblTempVesselPilot);
-        statusPanel.add(lblTempVesselGunner);
-        statusPanel.add(lblTempVesselCrew);
+        pnlVehicleCrew = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+        pnlVehicleCrew.setBorder(innerBorder);
+        pnlVehicleCrew.add(new JLabel(statusBarLabel("statusBar.pnlVehicleCrew.title")));
+        pnlVehicleCrew.add(lblTempVehicleCrewGround);
+        pnlVehicleCrew.add(lblTempVehicleCrewVTOL);
+        pnlVehicleCrew.add(lblTempVehicleCrewNaval);
+
+        pnlVesselCrew = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+        pnlVesselCrew.setBorder(innerBorder);
+        pnlVesselCrew.add(new JLabel(statusBarLabel("statusBar.pnlVesselCrew.title")));
+        pnlVesselCrew.add(lblTempVesselPilot);
+        pnlVesselCrew.add(lblTempVesselGunner);
+        pnlVesselCrew.add(lblTempVesselCrew);
+
+        JPanel pnlTempPersonnel = new JPanel(new FlowLayout(FlowLayout.LEADING, 8, 2));
+        pnlTempPersonnel.setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
+        pnlTempPersonnel.add(new JLabel(statusBarLabel("statusBar.pnlTempPersonnel.title")));
+        pnlTempPersonnel.add(lblTempAsTechs);
+        pnlTempPersonnel.add(lblTempMedics);
+        pnlTempPersonnel.add(lblTempSoldiers);
+        pnlTempPersonnel.add(lblTempBattleArmor);
+        pnlTempPersonnel.add(pnlVehicleCrew);
+        pnlTempPersonnel.add(pnlVesselCrew);
+
+        statusPanel.add(pnlTempPersonnel);
         statusPanel.add(lblPartsAvailabilityRating);
     }
 
@@ -438,19 +455,21 @@ public class CampaignGUI extends JPanel {
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
         JPanel pnlMarkets = new ScalingWidthConstrainedPanel(minWidth, maxWidth);
         pnlMarkets.setLayout(new GridBagLayout());
-        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("lblMarkets.title")));
+        pnlMarkets.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlMarkets.title")));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
 
+        btnContractMarket.setToolTipText(resourceMap.getString("btnContractMarket.toolTipText"));
         btnContractMarket.addActionListener(e -> showContractMarket());
         btnContractMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnContractMarket.setVerticalTextPosition(SwingConstants.CENTER);
         gridBagConstraints.gridy = 0;
         pnlMarkets.add(btnContractMarket, gridBagConstraints);
 
+        btnUnitMarket.setToolTipText(resourceMap.getString("btnUnitMarket.toolTipText"));
         btnUnitMarket.addActionListener(e -> showUnitMarket());
         btnUnitMarket.setHorizontalTextPosition(SwingConstants.CENTER);
         btnUnitMarket.setVerticalTextPosition(SwingConstants.CENTER);
@@ -486,6 +505,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
         btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
+        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
         btnCompanyGenerator.addActionListener(
               e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
@@ -509,12 +529,14 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
+        btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
         btnGlossary.addActionListener(evt -> new GlossaryDialog(getFrame()));
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
         pnlButton.add(btnGlossary, gridBagConstraints);
 
         RoundedJButton btnBugReport = new RoundedJButton(resourceMap.getString("btnBugReport.text"));
+        btnBugReport.setToolTipText(resourceMap.getString("btnBugReport.toolTipText"));
         btnBugReport.addActionListener(evt -> new EasyBugReportDialog(getFrame(), getCampaign()));
         gridBagConstraints.weightx = 0.6;
         gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, SMALL_GAP);
@@ -547,6 +569,14 @@ public class CampaignGUI extends JPanel {
 
     public @Nullable WarehouseTab getWarehouseTab() {
         return (WarehouseTab) getTab(MHQTabType.WAREHOUSE);
+    }
+
+    public @Nullable RepairTab getRepairBayTab() {
+        return (RepairTab) getTab(MHQTabType.REPAIR_BAY);
+    }
+
+    public @Nullable HangarTab getHangarTab() {
+        return (HangarTab) getTab(MHQTabType.HANGAR);
     }
 
     public boolean hasTab(MHQTabType tabType) {
@@ -1385,16 +1415,22 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
+    private String statusBarLabel(String key, Object... args) {
+        String label = getFormattedTextAt("mekhq.resources.CampaignGUI", key);
+        if (args.length == 0) {
+            return "<html><b>" + label + "</b></html>";
+        }
+        return "<html><b>" + label + "</b>: " + args[0] + "</html>";
+    }
+
     private void refreshTempAsTechs() {
-        // FIXME : Localize
-        String text = "<html><b>Temp AsTechs</b>: " + getCampaign().getTemporaryAsTechPool() + "</html>";
-        lblTempAsTechs.setText(text);
+        lblTempAsTechs.setText(statusBarLabel("statusBar.lblTempAsTechs.text",
+              getCampaign().getTemporaryAsTechPool()));
     }
 
     private void refreshTempMedics() {
-        // FIXME : Localize
-        String text = "<html><b>Temp Medics</b>: " + getCampaign().getTemporaryMedicPool() + "</html>";
-        lblTempMedics.setText(text);
+        lblTempMedics.setText(statusBarLabel("statusBar.lblTempMedics.text",
+              getCampaign().getTemporaryMedicPool()));
     }
 
     private void refreshTempSoldiers() {
@@ -1403,9 +1439,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempSoldiers.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Soldiers</b>: " + getCampaign().getTempCrewPool(PersonnelRole.SOLDIER) + "</html>";
-        lblTempSoldiers.setText(text);
+        lblTempSoldiers.setText(statusBarLabel("statusBar.lblTempSoldiers.text",
+              getCampaign().getTempCrewPool(PersonnelRole.SOLDIER)));
     }
 
     private void refreshTempBattleArmor() {
@@ -1414,88 +1449,92 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempBattleArmor.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Battle Armor</b>: " + getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR) +
-                            "</html>";
-        lblTempBattleArmor.setText(text);
+        lblTempBattleArmor.setText(statusBarLabel("statusBar.lblTempBattleArmor.text",
+              getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR)));
     }
 
     private void refreshTempVehicleCrewGround() {
         if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
             lblTempVehicleCrewGround.setVisible(false);
+            refreshVehicleCrewPanelVisibility();
             return;
         }
         lblTempVehicleCrewGround.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (Ground)</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND) +
-                            "</html>";
-        lblTempVehicleCrewGround.setText(text);
+        lblTempVehicleCrewGround.setText(statusBarLabel("statusBar.lblTempVehicleCrewGround.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND)));
+        refreshVehicleCrewPanelVisibility();
     }
 
     private void refreshTempVehicleCrewVTOL() {
         if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
             lblTempVehicleCrewVTOL.setVisible(false);
+            refreshVehicleCrewPanelVisibility();
             return;
         }
         lblTempVehicleCrewVTOL.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (VTOL)</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL) +
-                            "</html>";
-        lblTempVehicleCrewVTOL.setText(text);
+        lblTempVehicleCrewVTOL.setText(statusBarLabel("statusBar.lblTempVehicleCrewVTOL.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL)));
+        refreshVehicleCrewPanelVisibility();
     }
 
     private void refreshTempVehicleCrewNaval() {
         if (!getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
             lblTempVehicleCrewNaval.setVisible(false);
+            refreshVehicleCrewPanelVisibility();
             return;
         }
         lblTempVehicleCrewNaval.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vehicle Crew (Naval)</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL) +
-                            "</html>";
-        lblTempVehicleCrewNaval.setText(text);
+        lblTempVehicleCrewNaval.setText(statusBarLabel("statusBar.lblTempVehicleCrewNaval.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL)));
+        refreshVehicleCrewPanelVisibility();
+    }
+
+    private void refreshVehicleCrewPanelVisibility() {
+        pnlVehicleCrew.setVisible(lblTempVehicleCrewGround.isVisible()
+                                        || lblTempVehicleCrewVTOL.isVisible()
+                                        || lblTempVehicleCrewNaval.isVisible());
     }
 
     private void refreshTempVesselPilot() {
         if (!getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
             lblTempVesselPilot.setVisible(false);
+            refreshVesselCrewPanelVisibility();
             return;
         }
         lblTempVesselPilot.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vessel Pilots</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT) +
-                            "</html>";
-        lblTempVesselPilot.setText(text);
+        lblTempVesselPilot.setText(statusBarLabel("statusBar.lblTempVesselPilot.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT)));
+        refreshVesselCrewPanelVisibility();
     }
 
     private void refreshTempVesselGunner() {
         if (!getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
             lblTempVesselGunner.setVisible(false);
+            refreshVesselCrewPanelVisibility();
             return;
         }
         lblTempVesselGunner.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vessel Gunners</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER) +
-                            "</html>";
-        lblTempVesselGunner.setText(text);
+        lblTempVesselGunner.setText(statusBarLabel("statusBar.lblTempVesselGunner.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER)));
+        refreshVesselCrewPanelVisibility();
     }
 
     private void refreshTempVesselCrew() {
         if (!getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
             lblTempVesselCrew.setVisible(false);
+            refreshVesselCrewPanelVisibility();
             return;
         }
         lblTempVesselCrew.setVisible(true);
-        // FIXME : Localize
-        String text = "<html><b>Temp Vessel Crew</b>: " +
-                            getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW) +
-                            "</html>";
-        lblTempVesselCrew.setText(text);
+        lblTempVesselCrew.setText(statusBarLabel("statusBar.lblTempVesselCrew.text",
+              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW)));
+        refreshVesselCrewPanelVisibility();
+    }
+
+    private void refreshVesselCrewPanelVisibility() {
+        pnlVesselCrew.setVisible(lblTempVesselPilot.isVisible()
+                                       || lblTempVesselGunner.isVisible()
+                                       || lblTempVesselCrew.isVisible());
     }
 
     private void refreshPartsAvailability() {
@@ -1503,8 +1542,7 @@ public class CampaignGUI extends JPanel {
             lblPartsAvailabilityRating.setText("");
         } else {
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
-            // FIXME : Localize
-            lblPartsAvailabilityRating.setText(String.format("<html><b>Parts Availability Modifier</b>: %d</html>",
+            lblPartsAvailabilityRating.setText(statusBarLabel("statusBar.lblPartsAvailabilityRating.text",
                   partsAvailability));
         }
     }

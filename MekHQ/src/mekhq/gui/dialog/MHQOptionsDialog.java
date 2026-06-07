@@ -202,6 +202,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkNewDayVesselGunnerPoolNoRelease;
     private JCheckBox chkNewDayVesselCrewPoolFill;
     private JCheckBox chkNewDayVesselCrewPoolNoRelease;
+    private JCheckBox chkNewDayAutoLogistics;
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
     private JCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
@@ -1097,6 +1098,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
         chkNewDayMRMS.setName("chkNewDayMRMS");
 
+        chkNewDayAutoLogistics = new JCheckBox(getText("chkNewDayAutoLogistics.text"));
+        chkNewDayAutoLogistics.setToolTipText(wordWrap(getText("chkNewDayAutoLogistics.toolTipText")));
+        chkNewDayAutoLogistics.setName("chkNewDayAutoLogistics");
+
         chkNewDayOptimizeMedicalAssignments = new JCheckBox(resources.getString(
               "chkNewDayOptimizeMedicalAssignments.text"));
         chkNewDayOptimizeMedicalAssignments.setToolTipText(resources.getString(
@@ -1218,6 +1223,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkNewDayVesselGunnerPoolNoRelease)
                                       .addComponent(chkNewDayVesselCrewPoolFill)
                                       .addComponent(chkNewDayVesselCrewPoolNoRelease)
+                                      .addComponent(chkNewDayAutoLogistics)
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
                                       .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
@@ -1261,6 +1267,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkNewDayVesselGunnerPoolNoRelease)
                                         .addComponent(chkNewDayVesselCrewPoolFill)
                                         .addComponent(chkNewDayVesselCrewPoolNoRelease)
+                                        .addComponent(chkNewDayAutoLogistics)
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
                                         .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
@@ -1808,6 +1815,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options.setNewDayAsTechPoolNoRelease(chkNewDayAsTechPoolNoRelease.isSelected());
         options.setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
         options.setNewDayMedicPoolNoRelease(chkNewDayMedicPoolNoRelease.isSelected());
+        options.setNewDayAutoLogistics(chkNewDayAutoLogistics.isSelected());
         options.setNewDayMRMS(chkNewDayMRMS.isSelected());
         options.setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
         options.setNewDaySoldierPoolFill(chkNewDaySoldierPoolFill.isSelected());
@@ -2061,6 +2069,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayVesselCrewPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill());
         chkNewDayVesselCrewPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDayVesselCrewPoolNoRelease());
         chkNewDayVesselCrewPoolNoRelease.setEnabled(chkNewDayVesselCrewPoolFill.isSelected());
+        chkNewDayAutoLogistics.setSelected(options.getNewDayAutoLogistics());
         chkNewDayMRMS.setSelected(options.getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(options.getNewDayOptimizeMedicalAssignments());
         chkNewDayAutomaticallyAssignUnmaintainedUnits.setSelected(options
