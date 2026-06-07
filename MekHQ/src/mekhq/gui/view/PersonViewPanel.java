@@ -1187,7 +1187,7 @@ public class PersonViewPanel extends JScrollablePanel {
                             // ...otherwise, dive on in to the system view!
                             gui.getMapTab().switchPlanetaryMap(person.getOriginPlanet());
                         }
-                        gui.setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
+                        gui.setSelectedTab(gui.getMapTab());
                     }
                 });
             } else {
