@@ -986,10 +986,12 @@ public class AtBDynamicScenarioFactory {
                     LOGGER.info("This is a combat challenge, skipping culling");
                 }
 
+                boolean ignoreC3 = false;
+                boolean ignoreCrew = false;
                 for (Entity entity : generatedEntities) {
                     if (isClan || isOfficialChallenge) {
                         forceComposition.add(entity);
-                        int battleValue = getBattleValue(campaign, entity, false);
+                        int battleValue = getBattleValue(campaign, entity, false, ignoreC3, ignoreCrew);
                         forceBV += battleValue;
 
                         continue;
@@ -1001,7 +1003,7 @@ public class AtBDynamicScenarioFactory {
                         continue;
                     }
 
-                    int battleValue = getBattleValue(campaign, entity, false);
+                    int battleValue = getBattleValue(campaign, entity, false, ignoreC3, ignoreCrew);
 
                     if (forceBV > forceBVBudget) {
                         LOGGER.info("Culled {} ({} {} BV) - too expensive to consider",
@@ -1178,6 +1180,11 @@ public class AtBDynamicScenarioFactory {
                 ArrayList<Entity> forceComposition = new ArrayList<>();
                 Collections.shuffle(generatedEntities);
 
+                // We used to include C3 and Crew but that led to fighting the Clans becoming too easy when
+                // Batchalling. We discard these values now to retain some kind of challenge. This can be seen as a
+                // handicap to account for player skill v. princess' capabilities.
+                boolean ignoreC3 = true;
+                boolean ignoreCrew = true;
                 for (Entity entity : generatedEntities) {
                     // As before, we count transported units and their transporters as one unit when building a force.
                     // This prevents issues where we cull an APC, leaving infantry stranded.
@@ -1185,7 +1192,7 @@ public class AtBDynamicScenarioFactory {
                         continue;
                     }
 
-                    int battleValue = getBattleValue(campaign, entity, true);
+                    int battleValue = getBattleValue(campaign, entity, true, ignoreC3, ignoreCrew);
 
                     if (forceBV > forceBVBudget) {
                         bidAwayForces.add(entity);
@@ -1411,12 +1418,15 @@ public class AtBDynamicScenarioFactory {
      * When calculating Battle Value, the method also considers any Entities loaded in the transporters of the base
      * Entity, adding their respective Battle Values to the total.
      *
-     * @param campaign The current campaign.
-     * @param entity   The Entity for which the Battle Value is being calculated.
+     * @param campaign   The current campaign.
+     * @param entity     The Entity for which the Battle Value is being calculated.
+     * @param ignoreC3   {@code true} if the BV2 calculation should ignore C3
+     * @param ignoreCrew {@code true} if the BV2 calculation should ignore crew
      *
      * @return The calculated Battle Value as integer.
      */
-    private static int getBattleValue(Campaign campaign, Entity entity, boolean forceStandardBV) {
+    private static int getBattleValue(Campaign campaign, Entity entity, boolean forceStandardBV, boolean ignoreC3,
+          boolean ignoreCrew) {
         int battleValue;
         if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBV) {
             battleValue = entity.getGenericBattleValue();
@@ -1431,7 +1441,7 @@ public class AtBDynamicScenarioFactory {
 
             for (Transporter transporter : entity.getTransports()) {
                 for (Entity loadedEntity : transporter.getLoadedUnits()) {
-                    battleValue += loadedEntity.calculateBattleValue();
+                    battleValue += loadedEntity.calculateBattleValue(ignoreC3, ignoreCrew);
                 }
             }
         }

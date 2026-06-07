@@ -149,6 +149,7 @@ import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
+import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
@@ -422,7 +423,7 @@ public class CampaignNewDayManager {
                   campaign.getFactionStandings().processRegardDegradation(faction.getShortName(),
                         today.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
-                campaign.addReport(GENERAL, report);
+                campaign.addReport(POLITICS, report);
             }
         }
 
@@ -715,9 +716,7 @@ public class CampaignNewDayManager {
      * <li>- If advanced medical care is unavailable, decreases the healing wait
      * time and
      * applies natural or doctor-assisted healing.</li>
-     * <li><b>Weekly Edge Resets:</b> Resets edge points to their purchased value
-     * weekly (applies
-     * to support personnel).</li>
+     * <li><b>Edge Resets:</b> Resets edge points to their purchased value.</li>
      * <li><b>Vocational XP:</b> Awards monthly vocational experience points to the
      * person where
      * applicable.</li>
@@ -779,6 +778,7 @@ public class CampaignNewDayManager {
         int fatigueRate = campaignOptions.getFatigueRate();
         boolean useBetterMonthlyIncome = campaignOptions.isUseBetterExtraIncome();
         boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
+        boolean shouldEdgeRefreshToday = EdgeRefreshPeriod.shouldRefresh(campaignOptions.getEdgeRefreshPeriod(), today);
         for (Person person : personnel) {
             int age = person.getAge(today);
             person.setAgeForAttributeModifiers(isUseAgeEffects ? age : IGNORE_AGE);
@@ -830,8 +830,6 @@ public class CampaignNewDayManager {
                     // If the character has died, we don't need to process relationship events
                     processWeeklyRelationshipEvents(person);
                 }
-
-                person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
                     boolean isWithinCapacity = !campaign.isOnContractAndPlanetside() ||
@@ -936,6 +934,10 @@ public class CampaignNewDayManager {
                 if (isDayOfBloodHunt) {
                     Bloodmark.performAssassinationAttempt(campaign, person, today);
                 }
+            }
+
+            if (shouldEdgeRefreshToday) {
+                person.resetCurrentEdge();
             }
         }
 
@@ -1677,7 +1679,7 @@ public class CampaignNewDayManager {
     private void processWeeklyRelationshipEvents(Person person) {
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
             campaign.getDivorce().processNewWeek(campaign, today, person, false);
-            campaign.getMarriage().processNewWeek(campaign, today, person, false);
+            campaign.getMarriage().processNewWeek(campaign, today, person);
             campaign.getProcreation().processNewWeek(campaign, today, person);
         }
     }

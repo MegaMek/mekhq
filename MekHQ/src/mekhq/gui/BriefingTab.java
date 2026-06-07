@@ -34,8 +34,8 @@ package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
@@ -203,7 +203,8 @@ public final class BriefingTab extends CampaignGuiTab {
         TURNING_POINT("briefingTab.scenarioFilter.turningPoint"),
         ASSIGNED("briefingTab.scenarioFilter.assigned"),
         UNASSIGNED("briefingTab.scenarioFilter.unassigned"),
-        ALL_RESOLVED("briefingTab.scenarioFilter.allResolved");
+        ALL_RESOLVED("briefingTab.scenarioFilter.allResolved"),
+        CURRENT_MONTH("briefingTab.scenarioFilter.currentMonth");
 
         private final String resourceKey;
 
@@ -327,7 +328,8 @@ public final class BriefingTab extends CampaignGuiTab {
               ScenarioQueueFilter.TURNING_POINT,
               ScenarioQueueFilter.ASSIGNED,
               ScenarioQueueFilter.UNASSIGNED,
-              ScenarioQueueFilter.ALL_RESOLVED
+              ScenarioQueueFilter.ALL_RESOLVED,
+              ScenarioQueueFilter.CURRENT_MONTH
         });
 
         panScenarioActions = BriefingStyle.createSectionPanel(
@@ -708,7 +710,28 @@ public final class BriefingTab extends CampaignGuiTab {
             case TURNING_POINT -> scenarioModel.isTurningPointScenario(scenario);
             case ASSIGNED -> !scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
             case UNASSIGNED -> scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
+            case CURRENT_MONTH -> isScenarioInCurrentMonth(scenario);
         };
+    }
+
+    private boolean isScenarioInCurrentMonth(Scenario scenario) {
+        LocalDate scenarioDate = scenario.getDate();
+        if (scenarioDate == null) {
+            return false;
+        }
+
+
+        int scenarioYear = scenarioDate.getYear();
+        int scenarioMonth = scenarioDate.getMonthValue();
+
+        LocalDate campaignDate = getCampaign().getLocalDate();
+        int campaignYear = campaignDate.getYear();
+        int campaignMonth = campaignDate.getMonthValue();
+
+        boolean monthsMatch = scenarioMonth == campaignMonth;
+        boolean yearsMath = scenarioYear == campaignYear;
+
+        return monthsMatch && yearsMath;
     }
 
     private void refreshSelectedScenarioActions(@Nullable Scenario scenario) {
@@ -931,7 +954,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             for (String report : reports) {
                 if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(GENERAL, report);
+                    getCampaign().addReport(POLITICS, report);
                 }
             }
         }
@@ -2591,6 +2614,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (preserveResolvedSelection && (scenarioSelection >= 0) &&
                   (selectedFilter != ScenarioQueueFilter.ALL) &&
                   (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
+                  (selectedFilter != ScenarioQueueFilter.CURRENT_MONTH) &&
                   isResolvedScenario(visibleScenarios, scenarioSelection)) {
             scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
             return;
@@ -2603,6 +2627,10 @@ public final class BriefingTab extends CampaignGuiTab {
                 filteredScenarios.add(scenario);
             } else if (selectedFilter == ScenarioQueueFilter.ALL_RESOLVED) {
                 if (!scenario.getStatus().isCurrent()) {
+                    filteredScenarios.add(scenario);
+                }
+            } else if (selectedFilter == ScenarioQueueFilter.CURRENT_MONTH) {
+                if (matchesScenarioFilter(scenario, selectedFilter)) {
                     filteredScenarios.add(scenario);
                 }
             } else if (scenario.getStatus().isCurrent() && matchesScenarioFilter(scenario, selectedFilter)) {

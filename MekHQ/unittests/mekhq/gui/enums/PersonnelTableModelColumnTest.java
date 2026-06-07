@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -683,12 +683,12 @@ public class PersonnelTableModelColumnTest {
     }
 
     @Test
-    public void testIsTryingToConceive() {
+    public void testIsWantsChildren() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TRYING_TO_CONCEIVE) {
-                assertTrue(personnelTableModelColumn.isTryingToConceive());
+            if (personnelTableModelColumn == PersonnelTableModelColumn.WANTS_CHILDREN) {
+                assertTrue(personnelTableModelColumn.isWantsChildren());
             } else {
-                assertFalse(personnelTableModelColumn.isTryingToConceive());
+                assertFalse(personnelTableModelColumn.isWantsChildren());
             }
         }
     }

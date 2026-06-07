@@ -38,6 +38,7 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
@@ -1739,9 +1740,10 @@ public class HumanResources {
             }
         }
 
+        setVeterancyAwardEligibility(campaign, person);
+
         return person;
     }
-
 
     /**
      * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank.
@@ -2183,7 +2185,7 @@ public class HumanResources {
         ResourceBundle resources = campaign.getResources();
 
         for (Person spouse : allSpouses) {
-            recruitPerson(campaign, spouse, PrisonerStatus.FREE, true, false, false);
+            recruitPerson(campaign, spouse, PrisonerStatus.FREE, true, false, false, true);
 
             if (currentSpouse == spouse) {
                 campaign.addReport(DailyReportType.PERSONNEL,
@@ -2235,7 +2237,7 @@ public class HumanResources {
                 specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
             }
 
-            recruitPerson(campaign, child, PrisonerStatus.FREE, true, false, false);
+            recruitPerson(campaign, child, PrisonerStatus.FREE, true, false, false, true);
 
             if (currentChildren.contains(child)) {
                 campaign.addReport(DailyReportType.PERSONNEL,
