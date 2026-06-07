@@ -524,7 +524,7 @@ public class Skill {
             }
         }
 
-        // Administration
+        // Art/Cooking
         if (Objects.equals(S_ART_COOKING, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_SPICE_IS_RIGHT)) {
                 modifier += 2;
