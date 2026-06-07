@@ -123,8 +123,9 @@ public class CampaignOptionsCheckBox extends JCheckBox {
     public CampaignOptionsCheckBox(String name, @Nullable Integer customWrapSize,
                                    @Nullable CampaignOptionsMetadata metadata) {
         // Fetch base text and append badges
-        // Sets the checkbox's text from the resource bundle, wrapped in HTML tags
-        super(String.format("<html>%s%s</html>",
+        // Sets the checkbox's text from the resource bundle, wrapped in HTML tags. The <nobr> keeps the label and its
+        // trailing badges on a single line so the badge symbols do not wrap onto a second line in tight grid columns.
+        super(String.format("<html><nobr>%s%s</nobr></html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"),
               CampaignOptionsUtilities.formatBadges(metadata)));
 

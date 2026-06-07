@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,86 +32,90 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static megamek.common.enums.SkillLevel.ELITE;
-import static megamek.common.enums.SkillLevel.GREEN;
-import static megamek.common.enums.SkillLevel.HEROIC;
-import static megamek.common.enums.SkillLevel.LEGENDARY;
-import static megamek.common.enums.SkillLevel.NONE;
-import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
-import static megamek.common.enums.SkillLevel.VETERAN;
-import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JComboBox;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractCellEditor;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
+import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 import megamek.Version;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * SkillsTab is a component of the campaign options user interface that allows players to configure the rules and costs
  * associated with skills in their campaign.
- * <p>
- * This tab can be configured for either combat or support skills. It allows users to:
- * </p>
- * <ul>
- *   <li>Set skill target numbers.</li>
- *   <li>Specify skill costs at different levels.</li>
- *   <li>Define milestones for the progression of skills by skill levels.</li>
- *   <li>Copy and paste configurations for skill settings.</li>
- * </ul>
- * <p>
- * The interface is dynamically created to display all relevant skill options for the
- * selected tab (combat or support).
- * </p>
+ *
+ * <p>Each skill sub-type (Gunnery, Piloting, Support, Utility, Roleplay) is presented as a single table listing every
+ * skill in that category alongside its base target number and a summary of its experience milestones. Per-level XP
+ * costs and the milestone thresholds are edited through a dedicated "Advanced" pop-up so the main view stays compact.
+ * Ctrl+C copies the selected row's full configuration and Ctrl+V applies it onto one or more selected rows.</p>
  */
 public class SkillsTab {
     private final CampaignOptions campaignOptions;
 
-    private Map<String, JSpinner> allTargetNumbers;
-    private Map<String, List<JLabel>> allSkillLevels;
-    private Map<String, List<JSpinner>> allSkillCosts;
-    private Map<String, List<JComboBox<SkillLevel>>> allSkillMilestones;
-    private int storedTargetNumber = 0;
-    private List<Integer> storedValuesSpinners = new ArrayList<>();
-    private List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
+    private SkillsOptionsModel model;
+    private Map<SkillSubType, CampaignOptionsPagePanel> createdCategoryTabs;
+    private List<SkillsTableModel> tableModels;
+    private SkillConfiguration storedConfiguration;
 
-    private JPanel pnlEdgeCost;
-    private JLabel lblEdgeCost;
+    // Only the spinners are read back (in load/apply); their labels and the containing panel are write-only locals
+    // built in createEdgeCostPanel().
     private JSpinner spnEdgeCost;
-    private JLabel lblAttributeCost;
     private JSpinner spnAttributeCost;
 
-    private static final MMLogger LOGGER = MMLogger.create(SkillsTab.class);
-
     /**
-     * Constructs a new `SkillsTab` instance and initializes the necessary data structures for managing skill
+     * Constructs a new {@code SkillsTab} instance and initializes the necessary data structures for managing skill
      * configurations.
      *
      * @param campaignOptions the {@code CampaignOptions} instance that holds the settings to be modified or displayed
@@ -120,52 +124,32 @@ public class SkillsTab {
     public SkillsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
         initialize();
+        loadValuesFromCampaignOptions();
     }
 
     /**
-     * Initializes the SkillsTab by setting up the necessary data structures and default values for skill
-     * configuration.
+     * Sets up the data structures needed for skill configuration in the SkillsTab.
      */
     private void initialize() {
-        initializeGeneral();
-    }
-
-    /**
-     * Sets up the general data structures needed for skill configuration in the SkillsTab. This includes collections
-     * for tracking target numbers, costs, and milestones for every skill.
-     */
-    private void initializeGeneral() {
-        allTargetNumbers = new HashMap<>();
-        allSkillLevels = new HashMap<>();
-        allSkillCosts = new HashMap<>();
-        allSkillMilestones = new HashMap<>();
-        storedTargetNumber = 0;
-        storedValuesSpinners = new ArrayList<>();
-        storedValuesComboBoxes = new ArrayList<>();
-
-        pnlEdgeCost = new JPanel();
-        lblEdgeCost = new JLabel();
-        spnEdgeCost = new JSpinner();
-        lblAttributeCost = new JLabel();
-        spnAttributeCost = new JSpinner();
+        createdCategoryTabs = new EnumMap<>(SkillSubType.class);
+        tableModels = new ArrayList<>();
+        storedConfiguration = null;
     }
 
     /**
      * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
      *
-     * <p>This method dynamically generates a tab for either combat, support, or roleplay skills. The tab displays
-     * skill panels associated with the specified category, allowing users to configure target numbers, costs, and
-     * milestones. It also includes buttons to toggle visibility of skill panels and manages layout to organize various
-     * UI components.</p>
+     * @param category the {@link SkillSubType} representing the skill category to display.
      *
-     * @param category the {@link SkillSubType} representing the skill category. This determines which set of skills
-     *                 will be displayed (e.g., {@code COMBAT_GUNNERY}, {@code COMBAT_PILOTING}, {@code SUPPORT}, or
-     *                 {@code ROLEPLAY}).
-     *
-     * @return a {@link JPanel} containing the dynamically generated skill options and UI components for the selected
-     *       category.
+     * @return a {@link JPanel} containing the skill table and supporting controls for the selected category.
      */
     public JPanel createSkillsTab(SkillSubType category) {
+        // The page never rebuilds in place (only its table models refresh), so the CampaignOptionsPagePanel can be
+        // cached and returned directly rather than wrapping it in a container.
+        return createdCategoryTabs.computeIfAbsent(category, this::createSkillsPage);
+    }
+
+    private CampaignOptionsPagePanel createSkillsPage(SkillSubType category) {
         // Header
         CampaignOptionsHeaderPanel headerPanel;
         String panelName;
@@ -198,7 +182,7 @@ public class SkillsTab {
         }
 
         // Contents
-        List<SkillType> relevantSkills = new ArrayList<>();
+        List<String> relevantSkills = new ArrayList<>();
         for (String skillName : SkillType.getSkillList()) {
             SkillType skill = SkillType.getType(skillName);
             SkillSubType subType = skill.getSubType();
@@ -206,10 +190,8 @@ public class SkillsTab {
             boolean isCorrectType = switch (category) {
                 case NONE, COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
-                case SUPPORT -> subType == SUPPORT ||
-                                      subType == SUPPORT_TECHNICIAN;
-                case UTILITY -> subType == UTILITY ||
-                                      subType == UTILITY_COMMAND;
+                case SUPPORT -> subType == SUPPORT || subType == SUPPORT_TECHNICIAN;
+                case UTILITY -> subType == UTILITY || subType == UTILITY_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
                                                subType == ROLEPLAY_ART ||
                                                subType == ROLEPLAY_INTEREST ||
@@ -226,354 +208,290 @@ public class SkillsTab {
 
             // If the type is {@code null} for some reason, dump it into the combat category
             if (isCorrectType || (subType == null && category == COMBAT_GUNNERY)) {
-                relevantSkills.add(skill);
+                relevantSkills.add(skillName);
             }
         }
 
-        List<JPanel> skillPanels = new ArrayList<>();
+        SkillsTableModel tableModel = new SkillsTableModel(relevantSkills, model);
+        tableModels.add(tableModel);
+        JTable table = createSkillsTable(tableModel);
 
-        for (SkillType skill : relevantSkills) {
-            JPanel skillPanel = createSkillPanel(skill);
-            skillPanels.add(skillPanel);
-        }
+        // Build the single section that holds the misc costs (Gunnery only), the copy/paste controls, and the table.
+        JComponent sectionContent = createSkillsSectionContent(category, table, tableModel);
 
-        // Content
+        return CampaignOptionsPagePanel.builder(panelName, panelName, getImageDirectory())
+                     .header(headerPanel)
+                     .showDetailsPanel(false)
+                     .sectionsExpandedByDefault(true)
+                     .section("lblSkillsSection.text", "lblSkillsSection.summary", sectionContent)
+                     .build();
+    }
+
+    /**
+     * Builds the body for the skills section: the optional Misc Costs row (Gunnery only), the keyboard-shortcut hint
+     * row, and the skills table.
+     *
+     * @param category   the skill sub-type being displayed
+     * @param table      the skills table
+     * @param tableModel the model backing the table
+     *
+     * @return a {@link JComponent} containing the section's contents
+     */
+    private JComponent createSkillsSectionContent(SkillSubType category, JTable table, SkillsTableModel tableModel) {
+        final JPanel content = new CampaignOptionsStandardPanel("SkillsSectionContent", false);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(content);
+
+        installCopyPasteBindings(table, tableModel);
+
+        JLabel hintLabel = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableHint.text"));
+
+        layout.gridy = 0;
+
         if (category == COMBAT_GUNNERY) {
-            pnlEdgeCost = createEdgeCostPanel();
+            layout.gridwidth = 5;
+            layout.gridx = 0;
+            content.add(createEdgeCostPanel(), layout);
+            layout.gridy++;
         }
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel(panelName, true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        // Create a button to toggle the table
-        RoundedJButton hideAllButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
-              "btnHideAll.text"));
-        hideAllButton.addActionListener(e -> {
-            setVisibleForAll(false);
-
-            panel.revalidate();
-            panel.repaint();
-        });
-
-        // Create a button to toggle the table
-        RoundedJButton showAllButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
-              "btnDisplayAll.text"));
-        showAllButton.addActionListener(e -> {
-            setVisibleForAll(true);
-
-            panel.revalidate();
-            panel.repaint();
-        });
 
         layout.gridwidth = 5;
-        layout.gridy = 0;
-        panel.add(headerPanel, layout);
-
-        if (category == COMBAT_GUNNERY) {
-            layout.gridwidth = 2;
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(pnlEdgeCost, layout);
-        }
-
-        layout.gridwidth = 1;
         layout.gridx = 0;
-        layout.gridy++;
-        panel.add(showAllButton, layout);
-        layout.gridx++;
-        panel.add(hideAllButton, layout);
+        content.add(hintLabel, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        int rows = (int) Math.ceil(skillPanels.size() / 5.0);
-        for (int i = 0; i < rows; i++) {
-            layout.gridy++;
-            layout.gridx = 0;
-            for (int j = 0; j < 5; j++) {
-                int index = i * 5 + j;
-                if (index < skillPanels.size()) {
-                    panel.add(skillPanels.get(index), layout);
+        content.add(createTableScrollPane(table), layout);
+
+        return content;
+    }
+
+    private JTable createSkillsTable(SkillsTableModel tableModel) {
+        JTable table = new JTable(tableModel);
+        table.setName("tblSkills");
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        table.setShowVerticalLines(false);
+        table.setRowHeight(Math.max(table.getRowHeight(), UIUtil.scaleForGUI(24)));
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        // Allow Ctrl/Shift selection of several rows so a copied configuration can be pasted onto all of them.
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        table.getColumnModel().getColumn(SkillsTableModel.SKILL_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(180));
+        table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(50));
+        table.getColumnModel().getColumn(SkillsTableModel.PROGRESSION_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(230));
+        table.getColumnModel().getColumn(SkillsTableModel.COST_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(330));
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(70));
+
+        // Left-align the target number so it reads as a value rather than a right-aligned figure.
+        DefaultTableCellRenderer leftAlignedRenderer = new DefaultTableCellRenderer();
+        leftAlignedRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+        table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN).setCellRenderer(leftAlignedRenderer);
+
+        // Auto-select the existing value when editing a TN cell, so clicking a cell then typing a number replaces it.
+        JTextField targetEditorField = new JTextField();
+        targetEditorField.setHorizontalAlignment(SwingConstants.LEFT);
+        ((AbstractDocument) targetEditorField.getDocument()).setDocumentFilter(new DigitOnlyDocumentFilter());
+        DefaultCellEditor targetEditor = new DefaultCellEditor(targetEditorField) {
+            @Override
+            public boolean isCellEditable(EventObject anEvent) {
+                // Let Ctrl/Shift clicks extend the row selection instead of starting an edit, so multiple rows can be
+                // selected (and pasted onto) even when clicking within the TN column.
+                if (anEvent instanceof MouseEvent mouseEvent
+                          && (mouseEvent.isControlDown() || mouseEvent.isShiftDown())) {
+                    return false;
                 }
-                layout.gridx++;
+                return super.isCellEditable(anEvent);
             }
-        }
 
-        // Create Parent Panel
-        return createParentPanel(panel, category.name() + "SkillsTab");
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+                  int column) {
+                Component editor = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+                SwingUtilities.invokeLater(targetEditorField::selectAll);
+                return editor;
+            }
+        };
+        targetEditor.setClickCountToStart(1);
+        table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN).setCellEditor(targetEditor);
+        // Mirror the row copy/paste shortcuts onto the TN editor field so Ctrl+C/Ctrl+V still copy the whole row even
+        // when a TN cell is in edit mode (the field would otherwise consume them as a plain text copy/paste).
+        registerRowCopyPasteShortcuts(targetEditorField, JComponent.WHEN_FOCUSED, table, tableModel);
+
+        String editText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
+              .setCellRenderer(new ButtonRenderer(editText));
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
+              .setCellEditor(new AdvancedButtonEditor(table, tableModel, editText));
+
+        return table;
+    }
+
+    private JScrollPane createTableScrollPane(JTable table) {
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
+        int rowCount = Math.max(1, table.getRowCount());
+        int bodyHeight = table.getRowHeight() * rowCount;
+        int headerHeight = table.getTableHeader().getPreferredSize().height;
+        int width = CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
+        Dimension viewportSize = new Dimension(width, bodyHeight);
+        Dimension scrollPaneSize = new Dimension(width, bodyHeight + headerHeight + UIUtil.scaleForGUI(4));
+
+        table.setPreferredScrollableViewportSize(viewportSize);
+        scrollPane.setPreferredSize(scrollPaneSize);
+        scrollPane.setMinimumSize(scrollPaneSize);
+
+        return scrollPane;
     }
 
     /**
-     * Creates a panel to configure and display the edge cost option in the SkillsTab.
+     * Creates the borderless "Misc Costs" row containing the per-rank Edge cost and per-improvement Attribute cost
+     * controls laid out side by side. Only shown on the Gunnery tab.
      *
-     * @return A {@link JPanel} containing the label and spinner for the edge cost configuration.
+     * @return a {@link JPanel} containing the Edge and Attribute cost controls.
      */
     private JPanel createEdgeCostPanel() {
-        lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
+        JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
-        lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version(0, 51, 0)));
+        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version(0, 51, 0)));
         spnAttributeCost = new CampaignOptionsSpinner("AttributeCost", 100, 0, 500, 1);
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("EdgeCostPanel", true, "EdgeCostPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        // Borderless content panel with both cost controls side by side
+        final JPanel content = new CampaignOptionsStandardPanel("EdgeCostPanel", false);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(content);
 
         layout.gridwidth = 1;
-        layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(lblEdgeCost, layout);
-        layout.gridx++;
-        panel.add(spnEdgeCost, layout);
-
-        layout.gridy++;
         layout.gridx = 0;
-        panel.add(lblAttributeCost, layout);
+        content.add(lblEdgeCost, layout);
         layout.gridx++;
-        panel.add(spnAttributeCost, layout);
+        content.add(spnEdgeCost, layout);
+        layout.gridx++;
+        content.add(lblAttributeCost, layout);
+        layout.gridx++;
+        content.add(spnAttributeCost, layout);
 
-        return panel;
+        return content;
     }
 
     /**
-     * Toggles the visibility of all components related to skills in the SkillsTab UI.
-     * <p>
-     * This can be used to either hide or display all components for easier navigation or cleaner representation of the
-     * tab.
-     * </p>
+     * Registers Ctrl+C / Ctrl+V key bindings on the skills table so a row's full configuration can be copied from the
+     * selected row and pasted onto one or more selected rows without dedicated buttons.
      *
-     * @param visible a boolean indicating whether to show or hide all components.
+     * @param table      the skills table to bind the shortcuts to
+     * @param tableModel the model backing the table
      */
-    private void setVisibleForAll(boolean visible) {
-        setVisibleForAll(allSkillLevels, visible);
-        setVisibleForAll(allSkillCosts, visible);
-        setVisibleForAll(allSkillMilestones, visible);
+    private void installCopyPasteBindings(JTable table, SkillsTableModel tableModel) {
+        registerRowCopyPasteShortcuts(table, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, table, tableModel);
     }
 
     /**
-     * Toggles the visibility of a specific category of components in the SkillsTab UI.
-     * <p>
-     * This method allows visibility control over target numbers, costs, and skill level milestones based on the
-     * provided component map.
-     * </p>
+     * Registers the Ctrl+C / Ctrl+V row copy/paste actions on the given component. This is also applied to the TN cell
+     * editor so the shortcuts work while a TN cell is being edited (otherwise the editor would consume the keystrokes
+     * as a plain text copy/paste and the row configuration would never be captured).
      *
-     * @param componentsMap a map containing the components to show or hide.
-     * @param visible       a boolean indicating whether to show or hide the components.
-     * @param <T>           the type of the component to toggle visibility for (e.g., {@link JSpinner},
-     *                      {@link JComboBox}).
+     * @param component  the component whose input/action maps receive the shortcuts
+     * @param condition  the input map condition (e.g. {@link JComponent#WHEN_FOCUSED})
+     * @param table      the skills table the actions operate on
+     * @param tableModel the model backing the table
      */
-    private <T extends JComponent> void setVisibleForAll(Map<String, List<T>> componentsMap, boolean visible) {
-        for (String SkillName : componentsMap.keySet()) {
-            List<T> components = componentsMap.get(SkillName);
-            if (components != null) {
-                for (T component : components) {
-                    component.setVisible(visible);
-                }
+    private void registerRowCopyPasteShortcuts(JComponent component, int condition, JTable table,
+          SkillsTableModel tableModel) {
+        InputMap inputMap = component.getInputMap(condition);
+        ActionMap actionMap = component.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copySkill");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "pasteSkill");
+
+        actionMap.put("copySkill", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopEditing(table);
+                copySelectedSkill(table, tableModel);
+            }
+        });
+        actionMap.put("pasteSkill", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopEditing(table);
+                pasteToSelectedSkills(table, tableModel);
+            }
+        });
+    }
+
+    private void stopEditing(JTable table) {
+        if (table.isEditing()) {
+            TableCellEditor editor = table.getCellEditor();
+            if (editor != null) {
+                editor.stopCellEditing();
             }
         }
     }
 
-    /**
-     * Creates a dynamic panel for configuring the specified skill.
-     * <p>
-     * Each skill panel includes controls for:
-     * <p>
-     * <li>Setting the target number for the skill.</li>
-     * <li>Configuring costs of the skill at different levels.</li>
-     * <li>Defining milestones for skill progression (e.g., from Green to Veteran).</li>
-     * </p>
-     * Copy and paste buttons are available for transferring configurations between skills.
-     * </p>
-     *
-     * @param skill the {@link SkillType} object representing the skill to be configured.
-     *
-     * @return a {@link JPanel} containing the UI components for the given skill.
-     */
-    private JPanel createSkillPanel(SkillType skill) {
-        String panelName = "SkillPanel" + skill.getName().replace(" ", "");
-
-        // Create the target number spinner
-        JLabel lblTargetNumber = new CampaignOptionsLabel("SkillPanelTargetNumber");
-        JSpinner spnTargetNumber = new CampaignOptionsSpinner("SkillPanelTargetNumber", 0, 0, 12, 1);
-        allTargetNumbers.put(skill.getName(), spnTargetNumber);
-
-        List<JLabel> labels = new ArrayList<>();
-        List<JSpinner> spinners = new ArrayList<>();
-        List<JComboBox<SkillLevel>> comboBoxes = new ArrayList<>();
-
-        List<JLabel> skillLevels = new ArrayList<>();
-        List<JSpinner> skillCosts = new ArrayList<>();
-        List<JComboBox<SkillLevel>> skillMilestones = new ArrayList<>();
-        for (int i = 0; i < 11; i++) {
-            JLabel label = new CampaignOptionsLabel("SkillLevel" + i, null, true);
-            label.setVisible(false);
-            labels.add(label);
-            skillLevels.add(label);
-
-            JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + i, null, 0, -1, 9999, 1, true);
-            spinner.setVisible(false);
-            spinners.add(spinner);
-            skillCosts.add(spinner);
-
-            JComboBox<SkillLevel> comboBox = new JComboBox<>();
-            comboBox.addItem(ULTRA_GREEN);
-            comboBox.addItem(GREEN);
-            comboBox.addItem(REGULAR);
-            comboBox.addItem(VETERAN);
-            comboBox.addItem(ELITE);
-            comboBox.addItem(HEROIC);
-            comboBox.addItem(LEGENDARY);
-            comboBox.addActionListener(e -> milestoneActionListener(comboBoxes, comboBox));
-            comboBox.setVisible(false);
-            comboBoxes.add(comboBox);
-            skillMilestones.add(comboBox);
-        }
-
-        allSkillLevels.put(skill.getName(), skillLevels);
-        allSkillCosts.put(skill.getName(), skillCosts);
-        allSkillMilestones.put(skill.getName(), skillMilestones);
-
-        RoundedJButton copyButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCopy.text"));
-        copyButton.addActionListener(e -> {
-            storedTargetNumber = (Integer) spnTargetNumber.getValue();
-
-            storedValuesSpinners = new ArrayList<>();
-            storedValuesComboBoxes = new ArrayList<>();
-
-            for (int i = 0; i < labels.size(); i++) {
-                storedValuesSpinners.add((Integer) spinners.get(i).getValue());
-                storedValuesComboBoxes.add((SkillLevel) comboBoxes.get(i).getSelectedItem());
-            }
-        });
-
-        RoundedJButton pasteButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(), "btnPaste.text"));
-        pasteButton.addActionListener(e -> {
-            spnTargetNumber.setValue(storedTargetNumber);
-
-            for (int i = 0; i < labels.size(); i++) {
-                spinners.get(i).setValue(storedValuesSpinners.get(i));
-                comboBoxes.get(i).setSelectedItem(storedValuesComboBoxes.get(i));
-            }
-        });
-
-        final JPanel panel = new CampaignOptionsStandardPanel(panelName);
-        panel.setBorder(RoundedLineBorder.createRoundedLineBorder(skill.getName()));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        // Create a button to toggle the table
-        RoundedJButton toggleButton = new RoundedJButton(getTextAt(getCampaignOptionsResourceBundle(),
-              "btnToggle.text"));
-        toggleButton.addActionListener(e -> {
-            for (JLabel label : labels) {
-                label.setVisible(!label.isVisible());
-            }
-
-            for (JComboBox<SkillLevel> comboBox : comboBoxes) {
-                comboBox.setVisible(!comboBox.isVisible());
-            }
-
-            for (JSpinner spinner : spinners) {
-                spinner.setVisible(!spinner.isVisible());
-            }
-        });
-
-        layout.gridy = 0;
-        layout.gridx = 1;
-        layout.gridwidth = 2;
-        panel.add(toggleButton, layout);
-        layout.gridy++;
-
-        layout.gridy++;
-        layout.gridx = 1;
-        layout.gridwidth = 1;
-        panel.add(copyButton, layout);
-        layout.gridx++;
-        panel.add(pasteButton, layout);
-
-        layout.gridy++;
-        layout.gridx = 1;
-        panel.add(lblTargetNumber, layout);
-        layout.gridx++;
-        panel.add(spnTargetNumber, layout);
-
-        for (int i = 0; i < labels.size(); i++) {
-            layout.gridy++;
-            layout.gridx = 0;
-            layout.gridwidth = 1;
-            panel.add(labels.get(i), layout);
-            layout.gridx++;
-            panel.add(spinners.get(i), layout);
-            layout.gridx++;
-            panel.add(comboBoxes.get(i), layout);
-        }
-
-        return panel;
-    }
-
-    /**
-     * Action listener for milestone combo boxes to synchronize their values sequentially.
-     * <p>
-     * When the user changes the value of a milestone, subsequent milestones are automatically adjusted to ensure
-     * logical skill progression (e.g., later milestones cannot precede earlier ones). This method enforces such
-     * constraints.
-     * </p>
-     *
-     * @param comboBoxes the list of combo boxes representing milestones for a single skill.
-     * @param comboBox   the combo box that triggered the action.
-     */
-    private static void milestoneActionListener(List<JComboBox<SkillLevel>> comboBoxes,
-          JComboBox<SkillLevel> comboBox) {
-        int originIndex = comboBoxes.indexOf(comboBox);
-
-        SkillLevel currentSelection = (SkillLevel) comboBox.getSelectedItem();
-
-        if (currentSelection == null) {
+    private void copySelectedSkill(JTable table, SkillsTableModel tableModel) {
+        int viewRow = table.getSelectedRow();
+        if (viewRow < 0) {
             return;
         }
 
-        if (originIndex != 0) {
-            JComboBox<SkillLevel> previousComboBox = comboBoxes.get(originIndex - 1);
-            SkillLevel previousSelection = (SkillLevel) previousComboBox.getSelectedItem();
+        SkillConfiguration configuration = tableModel.getConfiguration(table.convertRowIndexToModel(viewRow));
+        if (configuration != null) {
+            storedConfiguration = new SkillConfiguration(configuration);
+        }
+    }
 
-            if (previousSelection != null) {
-                if (previousSelection.ordinal() > currentSelection.ordinal()) {
-                    comboBox.setSelectedItem(previousSelection);
-                } else if (currentSelection.ordinal() > previousSelection.ordinal() + 1) {
-                    comboBox.setSelectedItem(parseFromInteger(previousSelection.ordinal() + 1));
-                }
-            }
-        } else {
-            if (comboBox.getSelectedItem() != NONE) {
-                comboBox.setSelectedItem(ULTRA_GREEN);
-            }
+    private void pasteToSelectedSkills(JTable table, SkillsTableModel tableModel) {
+        if (storedConfiguration == null) {
+            return;
         }
 
-        if (originIndex < comboBoxes.size() - 1) {
-            originIndex++;
-            JComboBox<SkillLevel> nextComboBox = comboBoxes.get(originIndex);
-            nextComboBox.setSelectedItem(comboBox.getSelectedItem());
+        for (int viewRow : table.getSelectedRows()) {
+            int modelRow = table.convertRowIndexToModel(viewRow);
+            SkillConfiguration configuration = tableModel.getConfiguration(modelRow);
+            if (configuration != null) {
+                configuration.copyFrom(storedConfiguration);
+                tableModel.fireTableRowsUpdated(modelRow, modelRow);
+            }
+        }
+    }
+
+    private void openAdvancedEditor(JTable table, SkillsTableModel tableModel, int modelRow) {
+        SkillConfiguration configuration = tableModel.getConfiguration(modelRow);
+        if (configuration == null) {
+            return;
+        }
+
+        Window parent = SwingUtilities.getWindowAncestor(table);
+        SkillAdvancedEditorDialog dialog = new SkillAdvancedEditorDialog(parent,
+              tableModel.getSkillName(modelRow), configuration);
+        dialog.setVisible(true);
+
+        if (dialog.wasChanged()) {
+            tableModel.fireTableRowsUpdated(modelRow, modelRow);
         }
     }
 
     /**
-     * Loads skill values from the default campaign options.
-     * <p>
-     * A version of this method without parameters that uses default skill values defined in the campaign.
-     * </p>
+     * Loads skill values from the current campaign options using default skill values.
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, new HashMap<>());
+        loadValuesFromCampaignOptions(null, Map.of());
     }
 
     /**
-     * Loads skill values into the UI components from the campaign options.
-     * <p>
-     * The method populates the spinners, labels, and combo boxes for all skills with their corresponding properties
-     * (e.g., target numbers, costs, and milestones) retrieved from the campaign's configuration.
-     * </p>
+     * Loads skill values into the model and refreshes any tables that have already been created.
      *
-     * @param presetSkillValues an optional map of preset skill values. If null or empty, default skill values are used
-     *                          instead.
+     * @param presetCampaignOptions an optional {@link CampaignOptions} source. If {@code null}, the current campaign
+     *                              options are used.
+     * @param presetSkillValues     an optional map of preset skill values. If null or empty, default skill values are
+     *                              used instead.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
           Map<String, SkillType> presetSkillValues) {
@@ -582,109 +500,26 @@ public class SkillsTab {
             options = this.campaignOptions;
         }
 
-        String[] skills = SkillType.getSkillList(); // default skills
+        model = new SkillsOptionsModel(options, presetSkillValues);
 
-        for (String skillName : skills) {
-            // Fetch the skill, either from presetSkillValues or default
-            SkillType skill = presetSkillValues.getOrDefault(skillName, SkillType.getType(skillName));
-
-            // Skip outdated or missing skills
-            if (allTargetNumbers.get(skillName) == null) {
-                LOGGER.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
-                continue;
-            }
-
-            // Update Target Number
-            JSpinner spinner = allTargetNumbers.get(skillName);
-            spinner.setValue(skill.getTarget());
-
-            // Costs
-            List<JSpinner> skillCosts = allSkillCosts.get(skillName);
-            Integer[] costs = skill.getCosts();
-            if (costs != null && skillCosts != null) {
-                for (int i = 0; i < Math.min(costs.length, skillCosts.size()); i++) {
-                    skillCosts.get(i).setValue(costs[i]);
-                }
-            }
-
-            // Milestones
-            List<JComboBox<SkillLevel>> milestones = allSkillMilestones.get(skillName);
-            if (milestones != null) {
-                int greenIndex = skill.getGreenLevel();
-                int regularIndex = skill.getRegularLevel();
-                int veteranIndex = skill.getVeteranLevel();
-                int eliteIndex = skill.getEliteLevel();
-                int heroicIndex = skill.getHeroicLevel();
-                int legendaryIndex = skill.getLegendaryLevel();
-
-                for (int i = 0; i < milestones.size(); i++) {
-                    SkillLevel levelToSet = determineMilestoneLevel(i,
-                          greenIndex,
-                          regularIndex,
-                          veteranIndex,
-                          eliteIndex,
-                          heroicIndex,
-                          legendaryIndex);
-                    milestones.get(i).setSelectedItem(levelToSet);
-                }
-            }
+        for (SkillsTableModel tableModel : tableModels) {
+            tableModel.setOptionsModel(model);
         }
 
-        spnEdgeCost.setValue(options.getEdgeCost());
-        spnAttributeCost.setValue(options.getAttributeCost());
+        if (spnEdgeCost != null) {
+            spnEdgeCost.setValue(model.edgeCost);
+        }
+        if (spnAttributeCost != null) {
+            spnAttributeCost.setValue(model.attributeCost);
+        }
     }
 
     /**
-     * Determines the skill level milestone based on progress indices.
-     * <p>
-     * It evaluates whether the milestone falls under Green, Regular, Veteran, or Elite levels, ensuring proper
-     * assignments for milestone thresholds.
-     * </p>
-     *
-     * @param currentIndex   the position in the milestone sequence.
-     * @param greenIndex     the index where Green begins.
-     * @param regularIndex   the index where Regular begins.
-     * @param veteranIndex   the index where Veteran begins.
-     * @param eliteIndex     the index where Elite begins.
-     * @param heroicIndex    the index where Heroic begins.
-     * @param legendaryIndex the index where Legendary begins.
-     *
-     * @return the corresponding {@link SkillLevel} for the given milestone.
-     */
-    private SkillLevel determineMilestoneLevel(int currentIndex, int greenIndex, int regularIndex, int veteranIndex,
-          int eliteIndex, int heroicIndex, int legendaryIndex) {
-        if (currentIndex < greenIndex) {
-            return ULTRA_GREEN;
-        }
-        if (currentIndex < regularIndex) {
-            return GREEN;
-        }
-        if (currentIndex < veteranIndex) {
-            return REGULAR;
-        }
-        if (currentIndex < eliteIndex) {
-            return VETERAN;
-        }
-        if (currentIndex < heroicIndex) {
-            return ELITE;
-        }
-        if (currentIndex < legendaryIndex) {
-            return HEROIC;
-        }
-        return LEGENDARY;
-    }
-
-    /**
-     * Transfers the configured skill values from the SkillsTab UI into the campaign's underlying data model.
-     * <p>
-     * The method iterates through all configurable skills, updating the campaign with the configured target numbers,
-     * costs, and milestones for each skill.
-     * </p>
+     * Transfers the configured skill values from the SkillsTab into the campaign's underlying data model.
      *
      * @param presetCampaignOptions the {@link CampaignOptions} instance to save settings to, or {@code null} to update
      *                              the current campaign options.
-     * @param presetSkills          an optional map of preset skill values. Overrides default values if provided. Null
-     *                              values will use the campaign's default values.
+     * @param presetSkills          an optional map of preset skill values. Overrides default values if provided.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
           @Nullable Map<String, SkillType> presetSkills) {
@@ -693,111 +528,255 @@ public class SkillsTab {
             options = this.campaignOptions;
         }
 
-        for (final String skillName : SkillType.getSkillList()) {
-            SkillType type = SkillType.getType(skillName);
-            if (presetSkills != null) {
-                type = presetSkills.get(skillName);
-            }
-
-            if (type == null) {
-                LOGGER.info("(applyCampaignOptionsToCampaign) Skipping outdated or missing skill: {}", skillName);
-                continue;
-            }
-
-            // Update Target Number
-            updateTargetNumber(type);
-
-            // Update Skill Costs
-            updateSkillCosts(skillName);
-
-            // Update Skill Milestones
-            updateSkillMilestones(type);
+        if (spnEdgeCost != null) {
+            model.edgeCost = (int) spnEdgeCost.getValue();
+        }
+        if (spnAttributeCost != null) {
+            model.attributeCost = (int) spnAttributeCost.getValue();
         }
 
-        options.setEdgeCost((int) spnEdgeCost.getValue());
-        options.setAttributeCost((int) spnAttributeCost.getValue());
+        model.applyTo(options, presetSkills);
     }
 
     /**
-     * Updates the target number for a given skill in the campaign based on the corresponding user input from the
-     * SkillsTab UI.
-     * <p>
-     * The target number determines the difficulty level for the specified skill in the campaign. This value is fetched
-     * from the associated spinner component in the UI and is applied to the given {@link SkillType}.
-     * </p>
+     * Builds a short, human-readable summary of a skill's experience milestones (the level at which a character is
+     * considered Green, Regular, Veteran, Elite, Heroic, and Legendary).
      *
-     * @param type the {@link SkillType} object representing the skill whose target number needs to be updated.
+     * @param configuration the configuration to summarize
+     *
+     * @return a compact milestone summary string
      */
-    private void updateTargetNumber(SkillType type) {
-        int targetNumber = (int) allTargetNumbers.get(type.getName()).getValue();
-        type.setTarget(targetNumber);
+    private static String buildProgressionSummary(SkillConfiguration configuration) {
+        return String.format("G %d  ·  R %d  ·  V %d  ·  E %d  ·  H %d  ·  L %d",
+              configuration.greenLevel,
+              configuration.regularLevel,
+              configuration.veteranLevel,
+              configuration.eliteLevel,
+              configuration.heroicLevel,
+              configuration.legendaryLevel);
     }
 
     /**
-     * Updates the costs associated with a given skill based on the user input from the SkillsTab UI.
-     * <p>
-     * For each level of the specified skill, the cost values are retrieved from the corresponding spinner components in
-     * the UI and stored in the campaign's configuration. The costs represent the resource requirements for acquiring
-     * the skill at various levels.
-     * </p>
+     * Builds a compact summary of a skill's per-level XP costs (levels 0 through 10). A cost of {@code -1} marks an
+     * unreachable level and is shown as an em dash.
      *
-     * @param skillName the name of the skill whose cost values are to be updated.
+     * @param configuration the configuration to summarize
+     *
+     * @return a compact XP cost summary string
      */
-    private void updateSkillCosts(String skillName) {
-        List<JSpinner> costs = allSkillCosts.get(skillName);
-
-        for (int level = 0; level < costs.size(); level++) {
-            int cost = (int) costs.get(level).getValue();
-            SkillType.setCost(skillName, cost, level);
+    private static String buildCostSummary(SkillConfiguration configuration) {
+        StringBuilder summary = new StringBuilder();
+        for (int i = 0; i < configuration.costs.length; i++) {
+            if (i > 0) {
+                summary.append(" · ");
+            }
+            Integer cost = configuration.costs[i];
+            summary.append((cost == null || cost < 0) ? "—" : cost);
         }
+        return summary.toString();
     }
 
     /**
-     * Updates the skill milestones for a given skill in the campaign based on user input from the SkillsTab UI.
-     * <p>
-     * Milestones represent the thresholds required to reach certain skill levels (e.g., Green, Regular, Veteran,
-     * Elite). The method processes these values from the associated combo boxes in the UI and applies them to the
-     * provided {@link SkillType}.
-     * <p>
-     * The method ensures logical milestone progression and assigns default values if necessary.
-     * </p>
-     *
-     * @param type the {@link SkillType} object representing the skill whose milestones are to be updated.
+     * Table model backing a single skill sub-type's table. It reads and writes the live {@link SkillConfiguration}
+     * instances held by the {@link SkillsOptionsModel}, so edits made through the table (and the advanced editor) are
+     * reflected immediately in the model.
      */
-    private void updateSkillMilestones(SkillType type) {
-        List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type.getName());
+    private static final class SkillsTableModel extends AbstractTableModel {
+        private static final int SKILL_COLUMN = 0;
+        private static final int TARGET_COLUMN = 1;
+        private static final int PROGRESSION_COLUMN = 2;
+        private static final int COST_COLUMN = 3;
+        private static final int EDIT_COLUMN = 4;
+        private static final int COLUMN_COUNT = 5;
 
-        // These allow us to ensure the full array of milestones has been assigned
-        type.setGreenLevel(skillMilestones.size() - 6);
-        type.setRegularLevel(skillMilestones.size() - 5);
-        type.setVeteranLevel(skillMilestones.size() - 4);
-        type.setEliteLevel(skillMilestones.size() - 3);
-        type.setHeroicLevel(skillMilestones.size() - 2);
-        type.setLegendaryLevel(skillMilestones.size() - 1);
+        private final List<String> skillNames;
+        private SkillsOptionsModel optionsModel;
 
-        // Then we overwrite those insurance values with the actual values
-        SkillLevel lastAssignment = ULTRA_GREEN;
-        for (int i = 0; i < skillMilestones.size(); i++) {
+        private SkillsTableModel(List<String> skillNames, SkillsOptionsModel optionsModel) {
+            this.skillNames = List.copyOf(skillNames);
+            this.optionsModel = optionsModel;
+        }
 
-            JComboBox<SkillLevel> milestoneCombo = skillMilestones.get(i);
-            SkillLevel selectedSkillLevel = (SkillLevel) milestoneCombo.getSelectedItem();
+        private void setOptionsModel(SkillsOptionsModel optionsModel) {
+            this.optionsModel = optionsModel;
+            fireTableDataChanged();
+        }
 
-            if (selectedSkillLevel != lastAssignment) {
-                lastAssignment = selectedSkillLevel;
+        private String getSkillName(int rowIndex) {
+            return skillNames.get(rowIndex);
+        }
 
-                if (selectedSkillLevel != null) {
-                    switch (selectedSkillLevel) {
-                        case GREEN -> type.setGreenLevel(i);
-                        case REGULAR -> type.setRegularLevel(i);
-                        case VETERAN -> type.setVeteranLevel(i);
-                        case ELITE -> type.setEliteLevel(i);
-                        case HEROIC -> type.setHeroicLevel(i);
-                        case LEGENDARY -> type.setLegendaryLevel(i);
-                        default -> {
-                        }
-                    }
+        private SkillConfiguration getConfiguration(int rowIndex) {
+            if (optionsModel == null) {
+                return null;
+            }
+            return optionsModel.getSkillConfiguration(skillNames.get(rowIndex));
+        }
+
+        @Override
+        public int getRowCount() {
+            return skillNames.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return COLUMN_COUNT;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return switch (column) {
+                case SKILL_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableSkillColumn.text");
+                case TARGET_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableTargetColumn.text");
+                case PROGRESSION_COLUMN ->
+                      getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionColumn.text");
+                case COST_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableCostColumn.text");
+                case EDIT_COLUMN ->
+                      getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableAdvancedColumn.text");
+                default -> throw new IllegalArgumentException("Unknown skill table column: " + column);
+            };
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            return switch (column) {
+                case TARGET_COLUMN -> Integer.class;
+                default -> String.class;
+            };
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == TARGET_COLUMN || columnIndex == EDIT_COLUMN;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            SkillConfiguration configuration = getConfiguration(rowIndex);
+            return switch (columnIndex) {
+                case SKILL_COLUMN -> skillNames.get(rowIndex);
+                case TARGET_COLUMN -> configuration == null ? 0 : configuration.targetNumber;
+                case PROGRESSION_COLUMN -> configuration == null ? "" : buildProgressionSummary(configuration);
+                case COST_COLUMN -> configuration == null ? "" : buildCostSummary(configuration);
+                case EDIT_COLUMN -> "";
+                default -> throw new IllegalArgumentException("Unknown skill table column: " + columnIndex);
+            };
+        }
+
+        @Override
+        public void setValueAt(Object value, int rowIndex, int columnIndex) {
+            if (columnIndex != TARGET_COLUMN) {
+                return;
+            }
+
+            SkillConfiguration configuration = getConfiguration(rowIndex);
+            if (configuration == null) {
+                return;
+            }
+
+            configuration.targetNumber = clampTargetNumber(value);
+            fireTableCellUpdated(rowIndex, columnIndex);
+        }
+
+        private int clampTargetNumber(Object value) {
+            int parsed;
+            if (value instanceof Number number) {
+                parsed = number.intValue();
+            } else if (value == null) {
+                parsed = 0;
+            } else {
+                try {
+                    parsed = Integer.parseInt(value.toString().trim());
+                } catch (NumberFormatException exception) {
+                    parsed = 0;
                 }
             }
+            return Math.max(0, Math.min(12, parsed));
+        }
+    }
+
+    /**
+     * A {@link DocumentFilter} that only permits digit characters, used to keep the TN cell editor numeric. The table
+     * model still clamps the final value to its valid range when editing stops.
+     */
+    private static final class DigitOnlyDocumentFilter extends DocumentFilter {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+              throws BadLocationException {
+            if (isDigitsOnly(string)) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+              throws BadLocationException {
+            if (isDigitsOnly(text)) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+
+        private static boolean isDigitsOnly(String text) {
+            if (text == null) {
+                return true;
+            }
+            for (int i = 0; i < text.length(); i++) {
+                if (!Character.isDigit(text.charAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
+     * A table cell renderer that paints a button. Used to give every skill row an "Advanced" affordance.
+     */
+    private static final class ButtonRenderer extends JButton implements TableCellRenderer {        private ButtonRenderer(String text) {
+            super(text);
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+              boolean hasFocus, int row, int column) {
+            return this;
+        }
+    }
+
+    /**
+     * A table cell editor that turns the "Advanced" column into a clickable button. Clicking it opens the advanced
+     * editor dialog for that row.
+     */
+    private final class AdvancedButtonEditor extends AbstractCellEditor implements TableCellEditor {
+        private final JButton button;
+        private final JTable table;
+        private final SkillsTableModel tableModel;
+        private int editingModelRow = -1;
+
+        private AdvancedButtonEditor(JTable table, SkillsTableModel tableModel, String text) {
+            this.table = table;
+            this.tableModel = tableModel;
+            this.button = new JButton(text);
+            this.button.addActionListener(e -> {
+                int row = editingModelRow;
+                fireEditingStopped();
+                if (row >= 0) {
+                    openAdvancedEditor(this.table, this.tableModel, row);
+                }
+            });
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+              int column) {
+            editingModelRow = table.convertRowIndexToModel(row);
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return "";
         }
     }
 }

@@ -32,12 +32,9 @@
  */
 package mekhq.gui.campaignOptions.components;
 
-import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Dimension;
 import javax.swing.JPanel;
 
 import megamek.common.annotations.Nullable;
@@ -115,21 +112,6 @@ public class CampaignOptionsStandardPanel extends JPanel {
                             "" :
                             getTextAt(getCampaignOptionsResourceBundle(), "lbl" + borderTitle + ".text")
                                   + CampaignOptionsUtilities.formatBadges(metadata);
-
-        // Set a standardized panel behavior and preferred size scaling
-        new JPanel() {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension standardSize = super.getPreferredSize();
-                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
-            }
-
-            @Override
-            public Dimension getMinimumSize() {
-                Dimension standardSize = super.getPreferredSize();
-                return scaleForGUI(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
-            }
-        };
 
         if (includeBorder) {
             if (borderTitle.isBlank()) {

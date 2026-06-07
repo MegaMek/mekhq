@@ -34,35 +34,33 @@ package mekhq.gui.campaignOptions;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel.getTipPanelName;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -87,11 +85,18 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * </ul>
  */
 public class CampaignOptionsUtilities {
-    private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsUtilities.class);
-
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
     public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
+    /**
+     * Fixed content width for page-shell section bodies (tables, ability panels). Kept narrower than
+     * {@link #CAMPAIGN_OPTIONS_PANEL_WIDTH} so that, once the collapsible section's padding and insets are added, the
+     * content never reports a preferred width wider than the page can display (which would break the section layout).
+     */
+    public final static int CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH = scaleForGUI(860);
+    private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
+    private static final int QUOTE_BOTTOM_PADDING = scaleForGUI(8);
+    private static Consumer<String> tipTextConsumer;
 
 
     /**
@@ -147,6 +152,10 @@ public class CampaignOptionsUtilities {
         return RESOURCE_BUNDLE;
     }
 
+    static void setTipTextConsumer(@Nullable Consumer<String> tipTextConsumer) {
+        CampaignOptionsUtilities.tipTextConsumer = tipTextConsumer;
+    }
+
     /**
      * Retrieves the directory path for storing faction-related image resources.
      *
@@ -186,107 +195,99 @@ public class CampaignOptionsUtilities {
      * @return a fully initialized {@link JPanel} configured as a parent container.
      */
     public static JPanel createParentPanel(JPanel panel, String name) {
-        // Create Panel
-        final JPanel parentPanel = new CampaignOptionsStandardPanel(name);
-        final GroupLayout parentLayout = createGroupLayout(parentPanel);
+        return new CampaignOptionsPageWrapper(panel, name);
+    }
 
-        // Layout
-        parentPanel.setLayout(parentLayout);
+    static Component createContentWithQuote(Component content, @Nullable String quoteResourceName) {
+        if (quoteResourceName == null || !ResourceBundle.getBundle(RESOURCE_BUNDLE)
+                                                 .containsKey(quoteResourceName + ".border")) {
+            return content;
+        }
 
-        parentLayout.setVerticalGroup(
-              parentLayout.createSequentialGroup()
-                    .addComponent(panel));
+        int quoteWidth = Math.max(1, Math.min(getQuoteReferenceWidth(content), CAMPAIGN_OPTIONS_PANEL_WIDTH));
 
-        parentLayout.setHorizontalGroup(
-              parentLayout.createParallelGroup(Alignment.CENTER)
-                    .addComponent(panel));
+        JPanel quotePanel = new JPanel(new GridBagLayout());
+        quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, QUOTE_BOTTOM_PADDING, 0));
+        JLabel quote = new JLabel(String.format(
+              "<html><div style='width: %spx; text-align:center;'>%s</div></html>",
+              quoteWidth,
+              getTextAt(RESOURCE_BUNDLE, quoteResourceName + ".border")));
 
-        return parentPanel;
+        GridBagConstraints quoteConstraints = new GridBagConstraints();
+        quoteConstraints.gridx = GridBagConstraints.RELATIVE;
+        quoteConstraints.gridy = GridBagConstraints.RELATIVE;
+        quotePanel.add(quote, quoteConstraints);
+
+        JPanel quotedContent = new JPanel(new BorderLayout());
+        quotedContent.setName("pnl" + quoteResourceName + "QuotedContent");
+        quotedContent.add(content, BorderLayout.CENTER);
+        quotedContent.add(quotePanel, BorderLayout.SOUTH);
+        return quotedContent;
     }
 
     /**
-     * Dynamically creates a {@link JTabbedPane} from a map of tab names and panels.
+     * Determines the width that the closing quote should be sized to.
      *
      * <p>
-     * This method organizes the tabs in alphabetic order except for tabs whose names contain "GeneralTab", which are
-     * moved to the front as a prioritized tab. Each panel is wrapped in a custom layout that includes additional
-     * components, such as quotes or additional spacing elements, for better visual formatting.
+     * The page header reserves a fixed (wide) body text width, so sizing the quote to the whole content's preferred
+     * width makes the quote noticeably wider than the option sections beneath it. To keep the quote aligned with the
+     * visible sections, this method returns the width of the widest {@link MHQCollapsiblePanel} section found within the
+     * content tree, falling back to the content's preferred width when no section is present.
      * </p>
      *
-     * <p>
-     * Tabs are localized using the {@link ResourceBundle}, which maps tab names to their corresponding displayed
-     * titles.
-     * </p>
+     * @param content the content whose section widths should be inspected
      *
-     * @param panels a map where the key is the resource name of the tab, and the value is the {@link JPanel} displayed
-     *               as the content of the tab.
-     *
-     * @return a {@link JTabbedPane} containing the organized and formatted tabs.
+     * @return the reference width to use for the quote
      */
-    static JTabbedPane createSubTabs(Map<String, JPanel> panels) {
-        // We use a list here to ensure that the tabs always display in the same order,
-        // and that order might as well be alphabetic.
-        List<String> tabNames = new ArrayList<>(panels.keySet());
-        tabNames.sort(String.CASE_INSENSITIVE_ORDER);
+    private static int getQuoteReferenceWidth(Component content) {
+        int widestSection = findWidestSection(content);
+        return widestSection > 0 ? widestSection : content.getPreferredSize().width;
+    }
 
-        // This is a special case handler to ensure 'general options' tabs always appear first
-        int indexToMoveToFront = -1;
-        for (int i = 0; i < tabNames.size(); i++) {
-            if (tabNames.get(i).contains("GeneralTab")) {
-                indexToMoveToFront = i;
-                break;
+    private static int findWidestSection(Component component) {
+        int widest = 0;
+        if (component instanceof MHQCollapsiblePanel) {
+            widest = component.getPreferredSize().width;
+        }
+
+        if (component instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                widest = Math.max(widest, findWidestSection(child));
             }
         }
 
-        if (indexToMoveToFront != -1) {
-            String tabName = tabNames.remove(indexToMoveToFront);
-            tabNames.addFirst(tabName);
+        return widest;
+    }
+
+    private static class CampaignOptionsPageWrapper extends JPanel {
+        private final Component content;
+
+        private CampaignOptionsPageWrapper(Component content, String name) {
+            super(null);
+            this.content = content;
+            setName("pnl" + name);
+            add(content);
         }
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-
-        for (String tabName : tabNames) {
-            JPanel mainPanel = panels.get(tabName);
-
-            // Create a panel for the quote
-            JPanel quotePanel = new JPanel(new GridBagLayout());
-            JLabel quote = new JLabel(String.format(
-                  "<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                  UIUtil.scaleForGUI(mainPanel.getPreferredSize().width),
-                  getTextAt(RESOURCE_BUNDLE, tabName + ".border")));
-
-            GridBagConstraints quoteConstraints = new GridBagConstraints();
-            quoteConstraints.gridx = GridBagConstraints.RELATIVE;
-            quoteConstraints.gridy = GridBagConstraints.RELATIVE;
-            quotePanel.add(quote, quoteConstraints);
-
-            // Create a BorderLayout panel for mainPanel
-            JPanel mainPanelHolder = new JPanel(new GridBagLayout());
-            GridBagConstraints mainConstraints = new GridBagConstraints();
-            mainConstraints.gridx = GridBagConstraints.RELATIVE;
-            mainConstraints.gridy = GridBagConstraints.RELATIVE;
-            mainPanelHolder.add(mainPanel, mainConstraints);
-
-            // Reorganize mainPanel to include quotePanel at bottom
-            JPanel contentPanel = new JPanel(new BorderLayout());
-            contentPanel.setName(tabName);
-            contentPanel.add(mainPanelHolder, BorderLayout.CENTER);
-
-            contentPanel.add(quotePanel, BorderLayout.SOUTH);
-
-            // Create a wrapper panel for its easy alignment controls
-            JPanel wrapperPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.anchor = GridBagConstraints.NORTH;
-            gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
-
-            wrapperPanel.add(contentPanel, gbc);
-
-            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, tabName + ".title"), wrapperPanel);
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension preferredSize = content.getPreferredSize();
+            return new Dimension(Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), preferredSize.height);
         }
 
-        return tabbedPane;
+        @Override
+        public Dimension getMinimumSize() {
+            return new Dimension(0, content.getMinimumSize().height);
+        }
+
+        @Override
+        public void doLayout() {
+            Dimension preferredSize = content.getPreferredSize();
+            int contentWidth = Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH);
+            contentWidth = Math.min(contentWidth, getWidth());
+            int x = Math.max(0, (getWidth() - contentWidth) / 2);
+            content.setBounds(x, 0, contentWidth, preferredSize.height);
+        }
     }
 
     /**
@@ -302,14 +303,12 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Creates a {@link MouseAdapter} that updates the text of a {@link JLabel} within the specified panel to display a
-     * tip string when the mouse enters a related component.
+    * Creates a {@link MouseAdapter} that updates the shared Campaign Options help surface when the mouse enters a
+    * related component.
      *
      * <p>
-     * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
-     * associated with that component. If the tip contains fewer than five HTML line break tags ({@code <br>}), extra
-     * line breaks are appended to ensure a minimum number of lines. The formatted tip is then set as the text of a
-     * {@link JLabel} within the provided panel, specifically targeting labels whose name matches the required pattern.
+    * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
+    * associated with that component and sends the formatted text to the sticky help panel owned by the shell.
      * </p>
      *
      * @param associatedHeaderPanel   the {@link JPanel} containing the label to update
@@ -326,14 +325,12 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Creates a {@link MouseAdapter} that updates the text of a {@link JLabel} within the specified panel to display a
-     * tip string when the mouse enters a related component.
+    * Creates a {@link MouseAdapter} that updates the shared Campaign Options help surface when the mouse enters a
+    * related component.
      *
      * <p>
-     * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
-     * associated with that component. If the tip contains fewer than five HTML line break tags ({@code <br>}), extra
-     * line breaks are appended to ensure a minimum number of lines. The formatted tip is then set as the text of a
-     * {@link JLabel} within the provided panel, specifically targeting labels whose name matches the required pattern.
+    * When the mouse enters a component with the specified name, this adapter retrieves a localized tip string
+    * associated with that component and sends the formatted text to the sticky help panel owned by the shell.
      * </p>
      *
      * @param associatedHeaderPanel   the {@link JPanel} containing the label to update
@@ -360,74 +357,16 @@ public class CampaignOptionsUtilities {
                     return;
                 }
 
-                // This might seem really weird, and it is, but the wordWrap method uses '<br>' to create its new
-                // lines. This allows us to more easily account for line width when counting instances of '<br>' in
-                // the section below.
                 tipText = wordWrap(tipText, 120);
-
-                // We have to remove the opening tag so that the extra '<br>' we're adding can be factored into the
-                // display
-                tipText = tipText.replace("<html>", "");
-
-                // These extra linebreaks are to ensure we have a relatively consistent number of lines. This stops the
-                // options from 'bouncing' around too much as the tip resizes.
-                int panelLineCount = associatedHeaderPanel.getTipPanelHeight();
-                int missingLines = panelLineCount - tipLineCounter(tipText);
-                if (missingLines > 0) {
-                    String lineBreaks = "";
-                    for (int missingLine = 0; missingLine < missingLines; missingLine++) {
-                        lineBreaks += "<br>";
-                    }
-
-                    tipText = lineBreaks + tipText;
-                } else if (missingLines < 0) {
-                    LOGGER.warn("Tip panel for {} exceeds the maximum number of lines ({}). Line count should be " +
-                                      "increased by {}",
-                          associatedHeaderPanel.getName(),
-                          panelLineCount,
-                          Math.abs(missingLines));
+                if (!tipText.endsWith("</html>")) {
+                    tipText += "</html>";
                 }
 
-                // That out of the way, let's add the opening tag back in
-                tipText = "<html>" + tipText;
-
-                for (Component component : associatedHeaderPanel.getComponents()) {
-                    if (component instanceof JLabel label) {
-                        String labelName = label.getName();
-                        if (labelName != null && labelName.contains(getTipPanelName())) {
-                            label.setText(tipText);
-                        }
-                    }
+                if (tipTextConsumer != null) {
+                    tipTextConsumer.accept(tipText);
                 }
             }
         };
-    }
-
-    /**
-     * Counts the number of occurrences of the HTML line break tag {@code "<br>"} in the given tip string.
-     *
-     * <p>
-     * This method scans the provided string and returns the number of times the substring {@code "<br>"} appears. It is
-     * useful for determining how many HTML line breaks are present in formatted tip text.
-     * </p>
-     *
-     * @param tip the string to scan for {@code "<br>"} occurrences
-     *
-     * @return the number of {@code "<br>"} tags found in the string
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private static int tipLineCounter(String tip) {
-        Pattern pattern = Pattern.compile("<br>");
-        Matcher matcher = pattern.matcher(tip);
-
-        int count = 0;
-        while (matcher.find()) {
-            count++;
-        }
-
-        return count;
     }
 
     // region Badge Formatting

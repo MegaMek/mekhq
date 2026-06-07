@@ -32,32 +32,29 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.List;
-import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
@@ -73,16 +70,13 @@ import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
@@ -102,8 +96,18 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
+    // Intentional exception to the shared CampaignOptionsFormPanel default widths: the landing page uses a narrow
+    // label column and a wide control column to fit the faction and date pickers.
+    private static final int FORM_LABEL_COLUMN_WIDTH = 150;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 360;
+    private static final int GENERAL_HEADER_IMAGE_SIZE = 200;
+    private static final int BASIC_FIELD_WIDTH = 270;
+    private static final int FURTHER_READING_TEXT_WIDTH = 700;
+
     private static final LocalDate RANDOM_DATE_EARLIEST = LocalDate.of(2775, 1, 1);
     private static final LocalDate RANDOM_DATE_LATEST = LocalDate.of(3151, 1, 1);
+    private static final String HTML_OPEN_TAG = "<html>";
+    private static final String HTML_CLOSE_TAG = "</html>";
 
     private final JFrame frame;
     private final Campaign campaign;
@@ -111,19 +115,19 @@ public class GeneralTab {
 
     private JLabel lblName;
     private JTextField txtName;
-    private RoundedJButton btnNameGenerator;
+    private JButton btnNameGenerator;
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
-    private RoundedJButton btnRandomFaction;
+    private JButton btnRandomFaction;
     private JLabel lblDate;
-    private RoundedJButton btnDate;
-    private RoundedJButton btnRandomDate;
+    private JButton btnDate;
+    private JButton btnRandomDate;
     private LocalDate date;
     private JLabel lblCamo;
-    private RoundedJButton btnCamo;
+    private JButton btnCamo;
     private Camouflage camouflage;
     private JLabel lblIcon;
-    private RoundedJButton btnIcon;
+    private JButton btnIcon;
     private StandardFormationIcon unitIcon;
 
     /**
@@ -182,20 +186,20 @@ public class GeneralTab {
      *     <li>Buttons for choosing camouflage and unit icons</li>
      * </ul>
      *
-     * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
+     * @return A {@link JPanel} containing the general tab content.
      */
-    public AbstractMHQScrollablePanel createGeneralTab() {
-        // Header
-        JPanel headerPanel = createGeneralHeader();
-
+    public JPanel createGeneralTab() {
         // Campaign name
         lblName = new CampaignOptionsLabel("Name");
         txtName = new CampaignOptionsTextField("Name");
+        txtName.setColumns(24);
 
         // Generate new random campaign name
-        btnNameGenerator = new CampaignOptionsButton("NameGenerator");
-        btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController.randomMercenaryCompanyNameGenerator(
-              campaign.getCommander())));
+        btnNameGenerator = createButton("NameGenerator");
+        btnNameGenerator.addActionListener(event -> {
+            String generatedName = BackgroundsController.randomMercenaryCompanyNameGenerator(campaign.getCommander());
+            txtName.setText(generatedName);
+        });
 
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");
@@ -204,8 +208,8 @@ public class GeneralTab {
               getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Randomize faction
-        btnRandomFaction = new CampaignOptionsButton("RandomFaction", getMetadata(MILESTONE_BEFORE_METADATA));
-        btnRandomFaction.addActionListener(e -> {
+        btnRandomFaction = createButton("RandomFaction", getMetadata(MILESTONE_BEFORE_METADATA));
+        btnRandomFaction.addActionListener(event -> {
             FactionDisplay randomFaction = pickRandomFaction();
             if (randomFaction != null) {
                 comboFaction.setSelectedItem(randomFaction);
@@ -214,13 +218,13 @@ public class GeneralTab {
 
         // Date
         lblDate = new CampaignOptionsLabel("Date");
-        btnDate = new CampaignOptionsButton("Date");
+        btnDate = createButton("Date");
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Randomize starting date
-        btnRandomDate = new CampaignOptionsButton("RandomDate", getMetadata(MILESTONE_BEFORE_METADATA));
-        btnRandomDate.addActionListener(e -> {
+        btnRandomDate = createButton("RandomDate", getMetadata(MILESTONE_BEFORE_METADATA));
+        btnRandomDate.addActionListener(event -> {
             LocalDate randomDate = DateUtilities.getRandomDateBetween(RANDOM_DATE_EARLIEST, RANDOM_DATE_LATEST);
             setDate(randomDate);
         });
@@ -243,102 +247,82 @@ public class GeneralTab {
         btnIcon.addActionListener(this::btnIconActionPerformed);
         btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
 
-        // Initialize the parent panel
-        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
-              "generalPanel",
-              new GridBagLayout());
-
-        // Layout the Panel
-        JPanel panel = new JPanel();
-        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridwidth = 5;
-        layout.weightx = 1.0;
-        layout.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(headerPanel, layout);
-
-        layout.gridwidth = 1;
-        layout.weightx = 1;
-        layout.gridy++;
-        panel.add(lblDate, layout);
-        panel.add(btnDate, layout);
-        panel.add(btnRandomDate, layout);
-
-        layout.gridy++;
-        panel.add(lblName, layout);
-        panel.add(txtName, layout);
-
-        panel.add(btnNameGenerator, layout);
-
-        layout.gridy++;
-        panel.add(lblFaction, layout);
-        panel.add(comboFaction, layout);
-        panel.add(btnRandomFaction, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 5;
-        layout.gridx = GridBagConstraints.RELATIVE;
-
-        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        iconsPanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        iconsPanel.setMinimumSize(UIUtil.scaleForGUI(0, 120));
-
-        iconsPanel.add(lblIcon);
-        iconsPanel.add(btnIcon);
-        iconsPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(50)));
-        iconsPanel.add(lblCamo);
-        iconsPanel.add(btnCamo);
-
-        panel.add(iconsPanel, layout);
-        layout.gridy++;
-        layout.gridwidth = 5;
-        panel.add(createFurtherReadingPanel(), layout);
-        generalPanel.add(panel);
-
-        return generalPanel;
+        return CampaignOptionsPagePanel.builder("GeneralTab", "General", "data/images/misc/MekHQ.png")
+              .headerImageSize(GENERAL_HEADER_IMAGE_SIZE)
+              .tintHeaderImage(false)
+              .showDetailsPanel(false)
+              .quote("generalPanel")
+              .intro("lblGeneralIconLegend.text")
+              .section("lblGeneralCampaignBasicsPanel.text",
+                    "lblGeneralCampaignBasicsPanel.summary",
+                    createCampaignBasicsPanel())
+              .section("lblGeneralIdentityArtworkPanel.text",
+                    "lblGeneralIdentityArtworkPanel.summary",
+                    createIdentityArtworkPanel())
+              .section("lblFurtherReadingPanel.text",
+                    "lblFurtherReadingPanel.summary",
+                    createFurtherReadingPanel())
+              .build();
     }
 
-    /**
-     * Creates a header panel for the general tab, which includes:
-     * <p>
-     * <li>An image representing the campaign options</li>
-     * <li>A title for the general tab</li>
-     * <li>A description of the general tab functionalities</li>
-     * </p>
-     *
-     * @return A {@link JPanel} containing the general tab header.
-     */
-    private static JPanel createGeneralHeader() {
-        ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
-        imageIcon = scaleImageIcon(imageIcon, 200, true);
-        JLabel imageLabel = new JLabel(imageIcon);
+    private JPanel createCampaignBasicsPanel() {
+        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralCampaignBasicsPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
+        panel.addRow(lblName, createInlineControls(createFixedWidthControl(txtName), btnNameGenerator));
+        panel.addRow(lblFaction, createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction));
+        return panel;
+    }
 
-        final JLabel lblHeader = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblGeneral.text"),
-              SwingConstants.CENTER);
-        lblHeader.setMinimumSize(UIUtil.scaleForGUI(600, 0));
-        setFontScaling(lblHeader, true, 2);
-        lblHeader.setName("lblGeneral");
+    private JButton createButton(String name) {
+        return createButton(name, null);
+    }
 
-        JLabel lblBody = new JLabel(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralBody.text")),
-              SwingConstants.CENTER);
-        lblBody.setName("lblGeneralHeaderBody");
+    private JButton createButton(String name, @Nullable CampaignOptionsMetadata metadata) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text")
+              + formatBadges(metadata));
+        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
+        if (!tooltipText.isEmpty()) {
+            button.setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
+        }
+        button.setName("btn" + name);
+        setFontScaling(button, false, 1);
+        return button;
+    }
 
-        final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+    private void setControlWidth(JComponent component, int width) {
+        Dimension preferredSize = component.getPreferredSize();
+        Dimension adjustedSize = new Dimension(UIUtil.scaleForGUI(width), preferredSize.height);
+        component.setPreferredSize(adjustedSize);
+        component.setMinimumSize(adjustedSize);
+        component.setMaximumSize(adjustedSize);
+    }
 
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                                      .addComponent(lblHeader)
-                                      .addComponent(imageLabel)
-                                      .addComponent(lblBody)
-                                      .addGap(UIUtil.scaleForGUI(20)));
+    private JComponent createFixedWidthControl(JComponent component) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.add(component, BorderLayout.CENTER);
+        setControlWidth(panel, BASIC_FIELD_WIDTH);
+        return panel;
+    }
 
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.CENTER)
-                                        .addComponent(lblHeader)
-                                        .addComponent(imageLabel)
-                                        .addComponent(lblBody));
+    private JPanel createIdentityArtworkPanel() {
+        CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralIdentityArtworkPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              UIUtil.scaleForGUI(120));
+        panel.addRow(lblIcon, createInlineControls(btnIcon));
+        panel.addRow(lblCamo, createInlineControls(btnCamo));
+        return panel;
+    }
+
+    private JPanel createInlineControls(JComponent... components) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIUtil.scaleForGUI(5), 0));
+        panel.setOpaque(false);
+
+        for (JComponent component : components) {
+            panel.add(component);
+        }
 
         return panel;
     }
@@ -356,18 +340,18 @@ public class GeneralTab {
         lblName = new JLabel();
         txtName = new JTextField();
 
-        btnNameGenerator = new RoundedJButton();
+        btnNameGenerator = new JButton();
 
         lblFaction = new JLabel();
         comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
-        btnRandomFaction = new RoundedJButton();
+        btnRandomFaction = new JButton();
 
         lblDate = new JLabel();
-        btnDate = new RoundedJButton();
-        btnRandomDate = new RoundedJButton();
+        btnDate = new JButton();
+        btnRandomDate = new JButton();
 
         lblCamo = new JLabel();
-        btnCamo = new RoundedJButton() {
+        btnCamo = new JButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
@@ -375,7 +359,7 @@ public class GeneralTab {
         };
 
         lblIcon = new JLabel();
-        btnIcon = new RoundedJButton() {
+        btnIcon = new JButton() {
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
@@ -449,9 +433,11 @@ public class GeneralTab {
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();
-        ((DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel()).addAll(FactionDisplay.getSortedValidFactionDisplays(
-              Factions.getInstance().getChoosableFactions(),
-              date));
+        DefaultComboBoxModel<FactionDisplay> factionModel =
+            (DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel();
+        List<FactionDisplay> validFactions = FactionDisplay.getSortedValidFactionDisplays(
+            Factions.getInstance().getChoosableFactions(), date);
+        factionModel.addAll(validFactions);
         comboFaction.setSelectedItem(factionDisplay);
     }
 
@@ -490,20 +476,17 @@ public class GeneralTab {
      * @return A {@link JPanel} containing additional informational components.
      */
     private JPanel createFurtherReadingPanel() {
-        JLabel lblFurtherReading = new CampaignOptionsLabel("FurtherReading", null, true);
+        return new CampaignOptionsIntroPanel("FurtherReadingPanel",
+              getFurtherReadingText(),
+              UIUtil.scaleForGUI(FURTHER_READING_TEXT_WIDTH));
+    }
 
-        final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel", true, "FurtherReadingPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.fill = GridBagConstraints.HORIZONTAL;
-        layout.weightx = 1.0;
-
-        panel.add(lblFurtherReading, layout);
-
-        return panel;
+    private String getFurtherReadingText() {
+        String text = getTextAt(getCampaignOptionsResourceBundle(), "lblFurtherReading.text");
+        if (text.startsWith(HTML_OPEN_TAG) && text.endsWith(HTML_CLOSE_TAG)) {
+            return text.substring(HTML_OPEN_TAG.length(), text.length() - HTML_CLOSE_TAG.length());
+        }
+        return text;
     }
 
     /**

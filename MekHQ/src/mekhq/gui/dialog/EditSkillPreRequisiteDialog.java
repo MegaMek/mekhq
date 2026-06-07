@@ -109,8 +109,8 @@ public class EditSkillPreRequisiteDialog extends JDialog {
             panMain.add(choiceLvl);
         }
 
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
-        btnOK.setText("Done");
+        JPanel panButtons = new JPanel();
+        btnOK.setText("OK");
         btnOK.addActionListener(evt -> done());
 
         btnClose.setText("Cancel");

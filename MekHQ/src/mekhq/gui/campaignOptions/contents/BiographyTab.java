@@ -32,28 +32,26 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 
 import megamek.Version;
-import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -68,44 +66,70 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.model.RankTableModel;
 import mekhq.gui.panes.RankSystemsPane;
 
 /**
- * The `BiographyTab` class is responsible for managing the biography-related settings in the campaign options tab
- * within the MekHQ application. It provides an interface for configuring various campaign settings, such as:
+ * The `BiographyTab` class is responsible for managing the biography-related
+ * settings in the campaign options tab
+ * within the MekHQ application. It provides an interface for configuring
+ * various campaign settings, such as:
  * <ul>
- *     <li>General campaign settings like gender distribution and familial relationships.</li>
- *     <li>Background options, including randomized personality traits and origin determination.</li>
- *     <li>Death-related settings such as probability of random deaths, age-group-specific deaths, etc.</li>
- *     <li>Education module settings for academic progression, dropout chances, and related configurations.</li>
- *     <li>Random name generation and portrait assignment based on roles and factions.</li>
- *     <li>Rank and hierarchy management for campaign personnel.</li>
+ * <li>General campaign settings like gender distribution and familial
+ * relationships.</li>
+ * <li>Background options, including randomized personality traits and origin
+ * determination.</li>
+ * <li>Death-related settings such as probability of random deaths,
+ * age-group-specific deaths, etc.</li>
+ * <li>Education module settings for academic progression, dropout chances, and
+ * related configurations.</li>
+ * <li>Random name generation and portrait assignment based on roles and
+ * factions.</li>
+ * <li>Rank and hierarchy management for campaign personnel.</li>
  * </ul>
  * <p>
- * The class includes methods to initialize, load, and configure settings while providing GUI tools to enable user
- * interaction. It also integrates with the current `Campaign` and `CampaignOptions` objects to synchronize settings.
- * This class serves as the backbone for displaying and managing the "Biography" tab in the campaign options dialog.
+ * The class includes methods to initialize, load, and configure settings while
+ * providing GUI tools to enable user
+ * interaction. It also integrates with the current `Campaign` and
+ * `CampaignOptions` objects to synchronize settings.
+ * This class serves as the backbone for displaying and managing the "Biography"
+ * tab in the campaign options dialog.
  */
 public class BiographyTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    // Wider than the default control column because the Biography combo boxes need the extra room.
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
+    private static final int CHECKBOX_GRID_COLUMNS = 2;
+    private static final int RANK_SYSTEMS_PANEL_WIDTH = 860;
+    private static final int RANK_TABLE_HEIGHT = 260;
+    private static final int RANK_RATE_COLUMN_WIDTH = 60;
+    private static final int RANK_NAME_COLUMN_WIDTH = 150;
+    private static final int RANK_OFFICER_COLUMN_WIDTH = 90;
+    private static final int RANK_PAY_MULTIPLIER_COLUMN_WIDTH = 120;
+
     private final Campaign campaign;
     private final GeneralTab generalTab;
     private final CampaignOptions campaignOptions;
     private final RandomOriginOptions randomOriginOptions;
+    private BiographyOptionsModel model;
+    private boolean generalPageCreated;
+    private boolean backgroundsPageCreated;
+    private boolean deathPageCreated;
+    private boolean educationPageCreated;
+    private boolean nameAndPortraitPageCreated;
 
-    //start General Tab
+    // start General Tab
     private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseDylansRandomXP;
     private JLabel lblGender;
-    private JSlider sldGender;
+    private JSpinner spnGender;
     private JLabel lblNonBinaryDiceSize;
     private JSpinner spnNonBinaryDiceSize;
     private JLabel lblFamilyDisplayLevel;
@@ -124,9 +148,9 @@ public class BiographyTab {
     private JCheckBox chkAwardRelevantVeterancySPAs;
     private JCheckBox chkComingOfAgeSPAs;
     private JCheckBox chkRewardComingOfAgeRPSkills;
-    //end General Tab
+    // end General Tab
 
-    //start Backgrounds Tab
+    // start Backgrounds Tab
     private CampaignOptionsHeaderPanel backgroundHeader;
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
@@ -148,9 +172,9 @@ public class BiographyTab {
     private JSpinner spnOriginDistanceScale;
     private JCheckBox chkAllowClanOrigins;
     private JCheckBox chkExtraRandomOrigin;
-    //end Backgrounds Tab
+    // end Backgrounds Tab
 
-    //start Death Tab
+    // start Death Tab
     private CampaignOptionsHeaderPanel deathHeader;
     private JCheckBox chkUseRandomDeathSuicideCause;
     private JLabel lblRandomDeathMultiplier;
@@ -158,9 +182,9 @@ public class BiographyTab {
 
     private JPanel pnlDeathAgeGroup;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
-    //end Death Tab
+    // end Death Tab
 
-    //start Education Tab
+    // start Education Tab
     private CampaignOptionsHeaderPanel educationHeader;
     private JCheckBox chkUseEducationModule;
     private JLabel lblCurriculumXpRate;
@@ -193,9 +217,9 @@ public class BiographyTab {
     private JCheckBox chkAllAges;
     private JLabel lblMilitaryAcademyAccidents;
     private JSpinner spnMilitaryAcademyAccidents;
-    //end Education Tab
+    // end Education Tab
 
-    //start Name and Portrait Tab
+    // start Name and Portrait Tab
     private JCheckBox chkUseOriginFactionForNames;
     private JLabel lblFactionNames;
     private MMComboBox<String> comboFactionNames;
@@ -211,16 +235,18 @@ public class BiographyTab {
     private JCheckBox chkUseGenderedPortraitsOnly;
     private JCheckBox chkNoRandomPortraitsForChildren;
     private JCheckBox chkChildPortraitsWhenComingOfAge;
-    //end Name and Portrait Tab
+    // end Name and Portrait Tab
 
-    //start Rank Tab
+    // start Rank Tab
     private RankSystemsPane rankSystemsPane;
-    //end Rank Tab
+    // end Rank Tab
 
     /**
-     * Constructs the `BiographyTab` and initializes the campaign and its dependent options.
+     * Constructs the `BiographyTab` and initializes the campaign and its dependent
+     * options.
      *
-     * @param campaign   The current `Campaign` object to which the BiographyTab is linked. The campaign options and
+     * @param campaign   The current `Campaign` object to which the BiographyTab is
+     *                   linked. The campaign options and
      *                   origin options are derived from this object.
      * @param generalTab The currently active General Tab.
      */
@@ -231,18 +257,23 @@ public class BiographyTab {
         this.randomOriginOptions = campaignOptions.getRandomOriginOptions();
 
         initialize();
+        loadValuesFromCampaignOptions();
     }
 
     /**
-     * Initializes the various sections and settings tabs within the BiographyTab. This method organizes the following
+     * Initializes the various sections and settings tabs within the BiographyTab.
+     * This method organizes the following
      * tabs:
      * <p>
-     * <li>General Tab: Handles general campaign settings such as gender distribution and
+     * <li>General Tab: Handles general campaign settings such as gender
+     * distribution and
      * relationship displays.</li>
-     * <li>Background Tab: Configures randomized backgrounds for campaign characters.</li>
+     * <li>Background Tab: Configures randomized backgrounds for campaign
+     * characters.</li>
      * <li>Death Tab: Sets up random death rules and options.</li>
      * <li>Education Tab: Defines education-related gameplay settings.</li>
-     * <li>Name and Portrait Tab: Configures rules for name and portrait generation.</li>
+     * <li>Name and Portrait Tab: Configures rules for name and portrait
+     * generation.</li>
      * <li>Rank Tab: Manages the rank systems for campaign personnel.</li>
      * </p>
      */
@@ -259,9 +290,9 @@ public class BiographyTab {
     /**
      * Initializes the Name and Portrait tab. The tab allows users to:
      * <ul>
-     *     <li>Enable or disable the use of origin factions for name generation.</li>
-     *     <li>Assign portraits to personnel upon role changes.</li>
-     *     <li>Customize which portraits should be used randomly based on roles.</li>
+     * <li>Enable or disable the use of origin factions for name generation.</li>
+     * <li>Assign portraits to personnel upon role changes.</li>
+     * <li>Customize which portraits should be used randomly based on roles.</li>
      * </ul>
      */
     private void initializeNameAndPortraitTab() {
@@ -285,10 +316,11 @@ public class BiographyTab {
     /**
      * Initializes the Education tab, providing settings such as:
      * <ul>
-     *     <li>Setting curriculum XP rates.</li>
-     *     <li>Enabling re-education camps or specific academy requirements.</li>
-     *     <li>Managing academy dropout chances for adults and children.</li>
-     *     <li>Supporting the configuration of education-related accidents and events.</li>
+     * <li>Setting curriculum XP rates.</li>
+     * <li>Enabling re-education camps or specific academy requirements.</li>
+     * <li>Managing academy dropout chances for adults and children.</li>
+     * <li>Supporting the configuration of education-related accidents and
+     * events.</li>
      * </ul>
      */
     private void initializeEducationTab() {
@@ -328,9 +360,10 @@ public class BiographyTab {
     /**
      * Initializes the Death tab, focusing on:
      * <ul>
-     *     <li>Allowing configuration of random death probabilities for personnel.</li>
-     *     <li>Customizing age-group-specific death settings.</li>
-     *     <li>Selecting methods for random deaths (e.g., natural causes or accidents).</li>
+     * <li>Allowing configuration of random death probabilities for personnel.</li>
+     * <li>Customizing age-group-specific death settings.</li>
+     * <li>Selecting methods for random deaths (e.g., natural causes or
+     * accidents).</li>
      * </ul>
      */
     private void initializeDeathTab() {
@@ -346,7 +379,8 @@ public class BiographyTab {
      * Initializes the Backgrounds tab, which handles:
      * <p>
      * <li>Randomized background settings for characters.</li>
-     * <li>Options for specifying origins (e.g., faction-specific planetary systems).</li>
+     * <li>Options for specifying origins (e.g., faction-specific planetary
+     * systems).</li>
      * <li>Custom search radius and distance scaling for randomized origins.</li>
      * </p>
      */
@@ -378,19 +412,21 @@ public class BiographyTab {
      * Initializes the General tab, which provides options for:
      * <p>
      * <li>General gameplay settings such as gender distribution sliders.</li>
-     * <li>Configuration of familial display levels and other general campaign settings.</li>
-     * <li>Annunciation of anniversaries, recruitment dates, and officer-related milestones.</li>
+     * <li>Configuration of familial display levels and other general campaign
+     * settings.</li>
+     * <li>Annunciation of anniversaries, recruitment dates, and officer-related
+     * milestones.</li>
      * </p>
      */
     private void initializeGeneralTab() {
         chkUseDylansRandomXP = new JCheckBox();
         lblGender = new JLabel();
-        sldGender = new JSlider();
+        spnGender = new JSpinner();
         lblNonBinaryDiceSize = new JLabel();
         spnNonBinaryDiceSize = new JSpinner();
         lblFamilyDisplayLevel = new JLabel();
         comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel",
-              FamilialRelationshipDisplayLevel.values());
+                FamilialRelationshipDisplayLevel.values());
 
         pnlAnniversariesPanel = new JPanel();
         chkAnnounceOfficersOnly = new JCheckBox();
@@ -411,9 +447,11 @@ public class BiographyTab {
     }
 
     /**
-     * Builds and returns a `DefaultComboBoxModel` containing the names of all available factions.
+     * Builds and returns a `DefaultComboBoxModel` containing the names of all
+     * available factions.
      *
-     * @return A `DefaultComboBoxModel` populated with faction names for random name generation rules.
+     * @return A `DefaultComboBoxModel` populated with faction names for random name
+     *         generation rules.
      */
     private static DefaultComboBoxModel<String> getFactionNamesModel() {
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
@@ -426,18 +464,18 @@ public class BiographyTab {
     /**
      * Creates and lays out the General tab, including its components like:
      * <ul>
-     *     <li>Checkboxes for random XP distribution.</li>
-     *     <li>Sliders for gender representation customization.</li>
-     *     <li>Combo boxes for family display level settings within the GUI.</li>
+     * <li>Checkboxes for random XP distribution.</li>
+     * <li>Sliders for gender representation customization.</li>
+     * <li>Combo boxes for family display level settings within the GUI.</li>
      * </ul>
      *
-     * @return A `JPanel` representing the General tab in the campaign options dialog.
+     * @return A `JPanel` representing the General tab in the campaign options
+     *         dialog.
      */
     public JPanel createGeneralTab() {
         // Header
-        generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
-              getImageDirectory() + "logo_clan_blood_spirit.png",
-              6);
+        String imageAddress = getImageDirectory() + "logo_clan_blood_spirit.png";
+        generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab", imageAddress, 6);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -445,88 +483,64 @@ public class BiographyTab {
 
         lblGender = new CampaignOptionsLabel("Gender");
         lblGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
-        sldGender = new JSlider(SwingConstants.HORIZONTAL, 0, 100, 50);
-        sldGender.setMajorTickSpacing(25);
-        sldGender.setPaintTicks(true);
-        sldGender.setPaintLabels(true);
-        sldGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
+        spnGender = new CampaignOptionsSpinner("Gender", 50, 0, 100, 1);
+        spnGender.addMouseListener(createTipPanelUpdater(generalHeader, "Gender"));
 
         lblNonBinaryDiceSize = new CampaignOptionsLabel("NonBinaryDiceSize",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblNonBinaryDiceSize.addMouseListener(createTipPanelUpdater(generalHeader, "NonBinaryDiceSize"));
         spnNonBinaryDiceSize = new CampaignOptionsSpinner("NonBinaryDiceSize", 60, 0, 100000, 1);
         spnNonBinaryDiceSize.addMouseListener(createTipPanelUpdater(generalHeader, "NonBinaryDiceSize"));
 
         lblFamilyDisplayLevel = new CampaignOptionsLabel("FamilyDisplayLevel",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
         comboFamilyDisplayLevel.addMouseListener(createTipPanelUpdater(generalHeader, "FamilyDisplayLevel"));
 
+        JPanel generalOptionsPanel = createBiographyGeneralOptionsPanel();
         pnlAnniversariesPanel = createAnniversariesPanel();
-
         pnlLifeEvents = createLifeEventsPanel();
-
         pnlComingOfAge = createComingOfAgePanel();
+        JPanel panel = CampaignOptionsPagePanel.builder("BiographyGeneralTab", "BiographyGeneralTab", imageAddress)
+            .header(generalHeader)
+            .quote("biographyGeneralTab")
+            .section("lblBiographyGeneralTab.text",
+                "lblBiographyGeneralTab.summary",
+                generalOptionsPanel,
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM))
+            .section("lblAnniversariesPanel.text", "lblAnniversariesPanel.summary", pnlAnniversariesPanel)
+            .section("lblLifeEventsPanel.text", "lblLifeEventsPanel.summary", pnlLifeEvents)
+            .section("lblComingOfAgePanel.text", "lblComingOfAgePanel.summary", pnlComingOfAge)
+            .build();
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("BiographyGeneralTabLeft", true);
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        generalPageCreated = true;
+        updateGeneralControlsFromModel();
 
-        layoutLeft.gridy = 0;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkUseDylansRandomXP, layoutLeft);
+        return panel;
+    }
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblGender, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(sldGender, layoutLeft);
+    private JPanel createBiographyGeneralOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BiographyGeneralOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseDylansRandomXP);
+        panel.addRow(lblGender, spnGender);
+        panel.addRow(lblNonBinaryDiceSize, spnNonBinaryDiceSize);
+        panel.addRow(lblFamilyDisplayLevel, comboFamilyDisplayLevel);
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblNonBinaryDiceSize, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnNonBinaryDiceSize, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblFamilyDisplayLevel, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(comboFamilyDisplayLevel, layoutLeft);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true, "BiographyGeneralTab",
-              getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(generalHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(pnlAnniversariesPanel, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panelParent.add(pnlLifeEvents, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(pnlComingOfAge, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "BiographyGeneralTab");
+        return panel;
     }
 
     /**
-     * Creates the Anniversaries panel within the General tab for managing announcement-related settings:
+     * Creates the Anniversaries panel within the General tab for managing
+     * announcement-related settings:
      * <p>
      * <li>Enabling birthday and recruitment anniversary announcements.</li>
      * <li>Specifying whether such announcements should be limited to officers.</li>
      * </p>
      *
-     * @return A `JPanel` containing the UI components for defining anniversary-related settings.
+     * @return A `JPanel` containing the UI components for defining
+     *         anniversary-related settings.
      */
     private JPanel createAnniversariesPanel() {
         // Contents
@@ -534,31 +548,22 @@ public class BiographyTab {
         chkAnnounceBirthdays.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceBirthdays"));
         chkAnnounceRecruitmentAnniversaries = new CampaignOptionsCheckBox("AnnounceRecruitmentAnniversaries");
         chkAnnounceRecruitmentAnniversaries.addMouseListener(createTipPanelUpdater(generalHeader,
-              "AnnounceRecruitmentAnniversaries"));
+                "AnnounceRecruitmentAnniversaries"));
         chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly");
         chkAnnounceOfficersOnly.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceOfficersOnly"));
         chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkAnnounceChildBirthdays.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceChildBirthdays"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AnniversariesPanel", true, "AnniversariesPanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkAnnounceBirthdays, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(chkAnnounceRecruitmentAnniversaries, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkAnnounceOfficersOnly, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkAnnounceChildBirthdays, layoutParent);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AnniversariesPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkAnnounceBirthdays,
+                chkAnnounceRecruitmentAnniversaries,
+                chkAnnounceOfficersOnly,
+                chkAnnounceChildBirthdays);
 
         return panel;
     }
@@ -567,28 +572,22 @@ public class BiographyTab {
         // Contents
         chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
         chkShowLifeEventDialogBirths.addMouseListener(createTipPanelUpdater(generalHeader,
-              "ShowLifeEventDialogBirths"));
+                "ShowLifeEventDialogBirths"));
         chkShowLifeEventDialogComingOfAge = new CampaignOptionsCheckBox("ShowLifeEventDialogComingOfAge");
         chkShowLifeEventDialogComingOfAge.addMouseListener(createTipPanelUpdater(generalHeader,
-              "ShowLifeEventDialogComingOfAge"));
+                "ShowLifeEventDialogComingOfAge"));
         chkShowLifeEventDialogCelebrations = new CampaignOptionsCheckBox("ShowLifeEventDialogCelebrations");
         chkShowLifeEventDialogCelebrations.addMouseListener(createTipPanelUpdater(generalHeader,
-              "ShowLifeEventDialogCelebrations"));
+                "ShowLifeEventDialogCelebrations"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LifeEventsPanel", true, "LifeEventsPanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 1;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkShowLifeEventDialogBirths, layoutParent);
-        layoutParent.gridx++;
-        panel.add(chkShowLifeEventDialogComingOfAge, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(chkShowLifeEventDialogCelebrations, layoutParent);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("LifeEventsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkShowLifeEventDialogBirths,
+                chkShowLifeEventDialogComingOfAge,
+                chkShowLifeEventDialogCelebrations);
 
         return panel;
     }
@@ -596,40 +595,32 @@ public class BiographyTab {
     private JPanel createComingOfAgePanel() {
         // Contents
         chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         chkVeterancySPAs.addMouseListener(createTipPanelUpdater(generalHeader, "VeterancySPAs"));
 
         chkAwardRelevantVeterancySPAs = new CampaignOptionsCheckBox("AwardRelevantVeterancySPAs",
-              getMetadata(new Version(0, 51, 0), CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version(0, 51, 0), CampaignOptionFlag.IMPORTANT));
         chkAwardRelevantVeterancySPAs.addMouseListener(createTipPanelUpdater(generalHeader,
-              "AwardRelevantVeterancySPAs"));
+                "AwardRelevantVeterancySPAs"));
 
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities",
-              getMetadata(null, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(null, CampaignOptionFlag.RECOMMENDED));
         chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater(generalHeader, "ComingOfAgeAbilities"));
 
         chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkRewardComingOfAgeRPSkills.addMouseListener(createTipPanelUpdater(generalHeader,
-              "ComingOfAgeRPSkills"));
+                "ComingOfAgeRPSkills"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ComingOfAgePanel", true, "ComingOfAgePanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 1;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkVeterancySPAs, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkAwardRelevantVeterancySPAs, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkComingOfAgeSPAs, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkRewardComingOfAgeRPSkills, layoutParent);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComingOfAgePanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkVeterancySPAs,
+                chkAwardRelevantVeterancySPAs,
+                chkComingOfAgeSPAs,
+                chkRewardComingOfAgeRPSkills);
 
         return panel;
     }
@@ -637,41 +628,38 @@ public class BiographyTab {
     /**
      * Creates and lays out the Backgrounds tab, which includes:
      * <ul>
-     *     <li>Settings for enabling randomized personalities and relationships.</li>
-     *     <li>Random origin configurations such as faction specificity and distance scaling.</li>
+     * <li>Settings for enabling randomized personalities and relationships.</li>
+     * <li>Random origin configurations such as faction specificity and distance
+     * scaling.</li>
      * </ul>
      *
-     * @return A `JPanel` representing the Backgrounds tab in the campaign options dialog.
+     * @return A `JPanel` representing the Backgrounds tab in the campaign options
+     *         dialog.
      */
     public JPanel createBackgroundsTab() {
         // Header
-        backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
-              getImageDirectory() + "logo_nueva_castile.png",
-              3);
+        String imageAddress = getImageDirectory() + "logo_nueva_castile.png";
+        backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab", imageAddress, 3);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
         pnlRandomBackgrounds = createRandomBackgroundsPanel();
+        JPanel panel = CampaignOptionsPagePanel.builder("BackgroundsTab", "BackgroundsTab", imageAddress)
+            .header(backgroundHeader)
+            .quote("backgroundsTab")
+            .section("lblRandomOriginOptionsPanel.text",
+                "lblRandomOriginOptionsPanel.summary",
+                pnlRandomOriginOptions,
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM))
+            .section("lblRandomBackgroundsPanel.text",
+                "lblRandomBackgroundsPanel.summary",
+                pnlRandomBackgrounds)
+            .build();
 
-        // Layout the Panels
-        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true, "BackgroundsTab",
-              getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        backgroundsPageCreated = true;
+        updateBackgroundControlsFromModel();
 
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(backgroundHeader, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(pnlRandomOriginOptions, layout);
-
-        layout.gridx++;
-        panel.add(pnlRandomBackgrounds, layout);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "BackgroundsTab");
+        return panel;
     }
 
     /**
@@ -690,36 +678,28 @@ public class BiographyTab {
     JPanel createRandomBackgroundsPanel() {
         // Contents
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         chkUseRandomPersonalities.addMouseListener(createTipPanelUpdater(backgroundHeader, "UseRandomPersonalities"));
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
         chkUseRandomPersonalityReputation.addMouseListener(createTipPanelUpdater(backgroundHeader,
-              "UseRandomPersonalityReputation"));
+                "UseRandomPersonalityReputation"));
         chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier");
         chkUseReasoningXpMultiplier.addMouseListener(createTipPanelUpdater(backgroundHeader,
-              "UseReasoningXpMultiplier"));
+                "UseReasoningXpMultiplier"));
         chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseSimulatedRelationships.addMouseListener(createTipPanelUpdater(backgroundHeader,
-              "UseSimulatedRelationships"));
+                "UseSimulatedRelationships"));
 
         // Layout the Panels
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomBackgroundsPanel", true, "RandomBackgroundsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkUseRandomPersonalities, layout);
-
-        layout.gridy++;
-        panel.add(chkUseRandomPersonalityReputation, layout);
-
-        layout.gridy++;
-        panel.add(chkUseReasoningXpMultiplier, layout);
-
-        layout.gridy++;
-        panel.add(chkUseSimulatedRelationships, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomBackgroundsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkUseRandomPersonalities,
+                chkUseRandomPersonalityReputation,
+                chkUseReasoningXpMultiplier,
+                chkUseSimulatedRelationships);
 
         return panel;
     }
@@ -728,8 +708,10 @@ public class BiographyTab {
      * Creates and returns a panel for random origin options. This includes:
      * <p>
      * <li>Controls to enable or disable randomization of origins.</li>
-     * <li>Options for selecting specific planetary systems or factions for origin determination.</li>
-     * <li>Search radius and distance scaling fields to tweak origin calculations.</li>
+     * <li>Options for selecting specific planetary systems or factions for origin
+     * determination.</li>
+     * <li>Search radius and distance scaling fields to tweak origin
+     * calculations.</li>
      * </p>
      *
      * @return A `JPanel` for managing random origin settings.
@@ -740,29 +722,27 @@ public class BiographyTab {
         chkRandomizeOrigin.addMouseListener(createTipPanelUpdater(backgroundHeader, "RandomizeOrigin"));
         chkRandomizeDependentsOrigin = new CampaignOptionsCheckBox("RandomizeDependentsOrigin");
         chkRandomizeDependentsOrigin.addMouseListener(createTipPanelUpdater(backgroundHeader,
-              "RandomizeDependentsOrigin"));
+                "RandomizeDependentsOrigin"));
 
         chkRandomizeAroundSpecifiedPlanet = new CampaignOptionsCheckBox("RandomizeAroundSpecifiedPlanet");
         chkRandomizeAroundSpecifiedPlanet.addActionListener(evt -> refreshSystemsAndPlanets());
         chkRandomizeAroundSpecifiedPlanet.addMouseListener(createTipPanelUpdater(backgroundHeader,
-              "RandomizeAroundSpecifiedPlanet"));
+                "RandomizeAroundSpecifiedPlanet"));
 
         chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
         chkSpecifiedSystemFactionSpecific.addMouseListener(createTipPanelUpdater(backgroundHeader,
-              "SpecifiedSystemFactionSpecific"));
-
+                "SpecifiedSystemFactionSpecific"));
 
         lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
         lblSpecifiedSystem.addMouseListener(createTipPanelUpdater(backgroundHeader, "SpecifiedSystem"));
-        comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ?
-                                                                                           generalTab.getFaction() :
-                                                                                           null)));
+        comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(
+                getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalTab.getFaction() : null)));
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                  final boolean isSelected, final boolean cellHasFocus) {
+                    final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     setText(((PlanetarySystem) value).getName(generalTab.getDate()));
@@ -784,12 +764,12 @@ public class BiographyTab {
         final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
         if (planetarySystem != null) {
             comboSpecifiedPlanet.setModel(new DefaultComboBoxModel<>(planetarySystem.getPlanets()
-                                                                           .toArray(new Planet[] {})));
+                    .toArray(new Planet[] {})));
         }
         comboSpecifiedPlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                  final boolean isSelected, final boolean cellHasFocus) {
+                    final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
                     setText(((Planet) value).getName(generalTab.getDate()));
@@ -805,7 +785,7 @@ public class BiographyTab {
         spnOriginSearchRadius.addMouseListener(createTipPanelUpdater(backgroundHeader, "OriginSearchRadius"));
 
         lblOriginDistanceScale = new CampaignOptionsLabel("OriginDistanceScale",
-              getMetadata(null, CampaignOptionFlag.IMPORTANT));
+                getMetadata(null, CampaignOptionFlag.IMPORTANT));
         lblOriginDistanceScale.addMouseListener(createTipPanelUpdater(backgroundHeader, "OriginDistanceScale"));
         spnOriginDistanceScale = new CampaignOptionsSpinner("OriginDistanceScale", 0.6, 0.1, 2.0, 0.1);
         spnOriginDistanceScale.addMouseListener(createTipPanelUpdater(backgroundHeader, "OriginDistanceScale"));
@@ -815,77 +795,93 @@ public class BiographyTab {
         chkExtraRandomOrigin = new CampaignOptionsCheckBox("ExtraRandomOrigin");
         chkExtraRandomOrigin.addMouseListener(createTipPanelUpdater(backgroundHeader, "ExtraRandomOrigin"));
 
+        // The system/planet combos are backed by the whole universe, so an unprototyped
+        // combo would size itself to
+        // the widest entry and stretch this section wider than the other Biography
+        // sub-tabs. Pin them to the control
+        // column and surface the full selected value as a tooltip (it remains fully
+        // visible in the dropdown).
+        capComboWidthWithTooltip(comboSpecifiedSystem);
+        capComboWidthWithTooltip(comboSpecifiedPlanet);
+
         // Layout the Panel
-        final JPanel panelSystemPlanetOrigins = new CampaignOptionsStandardPanel(
-              "RandomOriginOptionsPanelSystemPlanetOrigins",
-              false,
-              "");
-        final GridBagConstraints layoutSystemPlanetOrigins = new CampaignOptionsGridBagConstraints(
-              panelSystemPlanetOrigins);
-
-        layoutSystemPlanetOrigins.gridwidth = 1;
-        layoutSystemPlanetOrigins.gridx = 0;
-        layoutSystemPlanetOrigins.gridy = 0;
-        panelSystemPlanetOrigins.add(lblSpecifiedSystem, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(comboSpecifiedSystem, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(lblSpecifiedPlanet, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(comboSpecifiedPlanet, layoutSystemPlanetOrigins);
-
-        layoutSystemPlanetOrigins.gridx = 0;
-        layoutSystemPlanetOrigins.gridy++;
-        panelSystemPlanetOrigins.add(lblOriginSearchRadius, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(spnOriginSearchRadius, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(lblOriginDistanceScale, layoutSystemPlanetOrigins);
-        layoutSystemPlanetOrigins.gridx++;
-        panelSystemPlanetOrigins.add(spnOriginDistanceScale, layoutSystemPlanetOrigins);
-
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomOriginOptionsPanel",
-              true,
-              "RandomOriginOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkRandomizeOrigin, layout);
-
-        layout.gridy++;
-        panel.add(chkRandomizeDependentsOrigin, layout);
-
-        layout.gridy++;
-        panel.add(chkRandomizeAroundSpecifiedPlanet, layout);
-
-        layout.gridy++;
-        panel.add(chkSpecifiedSystemFactionSpecific, layout);
-
-        layout.gridy++;
-        panel.add(panelSystemPlanetOrigins, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkAllowClanOrigins, layout);
-
-        layout.gridy++;
-        panel.add(chkExtraRandomOrigin, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomOriginOptionsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+            chkRandomizeOrigin,
+            chkRandomizeDependentsOrigin,
+            chkRandomizeAroundSpecifiedPlanet,
+            chkSpecifiedSystemFactionSpecific);
+        panel.addRow(lblSpecifiedSystem, comboSpecifiedSystem);
+        panel.addRow(lblSpecifiedPlanet, comboSpecifiedPlanet);
+        panel.addRow(lblOriginSearchRadius, spnOriginSearchRadius);
+        panel.addRow(lblOriginDistanceScale, spnOriginDistanceScale);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, chkAllowClanOrigins, chkExtraRandomOrigin);
 
         return panel;
     }
 
     /**
-     * Refreshes the planetary systems and planets displayed in the associated combo boxes.
+     * Pins {@code combo}'s preferred width to the form's control column so a
+     * long-content model (such as the full list
+     * of planetary systems or planets) cannot stretch the section wider than its
+     * siblings. The combo still fills the
+     * control column through the form's horizontal-fill layout, and the full
+     * selected value stays available as a
+     * tooltip (and in the dropdown). Without this, an unprototyped
+     * {@link javax.swing.JComboBox} measures every model
+     * entry and adopts the widest, which made the Backgrounds page noticeably wider
+     * than the other Biography sub-tabs.
      *
-     * <p>This method first stores the currently selected planetary system and planet. It then
-     * restores the list of available planetary systems by repopulating the `comboSpecifiedSystem`. Finally, it
-     * re-selects the previously selected planetary system and planet in their respective combo boxes.</p>
+     * @param combo the combo box to constrain and decorate with a full-value
+     *              tooltip
+     */
+    private void capComboWidthWithTooltip(MMComboBox<?> combo) {
+        combo.setPreferredSize(new Dimension(FORM_CONTROL_COLUMN_WIDTH, combo.getPreferredSize().height));
+        updateComboTooltip(combo);
+        combo.addActionListener(evt -> updateComboTooltip(combo));
+    }
+
+    /**
+     * Sets {@code combo}'s tooltip to the full, date-aware name of its selected
+     * planetary system or planet, so a value
+     * that is truncated with an ellipsis in the collapsed field can still be read
+     * in full on hover.
      *
-     * <p>The method ensures that the user selection persists even after the combo boxes are refreshed.
-     * Any exceptions during the selection process are caught and ignored. As if we can't restore the selection, that's
-     * fine, we just use the fallback index of 0.</p>
+     * @param combo the combo box whose tooltip should reflect its current selection
+     */
+    private void updateComboTooltip(MMComboBox<?> combo) {
+        final Object selected = combo.getSelectedItem();
+        if (selected instanceof PlanetarySystem system) {
+            combo.setToolTipText(system.getName(generalTab.getDate()));
+        } else if (selected instanceof Planet planet) {
+            combo.setToolTipText(planet.getName(generalTab.getDate()));
+        } else {
+            combo.setToolTipText(null);
+        }
+    }
+
+    /**
+     * Refreshes the planetary systems and planets displayed in the associated combo
+     * boxes.
+     *
+     * <p>
+     * This method first stores the currently selected planetary system and planet.
+     * It then
+     * restores the list of available planetary systems by repopulating the
+     * `comboSpecifiedSystem`. Finally, it
+     * re-selects the previously selected planetary system and planet in their
+     * respective combo boxes.
+     * </p>
+     *
+     * <p>
+     * The method ensures that the user selection persists even after the combo
+     * boxes are refreshed.
+     * Any exceptions during the selection process are caught and ignored. As if we
+     * can't restore the selection, that's
+     * fine, we just use the fallback index of 0.
+     * </p>
      */
     private void refreshSystemsAndPlanets() {
         final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
@@ -901,7 +897,8 @@ public class BiographyTab {
     }
 
     /**
-     * Resets the planet combo box to show only the planets matching the currently selected planetary system.
+     * Resets the planet combo box to show only the planets matching the currently
+     * selected planetary system.
      */
     private void restoreComboSpecifiedPlanet() {
         final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
@@ -910,28 +907,30 @@ public class BiographyTab {
             comboSpecifiedPlanet.removeAllItems();
         } else {
             comboSpecifiedPlanet.setModel(new DefaultComboBoxModel<>(planetarySystem.getPlanets()
-                                                                           .toArray(new Planet[] {})));
+                    .toArray(new Planet[] {})));
             comboSpecifiedPlanet.setSelectedItem(planetarySystem.getPrimaryPlanet());
         }
     }
 
     /**
-     * Resets the system combo box to show only the planetary systems that match the current faction, if applicable.
+     * Resets the system combo box to show only the planetary systems that match the
+     * current faction, if applicable.
      */
     private void restoreComboSpecifiedSystem() {
         comboSpecifiedSystem.removeAllItems();
 
-        comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ?
-                                                                                           generalTab.getFaction() :
-                                                                                           null)));
+        comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(
+                getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalTab.getFaction() : null)));
 
         restoreComboSpecifiedPlanet();
     }
 
     /**
-     * Filters planetary systems based on a given faction (if specified) and returns a sorted array of matches.
+     * Filters planetary systems based on a given faction (if specified) and returns
+     * a sorted array of matches.
      *
-     * @param faction The faction to filter planetary systems by (nullable). If `null`, all systems are included.
+     * @param faction The faction to filter planetary systems by (nullable). If
+     *                `null`, all systems are included.
      *
      * @return An array of `PlanetarySystem` objects meeting the filter criteria.
      */
@@ -956,70 +955,57 @@ public class BiographyTab {
     /**
      * Configures and creates the Death tab. This includes options like:
      * <ul>
-     *     <li>Methods for random death.</li>
-     *     <li>Percentage-based chances for random death events.</li>
-     *     <li>Check boxes to enable or disable age-specific death events.</li>
+     * <li>Methods for random death.</li>
+     * <li>Percentage-based chances for random death events.</li>
+     * <li>Check boxes to enable or disable age-specific death events.</li>
      * </ul>
      *
      * @return A `JPanel` representing the Death tab.
      */
     public JPanel createDeathTab() {
         // Header
-        deathHeader = new CampaignOptionsHeaderPanel("DeathTab",
-              getImageDirectory() + "logo_clan_fire_mandrills.png",
-              5);
+        String imageAddress = getImageDirectory() + "logo_clan_fire_mandrills.png";
+        deathHeader = new CampaignOptionsHeaderPanel("DeathTab", imageAddress, 5);
 
         // Contents
         lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED, CampaignOptionFlag.IMPORTANT));
         lblRandomDeathMultiplier.addMouseListener(createTipPanelUpdater(deathHeader, "RandomDeathMultiplier"));
         spnRandomDeathMultiplier = new CampaignOptionsSpinner("RandomDeathMultiplier", 1.0, 0, 100.0, 0.01);
         spnRandomDeathMultiplier.addMouseListener(createTipPanelUpdater(deathHeader, "RandomDeathMultiplier"));
 
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
         chkUseRandomDeathSuicideCause.addMouseListener(createTipPanelUpdater(deathHeader,
-              "UseRandomDeathSuicideCause"));
+                "UseRandomDeathSuicideCause"));
 
+        JPanel deathOptionsPanel = createDeathOptionsPanel();
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
+        JPanel panel = CampaignOptionsPagePanel.builder("DeathTab", "DeathTab", imageAddress)
+            .header(deathHeader)
+            .quote("deathTab")
+            .section("lblDeathTab.text", "lblDeathTab.summary", deathOptionsPanel)
+            .section("lblDeathAgeGroupsPanel.text", "lblDeathAgeGroupsPanel.summary", pnlDeathAgeGroup)
+            .build();
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("DeathTabLeft", true);
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        deathPageCreated = true;
+        updateDeathControlsFromModel();
 
-        layoutLeft.gridy = 0;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(lblRandomDeathMultiplier, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnRandomDeathMultiplier, layoutLeft);
+        return panel;
+    }
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
+    private JPanel createDeathOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblRandomDeathMultiplier, spnRandomDeathMultiplier);
+        panel.addCheckBox(chkUseRandomDeathSuicideCause);
 
-        layoutLeft.gridy++;
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(deathHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(pnlDeathAgeGroup, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "DeathTab");
+        return panel;
     }
 
     /**
-     * Configures and creates a panel where users can enable or disable random death probabilities for specific age
+     * Configures and creates a panel where users can enable or disable random death
+     * probabilities for specific age
      * groups.
      *
      * @return A `JPanel` containing the random death age group options.
@@ -1027,42 +1013,46 @@ public class BiographyTab {
     private JPanel createDeathAgeGroupsPanel() {
         final AgeGroup[] ageGroups = AgeGroup.values();
 
-        // Create the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DeathAgeGroupsPanel", true, "DeathAgeGroupsPanel");
-        panel.setLayout(new GridLayout((ageGroups.length / 2) + 1, 1));
-
         // Contents
+        JCheckBox[] ageGroupCheckBoxes = new JCheckBox[ageGroups.length];
         for (final AgeGroup ageGroup : ageGroups) {
             final JCheckBox checkBox = new JCheckBox(ageGroup.toString());
             checkBox.setToolTipText(ageGroup.getToolTipText());
             checkBox.setName("chk" + ageGroup);
             checkBox.addMouseListener(createTipPanelUpdater(deathHeader, null, ageGroup.getToolTipText()));
 
-            panel.add(checkBox);
+            ageGroupCheckBoxes[ageGroup.ordinal()] = checkBox;
             chkEnabledRandomDeathAgeGroups.put(ageGroup, checkBox);
         }
+
+        // Layout the Panel
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathAgeGroupsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, ageGroupCheckBoxes);
 
         return panel;
     }
 
     /**
-     * Creates the Education tab, which allows managing educational settings within the campaign.
+     * Creates the Education tab, which allows managing educational settings within
+     * the campaign.
      * <p>
      * This includes:
      * <ul>
-     *     <li>Setting curriculum XP rates.</li>
-     *     <li>Configuring academy requirements and override options.</li>
-     *     <li>Managing dropout chances for adults and children.</li>
-     *     <li>Enabling or disabling the use of reeducation camps, accidents, and events.</li>
+     * <li>Setting curriculum XP rates.</li>
+     * <li>Configuring academy requirements and override options.</li>
+     * <li>Managing dropout chances for adults and children.</li>
+     * <li>Enabling or disabling the use of reeducation camps, accidents, and
+     * events.</li>
      * </ul>
      *
      * @return A {@code JPanel} representing the Education tab in the campaign UI.
      */
     public JPanel createEducationTab() {
         // Header
-        educationHeader = new CampaignOptionsHeaderPanel("EducationTab",
-              getImageDirectory() + "logo_taurian_concordat.png",
-              3);
+        String imageAddress = getImageDirectory() + "logo_taurian_concordat.png";
+        educationHeader = new CampaignOptionsHeaderPanel("EducationTab", imageAddress, 3);
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
@@ -1082,104 +1072,56 @@ public class BiographyTab {
         chkUseReeducationCamps.addMouseListener(createTipPanelUpdater(educationHeader, "UseReeducationCamps"));
 
         chkEnableOverrideRequirements = new CampaignOptionsCheckBox("EnableOverrideRequirements",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkEnableOverrideRequirements.addMouseListener(createTipPanelUpdater(educationHeader,
-              "EnableOverrideRequirements"));
+                "EnableOverrideRequirements"));
 
         chkShowIneligibleAcademies = new CampaignOptionsCheckBox("ShowIneligibleAcademies");
         chkShowIneligibleAcademies.addMouseListener(createTipPanelUpdater(educationHeader, "ShowIneligibleAcademies"));
 
         lblEntranceExamBaseTargetNumber = new CampaignOptionsLabel("EntranceExamBaseTargetNumber",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblEntranceExamBaseTargetNumber.addMouseListener(createTipPanelUpdater(educationHeader,
-              "EntranceExamBaseTargetNumber"));
+                "EntranceExamBaseTargetNumber"));
         spnEntranceExamBaseTargetNumber = new CampaignOptionsSpinner("EntranceExamBaseTargetNumber", 14, 0, 20, 1);
         spnEntranceExamBaseTargetNumber.addMouseListener(createTipPanelUpdater(educationHeader,
-              "EntranceExamBaseTargetNumber"));
+                "EntranceExamBaseTargetNumber"));
 
+        JPanel educationOptionsPanel = createEducationOptionsPanel();
         pnlEnableStandardSets = createEnableStandardSetsPanel();
-
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
-
         pnlDropoutChance = createDropoutChancePanel();
-
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
+        JPanel panel = CampaignOptionsPagePanel.builder("EducationTab", "EducationTab", imageAddress)
+            .header(educationHeader)
+            .quote("educationTab")
+            .section("lblEducationTab.text", "lblEducationTab.summary", educationOptionsPanel)
+            .section("lblEnableStandardSetsPanel.text", "lblEnableStandardSetsPanel.summary", pnlEnableStandardSets)
+            .section("lblXpAndSkillBonusesPanel.text", "lblXpAndSkillBonusesPanel.summary", pnlXpAndSkillBonuses)
+            .section("lblDropoutChancePanel.text", "lblDropoutChancePanel.summary", pnlDropoutChance)
+            .section("lblAccidentsAndEventsPanel.text", "lblAccidentsAndEventsPanel.summary", pnlAccidentsAndEvents)
+            .build();
 
-        // Layout the Panels
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("EducationTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        educationPageCreated = true;
+        updateEducationControlsFromModel();
 
-        layoutLeft.gridwidth = 5;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        panelLeft.add(educationHeader, layoutLeft);
+        return panel;
+    }
 
-        layoutLeft.gridy++;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkUseEducationModule, layoutLeft);
+    private JPanel createEducationOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EducationOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseEducationModule);
+        panel.addRow(lblCurriculumXpRate, spnCurriculumXpRate);
+        panel.addRow(lblMaximumJumpCount, spnMaximumJumpCount);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+            chkUseReeducationCamps,
+            chkEnableOverrideRequirements,
+            chkShowIneligibleAcademies);
+        panel.addRow(lblEntranceExamBaseTargetNumber, spnEntranceExamBaseTargetNumber);
 
-        layoutLeft.gridy++;
-        panelLeft.add(lblCurriculumXpRate, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnCurriculumXpRate, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblMaximumJumpCount, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaximumJumpCount, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseReeducationCamps, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkEnableOverrideRequirements, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkShowIneligibleAcademies, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(lblEntranceExamBaseTargetNumber, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnEntranceExamBaseTargetNumber, layoutLeft);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(pnlEnableStandardSets, layoutLeft);
-
-        final JPanel panelRight = new CampaignOptionsStandardPanel("EducationTabRight");
-        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutRight.gridy++;
-        layoutRight.gridwidth = 1;
-        panelRight.add(panelLeft, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(pnlXpAndSkillBonuses, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(pnlDropoutChance, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(pnlAccidentsAndEvents, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("EducationTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(educationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "EducationTab");
+        return panel;
     }
 
     /**
@@ -1199,26 +1141,17 @@ public class BiographyTab {
         chkEnableLocalAcademies.addMouseListener(createTipPanelUpdater(educationHeader, "EnableLocalAcademies"));
         chkEnablePrestigiousAcademies = new CampaignOptionsCheckBox("EnablePrestigiousAcademies");
         chkEnablePrestigiousAcademies.addMouseListener(createTipPanelUpdater(educationHeader,
-              "EnablePrestigiousAcademies"));
+                "EnablePrestigiousAcademies"));
         chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation");
         chkEnableUnitEducation.addMouseListener(createTipPanelUpdater(educationHeader, "EnableUnitEducation"));
 
-        final JPanel panel = new CampaignOptionsStandardPanel("EnableStandardSetsPanel",
-              true,
-              "EnableStandardSetsPanel");
-
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkEnableLocalAcademies, layout);
-
-        layout.gridy++;
-        panel.add(chkEnablePrestigiousAcademies, layout);
-
-        layout.gridy++;
-        panel.add(chkEnableUnitEducation, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EnableStandardSetsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkEnableLocalAcademies,
+                chkEnablePrestigiousAcademies,
+                chkEnableUnitEducation);
 
         return panel;
     }
@@ -1245,19 +1178,11 @@ public class BiographyTab {
         spnFacultyXpMultiplier.addMouseListener(createTipPanelUpdater(educationHeader, "FacultyXpMultiplier"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("XpAndSkillBonusesPanel", true, "XpAndSkillBonusesPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        layout.gridwidth = 2;
-        panel.add(chkEnableBonuses, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblFacultyXpMultiplier, layout);
-        layout.gridx++;
-        panel.add(spnFacultyXpMultiplier, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("XpAndSkillBonusesPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkEnableBonuses);
+        panel.addRow(lblFacultyXpMultiplier, spnFacultyXpMultiplier);
 
         return panel;
     }
@@ -1286,27 +1211,18 @@ public class BiographyTab {
         spnChildrenDropoutChance.addMouseListener(createTipPanelUpdater(educationHeader, "ChildrenDropoutChance"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DropoutChancePanel", true, "DropoutChancePanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(lblAdultDropoutChance, layout);
-        layout.gridx++;
-        panel.add(spnAdultDropoutChance, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblChildrenDropoutChance, layout);
-        layout.gridx++;
-        panel.add(spnChildrenDropoutChance, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DropoutChancePanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblAdultDropoutChance, spnAdultDropoutChance);
+        panel.addRow(lblChildrenDropoutChance, spnChildrenDropoutChance);
 
         return panel;
     }
 
     /**
-     * Creates a panel for configuring accidents and events related to military academies.
+     * Creates a panel for configuring accidents and events related to military
+     * academies.
      * <p>
      * This includes:
      * <p>
@@ -1314,7 +1230,8 @@ public class BiographyTab {
      * <li>Configuring the frequency of military academy accidents.</li>
      * </p>
      *
-     * @return A {@code JPanel} containing the accidents and events configuration UI.
+     * @return A {@code JPanel} containing the accidents and events configuration
+     *         UI.
      */
     private JPanel createAccidentsAndEventsPanel() {
         // Contents
@@ -1323,25 +1240,17 @@ public class BiographyTab {
 
         lblMilitaryAcademyAccidents = new CampaignOptionsLabel("MilitaryAcademyAccidents");
         lblMilitaryAcademyAccidents.addMouseListener(createTipPanelUpdater(educationHeader,
-              "MilitaryAcademyAccidents"));
+                "MilitaryAcademyAccidents"));
         spnMilitaryAcademyAccidents = new CampaignOptionsSpinner("MilitaryAcademyAccidents", 10000, 0, 100000, 1);
         spnMilitaryAcademyAccidents.addMouseListener(createTipPanelUpdater(educationHeader,
-              "MilitaryAcademyAccidents"));
+                "MilitaryAcademyAccidents"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AccidentsAndEventsPanel",
-              true,
-              "AccidentsAndEventsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(chkAllAges, layout);
-
-        layout.gridy++;
-        panel.add(lblMilitaryAcademyAccidents, layout);
-        layout.gridx++;
-        panel.add(spnMilitaryAcademyAccidents, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AccidentsAndEventsPanel",
+            FORM_LABEL_COLUMN_WIDTH,
+            FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkAllAges);
+        panel.addRow(lblMilitaryAcademyAccidents, spnMilitaryAcademyAccidents);
 
         return panel;
     }
@@ -1352,103 +1261,98 @@ public class BiographyTab {
      * This tab allows users to:
      * </p>
      * <ul>
-     *     <li>Enable or disable the use of origin factions for name generation.</li>
-     *     <li>Assign portraits to personnel upon role changes.</li>
-     *     <li>Customize which portraits are randomly used for specific roles.</li>
+     * <li>Enable or disable the use of origin factions for name generation.</li>
+     * <li>Assign portraits to personnel upon role changes.</li>
+     * <li>Customize which portraits are randomly used for specific roles.</li>
      * </ul>
      *
      * @return A {@code JPanel} representing the Name and Portrait Generation tab.
      */
     public JPanel createNameAndPortraitGenerationTab() {
         // Header
+        String imageAddress = getImageDirectory() + "logo_clan_nova_cat.png";
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
-              getImageDirectory() + "logo_clan_nova_cat.png",
-              5);
+            imageAddress,
+            5);
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
         chkAssignPortraitOnRoleChange.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "AssignPortraitOnRoleChange"));
+                "AssignPortraitOnRoleChange"));
 
         chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits");
         chkAllowDuplicatePortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "AllowDuplicatePortraits"));
+                "AllowDuplicatePortraits"));
 
         chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "UseGenderedPortraitsOnly"));
+                "UseGenderedPortraitsOnly"));
 
         chkNoRandomPortraitsForChildren = new CampaignOptionsCheckBox("NoRandomPortraitsForChildren",
-              getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version(0, 51, 0)));
         chkNoRandomPortraitsForChildren.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "NoRandomPortraitsForChildren"));
+                "NoRandomPortraitsForChildren"));
 
         chkChildPortraitsWhenComingOfAge = new CampaignOptionsCheckBox("ChildPortraitsWhenComingOfAge",
-              getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version(0, 51, 0)));
         chkChildPortraitsWhenComingOfAge.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "ChildPortraitsWhenComingOfAge"));
+                "ChildPortraitsWhenComingOfAge"));
 
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
         chkUseOriginFactionForNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "UseOriginFactionForNames"));
+                "UseOriginFactionForNames"));
 
         lblFactionNames = new CampaignOptionsLabel("FactionNames");
         lblFactionNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader, "FactionNames"));
         comboFactionNames.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader, "FactionNames"));
 
+        JPanel nameGenerationPanel = createNameGenerationPanel();
+        JPanel portraitRulesPanel = createPortraitRulesPanel();
         pnlRandomPortrait = createRandomPortraitPanel();
+        JPanel panel = CampaignOptionsPagePanel.builder("NameAndPortraitGenerationTab",
+                "NameAndPortraitGenerationTab",
+                imageAddress)
+            .header(nameAndPortraitGenerationHeader)
+            .quote("nameAndPortraitGenerationTab")
+            .section("lblNameGenerationPanel.text", "lblNameGenerationPanel.summary", nameGenerationPanel)
+            .section("lblPortraitRulesPanel.text", "lblPortraitRulesPanel.summary", portraitRulesPanel)
+            .section("lblRandomPortraitPanel.text", "lblRandomPortraitPanel.summary", pnlRandomPortrait)
+            .build();
 
-        // Layout the Panels
-        final JPanel panelTop = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab");
-        final GridBagConstraints layoutTop = new CampaignOptionsGridBagConstraints(panelTop);
+        nameAndPortraitPageCreated = true;
+        updateNameAndPortraitControlsFromModel();
 
-        layoutTop.gridwidth = 1;
-        layoutTop.gridx = 0;
-        layoutTop.gridy = 0;
-        panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(chkAllowDuplicatePortraits, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(chkUseGenderedPortraitsOnly, layoutTop);
+        return panel;
+    }
 
-        layoutTop.gridx = 0;
-        layoutTop.gridy++;
-        panelTop.add(chkUseOriginFactionForNames, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(lblFactionNames, layoutTop);
-        layoutTop.gridx++;
-        panelTop.add(comboFactionNames, layoutTop);
+    private JPanel createNameGenerationPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("NameGenerationPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkUseOriginFactionForNames);
+        panel.addRow(lblFactionNames, comboFactionNames);
 
-        layoutTop.gridx = 0;
-        layoutTop.gridy++;
-        panelTop.add(chkNoRandomPortraitsForChildren, layoutTop);
+        return panel;
+    }
 
-        layoutTop.gridy++;
-        panelTop.add(chkChildPortraitsWhenComingOfAge, layoutTop);
+    private JPanel createPortraitRulesPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PortraitRulesPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+            chkAssignPortraitOnRoleChange,
+            chkAllowDuplicatePortraits,
+            chkUseGenderedPortraitsOnly,
+            chkNoRandomPortraitsForChildren);
+        panel.addCheckBox(chkChildPortraitsWhenComingOfAge);
 
-        final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(nameAndPortraitGenerationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(panelTop, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(pnlRandomPortrait, layoutParent);
-
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "NameAndPortraitGenerationTab");
+        return panel;
     }
 
     /**
-     * Creates a panel for customizing random portrait generation for personnel roles.
+     * Creates a panel for customizing random portrait generation for personnel
+     * roles.
      * <p>
      * This includes:
      * <p>
@@ -1456,57 +1360,89 @@ public class BiographyTab {
      * <li>Buttons to toggle all or no portrait options collectively.</li>
      * </p>
      *
-     * @return A {@code JPanel} containing the random portrait generation configuration UI.
+     * @return A {@code JPanel} containing the random portrait generation
+     *         configuration UI.
      */
     private JPanel createRandomPortraitPanel() {
         // Contents
         chkUsePortrait = new JCheckBox[personnelRoles.size() + 1];
 
-        btnEnableAllPortraits = new CampaignOptionsButton("EnableAllPortraits");
+        btnEnableAllPortraits = createPortraitAssignmentButton("EnableAllPortraits");
         btnEnableAllPortraits.addActionListener(evt -> {
             for (JCheckBox checkBox : chkUsePortrait) {
-                checkBox.setSelected(true);
+                if (checkBox != null) {
+                    checkBox.setSelected(true);
+                }
             }
         });
         btnEnableAllPortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "EnableAllPortraits"));
+                "EnableAllPortraits"));
 
-        btnDisableAllPortraits = new CampaignOptionsButton("DisableAllPortraits");
+        btnDisableAllPortraits = createPortraitAssignmentButton("DisableAllPortraits");
         btnDisableAllPortraits.addActionListener(evt -> {
             for (JCheckBox checkBox : chkUsePortrait) {
-                checkBox.setSelected(false);
+                if (checkBox != null) {
+                    checkBox.setSelected(false);
+                }
             }
         });
         btnDisableAllPortraits.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              "DisableAllPortraits"));
+                "DisableAllPortraits"));
 
         // Layout the Panel
-        JPanel panel = new JPanel(new GridLayout((int) Math.ceil((personnelRoles.size() + 3) / 5.0), 5));
-        panel.setBorder(BorderFactory.createTitledBorder(String.format(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblRandomPortraitPanel.text")))));
+        // BoxLayout (rather than FlowLayout.LEFT) so the first button sits flush at x=0
+        // and lines up with the checkbox
+        // column below; FlowLayout applies its hgap before the first component, which
+        // pushed the buttons ~5px right.
+        JPanel actionPanel = new JPanel();
+        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+        actionPanel.setOpaque(false);
+        actionPanel.add(btnEnableAllPortraits);
+        actionPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        actionPanel.add(btnDisableAllPortraits);
+        actionPanel.add(Box.createHorizontalGlue());
 
-        panel.add(btnEnableAllPortraits);
-        panel.add(btnDisableAllPortraits);
+        JCheckBox[] portraitCheckBoxes = new JCheckBox[personnelRoles.size() + 1];
+        int portraitIndex = 0;
 
         // Add remaining checkboxes
         JCheckBox jCheckBox;
         for (final PersonnelRole role : personnelRoles) {
             jCheckBox = new JCheckBox(role.toString());
             jCheckBox.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-                  null,
-                  role.getDescription(false)));
-            panel.add(jCheckBox);
+                    null,
+                    role.getDescription(false)));
+            portraitCheckBoxes[portraitIndex++] = jCheckBox;
             chkUsePortrait[role.ordinal()] = jCheckBox;
         }
 
         jCheckBox = new JCheckBox(PersonnelRoleSubType.CIVILIAN.toString());
         jCheckBox.addMouseListener(createTipPanelUpdater(nameAndPortraitGenerationHeader,
-              null,
-              getTextAt(getCampaignOptionsResourceBundle(), "lblCivilian.tooltip")));
-        panel.add(jCheckBox);
+                null,
+                getTextAt(getCampaignOptionsResourceBundle(), "lblCivilian.tooltip")));
+        portraitCheckBoxes[portraitIndex] = jCheckBox;
         chkUsePortrait[personnelRoles.size()] = jCheckBox;
 
+        CampaignOptionsFormPanel rolePanel = new CampaignOptionsFormPanel("RandomPortraitRolePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        rolePanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS, portraitCheckBoxes);
+
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.setName("pnlRandomPortraitPanel");
+        panel.setOpaque(false);
+        panel.add(actionPanel, BorderLayout.NORTH);
+        panel.add(rolePanel, BorderLayout.CENTER);
+
         return panel;
+    }
+
+    private JButton createPortraitAssignmentButton(String name) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+        button.setName("btn" + name);
+        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        return button;
     }
 
     /**
@@ -1514,37 +1450,103 @@ public class BiographyTab {
      * <p>
      * This tab provides options for:
      * <ul>
-     *     <li>Managing rank systems for personnel in the campaign.</li>
-     *     <li>Displaying rank-related UI components for user configuration.</li>
+     * <li>Managing rank systems for personnel in the campaign.</li>
+     * <li>Displaying rank-related UI components for user configuration.</li>
      * </ul>
      *
-     * @return A {@code JPanel} representing the Rank tab in the campaign configuration.
+     * @return A {@code JPanel} representing the Rank tab in the campaign
+     *         configuration.
      */
     public JPanel createRankTab() {
         // Header
-        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
-              getImageDirectory() + "logo_umayyad_caliphate.png", true, false, 0);
+        String imageAddress = getImageDirectory() + "logo_umayyad_caliphate.png";
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab", imageAddress);
 
         // Contents
-        Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
+        JPanel rankSystemsPanel = createRankSystemsPanel();
+        return CampaignOptionsPagePanel.builder("RankTab", "RankTab", imageAddress)
+            .header(headerPanel)
+            .intro("lblRankTabBody.text")
+            .quote("rankTab")
+            .section("lblRankTab.text", "lblRankTab.summary", rankSystemsPanel)
+            .build();
+    }
+
+    private JPanel createRankSystemsPanel() {
         rankSystemsPane.applyToCampaign();
+        configureEmbeddedRankSystemsPane();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        JPanel rankSystemsPanel = new JPanel(new BorderLayout());
+        rankSystemsPanel.setName("pnlRankSystemsPanel");
+        rankSystemsPanel.setOpaque(false);
+        rankSystemsPanel.add(rankSystemsPane, BorderLayout.CENTER);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(headerPanel, layoutParent);
+        return rankSystemsPanel;
+    }
 
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(rankSystemsViewport, layoutParent);
+    private void configureEmbeddedRankSystemsPane() {
+        rankSystemsPane.setBorder(BorderFactory.createEmptyBorder());
+        rankSystemsPane.setViewportBorder(null);
+        rankSystemsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        rankSystemsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        removeEmbeddedRankSystemsBorders(rankSystemsPane.getViewport().getView());
 
+        JTable ranksTable = rankSystemsPane.getRanksTable();
+        ranksTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        ranksTable.setFillsViewportHeight(true);
+        configureEmbeddedRankTableColumns(ranksTable);
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "RankTab");
+        JScrollPane tableScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
+                ranksTable);
+        if (tableScrollPane != null) {
+            Dimension tableSize = new Dimension(RANK_SYSTEMS_PANEL_WIDTH, RANK_TABLE_HEIGHT);
+            tableScrollPane.setPreferredSize(tableSize);
+            tableScrollPane.setMinimumSize(new Dimension(0, RANK_TABLE_HEIGHT));
+            tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        }
+
+        Dimension rankSystemsSize = getEmbeddedRankSystemsSize();
+        rankSystemsPane.setPreferredSize(rankSystemsSize);
+        rankSystemsPane.setMinimumSize(new Dimension(0, rankSystemsSize.height));
+    }
+
+    private Dimension getEmbeddedRankSystemsSize() {
+        Component view = rankSystemsPane.getViewport().getView();
+        int viewHeight = view == null ? RANK_TABLE_HEIGHT : view.getPreferredSize().height;
+        int horizontalScrollBarHeight = rankSystemsPane.getHorizontalScrollBar().getPreferredSize().height;
+
+        return new Dimension(RANK_SYSTEMS_PANEL_WIDTH, viewHeight + horizontalScrollBarHeight);
+    }
+
+    private void configureEmbeddedRankTableColumns(JTable ranksTable) {
+        for (int index = 0; index < ranksTable.getColumnModel().getColumnCount(); index++) {
+            int modelIndex = ranksTable.convertColumnIndexToModel(index);
+            TableColumn column = ranksTable.getColumnModel().getColumn(index);
+            column.setPreferredWidth(getEmbeddedRankColumnWidth(modelIndex));
+        }
+    }
+
+    private int getEmbeddedRankColumnWidth(int modelIndex) {
+        return switch (modelIndex) {
+            case RankTableModel.COL_NAME_RATE -> RANK_RATE_COLUMN_WIDTH;
+            case RankTableModel.COL_OFFICER -> RANK_OFFICER_COLUMN_WIDTH;
+            case RankTableModel.COL_PAY_MULTI -> RANK_PAY_MULTIPLIER_COLUMN_WIDTH;
+            default -> RANK_NAME_COLUMN_WIDTH;
+        };
+    }
+
+    private void removeEmbeddedRankSystemsBorders(Component component) {
+        if (component instanceof JPanel panel && ("rankSystemPanel".equals(panel.getName()) ||
+                "rankSystemFileButtonsPanel".equals(panel.getName()))) {
+            panel.setBorder(BorderFactory.createEmptyBorder());
+        }
+
+        if (component instanceof java.awt.Container container) {
+            for (Component child : container.getComponents()) {
+                removeEmbeddedRankSystemsBorders(child);
+            }
+        }
     }
 
     public void loadValuesFromCampaignOptions() {
@@ -1552,15 +1554,19 @@ public class BiographyTab {
     }
 
     /**
-     * Loads values from campaign options, optionally integrating with presets for default settings.
+     * Loads values from campaign options, optionally integrating with presets for
+     * default settings.
      *
-     * @param presetCampaignOptions     Optional preset campaign options, or `null` to use the campaign's active
+     * @param presetCampaignOptions     Optional preset campaign options, or `null`
+     *                                  to use the campaign's active
      *                                  settings.
-     * @param presetRandomOriginOptions Optional random origin options, or `null` to use the default origin settings.
-     * @param presetRankSystem          Optional rank system, or `null` to use the default system.
+     * @param presetRandomOriginOptions Optional random origin options, or `null` to
+     *                                  use the default origin settings.
+     * @param presetRankSystem          Optional rank system, or `null` to use the
+     *                                  default system.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-          @Nullable RandomOriginOptions presetRandomOriginOptions, @Nullable RankSystem presetRankSystem) {
+            @Nullable RandomOriginOptions presetRandomOriginOptions, @Nullable RankSystem presetRankSystem) {
         CampaignOptions options = presetCampaignOptions;
         if (options == null) {
             options = this.campaignOptions;
@@ -1576,93 +1582,26 @@ public class BiographyTab {
             rankSystem = campaign.getRankSystem();
         }
 
-        // General
-        chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
-        sldGender.setValue(getPercentFemale()); // 'getPercentFemale' is not stored in a Preset
-        spnNonBinaryDiceSize.setValue(options.getNonBinaryDiceSize());
-        comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
-        chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
-        chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
-        chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
-        chkAnnounceRecruitmentAnniversaries.setSelected(options.isAnnounceRecruitmentAnniversaries());
-        chkShowLifeEventDialogBirths.setSelected(options.isShowLifeEventDialogBirths());
-        chkShowLifeEventDialogComingOfAge.setSelected(options.isShowLifeEventDialogComingOfAge());
-        chkShowLifeEventDialogCelebrations.setSelected(options.isShowLifeEventDialogCelebrations());
-        chkVeterancySPAs.setSelected(options.isAwardVeterancySPAs());
-        chkAwardRelevantVeterancySPAs.setSelected(options.isAwardRelevantVeterancySPAs());
-        chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
-        chkRewardComingOfAgeRPSkills.setSelected(options.isRewardComingOfAgeRPSkills());
-
-        // Backgrounds
-        chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
-        chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
-        chkUseReasoningXpMultiplier.setSelected(options.isUseReasoningXpMultiplier());
-        chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
-        chkRandomizeOrigin.setSelected(originOptions.isRandomizeOrigin());
-        chkRandomizeDependentsOrigin.setSelected(originOptions.isRandomizeDependentOrigin());
-        chkRandomizeAroundSpecifiedPlanet.setSelected(originOptions.isRandomizeAroundSpecifiedPlanet());
-        comboSpecifiedSystem.setSelectedItem(originOptions.getSpecifiedPlanet().getParentSystem());
-        comboSpecifiedPlanet.setSelectedItem(originOptions.getSpecifiedPlanet());
-        spnOriginSearchRadius.setValue(originOptions.getOriginSearchRadius());
-        spnOriginDistanceScale.setValue(originOptions.getOriginDistanceScale());
-        chkAllowClanOrigins.setSelected(originOptions.isAllowClanOrigins());
-        chkExtraRandomOrigin.setSelected(originOptions.isExtraRandomOrigin());
-
-        // Death
-        chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
-        spnRandomDeathMultiplier.setValue(options.getRandomDeathMultiplier());
-
-        Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
-        for (final AgeGroup ageGroup : AgeGroup.values()) {
-            chkEnabledRandomDeathAgeGroups.get(ageGroup).setSelected(deathAgeGroups.get(ageGroup));
-        }
-
-        // Education
-        chkUseEducationModule.setSelected(options.isUseEducationModule());
-        spnCurriculumXpRate.setValue(options.getCurriculumXpRate());
-        spnMaximumJumpCount.setValue(options.getMaximumJumpCount());
-        chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
-        chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
-        chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
-        spnEntranceExamBaseTargetNumber.setValue(options.getEntranceExamBaseTargetNumber());
-        chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
-        chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
-        chkEnableUnitEducation.setSelected(options.isEnableUnitEducation());
-        chkEnableBonuses.setSelected(options.isEnableBonuses());
-        spnFacultyXpMultiplier.setValue(options.getFacultyXpRate());
-        spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
-        spnChildrenDropoutChance.setValue(options.getChildrenDropoutChance());
-        chkAllAges.setSelected(options.isAllAges());
-        spnMilitaryAcademyAccidents.setValue(options.getMilitaryAcademyAccidents());
-
-        // Name and Portraits
-        chkUseOriginFactionForNames.setSelected(options.isUseOriginFactionForNames());
-        // 'RandomNameGenerator' is not stored in a Preset
-        comboFactionNames.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
-        chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
-        chkAllowDuplicatePortraits.setSelected(options.isAllowDuplicatePortraits());
-        chkUseGenderedPortraitsOnly.setSelected(options.isUseGenderedPortraitsOnly());
-        chkNoRandomPortraitsForChildren.setSelected(options.isNoRandomPortraitsForChildren());
-        chkChildPortraitsWhenComingOfAge.setSelected(options.isChildPortraitsWhenComingOfAge());
-
-        final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
-        for (int i = 0; i < chkUsePortrait.length; i++) {
-            chkUsePortrait[i].setSelected(usePortraitForRole[i]);
-        }
+        model = new BiographyOptionsModel(options, originOptions);
+        updateCreatedControlsFromModel();
 
         // Ranks
         rankSystemsPane.getComboRankSystems().setSelectedItem(rankSystem);
     }
 
     /**
-     * Applies the current settings from the market UI components back into the {@link CampaignOptions} of the
+     * Applies the current settings from the market UI components back into the
+     * {@link CampaignOptions} of the
      * associated campaign.
      * <p>
-     * If a preset options object is provided, the changes are applied there. Otherwise, they are applied to the current
+     * If a preset options object is provided, the changes are applied there.
+     * Otherwise, they are applied to the current
      * campaign's options.
      *
-     * @param presetCampaignOptions A {@link CampaignOptions} object to update with the current UI settings, or
-     *                              {@code null} to apply changes to the campaign's options directly.
+     * @param presetCampaignOptions A {@link CampaignOptions} object to update with
+     *                              the current UI settings, or
+     *                              {@code null} to apply changes to the campaign's
+     *                              options directly.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -1674,90 +1613,237 @@ public class BiographyTab {
             originOptions = options.getRandomOriginOptions();
         }
 
-        // General
-        options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-        RandomGenderGenerator.setPercentFemale(sldGender.getValue());
-        options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
-        options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
-        options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
-        options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
-        options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());
-        options.setAnnounceRecruitmentAnniversaries(chkAnnounceRecruitmentAnniversaries.isSelected());
-        options.setShowLifeEventDialogBirths(chkShowLifeEventDialogBirths.isSelected());
-        options.setShowLifeEventDialogComingOfAge(chkShowLifeEventDialogComingOfAge.isSelected());
-        options.setShowLifeEventDialogCelebrations(chkShowLifeEventDialogCelebrations.isSelected());
-        options.setAwardVeterancySPAs(chkVeterancySPAs.isSelected());
-        options.setAwardRelevantVeterancySPAs(chkAwardRelevantVeterancySPAs.isSelected());
-        options.setRewardComingOfAgeAbilities(chkComingOfAgeSPAs.isSelected());
-        options.setRewardComingOfAgeRPSkills(chkRewardComingOfAgeRPSkills.isSelected());
-
-        // Backgrounds
-        options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
-        options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
-        options.setUseReasoningXpMultiplier(chkUseReasoningXpMultiplier.isSelected());
-        options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());
-
-        originOptions.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
-        originOptions.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
-        originOptions.setRandomizeAroundSpecifiedPlanet(chkRandomizeAroundSpecifiedPlanet.isSelected());
-
-        Planet selectedPlanet = comboSpecifiedPlanet.getSelectedItem();
-        originOptions.setSpecifiedPlanet(selectedPlanet == null ?
-                                               Systems.getInstance().getSystemById("Terra").getPrimaryPlanet() :
-                                               selectedPlanet);
-
-        originOptions.setOriginSearchRadius((int) spnOriginSearchRadius.getValue());
-        originOptions.setOriginDistanceScale((double) spnOriginDistanceScale.getValue());
-        originOptions.setAllowClanOrigins(chkAllowClanOrigins.isSelected());
-        originOptions.setExtraRandomOrigin(chkExtraRandomOrigin.isSelected());
-        options.setRandomOriginOptions(originOptions);
-
-        // Death
-        options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setRandomDeathMultiplier((double) spnRandomDeathMultiplier.getValue());
-        for (final AgeGroup ageGroup : AgeGroup.values()) {
-            options.getEnabledRandomDeathAgeGroups()
-                  .put(ageGroup, chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
-        }
-
-        // Education
-        options.setUseEducationModule(chkUseEducationModule.isSelected());
-        options.setCurriculumXpRate((int) spnCurriculumXpRate.getValue());
-        options.setMaximumJumpCount((int) spnMaximumJumpCount.getValue());
-        options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
-        options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
-        options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
-        options.setEntranceExamBaseTargetNumber((int) spnEntranceExamBaseTargetNumber.getValue());
-        options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
-        options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
-        options.setEnableUnitEducation(chkEnableUnitEducation.isSelected());
-        options.setEnableBonuses(chkEnableBonuses.isSelected());
-        options.setFacultyXpRate((double) spnFacultyXpMultiplier.getValue());
-        options.setAdultDropoutChance((int) spnAdultDropoutChance.getValue());
-        options.setChildrenDropoutChance((int) spnChildrenDropoutChance.getValue());
-        options.setAllAges(chkAllAges.isSelected());
-        options.setMilitaryAcademyAccidents((int) spnMilitaryAcademyAccidents.getValue());
-
-        // Name and Portraits
-        options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
-        options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
-        options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
-        options.setUseGenderedPortraitsOnly(chkUseGenderedPortraitsOnly.isSelected());
-        options.setNoRandomPortraitsForChildren(chkNoRandomPortraitsForChildren.isSelected());
-        options.setChildPortraitsWhenComingOfAge(chkChildPortraitsWhenComingOfAge.isSelected());
-        RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
-
-        for (int i = 0; i < chkUsePortrait.length; i++) {
-            if (i == chkUsePortrait.length - 1) {
-                for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
-                    options.setUsePortraitForRole(role.ordinal(), chkUsePortrait[i].isSelected());
-                }
-                continue;
-            }
-            options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
-        }
+        updateModelFromCreatedControls();
+        model.applyTo(options, originOptions);
 
         // Ranks
         rankSystemsPane.applyToCampaign();
     }
+
+    private void updateCreatedControlsFromModel() {
+        updateGeneralControlsFromModel();
+        updateBackgroundControlsFromModel();
+        updateDeathControlsFromModel();
+        updateEducationControlsFromModel();
+        updateNameAndPortraitControlsFromModel();
+    }
+
+    private void updateGeneralControlsFromModel() {
+        if (!generalPageCreated || model == null) {
+            return;
+        }
+
+        chkUseDylansRandomXP.setSelected(model.useDylansRandomXP);
+        spnGender.setValue(model.percentFemale);
+        spnNonBinaryDiceSize.setValue(model.nonBinaryDiceSize);
+        comboFamilyDisplayLevel.setSelectedItem(model.familyDisplayLevel);
+        chkAnnounceOfficersOnly.setSelected(model.announceOfficersOnly);
+        chkAnnounceBirthdays.setSelected(model.announceBirthdays);
+        chkAnnounceChildBirthdays.setSelected(model.announceChildBirthdays);
+        chkAnnounceRecruitmentAnniversaries.setSelected(model.announceRecruitmentAnniversaries);
+        chkShowLifeEventDialogBirths.setSelected(model.showLifeEventDialogBirths);
+        chkShowLifeEventDialogComingOfAge.setSelected(model.showLifeEventDialogComingOfAge);
+        chkShowLifeEventDialogCelebrations.setSelected(model.showLifeEventDialogCelebrations);
+        chkVeterancySPAs.setSelected(model.awardVeterancySPAs);
+        chkAwardRelevantVeterancySPAs.setSelected(model.awardRelevantVeterancySPAs);
+        chkComingOfAgeSPAs.setSelected(model.rewardComingOfAgeAbilities);
+        chkRewardComingOfAgeRPSkills.setSelected(model.rewardComingOfAgeRPSkills);
+    }
+
+    private void updateBackgroundControlsFromModel() {
+        if (!backgroundsPageCreated || model == null) {
+            return;
+        }
+
+        chkUseRandomPersonalities.setSelected(model.useRandomPersonalities);
+        chkUseRandomPersonalityReputation.setSelected(model.useRandomPersonalityReputation);
+        chkUseReasoningXpMultiplier.setSelected(model.useReasoningXpMultiplier);
+        chkUseSimulatedRelationships.setSelected(model.useSimulatedRelationships);
+        chkRandomizeOrigin.setSelected(model.randomizeOrigin);
+        chkRandomizeDependentsOrigin.setSelected(model.randomizeDependentOrigin);
+        chkRandomizeAroundSpecifiedPlanet.setSelected(model.randomizeAroundSpecifiedPlanet);
+        if (model.specifiedPlanet != null) {
+            comboSpecifiedSystem.setSelectedItem(model.specifiedPlanet.getParentSystem());
+            comboSpecifiedPlanet.setSelectedItem(model.specifiedPlanet);
+        }
+        spnOriginSearchRadius.setValue(model.originSearchRadius);
+        spnOriginDistanceScale.setValue(model.originDistanceScale);
+        chkAllowClanOrigins.setSelected(model.allowClanOrigins);
+        chkExtraRandomOrigin.setSelected(model.extraRandomOrigin);
+    }
+
+    private void updateDeathControlsFromModel() {
+        if (!deathPageCreated || model == null) {
+            return;
+        }
+
+        chkUseRandomDeathSuicideCause.setSelected(model.useRandomDeathSuicideCause);
+        spnRandomDeathMultiplier.setValue(model.randomDeathMultiplier);
+        for (final AgeGroup ageGroup : AgeGroup.values()) {
+            JCheckBox ageGroupCheckBox = chkEnabledRandomDeathAgeGroups.get(ageGroup);
+            if (ageGroupCheckBox != null) {
+                ageGroupCheckBox.setSelected(Boolean.TRUE.equals(model.enabledRandomDeathAgeGroups.get(ageGroup)));
+            }
+        }
+    }
+
+    private void updateEducationControlsFromModel() {
+        if (!educationPageCreated || model == null) {
+            return;
+        }
+
+        chkUseEducationModule.setSelected(model.useEducationModule);
+        spnCurriculumXpRate.setValue(model.curriculumXpRate);
+        spnMaximumJumpCount.setValue(model.maximumJumpCount);
+        chkUseReeducationCamps.setSelected(model.useReeducationCamps);
+        chkEnableOverrideRequirements.setSelected(model.enableOverrideRequirements);
+        chkShowIneligibleAcademies.setSelected(model.enableShowIneligibleAcademies);
+        spnEntranceExamBaseTargetNumber.setValue(model.entranceExamBaseTargetNumber);
+        chkEnableLocalAcademies.setSelected(model.enableLocalAcademies);
+        chkEnablePrestigiousAcademies.setSelected(model.enablePrestigiousAcademies);
+        chkEnableUnitEducation.setSelected(model.enableUnitEducation);
+        chkEnableBonuses.setSelected(model.enableBonuses);
+        spnFacultyXpMultiplier.setValue(model.facultyXpRate);
+        spnAdultDropoutChance.setValue(model.adultDropoutChance);
+        spnChildrenDropoutChance.setValue(model.childrenDropoutChance);
+        chkAllAges.setSelected(model.allAges);
+        spnMilitaryAcademyAccidents.setValue(model.militaryAcademyAccidents);
+    }
+
+    private void updateNameAndPortraitControlsFromModel() {
+        if (!nameAndPortraitPageCreated || model == null) {
+            return;
+        }
+
+        chkUseOriginFactionForNames.setSelected(model.useOriginFactionForNames);
+        comboFactionNames.setSelectedItem(model.factionNames);
+        chkAssignPortraitOnRoleChange.setSelected(model.assignPortraitOnRoleChange);
+        chkAllowDuplicatePortraits.setSelected(model.allowDuplicatePortraits);
+        chkUseGenderedPortraitsOnly.setSelected(model.useGenderedPortraitsOnly);
+        chkNoRandomPortraitsForChildren.setSelected(model.noRandomPortraitsForChildren);
+        chkChildPortraitsWhenComingOfAge.setSelected(model.childPortraitsWhenComingOfAge);
+
+        for (int i = 0; i < Math.min(chkUsePortrait.length, model.usePortraitForRole.length); i++) {
+            if (chkUsePortrait[i] != null) {
+                chkUsePortrait[i].setSelected(model.usePortraitForRole[i]);
+            }
+        }
+    }
+
+    private void updateModelFromCreatedControls() {
+        updateModelFromGeneralControls();
+        updateModelFromBackgroundControls();
+        updateModelFromDeathControls();
+        updateModelFromEducationControls();
+        updateModelFromNameAndPortraitControls();
+    }
+
+    private void updateModelFromGeneralControls() {
+        if (!generalPageCreated || model == null) {
+            return;
+        }
+
+        model.useDylansRandomXP = chkUseDylansRandomXP.isSelected();
+        model.percentFemale = (int) spnGender.getValue();
+        model.nonBinaryDiceSize = (int) spnNonBinaryDiceSize.getValue();
+        model.familyDisplayLevel = comboFamilyDisplayLevel.getSelectedItem();
+        model.announceOfficersOnly = chkAnnounceOfficersOnly.isSelected();
+        model.announceBirthdays = chkAnnounceBirthdays.isSelected();
+        model.announceChildBirthdays = chkAnnounceChildBirthdays.isSelected();
+        model.announceRecruitmentAnniversaries = chkAnnounceRecruitmentAnniversaries.isSelected();
+        model.showLifeEventDialogBirths = chkShowLifeEventDialogBirths.isSelected();
+        model.showLifeEventDialogComingOfAge = chkShowLifeEventDialogComingOfAge.isSelected();
+        model.showLifeEventDialogCelebrations = chkShowLifeEventDialogCelebrations.isSelected();
+        model.awardVeterancySPAs = chkVeterancySPAs.isSelected();
+        model.awardRelevantVeterancySPAs = chkAwardRelevantVeterancySPAs.isSelected();
+        model.rewardComingOfAgeAbilities = chkComingOfAgeSPAs.isSelected();
+        model.rewardComingOfAgeRPSkills = chkRewardComingOfAgeRPSkills.isSelected();
+    }
+
+    private void updateModelFromBackgroundControls() {
+        if (!backgroundsPageCreated || model == null) {
+            return;
+        }
+
+        model.useRandomPersonalities = chkUseRandomPersonalities.isSelected();
+        model.useRandomPersonalityReputation = chkUseRandomPersonalityReputation.isSelected();
+        model.useReasoningXpMultiplier = chkUseReasoningXpMultiplier.isSelected();
+        model.useSimulatedRelationships = chkUseSimulatedRelationships.isSelected();
+        model.randomizeOrigin = chkRandomizeOrigin.isSelected();
+        model.randomizeDependentOrigin = chkRandomizeDependentsOrigin.isSelected();
+        model.randomizeAroundSpecifiedPlanet = chkRandomizeAroundSpecifiedPlanet.isSelected();
+        model.specifiedPlanet = comboSpecifiedPlanet.getSelectedItem();
+        model.originSearchRadius = (int) spnOriginSearchRadius.getValue();
+        model.originDistanceScale = (double) spnOriginDistanceScale.getValue();
+        model.allowClanOrigins = chkAllowClanOrigins.isSelected();
+        model.extraRandomOrigin = chkExtraRandomOrigin.isSelected();
+    }
+
+    private void updateModelFromDeathControls() {
+        if (!deathPageCreated || model == null) {
+            return;
+        }
+
+        model.useRandomDeathSuicideCause = chkUseRandomDeathSuicideCause.isSelected();
+        model.randomDeathMultiplier = (double) spnRandomDeathMultiplier.getValue();
+        for (final AgeGroup ageGroup : AgeGroup.values()) {
+            JCheckBox ageGroupCheckBox = chkEnabledRandomDeathAgeGroups.get(ageGroup);
+            if (ageGroupCheckBox != null) {
+                model.enabledRandomDeathAgeGroups.put(ageGroup, ageGroupCheckBox.isSelected());
+            }
+        }
+    }
+
+    private void updateModelFromEducationControls() {
+        if (!educationPageCreated || model == null) {
+            return;
+        }
+
+        model.useEducationModule = chkUseEducationModule.isSelected();
+        model.curriculumXpRate = (int) spnCurriculumXpRate.getValue();
+        model.maximumJumpCount = (int) spnMaximumJumpCount.getValue();
+        model.useReeducationCamps = chkUseReeducationCamps.isSelected();
+        model.enableOverrideRequirements = chkEnableOverrideRequirements.isSelected();
+        model.enableShowIneligibleAcademies = chkShowIneligibleAcademies.isSelected();
+        model.entranceExamBaseTargetNumber = (int) spnEntranceExamBaseTargetNumber.getValue();
+        model.enableLocalAcademies = chkEnableLocalAcademies.isSelected();
+        model.enablePrestigiousAcademies = chkEnablePrestigiousAcademies.isSelected();
+        model.enableUnitEducation = chkEnableUnitEducation.isSelected();
+        model.enableBonuses = chkEnableBonuses.isSelected();
+        model.facultyXpRate = (double) spnFacultyXpMultiplier.getValue();
+        model.adultDropoutChance = (int) spnAdultDropoutChance.getValue();
+        model.childrenDropoutChance = (int) spnChildrenDropoutChance.getValue();
+        model.allAges = chkAllAges.isSelected();
+        model.militaryAcademyAccidents = (int) spnMilitaryAcademyAccidents.getValue();
+    }
+
+    private void updateModelFromNameAndPortraitControls() {
+        if (!nameAndPortraitPageCreated || model == null) {
+            return;
+        }
+
+        model.useOriginFactionForNames = chkUseOriginFactionForNames.isSelected();
+        model.factionNames = comboFactionNames.getSelectedItem();
+        model.assignPortraitOnRoleChange = chkAssignPortraitOnRoleChange.isSelected();
+        model.allowDuplicatePortraits = chkAllowDuplicatePortraits.isSelected();
+        model.useGenderedPortraitsOnly = chkUseGenderedPortraitsOnly.isSelected();
+        model.noRandomPortraitsForChildren = chkNoRandomPortraitsForChildren.isSelected();
+        model.childPortraitsWhenComingOfAge = chkChildPortraitsWhenComingOfAge.isSelected();
+
+        for (int i = 0; i < Math.min(chkUsePortrait.length, model.usePortraitForRole.length); i++) {
+            if (chkUsePortrait[i] == null) {
+                continue;
+            }
+            if (i == chkUsePortrait.length - 1) {
+                for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
+                    if (role.ordinal() < model.usePortraitForRole.length) {
+                        model.usePortraitForRole[role.ordinal()] = chkUsePortrait[i].isSelected();
+                    }
+                }
+                continue;
+            }
+            model.usePortraitForRole[i] = chkUsePortrait[i].isSelected();
+        }
+    }
+
 }

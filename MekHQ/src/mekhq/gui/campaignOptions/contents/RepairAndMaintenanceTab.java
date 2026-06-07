@@ -34,12 +34,10 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
-import java.awt.GridBagConstraints;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,31 +47,42 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * Represents a tab in the campaign options UI used to configure settings related to repair and maintenance in a
+ * Represents a tab in the campaign options UI used to configure settings
+ * related to repair and maintenance in a
  * campaign.
  * <p>
  * This tab is divided into two sections:
  * </p>
  * <ul>
- *     <li><b>Repair Tab:</b> Manages options for era modifications, tech assignments,
- *         equipment quirks handling, destruction margins, and more.</li>
- *     <li><b>Maintenance Tab:</b> Handles maintenance settings such as cycle frequency, quality standards,
- *         planetary modifiers, and unofficial maintenance rules.</li>
+ * <li><b>Repair Tab:</b> Manages options for era modifications, tech
+ * assignments,
+ * equipment quirks handling, destruction margins, and more.</li>
+ * <li><b>Maintenance Tab:</b> Handles maintenance settings such as cycle
+ * frequency, quality standards,
+ * planetary modifiers, and unofficial maintenance rules.</li>
  * </ul>
  * <p>
- * The class interacts with {@link CampaignOptions}, enabling the retrieval, storage,
+ * The class interacts with {@link CampaignOptions}, enabling the retrieval,
+ * storage,
  * and application of repair and maintenance configuration settings.
  * </p>
  */
 public class RepairAndMaintenanceTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int CHECKBOX_GRID_COLUMNS = 2;
+
     private final CampaignOptions campaignOptions;
+    private RepairAndMaintenanceOptionsModel model;
+    private boolean repairPageCreated;
+    private boolean maintenancePageCreated;
 
     private JCheckBox chkTechsUseAdministration;
     private JCheckBox chkUsefulAsTechs;
@@ -87,7 +96,7 @@ public class RepairAndMaintenanceTab {
     private JSpinner spnDamageMargin;
     private JLabel lblDestroyPartTarget;
     private JSpinner spnDestroyPartTarget;
-    //end Repair Tab
+    // end Repair Tab
 
     private JCheckBox checkMaintenance;
     private JLabel lblMaintenanceDays;
@@ -102,22 +111,26 @@ public class RepairAndMaintenanceTab {
     private JCheckBox chkUsePlanetaryModifiers;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
-    //end Maintenance Tab
+    // end Maintenance Tab
 
     /**
-     * Constructs a {@code RepairAndMaintenanceTab} instance for configuring repair and maintenance-related settings.
+     * Constructs a {@code RepairAndMaintenanceTab} instance for configuring repair
+     * and maintenance-related settings.
      *
-     * @param campaignOptions the {@link CampaignOptions} object to be used for managing repair and maintenance
+     * @param campaignOptions the {@link CampaignOptions} object to be used for
+     *                        managing repair and maintenance
      *                        options.
      */
     public RepairAndMaintenanceTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
+        loadValuesFromCampaignOptions();
     }
 
     /**
-     * Initializes the components of the tab, including both the Repair and Maintenance sections.
+     * Initializes the components of the tab, including both the Repair and
+     * Maintenance sections.
      */
     void initialize() {
         initializeRepairTab();
@@ -127,7 +140,8 @@ public class RepairAndMaintenanceTab {
     /**
      * Initializes the components for the Repair Tab.
      * <p>
-     * The Repair Tab includes settings for era-based modifications, technician assignment, equipment quirks, damage
+     * The Repair Tab includes settings for era-based modifications, technician
+     * assignment, equipment quirks, damage
      * margins, and destruction thresholds.
      * </p>
      */
@@ -155,7 +169,8 @@ public class RepairAndMaintenanceTab {
     /**
      * Initializes the components for the Maintenance Tab.
      * <p>
-     * The Maintenance Tab includes settings for maintenance scheduling, quality rules, randomization factors, and
+     * The Maintenance Tab includes settings for maintenance scheduling, quality
+     * rules, randomization factors, and
      * logging options.
      * </p>
      */
@@ -187,7 +202,8 @@ public class RepairAndMaintenanceTab {
     /**
      * Creates the panel for the Repair Tab.
      * <p>
-     * This tab provides configurable options for managing repair rules, handling quirks, setting margins for equipment
+     * This tab provides configurable options for managing repair rules, handling
+     * quirks, setting margins for equipment
      * survival, and incorporating era modifications.
      * </p>
      *
@@ -195,16 +211,16 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createRepairTab() {
         // Header
-        //start Repair Tab
-        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab",
-              getImageDirectory() + "logo_clan_burrock.png", 3);
+        // start Repair Tab
+        String imageAddress = getImageDirectory() + "logo_clan_burrock.png";
+        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab", imageAddress);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));
 
         chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUsefulAsTechs.addMouseListener(createTipPanelUpdater(repairHeader, "UsefulAsTechs"));
 
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
@@ -227,87 +243,67 @@ public class RepairAndMaintenanceTab {
         lblDamageMargin = new CampaignOptionsLabel("DamageMargin");
         lblDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
         spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
-              1, 1, 20, 1);
+                1, 1, 20, 1);
         spnDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
 
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
         lblDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
-              2, 2, 13, 1);
+                2, 2, 13, 1);
         spnDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        JPanel repairOptionsPanel = createRepairOptionsPanel();
+        JPanel componentDamagePanel = createComponentDamagePanel();
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(chkTechsUseAdministration, layoutLeft);
+        repairPageCreated = true;
+        updateRepairControlsFromModel();
 
-        layoutLeft.gridy++;
-        panelLeft.add(chkUsefulAsTechs, layoutLeft);
+        return CampaignOptionsPagePanel.builder("RepairTab", "RepairTab", imageAddress)
+                .header(repairHeader)
+                .quote("repairTab")
+                .section("lblRepairTab.text",
+                        "lblRepairTab.summary",
+                        repairOptionsPanel)
+                .section("lblRepairTabRight.text",
+                        "lblRepairTabRight.summary",
+                        componentDamagePanel,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .build();
+    }
 
-        layoutLeft.gridy++;
-        panelLeft.add(useEraModsCheckBox, layoutLeft);
+    private JPanel createRepairOptionsPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RepairOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkTechsUseAdministration,
+                chkUsefulAsTechs,
+                useEraModsCheckBox,
+                assignedTechFirstCheckBox,
+                resetToFirstTechCheckBox,
+                useQuirksBox);
 
-        layoutLeft.gridy++;
-        panelLeft.add(assignedTechFirstCheckBox, layoutLeft);
+        return panel;
+    }
 
-        layoutLeft.gridy++;
-        panelLeft.add(resetToFirstTechCheckBox, layoutLeft);
+    private JPanel createComponentDamagePanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComponentDamagePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                useAeroSystemHitsBox,
+                useDamageMargin);
+        panel.addRow(lblDamageMargin, spnDamageMargin);
+        panel.addRow(lblDestroyPartTarget, spnDestroyPartTarget);
 
-        layoutLeft.gridy++;
-        panelLeft.add(useQuirksBox, layoutLeft);
-
-        final JPanel panelRight = new CampaignOptionsStandardPanel("RepairTabRight", true,
-              "RepairTabRight",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutRight.gridx = 0;
-        layoutRight.gridy = 0;
-        layoutRight.gridwidth = 2;
-        panelRight.add(useAeroSystemHitsBox, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(useDamageMargin, layoutRight);
-
-        layoutRight.gridy++;
-        layoutRight.gridwidth = 1;
-        panelRight.add(lblDamageMargin, layoutRight);
-        layoutRight.gridx++;
-        panelRight.add(spnDamageMargin, layoutRight);
-
-        layoutRight.gridx = 0;
-        layoutRight.gridy++;
-        panelRight.add(lblDestroyPartTarget, layoutRight);
-        layoutRight.gridx++;
-        panelRight.add(spnDestroyPartTarget, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("RepairTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panelParent.add(repairHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "repairTab");
+        return panel;
     }
 
     /**
      * Creates the panel for the Maintenance Tab.
      * <p>
-     * This tab provides configurable options for managing maintenance cycles, quality standards, planetary effects, and
+     * This tab provides configurable options for managing maintenance cycles,
+     * quality standards, planetary effects, and
      * custom rules for units' upkeep.
      * </p>
      *
@@ -315,9 +311,9 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createMaintenanceTab() {
         // Header
-        //start Maintenance Tab
-        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab",
-              getImageDirectory() + "logo_magistracy_of_canopus.png", 6);
+        // start Maintenance Tab
+        String imageAddress = getImageDirectory() + "logo_magistracy_of_canopus.png";
+        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab", imageAddress);
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
@@ -326,173 +322,111 @@ public class RepairAndMaintenanceTab {
         lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
         lblMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
         spnMaintenanceDays = new CampaignOptionsSpinner("MaintenanceDays",
-              7, 1, 365, 1);
+                7, 1, 365, 1);
         spnMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
 
         lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
         lblMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
         spnMaintenanceBonus = new CampaignOptionsSpinner("MaintenanceBonus",
-              0, -13, 13, 1);
+                0, -13, 13, 1);
         spnMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
 
         lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
-              1, 1, 4, 1);
+                1, 1, 4, 1);
         spnDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
 
         useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         useQualityMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseQualityMaintenance"));
 
         reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                        CampaignOptionFlag.IMPORTANT));
         reverseQualityNames.addMouseListener(createTipPanelUpdater(maintenanceHeader, "ReverseQualityNames"));
 
         chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRandomUnitQualities.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseRandomUnitQualities"));
 
         chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
         chkUsePlanetaryModifiers.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UsePlanetaryModifiers"));
 
         useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                        CampaignOptionFlag.IMPORTANT));
         useUnofficialMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseUnofficialMaintenance"));
 
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
         logMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "LogMaintenance"));
 
-        // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
-        GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+        JPanel schedulePanel = createMaintenanceSchedulePanel();
+        JPanel qualityPanel = createMaintenanceQualityPanel();
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelLeft.add(checkMaintenance, layoutLeft);
+        maintenancePageCreated = true;
+        updateMaintenanceControlsFromModel();
 
-        layoutLeft.gridy++;
-        panelLeft.add(lblMaintenanceDays, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaintenanceDays, layoutLeft);
+        return CampaignOptionsPagePanel.builder("MaintenanceTab", "MaintenanceTab", imageAddress)
+                .header(maintenanceHeader)
+                .quote("maintenanceTab")
+                .section("lblMaintenanceTab.text",
+                        "lblMaintenanceTab.summary",
+                        schedulePanel)
+                .section("lblMaintenanceQualityPanel.text",
+                        "lblMaintenanceQualityPanel.summary",
+                        qualityPanel,
+                        getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .build();
+    }
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblMaintenanceBonus, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnMaintenanceBonus, layoutLeft);
+    private JPanel createMaintenanceSchedulePanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MaintenanceSchedulePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(checkMaintenance);
+        panel.addRow(lblMaintenanceDays, spnMaintenanceDays);
+        panel.addRow(lblMaintenanceBonus, spnMaintenanceBonus);
+        panel.addRow(lblDefaultMaintenanceTime, spnDefaultMaintenanceTime);
+        panel.addCheckBox(logMaintenance);
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(lblDefaultMaintenanceTime, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnDefaultMaintenanceTime, layoutLeft);
+        return panel;
+    }
 
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        layoutLeft.gridwidth = 2;
-        panelLeft.add(logMaintenance, layoutLeft);
+    private JPanel createMaintenanceQualityPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MaintenanceQualityPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                useQualityMaintenance,
+                reverseQualityNames,
+                chkUseRandomUnitQualities,
+                chkUsePlanetaryModifiers);
+        panel.addCheckBox(useUnofficialMaintenance);
 
-        final JPanel panelRight = new CampaignOptionsStandardPanel("repairTabRight", true);
-        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
-
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        layoutLeft.gridwidth = 1;
-        panelRight.add(useQualityMaintenance, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(reverseQualityNames, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(chkUseRandomUnitQualities, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(chkUseRandomUnitQualities, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(chkUsePlanetaryModifiers, layoutRight);
-
-        layoutRight.gridy++;
-        panelRight.add(useUnofficialMaintenance, layoutRight);
-
-        final JPanel panelParent = new CampaignOptionsStandardPanel("repairTab", true);
-        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridy = 0;
-        panelParent.add(maintenanceHeader, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-        layoutParent.gridx++;
-        panelParent.add(panelRight, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panelParent, "maintenanceTab");
+        return panel;
     }
 
     /**
-     * Applies the current tab's repair and maintenance settings from the UI components to the provided
-     * {@link CampaignOptions}.
-     * <p>
-     * If no custom {@link CampaignOptions} are provided, uses the default {@link CampaignOptions} associated with this
-     * tab.
-     * </p>
-     *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to apply the current settings to. If
-     *                              {@code null}, the default options are modified.
-     */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
-        }
-
-        // Repair
-        options.setTechsUseAdministration(chkTechsUseAdministration.isSelected());
-        options.setIsUseUsefulAsTechs(chkUsefulAsTechs.isSelected());
-        options.setEraMods(useEraModsCheckBox.isSelected());
-        options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
-        options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
-        options.setQuirks(useQuirksBox.isSelected());
-        options.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
-        options.setDestroyByMargin(useDamageMargin.isSelected());
-        options.setDestroyMargin((int) spnDamageMargin.getValue());
-        options.setDestroyPartTarget((int) spnDestroyPartTarget.getValue());
-
-        // Maintenance
-        options.setCheckMaintenance(checkMaintenance.isSelected());
-        options.setMaintenanceCycleDays((int) spnMaintenanceDays.getValue());
-        options.setMaintenanceBonus((int) spnMaintenanceBonus.getValue());
-        options.setDefaultMaintenanceTime((int) spnDefaultMaintenanceTime.getValue());
-        options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
-        options.setReverseQualityNames(reverseQualityNames.isSelected());
-        options.setUseRandomUnitQualities(chkUseRandomUnitQualities.isSelected());
-        options.setUsePlanetaryModifiers(chkUsePlanetaryModifiers.isSelected());
-        options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
-        options.setLogMaintenance(logMaintenance.isSelected());
-    }
-
-    /**
-     * Loads the repair and maintenance settings from the default {@link CampaignOptions} into the tab's UI components.
+     * Loads the repair and maintenance settings from the default
+     * {@link CampaignOptions} into the tab's UI components.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
     /**
-     * Loads the repair and maintenance settings from the {@link CampaignOptions} object into the tab's UI components.
+     * Loads the repair and maintenance settings from the {@link CampaignOptions}
+     * object into the tab's UI components.
      * <p>
-     * If no custom {@link CampaignOptions} are provided, the default {@link CampaignOptions} associated with this tab
+     * If no custom {@link CampaignOptions} are provided, the default
+     * {@link CampaignOptions} associated with this tab
      * is used.
      * </p>
      *
-     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to load settings from. If
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} object
+     *                              to load settings from. If
      *                              {@code null}, the default options are used.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
@@ -501,28 +435,110 @@ public class RepairAndMaintenanceTab {
             options = this.campaignOptions;
         }
 
-        // Repair
-        chkTechsUseAdministration.setSelected(options.isTechsUseAdministration());
-        chkUsefulAsTechs.setSelected(options.isUseUsefulAsTechs());
-        useEraModsCheckBox.setSelected(options.isUseEraMods());
-        assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
-        resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());
-        useQuirksBox.setSelected(options.isUseQuirks());
-        useAeroSystemHitsBox.setSelected(options.isUseAeroSystemHits());
-        useDamageMargin.setSelected(options.isDestroyByMargin());
-        spnDamageMargin.setValue(options.getDestroyMargin());
-        spnDestroyPartTarget.setValue(options.getDestroyPartTarget());
-
-        // Maintenance
-        checkMaintenance.setSelected(options.isCheckMaintenance());
-        spnMaintenanceDays.setValue(options.getMaintenanceCycleDays());
-        spnMaintenanceBonus.setValue(options.getMaintenanceBonus());
-        spnDefaultMaintenanceTime.setValue(options.getDefaultMaintenanceTime());
-        useQualityMaintenance.setSelected(options.isUseQualityMaintenance());
-        reverseQualityNames.setSelected(options.isReverseQualityNames());
-        chkUseRandomUnitQualities.setSelected(options.isUseRandomUnitQualities());
-        chkUsePlanetaryModifiers.setSelected(options.isUsePlanetaryModifiers());
-        useUnofficialMaintenance.setSelected(options.isUseUnofficialMaintenance());
-        logMaintenance.setSelected(options.isLogMaintenance());
+        model = new RepairAndMaintenanceOptionsModel(options);
+        updateCreatedControlsFromModel();
     }
+
+    /**
+     * Applies the current tab's repair and maintenance settings from the UI
+     * components to the provided
+     * {@link CampaignOptions}.
+     * <p>
+     * If no custom {@link CampaignOptions} are provided, uses the default
+     * {@link CampaignOptions} associated with this
+     * tab.
+     * </p>
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} object
+     *                              to apply the current settings to. If
+     *                              {@code null}, the default options are modified.
+     */
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
+        updateModelFromCreatedControls();
+        model.applyTo(options);
+    }
+
+    private void updateCreatedControlsFromModel() {
+        updateRepairControlsFromModel();
+        updateMaintenanceControlsFromModel();
+    }
+
+    private void updateRepairControlsFromModel() {
+        if (!repairPageCreated || model == null) {
+            return;
+        }
+
+        chkTechsUseAdministration.setSelected(model.techsUseAdministration);
+        chkUsefulAsTechs.setSelected(model.useUsefulAsTechs);
+        useEraModsCheckBox.setSelected(model.useEraMods);
+        assignedTechFirstCheckBox.setSelected(model.assignedTechFirst);
+        resetToFirstTechCheckBox.setSelected(model.resetToFirstTech);
+        useQuirksBox.setSelected(model.useQuirks);
+        useAeroSystemHitsBox.setSelected(model.useAeroSystemHits);
+        useDamageMargin.setSelected(model.destroyByMargin);
+        spnDamageMargin.setValue(model.destroyMargin);
+        spnDestroyPartTarget.setValue(model.destroyPartTarget);
+    }
+
+    private void updateMaintenanceControlsFromModel() {
+        if (!maintenancePageCreated || model == null) {
+            return;
+        }
+
+        checkMaintenance.setSelected(model.checkMaintenance);
+        spnMaintenanceDays.setValue(model.maintenanceCycleDays);
+        spnMaintenanceBonus.setValue(model.maintenanceBonus);
+        spnDefaultMaintenanceTime.setValue(model.defaultMaintenanceTime);
+        useQualityMaintenance.setSelected(model.useQualityMaintenance);
+        reverseQualityNames.setSelected(model.reverseQualityNames);
+        chkUseRandomUnitQualities.setSelected(model.useRandomUnitQualities);
+        chkUsePlanetaryModifiers.setSelected(model.usePlanetaryModifiers);
+        useUnofficialMaintenance.setSelected(model.useUnofficialMaintenance);
+        logMaintenance.setSelected(model.logMaintenance);
+    }
+
+    private void updateModelFromCreatedControls() {
+        updateModelFromRepairControls();
+        updateModelFromMaintenanceControls();
+    }
+
+    private void updateModelFromRepairControls() {
+        if (!repairPageCreated || model == null) {
+            return;
+        }
+
+        model.techsUseAdministration = chkTechsUseAdministration.isSelected();
+        model.useUsefulAsTechs = chkUsefulAsTechs.isSelected();
+        model.useEraMods = useEraModsCheckBox.isSelected();
+        model.assignedTechFirst = assignedTechFirstCheckBox.isSelected();
+        model.resetToFirstTech = resetToFirstTechCheckBox.isSelected();
+        model.useQuirks = useQuirksBox.isSelected();
+        model.useAeroSystemHits = useAeroSystemHitsBox.isSelected();
+        model.destroyByMargin = useDamageMargin.isSelected();
+        model.destroyMargin = (int) spnDamageMargin.getValue();
+        model.destroyPartTarget = (int) spnDestroyPartTarget.getValue();
+    }
+
+    private void updateModelFromMaintenanceControls() {
+        if (!maintenancePageCreated || model == null) {
+            return;
+        }
+
+        model.checkMaintenance = checkMaintenance.isSelected();
+        model.maintenanceCycleDays = (int) spnMaintenanceDays.getValue();
+        model.maintenanceBonus = (int) spnMaintenanceBonus.getValue();
+        model.defaultMaintenanceTime = (int) spnDefaultMaintenanceTime.getValue();
+        model.useQualityMaintenance = useQualityMaintenance.isSelected();
+        model.reverseQualityNames = reverseQualityNames.isSelected();
+        model.useRandomUnitQualities = chkUseRandomUnitQualities.isSelected();
+        model.usePlanetaryModifiers = chkUsePlanetaryModifiers.isSelected();
+        model.useUnofficialMaintenance = useUnofficialMaintenance.isSelected();
+        model.logMaintenance = logMaintenance.isSelected();
+    }
+
 }

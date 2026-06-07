@@ -32,46 +32,55 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
+import java.awt.FlowLayout;
+import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -81,23 +90,34 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * spanning multiple tabs.
  */
 public class SalariesTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    // Wider than the default control column so the salary-amount spinners have room for large figures.
+    private static final int FORM_CONTROL_COLUMN_WIDTH = 300;
+    private static final int FORM_LABEL_CONTROL_GAP = 12;
+    private static final int SECTION_CONTENT_WIDTH = FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP
+          + FORM_CONTROL_COLUMN_WIDTH;
+    private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
+    private static final int CIVILIAN_TABLE_WIDTH = SECTION_CONTENT_WIDTH;
+    private static final int CIVILIAN_SALARY_COLUMN_WIDTH = 120;
+    private static final int CIVILIAN_ROLE_COLUMN_WIDTH = CIVILIAN_TABLE_WIDTH - CIVILIAN_SALARY_COLUMN_WIDTH;
+
     private final CampaignOptions campaignOptions;
+    private SalariesOptionsModel model;
+    private boolean combatPageCreated;
+    private boolean supportPageCreated;
+    private boolean civilianPageCreated;
 
     //start Combat Salaries Tab
-    private CampaignOptionsHeaderPanel combatSalariesHeader;
+    private CampaignOptionsHeaderPanel salariesHeader;
     private JCheckBox chkDisableSecondaryRoleSalary;
 
-    private JPanel pnlSalaryMultipliersPanel;
     private JLabel lblAntiMekSalary;
     private JSpinner spnAntiMekSalary;
     private JLabel lblSpecialistInfantrySalary;
     private JSpinner spnSpecialistInfantrySalary;
 
-    private JPanel pnlSalaryExperienceMultipliersPanel;
     private Map<SkillLevel, JLabel> lblSalaryExperienceMultipliers;
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
-
-    private JPanel pnlSalaryBaseSalaryPanel;
 
     private List<PersonnelRole> combatRoles;
     private JLabel[] lblBaseSalaryCombat;
@@ -108,8 +128,9 @@ public class SalariesTab {
     private JSpinner[] spnBaseSalarySupport;
 
     private List<PersonnelRole> civilianRoles;
-    private JLabel[] lblBaseSalaryCivilian;
-    private JSpinner[] spnBaseSalaryCivilian;
+    private SalaryTableModel civilianSalaryTableModel;
+    private JTable civilianSalaryTable;
+    private JScrollPane civilianSalaryTableScrollPane;
     //end Salaries Tab
 
     /**
@@ -122,6 +143,7 @@ public class SalariesTab {
         this.campaignOptions = campaignOptions;
 
         initialize();
+        loadValuesFromCampaignOptions();
     }
 
     /**
@@ -130,19 +152,14 @@ public class SalariesTab {
     private void initialize() {
         chkDisableSecondaryRoleSalary = new JCheckBox();
 
-        pnlSalaryMultipliersPanel = new JPanel();
-
         lblAntiMekSalary = new JLabel();
         spnAntiMekSalary = new JSpinner();
 
         lblSpecialistInfantrySalary = new JLabel();
         spnSpecialistInfantrySalary = new JSpinner();
 
-        pnlSalaryExperienceMultipliersPanel = new JPanel();
         lblSalaryExperienceMultipliers = new HashMap<>();
         spnSalaryExperienceMultipliers = new HashMap<>();
-
-        pnlSalaryBaseSalaryPanel = new JPanel();
 
         combatRoles = PersonnelRole.getCombatRoles();
         combatRoles.sort(Comparator.comparing(role -> role.getLabel(false)));
@@ -160,8 +177,6 @@ public class SalariesTab {
         civilianRoles.addFirst(PersonnelRole.NONE);
         civilianRoles.remove(PersonnelRole.DEPENDENT);
         civilianRoles.addFirst(PersonnelRole.DEPENDENT);
-        lblBaseSalaryCivilian = new JLabel[civilianRoles.size()];
-        spnBaseSalaryCivilian = new JSpinner[civilianRoles.size()];
     }
 
     /**
@@ -171,54 +186,70 @@ public class SalariesTab {
      */
     public JPanel createSalariesTab(PersonnelRoleSubType type) {
         // Header
-        combatSalariesHeader = switch (type) {
-            case COMBAT ->
-                  new CampaignOptionsHeaderPanel("CombatSalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
-            case SUPPORT ->
-                  new CampaignOptionsHeaderPanel("SupportSalariesTab", getImageDirectory() + "logo_clan_coyote.png", 2);
-            case CIVILIAN ->
-                  new CampaignOptionsHeaderPanel("CivilianSalariesTab", getImageDirectory() + "logo_clan_coyote.png");
-        };
+        String imageAddress = getImageDirectory() + "logo_clan_coyote.png";
+        String headerName = getHeaderName(type);
+        salariesHeader = new CampaignOptionsHeaderPanel(headerName, imageAddress);
+        CampaignOptionsPagePanel.Builder builder = CampaignOptionsPagePanel.builder(headerName, headerName, imageAddress)
+            .header(salariesHeader)
+            .quote(getQuoteResourceName(type));
 
-        // Contents
         if (type == PersonnelRoleSubType.COMBAT) {
             chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary",
-                  getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-            chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(combatSalariesHeader,
-                  "DisableSecondaryRoleSalary"));
-            pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
-            pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
+                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+            chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
+                "DisableSecondaryRoleSalary"));
+
+            builder.section("lblSalaryRulesPanel.text", "lblSalaryRulesPanel.summary", createSalaryRulesPanel())
+                    .section("lblSalaryMultipliersPanel.text",
+                            "lblSalaryMultipliersPanel.summary",
+                            createSalaryMultipliersPanel())
+                    .section("lblExperienceMultipliersPanel.text",
+                            "lblExperienceMultipliersPanel.summary",
+                            createExperienceMultipliersPanel());
         }
 
-        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel(type);
+        JPanel panel = builder.section("lblBaseSalariesPanel.text",
+                getBaseSalariesSummaryKey(type),
+                createBaseSalariesPanel(type))
+                .build();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        markPageCreated(type);
+        updateSalariesControlsFromModel(type);
 
-        layout.gridwidth = 5;
-        layout.gridy = 0;
-        panel.add(combatSalariesHeader, layout);
+        return panel;
+    }
 
-        if (type == PersonnelRoleSubType.COMBAT) {
-            layout.gridx = 0;
-            layout.gridy++;
-            layout.gridwidth = 1;
-            panel.add(chkDisableSecondaryRoleSalary, layout);
+    private String getHeaderName(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> "CombatSalariesTab";
+            case SUPPORT -> "SupportSalariesTab";
+            case CIVILIAN -> "CivilianSalariesTab";
+        };
+    }
 
-            layout.gridy++;
-            panel.add(pnlSalaryMultipliersPanel, layout);
-            layout.gridx++;
-            panel.add(pnlSalaryExperienceMultipliersPanel, layout);
-        }
+    private String getQuoteResourceName(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> "0combatSalariesTab";
+            case SUPPORT -> "1supportSalariesTab";
+            case CIVILIAN -> "2civilianSalariesTab";
+        };
+    }
 
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(pnlSalaryBaseSalaryPanel, layout);
+    private String getBaseSalariesSummaryKey(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> "lblBaseSalariesPanel.summary.combat";
+            case SUPPORT -> "lblBaseSalariesPanel.summary.support";
+            case CIVILIAN -> "lblBaseSalariesPanel.summary.civilian";
+        };
+    }
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "SalariesTab");
+    private JPanel createSalaryRulesPanel() {
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalaryRulesPanel",
+              FORM_LABEL_COLUMN_WIDTH,
+              FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkDisableSecondaryRoleSalary);
+
+        return panel;
     }
 
     /**
@@ -229,35 +260,26 @@ public class SalariesTab {
     private JPanel createSalaryMultipliersPanel() {
         // Contents
         lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
-        lblAntiMekSalary.addMouseListener(createTipPanelUpdater(combatSalariesHeader, "AntiMekSalary"));
+        lblAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
         spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary", 0, 0, 100, 0.01);
-        spnAntiMekSalary.addMouseListener(createTipPanelUpdater(combatSalariesHeader, "AntiMekSalary"));
+        spnAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
 
         lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
-        lblSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(combatSalariesHeader,
+        lblSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(salariesHeader,
               "SpecialistInfantrySalary"));
         spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary", 0, 0, 100, 0.01);
-        spnSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(combatSalariesHeader,
+        spnSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(salariesHeader,
               "SpecialistInfantrySalary"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true, "SalaryMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        JComponent[] labels = { lblAntiMekSalary, lblSpecialistInfantrySalary };
+        JComponent[] controls = { spnAntiMekSalary, spnSpecialistInfantrySalary };
 
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblAntiMekSalary, layout);
-        layout.gridx++;
-        panel.add(spnAntiMekSalary, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSpecialistInfantrySalary, layout);
-        layout.gridx++;
-        panel.add(spnSpecialistInfantrySalary, layout);
-
-        return panel;
+        return createPairedFieldGridPanel("SalaryMultipliersPanel",
+              labels,
+              controls,
+              2,
+              GRID_CONTROL_COLUMN_WIDTH);
     }
 
     /**
@@ -272,75 +294,28 @@ public class SalariesTab {
         for (final SkillLevel skillLevel : skillLevels) {
             final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(), null, true);
             label.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
-            label.addMouseListener(createTipPanelUpdater(combatSalariesHeader, "SkillLevelMultiplier"));
+            label.addMouseListener(createTipPanelUpdater(salariesHeader, "SkillLevelMultiplier"));
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
             final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel, null, 0, 0, 100, 0.1, true);
             spinner.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
-            spinner.addMouseListener(createTipPanelUpdater(combatSalariesHeader, "SkillLevelMultiplier"));
+            spinner.addMouseListener(createTipPanelUpdater(salariesHeader, "SkillLevelMultiplier"));
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
         }
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel",
-              true,
-              "ExperienceMultipliersPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        JComponent[] labels = new JComponent[skillLevels.length];
+        JComponent[] controls = new JComponent[skillLevels.length];
+        for (int index = 0; index < skillLevels.length; index++) {
+            labels[index] = lblSalaryExperienceMultipliers.get(skillLevels[index]);
+            controls[index] = spnSalaryExperienceMultipliers.get(skillLevels[index]);
+        }
 
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[0]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[0]), layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[4]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[4]), layout);
-
-        // new column
-
-        layout.gridx = 2;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[1]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[1]), layout);
-
-        layout.gridx = 2;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[5]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[5]), layout);
-
-        // new column
-
-        layout.gridx = 4;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[2]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[2]), layout);
-
-        layout.gridx = 4;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[6]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[6]), layout);
-
-        // new column
-
-        layout.gridx = 6;
-        layout.gridy = 0;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[3]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[3]), layout);
-
-        layout.gridx = 6;
-        layout.gridy++;
-        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[7]), layout);
-        layout.gridx++;
-        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[7]), layout);
+        final JPanel panel = createPairedFieldGridPanel("ExperienceMultipliersPanel",
+              labels,
+              controls,
+              2,
+              GRID_CONTROL_COLUMN_WIDTH);
 
         return panel;
     }
@@ -351,120 +326,231 @@ public class SalariesTab {
      * @return a {@link JPanel} containing settings for base salaries.
      */
     private JPanel createBaseSalariesPanel(PersonnelRoleSubType type) {
+        if (type == PersonnelRoleSubType.CIVILIAN) {
+            return createCivilianBaseSalariesPanel();
+        }
+
         List<PersonnelRole> roles = switch (type) {
             case COMBAT -> combatRoles;
             case SUPPORT -> supportRoles;
-            case CIVILIAN -> civilianRoles;
+            case CIVILIAN -> throw new IllegalArgumentException("Civilian salaries use a table model.");
         };
         JLabel[] trackingLabel = switch (type) {
             case COMBAT -> lblBaseSalaryCombat;
             case SUPPORT -> lblBaseSalarySupport;
-            case CIVILIAN -> lblBaseSalaryCivilian;
+            case CIVILIAN -> throw new IllegalArgumentException("Civilian salaries use a table model.");
         };
         JSpinner[] trackingSpinner = switch (type) {
             case COMBAT -> spnBaseSalaryCombat;
             case SUPPORT -> spnBaseSalarySupport;
-            case CIVILIAN -> spnBaseSalaryCivilian;
+            case CIVILIAN -> throw new IllegalArgumentException("Civilian salaries use a table model.");
         };
 
         // Contents
-        for (final PersonnelRole personnelRole : roles) {
-            String componentName = personnelRole.toString().replace(" ", "");
-
-            // JLabel
-            JLabel jLabel = new JLabel(personnelRole.toString());
-            jLabel.setToolTipText(personnelRole.getDescription(false));
-            jLabel.addMouseListener(createTipPanelUpdater(combatSalariesHeader,
-                  null,
-                  personnelRole.getDescription(false)));
-            jLabel.setName("lbl" + componentName);
-
-            Dimension labelSize = jLabel.getPreferredSize();
-            jLabel.setMinimumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
-
-            // JSpinner
-            JSpinner jSpinner = new JSpinner();
-            jSpinner.setToolTipText(personnelRole.getDescription(false));
-            jSpinner.addMouseListener(createTipPanelUpdater(combatSalariesHeader,
-                  null,
-                  personnelRole.getDescription(false)));
-            jSpinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
-            jSpinner.setName("spn" + componentName);
-
-            DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
-            editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
-
-            Dimension spinnerSize = jSpinner.getPreferredSize();
-            jSpinner.setMinimumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
-
-            // Component Tracking Assignment
-            int index = roles.indexOf(personnelRole);
-            switch (type) {
-                case COMBAT -> {
-                    lblBaseSalaryCombat[index] = jLabel;
-                    spnBaseSalaryCombat[index] = jSpinner;
-                }
-                case SUPPORT -> {
-                    lblBaseSalarySupport[index] = jLabel;
-                    spnBaseSalarySupport[index] = jSpinner;
-                }
-                case CIVILIAN -> {
-                    lblBaseSalaryCivilian[index] = jLabel;
-                    spnBaseSalaryCivilian[index] = jSpinner;
-                }
-            }
+        for (int index = 0; index < roles.size(); index++) {
+            PersonnelRole personnelRole = roles.get(index);
+            trackingLabel[index] = createRoleSalaryLabel(personnelRole);
+            trackingSpinner[index] = createRoleSalarySpinner(personnelRole);
         }
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BaseSalariesPanel", true, "BaseSalariesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        return createPairedFieldGridPanel("BaseSalariesPanel",
+              trackingLabel,
+              trackingSpinner,
+              getBaseSalaryColumnCount(type),
+              GRID_CONTROL_COLUMN_WIDTH);
+    }
 
-        SequentialGroup mainHorizontalGroup = layout.createSequentialGroup();
-        SequentialGroup mainVerticalGroup = layout.createSequentialGroup();
+    private int getBaseSalaryColumnCount(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> 2;
+            case SUPPORT -> 2;
+            case CIVILIAN -> throw new IllegalArgumentException("Civilian salaries use a table model.");
+        };
+    }
 
-        int columns = 3;
-        int rows = (int) Math.ceil((double) trackingLabel.length / columns);
+    private JLabel createRoleSalaryLabel(PersonnelRole personnelRole) {
+        String componentName = personnelRole.toString().replace(" ", "");
+        JLabel label = new JLabel(personnelRole.toString());
+        label.setToolTipText(personnelRole.getDescription(false));
+        label.addMouseListener(createTipPanelUpdater(salariesHeader, null, personnelRole.getDescription(false)));
+        label.setName("lbl" + componentName);
 
-        // Create an array to store ParallelGroups for each column
-        ParallelGroup[] columnGroups = new ParallelGroup[columns];
-        for (int i = 0; i < columns; i++) {
-            columnGroups[i] = layout.createParallelGroup();
+        return label;
+    }
+
+    private JSpinner createRoleSalarySpinner(PersonnelRole personnelRole) {
+        String componentName = personnelRole.toString().replace(" ", "");
+        JSpinner spinner = new JSpinner();
+        spinner.setToolTipText(personnelRole.getDescription(false));
+        spinner.addMouseListener(createTipPanelUpdater(salariesHeader, null, personnelRole.getDescription(false)));
+        spinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
+        spinner.setName("spn" + componentName);
+
+        DefaultEditor editor = (DefaultEditor) spinner.getEditor();
+        editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+        CampaignOptionsSpinner.installSelectAllOnFocus(spinner);
+
+        return spinner;
+    }
+
+    private JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
+            int columnCount, int controlWidth) {
+        CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
+              FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP,
+              FORM_CONTROL_COLUMN_WIDTH,
+              controlWidth,
+              columnCount);
+        panel.addPairs(labels, controls);
+          return panel;
+    }
+
+    private JPanel createCivilianBaseSalariesPanel() {
+        civilianSalaryTableModel = new SalaryTableModel(civilianRoles);
+        if (model != null) {
+            civilianSalaryTableModel.setValues(model.roleBaseSalaries);
         }
 
-        for (int j = 0; j < rows; j++) {
-            ParallelGroup verticalGroup = layout.createParallelGroup(Alignment.BASELINE);
+        TableRowSorter<SalaryTableModel> sorter = new TableRowSorter<>(civilianSalaryTableModel);
+        sorter.setComparator(SalaryTableModel.SALARY_COLUMN,
+              Comparator.comparingDouble(value -> ((Number) value).doubleValue()));
 
-            for (int i = 0; i < columns; i++) {
-                int index = i * rows + j;
+        civilianSalaryTable = createCivilianSalaryTable(civilianSalaryTableModel, sorter);
+        civilianSalaryTableScrollPane = createCivilianSalaryTableScrollPane(civilianSalaryTable);
+        updateCivilianSalaryTableHeight();
 
-                if (index < trackingLabel.length) {
-                    // Create a SequentialGroup for the label and spinner
-                    SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
-
-                    horizontalSequentialGroup.addComponent(trackingLabel[index]);
-                    horizontalSequentialGroup.addComponent(trackingSpinner[index]);
-                    if (i != (columns - 1)) {
-                        horizontalSequentialGroup.addGap(10);
-                    }
-
-                    // Add the SequentialGroup to the column's ParallelGroup
-                    columnGroups[i].addGroup(horizontalSequentialGroup);
-
-                    verticalGroup.addComponent(trackingLabel[index]);
-                    verticalGroup.addComponent(trackingSpinner[index]);
-                }
-            }
-            mainVerticalGroup.addGroup(verticalGroup);
-        }
-        for (ParallelGroup columnGroup : columnGroups) {
-            mainHorizontalGroup.addGroup(columnGroup);
-        }
-
-        layout.setHorizontalGroup(mainHorizontalGroup);
-        layout.setVerticalGroup(mainVerticalGroup);
+        JPanel panel = new CampaignOptionsStandardPanel("BaseSalariesPanel");
+        panel.setLayout(new BorderLayout(0, UIUtil.scaleForGUI(8)));
+        panel.add(createCivilianSalaryFilterPanel(sorter), BorderLayout.NORTH);
+        panel.add(civilianSalaryTableScrollPane, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private JTable createCivilianSalaryTable(SalaryTableModel tableModel, TableRowSorter<SalaryTableModel> sorter) {
+        JTable table = new JTable(tableModel) {
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                int rowIndex = rowAtPoint(event.getPoint());
+                if (rowIndex < 0) {
+                    return super.getToolTipText(event);
+                }
+
+                int modelIndex = convertRowIndexToModel(rowIndex);
+                return tableModel.getRole(modelIndex).getDescription(false);
+            }
+        };
+        table.setName("tblCivilianBaseSalaries");
+        table.setRowSorter(sorter);
+        table.setFillsViewportHeight(false);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        table.setShowVerticalLines(false);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table.addMouseListener(createTipPanelUpdater(salariesHeader, "CivilianBaseSalariesTable"));
+
+        table.getColumnModel().getColumn(SalaryTableModel.ROLE_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(CIVILIAN_ROLE_COLUMN_WIDTH));
+        table.getColumnModel().getColumn(SalaryTableModel.SALARY_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(CIVILIAN_SALARY_COLUMN_WIDTH));
+        table.getColumnModel().getColumn(SalaryTableModel.SALARY_COLUMN).setCellRenderer(createSalaryCellRenderer());
+
+        return table;
+    }
+
+    private DefaultTableCellRenderer createSalaryCellRenderer() {
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setHorizontalAlignment(SwingConstants.LEFT);
+        return renderer;
+    }
+
+    private JScrollPane createCivilianSalaryTableScrollPane(JTable table) {
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setName("scrCivilianBaseSalaries");
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
+        return scrollPane;
+    }
+
+    private void updateCivilianSalaryTableHeight() {
+        if (civilianSalaryTable == null || civilianSalaryTableScrollPane == null) {
+            return;
+        }
+
+        int rowCount = Math.max(1, civilianSalaryTable.getRowCount());
+        int tableBodyHeight = civilianSalaryTable.getRowHeight() * rowCount;
+        int scrollPaneHeight = tableBodyHeight
+              + civilianSalaryTable.getTableHeader().getPreferredSize().height
+              + UIUtil.scaleForGUI(4);
+        Dimension viewportSize = UIUtil.scaleForGUI(CIVILIAN_TABLE_WIDTH, tableBodyHeight);
+        Dimension scrollPaneSize = UIUtil.scaleForGUI(CIVILIAN_TABLE_WIDTH, scrollPaneHeight);
+
+        civilianSalaryTableScrollPane.setPreferredSize(scrollPaneSize);
+        civilianSalaryTableScrollPane.setMinimumSize(scrollPaneSize);
+        civilianSalaryTable.setPreferredScrollableViewportSize(viewportSize);
+        civilianSalaryTableScrollPane.revalidate();
+        civilianSalaryTableScrollPane.repaint();
+
+        if (civilianSalaryTableScrollPane.getParent() != null) {
+            civilianSalaryTableScrollPane.getParent().revalidate();
+            civilianSalaryTableScrollPane.getParent().repaint();
+        }
+    }
+
+    private JPanel createCivilianSalaryFilterPanel(TableRowSorter<SalaryTableModel> sorter) {
+        JLabel filterLabel = new CampaignOptionsLabel("CivilianSalaryFilter");
+        filterLabel.addMouseListener(createTipPanelUpdater(salariesHeader, "CivilianSalaryFilter"));
+
+        JTextField filterField = new JTextField(24);
+        filterField.setName("txtCivilianSalaryFilter");
+        filterField.addMouseListener(createTipPanelUpdater(salariesHeader, "CivilianSalaryFilter"));
+        filterField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                updateFilter();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                updateFilter();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                updateFilter();
+            }
+
+            private void updateFilter() {
+                applyCivilianSalaryFilter(sorter, filterField.getText());
+            }
+        });
+
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        panel.setOpaque(false);
+        panel.add(filterLabel);
+        panel.add(filterField);
+
+        return panel;
+    }
+
+    private void applyCivilianSalaryFilter(TableRowSorter<SalaryTableModel> sorter, String filterText) {
+        String normalizedFilter = filterText.trim().toLowerCase(Locale.ROOT);
+        if (normalizedFilter.isBlank()) {
+            sorter.setRowFilter(null);
+            updateCivilianSalaryTableHeight();
+            return;
+        }
+
+        sorter.setRowFilter(new RowFilter<>() {
+            @Override
+            public boolean include(RowFilter.Entry<? extends SalaryTableModel, ? extends Integer> entry) {
+                return entry.getStringValue(SalaryTableModel.ROLE_COLUMN)
+                             .toLowerCase(Locale.ROOT)
+                             .contains(normalizedFilter);
+            }
+        });
+        updateCivilianSalaryTableHeight();
     }
 
     /**
@@ -489,30 +575,8 @@ public class SalariesTab {
             options = this.campaignOptions;
         }
 
-        // Salaries
-        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
-        spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
-        spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
-        }
-
-        Money[] baseSalaryTable = options.getRoleBaseSalaries();
-        for (int i = 0; i < spnBaseSalaryCombat.length; i++) {
-            PersonnelRole personnelRole = combatRoles.get(i);
-            int ordinal = personnelRole.ordinal();
-            spnBaseSalaryCombat[i].setValue(baseSalaryTable[ordinal].getAmount().doubleValue());
-        }
-        for (int i = 0; i < spnBaseSalarySupport.length; i++) {
-            PersonnelRole personnelRole = supportRoles.get(i);
-            int ordinal = personnelRole.ordinal();
-            spnBaseSalarySupport[i].setValue(baseSalaryTable[ordinal].getAmount().doubleValue());
-        }
-        for (int i = 0; i < spnBaseSalaryCivilian.length; i++) {
-            PersonnelRole personnelRole = civilianRoles.get(i);
-            int ordinal = personnelRole.ordinal();
-            spnBaseSalaryCivilian[i].setValue(baseSalaryTable[ordinal].getAmount().doubleValue());
-        }
+        model = new SalariesOptionsModel(options);
+        updateCreatedControlsFromModel();
     }
 
     /**
@@ -527,35 +591,217 @@ public class SalariesTab {
             options = this.campaignOptions;
         }
 
-        // Salaries
-        options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
-        options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
-        options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
+        updateModelFromCreatedControls();
+        model.applyTo(options);
+    }
 
-        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            options.getSalaryXPMultipliers().put(entry.getKey(), (double) entry.getValue().getValue());
-        }
-
-        for (PersonnelRole personnelRole : combatRoles) {
-            int index = combatRoles.indexOf(personnelRole);
-            double newValue = (double) spnBaseSalaryCombat[index].getValue();
-            options.setRoleBaseSalary(personnelRole, newValue);
-        }
-
-        for (PersonnelRole personnelRole : supportRoles) {
-            int index = supportRoles.indexOf(personnelRole);
-            if (index != -1) {
-                double newValue = (double) spnBaseSalarySupport[index].getValue();
-                options.setRoleBaseSalary(personnelRole, newValue);
-            }
-        }
-
-        for (PersonnelRole personnelRole : civilianRoles) {
-            int index = civilianRoles.indexOf(personnelRole);
-            if (index != -1) {
-                double newValue = (double) spnBaseSalaryCivilian[index].getValue();
-                options.setRoleBaseSalary(personnelRole, newValue);
-            }
+    private void markPageCreated(PersonnelRoleSubType type) {
+        switch (type) {
+            case COMBAT -> combatPageCreated = true;
+            case SUPPORT -> supportPageCreated = true;
+            case CIVILIAN -> civilianPageCreated = true;
         }
     }
+
+    private boolean isPageCreated(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> combatPageCreated;
+            case SUPPORT -> supportPageCreated;
+            case CIVILIAN -> civilianPageCreated;
+        };
+    }
+
+    private List<PersonnelRole> getRoles(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> combatRoles;
+            case SUPPORT -> supportRoles;
+            case CIVILIAN -> civilianRoles;
+        };
+    }
+
+    private JSpinner[] getBaseSalarySpinners(PersonnelRoleSubType type) {
+        return switch (type) {
+            case COMBAT -> spnBaseSalaryCombat;
+            case SUPPORT -> spnBaseSalarySupport;
+            case CIVILIAN -> throw new IllegalArgumentException("Civilian salaries use a table model.");
+        };
+    }
+
+    private void updateCreatedControlsFromModel() {
+        updateSalariesControlsFromModel(PersonnelRoleSubType.COMBAT);
+        updateSalariesControlsFromModel(PersonnelRoleSubType.SUPPORT);
+        updateSalariesControlsFromModel(PersonnelRoleSubType.CIVILIAN);
+    }
+
+    private void updateSalariesControlsFromModel(PersonnelRoleSubType type) {
+        if (!isPageCreated(type) || model == null) {
+            return;
+        }
+
+        if (type == PersonnelRoleSubType.COMBAT) {
+            chkDisableSecondaryRoleSalary.setSelected(model.disableSecondaryRoleSalary);
+            spnAntiMekSalary.setValue(model.salaryAntiMekMultiplier);
+            spnSpecialistInfantrySalary.setValue(model.salarySpecialistInfantryMultiplier);
+            for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+                entry.getValue().setValue(model.salaryXpMultipliers.get(entry.getKey()));
+            }
+        }
+
+        if (type == PersonnelRoleSubType.CIVILIAN) {
+            civilianSalaryTableModel.setValues(model.roleBaseSalaries);
+            return;
+        }
+
+        List<PersonnelRole> roles = getRoles(type);
+        JSpinner[] salarySpinners = getBaseSalarySpinners(type);
+        for (int i = 0; i < salarySpinners.length; i++) {
+            PersonnelRole personnelRole = roles.get(i);
+            salarySpinners[i].setValue(model.roleBaseSalaries.get(personnelRole));
+        }
+    }
+
+    private void updateModelFromCreatedControls() {
+        updateModelFromSalariesControls(PersonnelRoleSubType.COMBAT);
+        updateModelFromSalariesControls(PersonnelRoleSubType.SUPPORT);
+        updateModelFromSalariesControls(PersonnelRoleSubType.CIVILIAN);
+    }
+
+    private void updateModelFromSalariesControls(PersonnelRoleSubType type) {
+        if (!isPageCreated(type) || model == null) {
+            return;
+        }
+
+        if (type == PersonnelRoleSubType.COMBAT) {
+            model.disableSecondaryRoleSalary = chkDisableSecondaryRoleSalary.isSelected();
+            model.salaryAntiMekMultiplier = (double) spnAntiMekSalary.getValue();
+            model.salarySpecialistInfantryMultiplier = (double) spnSpecialistInfantrySalary.getValue();
+            for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+                model.salaryXpMultipliers.put(entry.getKey(), (double) entry.getValue().getValue());
+            }
+        }
+
+        if (type == PersonnelRoleSubType.CIVILIAN) {
+            stopCivilianSalaryTableEditing();
+            model.roleBaseSalaries.putAll(civilianSalaryTableModel.getValues());
+            return;
+        }
+
+        List<PersonnelRole> roles = getRoles(type);
+        JSpinner[] salarySpinners = getBaseSalarySpinners(type);
+        for (int i = 0; i < salarySpinners.length; i++) {
+            model.roleBaseSalaries.put(roles.get(i), (double) salarySpinners[i].getValue());
+        }
+    }
+
+    private void stopCivilianSalaryTableEditing() {
+        if (civilianSalaryTable != null && civilianSalaryTable.isEditing()) {
+            civilianSalaryTable.getCellEditor().stopCellEditing();
+        }
+    }
+
+    private static final class SalaryTableModel extends AbstractTableModel {
+        private static final int ROLE_COLUMN = 0;
+        private static final int SALARY_COLUMN = 1;
+        private static final int COLUMN_COUNT = 2;
+
+        private final List<PersonnelRole> roles;
+        private final Map<PersonnelRole, Double> salaries = new HashMap<>();
+
+        private SalaryTableModel(List<PersonnelRole> roles) {
+            this.roles = List.copyOf(roles);
+            for (PersonnelRole role : roles) {
+                salaries.put(role, 0.0);
+            }
+        }
+
+        @Override
+        public int getRowCount() {
+            return roles.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return COLUMN_COUNT;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return switch (column) {
+                case ROLE_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSalaryRoleColumn.text");
+                case SALARY_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSalaryAmountColumn.text");
+                default -> throw new IllegalArgumentException("Unknown salary table column: " + column);
+            };
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            return switch (column) {
+                case ROLE_COLUMN -> String.class;
+                case SALARY_COLUMN -> Double.class;
+                default -> Object.class;
+            };
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == SALARY_COLUMN;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            PersonnelRole role = roles.get(rowIndex);
+            return switch (columnIndex) {
+                case ROLE_COLUMN -> role.toString();
+                case SALARY_COLUMN -> salaries.get(role);
+                default -> throw new IllegalArgumentException("Unknown salary table column: " + columnIndex);
+            };
+        }
+
+        @Override
+        public void setValueAt(Object value, int rowIndex, int columnIndex) {
+            if (columnIndex != SALARY_COLUMN) {
+                return;
+            }
+
+            double salary = parseSalary(value);
+            salaries.put(roles.get(rowIndex), salary);
+            fireTableCellUpdated(rowIndex, columnIndex);
+        }
+
+        private double parseSalary(Object value) {
+            if (value == null) {
+                return 0.0;
+            }
+
+            if (value instanceof Number number) {
+                return clampSalary(number.doubleValue());
+            }
+
+            try {
+                return clampSalary(Double.parseDouble(value.toString()));
+            } catch (NumberFormatException exception) {
+                return 0.0;
+            }
+        }
+
+        private double clampSalary(double value) {
+            return Math.min(1000000.0, Math.max(0.0, value));
+        }
+
+        private PersonnelRole getRole(int rowIndex) {
+            return roles.get(rowIndex);
+        }
+
+        private void setValues(Map<PersonnelRole, Double> values) {
+            for (PersonnelRole role : roles) {
+                salaries.put(role, values.getOrDefault(role, 0.0));
+            }
+            fireTableDataChanged();
+        }
+
+        private Map<PersonnelRole, Double> getValues() {
+            return Map.copyOf(salaries);
+        }
+    }
+
 }

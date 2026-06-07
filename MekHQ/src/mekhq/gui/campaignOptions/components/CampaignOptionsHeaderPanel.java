@@ -36,17 +36,14 @@ import static java.awt.Color.BLACK;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
@@ -59,21 +56,12 @@ import megamek.client.ui.util.UIUtil;
  * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
-    private static final String TIP_PANEL_NAME = "TipPanel";
-
-    private final int tipPanelHeight;
-
-    public int getTipPanelHeight() {
-        return tipPanelHeight;
-    }
-
-    public static String getTipPanelName() {
-        return TIP_PANEL_NAME;
-    }
+    private static final int DEFAULT_IMAGE_SIZE = 64;
+    private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
 
     @Deprecated(since = "0.50.06", forRemoval = true)
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
-        this(name, imageAddress, includeBodyText, false, 0);
+        this(name, imageAddress, includeBodyText, false, 0, DEFAULT_IMAGE_SIZE);
     }
 
     /**
@@ -87,7 +75,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageAddress the path to the image file displayed in the panel
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress) {
-        this(name, imageAddress, false, false, 0);
+        this(name, imageAddress, false, false, 0, DEFAULT_IMAGE_SIZE);
     }
 
     /**
@@ -99,15 +87,41 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      *
      * @param name           a unique identifier used to fetch resource bundle entries and to form the panel's name
      * @param imageAddress   the path to the image file displayed in the panel
-     * @param tipPanelHeight the number of empty line breaks to reserve vertical space for the tip panel area
+     * @param tipPanelHeight retained for constructor compatibility; contextual help is shown in the shell
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, int tipPanelHeight) {
-        this(name, imageAddress, false, true, tipPanelHeight);
+        this(name, imageAddress, false, true, tipPanelHeight, DEFAULT_IMAGE_SIZE);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} with a custom image size.
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param imageSize       the target width or height for the header image
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText, int imageSize) {
+        this(name, imageAddress, includeBodyText, imageSize, true);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} with custom image sizing and tint behavior.
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param imageSize       the target width or height for the header image
+     * @param tintImage       if true, tints the image black to match the standard options header style
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText, int imageSize,
+          boolean tintImage) {
+        this(name, imageAddress, includeBodyText, false, 0, imageSize, tintImage);
     }
 
     /**
      * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
-     * additional descriptive body text and/or a tip panel.
+     * additional descriptive body text.
      *
      * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
      * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
@@ -116,17 +130,58 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
      * @param imageAddress    the path to the image file to display at the top of the panel
      * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param includeTipPanel if true, displays a tip panel beneath the body text (or image if body text is excluded)
-     * @param tipPanelHeight  the number of empty line breaks to reserve vertical space for the tip panel area
+     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
      */
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight) {
-        this.tipPanelHeight = tipPanelHeight;
+        this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, DEFAULT_IMAGE_SIZE);
+    }
 
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
+     * additional descriptive body text.
+     *
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
+     * @param imageSize       the target width or height for the header image
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+          boolean includeTipPanel, int tipPanelHeight, int imageSize) {
+        this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, imageSize, true);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
+     * additional descriptive body text.
+     *
+     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.</p>
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
+     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
+     * @param imageSize       the target width or height for the header image
+     * @param tintImage       if true, tints the image black to match the standard options header style
+     */
+    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+          boolean includeTipPanel, int tipPanelHeight, int imageSize, boolean tintImage) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
-        imageIcon = scaleImageIcon(imageIcon, 100, true);
-        imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
+        imageIcon = scaleImageIcon(imageIcon, imageSize, true);
+        if (tintImage) {
+            imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
+        }
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);
@@ -144,16 +199,15 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html><div style='width: %s'>%s</div></html>",
-                  UIUtil.scaleForGUI(750), getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
+                  UIUtil.scaleForGUI(DEFAULT_BODY_TEXT_WIDTH),
+                  getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
                   SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             setFontScaling(lblBody, false, 1);
         }
 
-        JLabel lblTip = getTooltipJLabel(name, includeTipPanel, tipPanelHeight);
-
         // Initialize the panel's layout using a GridBagLayout
-        new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
+        setName("pnl" + name + "HeaderPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(this);
 
         // Configure and add components to the panel
@@ -170,43 +224,5 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             layout.gridwidth = 1;
             this.add(lblBody, layout);
         }
-
-        if (includeTipPanel) {
-            layout.gridy++;
-            layout.gridwidth = 5;
-            this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
-            layout.gridy++;
-            this.add(lblTip, layout);
-            layout.gridy++;
-            this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
-        }
-    }
-
-    private JLabel getTooltipJLabel(String name, boolean includeTipPanel, int tipPanelHeight) {
-        JLabel lblTip = new JLabel() {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension standardSize = super.getPreferredSize();
-                // CAMPAIGN_OPTIONS_PANEL_WIDTH and standardSize are already in screen pixels — do not scale again
-                return new Dimension(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
-            }
-
-            @Override
-            public Dimension getMinimumSize() {
-                Dimension standardSize = super.getPreferredSize();
-                // CAMPAIGN_OPTIONS_PANEL_WIDTH and standardSize are already in screen pixels — do not scale again
-                return new Dimension(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
-            }
-        };
-
-        if (includeTipPanel) {
-            // This stops the tip panel from bouncing around too much as new options are selected
-            String lineBreaks = "<br>".repeat(Math.max(0, tipPanelHeight));
-
-            lblTip.setName("lbl" + name + TIP_PANEL_NAME);
-            lblTip.setText("<html>" + lineBreaks + "</html>");
-            lblTip.setHorizontalAlignment(SwingConstants.CENTER);
-        }
-        return lblTip;
     }
 }

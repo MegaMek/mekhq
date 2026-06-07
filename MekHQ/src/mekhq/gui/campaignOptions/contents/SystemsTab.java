@@ -34,12 +34,14 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.GridBagConstraints;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,33 +53,48 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * The {@code SystemsTab} class is responsible for managing and displaying the "Reputation" tab within the campaign
- * options UI. It provides Swing components for configuring reputation-related settings in a {@link Campaign}, including
- * unit rating methods, manual modifiers, and various campaign mechanics toggles.
+ * The {@code SystemsTab} class is responsible for managing and displaying the
+ * "Reputation" tab within the campaign
+ * options UI. It provides Swing components for configuring reputation-related
+ * settings in a {@link Campaign}, including
+ * unit rating methods, manual modifiers, and various campaign mechanics
+ * toggles.
  *
- * <p>The tab is constructed using helper panels and controls, grouped under "General" and "Sanity" sub-panels,
- * facilitating a user-friendly way to view and adjust reputation options.</p>
+ * <p>
+ * The tab is constructed using helper panels and controls, grouped under
+ * "General" and "Sanity" sub-panels,
+ * facilitating a user-friendly way to view and adjust reputation options.
+ * </p>
  *
  * @author Illiani
  * @since 0.50.07
  */
 public class SystemsTab {
+    private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
+    private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
+    private static final int CHECKBOX_GRID_COLUMNS = 2;
+
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
+    private SystemsOptionsModel model;
+    private boolean reputationPageCreated;
+    private boolean factionStandingPageCreated;
+    private boolean atowPageCreated;
 
     // Reputation Tab
     private CampaignOptionsHeaderPanel reputationHeader;
 
-    private JCheckBox chkResetCriminalRecord;
+    private JButton btnResetCriminalRecord;
 
     private JSpinner manualUnitRatingModifier;
     private JCheckBox chkRequireSupportForceTransportation;
@@ -127,10 +144,12 @@ public class SystemsTab {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
+        loadValuesFromCampaignOptions();
     }
 
     /**
-     * Creates the Reputation tab panel, containing grouped UI elements for reputation options and its header.
+     * Creates the Reputation tab panel, containing grouped UI elements for
+     * reputation options and its header.
      *
      * @return a {@link JPanel} component representing the entire Reputation tab UI
      *
@@ -139,36 +158,34 @@ public class SystemsTab {
      */
     public JPanel createReputationTab() {
         // Header
-        reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab",
-              getImageDirectory() + "logo_morgrains_valkyrate.png",
-              8);
+        String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
+        reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab", imageAddress);
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
         JPanel pnlReputationSanityOptions = createReputationSanityPanel();
 
+        reputationPageCreated = true;
+        updateReputationControlsFromModel();
+
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        final JPanel panel = CampaignOptionsPagePanel.builder("ReputationTab", "ReputationTab", imageAddress)
+                .header(reputationHeader)
+                .quote("reputationTab")
+                .section("lblReputationGeneralOptionsPanel.text",
+                        "lblReputationGeneralOptionsPanel.summary",
+                        pnlReputationGeneralOptions)
+                .section("lblReputationSanityOptionsPanel.text",
+                        "lblReputationSanityOptionsPanel.summary",
+                        pnlReputationSanityOptions)
+                .build();
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(reputationHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlReputationGeneralOptions, layoutParent);
-
-        layoutParent.gridx++;
-        panel.add(pnlReputationSanityOptions, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "ReputationTab");
+        return panel;
     }
 
     /**
-     * Creates and lays out the general reputation options panel, including controls for selecting unit rating method,
+     * Creates and lays out the general reputation options panel, including controls
+     * for selecting unit rating method,
      * manual modifiers, and criminal record reset.
      *
      * @return a {@link JPanel} containing the general reputation controls
@@ -180,34 +197,51 @@ public class SystemsTab {
         // Contents
         JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
-              "ManualUnitRatingModifier"));
+                "ManualUnitRatingModifier"));
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
-        manualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader, "ManualUnitRatingModifier"));
+        manualUnitRatingModifier
+                .addMouseListener(createTipPanelUpdater(reputationHeader, "ManualUnitRatingModifier"));
 
-        chkResetCriminalRecord = new CampaignOptionsCheckBox("ResetCriminalRecord",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        chkResetCriminalRecord.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        JLabel lblResetCriminalRecord = new CampaignOptionsLabel("ResetCriminalRecord",
+                getResetCriminalRecordMetadata());
+        lblResetCriminalRecord.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        btnResetCriminalRecord = createResetCriminalRecordButton();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationGeneralOptionsPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(lblManualUnitRatingModifier, layout);
-        layout.gridx++;
-        panel.add(manualUnitRatingModifier, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkResetCriminalRecord, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationGeneralOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblManualUnitRatingModifier, manualUnitRatingModifier);
+        panel.addRow(lblResetCriminalRecord, createLeftAlignedButtonPanel(btnResetCriminalRecord));
 
         return panel;
     }
 
+    private JButton createResetCriminalRecordButton() {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnResetCriminalRecord.text"));
+        button.setName("btnResetCriminalRecord");
+        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblResetCriminalRecord.tooltip"));
+        button.putClientProperty("JComponent.sizeVariant", "small");
+        button.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        button.addActionListener(event -> {
+            if (model != null) {
+                model.resetCriminalRecord = true;
+            }
+            updateResetCriminalRecordButtonFromModel();
+        });
+        return button;
+    }
+
+    private JPanel createLeftAlignedButtonPanel(JButton button) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        panel.setOpaque(false);
+        panel.add(button);
+        return panel;
+    }
+
     /**
-     * Creates and lays out the reputation "sanity" options panel, which includes various checkboxes for limiting or
+     * Creates and lays out the reputation "sanity" options panel, which includes
+     * various checkboxes for limiting or
      * modifying reputation calculations.
      *
      * @return a {@link JPanel} containing the reputation sanity option controls
@@ -218,111 +252,114 @@ public class SystemsTab {
     private JPanel createReputationSanityPanel() {
         // Contents
         chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
-              getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version(0, 51, 0)));
         chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater(reputationHeader,
-              "RequireSupportForceTransportation"));
+                "RequireSupportForceTransportation"));
 
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.RECOMMENDED));
         chkClampReputationPayMultiplier.addMouseListener(createTipPanelUpdater(reputationHeader,
-              "ClampReputationPayMultiplier"));
+                "ClampReputationPayMultiplier"));
 
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.RECOMMENDED));
         chkReduceReputationPerformanceModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
-              "ReduceReputationPerformanceModifier"));
+                "ReduceReputationPerformanceModifier"));
 
         chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.RECOMMENDED));
         chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater(reputationHeader,
-              "ReputationPerformanceModifierCutOff"));
+                "ReputationPerformanceModifierCutOff"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ReputationSanityOptionsPanel", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkClampReputationPayMultiplier, layout);
-
-        layout.gridy++;
-        panel.add(chkRequireSupportForceTransportation, layout);
-
-        layout.gridy++;
-        panel.add(chkReduceReputationPerformanceModifier, layout);
-
-        layout.gridy++;
-        panel.add(chkReputationPerformanceModifierCutOff, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationSanityOptionsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkClampReputationPayMultiplier,
+                chkRequireSupportForceTransportation,
+                chkReduceReputationPerformanceModifier,
+                chkReputationPerformanceModifierCutOff);
 
         return panel;
     }
 
     /**
-     * Creates the Faction Standing tab panel, containing grouped UI elements for Faction Standing options and its
+     * Creates the Faction Standing tab panel, containing grouped UI elements for
+     * Faction Standing options and its
      * header.
      *
-     * @return a {@link JPanel} component representing the entire Faction Standing tab UI
+     * @return a {@link JPanel} component representing the entire Faction Standing
+     *         tab UI
      *
      * @author Illiani
      * @since 0.50.07
      */
     public JPanel createFactionStandingTab() {
         // Header
-        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab",
-              getImageDirectory() + "logo_morgrains_valkyrate.png",
-              3);
+        String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
+        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab", imageAddress);
 
         // Contents
+        JPanel pnlFactionStandingTrackingPanel = createFactionStandingTrackingPanel();
+        JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
+
+        factionStandingPageCreated = true;
+        updateFactionStandingControlsFromModel();
+
+        // Layout the Panel
+        final JPanel panel = CampaignOptionsPagePanel.builder("FactionStandingTab", "FactionStandingTab",
+                        imageAddress)
+                .header(factionStandingHeader)
+                .quote("factionStandingTab")
+                .section("lblFactionStandingTrackingPanel.text",
+                        "lblFactionStandingTrackingPanel.summary",
+                        pnlFactionStandingTrackingPanel)
+                .section("lblFactionStandingEffectsPanel.text",
+                        "lblFactionStandingEffectsPanel.summary",
+                        pnlFactionStandingModifiersPanel)
+                .build();
+
+        return panel;
+    }
+
+    private JPanel createFactionStandingTrackingPanel() {
+        // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
-        chkTrackFactionStanding.addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                        CampaignOptionFlag.DOCUMENTED));
+        chkTrackFactionStanding
+                .addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
 
         chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "TrackClimateRegardChanges"));
+                "TrackClimateRegardChanges"));
 
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
 
-        JPanel pnlFactionStandingModifiersPanel = createFactionStandingModifiersPanel();
-
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingTrackingPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkTrackFactionStanding,
+                chkTrackClimateRegardChanges);
+        panel.addRow(lblRegardMultiplier, spnRegardMultiplier);
 
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(factionStandingHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(chkTrackFactionStanding, layoutParent);
-        layoutParent.gridx++;
-        panel.add(chkTrackClimateRegardChanges, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(lblRegardMultiplier, layoutParent);
-        layoutParent.gridx++;
-        panel.add(spnRegardMultiplier, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 2;
-        panel.add(pnlFactionStandingModifiersPanel, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "FactionStandingTab");
+        return panel;
     }
 
     /**
-     * Creates and lays out the Faction Standing modifiers panel, which includes various checkboxes for limiting Faction
+     * Creates and lays out the Faction Standing modifiers panel, which includes
+     * various checkboxes for limiting Faction
      * Standing modifiers.
      *
      * @return a {@link JPanel} containing the Faction Standing modifier controls
@@ -333,95 +370,78 @@ public class SystemsTab {
     private JPanel createFactionStandingModifiersPanel() {
         // Contents
         chkUseFactionStandingNegotiation = new CampaignOptionsCheckBox("UseFactionStandingNegotiation",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingNegotiation.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingNegotiation"));
+                "UseFactionStandingNegotiation"));
 
         chkUseFactionStandingResupply = new CampaignOptionsCheckBox("UseFactionStandingResupply",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingResupply.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingResupply"));
+                "UseFactionStandingResupply"));
 
         chkUseFactionStandingCommandCircuit = new CampaignOptionsCheckBox("UseFactionStandingCommandCircuit",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingCommandCircuit.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingCommandCircuit"));
+                "UseFactionStandingCommandCircuit"));
 
         chkUseFactionStandingOutlawed = new CampaignOptionsCheckBox("UseFactionStandingOutlawed",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingOutlawed.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingOutlawed"));
+                "UseFactionStandingOutlawed"));
 
-        chkUseFactionStandingBatchallRestrictions = new CampaignOptionsCheckBox("UseFactionStandingBatchallRestrictions",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+        chkUseFactionStandingBatchallRestrictions = new CampaignOptionsCheckBox(
+                "UseFactionStandingBatchallRestrictions",
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingBatchallRestrictions.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingBatchallRestrictions"));
+                "UseFactionStandingBatchallRestrictions"));
 
         chkUseFactionStandingRecruitment = new CampaignOptionsCheckBox("UseFactionStandingRecruitment",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingRecruitment.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingRecruitment"));
+                "UseFactionStandingRecruitment"));
 
         chkUseFactionStandingBarracksCosts = new CampaignOptionsCheckBox("UseFactionStandingBarracksCosts",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingBarracksCosts.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingBarracksCosts"));
+                "UseFactionStandingBarracksCosts"));
 
         chkUseFactionStandingUnitMarket = new CampaignOptionsCheckBox("UseFactionStandingUnitMarket",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingUnitMarket.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingUnitMarket"));
+                "UseFactionStandingUnitMarket"));
 
         chkUseFactionStandingContractPay = new CampaignOptionsCheckBox("UseFactionStandingContractPay",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingContractPay.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingContractPay"));
+                "UseFactionStandingContractPay"));
 
         chkUseFactionStandingSupportPoints = new CampaignOptionsCheckBox("UseFactionStandingSupportPoints",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseFactionStandingSupportPoints.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-              "UseFactionStandingSupportPoints"));
+                "UseFactionStandingSupportPoints"));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FactionStandingModifiersPanel", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 1;
-        panel.add(chkUseFactionStandingNegotiation, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingResupply, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingCommandCircuit, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingOutlawed, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingBatchallRestrictions, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingRecruitment, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingBarracksCosts, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingUnitMarket, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseFactionStandingContractPay, layout);
-        layout.gridx++;
-        panel.add(chkUseFactionStandingSupportPoints, layout);
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingEffectsPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkUseFactionStandingNegotiation,
+                chkUseFactionStandingResupply,
+                chkUseFactionStandingCommandCircuit,
+                chkUseFactionStandingOutlawed,
+                chkUseFactionStandingBatchallRestrictions,
+                chkUseFactionStandingRecruitment,
+                chkUseFactionStandingBarracksCosts,
+                chkUseFactionStandingUnitMarket,
+                chkUseFactionStandingContractPay,
+                chkUseFactionStandingSupportPoints);
 
         return panel;
     }
 
     /**
-     * Creates the ATOW tab panel, containing grouped UI elements for configuring ATOW-related options and its header.
+     * Creates the ATOW tab panel, containing grouped UI elements for configuring
+     * ATOW-related options and its header.
      *
      * @return a {@link JPanel} component representing the entire ATOW tab UI
      *
@@ -430,101 +450,87 @@ public class SystemsTab {
      */
     public JPanel createATOWTab() {
         // Header
-        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab",
-              getImageDirectory() + "logo_elysian_fields.png",
-              8);
+        String imageAddress = getImageDirectory() + "logo_elysian_fields.png";
+        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab", imageAddress);
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
 
+        atowPageCreated = true;
+        updateATOWControlsFromModel();
+
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ATimeOfWarTab", true);
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(atowHeader, layoutParent);
-
-        layoutParent.gridy++;
-        layoutParent.gridwidth = 1;
-        panel.add(pnlATOWAttributes, layoutParent);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "ATimeOfWarTab");
-    }
-
-    /**
-     * Creates and returns the ATOW panel, which allows users to configure settings for attribute and traits
-     * probabilities.
-     *
-     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
-     */
-    private JPanel createATOWAttributesPanel() {
-        // Contents
-        chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
-        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
-        chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
-        chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes",
-              getMetadata(MILESTONE_BEFORE_METADATA));
-        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
-        chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseAgeEffects.addMouseListener(createTipPanelUpdater(atowHeader, "UseAgeEffects"));
-        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
-        chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
-        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
-        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(atowHeader,
-              "AllowMonthlyReinvestment"));
-        chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections",
-              getMetadata(MILESTONE_BEFORE_METADATA));
-        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
-              "AllowMonthlyConnections"));
-        chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater(atowHeader,
-              "UseBetterExtraIncome"));
-        chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly",
-              getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater(atowHeader,
-              "UseSmallArmsOnly"));
-
-        final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 1;
-        layout.gridx = 0;
-        layout.gridy = 0;
-
-        layout.gridy++;
-        panel.add(chkUseAttributes, layout);
-        layout.gridx++;
-        panel.add(chkRandomizeAttributes, layout);
-        layout.gridx++;
-        panel.add(chkDisplayAllAttributes, layout);
-        layout.gridx++;
-        panel.add(chkUseAgeEffects, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkRandomizeTraits, layout);
-        layout.gridx++;
-        panel.add(chkAllowMonthlyReinvestment, layout);
-        layout.gridx++;
-        panel.add(chkAllowMonthlyConnections, layout);
-        layout.gridx++;
-        panel.add(chkUseBetterExtraIncome, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkUseSmallArmsOnly, layout);
+        final JPanel panel = CampaignOptionsPagePanel.builder("ATimeOfWarTab", "ATimeOfWarTab", imageAddress)
+                .header(atowHeader)
+                .quote("atowTab")
+                .section("lblATOWAttributesPanel.text",
+                        "lblATOWAttributesPanel.summary",
+                        pnlATOWAttributes)
+                .build();
 
         return panel;
     }
 
     /**
-     * Loads values from the current campaign or an optional preset campaign options into the UI components, updating
+     * Creates and returns the ATOW panel, which allows users to configure settings
+     * for attribute and traits
+     * probabilities.
+     *
+     * @return A {@code JPanel} containing configuration options for phenotype
+     *         probabilities.
+     */
+    private JPanel createATOWAttributesPanel() {
+        // Contents
+        chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes",
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+        chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
+        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
+        chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
+        chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes",
+                getMetadata(MILESTONE_BEFORE_METADATA));
+        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
+        chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects",
+                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                        CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseAgeEffects.addMouseListener(createTipPanelUpdater(atowHeader, "UseAgeEffects"));
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
+        chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
+        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
+        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(atowHeader,
+                "AllowMonthlyReinvestment"));
+        chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections",
+                getMetadata(MILESTONE_BEFORE_METADATA));
+        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
+                "AllowMonthlyConnections"));
+        chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome",
+                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater(atowHeader,
+                "UseBetterExtraIncome"));
+        chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly",
+                getMetadata(MILESTONE_BEFORE_METADATA));
+        chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater(atowHeader,
+                "UseSmallArmsOnly"));
+
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ATOWAttributesPanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
+                chkUseAttributes,
+                chkRandomizeAttributes,
+                chkDisplayAllAttributes,
+                chkUseAgeEffects,
+                chkRandomizeTraits,
+                chkAllowMonthlyReinvestment,
+                chkAllowMonthlyConnections,
+                chkUseBetterExtraIncome,
+                chkUseSmallArmsOnly);
+
+        return panel;
+    }
+
+    /**
+     * Loads values from the current campaign or an optional preset campaign options
+     * into the UI components, updating
      * their states to match the data.
      *
      * @author Illiani
@@ -535,19 +541,23 @@ public class SystemsTab {
     }
 
     /**
-     * Loads values from the specified {@code presetCampaignOptions}, or the current campaign's options if {@code null},
+     * Loads values from the specified {@code presetCampaignOptions}, or the current
+     * campaign's options if {@code null},
      * into the UI form fields and controls.
      *
-     * @param presetCampaignOptions        an alternative {@link CampaignOptions}, or {@code null} to use the current
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions},
+     *                                     or {@code null} to use the current
      *                                     campaign's options
-     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
-     *                                     {@code null}, values are loaded from the current skill preferences.
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences}
+     *                                     object to load values from; if
+     *                                     {@code null}, values are loaded from the
+     *                                     current skill preferences.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -558,55 +568,28 @@ public class SystemsTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-        // Reputation
-        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
-
-        chkRequireSupportForceTransportation.setSelected(options.isRequireSupportForceTransportation());
-        chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
-        chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
-        chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
-
-        // Faction Standing
-        chkTrackFactionStanding.setSelected(options.isTrackFactionStanding());
-        chkTrackClimateRegardChanges.setSelected(options.isTrackClimateRegardChanges());
-        spnRegardMultiplier.setValue(options.getRegardMultiplier());
-        chkUseFactionStandingNegotiation.setSelected(options.isUseFactionStandingNegotiation());
-        chkUseFactionStandingResupply.setSelected(options.isUseFactionStandingResupply());
-        chkUseFactionStandingCommandCircuit.setSelected(options.isUseFactionStandingCommandCircuit());
-        chkUseFactionStandingOutlawed.setSelected(options.isUseFactionStandingOutlawed());
-        chkUseFactionStandingBatchallRestrictions.setSelected(options.isUseFactionStandingBatchallRestrictions());
-        chkUseFactionStandingRecruitment.setSelected(options.isUseFactionStandingRecruitment());
-        chkUseFactionStandingBarracksCosts.setSelected(options.isUseFactionStandingBarracksCosts());
-        chkUseFactionStandingUnitMarket.setSelected(options.isUseFactionStandingUnitMarket());
-        chkUseFactionStandingContractPay.setSelected(options.isUseFactionStandingContractPay());
-        chkUseFactionStandingSupportPoints.setSelected(options.isUseFactionStandingSupportPoints());
-
-        // A Time of War
-        chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
-        chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
-        chkDisplayAllAttributes.setSelected(options.isDisplayAllAttributes());
-        chkUseAgeEffects.setSelected(options.isUseAgeEffects());
-        chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
-        chkAllowMonthlyReinvestment.setSelected(options.isAllowMonthlyReinvestment());
-        chkAllowMonthlyConnections.setSelected(options.isAllowMonthlyConnections());
-        chkUseBetterExtraIncome.setSelected(options.isUseBetterExtraIncome());
-        chkUseSmallArmsOnly.setSelected(options.isUseSmallArmsOnly());
+        model = new SystemsOptionsModel(options, skillPreferences);
+        updateCreatedControlsFromModel();
     }
 
     /**
-     * Applies the currently selected values in the UI controls to modify the campaign's options. If a preset is
+     * Applies the currently selected values in the UI controls to modify the
+     * campaign's options. If a preset is
      * provided, that preset is updated instead of the campaign's default options.
      *
-     * @param presetCampaignOptions        an alternative {@link CampaignOptions} object to update, or {@code null} to
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions}
+     *                                     object to update, or {@code null} to
      *                                     update the campaign's own options
-     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
-     *                                     {@code null}, values are applied to the current skill preferences.
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences}
+     *                                     object to set values to; if
+     *                                     {@code null}, values are applied to the
+     *                                     current skill preferences.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -617,44 +600,142 @@ public class SystemsTab {
             skillPreferences = this.randomSkillPreferences;
         }
 
-        // Reputation
-        options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+        updateModelFromCreatedControls();
 
-        if (chkResetCriminalRecord.isSelected()) {
+        if (model.resetCriminalRecord) {
             campaign.setDateOfLastCrime(null);
             campaign.setCrimeRating(0);
             campaign.setCrimePirateModifier(0);
+            model.resetCriminalRecord = false;
         }
 
-        options.setRequireSupportForceTransportation(chkRequireSupportForceTransportation.isSelected());
-        options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
-        options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
-        options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
-
-        // Faction Standing
-        options.setTrackFactionStanding(chkTrackFactionStanding.isSelected());
-        options.setTrackClimateRegardChanges(chkTrackClimateRegardChanges.isSelected());
-        options.setRegardMultiplier((double) spnRegardMultiplier.getValue());
-        options.setUseFactionStandingNegotiation(chkUseFactionStandingNegotiation.isSelected());
-        options.setUseFactionStandingResupply(chkUseFactionStandingResupply.isSelected());
-        options.setUseFactionStandingCommandCircuit(chkUseFactionStandingCommandCircuit.isSelected());
-        options.setUseFactionStandingOutlawed(chkUseFactionStandingOutlawed.isSelected());
-        options.setUseFactionStandingBatchallRestrictions(chkUseFactionStandingBatchallRestrictions.isSelected());
-        options.setUseFactionStandingRecruitment(chkUseFactionStandingRecruitment.isSelected());
-        options.setUseFactionStandingBarracksCosts(chkUseFactionStandingBarracksCosts.isSelected());
-        options.setUseFactionStandingUnitMarket(chkUseFactionStandingUnitMarket.isSelected());
-        options.setUseFactionStandingContractPay(chkUseFactionStandingContractPay.isSelected());
-        options.setUseFactionStandingSupportPoints(chkUseFactionStandingSupportPoints.isSelected());
-
-        // A Time of War
-        skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
-        skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
-        options.setDisplayAllAttributes(chkDisplayAllAttributes.isSelected());
-        options.setUseAgeEffects(chkUseAgeEffects.isSelected());
-        skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
-        options.setAllowMonthlyReinvestment(chkAllowMonthlyReinvestment.isSelected());
-        options.setAllowMonthlyConnections(chkAllowMonthlyConnections.isSelected());
-        options.setUseBetterExtraIncome(chkUseBetterExtraIncome.isSelected());
-        options.setUseSmallArmsOnly(chkUseSmallArmsOnly.isSelected());
+        model.applyTo(options, skillPreferences);
+        updateResetCriminalRecordButtonFromModel();
     }
+
+    private void updateCreatedControlsFromModel() {
+        updateReputationControlsFromModel();
+        updateFactionStandingControlsFromModel();
+        updateATOWControlsFromModel();
+    }
+
+    private void updateReputationControlsFromModel() {
+        if (!reputationPageCreated || model == null) {
+            return;
+        }
+
+        manualUnitRatingModifier.setValue(model.manualUnitRatingModifier);
+        updateResetCriminalRecordButtonFromModel();
+        chkRequireSupportForceTransportation.setSelected(model.requireSupportForceTransportation);
+        chkClampReputationPayMultiplier.setSelected(model.clampReputationPayMultiplier);
+        chkReduceReputationPerformanceModifier.setSelected(model.reduceReputationPerformanceModifier);
+        chkReputationPerformanceModifierCutOff.setSelected(model.reputationPerformanceModifierCutOff);
+    }
+
+    private void updateResetCriminalRecordButtonFromModel() {
+        if (btnResetCriminalRecord == null) {
+            return;
+        }
+
+        boolean isResetPending = model != null && model.resetCriminalRecord;
+        String resourceKey = isResetPending ? "btnResetCriminalRecord.pending.text" :
+                "btnResetCriminalRecord.text";
+        btnResetCriminalRecord.setText(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        btnResetCriminalRecord.setEnabled(!isResetPending);
+    }
+
+    private void updateFactionStandingControlsFromModel() {
+        if (!factionStandingPageCreated || model == null) {
+            return;
+        }
+
+        chkTrackFactionStanding.setSelected(model.trackFactionStanding);
+        chkTrackClimateRegardChanges.setSelected(model.trackClimateRegardChanges);
+        spnRegardMultiplier.setValue(model.regardMultiplier);
+        chkUseFactionStandingNegotiation.setSelected(model.useFactionStandingNegotiation);
+        chkUseFactionStandingResupply.setSelected(model.useFactionStandingResupply);
+        chkUseFactionStandingCommandCircuit.setSelected(model.useFactionStandingCommandCircuit);
+        chkUseFactionStandingOutlawed.setSelected(model.useFactionStandingOutlawed);
+        chkUseFactionStandingBatchallRestrictions.setSelected(model.useFactionStandingBatchallRestrictions);
+        chkUseFactionStandingRecruitment.setSelected(model.useFactionStandingRecruitment);
+        chkUseFactionStandingBarracksCosts.setSelected(model.useFactionStandingBarracksCosts);
+        chkUseFactionStandingUnitMarket.setSelected(model.useFactionStandingUnitMarket);
+        chkUseFactionStandingContractPay.setSelected(model.useFactionStandingContractPay);
+        chkUseFactionStandingSupportPoints.setSelected(model.useFactionStandingSupportPoints);
+    }
+
+    private void updateATOWControlsFromModel() {
+        if (!atowPageCreated || model == null) {
+            return;
+        }
+
+        chkUseAttributes.setSelected(model.useAttributes);
+        chkRandomizeAttributes.setSelected(model.randomizeAttributes);
+        chkDisplayAllAttributes.setSelected(model.displayAllAttributes);
+        chkUseAgeEffects.setSelected(model.useAgeEffects);
+        chkRandomizeTraits.setSelected(model.randomizeTraits);
+        chkAllowMonthlyReinvestment.setSelected(model.allowMonthlyReinvestment);
+        chkAllowMonthlyConnections.setSelected(model.allowMonthlyConnections);
+        chkUseBetterExtraIncome.setSelected(model.useBetterExtraIncome);
+        chkUseSmallArmsOnly.setSelected(model.useSmallArmsOnly);
+    }
+
+    private void updateModelFromCreatedControls() {
+        updateModelFromReputationControls();
+        updateModelFromFactionStandingControls();
+        updateModelFromATOWControls();
+    }
+
+    private void updateModelFromReputationControls() {
+        if (!reputationPageCreated || model == null) {
+            return;
+        }
+
+        model.manualUnitRatingModifier = (int) manualUnitRatingModifier.getValue();
+        model.requireSupportForceTransportation = chkRequireSupportForceTransportation.isSelected();
+        model.clampReputationPayMultiplier = chkClampReputationPayMultiplier.isSelected();
+        model.reduceReputationPerformanceModifier = chkReduceReputationPerformanceModifier.isSelected();
+        model.reputationPerformanceModifierCutOff = chkReputationPerformanceModifierCutOff.isSelected();
+    }
+
+    private CampaignOptionsMetadata getResetCriminalRecordMetadata() {
+        return getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT);
+    }
+
+    private void updateModelFromFactionStandingControls() {
+        if (!factionStandingPageCreated || model == null) {
+            return;
+        }
+
+        model.trackFactionStanding = chkTrackFactionStanding.isSelected();
+        model.trackClimateRegardChanges = chkTrackClimateRegardChanges.isSelected();
+        model.regardMultiplier = (double) spnRegardMultiplier.getValue();
+        model.useFactionStandingNegotiation = chkUseFactionStandingNegotiation.isSelected();
+        model.useFactionStandingResupply = chkUseFactionStandingResupply.isSelected();
+        model.useFactionStandingCommandCircuit = chkUseFactionStandingCommandCircuit.isSelected();
+        model.useFactionStandingOutlawed = chkUseFactionStandingOutlawed.isSelected();
+        model.useFactionStandingBatchallRestrictions = chkUseFactionStandingBatchallRestrictions.isSelected();
+        model.useFactionStandingRecruitment = chkUseFactionStandingRecruitment.isSelected();
+        model.useFactionStandingBarracksCosts = chkUseFactionStandingBarracksCosts.isSelected();
+        model.useFactionStandingUnitMarket = chkUseFactionStandingUnitMarket.isSelected();
+        model.useFactionStandingContractPay = chkUseFactionStandingContractPay.isSelected();
+        model.useFactionStandingSupportPoints = chkUseFactionStandingSupportPoints.isSelected();
+    }
+
+    private void updateModelFromATOWControls() {
+        if (!atowPageCreated || model == null) {
+            return;
+        }
+
+        model.useAttributes = chkUseAttributes.isSelected();
+        model.randomizeAttributes = chkRandomizeAttributes.isSelected();
+        model.displayAllAttributes = chkDisplayAllAttributes.isSelected();
+        model.useAgeEffects = chkUseAgeEffects.isSelected();
+        model.randomizeTraits = chkRandomizeTraits.isSelected();
+        model.allowMonthlyReinvestment = chkAllowMonthlyReinvestment.isSelected();
+        model.allowMonthlyConnections = chkAllowMonthlyConnections.isSelected();
+        model.useBetterExtraIncome = chkUseBetterExtraIncome.isSelected();
+        model.useSmallArmsOnly = chkUseSmallArmsOnly.isSelected();
+    }
+
 }
