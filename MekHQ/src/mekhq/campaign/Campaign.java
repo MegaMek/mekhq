@@ -3648,7 +3648,7 @@ public class Campaign implements ITechManager, ILocation {
                 hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER);
             }
         }
-        if (getCampaignOptions().isUseSupportEdge() &&
+        if (isUseSupportEdge &&
                   (roll < target.getValue()) &&
                   hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
