@@ -7965,7 +7965,7 @@ public class Unit implements ITechnology, ILocation {
     }
 
     @Override
-    public Set<Unit> getUnitsAtLocation() {
+    public Set<Unit> fetchUnitsAtLocation() {
         return Set.of(this);
     }
 }

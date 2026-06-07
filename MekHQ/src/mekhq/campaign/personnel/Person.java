@@ -7927,7 +7927,7 @@ public class Person implements ILocation {
     }
 
     @Override
-    public java.util.Set<Person> getPersonnelAtLocation() {
+    public java.util.Set<Person> fetchPersonnelAtLocation() {
         return java.util.Set.of(this);
     }
 

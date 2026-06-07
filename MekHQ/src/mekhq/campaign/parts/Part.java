@@ -2153,7 +2153,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
-    public Set<Part> getPartsAtLocation() {
+    public Set<Part> fetchPartsAtLocation() {
         return Set.of(this);
     }
 
