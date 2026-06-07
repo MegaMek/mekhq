@@ -595,7 +595,7 @@ public class HumanResources {
         for (Person person : doctors) {
             boolean hasDoItMyself = person.getOptions().booleanOption(UNOFFICIAL_ILL_DO_IT_MYSELF);
             if (hasDoItMyself) {
-                doctorCount -= MHQConstants.AS_TECH_TEAM_SIZE;
+                doctorCount--;
             }
         }
 

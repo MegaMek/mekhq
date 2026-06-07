@@ -68,7 +68,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
-    public static final String UNOFFICIAL_ILL_DO_IT_MYSELF = "unofficial_ill_do_it_Myself";
+    public static final String UNOFFICIAL_ILL_DO_IT_MYSELF = "unofficial_ill_do_it_myself";
     public static final String TECH_MAINTAINER = "tech_maintainer";
     public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
     public static final String ATOW_TOUGHNESS = "atow_toughness";
