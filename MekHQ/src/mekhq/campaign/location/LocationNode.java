@@ -114,7 +114,7 @@ public class LocationNode {
             if (child.getLocatable() instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
             }
-            // Future: Person, Unit, and Part children serialized here
+            // Future: Additional objects that need to be saved in a location-context other than the main force
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
