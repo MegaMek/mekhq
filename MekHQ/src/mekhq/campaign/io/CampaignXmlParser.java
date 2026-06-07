@@ -36,6 +36,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -136,6 +137,7 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -1739,6 +1741,34 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         if (academyName == null || academyName.isBlank()) {
             return null;
         }
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+        if ((academy != null) &&
+                  !(academy.isLocal() || academy.isHomeSchool()) &&
+                  !academy.getLocationSystems().isEmpty()) {
+
+            systemId = academy.getLocationSystems().getFirst();
+            if (academy.getLocationSystems().size() == 1) {
+                LOGGER.warn("Could not resolve Academy System ID for person {}. Returning only location for " +
+                                  "non-homeschool, non-local academy: {}", person, systemId);
+            } else {
+                LOGGER.warn("Could not resolve Academy System ID for person {} for non-homeschool, " +
+                                  "non-local academy with multiple locations, returning first : {}", person, systemId);
+            }
+            return systemId;
+
+        }
+
+        if (academy != null && campaign.getCurrentSystem() != null) {
+            LOGGER.warn("Could not resolve Academy System ID for person {}. for homeschool, " +
+                              "or local academy returning campaign's location : {}", person, systemId);
+            return campaign.getCurrentSystem().getId();
+        }
+
+        // This is bad if we reach here. This resolution attempt will fail for academy's at systems with parenthesis
+        // in the name. But if we've reached here we've run out of other options for getting the academy's location
+        // and have to guess based on the limited information we have.
+        LOGGER.warn("Could not resolve Academy System ID for person: {}. Guessing based on Academy name.",
+              person);
         int lastOpen = academyName.lastIndexOf('(');
         int lastClose = academyName.lastIndexOf(')');
         if (lastOpen < 0 || lastClose <= lastOpen) {
