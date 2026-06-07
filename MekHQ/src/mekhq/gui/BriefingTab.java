@@ -222,7 +222,6 @@ public final class BriefingTab extends CampaignGuiTab {
     public BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedScenario = -1;
-        MekHQ.registerHandler(this);
     }
     // endregion Constructors
 
@@ -742,8 +741,8 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         boolean stratConScenario = isStratConScenario(scenario);
-        btnDeploySelectedScenario.setEnabled(stratConScenario &&
-                                                   (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab));
+        btnDeploySelectedScenario.setEnabled(
+              stratConScenario && getCampaignGui().getStratConTab().isPresent());
         refreshScenarioActionButtonEmphasis();
     }
 
@@ -760,9 +759,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab) {
-            MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(), getCampaign(), scenario);
-        }
+        getCampaignGui().getStratConTab().ifPresent(
+              tab -> MaplessStratCon.deployWithoutMap(tab.getStratconPanel(), getCampaign(), scenario));
     }
 
     private void addMission() {

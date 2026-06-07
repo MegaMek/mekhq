@@ -124,7 +124,6 @@ public final class FinancesTab extends CampaignGuiTab {
     //region Constructors
     public FinancesTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 
