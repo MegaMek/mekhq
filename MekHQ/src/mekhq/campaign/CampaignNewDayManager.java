@@ -429,8 +429,8 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
-        for (AbstractLocation loc : new ArrayList<>(campaign.getLocations())) {
-            loc.newDay(campaign, loc != updatedLocation);
+        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+            location.newDay(campaign, location != updatedLocation);
         }
         updatedLocation = campaign.getCurrentLocation();
 

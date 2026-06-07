@@ -1771,18 +1771,18 @@ public class Campaign implements ITechManager, IPlace {
      * <p>Call this once per day after all personnel processing has completed.</p>
      */
     public void pruneEmptyLocations() {
-        AbstractLocation mainLoc = getCurrentLocation();
-        locations.removeIf(loc -> {
-            if (loc == mainLoc) {
+        AbstractLocation mainLocation = getCurrentLocation();
+        locations.removeIf(location -> {
+            if (location == mainLocation) {
                 return false;
             }
-            if (!loc.fetchPersonnelAtLocation().isEmpty()) {
+            if (!location.fetchPersonnelAtLocation().isEmpty()) {
                 return false;
             }
-            if (loc instanceof CurrentLocation) {
-                loc.setParent(null);
-            } else if (loc instanceof FixedLocation) {
-                for (LocationNode child : new ArrayList<>(loc.getLocationNode().getChildren())) {
+            if (location instanceof CurrentLocation) {
+                location.setParent(null);
+            } else if (location instanceof FixedLocation) {
+                for (LocationNode child : new ArrayList<>(location.getLocationNode().getChildren())) {
                     if (child.getLocatable() instanceof AcademyCampusLocation campus) {
                         campus.setParent(null);
                     }
@@ -1828,13 +1828,13 @@ public class Campaign implements ITechManager, IPlace {
     public AcademyCampusLocation getOrCreateCampusLocation(String academySet,
           String academyName, String systemId) {
         for (AbstractLocation loc : locations) {
-            if (!(loc instanceof FixedLocation fixedLoc)) {
+            if (!(loc instanceof FixedLocation fixedLocation)) {
                 continue;
             }
-            if (!fixedLoc.getCurrentSystem().getId().equals(systemId)) {
+            if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {
                 continue;
             }
-            for (LocationNode child : fixedLoc.getLocationNode().getChildren()) {
+            for (LocationNode child : fixedLocation.getLocationNode().getChildren()) {
                 if (child.getLocatable() instanceof AcademyCampusLocation campus
                           && academySet.equals(campus.getAcademySet())
                           && academyName.equals(campus.getAcademyName())) {

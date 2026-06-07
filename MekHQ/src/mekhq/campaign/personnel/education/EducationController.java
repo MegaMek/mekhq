@@ -642,7 +642,7 @@ public class EducationController {
     }
 
     private static void landAtCampus(Campaign campaign, Person person, ResourceBundle resources,
-          @Nullable CurrentLocation travelLoc) {
+          @Nullable CurrentLocation travelLocation) {
         campaign.addReport(PERSONNEL,
               String.format(resources.getString("arrived.text"), person.getHyperlinkedFullTitle()));
 
@@ -654,9 +654,9 @@ public class EducationController {
         }
         person.setParent(campusLoc);
 
-        if (travelLoc != null) {
-            travelLoc.setParent(null);
-            campaign.removeLocation(travelLoc);
+        if (travelLocation != null) {
+            travelLocation.setParent(null);
+            campaign.removeLocation(travelLocation);
         }
 
         person.setEduEducationStage(EducationStage.EDUCATION);
@@ -795,7 +795,7 @@ public class EducationController {
 
         AbstractLocation travelLoc = person.getCurrentLocation();
 
-        if (!(travelLoc instanceof CurrentLocation currentLoc)) {
+        if (!(travelLoc instanceof CurrentLocation currentLocation)) {
             int travelTime = max(2,
                   campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
             if (travelTime != person.getEduJourneyTime()) {
@@ -807,7 +807,7 @@ public class EducationController {
             return;
         }
 
-        if (!currentLoc.isOnPlanet()) {
+        if (!currentLocation.isOnPlanet()) {
             return;
         }
 
@@ -817,22 +817,22 @@ public class EducationController {
             return;
         }
 
-        if (!currentLoc.getCurrentSystem().equals(targetSystem)) {
-            JumpPath newPath = campaign.calculateJumpPath(currentLoc.getCurrentSystem(), targetSystem);
+        if (!currentLocation.getCurrentSystem().equals(targetSystem)) {
+            JumpPath newPath = campaign.calculateJumpPath(currentLocation.getCurrentSystem(), targetSystem);
             if (newPath != null && !newPath.isEmpty()) {
-                currentLoc.setJumpPath(newPath);
+                currentLocation.setJumpPath(newPath);
                 int newDays = (int) Math.ceil(
-                      newPath.getTotalTime(campaign.getLocalDate(), currentLoc.getTransitTime(), false));
+                      newPath.getTotalTime(campaign.getLocalDate(), currentLocation.getTransitTime(), false));
                 person.setEduJourneyTime(Math.max(2, newDays));
             }
             return;
         }
 
-        onTravelArrival.accept(currentLoc);
+        onTravelArrival.accept(currentLocation);
     }
 
     private static void arriveHome(Campaign campaign, Person person,
-          @Nullable CurrentLocation returnLoc) {
+          @Nullable CurrentLocation returnLocation) {
         person.setParent(campaign.getMainForcePersonnel());
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
 
@@ -844,9 +844,9 @@ public class EducationController {
             }
         }
 
-        if (returnLoc != null) {
-            returnLoc.setParent(null);
-            campaign.removeLocation(returnLoc);
+        if (returnLocation != null) {
+            returnLocation.setParent(null);
+            campaign.removeLocation(returnLocation);
         }
     }
 

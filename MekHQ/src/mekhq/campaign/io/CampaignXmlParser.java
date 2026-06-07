@@ -1628,27 +1628,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * On load those parent links are lost. This pass restores them.</p>
      */
     private static void reconnectPersonsToTravelLocations(Campaign campaign) {
-        for (AbstractLocation loc : campaign.getLocations()) {
+        for (AbstractLocation location : campaign.getLocations()) {
             // Persons traveling to/from campus — parented under a CurrentLocation
-            if (loc instanceof CurrentLocation currentLoc) {
-                for (UUID personId : currentLoc.drainPendingPersonIds()) {
+            if (location instanceof CurrentLocation currentLocation) {
+                for (UUID personId : currentLocation.drainPendingPersonIds()) {
                     Person person = campaign.getPerson(personId);
                     if (person != null) {
-                        person.setParent(currentLoc);
+                        person.setParent(currentLocation);
                     }
                 }
             }
 
             // Persons at campus — parented directly under AcademyCampusLocation (no CurrentLocation)
-            if (loc instanceof FixedLocation fixedLoc) {
-                for (LocationNode campusNode : fixedLoc.getLocationNode().getChildren()) {
-                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLoc)) {
+            if (location instanceof FixedLocation fixedLocation) {
+                for (LocationNode campusNode : fixedLocation.getLocationNode().getChildren()) {
+                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation)) {
                         continue;
                     }
-                    for (UUID personId : campusLoc.drainPendingPersonIds()) {
+                    for (UUID personId : campusLocation.drainPendingPersonIds()) {
                         Person person = campaign.getPerson(personId);
                         if (person != null) {
-                            person.setParent(campusLoc);
+                            person.setParent(campusLocation);
                         }
                     }
                 }
@@ -1684,10 +1684,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 if (systemId == null) {
                     continue;
                 }
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                       person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-                if (campusLoc != null) {
-                    person.setParent(campusLoc);
+                if (campusLocation != null) {
+                    person.setParent(campusLocation);
                 }
                 continue;
             }
@@ -1708,16 +1708,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
             double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
-            CurrentLocation travelLoc = new CurrentLocation(targetSystem, transitTime);
-            AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+            CurrentLocation travelLocation = new CurrentLocation(targetSystem, transitTime);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                   person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
-            if (campusLoc != null) {
-                travelLoc.setParent(campusLoc);
+            if (campusLocation != null) {
+                travelLocation.setParent(campusLocation);
             } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
-                travelLoc.setParent(campaign);
+                travelLocation.setParent(campaign);
             }
-            person.setParent(travelLoc);
-            campaign.addLocation(travelLoc);
+            person.setParent(travelLocation);
+            campaign.addLocation(travelLocation);
         }
     }
 

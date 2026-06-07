@@ -65,12 +65,12 @@ public class FixedLocation extends AbstractLocation {
     }
 
     public static FixedLocation generateInstanceFromXML(Node wn, Campaign campaign) {
-        FixedLocation retVal = null;
+        FixedLocation returnValue = null;
         try {
-            retVal = new FixedLocation(null);
-            NodeList nl = wn.getChildNodes();
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            returnValue = new FixedLocation(null);
+            NodeList nodeList = wn.getChildNodes();
+            for (int x = 0; x < nodeList.getLength(); x++) {
+                Node wn2 = nodeList.item(x);
                 if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
@@ -84,14 +84,14 @@ public class FixedLocation extends AbstractLocation {
                             p = campaign.getSystems().getFirst();
                         }
                     }
-                    retVal.currentSystem = p;
+                    returnValue.currentSystem = p;
                 } else if (wn2.getNodeName().equalsIgnoreCase("locationNodeChildren")) {
-                    LocationNode.reconnectChildren(wn2, retVal, campaign);
+                    LocationNode.reconnectChildren(wn2, returnValue, campaign);
                 }
             }
         } catch (Exception ex) {
             logger.error("", ex);
         }
-        return retVal;
+        return returnValue;
     }
 }

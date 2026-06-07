@@ -2771,8 +2771,8 @@ public class Person implements ILocation {
         while (node != null) {
             if (node.getLocatable() instanceof AcademyCampusLocation) {
                 LocationNode campusParent = node.getParent();
-                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation loc) {
-                    PlanetarySystem system = loc.getCurrentSystem();
+                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+                    PlanetarySystem system = location.getCurrentSystem();
                     return system != null ? system.getId() : null;
                 }
                 return null;

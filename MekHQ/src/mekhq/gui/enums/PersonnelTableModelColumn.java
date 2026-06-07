@@ -755,8 +755,8 @@ public enum PersonnelTableModelColumn {
                 yield scenario.getName();
             }
             case DESTINATION_NAME -> {
-                AbstractLocation loc = getPersonLocation(person);
-                if (loc instanceof CurrentLocation cl
+                AbstractLocation location = getPersonLocation(person);
+                if (location instanceof CurrentLocation cl
                           && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var destination = cl.getJumpPath().getLastSystem();
                     LocationNode clNode = cl.getLocationNode();
@@ -764,10 +764,10 @@ public enum PersonnelTableModelColumn {
                         LocationNode parent = clNode.getParent();
                         while (parent != null) {
                             if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
-                                LocationNode fixedLocNode = parent.getParent();
-                                if (fixedLocNode != null
-                                          && fixedLocNode.getLocatable() instanceof AbstractLocation campusLoc
-                                          && campusLoc.getCurrentSystem().equals(destination)) {
+                                LocationNode fixedLocationNode = parent.getParent();
+                                if (fixedLocationNode != null
+                                          && fixedLocationNode.getLocatable() instanceof AbstractLocation campusLocation
+                                          && campusLocation.getCurrentSystem().equals(destination)) {
                                     yield campus.getAcademyName();
                                 }
                                 yield campaign.getName();
@@ -779,8 +779,8 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case DESTINATION_PLANET -> {
-                AbstractLocation loc = getPersonLocation(person);
-                if (loc instanceof CurrentLocation cl
+                AbstractLocation location = getPersonLocation(person);
+                if (location instanceof CurrentLocation cl
                           && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var dest = cl.getJumpPath().getLastSystem();
                     if (dest != null) {
@@ -791,8 +791,8 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case DESTINATION_SYSTEM -> {
-                AbstractLocation loc = getPersonLocation(person);
-                if (loc instanceof CurrentLocation cl
+                AbstractLocation location = getPersonLocation(person);
+                if (location instanceof CurrentLocation cl
                           && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
                     var dest = cl.getJumpPath().getLastSystem();
                     yield dest != null ? dest.getPrintableName(today) : "-";
@@ -842,8 +842,8 @@ public enum PersonnelTableModelColumn {
             case LAST_RANK_CHANGE_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
             case LEADERSHIP -> skillValue.apply(SkillType.S_LEADER);
             case LOCATION_NAME -> {
-                AbstractLocation loc = getPersonLocation(person);
-                boolean isTraveling = loc instanceof CurrentLocation cl
+                AbstractLocation location = getPersonLocation(person);
+                boolean isTraveling = location instanceof CurrentLocation cl
                                             && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
                 LocationNode node = person.getLocationNode();
                 if (node != null) {
@@ -859,12 +859,13 @@ public enum PersonnelTableModelColumn {
                     }
                 }
                 if (isTraveling) {
-                    CurrentLocation currentLoc = (CurrentLocation) loc;
-                    JumpPath path = currentLoc.getJumpPath();
-                    PlanetarySystem sys = currentLoc.getCurrentSystem();
-                    if (path.size() > 1 && currentLoc.isAtJumpPoint()) {
-                        double neededHours = sys.getRechargeTime(today, currentLoc.computeIsUseCommandCircuit(campaign));
-                        double remainingHours = neededHours - currentLoc.getRechargeTime();
+                    CurrentLocation currentLocation = (CurrentLocation) location;
+                    JumpPath path = currentLocation.getJumpPath();
+                    PlanetarySystem sys = currentLocation.getCurrentSystem();
+                    if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
+                        double neededHours = sys.getRechargeTime(today,
+                              currentLocation.computeIsUseCommandCircuit(campaign));
+                        double remainingHours = neededHours - currentLocation.getRechargeTime();
                         if (remainingHours > 0) {
                             int days = (int) Math.ceil(remainingHours / 24.0);
                             yield String.format(
@@ -874,12 +875,12 @@ public enum PersonnelTableModelColumn {
                         }
                         yield resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
                     } else if (path.size() == 1) {
-                        int days = (int) Math.ceil(currentLoc.getTransitTime());
+                        int days = (int) Math.ceil(currentLocation.getTransitTime());
                         yield String.format(
                               resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text"),
                               days);
                     } else {
-                        double daysToJP = sys.getTimeToJumpPoint(1.0) - currentLoc.getTransitTime();
+                        double daysToJP = sys.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
                         int days = (int) Math.ceil(daysToJP);
                         yield String.format(
                               resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text"),
@@ -889,17 +890,17 @@ public enum PersonnelTableModelColumn {
                 yield "-";
             }
             case LOCATION_PLANET -> {
-                AbstractLocation loc = getPersonLocation(person);
-                if (loc != null) {
-                    Planet planet = loc.getPlanet();
+                AbstractLocation location = getPersonLocation(person);
+                if (location != null) {
+                    Planet planet = location.getPlanet();
                     yield planet != null ? planet.getPrintableName(today) : "-";
                 }
                 yield "-";
             }
             case LOCATION_SYSTEM -> {
-                AbstractLocation loc = getPersonLocation(person);
-                if (loc != null) {
-                    var system = loc.getCurrentSystem();
+                AbstractLocation location = getPersonLocation(person);
+                if (location != null) {
+                    var system = location.getCurrentSystem();
                     yield system != null ? system.getPrintableName(today) : "-";
                 }
                 yield "-";

@@ -87,14 +87,14 @@ public final class LocationDispatch {
             List<Person> group = entry.getValue();
 
             if (destSystem != null && fromSystem.equals(destSystem)) {
-                AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                       academySet, academyName, campusSystemId);
-                if (campusLoc == null) {
+                if (campusLocation == null) {
                     throw new IllegalStateException(
                           "Campus location must exist for system " + campusSystemId);
                 }
                 group.forEach(p -> {
-                    p.setParent(campusLoc);
+                    p.setParent(campusLocation);
                     p.setEduJourneyTime(2);
                 });
                 continue;
@@ -117,22 +117,22 @@ public final class LocationDispatch {
                   ? campaign.getCurrentLocation().getTransitTime()
                   : 0.0;
 
-            AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                   academySet, academyName, campusSystemId);
-            if (campusLoc == null) {
+            if (campusLocation == null) {
                 throw new IllegalStateException(
                       "Campus location must exist for system " + campusSystemId);
             }
 
-            CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
-            travelLoc.setJumpPath(path);
-            travelLoc.setParent(campusLoc);
-            campaign.addLocation(travelLoc);
+            CurrentLocation traveLocation = new CurrentLocation(fromSystem, startTransit);
+            traveLocation.setJumpPath(path);
+            traveLocation.setParent(campusLocation);
+            campaign.addLocation(traveLocation);
 
             int journeyDays = max(2,
                   (int) Math.ceil(path.getTotalTime(campaign.getLocalDate(), startTransit, false)));
             group.forEach(p -> {
-                p.setParent(travelLoc);
+                p.setParent(traveLocation);
                 p.setEduJourneyTime(journeyDays);
             });
         }
@@ -165,9 +165,9 @@ public final class LocationDispatch {
 
             PlanetarySystem academySystem = campaign.getSystemById(academySystemId);
 
-            AcademyCampusLocation campusLoc = campaign.getOrCreateCampusLocation(
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                   first.getEduAcademySet(), first.getEduAcademyNameInSet(), academySystemId);
-            if (campusLoc == null) {
+            if (campusLocation == null) {
                 throw new IllegalStateException(
                       "Campus location must exist for system " + academySystemId);
             }
@@ -181,7 +181,7 @@ public final class LocationDispatch {
                       ? max(2, campaign.getSimplifiedTravelTime(academySystem))
                       : 14;
                 group.forEach(p -> {
-                    p.setParent(campusLoc);
+                    p.setParent(campusLocation);
                     p.setEduJourneyTime(travelTime);
                     p.setEduDaysOfTravel(0);
                 });
@@ -189,15 +189,15 @@ public final class LocationDispatch {
             }
 
             double startTransit = academySystem.getTimeToJumpPoint(1.0);
-            CurrentLocation returnLoc = new CurrentLocation(academySystem, startTransit);
-            returnLoc.setJumpPath(returnPath);
-            returnLoc.setParent(campusLoc);
-            campaign.addLocation(returnLoc);
+            CurrentLocation returnLocation = new CurrentLocation(academySystem, startTransit);
+            returnLocation.setJumpPath(returnPath);
+            returnLocation.setParent(campusLocation);
+            campaign.addLocation(returnLocation);
 
             int journeyDays = max(2,
                   (int) Math.ceil(returnPath.getTotalTime(campaign.getLocalDate(), startTransit, false)));
             group.forEach(p -> {
-                p.setParent(returnLoc);
+                p.setParent(returnLocation);
                 p.setEduJourneyTime(journeyDays);
                 p.setEduDaysOfTravel(0);
             });
