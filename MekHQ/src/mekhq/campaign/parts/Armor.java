@@ -620,7 +620,7 @@ public class Armor extends Part implements IAcquisitionWork {
      * @return returns points of armor are found
      */
     public int getAmountAvailable() {
-        return campaign.getWarehouse()
+        return getWarehouse()
                      .streamSpareParts()
                      .filter(this::isSameArmorPart)
                      .mapToInt(part -> ((Armor) part).getAmount())
@@ -767,7 +767,7 @@ public class Armor extends Part implements IAcquisitionWork {
      * @return leftover amount; should be 0 except when removing if the part removed didn't have enough
      */
     protected int changeAmountAvailableSingle(int amount) {
-        Armor armor = (Armor) campaign.getWarehouse()
+        Armor armor = (Armor) getWarehouse()
                                     .findSparePart(part -> (part instanceof Armor) &&
                                                                  part.isPresent() &&
                                                                  Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
@@ -777,7 +777,7 @@ public class Armor extends Part implements IAcquisitionWork {
             int amountRemaining = armor.getAmount() + amount;
             armor.setAmount(amountRemaining);
             if (armor.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(armor);
+                getWarehouse().removePart(armor);
                 return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {

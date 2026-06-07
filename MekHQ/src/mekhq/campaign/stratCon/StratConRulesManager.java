@@ -1607,13 +1607,10 @@ public class StratConRulesManager {
 
         // Build a map of scouts and their information
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isCommandersOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles();
-        boolean isCommandersOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry();
-        boolean isCommandersOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor();
         Formation formation = campaign.getFormation(forceID);
         Hangar hangar = campaign.getHangar();
         List<ScoutRecord> scouts = formation == null ? new ArrayList<>() : buildScoutMap(formation, hangar,
-              isCommandersOnlyVehicles, isCommandersOnlyInfantry, isCommandersOnlyBattleArmor);
+              campaignOptions);
 
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
@@ -1825,14 +1822,9 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation                   the {@link Formation} containing units to evaluate
-     * @param hangar                      the {@link Hangar} used to help retrieve units from the force
-     * @param isCommandersOnlyVehicles    {@code true} to only use the skills possessed by the unit commander (if
-     *                                    vehicle)
-     * @param isCommandersOnlyInfantry    {@code true} to only use the skills possessed by the unit commander (if
-     *                                    conventional infantry)
-     * @param isCommandersOnlyBattleArmor {@code true} to only use the skills possessed by the unit commander (if battle
-     *                                    armor)
+     * @param formation       the {@link Formation} containing units to evaluate
+     * @param hangar          the {@link Hangar} used to help retrieve units from the force
+     * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1840,8 +1832,7 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    private static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, boolean isCommandersOnlyVehicles,
-          boolean isCommandersOnlyInfantry, boolean isCommandersOnlyBattleArmor) {
+    private static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions) {
         List<ScoutRecord> scouts = new ArrayList<>();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             List<Person> unitCrew = unit.getCrew();
@@ -1857,16 +1848,7 @@ public class StratConRulesManager {
                 boolean hasActiveProbe = EntityUtilities.hasActiveProbe(entity);
                 hasSensorEquipment = hasImprovedSensors || hasActiveProbe;
 
-                boolean useCommanderOnly = false;
-                if (entity.isVehicle() && isCommandersOnlyVehicles) {
-                    useCommanderOnly = true;
-                } else if (entity.isConventionalInfantry() && isCommandersOnlyInfantry) {
-                    useCommanderOnly = true;
-                } else if (entity.isBattleArmor() && isCommandersOnlyBattleArmor) {
-                    useCommanderOnly = true;
-                }
-
-                if (useCommanderOnly) {
+                if (unit.isOnlyCommandersMatter(campaignOptions)) {
                     Person commander = unit.getCommander();
                     if (commander == null) {
                         LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());

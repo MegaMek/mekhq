@@ -580,6 +580,7 @@ public class CampaignOptions {
 
     private int attributeCost;
     private int edgeCost;
+    private int edgeRefreshCost;
     // endregion Experience Tab
 
     // region Skills Tab
@@ -1251,6 +1252,7 @@ public class CampaignOptions {
         missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
         edgeCost = 10;
+        edgeRefreshCost = 20; // ATOW 3rd printing, p.43, 'edge recovery'
         attributeCost = 100;
         // endregion Experience Tab
 
@@ -4536,6 +4538,14 @@ public class CampaignOptions {
 
     public void setEdgeCost(final int edgeCost) {
         this.edgeCost = edgeCost;
+    }
+
+    public int getEdgeRefreshCost() {
+        return edgeRefreshCost;
+    }
+
+    public void setEdgeRefreshCost(final int edgeRefreshCost) {
+        this.edgeRefreshCost = edgeRefreshCost;
     }
 
     public int getAttributeCost() {
