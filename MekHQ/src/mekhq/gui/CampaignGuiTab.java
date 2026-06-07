@@ -90,9 +90,15 @@ public abstract class CampaignGuiTab extends JPanel {
     abstract public MHQTabType tabType();
 
     /**
-     * Called when tab is removed from gui.
+     * Called when tab is activated.
      */
-    public void disposeTab() {
+    public void activateTab() {
+        MekHQ.registerHandler(this);
+    }
+    /**
+     * Called when tab is deactivated.
+     */
+    public void deactivateTab() {
         MekHQ.unregisterHandler(this);
     }
 }

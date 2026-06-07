@@ -943,11 +943,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         return mode;
     }
 
-    @Override
-    public Warehouse getWarehouse() {
-        return campaign.getWarehouse();
-    }
-
     public void setMode(WorkTime wt) {
         if (canChangeWorkMode()) {
             this.mode = wt;

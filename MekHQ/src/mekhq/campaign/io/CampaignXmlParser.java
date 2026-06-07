@@ -1418,15 +1418,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            AbstractLocation loc = AbstractLocation.generateInstanceFromXML(child, campaign);
-            if (loc == null) {
+            AbstractLocation location = AbstractLocation.generateInstanceFromXML(child, campaign);
+            if (location == null) {
                 continue;
             }
             if (first) {
-                campaign.setLocation(loc);
+                campaign.setLocation(location);
                 first = false;
             } else {
-                campaign.addLocation(loc);
+                campaign.addLocation(location);
             }
         }
     }

@@ -150,18 +150,18 @@ public class CampaignSummary {
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for (Unit u : campaign.getAllHangar().getUnits()) {
-            Entity e = u.getEntity();
-            if (u.isUnmanned() ||
-                      u.isSalvage() ||
-                      u.isMothballed() ||
-                      u.isMothballing() ||
-                      !u.isPresent() ||
-                      (null == e)) {
+        for (Unit unit : campaign.getAllHangar().getUnits()) {
+            Entity entity = unit.getEntity();
+            if (unit.isUnmanned() ||
+                      unit.isSalvage() ||
+                      unit.isMothballed() ||
+                      unit.isMothballing() ||
+                      !unit.isPresent() ||
+                      (null == entity)) {
                 continue;
             }
-            countDamageStatus[u.getDamageState()]++;
-            switch (e.getUnitType()) {
+            countDamageStatus[unit.getDamageState()]++;
+            switch (entity.getUnitType()) {
                 case UnitType.MEK:
                 case UnitType.PROTOMEK:
                     mekCount++;
@@ -178,7 +178,7 @@ public class CampaignSummary {
                     infantryCount++;
                     break;
                 case UnitType.INFANTRY:
-                    Infantry i = (Infantry) e;
+                    Infantry i = (Infantry) entity;
                     squadCount += i.getSquadCount();
                     break;
             }
