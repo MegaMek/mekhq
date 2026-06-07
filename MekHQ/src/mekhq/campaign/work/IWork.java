@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ package mekhq.campaign.work;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.personnel.Person;
 
 public interface IWork {
@@ -64,4 +65,10 @@ public interface IWork {
     default WorkTime getMode() {
         return WorkTime.NORMAL;
     }
+
+    /**
+     * @return the {@code Warehouse} relevant to this work
+     */
+    @Nullable
+    Warehouse getWarehouse();
 }

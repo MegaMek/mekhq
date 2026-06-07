@@ -171,7 +171,7 @@ public enum PersonnelTableModelColumn {
     QUICK_TRAIN_IGNORE("PersonnelTableModelColumn.QUICK_TRAIN_IGNORE.text"),
     SALVAGE_SUPERVISOR("PersonnelTableModelColumn.SALVAGE_SUPERVISOR.text"),
     SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
-    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
+    WANTS_CHILDREN("PersonnelTableModelColumn.WANTS_CHILDREN.text"),
     UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
     COVER_MEDICAL_EXPENSES("PersonnelTableModelColumn.COVER_MEDICAL_EXPENSES.text"),
     BLOCK_MATERNITY_LEAVE("PersonnelTableModelColumn.BLOCK_MATERNITY_LEAVE.text"),
@@ -504,9 +504,7 @@ public enum PersonnelTableModelColumn {
         return this == DIVORCEABLE;
     }
 
-    public boolean isTryingToConceive() {
-        return this == TRYING_TO_CONCEIVE;
-    }
+    public boolean isWantsChildren() {return this == WANTS_CHILDREN;}
 
     public boolean isImmortal() {
         return this == IMMORTAL;
@@ -881,10 +879,8 @@ public enum PersonnelTableModelColumn {
             case TECH_VESSEL -> skillValue.apply(SkillType.S_TECH_VESSEL);
             case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
             case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
-            case TRYING_TO_CONCEIVE -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                                 person.getGender().isFemale() ?
-                                                                 (convertBooleanToYesNo(person.isTryingToConceive())) :
-                                                                 "NA.text");
+            case WANTS_CHILDREN -> resources.getString(person.isChild(campaign.getLocalDate()) ? "NA.text" :
+                                                             convertBooleanToYesNo(person.isWantsChildren()));
             case UNDER_PROTECTION -> resources.getString(convertBooleanToYesNo(person.isUnderProtection()));
             case COVER_MEDICAL_EXPENSES ->
                   resources.getString(convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses()));
@@ -1333,7 +1329,7 @@ public enum PersonnelTableModelColumn {
                      PREFERS_MEN,
                      PREFERS_WOMEN,
                      COVER_MEDICAL_EXPENSES,
-                     TRYING_TO_CONCEIVE,
+                     WANTS_CHILDREN,
                      BLOCK_MATERNITY_LEAVE -> true;
                 default -> false;
             };

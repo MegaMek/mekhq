@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -64,6 +65,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -251,6 +253,11 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public Campaign getCampaign() {
         return campaign;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        return campaign.getWarehouse();
     }
 
     public String getName() {
@@ -467,15 +474,15 @@ public abstract class Part implements IPartWork, ITechnology {
                 if (campaign.getQuartermaster() != null) {
                     inStock = campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType());
                 }
-            } else if (campaign.getWarehouse() != null) {
-                inStock = campaign.getWarehouse().getSparePartsCount(this);
+            } else if (getWarehouse() != null) {
+                inStock = getWarehouse().getSparePartsCount(this);
             }
             String inStockText = inStock == 0 ?
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorNegativeHexColor(),
+                                                                                           .getFontColorNegativeHexColor(),
                                              "None in stock") :
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorPositiveHexColor(),
+                                                                                           .getFontColorPositiveHexColor(),
                                              inStock + " in stock");
 
             toReturn.append("<br>").append(inStockText).append("<br>");
@@ -493,6 +500,10 @@ public abstract class Part implements IPartWork, ITechnology {
             if (getMode() != WorkTime.NORMAL) {
                 toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
             }
+        } else {
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                  MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                  getText("Part.damaged.beyond.repair")));
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -1459,9 +1470,9 @@ public abstract class Part implements IPartWork, ITechnology {
         quantity = Math.max(number, 0);
         if (quantity == 0) {
             for (Part childPart : childParts) {
-                campaign.getWarehouse().removePart(childPart);
+                getWarehouse().removePart(childPart);
             }
-            campaign.getWarehouse().removePart(this);
+            getWarehouse().removePart(this);
         }
     }
 
@@ -1495,8 +1506,8 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Returns the base quantity of this part for Parts In Use reporting, without checking whether the part
-     * is reserved or in use.
+     * Returns the base quantity of this part for Parts In Use reporting, without checking whether the part is reserved
+     * or in use.
      *
      * <p>Returns {@code 1} if the part is assigned to a unit, or the part's stored quantity otherwise.</p>
      *
@@ -1976,7 +1987,7 @@ public abstract class Part implements IPartWork, ITechnology {
     public void fixReferences(Campaign campaign) {
         if (replacementPart instanceof PartRef) {
             int id = replacementPart.getId();
-            replacementPart = campaign.getWarehouse().getPart(id);
+            replacementPart = getWarehouse().getPart(id);
             if ((replacementPart == null) && (id > 0)) {
                 LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
@@ -1984,7 +1995,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (parentPart instanceof PartRef) {
             int id = parentPart.getId();
-            parentPart = campaign.getWarehouse().getPart(id);
+            parentPart = getWarehouse().getPart(id);
             if ((parentPart == null) && (id > 0)) {
                 LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
             }
@@ -1993,7 +2004,7 @@ public abstract class Part implements IPartWork, ITechnology {
         for (int ii = childParts.size() - 1; ii >= 0; --ii) {
             Part childPart = childParts.get(ii);
             if (childPart instanceof PartRef) {
-                Part realPart = campaign.getWarehouse().getPart(childPart.getId());
+                Part realPart = getWarehouse().getPart(childPart.getId());
                 if (realPart != null) {
                     childParts.set(ii, realPart);
                 } else if (childPart.getId() > 0) {

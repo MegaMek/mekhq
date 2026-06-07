@@ -40,15 +40,23 @@ import javax.swing.JFrame;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.gui.utilities.ObservableString;
 import mekhq.io.FileType;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * Utility class with methods to show the various open/save file dialogs
  */
 public class FileDialogs {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FileDialogs";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+          DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                .withLocale(MekHQ.getMHQOptions().getDateLocale());
 
     private FileDialogs() {
         // no instances
@@ -80,8 +88,7 @@ public class FileDialogs {
         String fileName = String.format(
               "%s%s_ExportedPersonnel.prsx",
               campaign.getName(),
-              campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                   .withLocale(MekHQ.getMHQOptions().getDateLocale())));
+              campaign.getLocalDate().format(DATE_TIME_FORMATTER));
 
         Optional<File> value = GUI.fileDialogSave(
               frame,
@@ -191,8 +198,7 @@ public class FileDialogs {
         String fileName = String.format(
               "%s%s_ExportedParts.parts",
               campaign.getName(),
-              campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                   .withLocale(MekHQ.getMHQOptions().getDateLocale())));
+              campaign.getLocalDate().format(DATE_TIME_FORMATTER));
 
         Optional<File> value = GUI.fileDialogSave(
               frame,
@@ -278,8 +284,7 @@ public class FileDialogs {
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
         String fileName = String.format("%s%s.%s", campaign.getName(),
-              campaign.getLocalDate().format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                   .withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              campaign.getLocalDate().format(DATE_TIME_FORMATTER),
               MekHQ.getMHQOptions().getPreferGzippedOutput() ? "cpnx.gz" : "cpnx");
 
         Optional<File> value = GUI.fileDialogSave(frame, "Save Campaign", FileType.CPNX,
@@ -361,6 +366,81 @@ public class FileDialogs {
     }
 
     /**
+     * Displays a dialog window from which the user can select a <code>.csv</code> file to save personnel to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ExportPersonnel.csv as default filename.
+     */
+    public static Optional<File> savePersonnelCSV(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSavePersonnelCSV.title"), MekHQ.getPersonnelDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSavePersonnelCSV.fileSuffix")), FileType.CSV);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.csv</code> file to save units to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ExportUnits.csv as default filename.
+     */
+    public static Optional<File> saveUnitsCSV(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSaveUnitsCSV.title"), MekHQ.getUnitsDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSaveUnitsCSV.fileSuffix")), FileType.CSV);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.csv</code> file to save finances to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ExportFinances.csv as default filename.
+     */
+    public static Optional<File> saveFinancesCSV(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSaveFinancesCSV.title"), MekHQ.getFinancesDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSaveFinancesCSV.fileSuffix")), FileType.CSV);
+    }
+
+    /**
+     * Displays a dialog pointing at the default directory where the user can save a file,
+     * ensures its extension, and creates a backup if it already exists.
+     *
+     * <p>
+     * To streamline UX, the dialog show default directory and pre-populates output file.
+     * After file selection is done, makes file's parent directory default.
+     * </p>
+     *
+     * @param frame           dialog parent frame
+     * @param dialogTitle     title of the dialog frame
+     * @param defaultDir      default save directory
+     * @param defaultFilename default file name, excluding extension
+     * @param fileType        file type to be enforced
+     *
+     * @return a file user chose to save to, <code>Optional.empty</code> if the dialog was canceled
+     */
+    public static Optional<File> saveWithBackup(JFrame frame, String dialogTitle,
+          ObservableString defaultDir, String defaultFilename, FileType fileType) {
+        String saveFilename = defaultFilename + '.' + fileType.getRecommendedExtension();
+        Optional<File> selectedFile = GUI.fileDialogSave(frame, dialogTitle, fileType, defaultDir.getValue(), saveFilename);
+        Optional<File> outputFile = selectedFile.map(file -> enforceFileExtension(file, fileType));
+
+        outputFile.ifPresent(file -> defaultDir.setValue(file.getParent()));
+        // if the file already exists, make a backup copy
+        outputFile.filter(File::exists)
+              .ifPresent(file -> Utilities.copyfile(file, new File(file.getPath() + "_backup")));
+
+        return outputFile;
+    }
+
+    /**
+     * Ensures that the file has the appropriate file type extension.
+     *
+     * @param file     the file to check
+     * @param fileType enforced file type
+     *
+     * @return File with the appropriate file type extension
+     */
+    private static File enforceFileExtension(File file, FileType fileType) {
+        String path = file.getPath();
+        if (!path.endsWith('.' + fileType.getRecommendedExtension())) {
+            path += '.' + fileType.getRecommendedExtension();
+            file = new File(path);
+        }
+        return file;
+    }
+
+    /**
      * Displays a dialog window from which the user can select an <code>.xml</code> file to open.
      *
      * @return the file selected, if any
@@ -386,4 +466,14 @@ public class FileDialogs {
         value.ifPresent(x -> MekHQ.getMHQOptions().setCompanyGenerationDirectoryPath(x.getParent()));
         return value;
     }
+
+    private static String getDefaultFilename(Campaign campaign, String filenameSuffix) {
+        return campaign.getName() + campaign.getLocalDate().format(DATE_TIME_FORMATTER) + "_" + filenameSuffix;
+    }
+
+
+    private static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
+    }
+
 }
