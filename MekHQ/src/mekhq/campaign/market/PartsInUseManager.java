@@ -159,10 +159,10 @@ public class PartsInUseManager {
      * The values for each part type are retrieved from the campaign options.</p>
      *
      * <p>If the provided {@link Part} is a {@link MissingPart} we use {@link MissingPart#getNewPart()} to fetch the
-     * right part. We do this here to avoid an issue with inheritance. Chiefly missing parts can be a type of part, but
+     * right part. We do this here to avoid an issue with inheritance. Chiefly, missing parts can be a type of part, but
      * most parts aren't missing parts.</p>
      *
-     * <p></p>We could filter earlier in the pipeline, but that would rely on all future developers knowing about
+     * <p>We could filter earlier in the pipeline, but that would rely on all future developers knowing about
      * this risk and accounting for it. By self-correcting here, we avoid that issue entirely.</p>
      *
      * @param part The {@link Part} for which the default stock percentage is to be determined. The part must not be
