@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -65,21 +64,10 @@ public class Warehouse implements ILocation {
 
     private final LocationNode locationNode = new LocationNode(this);
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
-    private final LocationNode locationNode = new LocationNode(this);
 
     @Override
     public LocationNode getLocationNode() {
         return locationNode;
-    }
-
-    @Override
-    public LocationNode getLocationNode() {
-        return locationNode;
-    }
-
-    @Override
-    public Set<Part> getPartsAtLocation() {
-        return Set.copyOf(parts.values());
     }
 
     /**

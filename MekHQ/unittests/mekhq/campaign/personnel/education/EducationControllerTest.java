@@ -34,19 +34,25 @@ package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -227,6 +233,10 @@ class EducationControllerTest {
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(5);
             when(campaign.getOrCreateCampusLocation(any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
+
+            PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+            when(currentSystem.getId()).thenReturn("CurrentSystem");
+            when(campaign.getCurrentSystem()).thenReturn(currentSystem);
         }
 
         @Test
@@ -338,10 +348,24 @@ class EducationControllerTest {
             PlanetarySystem destSystem = mock(PlanetarySystem.class);
             when(destSystem.getName(any())).thenReturn("Galatea");
             when(campaign.getSystemById("Galatea")).thenReturn(destSystem);
-            when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(10);
 
             Person person = buildStudentPerson();
-            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+
+            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class)) {
+                JumpPath mockPath = mock(JumpPath.class);
+                when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
+                CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
+                travelLoc.setJumpPath(mockPath);
+
+                mockDispatch.when(() -> LocationDispatch.dispatchToLocation(any(), any(), any()))
+                      .thenAnswer(inv -> {
+                          Collection<Person> people = inv.getArgument(0);
+                          people.forEach(p -> p.setParent(travelLoc));
+                          return null;
+                      });
+
+                EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+            }
 
             assertEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
         }
@@ -376,10 +400,24 @@ class EducationControllerTest {
             PlanetarySystem destSystem = mock(PlanetarySystem.class);
             when(destSystem.getName(any())).thenReturn("Galatea");
             when(campaign.getSystemById("Galatea")).thenReturn(destSystem);
-            when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(10);
 
             Person person = buildStudentPerson();
-            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+
+            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class)) {
+                JumpPath mockPath = mock(JumpPath.class);
+                when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
+                CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
+                travelLoc.setJumpPath(mockPath);
+
+                mockDispatch.when(() -> LocationDispatch.dispatchToLocation(any(), any(), any()))
+                      .thenAnswer(inv -> {
+                          Collection<Person> people = inv.getArgument(0);
+                          people.forEach(p -> p.setParent(travelLoc));
+                          return null;
+                      });
+
+                EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+            }
 
             assertEquals(10, person.getEduJourneyTime());
         }

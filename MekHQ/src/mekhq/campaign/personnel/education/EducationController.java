@@ -341,9 +341,18 @@ public class EducationController {
                 person.setEduJourneyTime(2);
                 person.setEduAcademySystem(campaign.getCurrentSystem().getId());
             } else {
+                PlanetarySystem originSystem = person.getCurrentSystem();
                 person.setEduAcademySystem(campus);
-                LocationDispatch.dispatchToAcademy(
-                      List.of(person), academy.getSet(), academy.getName(), campus, campaign);
+                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(academy.getSet(),
+                      academy.getName(), academy.getLocationSystems().getFirst());
+                LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
+                double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
+                                            && campaign.getCurrentLocation() != null
+                                            ? campaign.getCurrentLocation().getTransitTime()
+                                            : 0.0;
+                int journeyDays = max(2,
+                      (int) Math.ceil(person.getJumpPath().getTotalTime(campaign.getLocalDate(), startTransit, false)));
+                person.setEduJourneyTime(journeyDays);
             }
         }
 
@@ -759,7 +768,11 @@ public class EducationController {
             return;
         }
 
-        LocationDispatch.dispatchHome(List.of(person), campaign);
+        LocationDispatch.dispatchToLocation(List.of(person), campaign, campaign);
+
+        int travelDays = max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+        person.setEduJourneyTime(travelDays);
+        person.setEduDaysOfTravel(0);
 
         campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
               person.getHyperlinkedFullTitle(), person.getEduJourneyTime()));

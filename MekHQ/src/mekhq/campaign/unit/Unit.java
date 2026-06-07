@@ -189,7 +189,6 @@ public class Unit implements ITechnology, ILocation {
     private UUID id;
     private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
-    private LocationNode locationNode = new LocationNode(this);
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -559,11 +558,6 @@ public class Unit implements ITechnology, ILocation {
     @Override
     public LocationNode getLocationNode() {
         return locationNode;
-    }
-
-    @Override
-    public Set<Unit> getUnitsAtLocation() {
-        return Set.of(this);
     }
 
     // Generic Transport Methods
@@ -8031,11 +8025,6 @@ public class Unit implements ITechnology, ILocation {
             LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", getEntity().getUnitType());
             return null;
         }
-    }
-
-    @Override
-    public LocationNode getLocationNode() {
-        return locationNode;
     }
 
     @Override

@@ -117,8 +117,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.NewGlossaryDialog;
 import mekhq.gui.enums.MHQTabType;
-import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.menus.MekHQMenuBar;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -1393,6 +1393,9 @@ public class CampaignGUI extends JPanel {
 
     public void refreshLab() {
         MekLabTab lab = getMekLabTab();
+        if (lab == null) {
+            return;
+        }
         Unit u = lab.getUnit();
         if (null == u) {
             return;
@@ -1419,8 +1422,9 @@ public class CampaignGUI extends JPanel {
         String label = getFormattedTextAt("mekhq.resources.CampaignGUI", key);
         if (args.length == 0) {
             return "<html><b>" + label + "</b></html>";
-            }
         }
+        return "<html><b>" + label + "</b>: " + args[0] + "</html>";
+    }
     /**
      * Returns the currently selected {@link LocationFilterItem}, defaulting to {@link LocationFilterItem#ALL} when the
      * combo has not yet been initialized.
@@ -1476,7 +1480,7 @@ public class CampaignGUI extends JPanel {
 
     /** Refreshes the three location-filtered tabs when the Active Location selection changes. */
     private void refreshLocationFilteredTabs() {
-        HangarTab ht = (HangarTab) getTab(MHQTabType.HANGAR);
+        HangarTab ht = getHangarTab();
         if (ht != null) {
             ht.refreshUnitList();
         }
@@ -1488,23 +1492,10 @@ public class CampaignGUI extends JPanel {
         if (wt != null) {
             wt.refreshPartsList();
         }
-        RepairTab rt = (RepairTab) getTab(MHQTabType.REPAIR_BAY);
+        RepairTab rt = (getRepairBayTab());
         if (rt != null) {
             rt.refreshServicedUnitList();
         }
-    }
-
-    /**
-     * Refreshes the 'funds' display on the GUI.
-     */
-    private void refreshFunds() {
-        Money funds = getCampaign().getFunds();
-        String inDebt = "";
-        if (getCampaign().getFinances().isInDebt()) {
-            // FIXME : Localize
-            inDebt = " <font color='" + ReportingUtilities.getNegativeColor() + "'>(in Debt)</font>";
-        }
-        return "<html><b>" + label + "</b>: " + args[0] + "</html>";
     }
 
     private void refreshTempAsTechs() {

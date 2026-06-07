@@ -62,7 +62,6 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import mekhq.campaign.personnel.Person;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
@@ -340,7 +339,7 @@ public class CurrentLocationTest {
 
 
     /**
-     * Tests for {@link CurrentLocation#newDay(Campaign)}
+     * Tests for {@link CurrentLocation#newDay(Campaign, boolean)}
      */
     @Nested
     class NewDay {
@@ -466,73 +465,6 @@ public class CurrentLocationTest {
             }
         }
     }
-
-    @Nested
-    class PersonChildSerialization {
-
-        @Test
-        void writeToXML_includesPersonIdTagForPersonChild() {
-            when(system.getId()).thenReturn("Outreach");
-            CurrentLocation loc = new CurrentLocation(system, 0.0);
-            Person person = new Person("First", "Last", null, "MERC");
-            person.setParent(loc);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            loc.writeToXML(new PrintWriter(baos, true), 0);
-
-            assertTrue(baos.toString().contains("<personId>" + person.getId() + "</personId>"));
-        }
-
-        @Test
-        void writeToXML_omitsPersonIdWhenNoPersonChildren() {
-            when(system.getId()).thenReturn("Outreach");
-            CurrentLocation loc = new CurrentLocation(system, 0.0);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            loc.writeToXML(new PrintWriter(baos, true), 0);
-
-            assertFalse(baos.toString().contains("personId"));
-        }
-
-        @Test
-        void generateInstanceFromXML_populatesPendingPersonIds() throws Exception {
-            UUID personId = UUID.randomUUID();
-            String xml = "<location><system>Outreach</system><transitTime>0.0</transitTime>"
-                               + "<personId>" + personId + "</personId></location>";
-            Node node = parseXml(xml);
-
-            Campaign mockCampaign = mock(Campaign.class);
-            when(mockCampaign.getSystemById("Outreach")).thenReturn(mock(PlanetarySystem.class));
-
-            CurrentLocation loc = CurrentLocation.generateInstanceFromXML(node, mockCampaign);
-            assertNotNull(loc);
-
-            List<UUID> ids = loc.drainPendingPersonIds();
-            assertEquals(1, ids.size());
-            assertEquals(personId, ids.get(0));
-        }
-
-        @Test
-        void drainPendingPersonIds_clearsListOnSecondCall() throws Exception {
-            UUID personId = UUID.randomUUID();
-            String xml = "<location><system>Outreach</system><transitTime>0.0</transitTime>"
-                               + "<personId>" + personId + "</personId></location>";
-            Node node = parseXml(xml);
-
-            Campaign mockCampaign = mock(Campaign.class);
-            when(mockCampaign.getSystemById("Outreach")).thenReturn(mock(PlanetarySystem.class));
-            CurrentLocation loc = CurrentLocation.generateInstanceFromXML(node, mockCampaign);
-
-            loc.drainPendingPersonIds();
-            assertTrue(loc.drainPendingPersonIds().isEmpty());
-        }
-
-        private Node parseXml(String xml) throws Exception {
-            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
-        }
-    }
-}
 
     @Nested
     class PersonChildSerialization {

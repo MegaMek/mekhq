@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.location;
 
-import static java.lang.Math.max;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -73,10 +71,6 @@ public final class LocationDispatch {
      * <p>Sets {@code eduJourneyTime} on each person.</p>
      *
      * @param people         the students to dispatch; must not be {@code null}
-     * @param academySet     the academy set name; must not be {@code null}
-     * @param academyName    the academy name within the set; must not be {@code null}
-     * @param campusSystemId the ID of the planetary system hosting the campus; must not be {@code null}
-     * @param people      the people to dispatch; must not be {@code null}
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign       the active campaign; must not be {@code null}
      */

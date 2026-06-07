@@ -43,7 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -130,7 +129,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
     protected String name;
     protected int id;
-    private LocationNode locationNode = new LocationNode(this);
 
     /**
      * This is the unitTonnage which needs to be tracked for some parts even when off the unit. Actual tonnage is
@@ -396,11 +394,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     @Override
     public LocationNode getLocationNode() {
         return locationNode;
-    }
-
-    @Override
-    public Set<Part> getPartsAtLocation() {
-        return Set.of(this);
     }
 
     @Override
@@ -2164,16 +2157,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         private PartPersonRef(UUID id) {
             super(id);
         }
-    }
-
-    @Override
-    public LocationNode getLocationNode() {
-        return locationNode;
-    }
-
-    @Override
-    public Set<Part> fetchPartsAtLocation() {
-        return Set.of(this);
     }
 
     public static class PartUnitRef extends Unit {

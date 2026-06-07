@@ -165,6 +165,7 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
@@ -1779,7 +1780,9 @@ public class Campaign implements ITechManager, IPlace {
             if (location == mainLocation) {
                 return false;
             }
-            if (!location.fetchPersonnelAtLocation().isEmpty()) {
+            if (!location.fetchPersonnelAtLocation().isEmpty() ||
+                      !location.fetchPartsAtLocation().isEmpty() ||
+                      !location.fetchUnitsAtLocation().isEmpty()) {
                 return false;
             }
             if (location instanceof CurrentLocation) {
