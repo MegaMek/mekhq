@@ -172,7 +172,7 @@ public class SVArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        return campaign.getWarehouse()
+        return getWarehouse()
                      .streamSpareParts()
                      .filter(this::isSameSVArmorPart)
                      .mapToInt(part -> ((SVArmor) part).getAmount())
@@ -181,7 +181,7 @@ public class SVArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        SVArmor armor = (SVArmor) campaign.getWarehouse()
+        SVArmor armor = (SVArmor) getWarehouse()
                                         .findSparePart(part -> isSamePartType(part) &&
                                                                      part.isPresent() &&
                                                                      Objects.equals(getRefitUnit(),
@@ -191,7 +191,7 @@ public class SVArmor extends Armor {
             int amountRemaining = armor.getAmount() + amount;
             armor.setAmount(amountRemaining);
             if (armor.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(armor);
+                getWarehouse().removePart(armor);
                 return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {

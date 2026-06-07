@@ -52,6 +52,7 @@ import static megamek.common.units.UnitType.TANK;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
@@ -568,7 +569,7 @@ public class AtBContract extends Contract {
                 String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
                       regardMultiplier, getLength());
                 if (report != null) {
-                    campaign.addReport(GENERAL, report);
+                    campaign.addReport(POLITICS, report);
                 }
             }
         }
@@ -2285,9 +2286,9 @@ public class AtBContract extends Contract {
                 // Removing this check will break things, see the other comments.
                 continue;
             }
-            // TODO implement getGBV(int index) in UnitTable to simplify this?
+
             // getMekSummary(int index) is NULL for salvage.
-            int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
+            int genericBattleValue = unitTable.getMekSummary(i).getGenericBattleValue();
             int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
 
             totalBattleValue += battleValue * weight;
