@@ -223,51 +223,6 @@
 
     <!-- GUNNERY SPA -->
     <ability>
-        <lookupName>gunnery_ballistic</lookupName>
-        <xpCost>100</xpCost>
-        <weight>1</weight>
-        <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
-        <skillPrereq>
-            <skill>Gunnery/Mek::Green</skill>
-            <skill>Gunnery/ProtoMek::Green</skill>
-            <skill>Gunnery/Aircraft::Green</skill>
-            <skill>Gunnery/Aerospace::Green</skill>
-            <skill>Gunnery/Spacecraft::Green</skill>
-            <skill>Gunnery/BattleArmor::Green</skill>
-            <skill>Gunnery/Vehicle::Green</skill>
-        </skillPrereq>
-    </ability>
-    <ability>
-        <lookupName>gunnery_missile</lookupName>
-        <xpCost>100</xpCost>
-        <weight>1</weight>
-        <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
-        <skillPrereq>
-            <skill>Gunnery/Mek::Green</skill>
-            <skill>Gunnery/ProtoMek::Green</skill>
-            <skill>Gunnery/Aircraft::Green</skill>
-            <skill>Gunnery/Aerospace::Green</skill>
-            <skill>Gunnery/Spacecraft::Green</skill>
-            <skill>Gunnery/BattleArmor::Green</skill>
-            <skill>Gunnery/Vehicle::Green</skill>
-        </skillPrereq>
-    </ability>
-    <ability>
-        <lookupName>gunnery_laser</lookupName>
-        <xpCost>100</xpCost>
-        <weight>1</weight>
-        <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
-        <skillPrereq>
-            <skill>Gunnery/Mek::Green</skill>
-            <skill>Gunnery/ProtoMek::Green</skill>
-            <skill>Gunnery/Aircraft::Green</skill>
-            <skill>Gunnery/Aerospace::Green</skill>
-            <skill>Gunnery/Spacecraft::Green</skill>
-            <skill>Gunnery/BattleArmor::Green</skill>
-            <skill>Gunnery/Vehicle::Green</skill>
-        </skillPrereq>
-    </ability>
-    <ability>
         <lookupName>cluster_hitter</lookupName>
         <xpCost>100</xpCost>
         <weight>3</weight>
