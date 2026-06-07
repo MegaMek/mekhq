@@ -116,6 +116,13 @@ public class MarketsTab {
       private static final int CHECKBOX_GRID_COLUMNS = 2;
       private static final int REMOVAL_TARGET_GRID_COLUMNS = 2;
       private static final int CONTRACT_PAY_OPTION_INDENT = 24;
+      // The contract-pay option panels are indented under their radio-button headers,
+      // which would otherwise push their
+      // control column right of the Market Rules section's control column. Shrinking
+      // their label column by the indent
+      // keeps the indent (the visual nesting) while landing the control column at the
+      // same x as Market Rules.
+      private static final int CONTRACT_PAY_LABEL_COLUMN_WIDTH = FORM_LABEL_COLUMN_WIDTH - CONTRACT_PAY_OPTION_INDENT;
 
       private final Campaign campaign;
       private final CampaignOptions campaignOptions;
@@ -853,8 +860,8 @@ public class MarketsTab {
             // Layout the Panel
             final CampaignOptionsFormPanel equipmentValuePanel = new CampaignOptionsFormPanel(
                         "ContractPayPanelValuePercent",
-                        FORM_LABEL_COLUMN_WIDTH,
-                        FORM_CONTROL_COLUMN_WIDTH);
+                    CONTRACT_PAY_LABEL_COLUMN_WIDTH,
+                                FORM_CONTROL_COLUMN_WIDTH);
             equipmentValuePanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
                         chkEquipContractSaleValue,
                         chkUseAlternatePaymentMode,
@@ -867,8 +874,8 @@ public class MarketsTab {
 
             final CampaignOptionsFormPanel personnelPayPanel = new CampaignOptionsFormPanel(
                         "ContractPayPersonnelPanel",
-                        FORM_LABEL_COLUMN_WIDTH,
-                        FORM_CONTROL_COLUMN_WIDTH);
+                    CONTRACT_PAY_LABEL_COLUMN_WIDTH,
+                                FORM_CONTROL_COLUMN_WIDTH);
             personnelPayPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
                         chkBLCSaleValue,
                         useInfantryDoseNotCountBox,

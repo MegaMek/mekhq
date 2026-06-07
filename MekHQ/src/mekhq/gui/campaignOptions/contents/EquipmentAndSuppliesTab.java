@@ -42,6 +42,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -88,6 +89,16 @@ public class EquipmentAndSuppliesTab {
     private static final int AUTO_LOGISTICS_PAIRS_PER_ROW = 2;
     private static final int MODIFIER_ROW_LABEL_COLUMN_WIDTH = 120;
     private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
+
+    /**
+     * Label-column width for the Acquisition tab's single-control sections
+     * (Acquisitions, Deliveries). It is computed
+     * at runtime from the AutoLogistics grid (see
+     * {@link #createAutoLogisticsPanel()}) so those sections' control
+     * column lines up with the grid's second label column. Until then it falls back
+     * to the standard label width.
+     */
+    private int acquisitionSectionLabelWidth = EQUIPMENT_LABEL_COLUMN_WIDTH;
 
     private final CampaignOptions campaignOptions;
     private EquipmentAndSuppliesOptionsModel model;
@@ -346,8 +357,12 @@ public class EquipmentAndSuppliesTab {
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab", imageAddress);
 
-        pnlAcquisitions = createAcquisitionPanel();
+        // Build AutoLogistics first: it measures its grid and sets
+        // acquisitionSectionLabelWidth, which the
+        // Acquisitions and Deliveries sections then use so their control column aligns
+        // with the grid's second column.
         pnlAutoLogistics = createAutoLogisticsPanel();
+        pnlAcquisitions = createAcquisitionPanel();
         JPanel pnlDelivery = createDeliveryPanel();
         acquisitionPageCreated = true;
         updateAcquisitionControlsFromModel();
@@ -409,8 +424,8 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AcquisitionPanel",
-              EQUIPMENT_LABEL_COLUMN_WIDTH,
-              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+                acquisitionSectionLabelWidth,
+                      EQUIPMENT_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblChoiceAcquireSkill, choiceAcquireSkill);
         panel.addCheckBox(chkUseFunctionalAppraisal);
         panel.addRow(lblProcurementPersonnelPick, cboProcurementPersonnelPick);
@@ -432,8 +447,8 @@ public class EquipmentAndSuppliesTab {
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
 
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeliveryPanel",
-              EQUIPMENT_LABEL_COLUMN_WIDTH,
-              EQUIPMENT_CONTROL_COLUMN_WIDTH);
+                acquisitionSectionLabelWidth,
+                      EQUIPMENT_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblTransitTimeUnits, choiceTransitTimeUnits);
         panel.addCheckBox(chkNoDeliveriesInTransit);
 
@@ -531,7 +546,55 @@ public class EquipmentAndSuppliesTab {
               lblAutoLogisticsWeapons, spnAutoLogisticsWeapons,
               lblAutoLogisticsOther, spnAutoLogisticsOther);
 
+        // Compute where this grid's second label column (the "third column") begins, so
+        // the single-control sections
+        // can size their label column to match and line their control column up with
+        // it. With two pairs per row the
+        // left pair occupies columns 0 (label) and 1 (spinner); the second pair's label
+        // begins after both, plus the
+        // inter-pair gap. addRowGrid floors each component at the configured widths, so
+        // we measure the realized
+        // (font-scaled) preferred widths of the left pair here, which keeps the
+        // alignment correct at any GUI scale.
+        int firstColumnLabelWidth = widestPreferredWidth(AUTO_LOGISTICS_LABEL_COLUMN_WIDTH,
+                lblAutoLogisticsMekHead,
+                lblAutoLogisticsNonRepairableLocation,
+                lblAutoLogisticsArmor,
+                lblAutoLogisticsActuators,
+                lblAutoLogisticsEngines,
+                lblAutoLogisticsOther);
+        int firstColumnControlWidth = widestPreferredWidth(AUTO_LOGISTICS_CONTROL_COLUMN_WIDTH,
+                spnAutoLogisticsMekHead,
+                spnAutoLogisticsNonRepairableLocation,
+                spnAutoLogisticsArmor,
+                spnAutoLogisticsActuators,
+                spnAutoLogisticsEngines,
+                spnAutoLogisticsOther);
+        // The label's own right padding and the grid label's right padding are equal,
+        // so they cancel; what remains is
+        // the first label column, the first control column, and the inter-pair gap
+        // between them.
+        acquisitionSectionLabelWidth = firstColumnLabelWidth + firstColumnControlWidth
+                + CampaignOptionsFormPanel.GRID_COLUMN_GAP;
+
         return panel;
+    }
+
+    /**
+     * Returns the widest preferred width among the given components, but never less
+     * than {@code floor}.
+     *
+     * @param floor      the minimum width to return
+     * @param components the components to measure
+     *
+     * @return the largest of {@code floor} and the components' preferred widths
+     */
+    private static int widestPreferredWidth(int floor, JComponent... components) {
+        int width = floor;
+        for (JComponent component : components) {
+            width = Math.max(width, component.getPreferredSize().width);
+        }
+        return width;
     }
 
     /**

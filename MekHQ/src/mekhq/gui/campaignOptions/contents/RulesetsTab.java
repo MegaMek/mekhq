@@ -46,6 +46,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -69,6 +70,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -99,6 +101,16 @@ public class RulesetsTab {
         private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
         private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
         private static final int CHECKBOX_GRID_COLUMNS = 2;
+        private static final int FORM_LABEL_CONTROL_GAP = 12;
+        private static final int GRID_CONTROL_COLUMN_WIDTH = 100;
+        // First pair column = label column + the form's label/control gap, so a
+        // two-column grid's column 3 lines up
+        // with the control column of the 2-column form sections on the same page. The
+        // following pair is narrower so the
+        // whole grid still stays within the shared page-width floor (312 + 303 -> 640px
+        // section; column 3 at x=312).
+        private static final int GRID_FIRST_PAIR_COLUMN_WIDTH = FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP;
+        private static final int GRID_FOLLOWING_PAIR_COLUMN_WIDTH = 303;
 
     private final CampaignOptions campaignOptions;
     private RulesetsOptionsModel model;
@@ -683,13 +695,22 @@ public class RulesetsTab {
     }
 
     private JPanel createStratConMoralePanel() {
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConMoralePanel",
-                FORM_LABEL_COLUMN_WIDTH,
-                FORM_CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblMoraleDecisiveVictory, spnMoraleDecisiveVictory);
-        panel.addRow(lblMoraleVictory, spnMoraleVictory);
-        panel.addRow(lblMoraleDefeat, spnMoraleDefeat);
-        panel.addRow(lblMoraleDecisiveDefeat, spnMoraleDecisiveDefeat);
+        // A generic 4-column (label/control, label/control) aligned grid: the two
+        // victory modifiers sit on the top
+        // row and the two defeat modifiers on the bottom row. Reuses the shared
+        // paired-grid widths so the grid's third
+        // column lines up with the control column of the 2-column sections elsewhere on
+        // this page.
+        final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel("StratConMoralePanel",
+                GRID_FIRST_PAIR_COLUMN_WIDTH,
+                GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
+                GRID_CONTROL_COLUMN_WIDTH,
+                2);
+        JComponent[] labels = { lblMoraleDecisiveVictory, lblMoraleVictory,
+                lblMoraleDefeat, lblMoraleDecisiveDefeat };
+        JComponent[] controls = { spnMoraleDecisiveVictory, spnMoraleVictory,
+                spnMoraleDefeat, spnMoraleDecisiveDefeat };
+        panel.addPairs(labels, controls);
 
         return panel;
     }

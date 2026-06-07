@@ -81,7 +81,15 @@ public class CampaignOptionsFormPanel extends JPanel {
 
     private static final int LABEL_RIGHT_PADDING = 12;
     private static final int ROW_VERTICAL_PADDING = 5;
-    private static final int CHECK_BOX_COLUMN_GAP = 32;
+    /**
+     * Horizontal gap, in pixels, between adjacent columns in a grid layout: between
+     * label/control pairs in
+     * {@link #addRowGrid} and between checkbox columns in {@link #addCheckBoxGrid}.
+     * Exposed so a section that mixes a
+     * paired grid with single-control rows can line its control column up with one
+     * of the grid's later columns.
+     */
+    public static final int GRID_COLUMN_GAP = 32;
 
     private final int labelWidth;
     private final int controlWidth;
@@ -270,7 +278,7 @@ public class CampaignOptionsFormPanel extends JPanel {
         if (column == columnCount - 1) {
             return 0;
         }
-        return labelWidth > 0 ? LABEL_RIGHT_PADDING : CHECK_BOX_COLUMN_GAP;
+        return labelWidth > 0 ? LABEL_RIGHT_PADDING : GRID_COLUMN_GAP;
     }
 
     /**
@@ -383,7 +391,7 @@ public class CampaignOptionsFormPanel extends JPanel {
             } else {
                 controlLayout.weightx = 0.0;
                 controlLayout.fill = GridBagConstraints.NONE;
-                controlLayout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, CHECK_BOX_COLUMN_GAP);
+                controlLayout.insets = new Insets(ROW_VERTICAL_PADDING, 0, ROW_VERTICAL_PADDING, GRID_COLUMN_GAP);
             }
             add(control, controlLayout);
         }

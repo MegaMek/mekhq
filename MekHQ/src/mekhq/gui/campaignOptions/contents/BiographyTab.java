@@ -43,7 +43,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1391,10 +1390,17 @@ public class BiographyTab {
                 "DisableAllPortraits"));
 
         // Layout the Panel
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        // BoxLayout (rather than FlowLayout.LEFT) so the first button sits flush at x=0
+        // and lines up with the checkbox
+        // column below; FlowLayout applies its hgap before the first component, which
+        // pushed the buttons ~5px right.
+        JPanel actionPanel = new JPanel();
+        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
         actionPanel.setOpaque(false);
         actionPanel.add(btnEnableAllPortraits);
+        actionPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         actionPanel.add(btnDisableAllPortraits);
+        actionPanel.add(Box.createHorizontalGlue());
 
         JCheckBox[] portraitCheckBoxes = new JCheckBox[personnelRoles.size() + 1];
         int portraitIndex = 0;

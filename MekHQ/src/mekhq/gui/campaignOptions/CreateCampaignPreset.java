@@ -34,14 +34,15 @@ package mekhq.gui.campaignOptions;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -80,6 +81,9 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * @author Justin "Windchild" Bowen
  */
 public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
+    private static final int DESCRIPTION_ROWS = 3;
+    private static final int DESCRIPTION_COLUMNS = 40;
+
     //region Variable Declarations
     private final Campaign campaign;
     private CampaignPreset preset;
@@ -340,18 +344,45 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
+        final int padding = UIUtil.scaleForGUI(5);
+
         final JPanel panel = new JPanel(new GridBagLayout());
         panel.setName("createCampaignPresetPanel");
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(padding, padding, padding, padding);
+        panel.add(createDetailsPanel(), gbc);
 
-        setTxtPresetName(new JTextField(resources.getString("txtPresetName.text")));
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(createStartupPanel(), gbc);
+
+        gbc.gridy++;
+        panel.add(createContinuousPanel(), gbc);
+
+        // Soak up any extra vertical space below the sections (for example when a
+        // remembered window size is taller than
+        // the packed size) so the fixed-height description box does not stretch.
+        gbc.gridy++;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        panel.add(Box.createVerticalGlue(), gbc);
+
+        return panel;
+    }
+
+    private JPanel createDetailsPanel() {
+        setTxtPresetName(new JTextField());
         getTxtPresetName().setToolTipText(resources.getString("txtPresetName.toolTipText"));
         getTxtPresetName().setName("txtPresetName");
+        getTxtPresetName().putClientProperty("JTextField.placeholderText",
+                resources.getString("txtPresetName.text"));
         getTxtPresetName().getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(final DocumentEvent evt) {
@@ -368,22 +399,45 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
                 revalidateAction(null);
             }
         });
-        panel.add(getTxtPresetName(), gbc);
 
-        setTxtPresetDescription(new JTextArea(resources.getString("txtPresetDescription.text")));
+        setTxtPresetDescription(new JTextArea(DESCRIPTION_ROWS, DESCRIPTION_COLUMNS));
         getTxtPresetDescription().setToolTipText(resources.getString("txtPresetDescription.toolTipText"));
         getTxtPresetDescription().setName("txtPresetDescription");
-        getTxtPresetDescription().setEditable(true);
         getTxtPresetDescription().setLineWrap(true);
         getTxtPresetDescription().setWrapStyleWord(true);
-        gbc.gridy++;
-        panel.add(getTxtPresetDescription(), gbc);
+        getTxtPresetDescription().putClientProperty("JTextField.placeholderText",
+                resources.getString("txtPresetDescription.text"));
+
+        final JScrollPane descriptionScrollPane = new JScrollPane(getTxtPresetDescription());
+        descriptionScrollPane.setName("txtPresetDescriptionScrollPane");
+        // Pin the minimum to the 3-row preferred size so a remembered (shorter) window
+        // size can't squash the box below
+        // three lines; the trailing glue in the center pane absorbs any extra height
+        // instead.
+        descriptionScrollPane.setMinimumSize(descriptionScrollPane.getPreferredSize());
+
+        final int padding = UIUtil.scaleForGUI(5);
+        final JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(new TitledBorder(resources.getString("detailsCampaignPresetPanel.title")));
+        panel.setToolTipText(resources.getString("detailsCampaignPresetPanel.toolTipText"));
+        panel.setName("detailsCampaignPresetPanel");
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(padding, padding, padding, padding);
+        panel.add(getTxtPresetName(), gbc);
 
         gbc.gridy++;
-        panel.add(createStartupPanel(), gbc);
-
-        gbc.gridy++;
-        panel.add(createContinuousPanel(), gbc);
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        // Give the description a larger bottom inset so it isn't crammed against the
+        // Preset Details border.
+        gbc.insets = new Insets(padding, padding, UIUtil.scaleForGUI(12), padding);
+        panel.add(descriptionScrollPane, gbc);
 
         return panel;
     }
@@ -555,67 +609,97 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkSpecifyRankSystem().doClick();
 
         // Layout the UI
-        final JPanel panel = new JPanel();
+        final JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(new TitledBorder(resources.getString("startupCampaignPresetPanel.title")));
         panel.setToolTipText(resources.getString("startupCampaignPresetPanel.toolTipText"));
         panel.setName("startupCampaignPresetPanel");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
 
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
+        final int gap = UIUtil.scaleForGUI(4);
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(gap, gap, gap, gap);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        layout.setVerticalGroup(
-              layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getChkSpecifyDate())
-                                    .addComponent(btnDate, Alignment.LEADING))
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getChkSpecifyFaction())
-                                    .addComponent(getComboFaction(), Alignment.LEADING))
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getChkSpecifyPlanet())
-                                    .addComponent(getChkStartingSystemFactionSpecific(), Alignment.LEADING))
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getComboStartingSystem())
-                                    .addComponent(getComboStartingPlanet(), Alignment.LEADING))
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getChkSpecifyRankSystem())
-                                    .addComponent(getComboRankSystem(), Alignment.LEADING))
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(lblContractCount)
-                                    .addComponent(getSpnContractCount(), Alignment.LEADING))
-                    .addComponent(getChkGM())
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getChkSpecifyCompanyGenerationOptions())
-                                    .addComponent(btnCompanyGenerationOptions, Alignment.LEADING))
-        );
+        // Specify Starting Date
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(getChkSpecifyDate(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panel.add(btnDate, gbc);
 
-        layout.setHorizontalGroup(
-              layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getChkSpecifyDate())
-                                    .addComponent(btnDate))
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getChkSpecifyFaction())
-                                    .addComponent(getComboFaction()))
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getChkSpecifyPlanet())
-                                    .addComponent(getChkStartingSystemFactionSpecific()))
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getComboStartingSystem())
-                                    .addComponent(getComboStartingPlanet()))
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getChkSpecifyRankSystem())
-                                    .addComponent(getComboRankSystem()))
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(lblContractCount)
-                                    .addComponent(getSpnContractCount()))
-                    .addComponent(getChkGM())
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getChkSpecifyCompanyGenerationOptions())
-                                    .addComponent(btnCompanyGenerationOptions))
-        );
+        // Specify Starting Faction
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(getChkSpecifyFaction(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(getComboFaction(), gbc);
+
+        // Specify Starting Planet
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(getChkSpecifyPlanet(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panel.add(getChkStartingSystemFactionSpecific(), gbc);
+
+        // Starting System / Planet
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(getComboStartingSystem(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panel.add(getComboStartingPlanet(), gbc);
+
+        // Specify Rank System
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(getChkSpecifyRankSystem(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(getComboRankSystem(), gbc);
+
+        // Starting Contract Count
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(lblContractCount, gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(getSpnContractCount(), gbc);
+
+        // Start as GM
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(getChkGM(), gbc);
+        gbc.gridwidth = 1;
+
+        // Specify Company Generation Options
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        panel.add(getChkSpecifyCompanyGenerationOptions(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(btnCompanyGenerationOptions, gbc);
 
         return panel;
     }
@@ -642,31 +726,47 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getChkSpecifyCampaignOptions().setSelected(true);
 
         // Layout the UI
-        final JPanel panel = new JPanel();
+        final JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(new TitledBorder(resources.getString("continuousCampaignPresetPanel.title")));
         panel.setToolTipText(resources.getString("continuousCampaignPresetPanel.toolTipText"));
         panel.setName("continuousCampaignPresetPanel");
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
 
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
+        final int gap = UIUtil.scaleForGUI(4);
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(gap, gap, gap, gap);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        layout.setVerticalGroup(
-              layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                    .addComponent(getChkSpecifyGameOptions())
-                                    .addComponent(btnGameOptions, Alignment.LEADING))
-                    .addComponent(getChkSpecifyCampaignOptions())
-        );
+        // Specify MegaMek Game Options
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(getChkSpecifyGameOptions(), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(btnGameOptions, gbc);
 
-        layout.setHorizontalGroup(
-              layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                                    .addComponent(getChkSpecifyGameOptions())
-                                    .addComponent(btnGameOptions))
-                    .addComponent(getChkSpecifyCampaignOptions())
-        );
+        // Specify Campaign Options
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        panel.add(getChkSpecifyCampaignOptions(), gbc);
+        gbc.gridwidth = 1;
+
+        // Reserve the same first-column width as the Startup panel (whose column 0 is
+        // driven by its longest checkbox)
+        // so the Game Options button lines up with the Company Generation Options
+        // button above it. The Startup panel is
+        // built first, so this measures that checkbox's actual (font-scaled) rendered
+        // width rather than guessing.
+        final int startupFirstColumnWidth = getChkSpecifyCompanyGenerationOptions().getPreferredSize().width;
+        final GridBagConstraints strutLayout = new GridBagConstraints();
+        strutLayout.gridx = 0;
+        strutLayout.gridy = gbc.gridy + 1;
+        strutLayout.insets = new Insets(0, gap, 0, gap);
+        panel.add(Box.createHorizontalStrut(startupFirstColumnWidth), strutLayout);
 
         return panel;
     }
@@ -675,6 +775,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         getOkButton().setEnabled(false);
+        getRootPane().setDefaultButton(getOkButton());
         restoreComboStartingSystem();
         final Faction faction = (getPreset() == null) || (getPreset().getFaction() == null)
                                       ? getCampaign().getFaction() : getPreset().getFaction();
@@ -695,6 +796,20 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             getSpnContractCount().setValue(getPreset().getContractCount());
         }
         getChkGM().setSelected((getPreset() == null) ? getCampaign().isGM() : getPreset().isGM());
+
+        // pack() in the parent can leave the dialog a touch short, clipping the bottom
+        // of the Continuous Options
+        // border. Grow to the preferred height plus a small margin - without shrinking
+        // a larger remembered size - and
+        // enforce that as the minimum so the whole layout is visible by default. The
+        // target is based on the preferred
+        // (layout) size, not the current size, so reopening does not let it creep
+        // larger each time.
+        final Dimension preferredSize = getPreferredSize();
+        final Dimension defaultSize = new Dimension(preferredSize.width,
+                preferredSize.height + UIUtil.scaleForGUI(20));
+        setMinimumSize(defaultSize);
+        setSize(Math.max(getWidth(), defaultSize.width), Math.max(getHeight(), defaultSize.height));
     }
 
     @Override
@@ -717,17 +832,17 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         final int gap = UIUtil.scaleForGUI(8);
         final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, gap, gap));
 
-        setOkButton(new JButton(resources.getString("Ok.text")));
-        getOkButton().setName("okButton");
-        getOkButton().setToolTipText(resources.getString("Ok.toolTipText"));
-        getOkButton().addActionListener(this::okButtonActionPerformed);
-        panel.add(getOkButton());
-
         final JButton validateButton = new JButton(resources.getString("Validate.text"));
         validateButton.setName("validateButton");
         validateButton.setToolTipText(resources.getString("Validate.toolTipText"));
         validateButton.addActionListener(this::validateButtonActionPerformed);
         panel.add(validateButton);
+
+        setOkButton(new JButton(resources.getString("Ok.text")));
+        getOkButton().setName("okButton");
+        getOkButton().setToolTipText(resources.getString("Ok.toolTipText"));
+        getOkButton().addActionListener(this::okButtonActionPerformed);
+        panel.add(getOkButton());
 
         final JButton cancelButton = new JButton(resources.getString("Cancel.text"));
         cancelButton.setName("cancelButton");

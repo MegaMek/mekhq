@@ -37,12 +37,15 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -150,8 +153,8 @@ public class SkillPrerequisitesDialog extends JDialog {
         JPanel topPanel = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(8)));
         topPanel.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10),
                 UIUtil.scaleForGUI(10),
-                0,
-                UIUtil.scaleForGUI(10)));
+                UIUtil.scaleForGUI(8),
+                        UIUtil.scaleForGUI(10)));
         topPanel.add(hint, BorderLayout.NORTH);
         topPanel.add(toolbar, BorderLayout.SOUTH);
         return topPanel;
@@ -217,11 +220,34 @@ public class SkillPrerequisitesDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(evt -> dispose());
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING,
-                UIUtil.scaleForGUI(4),
-                UIUtil.scaleForGUI(8)));
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
+        // GridBagLayout (rather than a trailing FlowLayout) lets the trailing margin
+        // exactly match the list wrapper's
+        // horizontal inset, so Cancel's right edge lines up with the list's right
+        // border. The top inset reuses the
+        // same gap the list has above it, keeping the spacing above and below the list
+        // symmetric.
+        int margin = UIUtil.scaleForGUI(10);
+        int topGap = UIUtil.scaleForGUI(8);
+        int buttonGap = UIUtil.scaleForGUI(4);
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(topGap, margin, margin, margin));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonPanel.add(Box.createHorizontalGlue(), gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        buttonPanel.add(okButton, gbc);
+
+        gbc.gridx = 2;
+        gbc.insets = new Insets(0, buttonGap, 0, 0);
+        buttonPanel.add(cancelButton, gbc);
+
         getRootPane().setDefaultButton(okButton);
         return buttonPanel;
     }
