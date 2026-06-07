@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -166,7 +166,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public void remove(boolean salvage) {
         final Unit unit = getUnit();
 
-        campaign.getWarehouse().removePart(this);
+        getWarehouse().removePart(this);
         if (unit != null) {
             unit.removePart(this);
         }
@@ -190,7 +190,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         }
 
         // don't just return with the first part if it is damaged
-        return campaign.getWarehouse()
+        return getWarehouse()
                      .streamSpareParts()
                      .filter(MissingPart::isAvailableAsReplacement)
                      .filter(p -> !p.isUsedForRefitPlanning() || !refit)
