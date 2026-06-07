@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -180,7 +180,7 @@ public class LFBattery extends Part {
             // you can't salvage and keep this in the warehouse, just remove/scrap and
             // replace it
             // See SO p130 for reference
-            campaign.getWarehouse().removePart(this);
+            getWarehouse().removePart(this);
             unit.removePart(this);
             Part missing = getMissingPart();
             unit.addPart(missing);

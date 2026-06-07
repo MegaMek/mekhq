@@ -34,6 +34,34 @@
 
 package mekhq.gui.menus;
 
+import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.xml.parsers.DocumentBuilder;
+
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.CopySystemDataAction;
@@ -57,6 +85,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -84,9 +113,6 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.CampaignGuiTab;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.GUI;
-import mekhq.gui.HangarTab;
-import mekhq.gui.PersonnelTab;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -101,33 +127,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.UIManager;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.xml.parsers.DocumentBuilder;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 
 public class MekHQMenuBar extends JMenuBar {
 
@@ -176,7 +175,17 @@ public class MekHQMenuBar extends JMenuBar {
         super();
         this.app = app;
         this.gui = gui;
-        initMenu();
+
+        getAccessibleContext().setAccessibleName("Main Menu");
+
+        add(initFileMenu());
+        add(initMarketMenu());
+        add(initReportsMenu());
+        add(initViewMenu());
+        add(initManageCampaignMenu());
+        add(initHelpMenu());
+
+        MekHQ.registerHandler(this);
     }
 
     private MekHQ getApplication() {
@@ -199,14 +208,12 @@ public class MekHQMenuBar extends JMenuBar {
         return getGui().getTabMain();
     }
 
-    private void initMenu() {
+    /**
+     * The File menu uses the following Mnemonic keys as of 25-MAR-2022:
+     * C, E, H, I, L, M, N, R, S, T, U, X
+     */
+    private JMenu initFileMenu() {
         // TODO : Implement "Export All" versions for Personnel and Parts
-        // See the JavaDoc comment for used mnemonic keys
-        getAccessibleContext().setAccessibleName("Main Menu");
-
-        // region File Menu
-        // The File menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // C, E, H, I, L, M, N, R, S, T, U, X
         JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text"));
         menuFile.setMnemonic(KeyEvent.VK_F);
 
@@ -226,6 +233,7 @@ public class MekHQMenuBar extends JMenuBar {
                 }
             }
             MekHQ.unregisterHandler(this);
+            MekHQ.unregisterHandler(getGui());
             // check for a loaded story arc and unregister that handler as well
             if (null != getCampaign().getStoryArc()) {
                 MekHQ.unregisterHandler(getCampaign().getStoryArc());
@@ -245,9 +253,61 @@ public class MekHQMenuBar extends JMenuBar {
         menuNew.addActionListener(evt -> handleInAppNewCampaign());
         menuFile.add(menuNew);
 
-        // region menuImport
-        // The Import menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // A, C, F, I, P
+        menuFile.add(initImportMenu());
+        menuFile.add(initExportMenu());
+        menuFile.add(initRefreshMenu());
+
+        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
+        menuOptions.setMnemonic(KeyEvent.VK_C);
+        menuOptions.addActionListener(this::menuOptionsActionPerformed);
+        menuFile.add(menuOptions);
+
+        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
+        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
+        miMHQOptions.setName("miMHQOptions");
+        miMHQOptions.setMnemonic(KeyEvent.VK_H);
+        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        menuFile.add(miMHQOptions);
+
+        final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
+        miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
+        miGameOptions.setName("miGameOptions");
+        miGameOptions.setMnemonic(KeyEvent.VK_M);
+        miGameOptions.addActionListener(evt -> {
+            final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
+            god.setEditable(true);
+            if (god.showDialog().isConfirmed()) {
+                getCampaign().setGameOptions(god.getOptions());
+                getGui().refreshWindowTitle();
+            }
+        });
+        menuFile.add(miGameOptions);
+
+        final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
+        miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
+        miMMClientOptions.setName("miMMClientOptions");
+        miMMClientOptions.setMnemonic(KeyEvent.VK_O);
+        miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(getFrame(), null).setVisible(true));
+        menuFile.add(miMMClientOptions);
+
+        menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
+        menuThemes.setMnemonic(KeyEvent.VK_T);
+        refreshThemeChoices();
+        menuFile.add(menuThemes);
+
+        JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
+        menuExitItem.setMnemonic(KeyEvent.VK_E);
+        menuExitItem.addActionListener(evt -> getApplication().exit(true));
+        menuFile.add(menuExitItem);
+
+        return menuFile;
+    }
+
+    /**
+     * The Import menu uses the following Mnemonic keys as of 25-MAR-2022:
+     * A, C, F, I, P
+     */
+    private JMenu initImportMenu() {
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text"));
         menuImport.setMnemonic(KeyEvent.VK_I);
 
@@ -275,76 +335,44 @@ public class MekHQMenuBar extends JMenuBar {
         miLoadForces.addActionListener(evt -> loadListFile(true));
         menuImport.add(miLoadForces);
 
-        menuFile.add(menuImport);
-        // endregion menuImport
+        return menuImport;
+    }
 
-        // region menuExport
-        // The Export menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // C, X, S
+    /**
+     * The Export menu uses the following Mnemonic keys as of 25-MAR-2022:
+     * C, X, S
+     * The CSV menu uses the following Mnemonic keys as of 25-MAR-2022:
+     * F, P, U
+     * The XML menu uses the following Mnemonic keys as of 25-MAR-2022:
+     * C, I, P, R
+     */
+    private JMenu initExportMenu() {
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text"));
         menuExport.setMnemonic(KeyEvent.VK_X);
 
         // region CSV Export
-        // The CSV menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // F, P, U
         JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text"));
         miExportCSVFile.setMnemonic(KeyEvent.VK_C);
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonnel.text"));
         miExportPersonCSV.setMnemonic(KeyEvent.VK_P);
-        miExportPersonCSV.addActionListener(evt -> {
-            try {
-                exportPersonnel(FileType.CSV,
-                      resourceMap.getString("dlgSavePersonnelCSV.text"),
-                      getCampaign().getLocalDate()
-                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())) + "_ExportedPersonnel");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
+        miExportPersonCSV.addActionListener(evt -> exportPersonnel());
         miExportCSVFile.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnit.text"));
         miExportUnitCSV.setMnemonic(KeyEvent.VK_U);
-        miExportUnitCSV.addActionListener(evt -> {
-            try {
-                exportUnits(FileType.CSV,
-                      resourceMap.getString("dlgSaveUnitsCSV.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedUnits");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
+        miExportUnitCSV.addActionListener(evt -> exportUnits());
         miExportCSVFile.add(miExportUnitCSV);
 
         JMenuItem miExportFinancesCSV = new JMenuItem(resourceMap.getString("miExportFinances.text"));
         miExportFinancesCSV.setMnemonic(KeyEvent.VK_F);
-        miExportFinancesCSV.addActionListener(evt -> {
-            try {
-                exportFinances(FileType.CSV,
-                      resourceMap.getString("dlgSaveFinancesCSV.text"),
-                      getCampaign().getName() +
-                            getCampaign().getLocalDate()
-                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                            "_ExportedFinances");
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        });
+        miExportFinancesCSV.addActionListener(evt -> exportFinances());
         miExportCSVFile.add(miExportFinancesCSV);
 
         menuExport.add(miExportCSVFile);
         // endregion CSV Export
 
         // region XML Export
-        // The XML menu uses the following Mnemonic keys as of 25-MAR-2022:
-        // C, I, P, R
         JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text"));
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
 
@@ -392,12 +420,14 @@ public class MekHQMenuBar extends JMenuBar {
         });
         menuExport.add(miExportCampaignSubset);
 
-        menuFile.add(menuExport);
-        // endregion menuExport
+        return menuExport;
+    }
 
-        // region Menu Refresh
-        // The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
-        // A, C, D, F, P, R, U
+    /**
+     * The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
+     * A, C, D, F, P, R, U
+     */
+    private JMenu initRefreshMenu() {
         JMenu menuRefresh = new JMenu(resourceMap.getString("menuRefresh.text"));
         menuRefresh.setMnemonic(KeyEvent.VK_R);
 
@@ -465,58 +495,14 @@ public class MekHQMenuBar extends JMenuBar {
         miRefreshFinancialInstitutions.addActionListener(evt -> FinancialInstitutions.initializeFinancialInstitutions());
         menuRefresh.add(miRefreshFinancialInstitutions);
 
-        menuFile.add(menuRefresh);
-        // endregion Menu Refresh
+        return menuRefresh;
+    }
 
-        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text"));
-        menuOptions.setMnemonic(KeyEvent.VK_C);
-        menuOptions.addActionListener(this::menuOptionsActionPerformed);
-        menuFile.add(menuOptions);
-
-        final JMenuItem miMHQOptions = new JMenuItem(resourceMap.getString("miMHQOptions.text"));
-        miMHQOptions.setToolTipText(resourceMap.getString("miMHQOptions.toolTipText"));
-        miMHQOptions.setName("miMHQOptions");
-        miMHQOptions.setMnemonic(KeyEvent.VK_H);
-        miMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
-        menuFile.add(miMHQOptions);
-
-        final JMenuItem miGameOptions = new JMenuItem(resourceMap.getString("miGameOptions.text"));
-        miGameOptions.setToolTipText(resourceMap.getString("miGameOptions.toolTipText"));
-        miGameOptions.setName("miGameOptions");
-        miGameOptions.setMnemonic(KeyEvent.VK_M);
-        miGameOptions.addActionListener(evt -> {
-            final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
-            god.setEditable(true);
-            if (god.showDialog().isConfirmed()) {
-                getCampaign().setGameOptions(god.getOptions());
-                getGui().refreshWindowTitle();
-            }
-        });
-        menuFile.add(miGameOptions);
-
-        final JMenuItem miMMClientOptions = new JMenuItem(resourceMap.getString("miMMClientOptions.text"));
-        miMMClientOptions.setToolTipText(resourceMap.getString("miMMClientOptions.toolTipText"));
-        miMMClientOptions.setName("miMMClientOptions");
-        miMMClientOptions.setMnemonic(KeyEvent.VK_O);
-        miMMClientOptions.addActionListener(evt -> new CommonSettingsDialog(getFrame(), null).setVisible(true));
-        menuFile.add(miMMClientOptions);
-
-        menuThemes = new JMenu(resourceMap.getString("menuThemes.text"));
-        menuThemes.setMnemonic(KeyEvent.VK_T);
-        refreshThemeChoices();
-        menuFile.add(menuThemes);
-
-        JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
-        menuExitItem.setMnemonic(KeyEvent.VK_E);
-        menuExitItem.addActionListener(evt -> getApplication().exit(true));
-        menuFile.add(menuExitItem);
-
-        add(menuFile);
-        // endregion File Menu
-
-        // region Marketplace Menu
-        // The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
-        // A, B, C, H, M, N, P, R, S, U
+    /**
+     * The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
+     * A, B, C, H, M, N, P, R, S, U
+     */
+    private JMenu initMarketMenu() {
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
@@ -600,7 +586,18 @@ public class MekHQMenuBar extends JMenuBar {
         menuRecruitment.add(menuCivilianRecruitment);
         menuMarket.add(menuRecruitment);
 
-        // region Temp Pool
+        menuMarket.add(initTempPoolMenu());
+
+        return menuMarket;
+    }
+
+    /**
+     * The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
+     * B, E, F, H
+     * The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
+     * B, E, H, R
+     */
+    private JMenu initTempPoolMenu() {
         JMenu menuTempPool = new JMenu(resourceMap.getString("menuTempPool.text"));
 
         JMenuItem miTempPoolFullStrength = new JMenuItem(resourceMap.getString("miTempPoolFullStrength.text"));
@@ -645,8 +642,6 @@ public class MekHQMenuBar extends JMenuBar {
         menuTempPool.addSeparator();
 
         // region Astech Pool
-        // The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
-        // B, E, F, H
         JMenu menuAstechPool = new JMenu(resourceMap.getString("menuAstechPool.text"));
         menuAstechPool.setMnemonic(KeyEvent.VK_A);
 
@@ -710,8 +705,6 @@ public class MekHQMenuBar extends JMenuBar {
         // endregion Astech Pool
 
         // region Medic Pool
-        // The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
-        // B, E, H, R
         JMenu menuMedicPool = new JMenu(resourceMap.getString("menuMedicPool.text"));
         menuMedicPool.setMnemonic(KeyEvent.VK_M);
 
@@ -833,17 +826,15 @@ public class MekHQMenuBar extends JMenuBar {
               "miHireVesselCrew.text", "popupHireVesselCrewNum.text",
               "miFireVesselCrew.text", "popupFireVesselCrewNum.text",
               "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
-        // endregion Blob Crew Pools
 
-        menuMarket.add(menuTempPool);
-        // endregion Temp Pool
+        return menuTempPool;
+    }
 
-        add(menuMarket);
-        // endregion Marketplace Menu
-
-        // region Reports Menu
-        // The Reports menu uses the following Mnemonic keys as of 19-March-2020:
-        // C, H, P, T, U
+    /**
+     * The Reports menu uses the following Mnemonic keys as of 19-March-2020:
+     * C, H, P, T, U
+     */
+    private JMenu initReportsMenu() {
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text"));
         menuReports.setMnemonic(KeyEvent.VK_E);
 
@@ -877,12 +868,14 @@ public class MekHQMenuBar extends JMenuBar {
               new CargoReport(getCampaign())).setVisible(true));
         menuReports.add(miCargoReport);
 
-        add(menuReports);
-        // endregion Reports Menu
+        return menuReports;
+    }
 
-        // region View Menu
-        // The View menu uses the following Mnemonic keys as of 02-June-2020:
-        // H, R
+    /**
+     * The View menu uses the following Mnemonic keys as of 02-June-2020:
+     * H, R
+     */
+    private JMenu initViewMenu() {
         JMenu menuView = new JMenu(resourceMap.getString("menuView.text"));
         menuView.setMnemonic(KeyEvent.VK_V);
 
@@ -908,10 +901,10 @@ public class MekHQMenuBar extends JMenuBar {
         miAwardEligibilityDialog.addActionListener(evt -> showAwardEligibilityDialog());
         menuView.add(miAwardEligibilityDialog);
 
-        add(menuView);
-        // endregion View Menu
+        return menuView;
+    }
 
-        // region Manage Campaign Menu
+    private JMenu initManageCampaignMenu() {
         JMenu menuManage = new JMenu(resourceMap.getString("menuManageCampaign.text"));
         menuManage.setMnemonic(KeyEvent.VK_C);
         menuManage.setName("manageMenu");
@@ -959,12 +952,14 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuManage.add(miAutoResolveBehaviorEditor);
 
-        add(menuManage);
-        // endregion Manage Campaign Menu
+        return menuManage;
+    }
 
-        // region Help Menu
-        // The Help menu uses the following Mnemonic keys as of 19-March-2020:
-        // A
+    /**
+     * The Help menu uses the following Mnemonic keys as of 19-March-2020:
+     * A
+     */
+    private JMenu initHelpMenu() {
         JMenu menuHelp = new JMenu(resourceMap.getString("menuHelp.text"));
         menuHelp.setMnemonic(KeyEvent.VK_SLASH);
         menuHelp.setName("helpMenu");
@@ -986,10 +981,7 @@ public class MekHQMenuBar extends JMenuBar {
         menuAboutItem.addActionListener(evt -> new MekHQAboutDialog(getFrame()).show());
         menuHelp.add(menuAboutItem);
 
-        add(menuHelp);
-        // endregion Help Menu
-
-        MekHQ.registerHandler(this);
+        return menuHelp;
     }
 
 
@@ -1027,132 +1019,51 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * Exports Personnel to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
+     * Exports Personnel to a CSV file.
      */
-    protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
-        if (((PersonnelTab) getGui().getTab(MHQTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
-            GUI.fileDialogSave(getFrame(),
-                  dialogTitle,
-                  format,
-                  MekHQ.getPersonnelDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getPersonnelDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = Utilities.exportTableToCSV(
-                          ((PersonnelTab) getGui().getTab(MHQTabType.PERSONNEL)).getPersonnelTable(), file);
-                } else {
-                    report = "Unsupported FileType in Export Personnel";
-                }
-                JOptionPane.showMessageDialog(getFrame(), report);
-            });
-        } else {
+    private void exportPersonnel() {
+        if (getGui().getPersonnelTab() == null) {
+            return;
+        }
+        JTable table = getGui().getPersonnelTab().getPersonnelTable();
+        if (table.getRowCount() == 0) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoPersonnel.text"));
+            return;
         }
+        FileDialogs.savePersonnelCSV(getFrame(), getCampaign())
+              .map(file -> Utilities.exportTableToCSV(table, file))
+              .ifPresent(status -> JOptionPane.showMessageDialog(getFrame(), status));
     }
 
     /**
-     * Exports Units to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
+     * Exports Units to a CSV file.
      */
-    protected void exportUnits(FileType format, String dialogTitle, String filename) {
-        if (((HangarTab) getGui().getTab(MHQTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
-            GUI.fileDialogSave(getFrame(),
-                  dialogTitle,
-                  format,
-                  MekHQ.getUnitsDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getUnitsDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = Utilities.exportTableToCSV(
-                          ((HangarTab) getGui().getTab(MHQTabType.HANGAR)).getUnitTable(), file);
-                } else {
-                    report = "Unsupported FileType in Export Units";
-                }
-                JOptionPane.showMessageDialog(getFrame(), report);
-            });
-        } else {
+    private void exportUnits() {
+        if (getGui().getHangarTab() == null) {
+            return;
+        }
+        JTable table = getGui().getHangarTab().getUnitTable();
+        if (table.getRowCount() == 0) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoUnits.text"));
+            return;
         }
+        FileDialogs.saveUnitsCSV(getFrame(), getCampaign())
+              .map(file -> Utilities.exportTableToCSV(table, file))
+              .ifPresent(status -> JOptionPane.showMessageDialog(getFrame(), status));
     }
 
     /**
-     * Exports Finances to a file (CSV, XML, etc.)
-     *
-     * @param format      file format to export to
-     * @param dialogTitle title of the dialog frame
-     * @param filename    file name to save to
+     * Exports Finances to a CSV file.
      */
-    protected void exportFinances(FileType format, String dialogTitle, String filename) {
-        if (!getCampaign().getFinances().getTransactions().isEmpty()) {
-            GUI.fileDialogSave(getFrame(),
-                  dialogTitle,
-                  format,
-                  MekHQ.getFinancesDirectory().getValue(),
-                  filename + '.' + format.getRecommendedExtension()).ifPresent(f -> {
-                MekHQ.getFinancesDirectory().setValue(f.getParent());
-                File file = checkFileEnding(f, format.getRecommendedExtension());
-                checkToBackupFile(file, file.getPath());
-                String report;
-                // TODO add support for xml and json export
-                if (format.equals(FileType.CSV)) {
-                    report = getCampaign().getFinances()
-                                   .exportFinancesToCSV(file.getPath(), format.getRecommendedExtension());
-                } else {
-                    report = "Unsupported FileType in Export Finances";
-                }
-                JOptionPane.showMessageDialog(getFrame(), report);
-            });
-        } else {
+    private void exportFinances() {
+        Finances finances = getCampaign().getFinances();
+        if (finances.getTransactions().isEmpty()) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoFinances.text"));
+            return;
         }
-    }
-
-
-    /**
-     * Checks if a file already exists, if so it makes a backup copy.
-     *
-     * @param file to determine if there is an existing file with that name
-     * @param path path to the file
-     */
-    private void checkToBackupFile(File file, String path) {
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
-    }
-
-    /**
-     * Checks to make sure the file has the appropriate ending / extension.
-     *
-     * @param file   the file to check
-     * @param format proper format for the ending/extension
-     *
-     * @return File with the appropriate ending/ extension
-     */
-    private File checkFileEnding(File file, String format) {
-        String path = file.getPath();
-        if (!path.endsWith('.' + format)) {
-            path += '.' + format;
-            file = new File(path);
-        }
-        return file;
+        FileDialogs.saveFinancesCSV(getFrame(), getCampaign())
+              .map(file -> finances.exportFinancesToCSV(file.getPath(), FileType.CSV.getRecommendedExtension()))
+              .ifPresent(status -> JOptionPane.showMessageDialog(getFrame(), status));
     }
 
     protected void loadListFile(final boolean allowNewPilots) {
@@ -1315,6 +1226,7 @@ public class MekHQMenuBar extends JMenuBar {
 
         // Unregister other handlers
         MekHQ.unregisterHandler(this);
+        MekHQ.unregisterHandler(getGui());
 
         if (getCampaign().getStoryArc() != null) {
             MekHQ.unregisterHandler(getCampaign().getStoryArc());
