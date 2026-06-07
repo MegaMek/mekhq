@@ -114,6 +114,8 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -164,7 +166,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Unit implements ITechnology {
+public class Unit implements ITechnology, ILocation {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
 
@@ -185,6 +187,7 @@ public class Unit implements ITechnology {
     private boolean salvaged;
     private UUID id;
     private String fluffName;
+    private LocationNode locationNode = new LocationNode(this);
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -7956,5 +7959,13 @@ public class Unit implements ITechnology {
         }
     }
 
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
 
+    @Override
+    public Set<Unit> getUnitsAtLocation() {
+        return Set.of(this);
+    }
 }

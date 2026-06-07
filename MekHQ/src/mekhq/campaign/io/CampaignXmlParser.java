@@ -747,6 +747,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             correctSexualPreferencesForCurrentSpouse(campaign.getPersonnel());
         }
 
+        // Reconnect all persons to the main-force personnel node. Persons whose location was
+        // serialized inside a travel or campus node will be re-parented during reconnectChildren.
+        for (Person person : campaign.getPersonnel()) {
+            person.setParent(campaign.getMainForcePersonnel());
+        }
+
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
@@ -1405,15 +1411,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
-            if (!child.getNodeName().equalsIgnoreCase("location")) {
+            AbstractLocation location = AbstractLocation.generateInstanceFromXML(child, campaign);
+            if (location == null) {
                 continue;
             }
-            AbstractLocation loc = CurrentLocation.generateInstanceFromXML(child, campaign);
             if (first) {
-                campaign.setLocation(loc);
+                campaign.setLocation(location);
                 first = false;
             } else {
-                campaign.addLocation(loc);
+                campaign.addLocation(location);
             }
         }
     }

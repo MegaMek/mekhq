@@ -391,6 +391,7 @@ public class Campaign implements ITechManager, ILocation {
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
+    private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -552,6 +553,11 @@ public class Campaign implements ITechManager, ILocation {
         this.locationNode = new LocationNode(this);
         setLocation(startLocation);
         this.setParent(startLocation);
+        if (startLocation != null) {
+            mainForcePersonnel.setParent(this);
+            units.setParent(this);
+            parts.setParent(this);
+        }
         reputation = reputationController;
         this.factionStandings = factionStandings;
         formations = formation;
@@ -1753,6 +1759,10 @@ public class Campaign implements ITechManager, ILocation {
         return Collections.unmodifiableList(locations);
     }
 
+    public Personnel getMainForcePersonnel() {
+        return mainForcePersonnel;
+    }
+
     /**
      * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
      * firing any associated events or automated behaviors.
@@ -2416,6 +2426,7 @@ public class Campaign implements ITechManager, ILocation {
      */
     public void importPerson(Person person) {
         humanResources.importPerson(person);
+        person.setParent(mainForcePersonnel);
     }
 
     public @Nullable Person getPerson(final UUID id) {
@@ -5541,8 +5552,12 @@ public class Campaign implements ITechManager, ILocation {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
-        for (AbstractLocation loc : locations) {
-            loc.writeToXML(writer, indent);
+        for (AbstractLocation location : locations) {
+            // Skip locations parented to another node — they are serialized inside their parent's XML.
+            if (location.getLocationNode().getParent() != null) {
+                continue;
+            }
+            location.writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
         locationNode.writeToXML(writer, indent);
