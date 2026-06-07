@@ -450,9 +450,8 @@ public class HumanResources {
         int techCount = techs.size();
 
         for (Person person : techs) {
-            boolean hasDoItMyself = person.getOptions().booleanOption(UNOFFICIAL_ILL_DO_IT_MYSELF);
-            if (hasDoItMyself) {
-                techCount -= MHQConstants.AS_TECH_TEAM_SIZE;
+            if (person.getOptions().booleanOption(UNOFFICIAL_ILL_DO_IT_MYSELF)) {
+                techCount--;
             }
         }
 
