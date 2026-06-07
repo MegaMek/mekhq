@@ -203,7 +203,6 @@ public final class LocationDispatch {
      *
      * <p>Sets {@code eduJourneyTime} and resets {@code eduDaysOfTravel} to zero on each person.</p>
      *
-     * @param people   the students to send home; must not be {@code null}
      * @param parts       the parts to dispatch; should all be spare parts; must not be {@code null}
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign the active campaign; must not be {@code null}

@@ -43,7 +43,7 @@ import mekhq.campaign.base.AbstractBase;
 /**
  * Static utilities for reasoning about "same effective location" across the {@link ILocation} tree.
  *
- * <h3>Co-location definition</h3>
+ * <p>Co-location definition</p>
  * Two {@link ILocation} items are <em>co-located</em> when:
  * <ol>
  *   <li>Neither is currently in transit (no active {@link mekhq.campaign.JumpPath} anywhere in
