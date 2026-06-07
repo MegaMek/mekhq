@@ -5982,19 +5982,12 @@ public class Person {
         boolean hasTraumaticPast = options.booleanOption(COMPULSION_TRAUMATIC_PAST);
         boolean hasInForLife = options.booleanOption(FLAW_IN_FOR_LIFE);
         boolean hasDobrowskiSyndrome = options.booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME);
-        boolean hasBelovedPet = options.booleanOption(UNOFFICIAL_BELOVED_PET);
 
         int traumaticPastModifier = hasTraumaticPast ? -1 : 0;
         int inForLifeModifier = hasInForLife ? -1 : 0;
         int dobrowskiModifier = hasDobrowskiSyndrome ? -1 : 0;
-        int hasBelovedPetModifier = hasBelovedPet ? 1 : 0;
 
-        return getEdge() +
-                     -unlucky +
-                     traumaticPastModifier +
-                     inForLifeModifier +
-                     dobrowskiModifier +
-                     hasBelovedPetModifier;
+        return getEdge() - unlucky + traumaticPastModifier + inForLifeModifier + dobrowskiModifier;
     }
 
     public void setEdge(final int edge) {
