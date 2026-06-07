@@ -268,7 +268,11 @@ public final class AutoAssignRankForCompanyGenerator {
      * @author Illiani
      * @since 0.51.0
      */
-    public static void assignAscendingRank(Person person, int startIndex) {
+    public static void assignAscendingRank(@Nullable Person person, int startIndex) {
+        if (person == null) {
+            return;
+        }
+
         int rankIndex = startIndex;
         person.setRank(rankIndex);
 
@@ -301,7 +305,11 @@ public final class AutoAssignRankForCompanyGenerator {
                      rankName.equalsIgnoreCase(MISSING_RANK);
     }
 
-    public static void assignRankSystemFromFaction(Person person, int rankLevel) {
+    public static void assignRankSystemFromFaction(@Nullable Person person, int rankLevel) {
+        if (person == null) {
+            return;
+        }
+
         RankSystem rankSystem = person.getOriginFaction().getRankSystem();
         final RankValidator rankValidator = new RankValidator();
         if (!rankValidator.validate(rankSystem, false)) {

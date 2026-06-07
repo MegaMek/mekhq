@@ -3929,7 +3929,7 @@ public class Campaign implements ITechManager, ILocation {
                     roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
-                        tech.setEdgeUsed(tech.getEdgeUsed() - 1);
+                        tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() - 1);
                     }
                     report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
                 }
@@ -4132,7 +4132,7 @@ public class Campaign implements ITechManager, ILocation {
                 roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
                 // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
-                    tech.setEdgeUsed(tech.getEdgeUsed() + 1);
+                    tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() + 1);
                 }
                 report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " +
                                 roll +

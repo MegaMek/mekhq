@@ -456,23 +456,11 @@ public class FactionCensureEvent {
         PersonnelRole politicalRole = getPoliticalRole();
         Person replacement = campaign.newPerson(primaryRole, politicalRole);
 
-        overrideSkills(false,
-              false,
-              false,
-              isUseArtillery,
-              useExtraRandomness,
-              replacement,
-              primaryRole,
-              VETERAN);
+        boolean checkVeterancyEligibility = true;
+        overrideSkills(campaign, replacement, primaryRole, VETERAN, checkVeterancyEligibility);
 
-        overrideSkills(false,
-              false,
-              false,
-              isUseArtillery,
-              useExtraRandomness,
-              replacement,
-              politicalRole,
-              VETERAN);
+        checkVeterancyEligibility = false;
+        overrideSkills(campaign, replacement, politicalRole, VETERAN, checkVeterancyEligibility);
 
         if (!replacement.hasSkill(S_LEADER)) {
             replacement.addSkill(S_LEADER, randomInt(3) + 1, 0);

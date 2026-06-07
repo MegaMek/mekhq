@@ -115,6 +115,8 @@ public class PersonnelTab {
     private JCheckBox chkUseSupportEdge;
     private JLabel lblEdgeRefreshPeriod;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
+    private JLabel lblEdgeRefreshCost;
+    private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
 
@@ -399,6 +401,8 @@ public class PersonnelTab {
         chkUseSupportEdge = new JCheckBox();
         lblEdgeRefreshPeriod = new JLabel();
         comboEdgeRefreshPeriod = new MMComboBox<>("comboEdgeRefreshPeriod", EdgeRefreshPeriod.values());
+        lblEdgeRefreshCost = new JLabel();
+        spnEdgeRefreshCost = new JSpinner();
         chkUseImplants = new JCheckBox();
         chkUseAlternativeQualityAveraging = new JCheckBox();
 
@@ -529,6 +533,10 @@ public class PersonnelTab {
         });
         comboEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshPeriod"));
 
+        lblEdgeRefreshCost = new CampaignOptionsLabel("EdgeRefreshCost", getMetadata(new Version(0, 51, 0)));
+        lblEdgeRefreshCost.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshCost"));
+        spnEdgeRefreshCost = new CampaignOptionsSpinner("EdgeRefreshCost", 20, 0, 100, 1);
+        spnEdgeRefreshCost.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshCost"));
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
         chkUseImplants.addMouseListener(createTipPanelUpdater(generalHeader, "UseImplants"));
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging",
@@ -573,6 +581,12 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkUseSupportEdge, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblEdgeRefreshCost, layout);
+        layout.gridx++;
+        panel.add(spnEdgeRefreshCost, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1501,6 +1515,7 @@ public class PersonnelTab {
         chkUseEdge.setSelected(options.isUseEdge());
         chkUseSupportEdge.setSelected(options.isUseSupportEdge());
         comboEdgeRefreshPeriod.setSelectedItem(options.getEdgeRefreshPeriod());
+        spnEdgeRefreshCost.setValue(options.getEdgeRefreshCost());
         chkUseImplants.setSelected(options.isUseImplants());
         chkUseAlternativeQualityAveraging.setSelected(options.isAlternativeQualityAveraging());
         chkUsePersonnelRemoval.setSelected(options.isUsePersonnelRemoval());
@@ -1612,6 +1627,7 @@ public class PersonnelTab {
         options.setUseEdge(chkUseEdge.isSelected());
         options.setUseSupportEdge(chkUseSupportEdge.isSelected());
         options.setEdgeRefreshPeriod(comboEdgeRefreshPeriod.getSelectedItem());
+        options.setEdgeRefreshCost((int) spnEdgeRefreshCost.getValue());
         options.setUseImplants(chkUseImplants.isSelected());
         options.setAlternativeQualityAveraging(chkUseAlternativeQualityAveraging.isSelected());
         options.setUsePersonnelRemoval(chkUsePersonnelRemoval.isSelected());

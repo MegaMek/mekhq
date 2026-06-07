@@ -154,6 +154,7 @@ public class CampaignOptionsUnmarshaller {
             case "missionXpOutstandingSuccess" -> campaignOptions.setMissionXpOutstandingSuccess(parseInt(
                   nodeContents));
             case "edgeCost" -> campaignOptions.setEdgeCost(parseInt(nodeContents));
+            case "edgeRefreshCost" -> campaignOptions.setEdgeRefreshCost(parseInt(nodeContents));
             case "attributeCost" -> campaignOptions.setAttributeCost(parseInt(nodeContents));
             case "waitingPeriod" -> campaignOptions.setWaitingPeriod(parseInt(nodeContents));
             case "acquisitionSkill" -> {
