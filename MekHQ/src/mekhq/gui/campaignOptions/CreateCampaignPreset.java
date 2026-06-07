@@ -797,19 +797,18 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         }
         getChkGM().setSelected((getPreset() == null) ? getCampaign().isGM() : getPreset().isGM());
 
-        // pack() in the parent can leave the dialog a touch short, clipping the bottom
-        // of the Continuous Options
-        // border. Grow to the preferred height plus a small margin - without shrinking
-        // a larger remembered size - and
-        // enforce that as the minimum so the whole layout is visible by default. The
-        // target is based on the preferred
-        // (layout) size, not the current size, so reopening does not let it creep
-        // larger each time.
+        // Size to the preferred (layout) height so the buttons sit directly under the
+        // content, with no band of empty
+        // space above them. The height is set explicitly rather than via
+        // max(remembered, preferred) because the
+        // remembered height is restored inside super.finalizeInitialization() and could
+        // be a stale larger value; the
+        // content is a fixed height, so there is no reason to keep a taller window. A
+        // remembered wider width is kept.
+        // The minimum prevents the bottom border from being clipped.
         final Dimension preferredSize = getPreferredSize();
-        final Dimension defaultSize = new Dimension(preferredSize.width,
-                preferredSize.height + UIUtil.scaleForGUI(20));
-        setMinimumSize(defaultSize);
-        setSize(Math.max(getWidth(), defaultSize.width), Math.max(getHeight(), defaultSize.height));
+        setMinimumSize(preferredSize);
+        setSize(Math.max(getWidth(), preferredSize.width), preferredSize.height);
     }
 
     @Override
