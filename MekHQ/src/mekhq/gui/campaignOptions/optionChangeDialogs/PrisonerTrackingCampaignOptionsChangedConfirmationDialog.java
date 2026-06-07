@@ -218,12 +218,11 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
                 quality = UnitOrder.getRandomUnitQuality(0);
             }
             Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
-            if (automaticallyAssignRanks) {
-                if (unit != null) {
+            if (unit != null) {
+                if (automaticallyAssignRanks) {
                     AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
-
-                    units.add(unit);
                 }
+                units.add(unit);
             }
         } catch (Exception e) {
             LOGGER.error(e, "Unable to load entity: {}: {}. Returning none.",

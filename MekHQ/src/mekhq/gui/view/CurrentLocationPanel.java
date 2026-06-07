@@ -33,8 +33,6 @@
 
 package mekhq.gui.view;
 
-import static mekhq.campaign.CurrentLocation.getFormattedTextAt;
-import static mekhq.campaign.CurrentLocation.getTextAt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
@@ -57,6 +55,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
+import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.universe.Atmosphere;
@@ -68,10 +67,11 @@ import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.ScalingVerticalFillImage;
+import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -90,6 +90,7 @@ import org.apache.logging.log4j.util.Strings;
  * </p>
  */
 public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
     private static final File JUMP_SHIP_IMAGE = new File(Configuration.unitImagesDir(), "jumpships/invader.png");
 
@@ -156,8 +157,8 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     }
 
     /**
-     * Updates the location title, dynamic images, planetary/transit info text, and the
-     * visibility and state of the Hiring Hall button based on the current location context.
+     * Updates the location title, dynamic images, planetary/transit info text, and the visibility and state of the
+     * Hiring Hall button based on the current location context.
      */
     private void refresh() {
         CampaignOptions options = campaign.getCampaignOptions();
@@ -261,7 +262,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *   <li>Temperature.</li>
      *   <li>Gravity.</li>
      * </ul>
-     *
+     * <p>
      * Each characteristic is colored dynamically based on the severity of the penalties it causes.
      *
      * @return a formatted HTML string representing the planetary conditions
@@ -319,8 +320,8 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     /**
      * Generates a description for the current travel course.
      *
-     * @return a formatted HTML string detailing the final destination system and remaining jumps,
-     * or an empty/fallback string if the player is not currently traveling.
+     * @return a formatted HTML string detailing the final destination system and remaining jumps, or an empty/fallback
+     *       string if the player is not currently traveling.
      */
     public String getCourseInfo() {
         JumpPath jumpPath = campaign.getCurrentLocation().getJumpPath();
@@ -337,7 +338,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      * Generates jump cost summary line.
      *
      * @return a formatted HTML string with remaining (or weekly average in case of traveling to a planet) jump cost,
-     *         information, or an empty string if not traveling
+     *       information, or an empty string if not traveling
      */
     public String getJumpCostInfo() {
         AbstractLocation location = campaign.getCurrentLocation();
@@ -358,6 +359,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     }
 
     // TODO: reuse the calculation logic from Maintenance::getTargetForMaintenance
+
     /**
      * Generates a status line detailing the socio-industrial conditions of the current planet.
      *
@@ -368,7 +370,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *   <li>Raw material output.</li>
      *   <li>Total population.</li>
      * </ul>
-     *
+     * <p>
      * Each metric is color-coded based on its rating.
      *
      * @return a formatted HTML string containing the socio-industrial status
@@ -434,6 +436,14 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         return MHQOptions.convertFontColorToHexColor(color == null ? Color.WHITE : color);
     }
 
+    private static String getFormattedTextAt(String key, Object... args) {
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
+    }
+
+    private static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
+    }
+
     // ======================================
     // Event handlers for UI synchronization
     // ======================================
@@ -445,6 +455,11 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
 
     @Subscribe
     public void handle(TransitStatusChangedEvent event) {
+        refresh();
+    }
+
+    @Subscribe
+    public void handle(MissionEvent event) {
         refresh();
     }
 

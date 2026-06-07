@@ -49,7 +49,6 @@ import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -268,10 +267,6 @@ public class CurrentLocation extends AbstractLocation {
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
             }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
-            }
         }
 
         if (wasTraveling || jumpPath != null) {
@@ -285,6 +280,10 @@ public class CurrentLocation extends AbstractLocation {
             // This should be before inoculations so that we can correctly read the TO&E
             if (!campaign.getAutomatedMothballUnits().isEmpty()) {
                 performAutomatedActivation(campaign);
+            }
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
             }
 
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
@@ -351,13 +350,5 @@ public class CurrentLocation extends AbstractLocation {
         }
 
         return retVal;
-    }
-
-    public static String getFormattedTextAt(String key, Object... args) {
-        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
-    }
-
-    public static String getTextAt(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 }

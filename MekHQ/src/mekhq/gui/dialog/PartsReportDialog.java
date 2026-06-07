@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -47,19 +49,33 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.WeaponType;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.market.PartsInUseManager;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
+import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -79,13 +95,31 @@ public class PartsReportDialog extends JDialog {
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
+    private JTextField txtPartsSearch;
+    private JComboBox<String> partsGroupFilterCB;
+    private TableRowSorter<PartsInUseTableModel> partsInUseSorter;
 
     private final Campaign campaign;
     private final PartsInUseManager partsInUseManager;
     private final CampaignGUI gui;
 
+    private static final int SG_ALL = 0;
+    private static final int SG_ARMOR = 1;
+    private static final int SG_SYSTEM = 2;
+    private static final int SG_EQUIP = 3;
+    private static final int SG_LOC = 4;
+    private static final int SG_WEAPON = 5;
+    private static final int SG_AMMO = 6;
+    private static final int SG_MISC = 7;
+    private static final int SG_ENGINE = 8;
+    private static final int SG_GYRO = 9;
+    private static final int SG_ACT = 10;
+
+    @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.PartsReportDialog", MekHQ.getMHQOptions().getLocale());
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PartsReportDialog";
 
     public PartsReportDialog(CampaignGUI gui, boolean modal) {
         super(gui.getFrame(), modal);
@@ -107,7 +141,6 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void initComponents() {
-
         this.setTitle(resourceMap.getString("Form.title"));
 
         Container container = this.getContentPane();
@@ -134,7 +167,7 @@ public class PartsReportDialog extends JDialog {
         }
         overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
         overviewPartsInUseTable.setShowGrid(false);
-        TableRowSorter<PartsInUseTableModel> partsInUseSorter = new TableRowSorter<>(overviewPartsModel);
+        partsInUseSorter = new TableRowSorter<>(overviewPartsModel);
         partsInUseSorter.setSortsOnUpdates(true);
         // Don't sort the buttons
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
@@ -282,9 +315,48 @@ public class PartsReportDialog extends JDialog {
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
               PartsInUseTableModel.COL_BUTTON_GM_ADD_BULK);
 
-
         JScrollPane tableScroll = new FastJScrollPane(overviewPartsInUseTable);
         tableScroll.setBorder(RoundedLineBorder.createRoundedLineBorder());
+
+        JLabel lblGroup = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.text"));
+
+        String[] groupNames = {
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.all"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.armor"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.system"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.equipment"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.locations"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.weapons"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.ammunition"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.misc"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.engine"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.gyro"),
+              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.actuator")
+        };
+        partsGroupFilterCB = new JComboBox<>(groupNames);
+        partsGroupFilterCB.setMaximumSize(partsGroupFilterCB.getPreferredSize());
+        partsGroupFilterCB.addActionListener(evt -> applyFilter());
+
+        JLabel lblSearch = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblPartsSearch.text"));
+
+        txtPartsSearch = new JTextField(15);
+        txtPartsSearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "lblPartsSearch.tooltip"));
+        txtPartsSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                applyFilter();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                applyFilter();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                applyFilter();
+            }
+        });
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
@@ -341,47 +413,108 @@ public class PartsReportDialog extends JDialog {
 
         layout.setHorizontalGroup(
               layout.createParallelGroup()
+                    .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblGroup)
+                                    .addComponent(partsGroupFilterCB)
+                                    .addGap(20)
+                                    .addComponent(lblSearch)
+                                    .addComponent(txtPartsSearch)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(tableScroll)
                     .addGroup(layout.createSequentialGroup()
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                          GroupLayout.DEFAULT_SIZE,
-                                          Short.MAX_VALUE)
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(ignorePartsUnderLabel)
                                     .addComponent(ignoreSparesUnderQualityCB)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(ignoreMothballedCheck)
                                     .addComponent(topUpWeeklyCheck)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                          GroupLayout.DEFAULT_SIZE,
-                                          Short.MAX_VALUE))
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                          GroupLayout.DEFAULT_SIZE,
-                                          Short.MAX_VALUE)
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(topUpButton)
                                     .addComponent(topUpGMButton)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(resetRequestedStockButton)
                                     .addComponent(btnClose)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                                          GroupLayout.DEFAULT_SIZE,
-                                          Short.MAX_VALUE))
+                                          GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         layout.setVerticalGroup(
               layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblGroup)
+                                    .addComponent(partsGroupFilterCB)
+                                    .addComponent(lblSearch)
+                                    .addComponent(txtPartsSearch))
                     .addComponent(tableScroll)
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(ignoreMothballedCheck)
                                     .addComponent(ignorePartsUnderLabel)
-                                    .addComponent(ignoreSparesUnderQualityCB)
+                                    .addComponent(ignoreSparesUnderQualityCB))
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(ignoreMothballedCheck)
                                     .addComponent(topUpWeeklyCheck))
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(topUpButton)
-                                    .addComponent(topUpGMButton)
+                                    .addComponent(topUpGMButton))
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(resetRequestedStockButton)
                                     .addComponent(btnClose))
         );
 
         setPreferredSize(UIUtil.scaleForGUI(1400, 1000));
+    }
+
+    private void applyFilter() {
+        final int group = partsGroupFilterCB.getSelectedIndex();
+        final String searchText = txtPartsSearch.getText().trim().toLowerCase();
+
+        partsInUseSorter.setRowFilter(new RowFilter<>() {
+            @Override
+            public boolean include(Entry<? extends PartsInUseTableModel, ? extends Integer> entry) {
+                PartInUse partInUse = entry.getModel().getPartInUse(entry.getIdentifier());
+                Part part = (Part) partInUse.getPartToBuy().getNewEquipment();
+
+                // Group filter
+                boolean inGroup = switch (group) {
+                    case SG_ARMOR -> part instanceof Armor;
+                    case SG_SYSTEM -> part instanceof MekGyro ||
+                                            part instanceof EnginePart ||
+                                            part instanceof MekActuator ||
+                                            part instanceof MekLifeSupport ||
+                                            part instanceof MekSensor;
+                    case SG_EQUIP -> part instanceof EquipmentPart;
+                    case SG_LOC -> part instanceof MekLocation || part instanceof TankLocation;
+                    case SG_WEAPON ->
+                          part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
+                    case SG_AMMO -> part instanceof AmmoStorage;
+                    case SG_MISC ->
+                          part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
+                    case SG_ENGINE -> part instanceof EnginePart;
+                    case SG_GYRO -> part instanceof MekGyro;
+                    case SG_ACT -> part instanceof MekActuator;
+                    default -> true; // SG_ALL
+                };
+
+                // Search filter
+                boolean inSearch = searchText.isEmpty() ||
+                                         partInUse.getDescription().toLowerCase().contains(searchText);
+
+                return inGroup && inSearch;
+            }
+        });
     }
 
 
