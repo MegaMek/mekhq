@@ -35,6 +35,7 @@ package mekhq.campaign.mission.camOpsSalvage;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
@@ -394,7 +395,7 @@ public class CamOpsSalvageUtilities {
     }
 
     private static void testForDeath(Campaign campaign, Person victim, List<Person> techs) {
-        if (victim.getTotalInjurySeverity() >= 6) {
+        if (victim.getTotalInjurySeverity() >= DEATH) {
             victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
             techs.remove(victim); // We're nice enough that we only kill each tech once
         }

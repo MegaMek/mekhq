@@ -34,6 +34,7 @@ package mekhq.campaign.randomEvents.prisoners;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 
 import java.util.Hashtable;
@@ -150,42 +151,18 @@ public class NonCombatPrisoners {
         for (int i = 0; i < supportCount; i++) {
             PersonnelRole role = SUPPORT_ROLES.randomItem();
             Person captive = generateCaptive(campaign, role, isUseAdvancedMedical);
-
-            addCaptive(captive,
-                  civilianCaptives,
-                  targetSkillLevel,
-                  adminsHaveNegotiation,
-                  doctorsHaveAdministration,
-                  techsHaveAdministration,
-                  isUseArtillery,
-                  isUseExtraRandom);
+            addCaptive(campaign, captive, civilianCaptives, targetSkillLevel);
         }
 
         for (int i = 0; i < soldierCount; i++) {
             Person captive = generateCaptive(campaign, SOLDIER, isUseAdvancedMedical);
-
-            addCaptive(captive,
-                  civilianCaptives,
-                  targetSkillLevel,
-                  adminsHaveNegotiation,
-                  doctorsHaveAdministration,
-                  techsHaveAdministration,
-                  isUseArtillery,
-                  isUseExtraRandom);
+            addCaptive(campaign, captive, civilianCaptives, targetSkillLevel);
         }
 
         for (int i = 0; i < civilianCount; i++) {
             PersonnelRole role = ObjectUtility.getRandomItem(CIVILIAN_ROLES);
             Person captive = generateCaptive(campaign, role, isUseAdvancedMedical);
-
-            addCaptive(captive,
-                  civilianCaptives,
-                  targetSkillLevel,
-                  adminsHaveNegotiation,
-                  doctorsHaveAdministration,
-                  techsHaveAdministration,
-                  isUseArtillery,
-                  isUseExtraRandom);
+            addCaptive(campaign, captive, civilianCaptives, targetSkillLevel);
         }
 
         return civilianCaptives;
@@ -230,34 +207,22 @@ public class NonCombatPrisoners {
      * overrides and marking the person as captured.
      *
      * <p>This helper encapsulates the logic for applying skill overrides via
-     * {@link PersonUtility#overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole,
-     * SkillLevel)} and constructing the {@link ResolveScenarioTracker.OppositionPersonnelStatus} wrapper.</p>
+     * {@link PersonUtility#overrideSkills(Campaign, Person, PersonnelRole, SkillLevel, boolean)} and constructing the
+     * {@link ResolveScenarioTracker.OppositionPersonnelStatus} wrapper.</p>
      *
-     * @param person                    the {@link Person} being added as a captive
-     * @param civilianCaptives          the table to which the captive will be added, keyed by {@link Person#getId()}
-     * @param targetSkillLevel          the target {@link SkillLevel} used when overriding the captive's skills
-     * @param adminsHaveNegotiation     whether administrators gain Negotiation as part of their skill set
-     * @param doctorsHaveAdministration whether doctors gain Administration as part of their skill set
-     * @param techsHaveAdministration   whether technicians gain Administration as part of their skill set
-     * @param isUseArtillery            whether artillery skills should be factored into skill generation
-     * @param isUseExtraRandom          whether additional randomization should be applied to the captive's skills
+     * @param campaign         the {@link Campaign} context
+     * @param person           the {@link Person} being added as a captive
+     * @param civilianCaptives the table to which the captive will be added, keyed by {@link Person#getId()}
+     * @param targetSkillLevel the target {@link SkillLevel} used when overriding the captive's skills
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void addCaptive(Person person,
+    private static void addCaptive(Campaign campaign, Person person,
           Hashtable<UUID, ResolveScenarioTracker.OppositionPersonnelStatus> civilianCaptives,
-          SkillLevel targetSkillLevel, boolean adminsHaveNegotiation,
-          boolean doctorsHaveAdministration, boolean techsHaveAdministration,
-          boolean isUseArtillery, boolean isUseExtraRandom) {
-        PersonUtility.overrideSkills(adminsHaveNegotiation,
-              doctorsHaveAdministration,
-              techsHaveAdministration,
-              isUseArtillery,
-              isUseExtraRandom,
-              person,
-              person.getPrimaryRole(),
-              targetSkillLevel);
+          SkillLevel targetSkillLevel) {
+        boolean checkVeterancyEligibility = true;
+        overrideSkills(campaign, person, person.getPrimaryRole(), targetSkillLevel, checkVeterancyEligibility);
 
         ResolveScenarioTracker.OppositionPersonnelStatus status =
               new ResolveScenarioTracker.OppositionPersonnelStatus(

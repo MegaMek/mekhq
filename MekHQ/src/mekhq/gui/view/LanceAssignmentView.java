@@ -83,10 +83,22 @@ public class LanceAssignmentView extends JPanel {
     private JComboBox<AtBContract> cbContract;
     private RequiredLancesTableModel requiredLancesModel;
     private LanceAssignmentTableModel lanceAssignmentModel;
+    private Runnable assignmentChangeListener;
 
     public LanceAssignmentView(Campaign c) {
         campaign = c;
         initComponents();
+    }
+
+    /**
+     * Registers a listener that is invoked whenever the unit assignments change (e.g. a force's contract or role is
+     * edited). This allows external views, such as the contract summary panel, to refresh derived information like
+     * deployment coverage.
+     *
+     * @param listener the action to run when assignments change, or {@code null} to clear it
+     */
+    public void setAssignmentChangeListener(Runnable listener) {
+        this.assignmentChangeListener = listener;
     }
 
     private void initComponents() {
@@ -329,6 +341,9 @@ public class LanceAssignmentView extends JPanel {
         public void tableChanged(TableModelEvent ev) {
             ((RequiredLancesTableModel) tblRequiredLances.getModel()).fireTableDataChanged();
             updateDeploymentSummary();
+            if (assignmentChangeListener != null) {
+                assignmentChangeListener.run();
+            }
         }
     };
 

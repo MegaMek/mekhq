@@ -111,12 +111,13 @@ public class AdvancedMedicalAlternateHealing {
         Set<BodyLocation> prostheticPenalties = getProstheticPenalties(patient);
 
         // Healing
+        boolean isUseEdge = campaign.getCampaignOptions().isUseSupportEdge();
         if (doctor == null) {
-            boolean patientUsesEdge = patient.getOptions().booleanOption(EDGE_MEDICAL);
+            boolean patientUsesEdge = isUseEdge && patient.getOptions().booleanOption(EDGE_MEDICAL);
             performUnassistedHealingCheck(today, isUseFatigue, fatigueRate, patient, modifiers, prostheticPenalties,
                   patientUsesEdge);
         } else {
-            boolean doctorUsesEdge = doctor.getOptions().booleanOption(EDGE_MEDICAL);
+            boolean doctorUsesEdge = isUseEdge && doctor.getOptions().booleanOption(EDGE_MEDICAL);
             performAssistedHealingCheck(today, isUseFatigue, fatigueRate, patient, doctor, modifiers,
                   prostheticPenalties, doctorUsesEdge);
         }
@@ -433,7 +434,9 @@ public class AdvancedMedicalAlternateHealing {
         int marginOfSuccess = surgery.getMarginOfSuccess();
 
         // Edge
-        if (marginOfSuccess <= -6 && useEdge) { // Permanent injury
+        if (marginOfSuccess <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
+            // manually update edge because if we pass useEdge == true, the doctor will get one free roll
+            doctor.changeCurrentEdge(-1);
             SkillCheckUtility edgeReroll = new SkillCheckUtility(
                   getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.edge"),
                   doctor,

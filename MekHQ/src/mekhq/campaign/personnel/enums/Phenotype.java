@@ -39,6 +39,7 @@ import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
@@ -128,9 +129,12 @@ public enum Phenotype {
     /**
      * Retrieves the cap (maximum allowable score) for a specified {@link SkillAttribute}.
      *
-     * @param attribute The {@link SkillAttribute} for which the cap is requested.
+     * <p><b>Warning:</b> this returns the direct cap without considering any Traits the character may have.
+     * Generally speaking you should be using {@link Person#getAttributeCap(SkillAttribute)} instead.</p>
      *
-     * @return The cap value for the specified skill attribute.
+     * @param attribute the {@link SkillAttribute} for which the cap is requested
+     *
+     * @return the cap value for the specified {@link SkillAttribute}
      *
      * @author Illiani
      * @since 0.50.05
