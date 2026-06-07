@@ -169,7 +169,7 @@ public class FinancialReport {
         financialReport.assets = campaign.getFinances().getTotalAssetValue();
         financialReport.rentals = campaign.getTotalRentFeesExcludingBays();
 
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getAllHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mek) {
                 financialReport.mek = financialReport.mek.plus(value);
@@ -190,7 +190,7 @@ public class FinancialReport {
         });
 
         financialReport.spareParts = financialReport.spareParts.plus(
-              campaign.getWarehouse().streamSpareParts()
+              campaign.getAllWarehouse().streamSpareParts()
                     .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                     .collect(Collectors.toList()));
 

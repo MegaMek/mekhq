@@ -234,8 +234,8 @@ public class CampaignNewDayManager {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.faction = campaign.getFaction();
-        this.hangar = campaign.getHangar();
-        this.warehouse = campaign.getWarehouse();
+        this.hangar = campaign.getAllHangar();
+        this.warehouse = campaign.getAllWarehouse();
         this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
     }

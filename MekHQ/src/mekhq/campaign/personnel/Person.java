@@ -1744,7 +1744,7 @@ public class Person implements ILocation {
      * @param campaign The current campaign
      */
     private void leadershipMassChangeLoyalty(Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -1853,7 +1853,7 @@ public class Person implements ILocation {
      */
     public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
           boolean isMajor) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -6371,7 +6371,7 @@ public class Person implements ILocation {
     }
 
     public void removeAllTechJobs(final Campaign campaign) {
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getAllHangar().forEachUnit(u -> {
             if (equals(u.getTech())) {
                 u.remove(this, true);
             }
@@ -6381,7 +6381,7 @@ public class Person implements ILocation {
             }
         });
 
-        for (final Part part : campaign.getWarehouse().getParts()) {
+        for (final Part part : campaign.getAllWarehouse().getParts()) {
             if (equals(part.getTech())) {
                 part.cancelAssignment(true);
             }

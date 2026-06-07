@@ -165,7 +165,7 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             when(campaign.getReputation()).thenReturn(reputation);
             when(campaign.getAccountant()).thenReturn(accountant);
-            when(campaign.getHangar()).thenReturn(hangar);
+            when(campaign.getAllHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
             when(campaign.getFutureAtBContracts()).thenReturn(List.of());
         }

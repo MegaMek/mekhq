@@ -269,7 +269,7 @@ public class StratConRulesManager {
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
 
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
-              campaign.getHangar(),
+              campaign.getAllHangar(),
               campaign.getAllFormations());
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
@@ -419,7 +419,7 @@ public class StratConRulesManager {
         // Grab the available lances and sort them by map type
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
-              campaign.getHangar(),
+              campaign.getAllHangar(),
               campaign.getAllFormations());
 
         // Select the target coords.
@@ -1608,7 +1608,7 @@ public class StratConRulesManager {
         // Build a map of scouts and their information
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Formation formation = campaign.getFormation(forceID);
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
         List<ScoutRecord> scouts = formation == null ? new ArrayList<>() : buildScoutMap(formation, hangar,
               campaignOptions);
 
@@ -2134,7 +2134,7 @@ public class StratConRulesManager {
               roll,
               targetNumber));
 
-        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation, campaign.getHangar());
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation, campaign.getAllHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, formation);
 
@@ -3123,7 +3123,7 @@ public class StratConRulesManager {
                                                              campaign,
                                                              campaignState) != ReinforcementEligibilityType.NONE);
 
-            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getHangar(), false);
+            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getAllHangar(), false);
             if ((force.getScenarioId() <= 0) &&
                       !allUnits.isEmpty() &&
                       !forcesInTracks.contains(force.getId()) &&
@@ -3800,7 +3800,7 @@ public class StratConRulesManager {
 
             if (formation.getCombatRoleInMemory().isPatrol()) {
                 boolean allLightUnits = true;
-                for (Unit unit : formation.getAllUnitsAsUnits(campaign.getHangar(), false)) {
+                for (Unit unit : formation.getAllUnitsAsUnits(campaign.getAllHangar(), false)) {
                     if (unit.getEntity() != null && unit.getEntity().getWeight() > 35) {
                         allLightUnits = false;
                         break;
