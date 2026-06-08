@@ -112,9 +112,9 @@ public class PlayerBase extends AbstractBase {
     public void writeToXML(PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "playerBase");
         writeBaseFieldsToXML(pw, indent);
-        if (getParentLocation() != null && getParentLocation().getCurrentSystem() != null) {
+        if (getCurrentLocation() != null && getCurrentLocation().getCurrentSystem() != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId",
-                  getParentLocation().getCurrentSystem().getId());
+                  getCurrentLocation().getCurrentSystem().getId());
         }
         // Persons who have arrived live under basePersonnel.
         for (LocationNode child : getBasePersonnel().getLocationNode().getChildren()) {

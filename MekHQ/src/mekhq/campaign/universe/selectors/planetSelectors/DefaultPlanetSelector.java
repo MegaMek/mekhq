@@ -79,7 +79,7 @@ public class DefaultPlanetSelector extends AbstractPlanetSelector {
     @Override
     public @Nullable Planet selectPlanet(final Campaign campaign) {
         return (getPlanet() == null) ?
-                       getOptions().determinePlanet(campaign.getParentLocation().getPlanet()) :
+                     getOptions().determinePlanet(campaign.getCurrentLocation().getPlanet()) :
                      getPlanet();
     }
 

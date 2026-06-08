@@ -69,7 +69,7 @@ public class UnableToAffordJumpNagLogic {
      * </p>
      */
     public static Money getNextJumpCost(Campaign campaign) {
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
 
         if (jumpPath == null) {

@@ -2019,7 +2019,7 @@ public class HumanResources {
                         add));
         }
 
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (location.isOnPlanet()) {
             Planet planet = location.getPlanet();
             String planetId = planet.getId();

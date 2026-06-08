@@ -299,7 +299,7 @@ public class ContractTest {
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
 
         CurrentLocation mockCurrentLocation = mock(CurrentLocation.class);
-        when(mockCampaign.getParentLocation()).thenReturn(mockCurrentLocation);
+        when(mockCampaign.getCurrentLocation()).thenReturn(mockCurrentLocation);
 
         TransportCostCalculations mockTransportCostCalculation = mock(TransportCostCalculations.class);
         when(mockCampaign.getTransportCostCalculation(EXP_REGULAR)).thenReturn(mockTransportCostCalculation);

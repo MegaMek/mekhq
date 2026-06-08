@@ -107,8 +107,8 @@ public final class LocationDispatch {
                 continue;
             }
 
-            double startTransit = campaign.getParentLocation() != null
-                                        ? campaign.getParentLocation().getTransitTime()
+            double startTransit = campaign.getCurrentLocation() != null
+                                        ? campaign.getCurrentLocation().getTransitTime()
                   : fromSystem.getTimeToJumpPoint(1.0);
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
@@ -175,8 +175,8 @@ public final class LocationDispatch {
                 continue;
             }
 
-            double startTransit = campaign.getParentLocation() != null
-                                        ? campaign.getParentLocation().getTransitTime()
+            double startTransit = campaign.getCurrentLocation() != null
+                                        ? campaign.getCurrentLocation().getTransitTime()
                                         : fromSystem.getTimeToJumpPoint(1.0);
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
@@ -244,8 +244,8 @@ public final class LocationDispatch {
                 continue;
             }
 
-            double startTransit = campaign.getParentLocation() != null
-                                        ? campaign.getParentLocation().getTransitTime()
+            double startTransit = campaign.getCurrentLocation() != null
+                                        ? campaign.getCurrentLocation().getTransitTime()
                                         : fromSystem.getTimeToJumpPoint(1.0);
 
             CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);

@@ -1658,7 +1658,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
                 Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
-                      !getCampaign().getParentLocation().isOnPlanet(),
+                      !getCampaign().getCurrentLocation().isOnPlanet(),
                       Set.of(disease.getSimpleName()));
                 for (Person person : people) {
                     Inoculations.applyDisease(getCampaign(), person, disease);
@@ -2316,7 +2316,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         popup.add(menu);
 
         if (!StaticChecks.areAnyFree(selected)) {
-            if (getCampaign().getParentLocation().isOnPlanet()) {
+            if (getCampaign().getCurrentLocation().isOnPlanet()) {
                 popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
             } else {

@@ -132,7 +132,7 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
         String commanderAddress = campaign.getCommanderAddress();
 
         // Determine the location context
-        String location = campaign.getParentLocation().isOnPlanet() ? "planetside" : "transit";
+        String location = campaign.getCurrentLocation().isOnPlanet() ? "planetside" : "transit";
 
         // Generate each paragraph and concatenate the full message
         StringBuilder messageBuilder = new StringBuilder();

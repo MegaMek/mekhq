@@ -328,7 +328,7 @@ public class SalvagePostScenarioPicker {
             }
 
             RecoveryTimeData data = RecoveryTimeCalculations.calculateRecoveryTimeForEntity(entity.getDisplayName(),
-                    entity.getRecoveryTime(), scenario, campaign.getParentLocation().getPlanet());
+                  entity.getRecoveryTime(), scenario, campaign.getCurrentLocation().getPlanet());
             recoveryTimeData.put(unit.getId(), data);
         }
     }

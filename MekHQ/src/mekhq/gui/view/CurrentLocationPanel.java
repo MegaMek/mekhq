@@ -162,7 +162,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     private void refresh() {
         CampaignOptions options = campaign.getCampaignOptions();
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         PlanetarySystem system = location.getCurrentSystem();
         LocalDate date = campaign.getLocalDate();
 
@@ -222,7 +222,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     public String getTitle() {
         LocalDate date = campaign.getLocalDate();
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         if (location.isOnPlanet()) {
             return getFormattedTextAt("title.onPlanet", location.getPlanet().getPrintableName(date));
@@ -268,7 +268,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      * @return a formatted HTML string representing the planetary conditions
      */
     public String getPlanetaryConditionsInfo() {
-        Planet planet = campaign.getParentLocation().getPlanet();
+        Planet planet = campaign.getCurrentLocation().getPlanet();
 
         Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
         megamek.common.planetaryConditions.Atmosphere pressure = planet.getPressure(campaign.getLocalDate());
@@ -324,7 +324,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *       string if the player is not currently traveling.
      */
     public String getCourseInfo() {
-        JumpPath jumpPath = campaign.getParentLocation().getJumpPath();
+        JumpPath jumpPath = campaign.getCurrentLocation().getJumpPath();
         if ((jumpPath == null) || jumpPath.isEmpty()) {
             return getTextAt("info.course.notTraveling");
         } else if (jumpPath.getJumps() == 0) {
@@ -341,7 +341,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *       information, or an empty string if not traveling
      */
     public String getJumpCostInfo() {
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
         if ((jumpPath == null) || jumpPath.isEmpty()) {
             return "";
@@ -377,7 +377,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     public String getSocioIndustrialInfo() {
         LocalDate date = campaign.getLocalDate();
-        Planet planet = campaign.getParentLocation().getPlanet();
+        Planet planet = campaign.getCurrentLocation().getPlanet();
         SocioIndustrialData status = planet.getSocioIndustrial(date);
 
         long population = ObjectUtils.firstNonNull(planet.getPopulation(date), 0L);

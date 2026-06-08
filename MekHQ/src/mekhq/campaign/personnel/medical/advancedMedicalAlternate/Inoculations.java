@@ -118,7 +118,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void triggerInoculationPrompt(Campaign campaign, boolean isAdHoc) {
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (!location.isOnPlanet()) {
             new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "Inoculations.inTransit"), true);
             return;
@@ -517,7 +517,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void performDiseaseChecks(Campaign campaign) {
-        AbstractLocation location = campaign.getParentLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         LocalDate today = campaign.getLocalDate();
 
         String planetCode = location.isOnPlanet() ? location.getPlanet().getId() : null;

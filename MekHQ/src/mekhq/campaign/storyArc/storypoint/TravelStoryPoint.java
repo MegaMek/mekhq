@@ -110,10 +110,10 @@ public class TravelStoryPoint extends StoryPoint {
             // if we don't have a valid destination, then complete the story point
             complete();
         } else if (autoStart) {
-            AbstractLocation location = getStoryArc().getCampaign().getParentLocation();
+            AbstractLocation location = getStoryArc().getCampaign().getCurrentLocation();
             JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(),
                   getDestination());
-            getStoryArc().getCampaign().getParentLocation().setJumpPath(path);
+            getStoryArc().getCampaign().getCurrentLocation().setJumpPath(path);
         }
     }
 

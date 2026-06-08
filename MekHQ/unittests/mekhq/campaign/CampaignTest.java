@@ -1165,7 +1165,7 @@ public class CampaignTest {
             void setLocation_null_currentLocationBecomesNull() {
                 campaign.setLocation(null);
 
-                assertNull(campaign.getParentLocation());
+                assertNull(campaign.getCurrentLocation());
             }
 
             @Test
@@ -1175,7 +1175,7 @@ public class CampaignTest {
 
                 campaign.setLocation(newLocation);
 
-                assertSame(newLocation, campaign.getParentLocation());
+                assertSame(newLocation, campaign.getCurrentLocation());
             }
         }
 

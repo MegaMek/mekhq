@@ -680,11 +680,11 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getComboFaction().setSelectedItem(new FactionDisplay(faction, getDate()));
         getComboStartingSystem().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
                                                        ?
-                                                         getCampaign().getParentLocation().getCurrentSystem() :
+                                                       getCampaign().getCurrentLocation().getCurrentSystem() :
                                                        getPreset().getPlanet().getParentSystem());
         getComboStartingPlanet().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
                                                        ?
-                                                         getCampaign().getParentLocation()
+                                                       getCampaign().getCurrentLocation()
                                                              .getCurrentSystem()
                                                              .getPrimaryPlanet() :
                                                        getPreset().getPlanet());
