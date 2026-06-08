@@ -1338,16 +1338,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
-                    menuItem = new JMenuItem(getText("addMinimumComplementLegendary.text"));
-                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_LEGENDARY);
-                    menuItem.addActionListener(this);
-                    menuMinimumComplement.add(menuItem);
-
-                    menuItem = new JMenuItem(getText("addMinimumComplementHeroic.text"));
-                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_HEROIC);
-                    menuItem.addActionListener(this);
-                    menuMinimumComplement.add(menuItem);
-
                     menuItem = new JMenuItem(getText("addMinimumComplementElite.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_ELITE);
                     menuItem.addActionListener(this);
