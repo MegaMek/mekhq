@@ -123,7 +123,6 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.campaign.unit.actions.UnloadAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
-import mekhq.gui.MekLabTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -135,7 +134,6 @@ import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToForceMenu;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
@@ -497,7 +495,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                         Campaign campaign = gui.getCampaign();
                         boolean checkVeterancyEligibility = true;
-                        overrideSkills(campaign, person, person.getPrimaryRole(), VETERAN, checkVeterancyEligibility);
+                        overrideSkills(campaign,
+                              person,
+                              person.getPrimaryRole(),
+                              skillLevel,
+                              checkVeterancyEligibility);
                     }
                 }
             }
@@ -1333,6 +1335,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     menuItem = new JMenuItem(getText("addMinimumComplementRandom.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(getText("addMinimumComplementLegendary.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_LEGENDARY);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(getText("addMinimumComplementHeroic.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_HEROIC);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
