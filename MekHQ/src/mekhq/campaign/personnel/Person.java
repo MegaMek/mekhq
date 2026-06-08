@@ -5756,6 +5756,16 @@ public class Person implements ILocation {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    public int getCostToImprove(final String skillName, final boolean useReasoning, final int targetSkillLevel) {
+        final Skill skill = getSkill(skillName);
+        final SkillType skillType = getType(skillName);
+        int cost = skillType.getCost(targetSkillLevel);
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
     /**
      * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
      *
