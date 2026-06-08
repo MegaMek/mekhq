@@ -576,8 +576,6 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel txtAllyRating = new JLabel();
         JLabel lblEnemyRating = new JLabel();
         JLabel txtEnemyRating = new JLabel();
-        JLabel lblMorale = new JLabel();
-        JLabel txtMorale = new JLabel();
         JLabel lblSharePct = new JLabel();
         JLabel txtSharePct = new JLabel();
         JLabel lblCargoRequirement = new JLabel();
@@ -1050,44 +1048,16 @@ public class MissionViewPanel extends JScrollablePanel {
 
         addDescriptionPane(contract.getDescription(), y++, 0.0);
 
-        // Enemy morale (text, trend arrow, and gauge) is intentionally shown at the
-        // very bottom of the panel, after
-        // the contract description.
-        final String moraleText;
-        final String moraleTooltip;
-        if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
-                contract.getMoraleLevel().isRouted()) {
-            moraleText = resourceMap.getString("txtGarrisonMoraleRouted.text");
-            moraleTooltip = resourceMap.getString("txtGarrisonMoraleRouted.tooltip");
-        } else {
-            moraleText = contract.getMoraleLevel().toString();
-            moraleTooltip = contract.getMoraleLevel().getToolTipText();
-        }
+        // Enemy morale is shown at the very bottom of the panel, after the contract
+        // description, as a labelled gauge.
+        // The bar's own label (which honours the special "Peaceful" wording for routed
+        // garrison/retainer contracts) is
+        // self-explanatory, so no separate "Enemy Morale:" caption is needed.
+        final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(contract);
+        final String moraleText = moraleDisplay.label();
+        final String moraleTooltip = moraleDisplay.tooltip();
 
-        lblMorale.setName("lblMorale");
-        lblMorale.setText(resourceMap.getString("lblMorale.text"));
-        lblMorale.setToolTipText(wordWrap(moraleTooltip));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.insets = new Insets(6, 0, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblMorale, gridBagConstraints);
-
-        txtMorale.setName("txtMorale");
-        txtMorale.setText("<html>" + moraleText + getMoraleTrendArrow(contract.getMoraleTrend()) + "</html>");
-        txtMorale.setToolTipText(wordWrap(moraleTooltip));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(6, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtMorale, gridBagConstraints);
-
-        MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel());
+        MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), moraleText);
         moraleBar.setToolTipText(wordWrap(moraleTooltip));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1095,37 +1065,10 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(2, 0, 2, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(6), 0, 2, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(moraleBar, gridBagConstraints);
-    }
-
-    /**
-     * Builds the small HTML snippet used to show the enemy morale trend next to the
-     * morale value.
-     *
-     * <p>
-     * The trend is shown from the player's perspective: rising enemy morale is
-     * dangerous and shown with a red up
-     * arrow, while falling enemy morale is favourable and shown with a green down
-     * arrow. No arrow is shown when the
-     * trend is unchanged or unknown.
-     * </p>
-     *
-     * @param trend a positive value if enemy morale rose, negative if it fell, or
-     *              zero if unchanged/unknown
-     *
-     * @return an HTML fragment containing the colored trend arrow, or an empty
-     *         string if there is no trend to show
-     */
-    private String getMoraleTrendArrow(int trend) {
-        if (trend > 0) {
-            return " <span style='color:" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + ";'>&#9650;</span>";
-        } else if (trend < 0) {
-            return " <span style='color:" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + ";'>&#9660;</span>";
-        }
-        return "";
     }
 
     private void addDescriptionPane(String description, int gridY) {

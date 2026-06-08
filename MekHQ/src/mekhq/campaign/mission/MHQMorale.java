@@ -237,10 +237,6 @@ public class MHQMorale {
         AtBMoraleLevel updatedMoraleLevel = currentMoraleLevel;
         MoraleOutcome moraleOutcome;
 
-        // Record the morale level prior to this check so the briefing room can display
-        // the morale trend.
-        contract.setPreviousMoraleLevel(currentMoraleLevel);
-
         if (roll <= RALLYING_TARGET_NUMBER) {
             moraleOutcome = MoraleOutcome.RALLYING;
             updatedMoraleLevel = switch (currentMoraleLevel) {

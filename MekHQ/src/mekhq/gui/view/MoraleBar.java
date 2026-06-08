@@ -32,65 +32,63 @@
  */
 package mekhq.gui.view;
 
-import java.awt.BasicStroke;
+import static megamek.client.ui.WrapLayout.wordWrap;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import javax.swing.JComponent;
-import javax.swing.UIManager;
+import java.util.List;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.gui.baseComponents.SegmentedBar;
 
 /**
  * A compact, segmented gauge that visualizes enemy {@link AtBMoraleLevel}.
  *
  * <p>
  * The bar has one segment per possible morale level, ordered from the morale
- * scale's minimum to its maximum. Each
- * segment is colored on a fixed green-to-red gradient and the colors are
- * presented from the <em>player's</em>
- * perspective: low enemy morale (e.g. {@code ROUTED}) is green because it is
- * favourable for the player, while high
- * enemy morale (e.g. {@code OVERWHELMING}) is red because it is dangerous.
- * Segments up to and including the current
- * morale level are drawn at full strength; the remaining segments are faded, so
- * the lit length communicates how high
- * the enemy's morale currently is while the lit "tip" colour communicates its
- * severity.
+ * scale's minimum to its maximum. The gauge reads like the enemy's morale
+ * meter: the more segments that are lit, the higher the enemy's morale. The
+ * colors are presented from the <em>player's</em> perspective: low enemy morale
+ * (a routed enemy) is green because it is favourable for the player, climbing
+ * through orange and into red at the highest morale (a dangerous,
+ * fully-committed enemy). Hovering a segment shows the name and description of
+ * that morale level.
+ * </p>
+ *
+ * <p>
+ * This is a thin configuration of the reusable {@link SegmentedBar}; all
+ * rendering and tooltip handling live there.
  * </p>
  *
  * @author The MegaMek Team
  */
-public class MoraleBar extends JComponent {
-    private static final int SEGMENT_COUNT = AtBMoraleLevel.MAXIMUM_MORALE_LEVEL - AtBMoraleLevel.MINIMUM_MORALE_LEVEL
-            + 1;
-    private static final int FADED_ALPHA = 55;
-    private static final int BORDER_ALPHA = 60;
-
+public class MoraleBar extends SegmentedBar {
     /**
-     * Anchor colors for the morale gradient, ordered from the most favourable
-     * morale for the player (deep green) to the
-     * most dangerous (deep red). The colors are deliberately deep and well
-     * separated so that adjacent segments remain
-     * easy to tell apart. Segment colors are interpolated across these anchors, so
-     * the gauge works for any number of
-     * morale levels.
+     * Anchor colors for the morale gradient, ordered from the lowest enemy morale
+     * to the highest. Low enemy morale is
+     * green (favourable for the player) and high enemy morale is red (dangerous for
+     * the player), so the gauge reads as
+     * an enemy-strength meter from the player's perspective: a short green bar is
+     * good news, a long red bar is bad. The
+     * colors are deliberately deep and well separated so that adjacent segments
+     * remain easy to tell apart.
      */
     private static final Color[] MORALE_GRADIENT = {
-            new Color(0x12, 0x7C, 0x1E), // deep green - most favourable for the player
+            new Color(0x12, 0x7C, 0x1E), // deep green - lowest enemy morale, most favourable for the player
             new Color(0x36, 0xB3, 0x2B), // green
             new Color(0x8C, 0xC6, 0x1A), // lime
             new Color(0xE8, 0xC4, 0x0A), // gold
             new Color(0xF2, 0x86, 0x00), // orange
             new Color(0xD2, 0x44, 0x10), // red-orange
-            new Color(0xA8, 0x12, 0x12) // deep red - most dangerous for the player
+            new Color(0xA8, 0x12, 0x12) // deep red - highest enemy morale, most dangerous for the player
     };
-
-    private AtBMoraleLevel moraleLevel;
 
     /**
      * Creates a morale bar for the given morale level.
@@ -99,117 +97,125 @@ public class MoraleBar extends JComponent {
      *                    which case nothing is painted
      */
     public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel) {
-        this.moraleLevel = moraleLevel;
-        setOpaque(false);
+        setMoraleLevel(moraleLevel);
     }
 
     /**
-     * Updates the displayed morale level and repaints the bar.
+     * Creates a morale bar for the given morale level with a custom label drawn
+     * beneath the active segment.
      *
-     * @param moraleLevel the new enemy morale level to display
+     * @param moraleLevel the enemy morale level to display; may be {@code null}, in
+     *                    which case nothing is painted
+     * @param labelText   the text to show beneath the current level (for example a
+     *                    contract-specific name such as
+     *                    "Peaceful"), or {@code null} to use the morale level's own
+     *                    name
+     */
+    public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
+        setMoraleLevel(moraleLevel, labelText);
+    }
+
+    /**
+     * Updates the displayed morale level and repaints the bar. The label beneath
+     * the active segment defaults to the
+     * morale level's own name.
+     *
+     * @param moraleLevel the new enemy morale level to display, or {@code null} to
+     *                    clear the bar
      */
     public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel) {
-        this.moraleLevel = moraleLevel;
-        repaint();
+        setMoraleLevel(moraleLevel, (moraleLevel == null) ? null : moraleLevel.toString());
     }
 
-    @Override
-    public Dimension getPreferredSize() {
-        return UIUtil.scaleForGUI(140, 14);
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return UIUtil.scaleForGUI(84, 10);
-    }
-
-    @Override
-    protected void paintComponent(final Graphics g) {
-        super.paintComponent(g);
+    /**
+     * Updates the displayed morale level and the label drawn beneath the active
+     * segment, then repaints the bar.
+     *
+     * @param moraleLevel the new enemy morale level to display, or {@code null} to
+     *                    clear the bar
+     * @param labelText   the text to show beneath the current level, or
+     *                    {@code null} for no label
+     */
+    public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
         if (moraleLevel == null) {
+            setSegments(List.of());
+            setFilledCount(0);
+            setActiveLabel(null);
             return;
         }
 
-        final Graphics2D g2 = (Graphics2D) g.create();
-        try {
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            final int width = getWidth();
-            final int height = getHeight();
-            final int gap = Math.max(UIUtil.scaleForGUI(2), 1);
-            final int arc = Math.max(UIUtil.scaleForGUI(4), 2);
-            final int totalGap = gap * (SEGMENT_COUNT - 1);
-            final int segmentWidth = Math.max((width - totalGap) / SEGMENT_COUNT, 1);
-            final int usedWidth = segmentWidth * SEGMENT_COUNT + totalGap;
-            final int xStart = Math.max((width - usedWidth) / 2, 0);
-
-            final int filledIndex = moraleLevel.getLevel() - AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
-
-            for (int i = 0; i < SEGMENT_COUNT; i++) {
-                final int x = xStart + i * (segmentWidth + gap);
-                final Color base = segmentColor(i);
-
-                if (i <= filledIndex) {
-                    g2.setColor(base);
-                } else {
-                    g2.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(), FADED_ALPHA));
-                }
-                g2.fillRoundRect(x, 0, segmentWidth, height, arc, arc);
-
-                g2.setColor(new Color(0, 0, 0, BORDER_ALPHA));
-                g2.drawRoundRect(x, 0, segmentWidth - 1, height - 1, arc, arc);
-            }
-
-            // Outline the current level so the exact morale value is unambiguous.
-            final int markerX = xStart + filledIndex * (segmentWidth + gap);
-            Color markerColor = UIManager.getColor("Label.foreground");
-            if (markerColor == null) {
-                markerColor = Color.WHITE;
-            }
-            g2.setColor(markerColor);
-            g2.setStroke(new BasicStroke(Math.max(UIUtil.scaleForGUI(2), 1)));
-            g2.drawRoundRect(markerX, 0, segmentWidth - 1, height - 1, arc, arc);
-        } finally {
-            g2.dispose();
+        final AtBMoraleLevel[] levels = AtBMoraleLevel.values();
+        final String[] tooltips = new String[levels.length];
+        for (int i = 0; i < levels.length; i++) {
+            tooltips[i] = wordWrap(levels[i] + " \u2014 " + levels[i].getToolTipText());
         }
+
+        setSegments(gradientSegments(MORALE_GRADIENT, tooltips));
+        setFilledCount(moraleLevel.getLevel() - AtBMoraleLevel.MINIMUM_MORALE_LEVEL + 1);
+        setActiveLabel(labelText);
     }
 
     /**
-     * Computes the color for the segment at the given index by interpolating across
-     * the deep, well-separated
-     * {@link #MORALE_GRADIENT} anchors, from green (favorable for the player) at
-     * the lowest morale to red (dangerous
-     * for the player) at the highest.
+     * Builds a self-contained panel wrapping a {@link MoraleBar}, suitable for
+     * embedding in dialogs such as the
+     * immersive "Morale Update" notification. The bar is given generous horizontal
+     * padding so it reads as a centered
+     * gauge rather than spanning the full dialog width. The label beneath the
+     * active
+     * segment honours the contract's
+     * special "Peaceful" wording for routed garrison/retainer contracts, matching
+     * the briefing-room contract panel.
      *
-     * @param index the zero-based segment index, from lowest to highest morale
+     * @param contract the contract whose enemy morale should be displayed
      *
-     * @return the color for the segment
+     * @return a transparent panel containing the configured morale bar
      */
-    private static Color segmentColor(final int index) {
-        if (SEGMENT_COUNT <= 1) {
-            return MORALE_GRADIENT[0];
-        }
+    public static JPanel createDialogPanel(final AtBContract contract) {
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        final int horizontalPadding = UIUtil.scaleForGUI(40);
+        final int verticalPadding = UIUtil.scaleForGUI(6);
+        panel.setBorder(BorderFactory.createEmptyBorder(verticalPadding, horizontalPadding, verticalPadding,
+                horizontalPadding));
 
-        final float fraction = (float) index / (SEGMENT_COUNT - 1);
-        final float scaled = fraction * (MORALE_GRADIENT.length - 1);
-        final int lower = (int) Math.floor(scaled);
-        final int upper = Math.min(lower + 1, MORALE_GRADIENT.length - 1);
-        return interpolate(MORALE_GRADIENT[lower], MORALE_GRADIENT[upper], scaled - lower);
+        final MoraleDisplay display = getMoraleDisplay(contract);
+        final MoraleBar bar = new MoraleBar(contract.getMoraleLevel(), display.label());
+        bar.setToolTipText(wordWrap(display.tooltip()));
+        panel.add(bar, BorderLayout.CENTER);
+        return panel;
     }
 
     /**
-     * Linearly interpolates between two colors.
+     * The display text and tooltip used to describe a contract's enemy morale.
      *
-     * @param from the color at {@code t == 0}
-     * @param to   the color at {@code t == 1}
-     * @param t    the interpolation factor, in the range {@code [0, 1]}
-     *
-     * @return the interpolated color
+     * @param label   the short morale name to show (e.g. a morale level name, or
+     *                "Peaceful")
+     * @param tooltip the descriptive tooltip for that morale state
      */
-    private static Color interpolate(final Color from, final Color to, final float t) {
-        final int red = Math.round(from.getRed() + (to.getRed() - from.getRed()) * t);
-        final int green = Math.round(from.getGreen() + (to.getGreen() - from.getGreen()) * t);
-        final int blue = Math.round(from.getBlue() + (to.getBlue() - from.getBlue()) * t);
-        return new Color(red, green, blue);
+    public record MoraleDisplay(String label, String tooltip) {
+    }
+
+    /**
+     * Computes the morale label and tooltip for a contract, applying the special
+     * "Peaceful" wording used for routed
+     * garrison-duty and retainer contracts. This is the single source of truth
+     * shared by the briefing-room contract
+     * panel and the morale dialog so the two never diverge.
+     *
+     * @param contract the contract whose enemy morale should be described
+     *
+     * @return the label and tooltip to display
+     */
+    public static MoraleDisplay getMoraleDisplay(final AtBContract contract) {
+        final AtBMoraleLevel level = contract.getMoraleLevel();
+        if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
+                level.isRouted()) {
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
+                    MekHQ.getMHQOptions().getLocale());
+            return new MoraleDisplay(resources.getString("txtGarrisonMoraleRouted.text"),
+                    resources.getString("txtGarrisonMoraleRouted.tooltip"));
+        }
+        return new MoraleDisplay(level.toString(), level.getToolTipText());
     }
 }
+

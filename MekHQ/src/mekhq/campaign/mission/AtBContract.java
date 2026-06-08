@@ -147,6 +147,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.view.MoraleBar;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -192,7 +193,6 @@ public class AtBContract extends Contract {
     protected int requiredCombatTeams;
     protected int requiredCombatElements;
     protected AtBMoraleLevel moraleLevel;
-    protected AtBMoraleLevel previousMoraleLevel = null;
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
     protected int sharesPct;
@@ -459,7 +459,6 @@ public class AtBContract extends Contract {
                     }
                 }
 
-                previousMoraleLevel = moraleLevel;
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
@@ -491,8 +490,9 @@ public class AtBContract extends Contract {
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + getName() + "</h2>"
-                                  + moraleLevel.getToolTipText();
-        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
+                + MoraleBar.getMoraleDisplay(this).tooltip();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(this),
+                true);
 
         MHQMorale.routedMoraleUpdate(campaign, this);
 
@@ -1108,10 +1108,6 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatElements", getRequiredCombatElements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
 
-        if (previousMoraleLevel != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "previousMoraleLevel", previousMoraleLevel.name());
-        }
-
         if (routEnd != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
         }
@@ -1212,8 +1208,6 @@ public class AtBContract extends Contract {
                     requiredCombatElements = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
-                } else if (item.getNodeName().equalsIgnoreCase("previousMoraleLevel")) {
-                    setPreviousMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("routEnd")) {
                     routEnd = MHQXMLUtility.parseDate(item.getTextContent().trim());
                 } else if (item.getNodeName().equalsIgnoreCase("routedPayout")) {
@@ -1553,45 +1547,6 @@ public class AtBContract extends Contract {
 
     public void setMoraleLevel(final AtBMoraleLevel moraleLevel) {
         this.moraleLevel = moraleLevel;
-    }
-
-    /**
-     * Returns the enemy morale level recorded immediately before the most recent
-     * morale check, or {@code null} if no
-     * prior morale level has been captured yet (e.g. for a freshly generated
-     * contract or a campaign saved before this
-     * information was tracked).
-     *
-     * @return the previous {@link AtBMoraleLevel}, or {@code null} if unknown
-     */
-    public @Nullable AtBMoraleLevel getPreviousMoraleLevel() {
-        return previousMoraleLevel;
-    }
-
-    public void setPreviousMoraleLevel(final @Nullable AtBMoraleLevel previousMoraleLevel) {
-        this.previousMoraleLevel = previousMoraleLevel;
-    }
-
-    /**
-     * Reports the direction in which enemy morale moved during the most recent
-     * morale check.
-     *
-     * <p>
-     * The value is expressed from the morale scale's point of view: a positive
-     * value means enemy morale rose
-     * (better for the enemy, worse for the player), a negative value means it fell,
-     * and zero means it was unchanged or
-     * the trend is unknown.
-     * </p>
-     *
-     * @return {@code 1} if morale rose, {@code -1} if it fell, or {@code 0} if
-     *         unchanged or unknown
-     */
-    public int getMoraleTrend() {
-        if ((previousMoraleLevel == null) || (moraleLevel == null)) {
-            return 0;
-        }
-        return Integer.signum(moraleLevel.getLevel() - previousMoraleLevel.getLevel());
     }
 
     /**
