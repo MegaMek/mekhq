@@ -63,13 +63,15 @@ import mekhq.gui.baseComponents.SegmentedBar;
  * </p>
  *
  * <p>
- * This is a thin configuration of the reusable {@link SegmentedBar}; all
- * rendering and tooltip handling live there.
+ * This wraps a private {@link SegmentedBar} (composition rather than
+ * inheritance) so that only the morale-specific API is exposed; callers cannot
+ * reconfigure the underlying segments and break the "one segment per morale
+ * level" invariant.
  * </p>
  *
  * @author The MegaMek Team
  */
-public class MoraleBar extends SegmentedBar {
+public class MoraleBar extends JPanel {
     /**
      * Anchor colors for the morale gradient, ordered from the lowest enemy morale
      * to the highest. Low enemy morale is
@@ -91,13 +93,19 @@ public class MoraleBar extends SegmentedBar {
     };
 
     /**
+     * The wrapped gauge. Kept private so the segment-level API is not exposed to
+     * callers.
+     */
+    private final SegmentedBar bar = new SegmentedBar();
+
+    /**
      * Creates a morale bar for the given morale level.
      *
      * @param moraleLevel the enemy morale level to display; may be {@code null}, in
      *                    which case nothing is painted
      */
     public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel) {
-        setMoraleLevel(moraleLevel);
+        this(moraleLevel, (moraleLevel == null) ? null : moraleLevel.toString());
     }
 
     /**
@@ -112,6 +120,9 @@ public class MoraleBar extends SegmentedBar {
      *                    name
      */
     public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
+        super(new BorderLayout());
+        setOpaque(false);
+        add(bar, BorderLayout.CENTER);
         setMoraleLevel(moraleLevel, labelText);
     }
 
@@ -138,9 +149,9 @@ public class MoraleBar extends SegmentedBar {
      */
     public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
         if (moraleLevel == null) {
-            setSegments(List.of());
-            setFilledCount(0);
-            setActiveLabel(null);
+            bar.setSegments(List.of());
+            bar.setFilledCount(0);
+            bar.setActiveLabel(null);
             return;
         }
 
@@ -150,9 +161,22 @@ public class MoraleBar extends SegmentedBar {
             tooltips[i] = wordWrap(levels[i] + " \u2014 " + levels[i].getToolTipText());
         }
 
-        setSegments(gradientSegments(MORALE_GRADIENT, tooltips));
-        setFilledCount(moraleLevel.getLevel() - AtBMoraleLevel.MINIMUM_MORALE_LEVEL + 1);
-        setActiveLabel(labelText);
+        bar.setSegments(SegmentedBar.gradientSegments(MORALE_GRADIENT, tooltips));
+        bar.setFilledCount(moraleLevel.getLevel() - AtBMoraleLevel.MINIMUM_MORALE_LEVEL + 1);
+        bar.setActiveLabel(labelText);
+    }
+
+    /**
+     * Forwards the tooltip to the wrapped gauge so that the area around the
+     * segments (gaps and the label) shows this
+     * fallback tooltip, while individual segments keep their own per-level
+     * tooltips.
+     *
+     * @param text the tooltip text, or {@code null} for none
+     */
+    @Override
+    public void setToolTipText(final @Nullable String text) {
+        bar.setToolTipText(text);
     }
 
     /**
@@ -179,9 +203,9 @@ public class MoraleBar extends SegmentedBar {
                 horizontalPadding));
 
         final MoraleDisplay display = getMoraleDisplay(contract);
-        final MoraleBar bar = new MoraleBar(contract.getMoraleLevel(), display.label());
-        bar.setToolTipText(wordWrap(display.tooltip()));
-        panel.add(bar, BorderLayout.CENTER);
+        final MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), display.label());
+        moraleBar.setToolTipText(wordWrap(display.tooltip()));
+        panel.add(moraleBar, BorderLayout.CENTER);
         return panel;
     }
 
