@@ -1133,7 +1133,6 @@ public class CampaignOptionsMarshaller {
               "opForLanceTypeVehicles",
               campaignOptions.getOpForLanceTypeVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

@@ -660,7 +660,6 @@ public class CampaignOptions {
     private int moraleDecisiveVictoryEffect;
     private int moraleDefeatEffect;
     private int moraleDecisiveDefeatEffect;
-    private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
     private final int[] atbBattleChance;
     private boolean generateChases;
@@ -1348,7 +1347,6 @@ public class CampaignOptions {
         moraleDecisiveDefeatEffect = -3;
 
         // Contract Operations
-        mercSizeLimited = false;
         restrictPartsByMission = true;
         atbBattleChance = new int[CombatRole.values().length - 1];
         atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
@@ -5148,14 +5146,6 @@ public class CampaignOptions {
 
     public void setMoraleDecisiveDefeatEffect(final int moraleDecisiveDefeatEffect) {
         this.moraleDecisiveDefeatEffect = moraleDecisiveDefeatEffect;
-    }
-
-    public boolean isMercSizeLimited() {
-        return mercSizeLimited;
-    }
-
-    public void setMercSizeLimited(final boolean mercSizeLimited) {
-        this.mercSizeLimited = mercSizeLimited;
     }
 
     public boolean isRegionalMekVariations() {
