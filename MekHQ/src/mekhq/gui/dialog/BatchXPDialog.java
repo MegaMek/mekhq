@@ -286,7 +286,7 @@ public final class BatchXPDialog extends JDialog {
                     skillLevel.setEnabled(true);
                     ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
                     skillLevel.getModel()
-                          .setValue(Math.clamp((Integer) skillLevel.getModel().getValue(), 1, maxSkillLevel));
+                          .setValue(Math.clamp((Integer) skillLevel.getModel().getValue(), 0, maxSkillLevel));
                     buttonSpendXP.setEnabled(true);
                 }
             }
