@@ -50,11 +50,18 @@ import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Vector;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
@@ -76,38 +83,40 @@ import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Handles the training of combat teams within the campaign.
+ * Manages the daily training progression of combat teams and their personnel within a campaign.
  *
- * <p>This class is responsible for managing the process of skill improvement and education for
- * training combat teams and their associated personnel. It identifies eligible combat teams, validates their contracts
- * and current conditions, and processes training for each team member.</p>
+ * <p>Each week that a combat team is assigned a training role, this class drives the full
+ * training pipeline: validating eligibility, resolving the educator's skill check, distributing XP progress to
+ * trainees, and advancing skills when the improvement threshold is met. The result of each session is surfaced as
+ * entries in the campaign's daily report and, optionally, each affected person's personnel log.</p>
  *
- * <p>Key functionality includes tracking education time for trainees, determining skills eligible
- * for training, generating skill improvement reports, and handling both individual and group training scenarios.</p>
+ * <h2>Training Resolution</h2>
+ * <ol>
+ *   <li>The combat team's commander makes a {@link SkillType#S_TRAINING}
+ *       skill check. The raw margin of success drives the amount of XP awarded this session.</li>
+ *   <li>A margin at or below {@link MarginOfSuccess#BARELY_MADE_IT}
+ *       produces no XP for any trainee.</li>
+ *   <li>Above that threshold, each trainee's target skill receives {@code max(1, marginOfSuccess)} XP.
+ *       Accumulated XP persists across sessions until the improvement cost is met.</li>
+ *   <li>When accumulated XP meets or exceeds the cost to improve (adjusted by
+ *       {@link CampaignOptions#getXpCostMultiplier()} and optional
+ *       reasoning-based adjustments), the skill advances one level and veterancy awards are evaluated.</li>
+ * </ol>
  *
- * <p>Main methods:
- * <ul>
- *     <li>{@link #processTrainingCombatTeams(Campaign)}: Entry point for processing all combat
- *     team training in the campaign.</li>
- *     <li>{@link #processTraining(Campaign, Formation)}: Applies training logic to a specific
- *     combat team.</li>
- *     <li>{@link #performTraining(Campaign, Formation, Person, Map, int)}: Handles training for individual
- *     trainees in a force.</li>
- *     <li>{@link #processTrainingTime(Person, Person, List, int, double, boolean, boolean, LocalDate)}  Updates a
- *     trainee's education progression and improves skills.</li>
- *     <li>{@link #createSkillsList(Campaign, Set)}: Collects the skill levels of educators to
- *     determine skills eligible for training.</li>
- * </ul>
+ * <h2>Entry Point</h2>
+ * <p>Call {@link #processTrainingCombatTeams(Campaign)} once per day to run the full pipeline for
+ * all eligible combat teams in the campaign. All other methods in this class are internal
+ * implementation details.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
  */
 public class TrainingCombatTeams {
     private static final MMLogger LOGGER = MMLogger.create(TrainingCombatTeams.class);
-
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Education";
-    @Deprecated(since = "0.50.10")
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
-          MekHQ.getMHQOptions().getLocale());
 
     private static final int EXPERIENCE_LEVEL_REDUCTION = -1;
+    static final int XP_RATE_BASE_LINE = 1;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -441,7 +450,7 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void improveSkill(Campaign campaign, Person trainee, Skill targetSkill, int baseCostToImprove) {
+    static void improveSkill(Campaign campaign, Person trainee, Skill targetSkill, int baseCostToImprove) {
         targetSkill.changeXpProgress(-baseCostToImprove);
         targetSkill.improve();
 
@@ -461,7 +470,7 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean isWasTrainingCompleted(int baseCostToImprove, int finalXPProgress) {
+    static boolean isWasTrainingCompleted(int baseCostToImprove, int finalXPProgress) {
         int actualCostToImprove = max(0, baseCostToImprove - finalXPProgress);
 
         return actualCostToImprove == 0;
@@ -481,9 +490,7 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.51.01
      */
-    private static int getFinalXPProgress(int marginOfSuccess, Skill targetSkill) {
-        final int XP_RATE_BASE_LINE = 1;
-
+    static int getFinalXPProgress(int marginOfSuccess, Skill targetSkill) {
         int actualXPProgress = max(XP_RATE_BASE_LINE, (XP_RATE_BASE_LINE * marginOfSuccess));
         targetSkill.changeXpProgress(actualXPProgress);
 
@@ -521,7 +528,7 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void sortSkillsLowestLevelToHighest(List<Skill> skillsBeingTrained) {
+    static void sortSkillsLowestLevelToHighest(List<Skill> skillsBeingTrained) {
         skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
     }
 
@@ -532,16 +539,16 @@ public class TrainingCombatTeams {
      * queued for training.</p>
      *
      * @param skillsBeingTrained the list of {@link Skill}s queued for training
-     * @param marginOfSuccess    the margin by which the skill check was passed; must exceed {@code BARELY_MADE_IT} for
-     *                           training to be possible
+     * @param marginOfSuccess    the margin by which the skill check was passed; must equal or exceed
+     *                           {@link MarginOfSuccess#BARELY_MADE_IT} for training to be possible
      *
      * @return {@code true} if training cannot proceed; {@code false} if it can
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, int marginOfSuccess) {
-        boolean isSkillCheckFailed = marginOfSuccess <= BARELY_MADE_IT.getValue();
+    static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, int marginOfSuccess) {
+        boolean isSkillCheckFailed = marginOfSuccess < BARELY_MADE_IT.getValue();
         boolean isNothingBeingTrained = skillsBeingTrained.isEmpty();
 
         return isSkillCheckFailed || isNothingBeingTrained;
