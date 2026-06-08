@@ -350,7 +350,7 @@ public class ContractMarketDialog extends JDialog {
 
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
+                    campaign.getParentLocation().getTransitTime(), isUseCommandCircuit));
             row.add(Integer.toString(days));
             row.add(String.valueOf(contract.getLength()));
             row.add(contract.getTransportCompString());
@@ -519,7 +519,7 @@ public class ContractMarketDialog extends JDialog {
             row.add(contract.getContractType().toString());
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getCurrentLocation().getTransitTime(), finalIsUseCommandCircuit));
+                    campaign.getParentLocation().getTransitTime(), finalIsUseCommandCircuit));
             row.add(Integer.toString(days));
             row.add(String.valueOf(contract.getLength()));
             row.add(contract.getTransportCompString());

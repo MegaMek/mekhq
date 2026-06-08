@@ -834,6 +834,11 @@ public class Campaign implements ITechManager, IPlace {
         this.campaignStartDate = campaignStartDate;
     }
 
+    public PlanetarySystem getCurrentSystem() {
+        AbstractLocation location = getParentLocation();
+        return location != null ? location.getCurrentSystem() : null;
+    }
+
     public boolean isAvoidingEmptySystems() {
         return isAvoidingEmptySystems;
     }
@@ -1775,7 +1780,7 @@ public class Campaign implements ITechManager, IPlace {
      * <p>Call this once per day after all personnel processing has completed.</p>
      */
     public void pruneEmptyLocations() {
-        AbstractLocation mainLocation = getCurrentLocation();
+        AbstractLocation mainLocation = getParentLocation();
         locations.removeIf(location -> {
             if (location == mainLocation) {
                 return false;
@@ -1886,7 +1891,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
         setLocation(new CurrentLocation(planetarySystem, 0.0));
-        MekHQ.triggerEvent(new LocationChangedEvent(getCurrentLocation(), false));
+        MekHQ.triggerEvent(new LocationChangedEvent(getParentLocation(), false));
 
         if (getAutomatedMothballUnits().isEmpty()) {
             performAutomatedActivation(this);

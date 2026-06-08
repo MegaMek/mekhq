@@ -1764,6 +1764,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         LocationNode.LocationManager.setLocation(part, currentLocation);
                     }
                 }
+
             }
 
             // Persons at campus — parented directly under AcademyCampusLocation (no CurrentLocation)

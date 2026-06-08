@@ -240,7 +240,7 @@ public class CampaignNewDayManager {
         this.warehouse = campaign.getAllWarehouse();
         this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
-        this.updatedLocation = campaign.getCurrentLocation();
+        this.updatedLocation = campaign.getParentLocation();
     }
 
     /**
@@ -434,7 +434,7 @@ public class CampaignNewDayManager {
         for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
             location.newDay(campaign, location != updatedLocation);
         }
-        updatedLocation = campaign.getCurrentLocation();
+        updatedLocation = campaign.getParentLocation();
 
 
         updateFacilities();
@@ -1318,7 +1318,7 @@ public class CampaignNewDayManager {
                 // If we're in transit and we don't allow deliveries while in transit the part will remain fixed with
                 // a delivery time of 1 day until we arrive at our destination.
                 if (campaignOptions.isNoDeliveriesInTransit() &&
-                          !campaign.getCurrentLocation().isOnPlanet() &&
+                          !campaign.getParentLocation().isOnPlanet() &&
                           newDaysToArrival <= 0) {
                     return;
                 }
@@ -1404,7 +1404,7 @@ public class CampaignNewDayManager {
                 campaign.workOnMothballingOrActivation(unit);
             }
             if (!unit.isPresent()) {
-                unit.checkArrival(!campaign.getCurrentLocation().isOnPlanet() &&
+                unit.checkArrival(!campaign.getParentLocation().isOnPlanet() &&
                                         campaignOptions.isNoDeliveriesInTransit());
 
                 // Has unit just been delivered?

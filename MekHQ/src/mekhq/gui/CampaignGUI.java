@@ -1425,6 +1425,7 @@ public class CampaignGUI extends JPanel {
         }
         return "<html><b>" + label + "</b>: " + args[0] + "</html>";
     }
+
     /**
      * Returns the currently selected {@link LocationFilterItem}, defaulting to {@link LocationFilterItem#ALL} when the
      * combo has not yet been initialized.

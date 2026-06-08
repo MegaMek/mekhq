@@ -551,7 +551,7 @@ class StratConRulesManagerTest {
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
 
         CurrentLocation location = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(location);
+        when(campaign.getParentLocation()).thenReturn(location);
 
         if (atmosphere != null) {
             Planet planet = mock(Planet.class);

@@ -53,7 +53,7 @@ public class DeploymentShortfallNagLogic {
      * @return {@code true} if there are unmet deployment requirements; otherwise, {@code false}.
      */
     public static boolean hasDeploymentShortfall(Campaign campaign) {
-        if (!campaign.getCurrentLocation().isOnPlanet()) {
+        if (!campaign.getParentLocation().isOnPlanet()) {
             return false;
         }
 

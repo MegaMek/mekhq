@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -60,6 +61,10 @@ public class Hangar implements ILocation {
     @Override
     public LocationNode getLocationNode() {
         return locationNode;
+    }
+
+    public Set<Unit> getUnitsAtLocation() {
+        return Set.copyOf(units.values());
     }
 
     /**

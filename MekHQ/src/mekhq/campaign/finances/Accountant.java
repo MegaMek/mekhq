@@ -157,7 +157,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getParentLocation();
         boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 

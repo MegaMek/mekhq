@@ -196,7 +196,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         txtTimeStart.setName("lblTimeStart2");
         txtTimeStart.setText("<html>" +
-                                   Math.round(path.getStartTime(campaign.getCurrentLocation().getTransitTime()) *
+                Math.round(path.getStartTime(campaign.getParentLocation().getTransitTime()) *
                                                     100.0) /
                                          100.0 +
                                    " days from " +
@@ -275,7 +275,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         txtTotalTime.setName("lblTotalTime2");
         txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate,
-              campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit) * 100.0) / 100.0 +
+                campaign.getParentLocation().getTransitTime(), isUseCommandCircuit) * 100.0) / 100.0 +
                                    " days" +
                                    "</html>");
         gridBagConstraints = new GridBagConstraints();
@@ -298,7 +298,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
-            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getCurrentLocation().getTransitTime(),
+            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getParentLocation().getTransitTime(),
                   isUseCommandCircuit));
             Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
 

@@ -347,8 +347,8 @@ public class EducationController {
                       academy.getName(), academy.getLocationSystems().getFirst());
                 LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
                 double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
-                                            && campaign.getCurrentLocation() != null
-                                            ? campaign.getCurrentLocation().getTransitTime()
+                                            && campaign.getParentLocation() != null
+                                            ? campaign.getParentLocation().getTransitTime()
                                             : 0.0;
                 int journeyDays = max(2,
                       (int) Math.ceil(person.getJumpPath().getTotalTime(campaign.getLocalDate(), startTransit, false)));
@@ -806,7 +806,7 @@ public class EducationController {
           Consumer<CurrentLocation> onTravelArrival) {
         person.incrementEduDaysOfTravel();
 
-        AbstractLocation travelLoc = person.getCurrentLocation();
+        AbstractLocation travelLoc = person.getParentLocation();
 
         if (!(travelLoc instanceof CurrentLocation currentLocation)) {
             int travelTime = max(2,

@@ -433,7 +433,7 @@ public abstract class AbstractProcreation {
             // Create a baby
             final Person baby = campaign.newDependent(Gender.RANDOMIZE,
                   mother.getOriginFaction(),
-                  campaign.getCurrentLocation().getPlanet());
+                    campaign.getParentLocation().getPlanet());
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
 

@@ -710,7 +710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final AbstractLocation location = campaign.getCurrentLocation();
+        final AbstractLocation location = campaign.getParentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();

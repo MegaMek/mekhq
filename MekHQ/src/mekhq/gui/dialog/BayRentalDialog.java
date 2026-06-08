@@ -94,7 +94,7 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
     }
 
     public static void showNoFacilitiesAvailableDialog(Campaign campaign) {
-        boolean isInSpace = !campaign.getCurrentLocation().isOnPlanet();
+        boolean isInSpace = !campaign.getParentLocation().isOnPlanet();
 
         String message;
         if (isInSpace) {

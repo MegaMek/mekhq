@@ -1053,7 +1053,7 @@ public class StratConRulesManager {
         // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
         // but they can operate on airless worlds (vacuum)
         if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
-            Planet planet = campaign.getCurrentLocation().getPlanet();
+            Planet planet = campaign.getParentLocation().getPlanet();
             if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
                 return false;
             }

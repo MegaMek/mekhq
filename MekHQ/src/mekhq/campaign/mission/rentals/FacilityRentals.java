@@ -482,7 +482,7 @@ public class FacilityRentals {
             }
         }
 
-        if (!isBayRentalAllowed || !campaign.getCurrentLocation().isOnPlanet()) {
+        if (!isBayRentalAllowed || !campaign.getParentLocation().isOnPlanet()) {
             BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
             return false;
         }

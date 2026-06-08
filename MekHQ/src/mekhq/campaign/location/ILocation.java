@@ -85,7 +85,7 @@ public interface ILocation {
      * @return {@link AbstractLocation}, or {@code null} if it doesn't have a {@code AbstractLocation}
      */
     @Nullable
-    default AbstractLocation getCurrentLocation() {
+    default AbstractLocation getParentLocation() {
         return hasLocationNode() ? getLocationNode().getNearestAbstractLocation() : NO_LOCATION;
     }
 
@@ -95,7 +95,7 @@ public interface ILocation {
      * @return {@code true} if this location has a location, otherwise {@code false}
      */
     default boolean hasLocation() {
-        return getCurrentLocation() != NO_LOCATION;
+        return getParentLocation() != NO_LOCATION;
     }
 
     /**
@@ -109,7 +109,7 @@ public interface ILocation {
             return false;
         }
 
-        return getCurrentLocation().isOnPlanet();
+        return getParentLocation().isOnPlanet();
     }
 
     /**
@@ -123,7 +123,7 @@ public interface ILocation {
             return false;
         }
 
-        return getCurrentLocation().isAtJumpPoint();
+        return getParentLocation().isAtJumpPoint();
     }
 
     /**
@@ -137,7 +137,7 @@ public interface ILocation {
             return 0.0;
         }
 
-        return getCurrentLocation().getPercentageTransit();
+        return getParentLocation().getPercentageTransit();
     }
 
     /**
@@ -151,7 +151,7 @@ public interface ILocation {
             return false;
         }
 
-        return getCurrentLocation().isInTransit();
+        return getParentLocation().isInTransit();
     }
 
     /**
@@ -166,7 +166,7 @@ public interface ILocation {
             return NO_PLANETARY_SYSTEM;
         }
 
-        return getCurrentLocation().getCurrentSystem();
+        return getParentLocation().getCurrentSystem();
     }
 
     /**
@@ -181,7 +181,7 @@ public interface ILocation {
             return NO_PLANET;
         }
 
-        return getCurrentLocation().getPlanet();
+        return getParentLocation().getPlanet();
     }
 
     /**
@@ -195,7 +195,7 @@ public interface ILocation {
             return 0.0;
         }
 
-        return getCurrentLocation().getTransitTime();
+        return getParentLocation().getTransitTime();
     }
 
     /**
@@ -209,7 +209,7 @@ public interface ILocation {
             return false;
         }
 
-        return getCurrentLocation().isJumpZenith();
+        return getParentLocation().isJumpZenith();
     }
 
     /**
@@ -224,7 +224,7 @@ public interface ILocation {
             return NO_JUMP_PATH;
         }
 
-        return getCurrentLocation().getJumpPath();
+        return getParentLocation().getJumpPath();
     }
 
     /**
@@ -235,7 +235,7 @@ public interface ILocation {
      */
     default void setJumpPath(JumpPath jumpPath) {
         if (hasLocation()) {
-            getCurrentLocation().setJumpPath(jumpPath);
+            getParentLocation().setJumpPath(jumpPath);
         }
     }
 

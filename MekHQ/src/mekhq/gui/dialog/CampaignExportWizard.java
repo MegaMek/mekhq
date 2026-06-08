@@ -525,7 +525,7 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.setFaction(sourceCampaign.getFaction());
             destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
-            destinationCampaign.setLocation(sourceCampaign.getCurrentLocation());
+            destinationCampaign.setLocation(sourceCampaign.getParentLocation());
         }
 
         if (chkExportContractOffers.isSelected()) {

@@ -369,7 +369,7 @@ public abstract class AbstractMarriage {
             }
         }
 
-        if (!isInterUnit && campaign.getCurrentLocation().isOnPlanet()) {
+        if (!isInterUnit && campaign.getParentLocation().isOnPlanet()) {
             List<Gender> possibleGenders = getPossibleGenders(person);
             if (possibleGenders.isEmpty()) {
                 return;

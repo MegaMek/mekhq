@@ -111,7 +111,7 @@ public class RandomFactionGenerator {
 
     public void startup(Campaign c) {
         borderTracker.setDate(c.getLocalDate());
-        final PlanetarySystem location = c.getCurrentLocation().getCurrentSystem();
+        final PlanetarySystem location = c.getParentLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
         borderTracker.setRegionRadius(c.getCampaignOptions().getContractSearchRadius());
         MekHQ.registerHandler(borderTracker);

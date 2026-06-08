@@ -65,7 +65,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -294,10 +293,10 @@ public class ContractSummaryPanel extends JPanel {
                         campaign.getFactionStandings(), List.of(atBContract));
 
             int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
+                    campaign.getParentLocation().getTransitTime(), isUseCommandCircuit));
             int jumps = path.getJumps();
             if (campaign.getCurrentSystem().getId().equals(contract.getSystemId()) &&
-                      campaign.getCurrentLocation().isOnPlanet()) {
+                        campaign.getParentLocation().isOnPlanet()) {
                 days = 0;
                 jumps = 0;
             }
