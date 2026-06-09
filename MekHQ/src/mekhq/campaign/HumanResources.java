@@ -1741,6 +1741,7 @@ public class HumanResources {
         }
 
         setVeterancyAwardEligibility(campaign, person);
+        person.resetPersonalityDescription();
 
         return person;
     }

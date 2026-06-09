@@ -202,16 +202,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
-        JPanel pnlAttributes = null;
-        if (campaignOptions.isDisplayAllAttributes()) {
-            pnlAttributes = fillAttributeScores();
-        } else {
-            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-            if (!relevantAttributes.isEmpty()) {
-                pnlAttributes = fillAttributeModifiers(relevantAttributes);
-            }
-        }
-
         if ((!person.getPersonalityDescription().isBlank()) &&
                   (campaignOptions.isUseRandomPersonalities()) &&
                   (!person.isHidePersonality())) {
@@ -235,6 +225,16 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(txtDesc, gridBagConstraints);
             gridY++;
+        }
+
+        JPanel pnlAttributes = null;
+        if (campaignOptions.isDisplayAllAttributes()) {
+            pnlAttributes = fillAttributeScores();
+        } else {
+            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+            if (!relevantAttributes.isEmpty()) {
+                pnlAttributes = fillAttributeModifiers(relevantAttributes);
+            }
         }
 
         if (pnlAttributes != null) {
