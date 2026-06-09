@@ -33,29 +33,16 @@
 package mekhq.campaign.personnel.skills;
 
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.utilities.ReportingUtilities;
 
 /**
  * This class calculates the target number for a skill check based on the person's attributes, skills, and the
@@ -66,6 +53,11 @@ import mekhq.utilities.ReportingUtilities;
  * @since 0.50.05
  */
 public class SkillCheckUtility {
+
+    // only static methods
+    private SkillCheckUtility() {
+    }
+
     private static final MMLogger LOGGER = MMLogger.create(SkillCheckUtility.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
 
@@ -84,399 +76,18 @@ public class SkillCheckUtility {
      */
     protected static final int UNTRAINED_SKILL_MODIFIER = 4; // ATOW pg 43
 
-    private final String reason;
-    private final Person person;
-    private final String skillName;
-    private int marginOfSuccess;
-    private String resultsText;
-    private TargetRoll targetNumber;
-    boolean isCountUp;
-    private int roll;
-    private boolean usedEdge;
-
     /**
-     * Executes a skill check for the specified person and skill type.
+     * Use {@link #determineTargetNumber(Person, SkillType, boolean, boolean, LocalDate)} instead.
      *
-     * <p>This constructor creates a {@code SkillCheckUtility} instance which calculates the target number for the
-     * skill check and performs the roll, determining the outcome based on factors such as the person's skill level,
-     * external modifiers, miscellaneous modifiers, and whether edge is used.</p>
+     * <p>Determines the target number for a skill check ignoring aging effects and clan campaign status.</p>
      *
-     * <p>External modifiers can optionally influence the target number, while miscellaneous modifiers alter the
-     * target based on whether the skill is classified as 'count up' or not. Using edge allows the person to attempt a
-     * re-roll if the initial roll fails. Additionally, the constructor can include margins of success text as part of
-     * the results, if desired.</p>
-     *
-     * <p><b>Usage:</b> This is a convenience constructor that excludes Reputation modifiers. Reputation modifiers
-     * are only applied to Negotiation, Protocols/Any, and Streetwise/Any checks.</p>
-     *
-     * @param reason                      the reason for the check; can be {@code null}
-     * @param person                      the {@link Person} performing the skill check
-     * @param skillName                   the name of the skill being used, corresponding to a {@link SkillType}
-     * @param externalModifiers           an optional list of {@link TargetRollModifier}s that affect the target number
-     * @param miscModifier                a miscellaneous modifier that affects the target number:
-     *                                    <ul>
-     *                                        <li>For 'count up' skills, this value is subtracted from
-     *                                            the target number (i.e., negative values are bonuses,
-     *                                            positive values are penalties).</li>
-     *                                        <li>For non-'count up' skills, this value is added to the
-     *                                            target number (i.e., positive values are penalties).</li>
-     *                                    </ul>
-     * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
-     * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public SkillCheckUtility(final @Nullable String reason, final Person person, final String skillName,
-          @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
-          final boolean includeMarginsOfSuccessText) {
-        this(reason,
-              person,
-              skillName,
-              externalModifiers,
-              miscModifier,
-              useEdge,
-              includeMarginsOfSuccessText,
-              false,
-              false,
-              LocalDate.of(3151, 1, 1));
-    }
-
-    /**
-     * Executes a skill check for the specified person and skill type.
-     *
-     * <p>This constructor creates a {@code SkillCheckUtility} instance which calculates the target number
-     * for the skill check and performs the roll, determining the outcome based on factors such as the person's skill
-     * level, external modifiers, miscellaneous modifiers, and whether edge is used.</p>
-     *
-     * <p>External modifiers can optionally influence the target number, while miscellaneous modifiers
-     * alter the target based on whether the skill is classified as 'count up' or not. Using edge allows the person to
-     * attempt a re-roll if the initial roll fails. Additionally, the constructor can include margins of success text as
-     * part of the results, if desired.</p>
-     *
-     * <p><b>Usage:</b> This constructor offers detailed control over the skill check process.
-     * For simpler use-cases, the
-     * {@link #performQuickSkillCheck(Person, String, List, int, boolean, boolean, LocalDate)} method provides a more
-     * streamlined approach.</p>
-     *
-     * @param reason                      the reason for the check; can be {@code null}
-     * @param person                      the {@link Person} performing the skill check
-     * @param skillName                   the name of the skill being used, corresponding to a {@link SkillType}
-     * @param externalModifiers           an optional list of {@link TargetRollModifier}s that affect the target number
-     * @param miscModifier                a miscellaneous modifier that affects the target number:
-     *                                    <ul>
-     *                                        <li>For 'count up' skills, this value is subtracted from
-     *                                            the target number (i.e., negative values are bonuses,
-     *                                            positive values are penalties).</li>
-     *                                        <li>For non-'count up' skills, this value is added to the
-     *                                            target number (i.e., positive values are penalties).</li>
-     *                                    </ul>
-     * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
-     * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
-     * @param isUseAgingEffects           if {@code true}, considers aging effects during the check
-     * @param isClanCampaign              if {@code true}, applies rules specific to clan campaigns
-     * @param today                       the current date, used for time-dependent logic
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public SkillCheckUtility(final @Nullable String reason, final Person person, final String skillName,
-          @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier, final boolean useEdge,
-          final boolean includeMarginsOfSuccessText, boolean isUseAgingEffects, boolean isClanCampaign,
-          LocalDate today) {
-        this.reason = reason;
-        this.person = person;
-        this.skillName = skillName;
-
-        if (isPersonNull()) {
-            return;
-        }
-
-        final SkillType skillType = SkillType.getType(skillName);
-        boolean hasNaturalAptitude = person.hasSkill(skillName) && person.getSkill(skillName).getHasNaturalAptitude();
-        isCountUp = skillType.isCountUp();
-        targetNumber = determineTargetNumber(person, skillType, miscModifier, isUseAgingEffects, isClanCampaign, today);
-
-        if (externalModifiers != null) {
-            for (TargetRollModifier modifier : externalModifiers) {
-                targetNumber.addModifier(modifier);
-            }
-        }
-
-        performCheck(useEdge, hasNaturalAptitude, includeMarginsOfSuccessText);
-    }
-
-    /**
-     * Use {@link #performQuickSkillCheck(Person, String, List, int, boolean, boolean, LocalDate)} instead
+     * @param person    the {@link Person} performing the skill check
+     * @param skillType the associated {@link SkillType} being checked
+     * @return the {@link TargetRoll} for the skill check
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public static boolean performQuickSkillCheck(final Person person, final String skillName,
-          final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier) {
-        return performQuickSkillCheck(person, skillName, externalModifiers, miscModifier, false, false,
-              LocalDate.of(3151, 1, 1));
-    }
-
-    /**
-     * Performs a quick and simple skill check for a person based on the specified skill name.
-     *
-     * <p>This method evaluates whether the given {@link Person} successfully performs a specified skill
-     * by creating a {@link SkillCheckUtility} instance to handle the calculations. The skill check's success or failure
-     * is determined based on the person's skill level, the provided modifiers (if any), and any campaign-specific
-     * rules.</p>
-     *
-     * <p><b>Usage:</b> This method is designed for common use cases and provides a streamlined approach
-     * to skill checks. For cases that require greater customization, such as support for edge re-rolls or detailed
-     * success metrics, use the {@link SkillCheckUtility} constructor instead.</p>
-     *
-     * @param person            the {@link Person} performing the skill check
-     * @param skillName         the name of the skill to be checked, corresponding to a {@link SkillType}
-     * @param externalModifiers an optional list of {@link TargetRollModifier}s to apply additional adjustments to the
-     *                          target number
-     * @param miscModifier      a miscellaneous modifier that affects the target number:
-     *                          <ul>
-     *                              <li>For 'count up' skills, this value is subtracted from the target number
-     *                                  (i.e., negative values are bonuses, positive values are penalties).</li>
-     *                              <li>For non-'count up' skills, this value is added to the target number
-     *                                  (i.e., positive values are penalties).</li>
-     *                          </ul>
-     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
-     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
-     * @param today             the current date, used for time-dependent logic
-     *
-     * @return {@code true} if the skill check succeeds, {@code false} otherwise
-     *
-     *       <p>This method is often the preferred choice for skill checks in MekHQ due to its simplicity and
-     *       effectiveness.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static boolean performQuickSkillCheck(final Person person, final String skillName,
-          final @Nullable List<TargetRollModifier> externalModifiers, final int miscModifier,
-          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
-        SkillCheckUtility skillCheck = new SkillCheckUtility(null, person, skillName, externalModifiers, miscModifier,
-              false, false, isUseAgingEffects, isClanCampaign, today);
-        return skillCheck.isSuccess();
-    }
-
-    /**
-     * Checks if the {@code person} object is {@code null} and handles the null case by auto-failing the check with
-     * obviously wrong results.
-     *
-     * <p>If the {@code person} is {@code null}, the method logs a debug message, sets a {@code DISASTROUS} failure
-     * margin, and assigns out-of-range values to the {@code targetNumber} and {@code roll} to make the issue easily
-     * identifiable.</p>
-     *
-     * @return {@code true} if the {@code person} is {@code null}, {@code false} otherwise.
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    private boolean isPersonNull() {
-        if (person == null) {
-            LOGGER.debug("Null person passed into SkillCheckUtility." +
-                               " Auto-failing check with bogus results so the bug stands out.");
-
-            marginOfSuccess = DISASTROUS.getValue();
-            resultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
-            targetNumber = new TargetRoll(Integer.MAX_VALUE, "ERROR");
-            roll = Integer.MIN_VALUE;
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Generates a formatted and localized results text describing the outcome of a skill check.
-     *
-     * <p>This method produces a detailed summary of the skill check results, including:</p>
-     * <ul>
-     *   <li>The person's title, name, and gender-based pronoun</li>
-     *   <li>The name of the skill being checked</li>
-     *   <li>The dice roll, target number, and margin of success or failure</li>
-     *   <li>A status message indicating success or failure</li>
-     *   <li>Use of edge (if applicable)</li>
-     * </ul>
-     *
-     * <p>The results text is color-coded using custom span tags based on the margin of success:
-     * <ul>
-     *   <li><b>Neutral Margin:</b> Displayed using a warning color (e.g., yellow).</li>
-     *   <li><b>Failure:</b> Displayed using a negative color (e.g., red).</li>
-     *   <li><b>Success:</b> Displayed using a positive color (e.g., green).</li>
-     * </ul>
-     * </p>
-     *
-     * <p>If edge was used to reroll the skill check, the results will include an additional note with
-     * information about the reroll. If the caller requests it, margin of success details can also be
-     * appended to the results text.</p>
-     *
-     * <p>If the skill name is {@code null}, the method returns a localized error message indicating that the
-     * skill name could not be resolved and that an error occurred during the results generation process.</p>
-     *
-     * @param includeMarginsOfSuccessText whether to include detailed margin of success information in the results text
-     *
-     * @return a localized and formatted {@link String} representing the outcomes of the skill check:
-     *       <ul>
-     *         <li>If successful, the string provides details of the roll, skill, and margin of success.</li>
-     *         <li>If edge was used, additional information about the reroll is included.</li>
-     *         <li>If the skill name is {@code null}, an error message is returned instead.</li>
-     *       </ul>
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    private String generateResultsText(boolean includeMarginsOfSuccessText, boolean hasNaturalAptitude) {
-        if (skillName == null) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullSkillName");
-        }
-
-        String fullTitle = person.getHyperlinkedFullTitle();
-        String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
-
-        String colorOpen;
-        int neutralMarginValue = BARELY_MADE_IT.getValue();
-        if (marginOfSuccess == neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
-        } else if (marginOfSuccess < neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
-        } else {
-            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
-        }
-
-        String status = getTextAt(RESOURCE_BUNDLE, "skillCheck.results." + (isSuccess() ? "success" : "failure"));
-
-        StringBuilder resultsText = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-              "skillCheck.results",
-              reason == null ? "" : "<b>" + reason + ":</b> ",
-              fullTitle,
-              colorOpen,
-              status,
-              CLOSING_SPAN_TAG,
-              genderedReferenced,
-              skillName,
-              roll,
-              targetNumber.getValue()));
-
-        if (hasNaturalAptitude) {
-            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.naturalAptitude"));
-        }
-
-        if (usedEdge) {
-            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled"));
-        }
-
-        if (includeMarginsOfSuccessText) {
-            MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
-            String marginOfSuccessText = colorOpen + marginOfSuccessObject.getLabel() + CLOSING_SPAN_TAG;
-            resultsText.append(" ").append(marginOfSuccessText);
-        }
-
-        return resultsText.toString();
-    }
-
-    /**
-     * Gets the calculated margin of success for this skill check.
-     *
-     * <p>The margin of success represents how much better (or worse) the roll was compared to the target number.</p>
-     *
-     * <p><b>Usage:</b> You want to call this method whenever you care about how well a check was passed. Or how
-     * badly it was failed. If you only care whether the check was passed or failed use {@link #isSuccess()}
-     * instead.</p>
-     *
-     * @return the margin of success
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public int getMarginOfSuccess() {
-        return marginOfSuccess;
-    }
-
-    /**
-     * Determines whether the skill check was successful.
-     *
-     * <p>A skill check is considered successful if the calculated margin of success is greater than or equal to the
-     * margin value of {@link MarginOfSuccess#BARELY_MADE_IT}.</p>
-     *
-     * <p><b>Usage:</b> You want to call this method whenever you only care whether the check was passed or failed.
-     * If you want to know how well the character did use {@link #getMarginOfSuccess()} instead.</p>
-     *
-     * @return {@code true} if the skill check succeeded, {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public boolean isSuccess() {
-        return marginOfSuccess >= BARELY_MADE_IT.getValue();
-    }
-
-    /**
-     * Gets the results text for the margin of success.
-     *
-     * <p>This is a descriptive string representing the outcome of the skill check, based on the calculated margin of
-     * success.</p>
-     *
-     * @return the results text for the skill check
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public String getResultsText() {
-        return resultsText;
-    }
-
-    /**
-     * Gets the target number for the skill check.
-     *
-     * <p>The target number represents the value that the rolled number must meet or exceed for the skill check to
-     * succeed.</p>
-     *
-     * @return the target number for the skill check
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public TargetRoll getTargetNumber() {
-        return targetNumber;
-    }
-
-    /**
-     * Gets the roll result for the skill check.
-     *
-     * <p>The roll is the result of the dice roll used to determine whether the skill check succeeded or failed.</p>
-     *
-     * @return the roll result for the skill check
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public int getRoll() {
-        return roll;
-    }
-
-    /**
-     * Checks whether edge was used during the skill check.
-     *
-     * <p>Edge provides the opportunity to re-roll if the initial skill check fails, allowing a chance to improve the
-     * outcome.</p>
-     *
-     * @return {@code true} if edge was used during the skill check, {@code false} otherwise
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isUsedEdge() {
-        return usedEdge;
-    }
-
-    /**
-     * Use {@link #determineTargetNumber(Person, SkillType, int, boolean, boolean, LocalDate)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
-        return determineTargetNumber(person, skillType, miscModifier, false, false, LocalDate.of(3151, 1, 1));
+    static TargetRoll determineTargetNumber(Person person, SkillType skillType) {
+        return determineTargetNumber(person, skillType, false, false, LocalDate.of(3151, 1, 1));
     }
 
     /**
@@ -488,30 +99,28 @@ public class SkillCheckUtility {
      *
      * @param person            the {@link Person} performing the skill check
      * @param skillType         the associated {@link SkillType} for the {@link Skill} being used.
-     * @param miscModifier      any special modifiers, as an {@link Integer}. These values are subtracted from the
-     *                          target number, if the associated skill is classified as 'count up', otherwise they are
-     *                          added to the target number. This means negative values are bonuses, positive values are
-     *                          penalties.
      * @param isUseAgingEffects if {@code true}, considers aging effects during the check
      * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
      * @param today             the current date, used for time-dependent logic
      *
-     * @return the target number for the skill check
+     * @return the {@link TargetRoll} for the skill check
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier,
+    public static TargetRoll determineTargetNumber(Person person, SkillType skillType,
           boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        if (person == null) {
+            throw new IllegalArgumentException("person == null in determineTargetNumber");
+        }
+
         final String skillName = skillType.getName();
-        final Attributes characterAttributes = person.getATOWAttributes();
-
         boolean isUntrained = !person.hasSkill(skillName);
-        int linkedAttributeCount = skillType.getLinkedAttributeCount();
-
         TargetRoll targetNumber = new TargetRoll();
 
         if (isUntrained) {
+            int linkedAttributeCount = skillType.getLinkedAttributeCount();
+
             if (linkedAttributeCount > 1) {
                 targetNumber.addModifier(UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES,
                       getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.twoLinkedAttributes"));
@@ -520,7 +129,7 @@ public class SkillCheckUtility {
                       getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.oneLinkedAttribute"));
             }
 
-            getTotalAttributeScoreForSkill(targetNumber, characterAttributes, skillType);
+            getTotalAttributeScoreForSkill(targetNumber, person.getATOWAttributes(), skillType);
 
             targetNumber.addModifier(UNTRAINED_SKILL_MODIFIER,
                   getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.skill"));
@@ -531,145 +140,21 @@ public class SkillCheckUtility {
             targetNumber.addModifier(skillValue, skillName);
         }
 
-        if (skillType.isCountUp()) {
-            targetNumber.addModifier(-miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
-        } else {
-            targetNumber.addModifier(miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
-        }
-
         return targetNumber;
     }
 
     /**
-     * Performs a skill check for a specified person, determining the outcome based on dice rolls and optionally
-     * allowing the use of edge points for a re-roll upon failure.
+     * Generates the roll value for a check, applying the natural aptitude if applicable.
      *
-     * <p>This method begins by rolling two six-sided dice (2d6) and comparing the result against
-     * a pre-calculated target number. If the initial roll meets or exceeds the target number, the skill check succeeds,
-     * and the results are calculated and stored. If the initial roll fails, and edge use is enabled and available, one
-     * edge point is consumed, and a re-roll is performed. The method concludes by storing the final skill check
-     * results, including the margin of success and optional descriptive text, for later use.</p>
-     *
-     * <p>When edge is used, the method records this information and updates the results accordingly
-     * to reflect the additional roll.</p>
-     *
-     * @param useEdge                     whether to allow the person to use an edge point to re-roll if the initial
-     *                                    roll fails. Edge use is conditional on the person's current edge
-     *                                    availability.
-     * @param includeMarginsOfSuccessText whether to include detailed information about the margin of success in the
-     *                                    final results text
-     * @param hasNaturalAptitude          {@code true} if the character rolls 3d6 for this check, using the highest 2
-     *
-     * @author Illiani
-     * @since 0.50.05
+     * @param hasNaturalAptitude {@code true} to roll 3d6 and keep the highest 2; {@code false} to roll 2d6
+     * @return the result of the dice roll
      */
-    void performCheck(boolean useEdge, boolean hasNaturalAptitude, boolean includeMarginsOfSuccessText) {
-        getRoll(hasNaturalAptitude);
-
-        if (performInitialRoll(useEdge, hasNaturalAptitude, includeMarginsOfSuccessText)) {
-            return;
-        }
-
-        // Prevent us from burning Edge on impossible checks
-        if (!targetNumber.cannotSucceed() || targetNumber.getValue() <= 12) {
-            getRoll(hasNaturalAptitude);
-            rollWithEdge(includeMarginsOfSuccessText, hasNaturalAptitude);
-        }
-    }
-
-    /**
-     * Generates the roll value for this check, applying the natural aptitude rule if applicable.
-     *
-     * <p>This method rolls two six-sided dice by default. If the character has the {@code Natural Aptitude} trait
-     * for this skill, a third die is rolled. The final roll value is the sum of the highest two dice, determined using
-     * {@link Compute#getHighestTwoIntegers(int...)}.</p>
-     *
-     * @param hasNaturalAptitude {@code true} if the character rolls 3d6 for this check, using the highest 2
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private void getRoll(boolean hasNaturalAptitude) {
+    static int getRoll(boolean hasNaturalAptitude) {
         int roll1 = d6(1);
         int roll2 = d6(1);
         int roll3 = hasNaturalAptitude ? d6(1) : 0;
 
-        roll = Compute.getHighestTwoIntegers(roll1, roll2, roll3);
-    }
-
-    /**
-     * Handles the initial dice roll in the skill check and determines whether the check is resolved or if further
-     * action (re-roll with edge) is required.
-     *
-     * <p>This method evaluates the outcome of the initial roll by comparing it against the target number.
-     * If the roll meets or exceeds the target number, the skill check is deemed successful, and the results are
-     * finalized. If the roll fails, the method decides whether edge can or should be used to perform a re-roll. Edge
-     * use is allowed only if the {@code useEdge} parameter is {@code true} and there are available edge points for the
-     * person.</p>
-     *
-     * <p>The method stores key results from the initial roll, including:</p>
-     * <ul>
-     *   <li>The margin of success or failure, calculated based on the target number and roll</li>
-     *   <li>A descriptive results text, optionally including margin details if requested</li>
-     * </ul>
-     *
-     * <p>If the roll does not succeed and edge use is feasible, the method signals the need for a re-roll,
-     * otherwise finalizes the results based on the initial roll.</p>
-     *
-     * @param useEdge                     whether to allow using edge points for a re-roll if the initial roll fails
-     * @param hasNaturalAptitude          {@code true} if the character rolls 3d6 for this check, using the highest 2
-     * @param includeMarginsOfSuccessText whether to include detailed margin of success information in the results text
-     *
-     * @return {@code true} if the skill check is resolved using the initial roll (success or no edge re-roll possible);
-     *       {@code false} if a re-roll using edge is required
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    boolean performInitialRoll(boolean useEdge, boolean hasNaturalAptitude, boolean includeMarginsOfSuccessText) {
-        int availableEdge = person.getCurrentEdge();
-        int targetNumberValue = targetNumber.getValue();
-
-        if (roll >= targetNumberValue || !useEdge || availableEdge < 1) {
-            int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
-
-            marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
-            resultsText = generateResultsText(includeMarginsOfSuccessText, hasNaturalAptitude);
-            LOGGER.info(resultsText);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Executes the re-roll logic for a skill check when edge is used, updating the person's edge points and
-     * recalculating the outcome based on the new roll.
-     *
-     * <p>This method is invoked only after the failure of the initial roll, provided edge usage is
-     * allowed and the person has at least one edge point available. When called, it decrements the person's edge points
-     * by one, triggers an event to update the game state reflecting this change, and marks that edge was used for this
-     * skill check. The results of the skill check are then recalculated based on the new roll, including the margin of
-     * success and the corresponding results text.</p>
-     *
-     * <p>The results text can optionally include detailed information about the margin of success,
-     * depending on the value of the {@code includeMarginsOfSuccessText} parameter.</p>
-     *
-     * @param includeMarginsOfSuccessText whether to include detailed margin of success information in the results text
-     * @param hasNaturalAptitude          {@code true} if the character rolls 3d6 for this check, using the highest 2
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    private void rollWithEdge(boolean includeMarginsOfSuccessText, boolean hasNaturalAptitude) {
-        person.changeCurrentEdge(-1);
-        MekHQ.triggerEvent(new PersonChangedEvent(person));
-        usedEdge = true;
-
-        int targetNumberValue = targetNumber.getValue();
-
-        int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
-        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
-        resultsText = generateResultsText(includeMarginsOfSuccessText, hasNaturalAptitude);
+        return Compute.getHighestTwoIntegers(roll1, roll2, roll3);
     }
 
     /**
