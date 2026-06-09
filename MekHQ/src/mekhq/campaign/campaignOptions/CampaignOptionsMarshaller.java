@@ -650,6 +650,14 @@ public class CampaignOptionsMarshaller {
               indent,
               "announceChildBirthdays",
               campaignOptions.isAnnounceChildBirthdays());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "announceRetireeDeath",
+              campaignOptions.isAnnounceRetireeDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "announceRetireeDeathExpanded",
+              campaignOptions.isAnnounceRetireeDeathExpanded());
         // endregion Announcements
 
         // region Life Events

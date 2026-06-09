@@ -357,6 +357,8 @@ public class CampaignOptions {
     private boolean announceRecruitmentAnniversaries;
     private boolean announceOfficersOnly;
     private boolean announceChildBirthdays;
+    private boolean announceRetireeDeath;
+    private boolean announceRetireeDeathExpanded;
 
     // Life Events
     private boolean showLifeEventDialogBirths;
@@ -1011,6 +1013,8 @@ public class CampaignOptions {
         setAnnounceRecruitmentAnniversaries(true);
         setAnnounceOfficersOnly(true);
         setAnnounceChildBirthdays(true);
+        announceRetireeDeath = true;
+        announceRetireeDeathExpanded = false;
 
         // Life Events
         setShowLifeEventDialogBirths(true);
@@ -2685,6 +2689,22 @@ public class CampaignOptions {
 
     public void setAnnounceChildBirthdays(final boolean announceChildBirthdays) {
         this.announceChildBirthdays = announceChildBirthdays;
+    }
+
+    public boolean isAnnounceRetireeDeath() {
+        return announceRetireeDeath;
+    }
+
+    public void setAnnounceRetireeDeath(final boolean announceRetireeDeath) {
+        this.announceRetireeDeath = announceRetireeDeath;
+    }
+
+    public boolean isAnnounceRetireeDeathExpanded() {
+        return announceRetireeDeathExpanded;
+    }
+
+    public void setAnnounceRetireeDeathExpanded(final boolean announceRetireeDeathExpanded) {
+        this.announceRetireeDeathExpanded = announceRetireeDeathExpanded;
     }
     // endregion anniversaries
 

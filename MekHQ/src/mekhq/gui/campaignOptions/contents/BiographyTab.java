@@ -115,6 +115,8 @@ public class BiographyTab {
     private JCheckBox chkAnnounceBirthdays;
     private JCheckBox chkAnnounceChildBirthdays;
     private JCheckBox chkAnnounceRecruitmentAnniversaries;
+    private JCheckBox chkAnnounceRetireeDeath;
+    private JCheckBox chkAnnounceRetireeDeathExpanded;
     private JPanel pnlLifeEvents;
     private JCheckBox chkShowLifeEventDialogBirths;
     private JCheckBox chkShowLifeEventDialogComingOfAge;
@@ -397,6 +399,8 @@ public class BiographyTab {
         chkAnnounceBirthdays = new JCheckBox();
         chkAnnounceChildBirthdays = new JCheckBox();
         chkAnnounceRecruitmentAnniversaries = new JCheckBox();
+        chkAnnounceRetireeDeath = new JCheckBox();
+        chkAnnounceRetireeDeathExpanded = new JCheckBox();
 
         pnlLifeEvents = new JPanel();
         chkShowLifeEventDialogBirths = new JCheckBox();
@@ -535,6 +539,14 @@ public class BiographyTab {
         chkAnnounceRecruitmentAnniversaries = new CampaignOptionsCheckBox("AnnounceRecruitmentAnniversaries");
         chkAnnounceRecruitmentAnniversaries.addMouseListener(createTipPanelUpdater(generalHeader,
               "AnnounceRecruitmentAnniversaries"));
+        chkAnnounceRetireeDeath = new CampaignOptionsCheckBox("AnnounceRetireeDeath",
+              getMetadata(new Version(0, 51, 0)));
+        chkAnnounceRetireeDeath.addMouseListener(createTipPanelUpdater(generalHeader,
+              "AnnounceRetireeDeath"));
+        chkAnnounceRetireeDeathExpanded = new CampaignOptionsCheckBox("AnnounceRetireeDeathExpanded",
+              getMetadata(new Version(0, 51, 0)));
+        chkAnnounceRetireeDeathExpanded.addMouseListener(createTipPanelUpdater(generalHeader,
+              "AnnounceRetireeDeathExpanded"));
         chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly");
         chkAnnounceOfficersOnly.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceOfficersOnly"));
         chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays",
@@ -559,6 +571,12 @@ public class BiographyTab {
 
         layoutParent.gridy++;
         panel.add(chkAnnounceChildBirthdays, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkAnnounceRetireeDeath, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkAnnounceRetireeDeathExpanded, layoutParent);
 
         return panel;
     }
@@ -1585,6 +1603,8 @@ public class BiographyTab {
         chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
         chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
         chkAnnounceRecruitmentAnniversaries.setSelected(options.isAnnounceRecruitmentAnniversaries());
+        chkAnnounceRetireeDeath.setSelected(options.isAnnounceRetireeDeath());
+        chkAnnounceRetireeDeathExpanded.setSelected(options.isAnnounceRetireeDeathExpanded());
         chkShowLifeEventDialogBirths.setSelected(options.isShowLifeEventDialogBirths());
         chkShowLifeEventDialogComingOfAge.setSelected(options.isShowLifeEventDialogComingOfAge());
         chkShowLifeEventDialogCelebrations.setSelected(options.isShowLifeEventDialogCelebrations());
@@ -1683,6 +1703,8 @@ public class BiographyTab {
         options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
         options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());
         options.setAnnounceRecruitmentAnniversaries(chkAnnounceRecruitmentAnniversaries.isSelected());
+        options.setAnnounceRetireeDeath(chkAnnounceRetireeDeath.isSelected());
+        options.setAnnounceRetireeDeathExpanded(chkAnnounceRetireeDeathExpanded.isSelected());
         options.setShowLifeEventDialogBirths(chkShowLifeEventDialogBirths.isSelected());
         options.setShowLifeEventDialogComingOfAge(chkShowLifeEventDialogComingOfAge.isSelected());
         options.setShowLifeEventDialogCelebrations(chkShowLifeEventDialogCelebrations.isSelected());
