@@ -58,10 +58,16 @@ public class PersonnelOptions extends PilotOptions {
     private static final MMLogger LOGGER = MMLogger.create(PersonnelOptions.class);
 
     public static final String EDGE_MEDICAL = "edge_when_heal_crit_fail";
+    public static final String EDGE_ADVANCED_SURGERY = "edge_when_advanced_surgery_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
+    public static final String EDGE_ADMIN_ACQUIRE_FAIL_EIGHT = "edge_when_admin_acquire_fail_greater_than_eight";
+    public static final String EDGE_ADMIN_ACQUIRE_FAIL_OTHER = "edge_when_admin_acquire_fail_other";
+    public static final String EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN = "edge_when_admin_acquire_fail_greater_than_eleven";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
+    public static final String EDGE_ADMIN_APPRAISAL_FAIL = "edge_when_admin_fail_appraisal";
     public static final String EDGE_SALVAGE_ACCIDENTS = "edge_when_salvage_accident";
+    public static final String EDGE_ESCAPE_ATTEMPTS = "edge_when_escape_attempt_fail";
     public static final String EDGE_RECON_FAIL = "edge_when_recon_fail";
 
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
@@ -69,6 +75,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
+    public static final String UNOFFICIAL_SPICE_IS_RIGHT = "unofficial_spice_is_right";
+    public static final String UNOFFICIAL_KITCHEN_MENACE = "unofficial_kitchen_menace";
     public static final String TECH_MAINTAINER = "tech_maintainer";
     public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
     public static final String ATOW_TOUGHNESS = "atow_toughness";
@@ -151,6 +159,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EXCEPTIONAL_ATTRIBUTE_WILLPOWER = "exceptional_attribute_willpower";
     public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
     public static final String EXCEPTIONAL_ATTRIBUTE_EDGE = "exceptional_attribute_edge";
+    public static final String UNOFFICIAL_BELOVED_PET = "unofficial_beloved_pet";
 
     public static final String ADMIN_MEDIATOR = "admin_mediator";
     public static final String ADMIN_LOGISTICIAN = "admin_logistician";
@@ -253,6 +262,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_INTERNAL_SPECIALIST, false);
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
+        addOption(l3a, UNOFFICIAL_SPICE_IS_RIGHT, false);
+        addOption(l3a, UNOFFICIAL_KITCHEN_MENACE, false);
         addOption(l3a, TECH_MAINTAINER, false);
         addOption(l3a, FLAW_GLASS_JAW, false);
         addOption(l3a, ATOW_TOUGHNESS, false);
@@ -334,6 +345,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_WILLPOWER, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
         addOption(l3a, EXCEPTIONAL_ATTRIBUTE_EDGE, false);
+        addOption(l3a, UNOFFICIAL_BELOVED_PET, false);
 
         addOption(l3a, ADMIN_MEDIATOR, false);
         addOption(l3a, ADMIN_LOGISTICIAN, false);
@@ -377,10 +389,16 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, MADNESS_BERSERKER, false);
 
         addOption(edge, EDGE_MEDICAL, true);
+        addOption(edge, EDGE_ADVANCED_SURGERY, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
+        addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL_OTHER, true);
+        addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL_EIGHT, true);
+        addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
+        addOption(edge, EDGE_ADMIN_APPRAISAL_FAIL, false);
         addOption(edge, EDGE_SALVAGE_ACCIDENTS, true);
+        addOption(edge, EDGE_ESCAPE_ATTEMPTS, true);
         addOption(edge, EDGE_RECON_FAIL, false);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();

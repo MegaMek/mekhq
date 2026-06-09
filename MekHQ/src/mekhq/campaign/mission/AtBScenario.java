@@ -873,7 +873,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().isUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
-                Hangar hangar = campaign.getHangar();
+                Hangar hangar = campaign.getAllHangar();
                 List<UUID> allCombatUnits = campaign.getAllUnitsInTheTOE(true);
                 Collections.shuffle(allCombatUnits); // Remove bias
                 for (UUID unitId : allCombatUnits) {

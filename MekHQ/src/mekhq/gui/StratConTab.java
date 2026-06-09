@@ -167,8 +167,6 @@ public class StratConTab extends CampaignGuiTab {
         infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600),
               infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
-
-        MekHQ.registerHandler(this);
     }
 
     /**

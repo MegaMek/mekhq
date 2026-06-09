@@ -155,9 +155,7 @@ public class AcquisitionsDialog extends JDialog {
 
             btnSummary.firePropertyChange("missingCount", -1, PartsAcquisitionService.getMissingCount());
 
-            if (campaignGUI.getTab(MHQTabType.REPAIR_BAY) != null) {
-                ((RepairTab) campaignGUI.getTab(MHQTabType.REPAIR_BAY)).refreshPartsAcquisitionService(false);
-            }
+            campaignGUI.getRepairBayTab().refreshPartsAcquisitionService(false);
         });
 
         GridBagConstraints gbc = new GridBagConstraints();

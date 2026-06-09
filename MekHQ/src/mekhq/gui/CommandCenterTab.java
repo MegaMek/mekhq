@@ -192,7 +192,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     public CommandCenterTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
     }
 
     //region Getters/Setters

@@ -106,7 +106,7 @@ public class MercenaryRelations {
                 // Death to Mercenaries starts to be relaxed, but not wholly removed
                 new MercenaryRelation(LocalDate.of(3039, 4, 16), LocalDate.of(3049, 4, 16), AWFUL),
                 // Death to Mercenaries relaxed further
-                new MercenaryRelation(LocalDate.of(3049, 4, 17), LocalDate.of(3054, 9, 14), AWFUL),
+                new MercenaryRelation(LocalDate.of(3049, 4, 17), LocalDate.of(3054, 9, 14), BELOW_AVERAGE),
                 // Theodore Kurita's reforms (new default)
                 new MercenaryRelation(LocalDate.of(3054, 9, 15), NO_ENDING_DATE, AVERAGE)
           )),
