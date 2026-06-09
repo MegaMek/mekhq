@@ -188,6 +188,8 @@ public class CampaignOptions {
     private int autoLogisticsJumpJets;
     private int autoLogisticsEngines;
     private int autoLogisticsWeapons;
+    private int autoLogisticsGyros;
+    private int autoLogisticsHeadComponents;
     private int autoLogisticsOther;
 
     // Delivery
@@ -793,6 +795,8 @@ public class CampaignOptions {
         autoLogisticsJumpJets = 50;
         autoLogisticsEngines = 0;
         autoLogisticsWeapons = 50;
+        autoLogisticsGyros = 0;
+        autoLogisticsHeadComponents = 15;
         autoLogisticsOther = 0;
 
         // Delivery
@@ -4962,6 +4966,22 @@ public class CampaignOptions {
 
     public void setAutoLogisticsWeapons(int autoLogisticsWeapons) {
         this.autoLogisticsWeapons = autoLogisticsWeapons;
+    }
+
+    public int getAutoLogisticsGyros() {
+        return autoLogisticsGyros;
+    }
+
+    public void setAutoLogisticsGyros(int autoLogisticsGyros) {
+        this.autoLogisticsGyros = autoLogisticsGyros;
+    }
+
+    public int getAutoLogisticsHeadComponents() {
+        return autoLogisticsHeadComponents;
+    }
+
+    public void setAutoLogisticsHeadComponents(int autoLogisticsHeadComponents) {
+        this.autoLogisticsHeadComponents = autoLogisticsHeadComponents;
     }
 
     public int getAutoLogisticsOther() {

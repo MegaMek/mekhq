@@ -256,6 +256,11 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getAutoLogisticsJumpJets());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", campaignOptions.getAutoLogisticsEngines());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", campaignOptions.getAutoLogisticsWeapons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsGyros", campaignOptions.getAutoLogisticsGyros());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "autoLogisticsHeadComponents",
+              campaignOptions.getAutoLogisticsHeadComponents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", campaignOptions.getAutoLogisticsOther());
 
         // region Personnel Tab

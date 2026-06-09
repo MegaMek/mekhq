@@ -321,6 +321,9 @@ public class CampaignOptionsUnmarshaller {
             case "autoLogisticsJumpJets" -> campaignOptions.setAutoLogisticsJumpJets(parseInt(nodeContents));
             case "autoLogisticsEngines" -> campaignOptions.setAutoLogisticsEngines(parseInt(nodeContents));
             case "autoLogisticsWeapons" -> campaignOptions.setAutoLogisticsWeapons(parseInt(nodeContents));
+            case "autoLogisticsGyros" -> campaignOptions.setAutoLogisticsGyros(parseInt(nodeContents));
+            case "autoLogisticsHeadComponents" ->
+                  campaignOptions.setAutoLogisticsHeadComponents(parseInt(nodeContents));
             case "autoLogisticsOther" -> campaignOptions.setAutoLogisticsOther(parseInt(nodeContents));
             case "useTactics" -> campaignOptions.setUseTactics(parseBoolean(nodeContents));
             case "useInitiativeBonus" -> campaignOptions.setUseInitiativeBonus(parseBoolean(nodeContents));
