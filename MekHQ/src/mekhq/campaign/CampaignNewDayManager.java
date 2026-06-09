@@ -1548,7 +1548,10 @@ public class CampaignNewDayManager {
         }
 
         // Censure degradation
-        campaign.getFactionStandings().processCensureDegradation(today);
+        List<String> reports = campaign.getFactionStandings().processCensureDegradation(today);
+        for (String report : reports) {
+            campaign.addReport(POLITICS, report);
+        }
     }
 
     /**
