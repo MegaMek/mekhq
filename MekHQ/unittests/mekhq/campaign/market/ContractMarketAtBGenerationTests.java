@@ -123,7 +123,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -228,7 +228,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -336,7 +336,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -444,7 +444,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -561,7 +561,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -713,7 +713,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -821,7 +821,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -921,7 +921,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1029,7 +1029,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1133,7 +1133,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1241,7 +1241,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1349,7 +1349,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1457,7 +1457,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1564,7 +1564,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1673,7 +1673,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1781,7 +1781,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
@@ -1890,7 +1890,7 @@ public class ContractMarketAtBGenerationTests {
 
         Hangar hangar = mock(Hangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());

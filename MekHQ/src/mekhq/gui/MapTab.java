@@ -100,7 +100,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     //region Constructors
     public MapTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 

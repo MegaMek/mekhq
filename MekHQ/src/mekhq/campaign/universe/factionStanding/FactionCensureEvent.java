@@ -423,7 +423,7 @@ public class FactionCensureEvent {
             seniorPersonnel.add(secondInCommand);
         }
 
-        for (Person officer : campaign.getPersonnel()) {
+        for (Person officer : campaign.getAllPersonnel()) {
             if (isExempt(officer, today)) {
                 continue;
             }

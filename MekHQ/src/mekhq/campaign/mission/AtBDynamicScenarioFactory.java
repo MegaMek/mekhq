@@ -4471,17 +4471,17 @@ public class AtBDynamicScenarioFactory {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
             if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                       scenario,
                       untransportedEntities,
                       scenario.getHostileReinforcementDelayReduction());
             } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                       scenario,
                       untransportedEntities,
                       scenario.getFriendlyReinforcementDelayReduction());
             } else {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities, 0);
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(), scenario, untransportedEntities, 0);
             }
         } else {
             for (Entity entity : untransportedEntities) {
@@ -4524,7 +4524,7 @@ public class AtBDynamicScenarioFactory {
         // deployment turn explicitly or use a stagger algorithm.
         // For player forces where there's not an associated force template, we calculate the
         // deployment turn as if they were reinforcements
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
@@ -4593,7 +4593,7 @@ public class AtBDynamicScenarioFactory {
             } else {
                 LOGGER.info("We're using a fallback deployment turn calculation for {}",
                       playerFormation.getName());
-                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities, strategy);
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(), scenario, forceEntities, strategy);
             }
         }
 
@@ -4615,7 +4615,7 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                    setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                           scenario,
                           Collections.singletonList(entity),
                           strategy);
@@ -4623,7 +4623,7 @@ public class AtBDynamicScenarioFactory {
                     entity.setDeployRound(deployRound);
                 }
             } else {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                       scenario,
                       Collections.singletonList(entity),
                       strategy);

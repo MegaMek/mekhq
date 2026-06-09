@@ -74,7 +74,7 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewGlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDialog;
 
 /**
  * {@link AccoladeSelectionDialog} is a modal dialog allowing a user to select a faction and an accolade level for that
@@ -484,7 +484,7 @@ public class AccoladeSelectionDialog extends JDialog {
      */
     private void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
+            GlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }
