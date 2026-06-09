@@ -35,6 +35,9 @@ package mekhq.gui.adapter;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.HEROIC;
+import static megamek.common.enums.SkillLevel.LEGENDARY;
+import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
@@ -204,6 +207,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_GM_ACTIVATE = COMMAND_ACTIVATE + COMMAND_GM;
     public static final String COMMAND_UNDEPLOY = "UNDEPLOY";
     public static final String COMMAND_HIRE_FULL_GM = COMMAND_HIRE_FULL + COMMAND_GM;
+    public static final String COMMAND_HIRE_FULL_GM_LEGENDARY = COMMAND_HIRE_FULL + COMMAND_GM + "LEGENDARY";
+    public static final String COMMAND_HIRE_FULL_GM_HEROIC = COMMAND_HIRE_FULL + COMMAND_GM + "HEROIC";
     public static final String COMMAND_HIRE_FULL_GM_ELITE = COMMAND_HIRE_FULL + COMMAND_GM + "ELITE";
     public static final String COMMAND_HIRE_FULL_GM_VETERAN = COMMAND_HIRE_FULL + COMMAND_GM + "VETERAN";
     public static final String COMMAND_HIRE_FULL_GM_REGULAR = COMMAND_HIRE_FULL + COMMAND_GM + "REGULAR";
@@ -470,23 +475,20 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 hireAction.execute(gui.getCampaign(), unit);
 
-                boolean fixSkillLevels = false;
 
-                SkillLevel skillLevel = REGULAR;
-                if (command.contains("ELITE")) {
-                    skillLevel = ELITE;
-                    fixSkillLevels = true;
-                } else if (command.contains("VETERAN")) {
-                    skillLevel = VETERAN;
-                    fixSkillLevels = true;
-                } else if (command.contains("ULTRA_GREEN")) {
-                    skillLevel = ULTRA_GREEN;
-                    fixSkillLevels = true;
-                } else if (command.contains("GREEN")) {
-                    skillLevel = GREEN;
-                    fixSkillLevels = true;
-                }
+                SkillLevel skillLevel = switch (command) {
+                    case String s when s.contains("LEGENDARY") -> LEGENDARY;
+                    case String s when s.contains("HEROIC") -> HEROIC;
+                    case String s when s.contains("ELITE") -> ELITE;
+                    case String s when s.contains("VETERAN") -> VETERAN;
+                    case String s when s.contains("REGULAR") -> REGULAR;
+                    // Must come before GREEN as ULTRA_GREEN contains GREEN
+                    case String s when s.contains("ULTRA_GREEN") -> ULTRA_GREEN;
+                    case String s when s.contains("GREEN") -> GREEN;
+                    default -> NONE;
+                };
 
+                boolean fixSkillLevels = skillLevel != NONE;
                 if (fixSkillLevels) {
                     for (Person person : unit.getCrew()) {
                         if (preExistingCrew.contains(person)) {
@@ -1335,6 +1337,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     menuItem = new JMenuItem(getText("addMinimumComplementRandom.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(getText("addMinimumComplementLegendary.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_LEGENDARY);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(getText("addMinimumComplementHeroic.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_HEROIC);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
