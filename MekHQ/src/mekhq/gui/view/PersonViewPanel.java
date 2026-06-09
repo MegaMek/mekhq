@@ -332,9 +332,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         if ((!person.getPersonalityDescription().isBlank()) &&
                   (campaignOptions.isUseRandomPersonalities()) &&
-                  (!person.isHidePersonality()) &&
-                  (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
-            // descriptions won't fit
+                  (!person.isHidePersonality())) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);

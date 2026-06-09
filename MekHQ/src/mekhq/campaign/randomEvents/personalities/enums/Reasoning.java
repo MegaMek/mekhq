@@ -157,7 +157,7 @@ public enum Reasoning {
      *
      * @return {@code true} if the instance is of average type, {@code false} otherwise.
      */
-    public boolean isAverageType() {
+    public boolean isAverage() {
         return this == AVERAGE;
     }
     // endregion Boolean Comparison Methods

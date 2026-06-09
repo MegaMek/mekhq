@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
@@ -170,30 +169,28 @@ public class PersonalityController {
         return String.valueOf(traitRoll);
     }
 
+    public static String writePersonalityDescription(Person person) {
+        return writePersonalityDescription(person.getAggression(),
+              person.getAmbition(),
+              person.getGreed(),
+              person.getSocial(),
+              person.getReasoning(),
+              person.getPersonalityQuirk());
+    }
+
     /**
      * Generates and sets a descriptive personality summary for the given person based on their assigned personality
      * traits and quirks. It combines descriptions for each non-default characteristic and formats them into
      * paragraphs.
-     *
-     * @param person the person whose personality description will be generated and updated
      */
-    public static void writePersonalityDescription(Person person) {
-        Gender gender = person.getGender();
-        String givenName = person.getGivenName();
-
-        List<String> traitDescriptions = getTraitDescriptions(gender,
-              givenName,
-              person.getAggression(),
-              person.getAmbition(),
-              person.getGreed(),
-              person.getSocial());
-
-        // PERSONALITY QUIRK
-        PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
-        if (!personalityQuirk.isNone()) {
-            String quirkDescription = personalityQuirk.getLabel();
-            traitDescriptions.add(quirkDescription);
-        }
+    public static String writePersonalityDescription(Aggression aggression, Ambition ambition, Greed greed,
+          Social social, Reasoning reasoning, PersonalityQuirk personalityQuirk) {
+        List<String> traitDescriptions = getTraitDescriptions(aggression,
+              ambition,
+              greed,
+              social,
+              reasoning,
+              personalityQuirk);
 
         // Build the description proper
         StringBuilder personalityDescription = new StringBuilder();
@@ -206,7 +203,7 @@ public class PersonalityController {
             personalityDescription.append(description);
         }
 
-        person.setPersonalityDescription(personalityDescription.toString());
+        return personalityDescription.toString();
     }
 
     /**
@@ -217,55 +214,60 @@ public class PersonalityController {
      * <p>Descriptions for traits that are not assigned or are empty will be excluded from the
      * returned list. This ensures only meaningful and applicable descriptions are included.
      *
-     * @param gender     the gender of the person, used for generating gender-specific pronouns in trait descriptions
-     * @param givenName  the given name of the person, used to personalize the descriptions
-     * @param aggression the {@link Aggression} trait assigned to the person; omitted if the trait is set to "none"
-     * @param ambition   the {@link Ambition} trait assigned to the person; omitted if the trait is set to "none"
-     * @param greed      the {@link Greed} trait assigned to the person; omitted if the trait is set to "none"
-     * @param social     the {@link Social} behavior trait assigned to the person; omitted if the trait is set to
-     *                   "none"
+     * @param aggression       the {@link Aggression} trait assigned to the person; omitted if the trait is set to
+     *                         {@link Aggression#NONE}
+     * @param ambition         the {@link Ambition} trait assigned to the person; omitted if the trait is set to *
+     *                         {@link Ambition#NONE}
+     * @param greed            the {@link Greed} trait assigned to the person; omitted if the trait is set to *
+     *                         {@link Greed#NONE}
+     * @param social           the {@link Social} behavior trait assigned to the person; omitted if the trait is set to
+     *                         {@link Social#NONE}
+     * @param reasoning        the {@link Reasoning} trait assigned to the person; omitted if the trait is set to
+     *                         {@link Reasoning#AVERAGE}
+     * @param personalityQuirk the {@link PersonalityQuirk} trait assigned to the person; omitted if the trait is set to
+     *                         {@link PersonalityQuirk#NONE}
      *
      * @return a list of strings, where each string represents a detailed description of a personality trait assigned to
      *       the given person; traits without meaningful descriptions are excluded
      */
-    private static List<String> getTraitDescriptions(Gender gender, String givenName, Aggression aggression,
-          Ambition ambition, Greed greed, Social social) {
+    private static List<String> getTraitDescriptions(Aggression aggression, Ambition ambition, Greed greed,
+          Social social, Reasoning reasoning, PersonalityQuirk personalityQuirk) {
         List<String> traitDescriptions = new ArrayList<>();
 
         // AGGRESSION
         if (!aggression.isNone()) {
             String traitDescription = aggression.getLabel();
-
-            if (!traitDescription.isBlank()) {
-                traitDescriptions.add(traitDescription);
-            }
+            traitDescriptions.add(traitDescription);
         }
 
         // AMBITION
         if (!ambition.isNone()) {
             String traitDescription = ambition.getLabel();
-
-            if (!traitDescription.isBlank()) {
-                traitDescriptions.add(traitDescription);
-            }
+            traitDescriptions.add(traitDescription);
         }
 
         // GREED
         if (!greed.isNone()) {
             String traitDescription = greed.getLabel();
-
-            if (!traitDescription.isBlank()) {
-                traitDescriptions.add(traitDescription);
-            }
+            traitDescriptions.add(traitDescription);
         }
 
         // SOCIAL
         if (!social.isNone()) {
             String traitDescription = social.getLabel();
+            traitDescriptions.add(traitDescription);
+        }
 
-            if (!traitDescription.isBlank()) {
-                traitDescriptions.add(traitDescription);
-            }
+        // REASONING
+        if (!reasoning.isAverage()) {
+            String traitDescription = reasoning.getLabel();
+            traitDescriptions.add(traitDescription);
+        }
+
+        // PERSONALITY QUIRK
+        if (!personalityQuirk.isNone()) {
+            String traitDescription = personalityQuirk.getLabel();
+            traitDescriptions.add(traitDescription);
         }
 
         return traitDescriptions;

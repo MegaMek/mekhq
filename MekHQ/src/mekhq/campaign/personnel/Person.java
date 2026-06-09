@@ -2920,21 +2920,13 @@ public class Person implements ILocation {
         this.storedReasoning = storedReasoning;
     }
 
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    int getStoredReasoningDescriptionIndex() {
-        return 0;
-    }
-
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    void setStoredReasoningDescriptionIndex(int storedReasoningDescriptionIndex) {
-    }
-
     public String getPersonalityDescription() {
         return personalityDescription;
     }
 
-    public void setPersonalityDescription(final String personalityDescription) {
-        this.personalityDescription = personalityDescription;
+    public void resetPersonalityDescription() {
+        this.personalityDescription = PersonalityController.writePersonalityDescription(aggression, ambition, greed,
+              social, reasoning, personalityQuirk);
     }
 
     public boolean isSufferingFromClinicalParanoia() {
@@ -4192,8 +4184,6 @@ public class Person implements ILocation {
                     }
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
                     person.performanceExamScore = MathUtility.parseInt(wn2.getTextContent().trim(), 50);
-                } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
-                    person.personalityDescription = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("storedGivenName")) {
                     person.storedGivenName = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("storedSurname")) {
@@ -4268,6 +4258,8 @@ public class Person implements ILocation {
             }
 
             person.setFullName(); // this sets the name based on the loaded values
+
+            person.resetPersonalityDescription();
 
             if ((advantages != null) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, DELIMITER);
@@ -7787,7 +7779,7 @@ public class Person implements ILocation {
     public double getReasoningXpCostMultiplier(final boolean useReasoningXpCostMultiplier) {
         Reasoning reasoning = getReasoning();
 
-        if (!useReasoningXpCostMultiplier || reasoning.isAverageType()) {
+        if (!useReasoningXpCostMultiplier || reasoning.isAverage()) {
             return 1;
         }
 
