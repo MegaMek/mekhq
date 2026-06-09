@@ -134,9 +134,7 @@ public final class HangarTab extends CampaignGuiTab {
     // region Constructors
     public HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
-        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
     // endregion Constructors
 
@@ -605,8 +603,14 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     @Override
-    public void disposeTab() {
-        super.disposeTab();
+    public void activateTab() {
+        super.activateTab();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
+    }
+
+    @Override
+    public void deactivateTab() {
+        super.deactivateTab();
         GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 

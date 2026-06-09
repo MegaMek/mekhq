@@ -37,9 +37,12 @@ import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.CENSUR
 import static mekhq.campaign.universe.factionStanding.FactionCensureLevel.MIN_CENSURE_SEVERITY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +51,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -66,6 +70,7 @@ import org.w3c.dom.NodeList;
  * @since 0.50.07
  */
 public class FactionJudgment {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingJudgments";
     private static final MMLogger LOGGER = MMLogger.create(FactionJudgment.class);
 
     static final int THRESHOLD_FOR_CENSURE = 0;
@@ -107,7 +112,9 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     public boolean factionHasCensure(final String factionCode) {
-        return factionCensures.containsKey(factionCode);
+        FactionCensureLevel censureLevel = getCensureLevelForFaction(factionCode);
+
+        return censureLevel.getSeverity() == MIN_CENSURE_SEVERITY;
     }
 
     /**
@@ -156,18 +163,40 @@ public class FactionJudgment {
      *
      * @param today the date to use when checking for censure expiration and applying any degradation
      *
+     * @return a {@link List} of HTML-formatted {@link String} reports of censure expiry events
+     *
      * @author Illiani
      * @since 0.50.07
      */
-    public void processCensureDegradation(final LocalDate today) {
+    public List<String> processCensureDegradation(final LocalDate today) {
+        List<String> reports = new ArrayList<>();
         for (Map.Entry<String, CensureEntry> entry : factionCensures.entrySet()) {
             String factionCode = entry.getKey();
             CensureEntry censureEntry = entry.getValue();
 
             if (censureEntry.hasExpired(today)) {
                 decreaseCensureForFaction(factionCode, today);
+                Faction relevantFaction = Factions.getInstance().getFaction(factionCode);
+                String factionName = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.faction");
+                if (relevantFaction != null) {
+                    factionName = relevantFaction.getFullName(today.getYear());
+                }
+
+                FactionCensureLevel censureLevel = getCensureLevelForFaction(factionCode);
+
+                String reportKey;
+                if (censureLevel.getSeverity() == MIN_CENSURE_SEVERITY) {
+                    reportKey = "FactionJudgment.censureDecay.ended";
+                } else {
+                    reportKey = "FactionJudgment.censureDecay.continuing";
+                }
+
+                String report = getFormattedTextAt(RESOURCE_BUNDLE, reportKey, factionName);
+                reports.add(report);
             }
         }
+
+        return reports;
     }
 
     /**
@@ -197,6 +226,10 @@ public class FactionJudgment {
             FactionCensureLevel newCensureLevel = FactionCensureLevel.getCensureLevelFromSeverity(currentSeverity);
 
             setCensureForFaction(factionCode, newCensureLevel, today);
+        }
+
+        if (currentSeverity == MIN_CENSURE_SEVERITY) {
+            factionCensures.remove(factionCode);
         }
     }
 

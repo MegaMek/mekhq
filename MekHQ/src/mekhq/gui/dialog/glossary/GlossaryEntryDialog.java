@@ -32,9 +32,9 @@
  */
 package mekhq.gui.dialog.glossary;
 
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.GLOSSARY_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.glossaryEntries;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.GLOSSARY_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.glossaryEntries;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -68,8 +68,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.50.07
  */
-public class NewGlossaryEntryDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(NewGlossaryEntryDialog.class);
+public class GlossaryEntryDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(GlossaryEntryDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.NewGlossaryDialog";
 
     private static final int PADDING = UIUtil.scaleForGUI(10);
@@ -176,7 +176,7 @@ public class NewGlossaryEntryDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public NewGlossaryEntryDialog(JDialog parent, GlossaryEntry glossaryEntry) {
+    public GlossaryEntryDialog(JDialog parent, GlossaryEntry glossaryEntry) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.title"));
 
         tabbedPane = new EnhancedTabbedPane(false, true);
@@ -357,7 +357,7 @@ public class NewGlossaryEntryDialog extends JDialog {
                     return;
                 }
 
-                new NewDocumentationEntryDialog(this, documentationEntry);
+                new GlossaryDocumentationEntryDialog(this, documentationEntry);
             }
         }
     }
@@ -427,7 +427,7 @@ public class NewGlossaryEntryDialog extends JDialog {
      */
     private void setPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewGlossaryEntryDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(GlossaryEntryDialog.class);
             this.setName("NewGlossaryEntryDialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {

@@ -82,7 +82,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.factionStanding.gmToolsDialog.GMTools;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
-import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -432,7 +432,7 @@ public class FactionStandingReport extends JDialog {
                 return;
             }
 
-            new NewDocumentationEntryDialog(this, documentationEntry);
+            new GlossaryDocumentationEntryDialog(this, documentationEntry);
         });
         btnDocumentation.setFocusable(false);
         pnlButtons.add(btnDocumentation);
