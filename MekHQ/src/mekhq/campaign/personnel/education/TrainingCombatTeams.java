@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.education;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -44,17 +43,25 @@ import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Vector;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
@@ -74,40 +81,43 @@ import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
+import org.jspecify.annotations.NonNull;
 
 /**
- * Handles the training of combat teams within the campaign.
+ * Manages the daily training progression of combat teams and their personnel within a campaign.
  *
- * <p>This class is responsible for managing the process of skill improvement and education for
- * training combat teams and their associated personnel. It identifies eligible combat teams, validates their contracts
- * and current conditions, and processes training for each team member.</p>
+ * <p>Each week that a combat team is assigned a training role, this class drives the full
+ * training pipeline: validating eligibility, resolving the educator's skill check, distributing XP progress to
+ * trainees, and advancing skills when the improvement threshold is met. The result of each session is surfaced as
+ * entries in the campaign's daily report and, optionally, each affected person's personnel log.</p>
  *
- * <p>Key functionality includes tracking education time for trainees, determining skills eligible
- * for training, generating skill improvement reports, and handling both individual and group training scenarios.</p>
+ * <h2>Training Resolution</h2>
+ * <ol>
+ *   <li>The combat team's commander makes a {@link SkillType#S_TRAINING}
+ *       skill check. The raw margin of success drives the amount of XP awarded this session.</li>
+ *   <li>A margin at or below {@link MarginOfSuccess#BARELY_MADE_IT}
+ *       produces no XP for any trainee.</li>
+ *   <li>Above that threshold, each trainee's target skill receives {@code max(1, marginOfSuccess)} XP.
+ *       Accumulated XP persists across sessions until the improvement cost is met.</li>
+ *   <li>When accumulated XP meets or exceeds the cost to improve (adjusted by
+ *       {@link CampaignOptions#getXpCostMultiplier()} and optional
+ *       reasoning-based adjustments), the skill advances one level and veterancy awards are evaluated.</li>
+ * </ol>
  *
- * <p>Main methods:
- * <ul>
- *     <li>{@link #processTrainingCombatTeams(Campaign)}: Entry point for processing all combat
- *     team training in the campaign.</li>
- *     <li>{@link #processTraining(Campaign, Formation)}: Applies training logic to a specific
- *     combat team.</li>
- *     <li>{@link #performTraining(Campaign, Formation, Person, Map, int)}: Handles training for individual
- *     trainees in a force.</li>
- *     <li>{@link #processTrainingTime(Person, Person, List, int, double, boolean, boolean, LocalDate)}  Updates a
- *     trainee's education progression and improves skills.</li>
- *     <li>{@link #createSkillsList(Campaign, Set)}: Collects the skill levels of educators to
- *     determine skills eligible for training.</li>
- * </ul>
+ * <h2>Entry Point</h2>
+ * <p>Call {@link #processTrainingCombatTeams(Campaign)} once per day to run the full pipeline for
+ * all eligible combat teams in the campaign. All other methods in this class are internal
+ * implementation details.</p>
+ *
+ * @author Illiani
+ * @since 0.50.10
  */
 public class TrainingCombatTeams {
     private static final MMLogger LOGGER = MMLogger.create(TrainingCombatTeams.class);
-
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Education";
-    @Deprecated(since = "0.50.10")
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE,
-          MekHQ.getMHQOptions().getLocale());
 
     private static final int EXPERIENCE_LEVEL_REDUCTION = -1;
+    static final int XP_RATE_BASE_LINE = 1;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -184,7 +194,7 @@ public class TrainingCombatTeams {
         Person commander = campaign.getPerson(commanderID);
 
         if (commander == null) {
-            campaign.addReport(GENERAL, String.format(resources.getString("noCommander.text"), formation.getName(),
+            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "noCommander.text", formation.getName(),
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
             LOGGER.info("Failed to fetch commander for Force: {}", formation.getName());
             return;
@@ -273,7 +283,7 @@ public class TrainingCombatTeams {
                 }
 
                 if (educatorSkills.isEmpty() || skillsBeingTrained.isEmpty()) {
-                    campaign.addReport(PERSONNEL, String.format(resources.getString("notLearningAnything.text"),
+                    campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "notLearningAnything.text",
                           trainee.getHyperlinkedFullTitle(),
                           commander.getFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -282,7 +292,7 @@ public class TrainingCombatTeams {
                     continue;
                 }
 
-                String report = processTrainingTime(commander, trainee, skillsBeingTrained, marginOfSuccess,
+                String report = processTrainingTime(campaign, commander, trainee, skillsBeingTrained, marginOfSuccess,
                       xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
                       campaign.getLocalDate());
 
@@ -312,88 +322,236 @@ public class TrainingCombatTeams {
     }
 
     /**
-     * Progresses a trainee's education time and increases the skill level of the trainee if enough training time has
-     * accrued.
+     * Processes a single training session between an educator and a trainee, determining whether the trainee's
+     * lowest-level skill advances to the next level based on XP progress earned.
      *
-     * <p>This method simulates on-the-job or field training for a {@link Person} (the trainee) by the given educator
-     * (trainer). It does so by maintaining an education history and counting accumulated days. When the accumulated
-     * training time reaches the required threshold for the next skill improvement, the lowest eligible skill from
-     * {@code skillsBeingTrained} will be increased by one level, the trainee's education-time counter will be reduced
-     * appropriately, and a report is generated.</p>
+     * <p>The method follows this sequence:</p>
+     * <ol>
+     *   <li>Returns early with an empty string if training is impossible (skill check not cleared above {@link
+     *   MarginOfSuccess#BARELY_MADE_IT}, or no skills queued).</li>
+     *   <li>Sorts {@code skillsBeingTrained} ascending by level and targets the lowest-level skill for improvement.</li>
+     *   <li>Calculates the base XP cost to reach the next level of the target skill, applying
+     *       {@code xpCostMultiplier} and optional reasoning-based adjustments.</li>
+     *   <li>Applies XP progress to the target skill scaled by {@code marginOfSuccess} (minimum 1), then checks
+     *   whether the accumulated progress meets or exceeds the cost to improve.</li>
+     *   <li>If the cost is fully covered, delegates to
+     *       {@link #processCompletedTraining(Campaign, Person, Person, boolean, LocalDate, Skill, int, String, int)}
+     *       to apply the improvement and return a formatted report message.</li>
+     *   <li>If the cost is not yet met, XP progress is retained on the skill for future sessions and an empty string
+     *   is returned.</li>
+     * </ol>
      *
-     * <p>Functional details:</p>
-     * <ul>
-     *     <li>If the trainee is not currently set as being in the {@code TRAINING_COMBAT_TEAM} 'academy', their
-     *     education time is reset and this value is set.</li>
-     *     <li>If the trainee is already in team training, increment their education time. If they have no trainable
-     *     skills for this session, no further action is taken.</li>
-     *     <li>The skill improved is always the lowest-level skill in {@code skillsBeingTrained} (ties are broken
-     *     arbitrarily).</li>
-     *     <li>The experience required for the next level is based on a campaign setting-multiplied constant, with
-     *     the experience tier for the <b>next</b> level (not current) used as a multiplier.</li>
-     *     <li>If after incrementing, the education time counter is still above the required threshold, another point
-     *     of improvement may happen at a future call.</li>
-     * </ul>
+     * <p><b>Note:</b> {@code skillsBeingTrained} is sorted in-place. XP progress is always applied to the target
+     * skill regardless of whether the improvement threshold is reached, so partial progress persists across calls.</p>
      *
-     * @param educator           the {@link Person} acting as the educator (commander or trainer) for the trainee
-     * @param trainee            the {@link Person} receiving the training and accumulating skill improvement
-     * @param skillsBeingTrained a list of {@link Skill} objects that the trainee is eligible to improve during this
-     *                           session. The lowest-level skill in this list is chosen for improvement if the time
-     *                           threshold is met.
+     * @param campaign              the current {@link Campaign} context, used for veterancy award processing and report
+     *                              generation
+     * @param educator              the {@link Person} acting as the instructor; referenced in the returned report
+     *                              message
+     * @param trainee               the {@link Person} receiving the training; their skill and XP state are mutated if
+     *                              improvement occurs
+     * @param skillsBeingTrained    the list of {@link Skill}s queued for training; sorted ascending by level in-place;
+     *                              must not be {@code null}
+     * @param marginOfSuccess       the margin by which the skill check was passed; values at or below
+     *                              {@link MarginOfSuccess#BARELY_MADE_IT} immediately abort training with no XP
+     *                              applied; higher values yield proportionally more XP progress
+     * @param xpCostMultiplier      a multiplier applied to the raw XP improvement cost before comparing against
+     *                              progress; values below {@code 1.0} reduce the cost, values above {@code 1.0}
+     *                              increase it
+     * @param useReasoningXPChanges whether to apply reasoning-based XP cost adjustments when calculating the
+     *                              improvement cost via {@link Person#getCostToImprove}
+     * @param isLogSkillChange      whether to write the skill improvement to the trainee's personnel log via
+     *                              {@link PerformanceLogger#improvedSkill}
+     * @param today                 the in-game date of the training session; recorded in the personnel log if
+     *                              {@code isLogSkillChange} is {@code true}
+     *
+     * @return a formatted report message announcing the skill improvement if the target skill advanced this session; an
+     *       empty string if training was impossible or XP progress was enough to complete the improvement
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private static String processTrainingTime(Person educator, Person trainee, List<Skill> skillsBeingTrained,
-          int marginOfSuccess, double trainingMultiplier, boolean useReasoningXPChanges, boolean isLogSkillChange,
-          LocalDate today) {
-        final int WEEK_DURATION = 7; // days
-        final int EDUCATION_TIME_MULTIPLIER = 35; // days
-
-        if (skillsBeingTrained.isEmpty()) {
+    private static String processTrainingTime(Campaign campaign, Person educator, Person trainee,
+          List<Skill> skillsBeingTrained, int marginOfSuccess, double xpCostMultiplier, boolean useReasoningXPChanges,
+          boolean isLogSkillChange, LocalDate today) {
+        if (isTrainingImpossible(skillsBeingTrained, marginOfSuccess)) {
             return "";
         }
 
-        double successMultiplier = 1.0;
-        if (marginOfSuccess >= BARELY_MADE_IT.getValue()) {
-            successMultiplier += (marginOfSuccess * 0.25);
-        } else {
-            successMultiplier -= (abs(marginOfSuccess) * 0.25);
-        }
+        sortSkillsLowestLevelToHighest(skillsBeingTrained);
 
-        int trainingTime = (int) round(WEEK_DURATION * successMultiplier);
-        trainee.changeTrainingForceEducationTime(trainingTime);
-
-        // The lowest skill is improved first
-        skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
         Skill targetSkill = skillsBeingTrained.getFirst();
+        String skillName = targetSkill.getType().getName();
+        int targetSkillLevel = targetSkill.getLevel() + 1; // The +1 is to account for the next skill level to be gained
 
-        // The +1 is to account for the next skill level to be gained
-        int targetSkillLevel = targetSkill.getLevel() + 1;
+        int baseCostToImprove = getBaseCostToImprove(trainee, xpCostMultiplier, useReasoningXPChanges,
+              skillName, targetSkillLevel);
 
-        // Reasoning cost changes should always take place before global changes
-        double reasoningMultiplier = trainee.getReasoningXpCostMultiplier(useReasoningXPChanges);
-        int perExperienceLevelMultiplier = (int) round(EDUCATION_TIME_MULTIPLIER *
-                                                             reasoningMultiplier *
-                                                             trainingMultiplier);
+        int finalXPProgress = getFinalXPProgress(marginOfSuccess, targetSkill);
 
-        double currentTrainingTime = trainee.getTrainingForceEducationTime();
-        int educationTimeTarget = targetSkillLevel * perExperienceLevelMultiplier;
-        if (currentTrainingTime >= educationTimeTarget) {
-            // We use subtraction here as it's possible the character might have excess education time
-            trainee.changeTrainingForceEducationTime(-educationTimeTarget);
-            targetSkill.setLevel(targetSkillLevel);
-            String skillName = targetSkill.getType().getName();
+        boolean wasTrainingCompleted = isWasTrainingCompleted(baseCostToImprove, finalXPProgress);
 
-            PerformanceLogger.improvedSkill(isLogSkillChange, trainee, today, skillName, targetSkillLevel);
-            SkillModifierData skillModifierData = trainee.getSkillModifierData();
-            return String.format(resources.getString("learnedNewSkill.text"),
-                  educator.getFullTitle(),
-                  trainee.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                  CLOSING_SPAN_TAG,
-                  skillName,
-                  targetSkill.getFinalSkillValue(skillModifierData));
+        if (wasTrainingCompleted) {
+            return processCompletedTraining(campaign, educator, trainee, isLogSkillChange, today, targetSkill,
+                  baseCostToImprove, skillName, targetSkillLevel);
+        } else {
+            return "";
         }
+    }
 
-        return "";
+    /**
+     * Finalizes a completed training session by applying the skill improvement, logging the change to the personnel
+     * record if requested, and returning a formatted daily report message.
+     *
+     * @param campaign          the current {@link Campaign} context
+     * @param educator          the {@link Person} acting as the instructor
+     * @param trainee           the {@link Person} whose skill was improved
+     * @param isLogSkillChange  whether to log the skill change to the personnel record
+     * @param today             the in-game date on which training was completed
+     * @param targetSkill       the {@link Skill} that was improved
+     * @param baseCostToImprove the base XP cost (after multiplier) that was deducted from the skill's progress
+     * @param skillName         the display name of the skill that was improved
+     * @param targetSkillLevel  the new skill level reached after improvement
+     *
+     * @return a formatted report message announcing the skill improvement, including the educator, trainee, skill name,
+     *       and new skill value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @NonNull String processCompletedTraining(Campaign campaign, Person educator, Person trainee,
+          boolean isLogSkillChange, LocalDate today, Skill targetSkill, int baseCostToImprove, String skillName,
+          int targetSkillLevel) {
+        improveSkill(campaign, trainee, targetSkill, baseCostToImprove);
+
+        // Personnel Log
+        PerformanceLogger.improvedSkill(isLogSkillChange, trainee, today, skillName, targetSkillLevel);
+
+        // Daily Report Message
+        SkillModifierData skillModifierData = trainee.getSkillModifierData();
+        return getFormattedTextAt(RESOURCE_BUNDLE, "learnedNewSkill.text",
+              educator.getFullTitle(),
+              trainee.getHyperlinkedFullTitle(),
+              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+              CLOSING_SPAN_TAG,
+              skillName,
+              targetSkill.getFinalSkillValue(skillModifierData));
+    }
+
+    /**
+     * Applies a skill improvement to the trainee by decrementing the skill's XP progress by the base cost, advancing
+     * the skill level, and triggering any veterancy award processing.
+     *
+     * @param campaign          the current {@link Campaign} context, used for veterancy award evaluation
+     * @param trainee           the {@link Person} receiving the skill improvement
+     * @param targetSkill       the {@link Skill} to be improved
+     * @param baseCostToImprove the XP amount to deduct from the skill's current progress before improving
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void improveSkill(Campaign campaign, Person trainee, Skill targetSkill, int baseCostToImprove) {
+        targetSkill.changeXpProgress(-baseCostToImprove);
+        targetSkill.improve();
+
+        trainee.processVeterancyAwards(campaign);
+    }
+
+    /**
+     * Determines whether a training session resulted in a completed skill improvement.
+     *
+     * <p>Training is considered complete when the remaining XP cost after applying progress is zero.</p>
+     *
+     * @param baseCostToImprove the total XP cost required to improve the skill
+     * @param finalXPProgress   the trainee's accumulated XP progress toward the skill after this session
+     *
+     * @return {@code true} if the XP progress fully covers the improvement cost; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isWasTrainingCompleted(int baseCostToImprove, int finalXPProgress) {
+        int actualCostToImprove = max(0, baseCostToImprove - finalXPProgress);
+
+        return actualCostToImprove == 0;
+    }
+
+    /**
+     * Calculates and applies XP progress to the target skill for this training session.
+     *
+     * <p>Progress is at minimum 1 XP, scaled by the margin of success. Returns the skill's total accumulated XP
+     * progress after applying this session's gain.</p>
+     *
+     * @param marginOfSuccess the margin by which the skill check was passed, used to scale XP gain
+     * @param targetSkill     the {@link Skill} receiving the XP progress; its progress is mutated in-place
+     *
+     * @return the skill's total accumulated XP progress after this session's contribution is applied
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getFinalXPProgress(int marginOfSuccess, Skill targetSkill) {
+        int actualXPProgress = max(XP_RATE_BASE_LINE, (XP_RATE_BASE_LINE * marginOfSuccess));
+        targetSkill.changeXpProgress(actualXPProgress);
+
+        return targetSkill.getXpProgress();
+    }
+
+    /**
+     * Calculates the XP cost for the trainee to improve the specified skill to the target level, applying the given
+     * cost multiplier and rounding to the nearest integer.
+     *
+     * @param trainee               the {@link Person} whose skill cost is being evaluated
+     * @param xpCostMultiplier      a multiplier applied to the raw improvement cost
+     * @param useReasoningXPChanges whether to apply reasoning-based XP cost adjustments
+     * @param skillName             the name of the skill being evaluated
+     * @param targetSkillLevel      the skill level the trainee is working toward
+     *
+     * @return the adjusted XP cost to improve the skill, rounded to the nearest integer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getBaseCostToImprove(Person trainee, double xpCostMultiplier, boolean useReasoningXPChanges,
+          String skillName, int targetSkillLevel) {
+        int baseCostToImprove = trainee.getCostToImprove(skillName, useReasoningXPChanges, targetSkillLevel);
+        baseCostToImprove = (int) round(baseCostToImprove * xpCostMultiplier);
+        return baseCostToImprove;
+    }
+
+    /**
+     * Sorts the provided list of skills in ascending order by skill level, so the lowest-level skill is processed first
+     * during training.
+     *
+     * @param skillsBeingTrained the list of {@link Skill}s to sort; modified in-place
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void sortSkillsLowestLevelToHighest(List<Skill> skillsBeingTrained) {
+        skillsBeingTrained.sort(Comparator.comparingInt(Skill::getLevel));
+    }
+
+    /**
+     * Determines whether training is impossible for the current session.
+     *
+     * <p>Training cannot proceed if the skill check was not passed above the minimum threshold or if no skills are
+     * queued for training.</p>
+     *
+     * @param skillsBeingTrained the list of {@link Skill}s queued for training
+     * @param marginOfSuccess    the margin by which the skill check was passed; must equal or exceed
+     *                           {@link MarginOfSuccess#BARELY_MADE_IT} for training to be possible
+     *
+     * @return {@code true} if training cannot proceed; {@code false} if it can
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, int marginOfSuccess) {
+        boolean isSkillCheckFailed = marginOfSuccess < BARELY_MADE_IT.getValue();
+        boolean isNothingBeingTrained = skillsBeingTrained.isEmpty();
+
+        return isSkillCheckFailed || isNothingBeingTrained;
     }
 
     private static int performTrainingSkillCheck(Campaign campaign, Person educator) {
@@ -416,7 +574,7 @@ public class TrainingCombatTeams {
         int raw = skillCheck.getMarginOfSuccess();
         MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
 
-        String personnelReport = String.format(resources.getString("learnedProgress.text"),
+        String personnelReport = getFormattedTextAt(RESOURCE_BUNDLE, "learnedProgress.text",
               educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
               marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
         campaign.addReport(PERSONNEL, personnelReport);
