@@ -64,6 +64,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
@@ -461,36 +462,184 @@ public class TrainingCombatTeams {
     }
 
     /**
-     * Determines the highest skill level available among all educators for each profession skill.
+     * Aggregates and filters skills from a set of educator {@link Person} objects, returning only the most proficient
+     * skill within each competitive skill group (e.g., scouting, infantry gunnery).
      *
-     * <p>Iterates through all educators and profession skills to find the maximum skill level that can be taught for
-     * each skill. Only skills that at least one educator possesses are included in the result.</p>
+     * <p>For each educator, profession skills are first collected via {@code getProfessionSkillsForEducator}, then
+     * competing skill groups are filtered so that only the highest-level skill in each group is retained.</p>
      *
-     * @param educators        the set of educators to evaluate
-     * @param professionSkills the set of skill names relevant to the profession
+     * @param educators        the set of {@link Person} objects acting as educators; must not be {@code null}
+     * @param professionSkills the set of skill names eligible for collection from each educator; must not be
+     *                         {@code null}
      *
-     * @return a map of skill names to their highest available level among all educators, containing only skills that at
-     *       least one educator possesses
+     * @return a {@link Map} of skill name to experience level, containing at most one representative skill per
+     *       competitive skill group
      *
      * @author Illiani
-     * @since 0.50.10
+     * @since 50.10
      */
     private static Map<String, Integer> getEducatorSkills(Set<Person> educators, Set<String> professionSkills) {
         Map<String, Integer> educatorSkills = new HashMap<>();
 
         for (Person educator : educators) {
-            SkillModifierData skillModifierData = educator.getSkillModifierData();
-            for (String professionSkill : professionSkills) {
-                Skill skill = educator.getSkill(professionSkill);
-
-                if (skill != null) {
-                    int experienceLevel = skill.getExperienceLevel(skillModifierData) + EXPERIENCE_LEVEL_REDUCTION;
-                    educatorSkills.merge(professionSkill, experienceLevel, Math::max);
-                }
-            }
+            getProfessionSkillsForEducator(professionSkills, educator, educatorSkills);
         }
 
+        filterInfantryGunnerySkillsForEducator(educatorSkills);
+        filterScoutingSkillsForEducator(educatorSkills);
+
         return educatorSkills;
+    }
+
+    /**
+     * Filters the educator's current skill map so that only the single highest-level infantry gunnery skill is
+     * retained, removing all others.
+     *
+     * <p>Iterates over {@link InfantryGunnerySkills#INFANTRY_GUNNERY_SKILLS}, tracking the skill with the greatest
+     * experience level. All infantry gunnery skills are removed from {@code educatorSkills} during iteration; the best
+     * one is then re-added via {@link #validateAndAddBackEducatorAggregateSkill} if it resolves to a valid
+     * {@link SkillType}.</p>
+     *
+     * @param educatorSkills the mutable skill map to filter in place; must not be {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void filterInfantryGunnerySkillsForEducator(Map<String, Integer> educatorSkills) {
+        final int NO_SKILL_PICKED = -1;
+        String bestInfantryGunnerySkillName = "";
+        int bestInfantryGunnerySkillExperienceLevel = NO_SKILL_PICKED;
+        for (String currentInfantryGunnerySkill : InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS) {
+            if (!isSkillAmongEducatorSkills(educatorSkills, currentInfantryGunnerySkill)) {
+                continue;
+            }
+
+            int currentInfantryGunneryLevel = educatorSkills.get(currentInfantryGunnerySkill);
+            boolean isNoSkillSet = bestInfantryGunnerySkillExperienceLevel == NO_SKILL_PICKED;
+            boolean isCurrentSkillBetter = bestInfantryGunnerySkillExperienceLevel < currentInfantryGunneryLevel;
+
+            if (isNoSkillSet || isCurrentSkillBetter) {
+                bestInfantryGunnerySkillName = currentInfantryGunnerySkill;
+                bestInfantryGunnerySkillExperienceLevel = currentInfantryGunneryLevel;
+            }
+
+            educatorSkills.remove(currentInfantryGunnerySkill);
+        }
+
+        if (bestInfantryGunnerySkillExperienceLevel != NO_SKILL_PICKED) {
+            validateAndAddBackEducatorAggregateSkill(educatorSkills,
+                  bestInfantryGunnerySkillName,
+                  bestInfantryGunnerySkillExperienceLevel);
+        }
+    }
+
+    /**
+     * Validates a candidate aggregate skill name and, if valid, inserts it back into the educator's skill map at the
+     * given experience level.
+     *
+     * <p>Validation is performed by checking that {@link SkillType#getType(String)} returns a non-{@code null}
+     * result for {@code bestSkillName}. If validation fails, an error is logged with a {@link NullPointerException} and
+     * the skill is not added.</p>
+     *
+     * @param educatorSkills           the skill map to update; must not be {@code null}
+     * @param bestSkillName            the name of the skill to validate and re-insert
+     * @param bestSkillExperienceLevel the experience level to associate with the skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void validateAndAddBackEducatorAggregateSkill(Map<String, Integer> educatorSkills,
+          String bestSkillName, int bestSkillExperienceLevel) {
+        if (SkillType.getType(bestSkillName) != null) {
+            educatorSkills.put(bestSkillName, bestSkillExperienceLevel);
+        } else {
+            LOGGER.error(new NullPointerException(), "No valid skill for {}", bestSkillName);
+        }
+    }
+
+    /**
+     * Returns {@code true} if the given skill name is present as a key in the educator's skill map.
+     *
+     * @param educatorSkills the skill map to query; must not be {@code null}
+     * @param skillName      the skill name to look up
+     *
+     * @return {@code true} if {@code educatorSkills} contains the specified skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isSkillAmongEducatorSkills(Map<String, Integer> educatorSkills, String skillName) {
+        return educatorSkills.containsKey(skillName);
+    }
+
+    /**
+     * Filters the educator's current skill map so that only the single highest-level scouting skill is retained,
+     * removing all others.
+     *
+     * <p>Iterates over {@link ScoutingSkills#SCOUTING_SKILLS}, tracking the skill with the greatest experience level.
+     * All scouting skills are removed from {@code educatorSkills} during iteration; the best one is then re-added via
+     * {@link #validateAndAddBackEducatorAggregateSkill} if it resolves to a valid {@link SkillType}.</p>
+     *
+     * @param educatorSkills the mutable skill map to filter in place
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void filterScoutingSkillsForEducator(Map<String, Integer> educatorSkills) {
+        final int NO_SKILL_PICKED = -1;
+        String bestScoutingSkillName = "";
+        int bestScoutingSkillExperienceLevel = NO_SKILL_PICKED;
+        for (String currentScoutingSkill : ScoutingSkills.SCOUTING_SKILLS) {
+            if (!educatorSkills.containsKey(currentScoutingSkill)) {
+                continue;
+            }
+
+            int currentScoutingLevel = educatorSkills.get(currentScoutingSkill);
+            boolean isNoSkillSet = bestScoutingSkillExperienceLevel == NO_SKILL_PICKED;
+            boolean isCurrentSkillBetter = bestScoutingSkillExperienceLevel < currentScoutingLevel;
+
+            if (isNoSkillSet || isCurrentSkillBetter) {
+                bestScoutingSkillName = currentScoutingSkill;
+                bestScoutingSkillExperienceLevel = currentScoutingLevel;
+            }
+
+            educatorSkills.remove(currentScoutingSkill);
+        }
+
+        if (bestScoutingSkillExperienceLevel != NO_SKILL_PICKED) {
+            validateAndAddBackEducatorAggregateSkill(educatorSkills,
+                  bestScoutingSkillName,
+                  bestScoutingSkillExperienceLevel);
+        }
+    }
+
+    /**
+     * Collects profession skills from a single educator and merges them into the shared skill map, retaining the
+     * highest experience level seen for each skill.
+     *
+     * <p>For each skill name in {@code professionSkills}, the educator's corresponding {@link Skill} is retrieved.
+     * If present, its experience level is computed via {@link Skill#getExperienceLevel(SkillModifierData)}, reduced by
+     * {@link #EXPERIENCE_LEVEL_REDUCTION}, and merged into {@code educatorSkills} using {@link Math#max} so that a
+     * skill already recorded at a higher level is never overwritten.</p>
+     *
+     * <p>Skills the educator does not possess (i.e. {@link Person#getSkill(String)} returns {@code null}) are
+     * silently skipped.</p>
+     *
+     * @param professionSkills the set of skill names to evaluate for the educator; must not be {@code null}
+     * @param educator         the {@link Person} whose skills are being assessed; must not be {@code null}
+     * @param educatorSkills   the mutable skill map to merge results into; must not be {@code null}
+     */
+    private static void getProfessionSkillsForEducator(Set<String> professionSkills, Person educator,
+          Map<String, Integer> educatorSkills) {
+        SkillModifierData skillModifierData = educator.getSkillModifierData();
+        for (String professionSkill : professionSkills) {
+            Skill skill = educator.getSkill(professionSkill);
+
+            if (skill != null) {
+                int experienceLevel = skill.getExperienceLevel(skillModifierData) + EXPERIENCE_LEVEL_REDUCTION;
+                educatorSkills.merge(professionSkill, experienceLevel, Math::max);
+            }
+        }
     }
 
     /**
