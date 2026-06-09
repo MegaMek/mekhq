@@ -5756,8 +5756,21 @@ public class Person implements ILocation {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    /**
+     * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
+     * multiplier.
+     *
+     * @param skillName        the name of the skill for which to calculate the improvement cost.
+     * @param useReasoning     a boolean indicating whether to apply {@link Reasoning} cost multipliers.
+     * @param targetSkillLevel The target skill level
+     *
+     * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
+     *       0 if the specified skill does not currently exist.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     public int getCostToImprove(final String skillName, final boolean useReasoning, final int targetSkillLevel) {
-        final Skill skill = getSkill(skillName);
         final SkillType skillType = getType(skillName);
         int cost = skillType.getCost(targetSkillLevel);
 
