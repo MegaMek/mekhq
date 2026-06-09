@@ -375,17 +375,11 @@ public class Person implements ILocation {
 
     // region Personality
     private Aggression aggression;
-    private int aggressionDescriptionIndex;
     private Ambition ambition;
-    private int ambitionDescriptionIndex;
     private Greed greed;
-    private int greedDescriptionIndex;
     private Social social;
-    private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
-    private int personalityQuirkDescriptionIndex;
     private String personalityDescription;
-    private String personalityInterviewNotes;
     private Reasoning reasoning;
     private int performanceExamScore;
     // endregion Personality
@@ -396,15 +390,10 @@ public class Person implements ILocation {
     private int storedLoyalty;
     private Faction storedOriginFaction;
     private Aggression storedAggression;
-    private int storedAggressionDescriptionIndex;
     private Ambition storedAmbition;
-    private int storedAmbitionDescriptionIndex;
     private Greed storedGreed;
-    private int storedGreedDescriptionIndex;
     private Social storedSocial;
-    private int storedSocialDescriptionIndex;
     private PersonalityQuirk storedPersonalityQuirk;
-    private int storedPersonalityQuirkDescriptionIndex;
     private Reasoning storedReasoning;
     private boolean sufferingFromClinicalParanoia;
     private boolean darkSecretRevealed;
@@ -614,30 +603,19 @@ public class Person implements ILocation {
         eduAcademyFaction = null;
         trainingForceEducationTime = 0.0;
         aggression = Aggression.NONE;
-        aggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
         ambition = Ambition.NONE;
-        ambitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
         greed = Greed.NONE;
-        greedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
         social = Social.NONE;
-        socialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
         personalityQuirk = PersonalityQuirk.NONE;
-        personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         reasoning = Reasoning.AVERAGE;
         performanceExamScore = 50;
         personalityDescription = "";
-        personalityInterviewNotes = "";
         storedLoyalty = 0;
         storedAggression = Aggression.NONE;
-        storedAggressionDescriptionIndex = 0;
         storedAmbition = Ambition.NONE;
-        storedAmbitionDescriptionIndex = 0;
         storedGreed = Greed.NONE;
-        storedGreedDescriptionIndex = 0;
         storedSocial = Social.NONE;
-        storedSocialDescriptionIndex = 0;
         storedPersonalityQuirk = PersonalityQuirk.NONE;
-        storedPersonalityQuirkDescriptionIndex = 0;
         storedReasoning = Reasoning.AVERAGE;
         sufferingFromClinicalParanoia = false;
         darkSecretRevealed = false;
@@ -2837,34 +2815,12 @@ public class Person implements ILocation {
         this.aggression = aggression;
     }
 
-    public int getAggressionDescriptionIndex() {
-        return aggressionDescriptionIndex;
-    }
-
-    /**
-     * Sets the index value for the {@link Aggression} description.
-     *
-     * @param aggressionDescriptionIndex The index value to set for the aggression description. It will be clamped to
-     *                                   ensure it remains within the valid range.
-     */
-    public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
-    }
-
     Aggression getStoredAggression() {
         return storedAggression;
     }
 
     void setStoredAggression(Aggression storedAggression) {
         this.storedAggression = storedAggression;
-    }
-
-    int getStoredAggressionDescriptionIndex() {
-        return storedAggressionDescriptionIndex;
-    }
-
-    void setStoredAggressionDescriptionIndex(int storedAggressionDescriptionIndex) {
-        this.storedAggressionDescriptionIndex = storedAggressionDescriptionIndex;
     }
 
     public Ambition getAmbition() {
@@ -2875,34 +2831,12 @@ public class Person implements ILocation {
         this.ambition = ambition;
     }
 
-    public int getAmbitionDescriptionIndex() {
-        return ambitionDescriptionIndex;
-    }
-
-    /**
-     * Sets the index value for the {@link Ambition} description.
-     *
-     * @param ambitionDescriptionIndex The index value to set for the Ambition description. It will be clamped to ensure
-     *                                 it remains within the valid range.
-     */
-    public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
-    }
-
     Ambition getStoredAmbition() {
         return storedAmbition;
     }
 
     void setStoredAmbition(Ambition storedAmbition) {
         this.storedAmbition = storedAmbition;
-    }
-
-    int getStoredAmbitionDescriptionIndex() {
-        return storedAmbitionDescriptionIndex;
-    }
-
-    void setStoredAmbitionDescriptionIndex(int storedAmbitionDescriptionIndex) {
-        this.storedAmbitionDescriptionIndex = storedAmbitionDescriptionIndex;
     }
 
     public Greed getGreed() {
@@ -2913,34 +2847,12 @@ public class Person implements ILocation {
         this.greed = greed;
     }
 
-    public int getGreedDescriptionIndex() {
-        return greedDescriptionIndex;
-    }
-
-    /**
-     * Sets the index value for the {@link Greed} description.
-     *
-     * @param greedDescriptionIndex The index value to set for the Greed description. It will be clamped to ensure it
-     *                              remains within the valid range.
-     */
-    public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
-    }
-
     Greed getStoredGreed() {
         return storedGreed;
     }
 
     void setStoredGreed(Greed storedGreed) {
         this.storedGreed = storedGreed;
-    }
-
-    int getStoredGreedDescriptionIndex() {
-        return storedGreedDescriptionIndex;
-    }
-
-    void setStoredGreedDescriptionIndex(int storedGreedDescriptionIndex) {
-        this.storedGreedDescriptionIndex = storedGreedDescriptionIndex;
     }
 
     public Social getSocial() {
@@ -2951,34 +2863,12 @@ public class Person implements ILocation {
         this.social = social;
     }
 
-    public int getSocialDescriptionIndex() {
-        return socialDescriptionIndex;
-    }
-
-    /**
-     * Sets the index value for the {@link Social} description.
-     *
-     * @param socialDescriptionIndex The index value to set for the Social description. It will be clamped to ensure it
-     *                               remains within the valid range.
-     */
-    public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
-    }
-
     Social getStoredSocial() {
         return storedSocial;
     }
 
     void setStoredSocial(Social storedSocial) {
         this.storedSocial = storedSocial;
-    }
-
-    int getStoredSocialDescriptionIndex() {
-        return storedSocialDescriptionIndex;
-    }
-
-    void setStoredSocialDescriptionIndex(int storedSocialDescriptionIndex) {
-        this.storedSocialDescriptionIndex = storedSocialDescriptionIndex;
     }
 
     public PersonalityQuirk getPersonalityQuirk() {
@@ -2989,36 +2879,12 @@ public class Person implements ILocation {
         this.personalityQuirk = personalityQuirk;
     }
 
-    public int getPersonalityQuirkDescriptionIndex() {
-        return personalityQuirkDescriptionIndex;
-    }
-
-    /**
-     * Sets the index value for the {@link PersonalityQuirk} description.
-     *
-     * @param personalityQuirkDescriptionIndex The index value to set for the quirk description. It will be clamped to
-     *                                         ensure it remains within the valid range.
-     */
-    public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
-        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
-              0,
-              PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
-    }
-
     PersonalityQuirk getStoredPersonalityQuirk() {
         return storedPersonalityQuirk;
     }
 
     void setStoredPersonalityQuirk(PersonalityQuirk storedPersonalityQuirk) {
         this.storedPersonalityQuirk = storedPersonalityQuirk;
-    }
-
-    int getStoredPersonalityQuirkDescriptionIndex() {
-        return storedPersonalityQuirkDescriptionIndex;
-    }
-
-    void setStoredPersonalityQuirkDescriptionIndex(int storedPersonalityQuirkDescriptionIndex) {
-        this.storedPersonalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
     }
 
     public Reasoning getReasoning() {
@@ -3069,14 +2935,6 @@ public class Person implements ILocation {
 
     public void setPersonalityDescription(final String personalityDescription) {
         this.personalityDescription = personalityDescription;
-    }
-
-    public String getPersonalityInterviewNotes() {
-        return personalityInterviewNotes;
-    }
-
-    public void setPersonalityInterviewNotes(final String personalityInterviewNotes) {
-        this.personalityInterviewNotes = personalityInterviewNotes;
     }
 
     public boolean isSufferingFromClinicalParanoia() {
@@ -3667,33 +3525,21 @@ public class Person implements ILocation {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggressionDescriptionIndex", aggressionDescriptionIndex);
-
             if (ambition != Ambition.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.name());
             }
-
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambitionDescriptionIndex", ambitionDescriptionIndex);
 
             if (greed != Greed.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greedDescriptionIndex", greedDescriptionIndex);
-
             if (social != Social.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.name());
             }
 
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "socialDescriptionIndex", socialDescriptionIndex);
-
             if (personalityQuirk != PersonalityQuirk.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.name());
             }
-
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent,
-                  "personalityQuirkDescriptionIndex",
-                  personalityQuirkDescriptionIndex);
 
             if (reasoning != Reasoning.AVERAGE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reasoning", reasoning.ordinal());
@@ -3705,9 +3551,6 @@ public class Person implements ILocation {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
 
-            if (!isNullOrBlank(personalityInterviewNotes)) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityInterviewNotes", personalityInterviewNotes);
-            }
 
             if (!isNullOrBlank(storedGivenName)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGivenName", storedGivenName);
@@ -3729,52 +3572,20 @@ public class Person implements ILocation {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedAggression", storedAggression.name());
             }
 
-            if (storedAggressionDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedAggressionDescriptionIndex",
-                      storedAggressionDescriptionIndex);
-            }
-
             if (storedAmbition != Ambition.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedAmbition", storedAmbition.name());
-            }
-
-            if (storedAmbitionDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedAmbitionDescriptionIndex",
-                      storedAmbitionDescriptionIndex);
             }
 
             if (storedGreed != Greed.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGreed", storedGreed.name());
             }
 
-            if (storedGreedDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedGreedDescriptionIndex", storedGreedDescriptionIndex);
-            }
-
             if (storedSocial != Social.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedSocial", storedSocial.name());
             }
 
-            if (storedSocialDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedSocialDescriptionIndex",
-                      storedSocialDescriptionIndex);
-            }
-
             if (storedPersonalityQuirk != PersonalityQuirk.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "storedPersonalityQuirk", storedPersonalityQuirk.name());
-            }
-
-            if (storedPersonalityQuirkDescriptionIndex != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw,
-                      indent,
-                      "storedPersonalityQuirkDescriptionIndex",
-                      storedPersonalityQuirkDescriptionIndex);
             }
 
             if (storedReasoning != Reasoning.AVERAGE) {
@@ -4364,24 +4175,14 @@ public class Person implements ILocation {
                     person.trainingForceEducationTime = MathUtility.parseDouble(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("aggression")) {
                     person.aggression = Aggression.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("aggressionDescriptionIndex")) {
-                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("ambition")) {
                     person.ambition = Ambition.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("ambitionDescriptionIndex")) {
-                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("greed")) {
                     person.greed = Greed.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("greedDescriptionIndex")) {
-                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("social")) {
                     person.social = Social.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("socialDescriptionIndex")) {
-                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("personalityQuirk")) {
                     person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
-                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
                     Reasoning parsedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
                     person.reasoning = parsedReasoning;
@@ -4393,8 +4194,6 @@ public class Person implements ILocation {
                     person.performanceExamScore = MathUtility.parseInt(wn2.getTextContent().trim(), 50);
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
-                } else if (nodeName.equalsIgnoreCase("personalityInterviewNotes")) {
-                    person.personalityInterviewNotes = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("storedGivenName")) {
                     person.storedGivenName = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("storedSurname")) {
@@ -4405,24 +4204,14 @@ public class Person implements ILocation {
                     person.storedOriginFaction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedAggression")) {
                     person.storedAggression = Aggression.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedAggressionDescriptionIndex")) {
-                    person.storedAggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedAmbition")) {
                     person.storedAmbition = Ambition.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedAmbitionDescriptionIndex")) {
-                    person.storedAmbitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedGreed")) {
                     person.storedGreed = Greed.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedGreedDescriptionIndex")) {
-                    person.storedGreedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedSocial")) {
                     person.storedSocial = Social.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedSocialDescriptionIndex")) {
-                    person.storedSocialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirk")) {
                     person.storedPersonalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent().trim());
-                } else if (nodeName.equalsIgnoreCase("storedPersonalityQuirkDescriptionIndex")) {
-                    person.storedPersonalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("storedReasoning")) {
                     person.storedReasoning = Reasoning.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("sufferingFromClinicalParanoia")) {
@@ -8328,28 +8117,23 @@ public class Person implements ILocation {
                 case AGGRESSION -> {
                     String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
                     setStoredAggression(Aggression.fromString(traitIndex));
-                    setStoredAggressionDescriptionIndex(randomInt(Aggression.MAXIMUM_VARIATIONS));
                 }
                 case AMBITION -> {
                     String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
                     setStoredAmbition(Ambition.fromString(traitIndex));
-                    setStoredAmbitionDescriptionIndex(randomInt(Ambition.MAXIMUM_VARIATIONS));
                 }
                 case GREED -> {
                     String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
                     setStoredGreed(Greed.fromString(traitIndex));
-                    setStoredGreedDescriptionIndex(randomInt(Greed.MAXIMUM_VARIATIONS));
                 }
                 case SOCIAL -> {
                     String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
                     setStoredSocial(Social.fromString(traitIndex));
-                    setStoredSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
                 }
                 case PERSONALITY_QUIRK -> {
                     int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
                     String traitIndex = String.valueOf(traitRoll);
                     setStoredPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
-                    setStoredPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
                 }
                 default -> {}
             }
@@ -8439,41 +8223,21 @@ public class Person implements ILocation {
         aggression = storedAggression;
         storedAggression = transitionaryAggression;
 
-        int transitionaryAggressionDescriptionIndex = aggressionDescriptionIndex;
-        aggressionDescriptionIndex = storedAggressionDescriptionIndex;
-        storedAggressionDescriptionIndex = transitionaryAggressionDescriptionIndex;
-
         Ambition transitionaryAmbition = ambition;
         ambition = storedAmbition;
         storedAmbition = transitionaryAmbition;
-
-        int transitionaryAmbitionDescriptionIndex = ambitionDescriptionIndex;
-        ambitionDescriptionIndex = storedAmbitionDescriptionIndex;
-        storedAmbitionDescriptionIndex = transitionaryAmbitionDescriptionIndex;
 
         Greed transitionaryGreed = greed;
         greed = storedGreed;
         storedGreed = transitionaryGreed;
 
-        int transitionaryGreedDescriptionIndex = greedDescriptionIndex;
-        greedDescriptionIndex = storedGreedDescriptionIndex;
-        storedGreedDescriptionIndex = transitionaryGreedDescriptionIndex;
-
         Social transitionarySocial = social;
         social = storedSocial;
         storedSocial = transitionarySocial;
 
-        int transitionarySocialDescriptionIndex = socialDescriptionIndex;
-        socialDescriptionIndex = storedSocialDescriptionIndex;
-        storedSocialDescriptionIndex = transitionarySocialDescriptionIndex;
-
         PersonalityQuirk transitionaryPersonalityQuirk = personalityQuirk;
         personalityQuirk = storedPersonalityQuirk;
         storedPersonalityQuirk = transitionaryPersonalityQuirk;
-
-        int transitionaryPersonalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
-        personalityQuirkDescriptionIndex = storedPersonalityQuirkDescriptionIndex;
-        storedPersonalityQuirkDescriptionIndex = transitionaryPersonalityQuirkDescriptionIndex;
 
         Reasoning transitionaryReasoning = reasoning;
         reasoning = storedReasoning;

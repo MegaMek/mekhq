@@ -40,12 +40,10 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import megamek.common.enums.Gender;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 public class SocialTest {
     @ParameterizedTest
@@ -75,27 +73,13 @@ public class SocialTest {
     static Stream<Arguments> provideSocialsAndIndices() {
         return Arrays.stream(Social.values())
                      .flatMap(trait -> IntStream.range(0, Social.MAXIMUM_VARIATIONS)
-                                             .mapToObj(i -> Arguments.of(trait, i)));
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = "provideSocialsAndIndices")
-    void testGetDescription_notInvalid(Social trait, int i) {
-        String description = trait.getDescription(i, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "99", "1000", "-1" })
-    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = Social.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
+                                             .mapToObj(i -> Arguments.of(trait)));
     }
 
     @ParameterizedTest
     @EnumSource(value = Social.class)
     void testGetRoninMessage_notInvalid(Social trait) {
-        String description = trait.getRoninMessage("Commander");
+        String description = trait.getRoninMessage();
         assertTrue(isResourceKeyValid(description));
     }
 }

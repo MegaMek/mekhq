@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.randomEvents.personalities.enums.Aggression.MAXIMUM_VARIATIONS;
-import static mekhq.campaign.randomEvents.personalities.enums.Aggression.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,12 +40,10 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import megamek.common.enums.Gender;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 public class AggressionTest {
     @ParameterizedTest
@@ -75,28 +71,15 @@ public class AggressionTest {
     }
 
     static Stream<Arguments> provideAggressionsAndIndices() {
-        return Arrays.stream(Aggression.values())
-                     .flatMap(trait -> IntStream.range(0, MAXIMUM_VARIATIONS).mapToObj(i -> Arguments.of(trait, i)));
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = "provideAggressionsAndIndices")
-    void testGetDescription_notInvalid(Aggression trait, int i) {
-        String description = trait.getDescription(i, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "99", "1000", "-1" })
-    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
+        return Arrays.stream(Social.values())
+                     .flatMap(trait -> IntStream.range(0, Aggression.MAXIMUM_VARIATIONS)
+                                             .mapToObj(i -> Arguments.of(trait)));
     }
 
     @ParameterizedTest
     @EnumSource(value = Aggression.class)
     void testGetRoninMessage_notInvalid(Aggression trait) {
-        String description = trait.getRoninMessage("Commander");
+        String description = trait.getRoninMessage();
         assertTrue(isResourceKeyValid(description));
     }
 }

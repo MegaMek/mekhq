@@ -32,21 +32,14 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
-import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.PERSONALITY_QUIRK;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.PronounData;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.Faction;
 
 /**
  * Represents various personality quirks that can define an individual's behavior or habits.
@@ -303,7 +296,6 @@ public enum PersonalityQuirk {
     FREEZES,
     TRAUMATIZED,
     HAUNTED,
-    @Deprecated(since = "0.50.07", forRemoval = true)
     BROKEN,
     REGRETS,
     DARK_SECRET,
@@ -367,82 +359,6 @@ public enum PersonalityQuirk {
         final String RESOURCE_KEY = name() + ".label";
 
         return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
-    }
-
-    /**
-     * Generates a localized and detailed description for a person based on their role, personality, gender, faction
-     * origin, and given name.
-     * <p>
-     * This method uses the provided role and personality quirk index, along with character attributes like gender and
-     * faction, to generate a formatted description string. The description incorporates pronouns and other
-     * character-specific details, tailoring the result for the user.
-     * </p>
-     *
-     * @param primaryRole           the primary {@link PersonnelRole} of the person. If the role is marked as
-     *                              "dependent" or "None", no description is generated.
-     * @param personalityQuirkIndex an index representing the person's personality quirk description variant. This is
-     *                              clamped to a valid range from 0 to {@code MAXIMUM_VARIATIONS - 1}.
-     * @param gender                the {@link Gender} of the person, used to determine pronouns for the description.
-     * @param originFaction         the {@link Faction} representing the person's origin.
-     * @param givenName             the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
-     *                              <b>NOT</b> 'person.getFirstName()'
-     *
-     * @return a formatted description string tailored to the specified person. Returns an empty string if the
-     *       {@code primaryRole} is "dependent" or "none.
-     */
-    public String getDescription(final PersonnelRole primaryRole, int personalityQuirkIndex,
-          final Gender gender, final Faction originFaction, final String givenName) {
-        if (primaryRole.isDependent() || primaryRole.isNone()) {
-            return "";
-        }
-
-        personalityQuirkIndex = Math.clamp(personalityQuirkIndex, 0, MAXIMUM_VARIATIONS - 1);
-
-        String professionKey;
-        if (primaryRole.isCombat()) {
-            professionKey = "COMBATANT";
-        } else {
-            professionKey = "SUPPORT";
-        }
-
-        final String RESOURCE_KEY = name() + ".description." + personalityQuirkIndex + '.' + professionKey;
-        final PronounData pronounData = new PronounData(gender);
-
-        String formationKey;
-        if (primaryRole == SOLDIER || primaryRole == BATTLE_ARMOUR) {
-            formationKey = "squad";
-        } else {
-            formationKey = "lance";
-        }
-
-        String factionKey;
-        if (originFaction.isClan()) {
-            factionKey = "clan";
-        } else if (originFaction.isComStarOrWoB()) {
-            factionKey = "comStar";
-        } else {
-            factionKey = "innerSphere";
-        }
-
-        String lanceLabelUppercase = getFormattedTextAt(RESOURCE_BUNDLE,
-              formationKey + '.' + factionKey);
-        String lanceLabelLowercase = lanceLabelUppercase.toLowerCase();
-
-        // {0} = givenName
-        // {1} = He/She/They
-        // {2} = he/she/they
-        // {3} = Him/Her/Them
-        // {4} = him/her/them
-        // {5} = His/Her/Their
-        // {6} = his/her/their
-        // {7} = Star/Lance/Level
-        // {8} = star/lance/level
-        // {9} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
-              pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
-              pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), lanceLabelUppercase,
-              lanceLabelLowercase, pronounData.pluralizer());
     }
 
     /**

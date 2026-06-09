@@ -131,7 +131,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -344,10 +343,8 @@ public class PersonViewPanel extends JScrollablePanel {
             String borderTitleKey = "pnlPersonality.normal";
             if (person.getJoinedCampaign() == null) {
                 borderTitleKey = "pnlPersonality.interview";
-                txtDesc.setText(person.getPersonalityInterviewNotes());
-            } else {
-                txtDesc.setText(person.getPersonalityDescription());
             }
+            txtDesc.setText(person.getPersonalityDescription());
             txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;

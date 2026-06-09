@@ -48,6 +48,7 @@ import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitTy
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.GREED;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -281,18 +282,18 @@ public class RoninOffer {
         String message = "";
         if (chosenTrait != null) {
             message = switch (chosenTrait) {
-                case AGGRESSION -> aggression.getRoninMessage(commanderAddress);
-                case AMBITION -> ambition.getRoninMessage(commanderAddress);
-                case GREED -> greed.getRoninMessage(commanderAddress);
-                case SOCIAL -> social.getRoninMessage(commanderAddress);
+                case AGGRESSION -> aggression.getRoninMessage();
+                case AMBITION -> ambition.getRoninMessage();
+                case GREED -> greed.getRoninMessage();
+                case SOCIAL -> social.getRoninMessage();
                 default -> "";
             };
         }
 
         if (message.isBlank()) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "message.ic.fallback", commanderAddress);
+            return getTextAt(RESOURCE_BUNDLE, "message.ic.fallback");
         } else {
-            return String.format(message, commanderAddress);
+            return message;
         }
     }
 

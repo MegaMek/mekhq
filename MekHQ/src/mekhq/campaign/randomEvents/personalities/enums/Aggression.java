@@ -36,9 +36,7 @@ import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitTy
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.PronounData;
 
 /**
  * Represents various levels and traits of aggression in a personality.
@@ -155,60 +153,14 @@ public enum Aggression {
     }
 
     /**
-     * Generates a localized and personalized description for the current enumeration value.
-     * <p>
-     * This method retrieves a description using the enumeration's name and a specific key suffix derived from the given
-     * aggression description index. The description is further customized using the provided gender-specific pronouns,
-     * the individual's given name, and other localized text from the resource bundle.
-     * </p>
-     *
-     * @param aggressionDescriptionIndex an index representing the type/variation of the description. This value is
-     *                                   clamped to ensure it falls within a valid range.
-     * @param gender                     the {@link Gender} of the individual, used to determine appropriate pronouns
-     *                                   for the description.
-     * @param givenName                  the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
-     *                                   <b>NOT</b> 'person.getFirstName()'
-     *
-     * @return a formatted description string based on the enum, the individual's gender, name, and aggression
-     *       description index.
-     *
-     * @see Gender
-     */
-    public String getDescription(int aggressionDescriptionIndex, final Gender gender,
-          final String givenName) {
-        aggressionDescriptionIndex = Math.clamp(aggressionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
-
-        final String RESOURCE_KEY = name() + ".description." + aggressionDescriptionIndex;
-        final PronounData pronounData = new PronounData(gender);
-
-        // {0} = givenName
-        // {1} = He/She/They
-        // {2} = he/she/they
-        // {3} = Him/Her/Them
-        // {4} = him/her/them
-        // {5} = His/Her/Their
-        // {6} = his/her/their
-        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
-              pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
-              pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
-    }
-
-    /**
      * Retrieves the message displayed when a Ronin warrior expresses interest in joining the campaign.
-     *
-     * <p>This method formats a message using a resource key derived from the current object and
-     * includes the commander's address as part of the message formatting.</p>
-     *
-     * @param commanderAddress the address or name of the commander to include in the message.
      *
      * @return the formatted Ronin message as a {@link String}.
      */
-    public String getRoninMessage(String commanderAddress) {
+    public String getRoninMessage() {
         final String RESOURCE_KEY = name() + ".ronin";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, commanderAddress);
+        return getTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**

@@ -40,12 +40,10 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import megamek.common.enums.Gender;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 public class AmbitionTest {
     @ParameterizedTest
@@ -73,29 +71,15 @@ public class AmbitionTest {
     }
 
     static Stream<Arguments> provideAmbitionsAndIndices() {
-        return Arrays.stream(Ambition.values())
+        return Arrays.stream(Social.values())
                      .flatMap(trait -> IntStream.range(0, Ambition.MAXIMUM_VARIATIONS)
-                                             .mapToObj(i -> Arguments.of(trait, i)));
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = "provideAmbitionsAndIndices")
-    void testGetDescription_notInvalid(Ambition trait, int i) {
-        String description = trait.getDescription(i, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "99", "1000", "-1" })
-    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = Ambition.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
+                                             .mapToObj(i -> Arguments.of(trait)));
     }
 
     @ParameterizedTest
     @EnumSource(value = Ambition.class)
     void testGetRoninMessage_notInvalid(Ambition trait) {
-        String description = trait.getRoninMessage("Commander");
+        String description = trait.getRoninMessage();
         assertTrue(isResourceKeyValid(description));
     }
 }

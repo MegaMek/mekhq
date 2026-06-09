@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 import java.awt.BorderLayout;
@@ -259,7 +258,6 @@ public class NewRecruitDialog extends JDialog {
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         writePersonalityDescription(person);
-        writeInterviewersNotes(person);
         refreshView();
     }
 

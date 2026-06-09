@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,15 +40,12 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import megamek.common.enums.Gender;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 public class PersonalityQuirkTest {
     @ParameterizedTest
@@ -75,20 +70,7 @@ public class PersonalityQuirkTest {
         Faction originFaction = Factions.getInstance().getFaction("MERC");
         return Arrays.stream(PersonalityQuirk.values())
                      .flatMap(trait -> IntStream.range(0, 3)
-                                             .mapToObj(i -> Arguments.of(trait,
-                                                   MEKWARRIOR,
-                                                   i,
-                                                   Gender.MALE,
-                                                   originFaction,
-                                                   "Barry")));
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = "provideTraitsAndRoles")
-    void testGetDescription_notInvalid(PersonalityQuirk trait, PersonnelRole role, int validIndex, Gender gender,
-          Faction faction, String name) {
-        String description = trait.getDescription(role, validIndex, gender, faction, name);
-        assertTrue(isResourceKeyValid(description));
+                                             .mapToObj(i -> Arguments.of(trait)));
     }
 
     @ParameterizedTest
@@ -96,14 +78,5 @@ public class PersonalityQuirkTest {
     void testGetPersonalityTraitTypeLabel_notInvalid(PersonalityQuirk status) {
         String label = status.getPersonalityTraitTypeLabel();
         assertTrue(isResourceKeyValid(label));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "-1", "999", "1000000", "2147483647" })
-        // example edge cases
-    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        Faction originFaction = Factions.getInstance().getFaction("MERC");
-        String description = NONE.getDescription(MEKWARRIOR, invalidIndex, Gender.MALE, originFaction, "Barry");
-        assertTrue(isResourceKeyValid(description));
     }
 }

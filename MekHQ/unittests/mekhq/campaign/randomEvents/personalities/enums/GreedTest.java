@@ -40,12 +40,10 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import megamek.common.enums.Gender;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 public class GreedTest {
     @ParameterizedTest
@@ -73,29 +71,15 @@ public class GreedTest {
     }
 
     static Stream<Arguments> provideGreedsAndIndices() {
-        return Arrays.stream(Greed.values())
-                     .flatMap(trait -> IntStream.range(0, Greed.MAXIMUM_VARIATIONS)
-                                             .mapToObj(i -> Arguments.of(trait, i)));
-    }
-
-    @ParameterizedTest
-    @MethodSource(value = "provideGreedsAndIndices")
-    void testGetDescription_notInvalid(Greed trait, int i) {
-        String description = trait.getDescription(i, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = { "99", "1000", "-1" })
-    void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = Greed.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
-        assertTrue(isResourceKeyValid(description));
+        return Arrays.stream(Social.values())
+                     .flatMap(trait -> IntStream.range(0, Ambition.MAXIMUM_VARIATIONS)
+                                             .mapToObj(i -> Arguments.of(trait)));
     }
 
     @ParameterizedTest
     @EnumSource(value = Greed.class)
     void testGetRoninMessage_notInvalid(Greed trait) {
-        String description = trait.getRoninMessage("Commander");
+        String description = trait.getRoninMessage();
         assertTrue(isResourceKeyValid(description));
     }
 }

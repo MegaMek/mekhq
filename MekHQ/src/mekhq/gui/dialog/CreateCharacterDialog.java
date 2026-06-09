@@ -35,7 +35,6 @@ package mekhq.gui.dialog;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
@@ -149,15 +148,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JTextField textLoyalty;
 
     private MMComboBox<Aggression> comboAggression;
-    private JSpinner spnAggression;
     private MMComboBox<Ambition> comboAmbition;
-    private JSpinner spnAmbition;
     private MMComboBox<Greed> comboGreed;
-    private JSpinner spnGreed;
     private MMComboBox<Social> comboSocial;
-    private JSpinner spnSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
-    private JSpinner spnPersonalityQuirk;
     private MMComboBox<Reasoning> comboReasoning;
     private JTextField textPreNominal;
     private JTextField textGivenName;
@@ -886,16 +880,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboAggression, gridBagConstraints);
 
-            spnAggression = new JSpinner(new SpinnerNumberModel(person.getAggressionDescriptionIndex(),
-                  0, Ambition.MAXIMUM_VARIATIONS, 1));
-
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demographicPanel.add(spnAggression, gridBagConstraints);
-
             JLabel labelAmbition = new JLabel();
             labelAmbition.setText("Ambition:");
             labelAmbition.setName("labelAmbition");
@@ -915,16 +899,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboAmbition, gridBagConstraints);
-
-            spnAmbition = new JSpinner(new SpinnerNumberModel(person.getAmbitionDescriptionIndex(),
-                  0, Ambition.MAXIMUM_VARIATIONS, 1));
-
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demographicPanel.add(spnAmbition, gridBagConstraints);
 
             JLabel labelGreed = new JLabel();
             labelGreed.setText("Greed:");
@@ -946,16 +920,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboGreed, gridBagConstraints);
 
-            spnGreed = new JSpinner(new SpinnerNumberModel(person.getGreedDescriptionIndex(),
-                  0, Greed.MAXIMUM_VARIATIONS, 1));
-
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demographicPanel.add(spnGreed, gridBagConstraints);
-
             JLabel labelSocial = new JLabel();
             labelSocial.setText("Social:");
             labelSocial.setName("labelSocial");
@@ -976,16 +940,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboSocial, gridBagConstraints);
 
-            spnSocial = new JSpinner(new SpinnerNumberModel(person.getSocialDescriptionIndex(),
-                  0, Social.MAXIMUM_VARIATIONS, 1));
-
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demographicPanel.add(spnSocial, gridBagConstraints);
-
             JLabel labelPersonalityQuirk = new JLabel();
             labelPersonalityQuirk.setText("Quirk:");
             labelPersonalityQuirk.setName("labelPersonalityQuirk");
@@ -1005,16 +959,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboPersonalityQuirk, gridBagConstraints);
-
-            spnPersonalityQuirk = new JSpinner(new SpinnerNumberModel(person.getPersonalityQuirkDescriptionIndex(),
-                  0, PersonalityQuirk.MAXIMUM_VARIATIONS, 1));
-
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demographicPanel.add(spnPersonalityQuirk, gridBagConstraints);
 
             JLabel labelReasoning = new JLabel();
             labelReasoning.setText("Talent:");
@@ -1152,11 +1096,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
-     * current selection across the swap. If there was no current selection (or the previously
-     * selected faction has been filtered out by the new model), the index is explicitly set to
-     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
-     * would silently assign an unintended origin when OK is clicked.
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the current selection
+     * across the swap. If there was no current selection (or the previously selected faction has been filtered out by
+     * the new model), the index is explicitly set to {@code -1} — otherwise Swing's combobox auto-selects the first
+     * item on a model swap, which would silently assign an unintended origin when OK is clicked.
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();
@@ -1745,24 +1688,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
             person.setAggression(comboAggression.getSelectedItem());
-            person.setAggressionDescriptionIndex((int) spnAggression.getValue());
-
             person.setAmbition(comboAmbition.getSelectedItem());
-            person.setAmbitionDescriptionIndex((int) spnAmbition.getValue());
-
             person.setGreed(comboGreed.getSelectedItem());
-            person.setGreedDescriptionIndex((int) spnGreed.getValue());
-
             person.setSocial(comboSocial.getSelectedItem());
-            person.setSocialDescriptionIndex((int) spnSocial.getValue());
-
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
-            person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
-
             person.setReasoning(comboReasoning.getSelectedItem());
 
             writePersonalityDescription(person);
-            writeInterviewersNotes(person);
         }
 
         person.setPortrait(portrait);

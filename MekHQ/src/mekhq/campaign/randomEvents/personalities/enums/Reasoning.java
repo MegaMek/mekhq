@@ -38,107 +38,62 @@ import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitTy
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.enums.Gender;
-import mekhq.campaign.personnel.PronounData;
 
 /**
  * Represents various levels and traits of Reasoning in a personality.
  *
  * <p>
  * This enumeration defines a wide range of Reasoning-related traits, each categorized based on its comparison level.
- * Traits are associated with a broader classification through {@link ReasoningComparison}, allowing for simplified
- * grouping and weighting of Reasoning levels.
- * </p>
- *
- * <p>
- * The Reasoning levels range from significantly below average to vastly above average, with the ability to generate
- * user-facing descriptions and labels using internationalized resource bundles. Traits also integrate with
- * {@link Gender} to provide personalized and localized descriptions using gender-specific pronouns.
  * </p>
  */
 public enum Reasoning {
     // region Enum Declarations
     // Although we no longer use the descriptive names for Reasoning traits, we've kept them
     // here as it avoids needing to create a handler for old characters
-    BRAIN_DEAD(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 0),
-    UNINTELLIGENT(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 1),
-    FOOLISH(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 2),
-    SIMPLE(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 3),
-    SLOW(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 4),
-    UNINSPIRED(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 5),
-    DULL(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 6),
-    DIMWITTED(ReasoningComparison.SIGNIFICANTLY_BELOW_AVERAGE, 7),
-    OBTUSE(ReasoningComparison.BELOW_AVERAGE, 8),
-    LIMITED_INSIGHT(ReasoningComparison.BELOW_AVERAGE, 9),
-    UNDER_PERFORMING(ReasoningComparison.SLIGHTLY_BELOW_AVERAGE, 10),
-    BELOW_AVERAGE(ReasoningComparison.AVERAGE, 11),
-    AVERAGE(ReasoningComparison.AVERAGE, 12),
-    ABOVE_AVERAGE(ReasoningComparison.AVERAGE, 13),
-    STUDIOUS(ReasoningComparison.SLIGHTLY_ABOVE_AVERAGE, 14),
-    DISCERNING(ReasoningComparison.ABOVE_AVERAGE, 15),
-    SHARP(ReasoningComparison.SIGNIFICANTLY_ABOVE_AVERAGE, 16),
-    QUICK_WITTED(ReasoningComparison.SIGNIFICANTLY_ABOVE_AVERAGE, 17),
-    PERCEPTIVE(ReasoningComparison.SIGNIFICANTLY_ABOVE_AVERAGE, 18),
-    BRIGHT(ReasoningComparison.VASTLY_ABOVE_AVERAGE, 19),
-    CLEVER(ReasoningComparison.VASTLY_ABOVE_AVERAGE, 20),
-    INTELLECTUAL(ReasoningComparison.VASTLY_ABOVE_AVERAGE, 21),
-    BRILLIANT(ReasoningComparison.VASTLY_ABOVE_AVERAGE, 22),
-    EXCEPTIONAL(ReasoningComparison.VASTLY_ABOVE_AVERAGE, 23),
-    GENIUS(ReasoningComparison.VASTLY_ABOVE_AVERAGE, 24);
-
-    /**
-     * Enum representing different levels of Reasoning comparison. Used when fetching the user-facing description of any
-     * given {@link Reasoning} enum.
-     *
-     * <p>We use this so that we can 'weight' descriptions without needing to create n descriptions
-     * per individual Reasoning level. This way Reasoning levels with lower frequency can share descriptions reducing
-     * the overall writing load.</p>
-     */
-    public enum ReasoningComparison {
-        SIGNIFICANTLY_BELOW_AVERAGE,
-        BELOW_AVERAGE,
-        SLIGHTLY_BELOW_AVERAGE,
-        AVERAGE,
-        SLIGHTLY_ABOVE_AVERAGE,
-        ABOVE_AVERAGE,
-        SIGNIFICANTLY_ABOVE_AVERAGE,
-        VASTLY_ABOVE_AVERAGE,
-    }
+    BRAIN_DEAD(0),
+    UNINTELLIGENT(1),
+    FOOLISH(2),
+    SIMPLE(3),
+    SLOW(4),
+    UNINSPIRED(5),
+    DULL(6),
+    DIMWITTED(7),
+    OBTUSE(8),
+    LIMITED_INSIGHT(9),
+    UNDER_PERFORMING(10),
+    BELOW_AVERAGE(11),
+    AVERAGE(12),
+    ABOVE_AVERAGE(13),
+    STUDIOUS(14),
+    DISCERNING(15),
+    SHARP(16),
+    QUICK_WITTED(17),
+    PERCEPTIVE(18),
+    BRIGHT(19),
+    CLEVER(20),
+    INTELLECTUAL(21),
+    BRILLIANT(22),
+    EXCEPTIONAL(23),
+    GENIUS(24);
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     private final String label;
-    private final ReasoningComparison comparison;
     private final int level;
 
     /**
-     * @deprecated only used in deprecated methods
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public final static int MAXIMUM_VARIATIONS = 25;
-
-    /**
-     * Constructs an instance of the {@link Reasoning} enum, with an associated {@link ReasoningComparison} value.
+     * Constructs an instance of the {@link Reasoning} enum
      *
-     * @param comparison the {@link ReasoningComparison} enum value to associate with this {@link Reasoning} enum value
-     * @param level      The integer score associated with this {@link Reasoning} enum value
+     * @param level The integer score associated with this {@link Reasoning} enum value
      */
-    Reasoning(ReasoningComparison comparison, int level) {
-        this.comparison = comparison;
+    Reasoning(int level) {
         this.level = level;
         this.label = generateLabel();
     }
 
     public String getLabel() {
         return label;
-    }
-
-    /**
-     * Retrieves the {@link ReasoningComparison} associated with this {@link Reasoning} enum value.
-     */
-    public ReasoningComparison getComparison() {
-        return comparison;
     }
 
     /**
@@ -160,46 +115,6 @@ public enum Reasoning {
     private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY) + " (" + level + ")";
-    }
-
-    /**
-     * @deprecated No longer used.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public String getDescription(int reasoningDescriptionIndex, final Gender gender, final String givenName) {
-        reasoningDescriptionIndex = Math.clamp(reasoningDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
-
-        final String RESOURCE_KEY = comparison + ".description." + reasoningDescriptionIndex;
-        final PronounData pronounData = new PronounData(gender);
-
-        // {0} = givenName
-        // {1} = He/She/They
-        // {2} = he/she/they
-        // {3} = Him/Her/Them
-        // {4} = him/her/them
-        // {5} = His/Her/Their
-        // {6} = his/her/their
-        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use a plural case)
-
-        return getFormattedTextAt(RESOURCE_BUNDLE,
-              RESOURCE_KEY,
-              givenName,
-              pronounData.subjectPronoun(),
-              pronounData.subjectPronounLowerCase(),
-              pronounData.objectPronoun(),
-              pronounData.objectPronounLowerCase(),
-              pronounData.possessivePronoun(),
-              pronounData.possessivePronounLowerCase(),
-              pronounData.pluralizer());
-    }
-
-    /**
-     * @deprecated use {@link #getExamResults(int)} instead.
-     *
-     */
-    @Deprecated(since = "0.51.00", forRemoval = true)
-    public String getExamResults() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "examResults.text", getExamScore());
     }
 
     /**
@@ -243,7 +158,7 @@ public enum Reasoning {
      * @return {@code true} if the instance is of average type, {@code false} otherwise.
      */
     public boolean isAverageType() {
-        return this.comparison == ReasoningComparison.AVERAGE;
+        return this == AVERAGE;
     }
     // endregion Boolean Comparison Methods
 

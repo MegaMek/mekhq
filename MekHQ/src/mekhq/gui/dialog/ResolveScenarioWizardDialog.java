@@ -38,7 +38,6 @@ import static mekhq.MHQConstants.CONFIRMATION_RESOLVE_SCENARIO;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -890,7 +889,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             // as this is the earliest point in which that description is visible to the
             // user
             writePersonalityDescription(status.getPerson());
-            writeInterviewersNotes(status.getPerson());
             prisonerIndex++;
         }
 

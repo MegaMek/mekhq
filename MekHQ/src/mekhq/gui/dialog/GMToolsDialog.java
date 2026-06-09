@@ -33,7 +33,6 @@
 package mekhq.gui.dialog;
 
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 import java.awt.Component;
@@ -1559,7 +1558,6 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             getPerson().setGivenName(getLastGeneratedName()[0]);
             getPerson().setSurname(getLastGeneratedName()[1]);
             writePersonalityDescription(person);
-            writeInterviewersNotes(person);
             MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
         }
     }
