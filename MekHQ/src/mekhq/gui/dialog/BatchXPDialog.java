@@ -389,8 +389,7 @@ public final class BatchXPDialog extends JDialog {
                 Skill skill = person.getSkill(skillName);
 
                 if (skill != null) {
-                    // We're grabbing the current progress, clearing it, and then reducing the cost by however much
-                    // we previously progressed.
+                    // Capture current XP progress so we can apply it as a discount, then consume progress up to the improvement cost.
                     int progress = skill.getXpProgress();
                     skill.changeXpProgress(-cost);
                     cost = max(0, cost - progress);
