@@ -41,6 +41,7 @@ import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ADVANCED_SURGERY;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_BIOLOGICAL_MACHINIST;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.CLONED_LIMB_RECOVERY;
@@ -87,6 +88,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -159,6 +161,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     );
 
     private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
     private final Person patient;
     private final boolean isGMMode;
     private Person surgeon; // can be null
@@ -217,6 +220,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     public AdvancedReplacementLimbDialog(Campaign campaign, @Nullable Person patient, boolean isGMMode) {
         this.patient = patient;
         this.campaign = campaign;
+        this.campaignOptions = campaign.getCampaignOptions();
         this.isGMMode = isGMMode;
         surgeon = getSurgeon(campaign.getDoctors()); // can return null
 
@@ -407,7 +411,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         Faction campaignFaction = campaign.getFaction();
         int currentYear = campaign.getGameYear();
         boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
-        boolean isUseKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
+        boolean isUseKinderMode = campaignOptions.isUseKinderAlternativeAdvancedMedical();
 
         JComboBox<ProstheticType> comboBox = new JComboBox<>();
 
@@ -725,7 +729,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries, unsuccessfulSurgeries);
 
         // Then perform the actual surgeries
-        boolean useKinderMode = campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical();
+        boolean useKinderMode = campaignOptions.isUseKinderAlternativeAdvancedMedical();
         for (PlannedSurgery surgery : prioritizedSurgeries) {
             performSurgery(surgery, useKinderMode, successfulSurgeries);
         }
@@ -851,13 +855,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void addImplantsAndAbilities(ProstheticType type) {
-        if (campaign.getCampaignOptions().isUseImplants()) {
+        if (campaignOptions.isUseImplants()) {
             for (String implant : type.getAssociatedPilotOptions()) {
                 patient.getOptions().acquireAbility(MD_ADVANTAGES, implant, true);
             }
         }
 
-        if (campaign.getCampaignOptions().isUseAbilities()) {
+        if (campaignOptions.isUseAbilities()) {
             for (String option : type.getAssociatedPersonnelOptions()) {
                 patient.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
             }
@@ -1017,6 +1021,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private void performSurgerySkillChecks(List<PlannedSurgery> prioritizedSurgeries,
           List<PlannedSurgery> successfulSurgeries, List<PlannedSurgery> unsuccessfulSurgeries) {
         boolean hasMachinistSPA = surgeon.getOptions().booleanOption(UNOFFICIAL_BIOLOGICAL_MACHINIST);
+        boolean isUseEdge = campaignOptions.isUseEdge() &&
+                                  campaignOptions.isUseSupportEdge() &&
+                                  surgeon.getOptions().booleanOption(EDGE_ADVANCED_SURGERY);
 
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
             int spaModifier = surgery.type != COSMETIC_SURGERY && hasMachinistSPA ? -2 : 0;
@@ -1026,7 +1033,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                   S_SURGERY,
                   List.of(),
                   spaModifier,
-                  true,
+                  isUseEdge,
                   false);
             campaign.addReport(SKILL_CHECKS, skillCheckUtility.getResultsText());
             if (skillCheckUtility.isSuccess()) {

@@ -3520,6 +3520,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAdvancedSurgery.text"));
+                    cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_ADVANCED_SURGERY));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADVANCED_SURGERY));
+                    if (!person.getPrimaryRole().isDoctor()) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
 
                     // Techs
                     cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerBreakPart.text"));
@@ -3635,6 +3643,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
 
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAdvancedSurgery.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADVANCED_SURGERY,
+                          TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
                     menuItem = new JMenuItem(resources.getString("edgeTriggerBreakPart.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
                           PersonnelOptions.EDGE_REPAIR_BREAK_PART,
@@ -3725,6 +3740,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (getCampaignOptions().isUseSupportEdge()) {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerHealCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAdvancedSurgery.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADVANCED_SURGERY,
+                          FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
 
