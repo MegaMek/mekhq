@@ -1789,8 +1789,8 @@ public class StratConRulesManager {
      *
      * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
-     * @return a {@link TargetRollModifier} reflecting bonuses from unit sensor equipment; will have a modifier
-     *       value of 0 if no qualifying equipment is present
+     * @return a {@link TargetRollModifier} reflecting bonuses from unit sensor equipment; will have a modifier value of
+     *       0 if no qualifying equipment is present
      */
     static TargetRollModifier getUnitEquipmentModifier(boolean unitHasSensorEquipment) {
         int modifier = unitHasSensorEquipment ? -1 : 0;
@@ -1841,8 +1841,8 @@ public class StratConRulesManager {
      * force.
      *
      * <p>For each unit retrieved from the {@code Force}, this method examines all crew members to determine which
-     * has the highest scouting-related skill (as evaluated by
-     * {@link ScoutingSkills#getBestScoutingSkill(Person)}) in combination with scouting roll modifiers</p>
+     * has the highest scouting-related skill (as evaluated by {@link ScoutingSkills#getBestScoutingSkill(Person)}) in
+     * combination with scouting roll modifiers</p>
      *
      * <p>The crew member with the highest skill level becomes the designated scout for that unit. The method also
      * determines whether each unit is a "light unit" based on its weight class.</p>
@@ -1915,11 +1915,11 @@ public class StratConRulesManager {
 
                 modifiers.forEach(targetNumber::addModifier);
                 modifiers.forEach(m ->
-                    LOGGER.error("Modifier: " + m.value()));
+                                        LOGGER.error("Modifier: " + m.value()));
 
                 if (bestScout == null || targetNumber.getValue() < bestScoutTargetNumber) {
                     bestScout = new ScoutRecord(crewMember, targetNumber, scoutSkillName,
-                        hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
+                          hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
                     bestScoutTargetNumber = targetNumber.getValue();
                 }
             }
@@ -2376,7 +2376,7 @@ public class StratConRulesManager {
     /**
      * Utility method to determine if the current scenario's force commander's force is on defence
      */
-    private static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
+    public static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
         Person lanceCommander = scenario.getLanceCommander(campaign);
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();

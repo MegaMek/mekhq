@@ -236,13 +236,13 @@ public class StratConScenarioWizard extends JDialog {
                 leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
             }
 
-            eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
-            eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
-
-            setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-            gbc.gridy++;
-
             if (currentScenario.getNumDefensivePoints() > 0) {
+                eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
+                eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
+
+                setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
+                gbc.gridy++;
+
                 setDefensiveUI(gbc);
                 gbc.gridy++;
             }
