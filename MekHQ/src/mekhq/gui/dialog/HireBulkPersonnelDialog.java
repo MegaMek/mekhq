@@ -289,8 +289,6 @@ public class HireBulkPersonnelDialog extends JDialog {
             skillLevel.setEnabled(false);
 
             skillLevel.removeItem(SkillLevel.NONE);
-            skillLevel.removeItem(SkillLevel.HEROIC);
-            skillLevel.removeItem(SkillLevel.LEGENDARY);
 
             JLabel labelMinSkill = new JLabel("Minimum Skill:");
             labelMinSkill.setLabelFor(skillLevel);
