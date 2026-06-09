@@ -1093,6 +1093,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemographics.add(comboAggression, gridBagConstraints);
 
+            y++;
+
             JLabel labelAmbition = new JLabel();
             labelAmbition.setText("Ambition:");
             labelAmbition.setName("labelAmbition");
@@ -1112,6 +1114,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemographics.add(comboAmbition, gridBagConstraints);
+
+            y++;
 
             JLabel labelGreed = new JLabel();
             labelGreed.setText("Greed:");
@@ -1133,6 +1137,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemographics.add(comboGreed, gridBagConstraints);
 
+            y++;
+
             JLabel labelSocial = new JLabel();
             labelSocial.setText("Social:");
             labelSocial.setName("labelSocial");
@@ -1152,6 +1158,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemographics.add(comboSocial, gridBagConstraints);
+
+            y++;
 
             JLabel labelPersonalityQuirk = new JLabel();
             labelPersonalityQuirk.setText("Quirk:");

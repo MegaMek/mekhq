@@ -212,6 +212,31 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
+        if ((!person.getPersonalityDescription().isBlank()) &&
+                  (campaignOptions.isUseRandomPersonalities()) &&
+                  (!person.isHidePersonality())) {
+            JTextPane txtDesc = new JTextPane();
+            txtDesc.setName("personalityDescription");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+
+            String borderTitleKey = "pnlPersonality.normal";
+            if (person.getJoinedCampaign() == null) {
+                borderTitleKey = "pnlPersonality.interview";
+            }
+            txtDesc.setText(person.getPersonalityDescription());
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+            gridY++;
+        }
+
         if (pnlAttributes != null) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -327,31 +352,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             add(pnlProsthetics, gridBagConstraints);
-            gridY++;
-        }
-
-        if ((!person.getPersonalityDescription().isBlank()) &&
-                  (campaignOptions.isUseRandomPersonalities()) &&
-                  (!person.isHidePersonality())) {
-            JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("personalityDescription");
-            txtDesc.setEditable(false);
-            txtDesc.setContentType("text/html");
-
-            String borderTitleKey = "pnlPersonality.normal";
-            if (person.getJoinedCampaign() == null) {
-                borderTitleKey = "pnlPersonality.interview";
-            }
-            txtDesc.setText(person.getPersonalityDescription());
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtDesc, gridBagConstraints);
             gridY++;
         }
 
