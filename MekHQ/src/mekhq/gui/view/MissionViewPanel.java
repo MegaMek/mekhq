@@ -247,7 +247,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtType, gridBagConstraints);
         }
 
-        addDescriptionPane(mission.getDescription(), 3);
+        addDescriptionPane(mission.getDescription(), 3, 1.0);
     }
 
     private void fillStatsContract() {
@@ -542,7 +542,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
         i++;
-        addDescriptionPane(contract.getDescription(), i);
+        addDescriptionPane(contract.getDescription(), i, 1.0);
 
     }
 
@@ -1048,11 +1048,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         addDescriptionPane(contract.getDescription(), y++, 0.0);
 
-        // Enemy morale is shown at the very bottom of the panel, after the contract
-        // description, as a labelled gauge.
-        // The bar's own label (which honours the special "Peaceful" wording for routed
-        // garrison/retainer contracts) is
-        // self-explanatory, so no separate "Enemy Morale:" caption is needed.
+        // Enemy morale is shown at the very bottom of the panel, as a labelled gauge.
         final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(contract);
         final String moraleText = moraleDisplay.label();
         final String moraleTooltip = moraleDisplay.tooltip();
@@ -1069,10 +1065,6 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(moraleBar, gridBagConstraints);
-    }
-
-    private void addDescriptionPane(String description, int gridY) {
-        addDescriptionPane(description, gridY, 1.0);
     }
 
     private void addDescriptionPane(String description, int gridY, double weighty) {
