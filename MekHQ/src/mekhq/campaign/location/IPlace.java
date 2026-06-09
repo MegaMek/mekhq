@@ -33,12 +33,10 @@
 
 package mekhq.campaign.location;
 
-import java.util.Collection;
-
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.personnel.Person;
 
 /**
  * A sub-interface of {@link ILocation} that marks a node in the {@link LocationNode} tree as a
@@ -88,7 +86,7 @@ public interface IPlace extends ILocation {
      */
     @Override
     @Nullable
-    default Collection<Person> getPersonnel() {
+    default Personnel getPersonnel() {
         return null;
     }
 }

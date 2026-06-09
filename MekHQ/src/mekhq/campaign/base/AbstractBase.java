@@ -33,16 +33,19 @@
 package mekhq.campaign.base;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -144,6 +147,19 @@ public abstract class AbstractBase implements ILocation {
     public @Nullable ILocation getParent() {
         LocationNode parent = locationNode.getParent();
         return parent != null ? parent.getLocatable() : null;
+    }
+
+    @Override
+    public void processArrivals(Campaign campaign) {
+        for (LocationNode child : new ArrayList<>(getLocationNode().getChildren())) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelLoc)) {
+                continue;
+            }
+            if (!travelLoc.isOnPlanet()) {
+                continue;
+            }
+            LocationDispatch.landFromTravelNode(travelLoc, basePersonnel, baseHangar, baseWarehouse, campaign);
+        }
     }
 
     /**

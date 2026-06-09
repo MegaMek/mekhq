@@ -32,11 +32,15 @@
  */
 package mekhq.campaign.location;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
@@ -63,16 +67,120 @@ public final class LocationDispatch {
     private LocationDispatch() {}
 
     /**
+     * Returns the transit time from {@code fromSystem} that should be used as the start-transit
+     * parameter when calculating a new journey's duration.
+     *
+     * <p>When the campaign JumpShip is already in-system, we inherit its current transit progress.
+     * When there is no campaign location (e.g., the faction has no fixed JumpShip), we assume the
+     * traveler starts at the outer jump point of their system.</p>
+     *
+     * @param fromSystem the departure system; must not be {@code null}
+     * @param campaign   the active campaign; must not be {@code null}
+     * @return transit time in days
+     */
+    public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
+        return campaign.getCurrentLocation() != null
+              ? campaign.getCurrentLocation().getTransitTime()
+              : fromSystem.getTimeToJumpPoint(1.0);
+    }
+
+    /**
+     * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of
+     * 2 days.
+     *
+     * @param path         the route to calculate; must not be {@code null}
+     * @param date         the in-game date (used for pirate-point availability); must not be {@code null}
+     * @param startTransit the already-elapsed transit time at the origin, in days
+     * @return journey length in whole days, always at least 2
+     */
+    public static int computeJourneyDays(JumpPath path, LocalDate date, double startTransit) {
+        return Math.max(2, (int) Math.ceil(path.getTotalTime(date, startTransit, false)));
+    }
+
+    /**
+     * Removes a completed travel node from the campaign: detaches it from the location tree and
+     * de-registers it from the campaign's location list.
+     *
+     * <p>Safe to call with a {@code null} argument (no-op).</p>
+     *
+     * @param travelNode the node to remove, or {@code null}
+     * @param campaign   the active campaign; must not be {@code null}
+     */
+    public static void removeTravelNode(@Nullable CurrentLocation travelNode, Campaign campaign) {
+        if (travelNode == null) {
+            return;
+        }
+        travelNode.setParent(null);
+        campaign.removeLocation(travelNode);
+    }
+
+    /**
+     * Completes the arrival of all persons, units, and parts carried by a finished travel node,
+     * then removes the node from the location tree and campaign registry.
+     *
+     * <p>Persons are reparented to {@code personDest}. Units and parts have their
+     * {@link LocationNode} moved to {@code unitDest} and {@code partDest} respectively; their
+     * hangar and warehouse data structures are assumed to have already been updated at dispatch
+     * time.</p>
+     *
+     * @param travelLoc  the completed travel node; must not be {@code null}
+     * @param personDest destination container for persons; must not be {@code null}
+     * @param unitDest   destination container for units; must not be {@code null}
+     * @param partDest   destination container for parts; must not be {@code null}
+     * @param campaign   the active campaign; must not be {@code null}
+     */
+    public static void landFromTravelNode(CurrentLocation travelLoc,
+          ILocation personDest,
+          ILocation unitDest,
+          ILocation partDest,
+          Campaign campaign) {
+        for (Person p : new ArrayList<>(travelLoc.fetchPersonnelAtLocation())) {
+            p.setParent(personDest);
+        }
+        for (Unit u : new ArrayList<>(travelLoc.fetchUnitsAtLocation())) {
+            LocationNode.LocationManager.setLocation(u, unitDest);
+        }
+        for (Part part : new ArrayList<>(travelLoc.fetchPartsAtLocation())) {
+            LocationNode.LocationManager.setLocation(part, partDest);
+        }
+        removeTravelNode(travelLoc, campaign);
+    }
+
+    /**
+     * Builds a cross-system travel node from {@code fromSystem} toward {@code destSystem},
+     * parented under {@code destination}, and registers it with the campaign.
+     *
+     * <p>Returns an empty {@link Optional} (without modifying state) when no path exists or the
+     * path is empty — callers should fall back to direct placement in that case.</p>
+     */
+    private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
+          PlanetarySystem destSystem,
+          ILocation destination,
+          Campaign campaign,
+          String logContext) {
+        JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
+        if (path == null || path.isEmpty()) {
+            return Optional.empty();
+        }
+        double startTransit = computeStartTransit(fromSystem, campaign);
+        CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
+        travelLoc.setJumpPath(path);
+        if (!travelLoc.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for travelLoc → {}; "
+                  + "items may display as Main Force after save/load",
+                  logContext, destination.getClass().getSimpleName());
+        }
+        campaign.addLocation(travelLoc);
+        return Optional.of(travelLoc);
+    }
+
+    /**
      * Dispatches {@code people} to {@code destination}, grouping by departure system so that
      * everyone leaving from the same system shares one {@link CurrentLocation} for the journey.
      *
-     * <p>Mirrors the travel logic in {@code EducationController.enrollPerson()}.</p>
-     *
-     * <p>Sets {@code eduJourneyTime} on each person.</p>
-     *
-     * @param people         the students to dispatch; must not be {@code null}
+     * @param people      the persons to dispatch; must not be {@code null}
      * @param destination the target {@link ILocation}; must not be {@code null}
-     * @param campaign       the active campaign; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
      */
     public static void dispatchToLocation(Collection<Person> people,
           ILocation destination,
@@ -101,25 +209,13 @@ public final class LocationDispatch {
                 continue;
             }
 
-            JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
-            if (path == null || path.isEmpty()) {
+            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+                  fromSystem, destSystem, destination, campaign, "dispatchToLocation");
+            if (maybeTravelLoc.isEmpty()) {
                 group.forEach(p -> p.setParent(arrivalDestination));
                 continue;
             }
-
-            double startTransit = campaign.getCurrentLocation() != null
-                                        ? campaign.getCurrentLocation().getTransitTime()
-                  : fromSystem.getTimeToJumpPoint(1.0);
-
-            CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
-            travelLoc.setJumpPath(path);
-            if (!travelLoc.setParent(destination)) {
-                LOGGER.warn("dispatchToLocation: setParent failed for travelLoc → {}; "
-                      + "persons may display as Main Force after save/load",
-                      destination.getClass().getSimpleName());
-            }
-            group.forEach(p -> p.setParent(travelLoc));
-            campaign.addLocation(travelLoc);
+            group.forEach(p -> p.setParent(maybeTravelLoc.get()));
         }
     }
 
@@ -169,25 +265,13 @@ public final class LocationDispatch {
                 continue;
             }
 
-            JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
-            if (path == null || path.isEmpty()) {
+            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+                  fromSystem, destSystem, destination, campaign, "dispatchUnitsToLocation");
+            if (maybeTravelLoc.isEmpty()) {
                 group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
                 continue;
             }
-
-            double startTransit = campaign.getCurrentLocation() != null
-                                        ? campaign.getCurrentLocation().getTransitTime()
-                                        : fromSystem.getTimeToJumpPoint(1.0);
-
-            CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
-            travelLoc.setJumpPath(path);
-            if (!travelLoc.setParent(destination)) {
-                LOGGER.warn("dispatchUnitsToLocation: setParent failed for travelLoc → {}; "
-                      + "units may display as Main Force after save/load",
-                      destination.getClass().getSimpleName());
-            }
-            group.forEach(u -> LocationNode.LocationManager.setLocation(u, travelLoc));
-            campaign.addLocation(travelLoc);
+            group.forEach(u -> LocationNode.LocationManager.setLocation(u, maybeTravelLoc.get()));
         }
     }
 
@@ -201,11 +285,9 @@ public final class LocationDispatch {
      * {@code destination}) so that location columns show in-transit status. Same-system dispatches skip the travel
      * node.</p>
      *
-     * <p>Sets {@code eduJourneyTime} and resets {@code eduDaysOfTravel} to zero on each person.</p>
-     *
      * @param parts       the parts to dispatch; should all be spare parts; must not be {@code null}
      * @param destination the target {@link ILocation}; must not be {@code null}
-     * @param campaign the active campaign; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
      */
     public static void dispatchPartsToLocation(Collection<Part> parts,
           ILocation destination,
@@ -238,25 +320,13 @@ public final class LocationDispatch {
                 continue;
             }
 
-            JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
-            if (path == null || path.isEmpty()) {
+            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+                  fromSystem, destSystem, destination, campaign, "dispatchPartsToLocation");
+            if (maybeTravelLoc.isEmpty()) {
                 group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
                 continue;
             }
-
-            double startTransit = campaign.getCurrentLocation() != null
-                                        ? campaign.getCurrentLocation().getTransitTime()
-                                        : fromSystem.getTimeToJumpPoint(1.0);
-
-            CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
-            travelLoc.setJumpPath(path);
-            if (!travelLoc.setParent(destination)) {
-                LOGGER.warn("dispatchPartsToLocation: setParent failed for travelLoc → {}; "
-                      + "parts may display as Main Force after save/load",
-                      destination.getClass().getSimpleName());
-            }
-            group.forEach(p -> LocationNode.LocationManager.setLocation(p, travelLoc));
-            campaign.addLocation(travelLoc);
+            group.forEach(p -> LocationNode.LocationManager.setLocation(p, maybeTravelLoc.get()));
         }
     }
 

@@ -793,8 +793,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             person.setParent(campaign.getMainForcePersonnel());
         }
 
-        reconnectPersonsToTravelLocations(campaign);
+
         migrateLegacyEducationTravel(campaign);
+        reconnectPersonsToTravelLocations(campaign);
 
         LOGGER.info("Load of campaign file complete!");
 
@@ -1767,7 +1768,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             }
 
-            // Persons at campus — parented directly under AcademyCampusLocation (no CurrentLocation)
+            // Persons at campus — parented under the campus's Personnel sub-node
             if (location instanceof FixedLocation fixedLocation) {
                 for (LocationNode campusNode : fixedLocation.getLocationNode().getChildren()) {
                     if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation)) {
@@ -1776,7 +1777,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     for (UUID personId : campusLocation.drainPendingPersonIds()) {
                         Person person = campaign.getPerson(personId);
                         if (person != null) {
-                            person.setParent(campusLocation);
+                            person.setParent(campusLocation.getCampusPersonnel());
                         }
                     }
                 }
@@ -1824,7 +1825,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * arrive on planet within a day or two via normal {@code newDay()} processing.</p>
      */
     private static void migrateLegacyEducationTravel(Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : List.copyOf(campaign.getPersonnel().values())) {
             EducationStage stage = person.getEduEducationStage();
             if (stage != EducationStage.JOURNEY_TO_CAMPUS
                       && stage != EducationStage.JOURNEY_FROM_CAMPUS
@@ -1838,6 +1839,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (stage == EducationStage.EDUCATION
                       || stage == EducationStage.GRADUATING
                       || stage == EducationStage.DROPPING_OUT) {
+                // Skip persons already reconnected by reconnectPersonsToTravelLocations (post-refactor
+                // saves). Without this guard, resolveAcademySystemId may return the wrong system for
+                // multi-location academies, creating a duplicate campus and displacing the person.
+                LocationNode parentNode = person.getLocationNode().getParent();
+                if (parentNode != null
+                          && !(parentNode.getLocatable() instanceof Campaign)) {
+                    continue;
+                }
                 String systemId = resolveAcademySystemId(campaign, person);
                 if (systemId == null) {
                     continue;
@@ -1845,7 +1854,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
                       person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
                 if (campusLocation != null) {
-                    person.setParent(campusLocation);
+                    person.setParent(campusLocation.getCampusPersonnel());
                 }
                 continue;
             }

@@ -325,7 +325,7 @@ public class EducationController {
                 throw new IllegalStateException("Campus location must exist for home-school at " +
                                                       campaign.getCurrentSystem().getId());
             }
-            person.setParent(campusLocation);
+            person.setParent(campusLocation.getCampusPersonnel());
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         }
@@ -347,12 +347,10 @@ public class EducationController {
                       academy.getName(), academy.getLocationSystems().getFirst());
                 LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
                 double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
-                                            && campaign.getCurrentLocation() != null
-                                            ? campaign.getCurrentLocation().getTransitTime()
+                                            ? LocationDispatch.computeStartTransit(originSystem, campaign)
                                             : 0.0;
-                int journeyDays = max(2,
-                      (int) Math.ceil(person.getJumpPath().getTotalTime(campaign.getLocalDate(), startTransit, false)));
-                person.setEduJourneyTime(journeyDays);
+                person.setEduJourneyTime(
+                      LocationDispatch.computeJourneyDays(person.getJumpPath(), campaign.getLocalDate(), startTransit));
             }
         }
 
@@ -425,7 +423,7 @@ public class EducationController {
                 throw new IllegalStateException("Campus location must exist for re-enrollment at " +
                                                       campaign.getCurrentSystem().getId());
             }
-            person.setParent(campusLoc);
+            person.setParent(campusLoc.getCampusPersonnel());
         } else {
             // Person is already at the campus — keep them there and restart the course.
             // The 2-day JOURNEY_TO_CAMPUS stage fires landAtCampus via the day-counter fallback
@@ -661,13 +659,8 @@ public class EducationController {
         if (campusLoc == null) {
             throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
         }
-        person.setParent(campusLoc);
-
-        if (travelLocation != null) {
-            travelLocation.setParent(null);
-            campaign.removeLocation(travelLocation);
-        }
-
+        person.setParent(campusLoc.getCampusPersonnel());
+        LocationDispatch.removeTravelNode(travelLocation, campaign);
         person.setEduEducationStage(EducationStage.EDUCATION);
     }
 
@@ -834,9 +827,8 @@ public class EducationController {
             JumpPath newPath = campaign.calculateJumpPath(currentLocation.getCurrentSystem(), targetSystem);
             if (newPath != null && !newPath.isEmpty()) {
                 currentLocation.setJumpPath(newPath);
-                int newDays = (int) Math.ceil(
-                      newPath.getTotalTime(campaign.getLocalDate(), currentLocation.getTransitTime(), false));
-                person.setEduJourneyTime(Math.max(2, newDays));
+                person.setEduJourneyTime(LocationDispatch.computeJourneyDays(
+                      newPath, campaign.getLocalDate(), currentLocation.getTransitTime()));
             }
             return;
         }
@@ -857,10 +849,7 @@ public class EducationController {
             }
         }
 
-        if (returnLocation != null) {
-            returnLocation.setParent(null);
-            campaign.removeLocation(returnLocation);
-        }
+        LocationDispatch.removeTravelNode(returnLocation, campaign);
     }
 
     /**

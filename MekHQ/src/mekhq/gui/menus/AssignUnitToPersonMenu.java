@@ -169,7 +169,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // 2) Prisoner
         // 3) Already assigned to a unit
         // Then sorts the remainder based on their full title
-        List<Person> personnel = campaign.getPersonnel()
+        List<Person> personnel = campaign.getPersonnel().values()
                                        .stream()
                                        .filter(person -> person.getStatus().isActive())
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())

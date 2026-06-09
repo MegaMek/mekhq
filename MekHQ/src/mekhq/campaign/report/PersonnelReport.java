@@ -70,7 +70,7 @@ public class PersonnelReport extends AbstractReport {
         int countRetired = 0;
         Money salary = Money.zero();
 
-        for (Person p : getCampaign().getPersonnel()) {
+        for (Person p : getCampaign().getPersonnel().values()) {
             if ((!p.getPrimaryRole().isCombat()) || (!p.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
             }
@@ -172,7 +172,7 @@ public class PersonnelReport extends AbstractReport {
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
 
-        for (Person person : getCampaign().getPersonnel()) {
+        for (Person person : getCampaign().getPersonnel().values()) {
             if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
                 campFollowers++;
                 continue;
@@ -304,7 +304,7 @@ public class PersonnelReport extends AbstractReport {
     public String getSecondarySupportPersonnelDetails() {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
         int countSecondary = 0;
-        for (Person person : getCampaign().getPersonnel()) {
+        for (Person person : getCampaign().getPersonnel().values()) {
             // Add them to the total count
             final boolean secondarySupport = person.getSecondaryRole().isSupport(true);
 
@@ -335,7 +335,7 @@ public class PersonnelReport extends AbstractReport {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
 
         int countSecondary = 0;
-        for (Person person : getCampaign().getPersonnel()) {
+        for (Person person : getCampaign().getPersonnel().values()) {
             // Add them to the total count
             final boolean secondaryCombat = person.getSecondaryRole().isCombat();
 

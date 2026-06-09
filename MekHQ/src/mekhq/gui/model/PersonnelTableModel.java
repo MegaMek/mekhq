@@ -138,11 +138,11 @@ public class PersonnelTableModel extends DataTableModel<Person> {
 
     public void refreshData() {
         if (!isGroupByUnit()) {
-            setData(new ArrayList<>(getCampaign().getPersonnel()));
+            setData(new ArrayList<>(getCampaign().getPersonnel().values()));
         } else {
             Campaign c = getCampaign();
             List<Person> commanders = new ArrayList<>();
-            for (Person p : c.getPersonnel()) {
+            for (Person p : c.getPersonnel().values()) {
                 if ((p.getUnit() != null) && !p.equals(p.getUnit().getCommander())) {
                     // this person is NOT the commander of their unit,
                     // skip them.

@@ -167,6 +167,7 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -1908,6 +1909,23 @@ public class Campaign implements ITechManager, IPlace {
         return locationNode;
     }
 
+    @Override
+    public void processArrivals(Campaign campaign) {
+        if (locationNode == null) {
+            return;
+        }
+        for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelLoc)) {
+                continue;
+            }
+            if (!travelLoc.isOnPlanet()) {
+                continue;
+            }
+            LocationDispatch.landFromTravelNode(
+                  travelLoc, mainForcePersonnel, units, parts, campaign);
+        }
+    }
+
     public boolean isOnContractAndPlanetside() {
         boolean isOnContract = !getActiveMissions(false).isEmpty();
         boolean isPlanetside = isOnPlanet();
@@ -2562,8 +2580,9 @@ public class Campaign implements ITechManager, IPlace {
         return humanResources.getPerson(id);
     }
 
-    public Collection<Person> getPersonnel() {
-        return humanResources.getPersonnel();
+    @Override
+    public Personnel getPersonnel() {
+        return mainForcePersonnel;
     }
 
     /**
@@ -4638,7 +4657,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return the flagged commander if present, otherwise {@code null}
      */
     public @Nullable Person getFlaggedCommander() {
-        return getPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
+        return this.getPersonnel().values().stream().filter(Person::isCommander).findFirst().orElse(null);
     }
 
     /**
@@ -4650,7 +4669,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return the flagged second-in-command if present, otherwise {@code null}
      */
     public @Nullable Person getFlaggedSecondInCommand() {
-        return getPersonnel().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
+        return this.getPersonnel().values().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
 
     /**
@@ -4957,7 +4976,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     public void cleanUp() {
         // Cleans non-existing spouses
-        for (Person person : getPersonnel()) {
+        for (Person person : this.getPersonnel().values()) {
             if (person.getGenealogy().hasSpouse()) {
                 if (getPerson(person.getGenealogy().getSpouse().getId()) == null) {
                     person.getGenealogy().setSpouse(null);
@@ -6028,7 +6047,7 @@ public class Campaign implements ITechManager, IPlace {
         setRankSystemDirect(rankSystem);
 
         // Finally, we fix all personnel ranks and ensure they are properly set
-        getPersonnel().stream()
+        this.getPersonnel().values().stream()
               .filter(person -> person.getRankSystem().equals(oldRankSystem))
               .forEach(person -> person.setRankSystem(rankValidator, rankSystem));
     }
@@ -8458,7 +8477,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInService() {
-        for (Person person : getPersonnel()) {
+        for (Person person : this.getPersonnel().values()) {
             if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
                 for (LogEntry logEntry : person.getPersonalLog()) {
@@ -8482,7 +8501,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public void initTimeInRank() {
-        for (Person person : getPersonnel()) {
+        for (Person person : this.getPersonnel().values()) {
             if (!person.getPrimaryRole().isDependent() && person.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
                 for (LogEntry logEntry : person.getPersonalLog()) {
@@ -8528,7 +8547,7 @@ public class Campaign implements ITechManager, IPlace {
              * the unit was founded.
              */
             LocalDate founding = null;
-            for (Person person : getPersonnel()) {
+            for (Person person : this.getPersonnel().values()) {
                 for (LogEntry logEntry : person.getPersonalLog()) {
                     if ((founding == null) || logEntry.getDate().isBefore(founding)) {
                         founding = logEntry.getDate();
@@ -8540,7 +8559,7 @@ public class Campaign implements ITechManager, IPlace {
              * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
              * they joined came with that `Mek (which is a less certain assumption)
              */
-            for (Person person : getPersonnel()) {
+            for (Person person : this.getPersonnel().values()) {
                 LocalDate join = person.getPersonalLog()
                                        .stream()
                                        .filter(e -> e.getDesc().startsWith("Joined "))

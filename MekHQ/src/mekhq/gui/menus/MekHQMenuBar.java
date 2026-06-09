@@ -924,7 +924,7 @@ public class MekHQMenuBar extends JMenuBar {
         JMenuItem miBloodnames = new JMenuItem(resourceMap.getString("miRandomBloodnames.text"));
         miBloodnames.setMnemonic(KeyEvent.VK_B);
         miBloodnames.addActionListener(evt -> {
-            for (final Person person : getCampaign().getPersonnel()) {
+            for (final Person person : getCampaign().getPersonnel().values()) {
                 getCampaign().checkBloodnameAdd(person, false);
             }
         });
@@ -1149,7 +1149,7 @@ public class MekHQMenuBar extends JMenuBar {
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel(true, true)) {
                 if (p.getGenealogy().hasSpouse() &&
-                          !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
+                          !getCampaign().getPersonnel().containsValue(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
@@ -1162,7 +1162,7 @@ public class MekHQMenuBar extends JMenuBar {
                     String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
                     UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
                     if ((fatherId != null) &&
-                              !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
+                              !getCampaign().getPersonnel().containsValue(getCampaign().getPerson(fatherId))) {
                         p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
                     }
                 }
@@ -1545,7 +1545,7 @@ public class MekHQMenuBar extends JMenuBar {
 
         // Clear Procreation Data if Disabled
         if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
-            getCampaign().getPersonnel()
+            getCampaign().getPersonnel().values()
                   .parallelStream()
                   .filter(Person::isPregnant)
                   .forEach(person -> getCampaign().getProcreation().removePregnancy(person));

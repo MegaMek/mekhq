@@ -33,14 +33,15 @@
 
 package mekhq.campaign.location;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -343,7 +344,7 @@ public interface ILocation {
 
 
     /**
-     * Returns the {@link Hangar} owned by the nearest {@link IPlace} ancestor of this location, or
+     * Returns the {@link Hangar} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location, or
      * {@code null} if no such ancestor exists or it does not own a hangar.
      */
     @Nullable
@@ -355,7 +356,7 @@ public interface ILocation {
     }
 
     /**
-     * Returns the {@link Warehouse} owned by the nearest {@link IPlace} ancestor of this location,
+     * Returns the {@link Warehouse} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location,
      * or {@code null} if no such ancestor exists or it does not own a warehouse.
      */
     @Nullable
@@ -367,11 +368,11 @@ public interface ILocation {
     }
 
     /**
-     * Returns the personnel roster owned by the nearest {@link IPlace} ancestor of this location,
+     * Returns the personnel roster owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location,
      * or {@code null} if no such ancestor exists or it does not own a personnel roster.
      */
     @Nullable
-    default Collection<Person> getPersonnel() {
+    default Personnel getPersonnel() {
         if (!hasLocationNode() || getLocationNode().getParent() == null) {
             return null;
         }
@@ -404,4 +405,19 @@ public interface ILocation {
                      .flatMap(loc -> loc.getLocatable().fetchPartsAtLocation().stream())
                      .collect(Collectors.toSet());
     }
+
+    /**
+     * Processes arriving travel nodes parented to this location.
+     *
+     * <p>For each completed {@link mekhq.campaign.CurrentLocation} child (one whose jump path has
+     * finished and which is on-planet), implementations should move all carried persons, units, and
+     * parts to the appropriate destination containers and call
+     * {@link LocationDispatch#removeTravelNode} to detach and de-register the node.</p>
+     *
+     * <p>The default implementation is a no-op; location types that host arriving travel nodes
+     * should override it.</p>
+     *
+     * @param campaign the active campaign
+     */
+    default void processArrivals(Campaign campaign) {}
 }

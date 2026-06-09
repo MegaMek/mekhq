@@ -106,6 +106,7 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -9298,5 +9299,22 @@ public class Person implements ILocation {
 
     public void setAdvancedAsTechContribution(int contribution) {
         advancedAsTechContribution = contribution;
+    }
+
+    @Override
+    public boolean setParent(ILocation parent) {
+        ILocation oldParent = getLocationNode().getParent() != null ?
+                                    getLocationNode().getParent().getLocatable() :
+                                    null;
+        if (ILocation.super.setParent(parent)) {
+            if (oldParent instanceof Personnel personnel) {
+                personnel.remove(getId());
+            }
+            if (parent instanceof Personnel personnel) {
+                personnel.put(getId(), this);
+            }
+            return true;
+        }
+        return false;
     }
 }

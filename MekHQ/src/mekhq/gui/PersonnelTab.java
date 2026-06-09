@@ -510,7 +510,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         List<Person> people;
         if (locationFilter.isAll()) {
-            people = new ArrayList<>(getCampaign().getPersonnel());
+            people = new ArrayList<>(getCampaign().getAllPersonnel());
         } else if (locationFilter.isMainForce()) {
             people = new ArrayList<>(getCampaign().getMainForcePersonnel().fetchPersonnelAtLocation());
         } else {

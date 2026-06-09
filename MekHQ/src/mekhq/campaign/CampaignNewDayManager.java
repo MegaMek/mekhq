@@ -110,6 +110,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
@@ -440,6 +441,15 @@ public class CampaignNewDayManager {
         updateFacilities();
 
         processNewDayPersonnel();
+
+        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+            location.processArrivals(campaign);
+        }
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            base.processArrivals(campaign);
+        }
+        campaign.processArrivals(campaign);
+
         campaign.pruneEmptyLocations();
 
         if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {

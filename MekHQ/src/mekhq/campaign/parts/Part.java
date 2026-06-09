@@ -1486,9 +1486,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
                                               ? w
                                               : campaign.getWarehouse();
             for (Part childPart : childParts) {
-                getWarehouse().removePart(childPart);
+                owningWarehouse.removePart(childPart);
             }
-            getWarehouse().removePart(this);
+            owningWarehouse.removePart(this);
         }
     }
 
