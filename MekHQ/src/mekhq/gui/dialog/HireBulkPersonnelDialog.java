@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
@@ -362,7 +361,11 @@ public class HireBulkPersonnelDialog extends JDialog {
             if (useSkill && !selectedRole.isDependent() && !selectedRole.isNone()) {
                 if (skillLevel.getSelectedItem() != null) {
                     boolean checkVeterancyEligibility = false;
-                    overrideSkills(campaign, person, selectedRole, VETERAN, checkVeterancyEligibility);
+                    overrideSkills(campaign,
+                          person,
+                          selectedRole,
+                          skillLevel.getSelectedItem(),
+                          checkVeterancyEligibility);
                 }
             }
 
