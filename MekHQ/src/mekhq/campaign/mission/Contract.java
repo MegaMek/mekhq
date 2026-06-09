@@ -757,7 +757,7 @@ public class Contract extends Mission {
                                   .multipliedBy(straightSupport)
                                   .dividedBy(100);
         } else {
-            Money maintCosts = campaign.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
+            Money maintCosts = campaign.getAllHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                   Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts

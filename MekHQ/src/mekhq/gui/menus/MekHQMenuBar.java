@@ -229,7 +229,7 @@ public class MekHQMenuBar extends JMenuBar {
             // Unregister event handlers for CampaignGUI and tabs
             for (int i = 0; i < getTabMain().getTabCount(); i++) {
                 if (getTabMain().getComponentAt(i) instanceof CampaignGuiTab) {
-                    ((CampaignGuiTab) getTabMain().getComponentAt(i)).disposeTab();
+                    ((CampaignGuiTab) getTabMain().getComponentAt(i)).deactivateTab();
                 }
             }
             MekHQ.unregisterHandler(this);
@@ -1022,9 +1022,6 @@ public class MekHQMenuBar extends JMenuBar {
      * Exports Personnel to a CSV file.
      */
     private void exportPersonnel() {
-        if (getGui().getPersonnelTab() == null) {
-            return;
-        }
         JTable table = getGui().getPersonnelTab().getPersonnelTable();
         if (table.getRowCount() == 0) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoPersonnel.text"));
@@ -1039,9 +1036,6 @@ public class MekHQMenuBar extends JMenuBar {
      * Exports Units to a CSV file.
      */
     private void exportUnits() {
-        if (getGui().getHangarTab() == null) {
-            return;
-        }
         JTable table = getGui().getHangarTab().getUnitTable();
         if (table.getRowCount() == 0) {
             JOptionPane.showMessageDialog(getFrame(), resourceMap.getString("dlgNoUnits.text"));
@@ -1220,7 +1214,7 @@ public class MekHQMenuBar extends JMenuBar {
         for (int i = 0; i < getTabMain().getTabCount(); i++) {
             Component tab = getTabMain().getComponentAt(i);
             if (tab instanceof CampaignGuiTab) {
-                ((CampaignGuiTab) tab).disposeTab();
+                ((CampaignGuiTab) tab).deactivateTab();
             }
         }
 

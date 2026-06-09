@@ -152,7 +152,7 @@ public class RecoverMIAPersonnel {
      * @param campaign The campaign instance containing the personnel to be checked and updated.
      */
     public static void abandonMissingPersonnel(Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (!person.getStatus().isMIA()) {
                 continue;
             }

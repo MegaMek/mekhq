@@ -112,6 +112,8 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -168,7 +170,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
  */
-public class Person {
+public class Person implements ILocation {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
@@ -218,6 +220,8 @@ public class Person {
 
 
     private PersonAwardController awardController;
+
+    private LocationNode locationNode = new LocationNode(this);
 
     // region Family Variables
     // Lineage
@@ -1740,7 +1744,7 @@ public class Person {
      * @param campaign The current campaign
      */
     private void leadershipMassChangeLoyalty(Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -1849,7 +1853,7 @@ public class Person {
      */
     public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
           boolean isMajor) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -5753,6 +5757,29 @@ public class Person {
     }
 
     /**
+     * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
+     * multiplier.
+     *
+     * @param skillName        the name of the skill for which to calculate the improvement cost.
+     * @param useReasoning     a boolean indicating whether to apply {@link Reasoning} cost multipliers.
+     * @param targetSkillLevel The target skill level
+     *
+     * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
+     *       0 if the specified skill does not currently exist.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getCostToImprove(final String skillName, final boolean useReasoning, final int targetSkillLevel) {
+        final SkillType skillType = getType(skillName);
+        int cost = skillType.getCost(targetSkillLevel);
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
+    /**
      * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
      *
      * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
@@ -6367,7 +6394,7 @@ public class Person {
     }
 
     public void removeAllTechJobs(final Campaign campaign) {
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getAllHangar().forEachUnit(u -> {
             if (equals(u.getTech())) {
                 u.remove(this, true);
             }
@@ -6377,7 +6404,7 @@ public class Person {
             }
         });
 
-        for (final Part part : campaign.getWarehouse().getParts()) {
+        for (final Part part : campaign.getAllWarehouse().getParts()) {
             if (equals(part.getTech())) {
                 part.cancelAssignment(true);
             }
@@ -7915,6 +7942,16 @@ public class Person {
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
                       OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
+    }
+
+    @Override
+    public LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public java.util.Set<Person> fetchPersonnelAtLocation() {
+        return java.util.Set.of(this);
     }
 
     public static class PersonUnitRef extends Unit {

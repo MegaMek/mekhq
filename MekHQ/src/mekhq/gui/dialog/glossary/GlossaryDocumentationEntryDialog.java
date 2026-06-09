@@ -32,8 +32,8 @@
  */
 package mekhq.gui.dialog.glossary;
 
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.documentationEntries;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.documentationEntries;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -70,8 +70,8 @@ import mekhq.gui.utilities.MHQPDFReaderPanel;
  * @author Illiani
  * @since 0.50.07
  */
-public class NewDocumentationEntryDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(NewDocumentationEntryDialog.class);
+public class GlossaryDocumentationEntryDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(GlossaryDocumentationEntryDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.NewGlossaryDialog";
 
     private static final int PADDING = UIUtil.scaleForGUI(10);
@@ -94,7 +94,7 @@ public class NewDocumentationEntryDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public NewDocumentationEntryDialog(JDialog parent, DocumentationEntry documentationEntry) {
+    public GlossaryDocumentationEntryDialog(JDialog parent, DocumentationEntry documentationEntry) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.title"));
 
         tabbedPane = new EnhancedTabbedPane(false, true);
@@ -279,7 +279,7 @@ public class NewDocumentationEntryDialog extends JDialog {
      */
     private void setPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewDocumentationEntryDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(GlossaryDocumentationEntryDialog.class);
             this.setName("NewDocumentationEntryDialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {

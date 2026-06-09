@@ -68,8 +68,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.50.07
  */
-public class NewGlossaryDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(NewGlossaryDialog.class);
+public class GlossaryDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(GlossaryDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.NewGlossaryDialog";
 
     /**
@@ -119,7 +119,7 @@ public class NewGlossaryDialog extends JDialog {
      * @author Illiani
      * @since 0.50.07
      */
-    public NewGlossaryDialog(Frame parent) {
+    public GlossaryDialog(Frame parent) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.title"));
 
         JPanel pnlContents = buildContentsPanel();
@@ -385,7 +385,7 @@ public class NewGlossaryDialog extends JDialog {
                     return;
                 }
 
-                new NewGlossaryEntryDialog(parent, glossaryEntry);
+                new GlossaryEntryDialog(parent, glossaryEntry);
             } else if (command.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
                 DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
 
@@ -395,7 +395,7 @@ public class NewGlossaryDialog extends JDialog {
                 }
 
                 try {
-                    new NewDocumentationEntryDialog(parent, documentationEntry);
+                    new GlossaryDocumentationEntryDialog(parent, documentationEntry);
                 } catch (Exception ex) {
                     LOGGER.error("Failed to open PDF", ex);
                 }
@@ -413,7 +413,7 @@ public class NewGlossaryDialog extends JDialog {
      */
     private void setPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewGlossaryDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(GlossaryDialog.class);
             this.setName("NewGlossaryDialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
