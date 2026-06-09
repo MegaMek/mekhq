@@ -2463,7 +2463,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (row < 0) {
             scrollScenarioView.setViewportView(null);
             panScenarioActions.setVisible(!isResolvedScenarioFilterSelected());
-            refreshAssignmentsTabAvailability(null);
+            refreshAssignmentsTabAvailability();
             clearScenarioActionButtons();
             selectedScenario = -1;
             return;
@@ -2472,7 +2472,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             scrollScenarioView.setViewportView(null);
             panScenarioActions.setVisible(!isResolvedScenarioFilterSelected());
-            refreshAssignmentsTabAvailability(null);
+            refreshAssignmentsTabAvailability();
             clearScenarioActionButtons();
             selectedScenario = -1;
             return;
@@ -2481,7 +2481,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setViewportView(createScenarioViewPanel(scenario));
         refreshSelectedScenarioActions(scenario);
         panScenarioActions.setVisible(scenario.getStatus().isCurrent());
-        refreshAssignmentsTabAvailability(scenario);
+        refreshAssignmentsTabAvailability();
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
@@ -2518,10 +2518,8 @@ public final class BriefingTab extends CampaignGuiTab {
               ScenarioQueueFilter.ALL_ACTIVE) == ScenarioQueueFilter.ALL_RESOLVED;
     }
 
-    private void refreshAssignmentsTabAvailability(@Nullable Scenario scenario) {
-        boolean assignmentsEnabled = getCampaignOptions().isUseStratCon() &&
-                                           !isResolvedScenarioFilterSelected() &&
-                                           ((scenario == null) || scenario.getStatus().isCurrent());
+    private void refreshAssignmentsTabAvailability() {
+        boolean assignmentsEnabled = getCampaignOptions().isUseStratCon();
         scenarioWorkTabs.setEnabledAt(ASSIGNMENTS_TAB_INDEX, assignmentsEnabled);
         if (!assignmentsEnabled && (scenarioWorkTabs.getSelectedIndex() == ASSIGNMENTS_TAB_INDEX)) {
             scenarioWorkTabs.setSelectedIndex(SCENARIO_DETAILS_TAB_INDEX);
@@ -2551,7 +2549,7 @@ public final class BriefingTab extends CampaignGuiTab {
     public void refreshLanceAssignments() {
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
-        refreshAssignmentsTabAvailability(getSelectedScenario());
+        refreshAssignmentsTabAvailability();
         updateMissionDeploymentCoverage();
     }
 
@@ -2760,7 +2758,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
-        refreshAssignmentsTabAvailability(getSelectedScenario());
+        refreshAssignmentsTabAvailability();
     }
 
     @Subscribe

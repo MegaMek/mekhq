@@ -623,10 +623,10 @@ public class ContractMarketDialog extends JDialog {
 
             // Process Faction Standings Changes
             if (campaign.getCampaignOptions().isTrackFactionStanding()) {
-                Faction enemy = null;
+                Faction enemyFaction = null;
                 boolean isGarrisonType = false;
                 if (selectedContract instanceof AtBContract contract) {
-                    enemy = contract.getEnemy();
+                    enemyFaction = contract.getEnemy();
                     isGarrisonType = contract.getContractType().isGarrisonType();
                 }
 
@@ -634,7 +634,7 @@ public class ContractMarketDialog extends JDialog {
                 if (!isGarrisonType) {
                     FactionStandings factionStandings = campaign.getFactionStandings();
                     String standingsReport =
-                          factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemy,
+                          factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemyFaction,
                                 campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier(), 1);
 
                     if (standingsReport != null) {

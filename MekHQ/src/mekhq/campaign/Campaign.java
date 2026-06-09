@@ -57,6 +57,7 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
@@ -3674,10 +3675,21 @@ public class Campaign implements ITechManager, IPlace {
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
-        if (getCampaignOptions().isUseSupportEdge() &&
+        int targetValue = target.getValue();
+        boolean isUseSupportEdge = getCampaignOptions().isUseSupportEdge();
+        boolean hasEdgeTrigger = isUseSupportEdge && person != null;
+        if (hasEdgeTrigger) {
+            if (targetValue >= 11) {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN);
+            } else if (targetValue >= 8) {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT);
+            } else {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER);
+            }
+        }
+        if (isUseSupportEdge &&
                   (roll < target.getValue()) &&
-                  (person != null) &&
-                  person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL) &&
+                  hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
             person.changeCurrentEdge(-1);
             roll = d6(2);
@@ -3686,8 +3698,11 @@ public class Campaign implements ITechManager, IPlace {
         int xpGained = 0;
         if (roll >= target.getValue()) {
             boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
+            boolean isUseEdge = person != null &&
+                                      campaignOptions.isUseSupportEdge() &&
+                                      person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
             double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
-                  currentDay) : 1.0;
+                  currentDay, isUseEdge) : 1.0;
             String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
 
             if (transitDays < 0) {

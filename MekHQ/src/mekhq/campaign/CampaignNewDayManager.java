@@ -145,6 +145,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
@@ -741,6 +742,11 @@ public class CampaignNewDayManager {
         RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(campaign, faction, campaign.getAtBUnitRatingMod());
         MedicalController medicalController = new MedicalController(campaign);
 
+        // Special New Week Processing
+        boolean isNewWeek = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        RandomDeath randomDeath = campaign.getRandomDeath();
+        processPersonnelWhoHaveDepartedCampaign(isNewWeek, randomDeath);
+
         // campaign list ensures we don't hit a concurrent modification error
         List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
 
@@ -774,10 +780,6 @@ public class CampaignNewDayManager {
         boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
         boolean shouldEdgeRefreshToday = EdgeRefreshPeriod.shouldRefresh(campaignOptions.getEdgeRefreshPeriod(), today);
         for (Person person : personnel) {
-            if (person.getStatus().isDepartedUnit()) {
-                continue;
-            }
-
             int age = person.getAge(today);
             person.setAgeForAttributeModifiers(isUseAgeEffects ? age : IGNORE_AGE);
 
@@ -823,8 +825,8 @@ public class CampaignNewDayManager {
             }
 
             // Weekly events
-            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-                if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
+            if (isNewWeek) {
+                if (!randomDeath.processNewWeek(campaign, today, person)) {
                     // If the character has died, we don't need to process relationship events
                     processWeeklyRelationshipEvents(person);
                 }
@@ -966,6 +968,17 @@ public class CampaignNewDayManager {
                   campaign,
                   quickTrainOptions,
                   true);
+        }
+    }
+
+    private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
+        List<Person> departedPersonnel = campaign.getPersonnel().stream()
+                                               .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
+                                               .toList();
+        for (Person person : departedPersonnel) {
+            if (isNewWeek) {
+                randomDeath.processNewWeek(campaign, today, person);
+            }
         }
     }
 
@@ -1535,7 +1548,10 @@ public class CampaignNewDayManager {
         }
 
         // Censure degradation
-        campaign.getFactionStandings().processCensureDegradation(today);
+        List<String> reports = campaign.getFactionStandings().processCensureDegradation(today);
+        for (String report : reports) {
+            campaign.addReport(POLITICS, report);
+        }
     }
 
     /**

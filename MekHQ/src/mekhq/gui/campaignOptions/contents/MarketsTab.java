@@ -38,6 +38,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPan
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
@@ -79,8 +80,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 /**
  * The {@code MarketsTab} class represents the campaign options tab related to market settings. This tab provides
@@ -177,7 +176,6 @@ public class MarketsTab {
     private JSpinner spnWarShipPercent;
     private JRadioButton btnContractPersonnel;
     private JCheckBox useInfantryDoseNotCountBox;
-    private JCheckBox chkMercSizeLimited;
     private JCheckBox chkBLCSaleValue;
     private JCheckBox chkOverageRepaymentInFinalPayment;
     //end Contract Market
@@ -197,8 +195,8 @@ public class MarketsTab {
     }
 
     /**
-     * Initializes the market-related options tabs by setting up configurations for the Personnel Recruitment,
-     * Unit Market, and Contract Market.
+     * Initializes the market-related options tabs by setting up configurations for the Personnel Recruitment, Unit
+     * Market, and Contract Market.
      * <p>
      * This method is invoked internally within the constructor to prepare the various market configurations for use in
      * the UI.
@@ -585,7 +583,6 @@ public class MarketsTab {
         spnWarShipPercent = new JSpinner();
         btnContractPersonnel = new JRadioButton();
         useInfantryDoseNotCountBox = new JCheckBox();
-        chkMercSizeLimited = new JCheckBox();
         chkBLCSaleValue = new JCheckBox();
         chkOverageRepaymentInFinalPayment = new JCheckBox();
     }
@@ -851,9 +848,6 @@ public class MarketsTab {
         useInfantryDoseNotCountBox.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "UseInfantryDoseNotCountBox"));
 
-        chkMercSizeLimited = new CampaignOptionsCheckBox("MercSizeLimited");
-        chkMercSizeLimited.addMouseListener(createTipPanelUpdater(contractMarketHeader, "MercSizeLimited"));
-
         chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
         chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater(contractMarketHeader,
               "OverageRepaymentInFinalPayment"));
@@ -917,10 +911,6 @@ public class MarketsTab {
         layout.gridx = 0;
         layout.gridy++;
         panel.add(useInfantryDoseNotCountBox, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(chkMercSizeLimited, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -995,7 +985,6 @@ public class MarketsTab {
         spnJumpShipPercent.setValue(options.getJumpShipContractPercent());
         spnWarShipPercent.setValue(options.getWarShipContractPercent());
         useInfantryDoseNotCountBox.setSelected(options.isInfantryDontCount());
-        chkMercSizeLimited.setSelected(options.isMercSizeLimited());
         chkBLCSaleValue.setSelected(options.isBLCSaleValue());
         chkOverageRepaymentInFinalPayment.setSelected(options.isOverageRepaymentInFinalPayment());
     }
@@ -1065,7 +1054,6 @@ public class MarketsTab {
         options.setUseAlternatePaymentMode(chkUseAlternatePaymentMode.isSelected());
         options.setUseDiminishingContractPay(chkUseDiminishingContractPay.isSelected());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
-        options.setMercSizeLimited(chkMercSizeLimited.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
         options.setUseInfantryDontCount(useInfantryDoseNotCountBox.isSelected());
         options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());

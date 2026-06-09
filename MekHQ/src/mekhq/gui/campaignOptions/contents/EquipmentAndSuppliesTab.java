@@ -51,6 +51,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
@@ -127,6 +128,10 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnAutoLogisticsJumpJets;
     private JLabel lblAutoLogisticsEngines;
     private JSpinner spnAutoLogisticsEngines;
+    private JLabel lblAutoLogisticsHeadComponents;
+    private JSpinner spnAutoLogisticsHeadComponents;
+    private JLabel lblAutoLogisticsGyros;
+    private JSpinner spnAutoLogisticsGyros;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
     //end autoLogistics Tab
@@ -316,6 +321,10 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsJumpJets = new JSpinner();
         lblAutoLogisticsEngines = new JLabel();
         spnAutoLogisticsEngines = new JSpinner();
+        lblAutoLogisticsHeadComponents = new JLabel();
+        spnAutoLogisticsHeadComponents = new JSpinner();
+        lblAutoLogisticsGyros = new JLabel();
+        spnAutoLogisticsGyros = new JSpinner();
         lblAutoLogisticsOther = new JLabel();
         spnAutoLogisticsOther = new JSpinner();
     }
@@ -545,10 +554,23 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsJumpJets = new CampaignOptionsSpinner("AutoLogisticsJumpJets", 250, 0, 10000, 1);
         spnAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsJumpJets"));
 
+        lblAutoLogisticsHeadComponents = new CampaignOptionsLabel("AutoLogisticsHeadComponents",
+              getMetadata(new Version(0, 51, 1)));
+        lblAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater(acquisitionHeader,
+              "AutoLogisticsHeadComponents"));
+        spnAutoLogisticsHeadComponents = new CampaignOptionsSpinner("AutoLogisticsHeadComponents", 15, 0, 10000, 1);
+        spnAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater(acquisitionHeader,
+              "AutoLogisticsHeadComponents"));
+
         lblAutoLogisticsEngines = new CampaignOptionsLabel("AutoLogisticsEngines");
         lblAutoLogisticsEngines.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsEngines"));
         spnAutoLogisticsEngines = new CampaignOptionsSpinner("AutoLogisticsEngines", 250, 0, 10000, 1);
         spnAutoLogisticsEngines.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsEngines"));
+
+        lblAutoLogisticsGyros = new CampaignOptionsLabel("AutoLogisticsGyros", getMetadata(new Version(0, 51, 1)));
+        lblAutoLogisticsGyros.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsGyros"));
+        spnAutoLogisticsGyros = new CampaignOptionsSpinner("AutoLogisticsGyros", 0, 0, 10000, 1);
+        spnAutoLogisticsGyros.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsGyros"));
 
         lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther");
         lblAutoLogisticsOther.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsOther"));
@@ -570,7 +592,9 @@ public class EquipmentAndSuppliesTab {
         addSpinnerToPanel(panel, layout, lblAutoLogisticsAmmunition, spnAutoLogisticsAmmunition);
         addSpinnerToPanel(panel, layout, lblAutoLogisticsActuators, spnAutoLogisticsActuators);
         addSpinnerToPanel(panel, layout, lblAutoLogisticsJumpJets, spnAutoLogisticsJumpJets);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsHeadComponents, spnAutoLogisticsHeadComponents);
         addSpinnerToPanel(panel, layout, lblAutoLogisticsEngines, spnAutoLogisticsEngines);
+        addSpinnerToPanel(panel, layout, lblAutoLogisticsGyros, spnAutoLogisticsGyros);
         addSpinnerToPanel(panel, layout, lblAutoLogisticsWeapons, spnAutoLogisticsWeapons);
         addSpinnerToPanel(panel, layout, lblAutoLogisticsOther, spnAutoLogisticsOther);
 
@@ -1132,6 +1156,8 @@ public class EquipmentAndSuppliesTab {
         options.setAutoLogisticsActuators((int) spnAutoLogisticsActuators.getValue());
         options.setAutoLogisticsJumpJets((int) spnAutoLogisticsJumpJets.getValue());
         options.setAutoLogisticsEngines((int) spnAutoLogisticsEngines.getValue());
+        options.setAutoLogisticsHeadComponents((int) spnAutoLogisticsHeadComponents.getValue());
+        options.setAutoLogisticsGyros((int) spnAutoLogisticsGyros.getValue());
         options.setAutoLogisticsHeatSink((int) spnAutoLogisticsHeatSink.getValue());
         options.setAutoLogisticsWeapons((int) spnAutoLogisticsWeapons.getValue());
         options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
@@ -1215,6 +1241,8 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsActuators.setValue(options.getAutoLogisticsActuators());
         spnAutoLogisticsJumpJets.setValue(options.getAutoLogisticsJumpJets());
         spnAutoLogisticsEngines.setValue(options.getAutoLogisticsEngines());
+        spnAutoLogisticsHeadComponents.setValue(options.getAutoLogisticsHeadComponents());
+        spnAutoLogisticsGyros.setValue(options.getAutoLogisticsGyros());
         spnAutoLogisticsHeatSink.setValue(options.getAutoLogisticsHeatSink());
         spnAutoLogisticsWeapons.setValue(options.getAutoLogisticsWeapons());
         spnAutoLogisticsOther.setValue(options.getAutoLogisticsOther());

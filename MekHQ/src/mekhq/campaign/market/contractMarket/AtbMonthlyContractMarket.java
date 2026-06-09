@@ -925,15 +925,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        if (campaign.getCampaignOptions().isMercSizeLimited() && campaign.getFaction().isMercenary()) {
-            int max = (unitRatingMod + 1) * 12;
-            int numMods = (ContractUtilities.getEffectiveNumUnits(campaign) - max) / 2;
-            while (numMods > 0) {
-                mods.mods[Compute.randomInt(4)]--;
-                numMods--;
-            }
-        }
-
         mods.mods[CLAUSE_COMMAND] = adminCommandExp - SkillType.EXP_REGULAR;
         mods.mods[CLAUSE_SALVAGE] = adminLogisticsExp - SkillType.EXP_REGULAR;
         mods.mods[CLAUSE_TRANSPORT] = adminTransportExp - SkillType.EXP_REGULAR;
