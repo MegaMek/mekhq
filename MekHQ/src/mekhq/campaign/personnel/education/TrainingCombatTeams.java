@@ -277,8 +277,7 @@ public class TrainingCombatTeams {
                           commander.getFullTitle(),
                           spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                           CLOSING_SPAN_TAG));
-                    trainee.setEduAcademyName("");
-                    trainee.setEduEducationTime(0);
+                    trainee.setTrainingForceEducationTime(0);
                     continue;
                 }
 
