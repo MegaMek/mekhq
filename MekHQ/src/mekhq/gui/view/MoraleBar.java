@@ -52,35 +52,27 @@ import mekhq.gui.baseComponents.SegmentedBar;
  * A compact, segmented gauge that visualizes enemy {@link AtBMoraleLevel}.
  *
  * <p>
- * The bar has one segment per possible morale level, ordered from the morale
- * scale's minimum to its maximum. The gauge reads like the enemy's morale
- * meter: the more segments that are lit, the higher the enemy's morale. The
- * colors are presented from the <em>player's</em> perspective: low enemy morale
- * (a routed enemy) is green because it is favourable for the player, climbing
- * through orange and into red at the highest morale (a dangerous,
- * fully-committed enemy). Hovering a segment shows the name and description of
- * that morale level.
+ * The bar has one segment per possible morale level, ordered from the morale scale's minimum to its maximum. The gauge
+ * reads like the enemy's morale meter: the more segments that are lit, the higher the enemy's morale. The colors are
+ * presented from the <em>player's</em> perspective: low enemy morale (a routed enemy) is green because it is favourable
+ * for the player, climbing through orange and into red at the highest morale (a dangerous, fully-committed enemy).
+ * Hovering a segment shows the name and description of that morale level.
  * </p>
  *
  * <p>
- * This wraps a private {@link SegmentedBar} (composition rather than
- * inheritance) so that only the morale-specific API is exposed; callers cannot
- * reconfigure the underlying segments and break the "one segment per morale
- * level" invariant.
+ * This wraps a private {@link SegmentedBar} (composition rather than inheritance) so that only the morale-specific API
+ * is exposed; callers cannot reconfigure the underlying segments and break the "one segment per morale level"
+ * invariant.
  * </p>
  *
  * @author The MegaMek Team
  */
 public class MoraleBar extends JPanel {
     /**
-     * Anchor colors for the morale gradient, ordered from the lowest enemy morale
-     * to the highest. Low enemy morale is
-     * green (favourable for the player) and high enemy morale is red (dangerous for
-     * the player), so the gauge reads as
-     * an enemy-strength meter from the player's perspective: a short green bar is
-     * good news, a long red bar is bad. The
-     * colors are deliberately deep and well separated so that adjacent segments
-     * remain easy to tell apart.
+     * Anchor colors for the morale gradient, ordered from the lowest enemy morale to the highest. Low enemy morale is
+     * green (favourable for the player) and high enemy morale is red (dangerous for the player), so the gauge reads as
+     * an enemy-strength meter from the player's perspective: a short green bar is good news, a long red bar is bad. The
+     * colors are deliberately deep and well separated so that adjacent segments remain easy to tell apart.
      */
     private static final Color[] MORALE_GRADIENT = {
             new Color(0x12, 0x7C, 0x1E), // deep green - lowest enemy morale, most favourable for the player
@@ -93,31 +85,25 @@ public class MoraleBar extends JPanel {
     };
 
     /**
-     * The wrapped gauge. Kept private so the segment-level API is not exposed to
-     * callers.
+     * The wrapped gauge. Kept private so the segment-level API is not exposed to callers.
      */
     private final SegmentedBar bar = new SegmentedBar();
 
     /**
      * Creates a morale bar for the given morale level.
      *
-     * @param moraleLevel the enemy morale level to display; may be {@code null}, in
-     *                    which case nothing is painted
+     * @param moraleLevel the enemy morale level to display; may be {@code null}, in which case nothing is painted
      */
     public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel) {
         this(moraleLevel, (moraleLevel == null) ? null : moraleLevel.toString());
     }
 
     /**
-     * Creates a morale bar for the given morale level with a custom label drawn
-     * beneath the active segment.
+     * Creates a morale bar for the given morale level with a custom label drawn beneath the active segment.
      *
-     * @param moraleLevel the enemy morale level to display; may be {@code null}, in
-     *                    which case nothing is painted
-     * @param labelText   the text to show beneath the current level (for example a
-     *                    contract-specific name such as
-     *                    "Peaceful"), or {@code null} to use the morale level's own
-     *                    name
+     * @param moraleLevel the enemy morale level to display; may be {@code null}, in which case nothing is painted
+     * @param labelText   the text to show beneath the current level (for example a contract-specific name such as
+     *                    "Peaceful"), or {@code null} to use the morale level's own name
      */
     public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
         super(new BorderLayout());
@@ -127,25 +113,20 @@ public class MoraleBar extends JPanel {
     }
 
     /**
-     * Updates the displayed morale level and repaints the bar. The label beneath
-     * the active segment defaults to the
+     * Updates the displayed morale level and repaints the bar. The label beneath the active segment defaults to the
      * morale level's own name.
      *
-     * @param moraleLevel the new enemy morale level to display, or {@code null} to
-     *                    clear the bar
+     * @param moraleLevel the new enemy morale level to display, or {@code null} to clear the bar
      */
     public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel) {
         setMoraleLevel(moraleLevel, (moraleLevel == null) ? null : moraleLevel.toString());
     }
 
     /**
-     * Updates the displayed morale level and the label drawn beneath the active
-     * segment, then repaints the bar.
+     * Updates the displayed morale level and the label drawn beneath the active segment, then repaints the bar.
      *
-     * @param moraleLevel the new enemy morale level to display, or {@code null} to
-     *                    clear the bar
-     * @param labelText   the text to show beneath the current level, or
-     *                    {@code null} for no label
+     * @param moraleLevel the new enemy morale level to display, or {@code null} to clear the bar
+     * @param labelText   the text to show beneath the current level, or {@code null} for no label
      */
     public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
         if (moraleLevel == null) {
@@ -167,10 +148,8 @@ public class MoraleBar extends JPanel {
     }
 
     /**
-     * Forwards the tooltip to the wrapped gauge so that the area around the
-     * segments (gaps and the label) shows this
-     * fallback tooltip, while individual segments keep their own per-level
-     * tooltips.
+     * Forwards the tooltip to the wrapped gauge so that the area around the segments (gaps and the label) shows this
+     * fallback tooltip, while individual segments keep their own per-level tooltips.
      *
      * @param text the tooltip text, or {@code null} for none
      */
@@ -180,15 +159,10 @@ public class MoraleBar extends JPanel {
     }
 
     /**
-     * Builds a self-contained panel wrapping a {@link MoraleBar}, suitable for
-     * embedding in dialogs such as the
-     * immersive "Morale Update" notification. The bar is given generous horizontal
-     * padding so it reads as a centered
-     * gauge rather than spanning the full dialog width. The label beneath the
-     * active
-     * segment honours the contract's
-     * special "Peaceful" wording for routed garrison/retainer contracts, matching
-     * the briefing-room contract panel.
+     * Builds a self-contained panel wrapping a {@link MoraleBar}, suitable for embedding in dialogs such as the
+     * immersive "Morale Update" notification. The bar is given generous horizontal padding so it reads as a centered
+     * gauge rather than spanning the full dialog width. The label beneath the active segment honours the contract's
+     * special "Peaceful" wording for routed garrison/retainer contracts, matching the briefing-room contract panel.
      *
      * @param contract the contract whose enemy morale should be displayed
      *
@@ -212,18 +186,15 @@ public class MoraleBar extends JPanel {
     /**
      * The display text and tooltip used to describe a contract's enemy morale.
      *
-     * @param label   the short morale name to show (e.g. a morale level name, or
-     *                "Peaceful")
+     * @param label   the short morale name to show (e.g. a morale level name, or "Peaceful")
      * @param tooltip the descriptive tooltip for that morale state
      */
     public record MoraleDisplay(String label, String tooltip) {
     }
 
     /**
-     * Computes the morale label and tooltip for a contract, applying the special
-     * "Peaceful" wording used for routed
-     * garrison-duty and retainer contracts. This is the single source of truth
-     * shared by the briefing-room contract
+     * Computes the morale label and tooltip for a contract, applying the special "Peaceful" wording used for routed
+     * garrison-duty and retainer contracts. This is the single source of truth shared by the briefing-room contract
      * panel and the morale dialog so the two never diverge.
      *
      * @param contract the contract whose enemy morale should be described
