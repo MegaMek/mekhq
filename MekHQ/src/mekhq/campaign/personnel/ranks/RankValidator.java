@@ -212,7 +212,7 @@ public class RankValidator {
         }
 
         // Then, we need to fix any old rank system assignments for personnel
-        campaign.getPersonnel().stream().filter(person -> !person.getRankSystem().getType().isCampaign())
+        campaign.getAllPersonnel().stream().filter(person -> !person.getRankSystem().getType().isCampaign())
               .forEach(person -> person.setRankSystem(this,
                     Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
     }

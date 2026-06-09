@@ -570,7 +570,7 @@ public record Accountant(Campaign campaign) {
         if (getCampaignOptions().isUseAlternatePaymentMode()) {
             final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getFaction(),
                   campaign.getAllFormations(),
-                  campaign.getHangar(),
+                  campaign.getAllHangar(),
                   useDiminishingContractPay,
                   excludeInfantry,
                   combatUnitContractPercent,

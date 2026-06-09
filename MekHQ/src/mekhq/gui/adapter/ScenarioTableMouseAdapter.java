@@ -86,12 +86,12 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         JMenu menu;
 
         // let's fill the pop-up menu
-        if (gui.getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab
-                  && scenario instanceof AtBDynamicScenario) {
+        if (gui.getStratConTab().isPresent() && scenario instanceof AtBDynamicScenario) {
             menuItem = new JMenuItem("Deploy...");
-            menuItem.addActionListener(evt -> MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(),
-                  gui.getCampaign(),
-                  scenario));
+            menuItem.addActionListener(
+                  event -> gui.getStratConTab().ifPresent(
+                        tab -> MaplessStratCon.deployWithoutMap(tab.getStratconPanel(), gui.getCampaign(), scenario))
+            );
             popup.add(menuItem);
         }
 

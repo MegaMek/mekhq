@@ -132,23 +132,6 @@ public enum MHQTabType {
     }
     //endregion Boolean Comparison Methods
 
-    public @Nullable CampaignGuiTab createTab(final CampaignGUI gui) {
-        return switch (this) {
-            case COMMAND_CENTER -> new CommandCenterTab(gui, toString());
-            case TOE -> new TOETab(gui, toString());
-            case BRIEFING_ROOM -> new BriefingTab(gui, toString());
-            case INTERSTELLAR_MAP -> new MapTab(gui, toString());
-            case PERSONNEL -> new PersonnelTab(gui, toString());
-            case HANGAR -> new HangarTab(gui, toString());
-            case WAREHOUSE -> new WarehouseTab(gui, toString());
-            case REPAIR_BAY -> new RepairTab(gui, toString());
-            case INFIRMARY -> new InfirmaryTab(gui, toString());
-            case FINANCES -> new FinancesTab(gui, toString());
-            case MEK_LAB -> new MekLabTab(gui, toString());
-            case STRAT_CON -> new StratConTab(gui, toString());
-        };
-    }
-
     @Override
     public String toString() {
         return name;

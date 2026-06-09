@@ -256,6 +256,11 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getAutoLogisticsJumpJets());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", campaignOptions.getAutoLogisticsEngines());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", campaignOptions.getAutoLogisticsWeapons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsGyros", campaignOptions.getAutoLogisticsGyros());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "autoLogisticsHeadComponents",
+              campaignOptions.getAutoLogisticsHeadComponents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", campaignOptions.getAutoLogisticsOther());
 
         // region Personnel Tab
@@ -650,6 +655,14 @@ public class CampaignOptionsMarshaller {
               indent,
               "announceChildBirthdays",
               campaignOptions.isAnnounceChildBirthdays());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "announceRetireeDeath",
+              campaignOptions.isAnnounceRetireeDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "announceRetireeDeathExpanded",
+              campaignOptions.isAnnounceRetireeDeathExpanded());
         // endregion Announcements
 
         // region Life Events
@@ -1133,7 +1146,6 @@ public class CampaignOptionsMarshaller {
               "opForLanceTypeVehicles",
               campaignOptions.getOpForLanceTypeVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,

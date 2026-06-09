@@ -145,7 +145,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     // region Constructors
     public RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
     }
     // endregion Constructors
@@ -459,15 +458,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
             refreshAsTechPool();
             WarehouseTab warehouseTab = getCampaignGui().getWarehouseTab();
-            if (warehouseTab != null) {
-                warehouseTab.refreshAsTechPool();
-                warehouseTab.refreshOvertimeStatus();
-            }
+            warehouseTab.refreshAsTechPool();
+            warehouseTab.refreshOvertimeStatus();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;

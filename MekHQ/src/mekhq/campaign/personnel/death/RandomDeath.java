@@ -672,8 +672,24 @@ public class RandomDeath {
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
-            campaign.addReport(PERSONNEL, String.format("%s has %s<b>died</b>%s.",
-                  person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
+
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            boolean isReportRetireeDeaths = campaignOptions.isAnnounceRetireeDeath();
+            boolean isReportMostDeaths = campaignOptions.isAnnounceRetireeDeathExpanded();
+
+            PersonnelStatus status = person.getStatus();
+            boolean isRetiredOrBackground = status.isRetired() || status.isBackground();
+            boolean announceDeath = isReportRetireeDeaths && isRetiredOrBackground;
+            boolean announceDeathExpanded = !isRetiredOrBackground &&
+                                                  (status.isFollowAfterLeavingCampaign() && isReportMostDeaths);
+
+            if (announceDeath || announceDeathExpanded) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.departed",
+                      person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG, status.getLabel()));
+            } else if (!status.isDepartedUnit()) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeath.reporting.normal",
+                      person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
+            }
 
             person.changeStatus(campaign, today, getCause(person, ageGroup, age));
 

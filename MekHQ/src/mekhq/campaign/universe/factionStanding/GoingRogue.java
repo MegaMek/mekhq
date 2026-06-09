@@ -233,7 +233,7 @@ public class GoingRogue {
     private static void processPersonnel(Campaign campaign, boolean isDefection, Person commander,
           @Nullable Person second) {
         final LocalDate today = campaign.getLocalDate();
-        Collection<Person> allPersonnel = campaign.getPersonnel();
+        Collection<Person> allPersonnel = campaign.getAllPersonnel();
         Set<Person> preProcessedPersonnel = new HashSet<>();
 
         preProcessedPersonnel.add(commander);

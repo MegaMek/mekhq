@@ -164,7 +164,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
@@ -266,7 +266,7 @@ import mekhq.utilities.ReportingUtilities;
  *
  * @author Taharqa
  */
-public class Campaign implements ITechManager, ILocation {
+public class Campaign implements ITechManager, IPlace {
     private static final MMLogger LOGGER = MMLogger.create(Campaign.class);
 
     public static final String REPORT_LINEBREAK = "<br/><br/>";
@@ -392,6 +392,7 @@ public class Campaign implements ITechManager, ILocation {
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
+    private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
 
@@ -553,6 +554,11 @@ public class Campaign implements ITechManager, ILocation {
         this.locationNode = new LocationNode(this);
         setLocation(startLocation);
         this.setParent(startLocation);
+        if (startLocation != null) {
+            mainForcePersonnel.setParent(this);
+            units.setParent(this);
+            parts.setParent(this);
+        }
         reputation = reputationController;
         this.factionStandings = factionStandings;
         formations = formation;
@@ -1754,6 +1760,10 @@ public class Campaign implements ITechManager, ILocation {
         return Collections.unmodifiableList(locations);
     }
 
+    public Personnel getMainForcePersonnel() {
+        return mainForcePersonnel;
+    }
+
     /**
      * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
      * firing any associated events or automated behaviors.
@@ -2039,6 +2049,14 @@ public class Campaign implements ITechManager, ILocation {
      * @return the current hangar containing the player's units.
      */
     public Hangar getHangar() {
+        return units;
+    }
+
+    /**
+     * @return all hangars across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     */
+    public Hangar getAllHangar() {
         return units;
     }
 
@@ -2417,6 +2435,7 @@ public class Campaign implements ITechManager, ILocation {
      */
     public void importPerson(Person person) {
         humanResources.importPerson(person);
+        person.setParent(mainForcePersonnel);
     }
 
     public @Nullable Person getPerson(final UUID id) {
@@ -2424,6 +2443,13 @@ public class Campaign implements ITechManager, ILocation {
     }
 
     public Collection<Person> getPersonnel() {
+        return humanResources.getPersonnel();
+    }
+
+    /**
+     * @return all personnel across all locations associated with this campaign.
+     */
+    public Collection<Person> getAllPersonnel() {
         return humanResources.getPersonnel();
     }
 
@@ -2648,6 +2674,14 @@ public class Campaign implements ITechManager, ILocation {
      * Gets the Warehouse which stores parts.
      */
     public Warehouse getWarehouse() {
+        return parts;
+    }
+
+    /**
+     * @return all warehouses across all locations associated with this campaign.
+     * TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     */
+    public Warehouse getAllWarehouse() {
         return parts;
     }
 
@@ -3637,10 +3671,21 @@ public class Campaign implements ITechManager, ILocation {
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
-        if (getCampaignOptions().isUseSupportEdge() &&
+        int targetValue = target.getValue();
+        boolean isUseSupportEdge = getCampaignOptions().isUseSupportEdge();
+        boolean hasEdgeTrigger = isUseSupportEdge && person != null;
+        if (hasEdgeTrigger) {
+            if (targetValue >= 11) {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN);
+            } else if (targetValue >= 8) {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT);
+            } else {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER);
+            }
+        }
+        if (isUseSupportEdge &&
                   (roll < target.getValue()) &&
-                  (person != null) &&
-                  person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL) &&
+                  hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
             person.changeCurrentEdge(-1);
             roll = d6(2);
@@ -5545,8 +5590,12 @@ public class Campaign implements ITechManager, ILocation {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
-        for (AbstractLocation loc : locations) {
-            loc.writeToXML(writer, indent);
+        for (AbstractLocation location : locations) {
+            // Skip locations parented to another node — they are serialized inside their parent's XML.
+            if (location.getLocationNode().getParent() != null) {
+                continue;
+            }
+            location.writeToXML(writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
         locationNode.writeToXML(writer, indent);

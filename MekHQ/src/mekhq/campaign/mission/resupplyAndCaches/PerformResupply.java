@@ -255,9 +255,9 @@ public class PerformResupply {
             } else if (part instanceof Armor) {
                 int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
                 ((Armor) part).setAmount(quantity);
-                campaign.getWarehouse().addPart(part, true);
+                campaign.getAllWarehouse().addPart(part, true);
             } else {
-                campaign.getWarehouse().addPart(part, true);
+                campaign.getAllWarehouse().addPart(part, true);
             }
         }
     }
@@ -390,7 +390,7 @@ public class PerformResupply {
             convoyWeight += npcConvoyWeight;
         } else {
             for (UUID unitId : playerConvoy.getAllUnits(false)) {
-                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
+                Entity entity = getEntityFromUnitId(campaign.getAllHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -445,8 +445,8 @@ public class PerformResupply {
             }
 
             // Non-ground convoys don't get roleplay events
-            if (convoy.formationContainsOnlyVTOLForces(campaign.getHangar(), false) ||
-                      convoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (convoy.formationContainsOnlyVTOLForces(campaign.getAllHangar(), false) ||
+                      convoy.formationContainsOnlyAerialForces(campaign.getAllHangar(), false, false)) {
                 completeSuccessfulDelivery(resupply, convoyContents);
                 return;
             }
@@ -534,9 +534,9 @@ public class PerformResupply {
         String templateAddress = GENERIC;
 
         if (targetConvoy != null) {
-            if (targetConvoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (targetConvoy.formationContainsOnlyAerialForces(campaign.getAllHangar(), false, false)) {
                 templateAddress = PLAYER_AEROSPACE_CONVOY;
-            } else if (targetConvoy.formationContainsMajorityVTOLForces(campaign.getHangar(), false)) {
+            } else if (targetConvoy.formationContainsMajorityVTOLForces(campaign.getAllHangar(), false)) {
                 templateAddress = PLAYER_VTOL_CONVOY;
             } else {
                 templateAddress = PLAYER_CONVOY;
@@ -647,7 +647,7 @@ public class PerformResupply {
         if (targetConvoy != null) {
             speaker = campaign.getPerson(targetConvoy.getFormationCommanderID());
 
-            Hangar hangar = campaign.getHangar();
+            Hangar hangar = campaign.getAllHangar();
             if (targetConvoy.formationContainsOnlyVTOLForces(hangar, false) ||
                       targetConvoy.formationContainsOnlyAerialForces(hangar, false, false)) {
                 inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,

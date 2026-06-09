@@ -199,61 +199,6 @@ public class MHQTabTypeTest {
     }
     //endregion Boolean Comparison Methods
 
-    /**
-     * This test is disabled because it will run through all the GUI tabs and initialize them, which is not a quick
-     * process. This also requires lots more mock handling to actually go through the initializations too.
-     */
-    @Disabled
-    @Test
-    public void testCreateTab() {
-        final MekHQ mockMekHQ = mock(MekHQ.class);
-        final CampaignGUI gui = new CampaignGUI(mockMekHQ);
-        for (final MHQTabType mhqTabType : types) {
-            final CampaignGuiTab tab = mhqTabType.createTab(gui);
-            switch (mhqTabType) {
-                case COMMAND_CENTER:
-                    assertInstanceOf(CommandCenterTab.class, tab);
-                    break;
-                case TOE:
-                    assertInstanceOf(TOETab.class, tab);
-                    break;
-                case BRIEFING_ROOM:
-                    assertInstanceOf(BriefingTab.class, tab);
-                    break;
-                case INTERSTELLAR_MAP:
-                    assertInstanceOf(MapTab.class, tab);
-                    break;
-                case PERSONNEL:
-                    assertInstanceOf(PersonnelTab.class, tab);
-                    break;
-                case HANGAR:
-                    assertInstanceOf(HangarTab.class, tab);
-                    break;
-                case WAREHOUSE:
-                    assertInstanceOf(WarehouseTab.class, tab);
-                    break;
-                case REPAIR_BAY:
-                    assertInstanceOf(RepairTab.class, tab);
-                    break;
-                case INFIRMARY:
-                    assertInstanceOf(InfirmaryTab.class, tab);
-                    break;
-                case FINANCES:
-                    assertInstanceOf(FinancesTab.class, tab);
-                    break;
-                case MEK_LAB:
-                    assertInstanceOf(MekLabTab.class, tab);
-                    break;
-                case STRAT_CON:
-                    assertInstanceOf(StratConTab.class, tab);
-                    break;
-                default:
-                    assertNull(tab);
-                    break;
-            }
-        }
-    }
-
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("MHQTabType.COMMAND_CENTER.text"), MHQTabType.COMMAND_CENTER.toString());
