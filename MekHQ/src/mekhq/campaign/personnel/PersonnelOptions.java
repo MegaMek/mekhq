@@ -64,6 +64,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_EIGHT = "edge_when_admin_acquire_fail_greater_than_eight";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_OTHER = "edge_when_admin_acquire_fail_other";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN = "edge_when_admin_acquire_fail_greater_than_eleven";
+    public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
+    public static final String EDGE_ADMIN_APPRAISAL_FAIL = "edge_when_admin_fail_appraisal";
     public static final String EDGE_SALVAGE_ACCIDENTS = "edge_when_salvage_accident";
     public static final String EDGE_ESCAPE_ATTEMPTS = "edge_when_escape_attempt_fail";
 
@@ -392,6 +394,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL_OTHER, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL_EIGHT, true);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN, true);
+        addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
+        addOption(edge, EDGE_ADMIN_APPRAISAL_FAIL, false);
         addOption(edge, EDGE_SALVAGE_ACCIDENTS, true);
         addOption(edge, EDGE_ESCAPE_ATTEMPTS, true);
 
